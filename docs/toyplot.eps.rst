@@ -1,5 +1,5 @@
 toyplot.eps module
-=================
+==================
 
 .. automodule:: toyplot.eps
     :members:

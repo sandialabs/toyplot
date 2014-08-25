@@ -19,7 +19,7 @@ MacPorts-Specific Instructions
 
 There isn't a MacPorts port for Toyplot yet, but you can still use MacPorts
 to install Toyplot's :ref:`dependencies<Toyplot Dependencies>` before installing
-:ref:`from source<From Source>`::
+Toyplot using pip::
 
     $ sudo port install python27
     $ sudo port select --set python python27
@@ -29,6 +29,7 @@ to install Toyplot's :ref:`dependencies<Toyplot Dependencies>` before installing
     $ sudo port install py27-pip
     $ sudo port select --set pip pip27
     $ sudo pip install colormath
+    $ sudo pip install toyplot
 
 If you want to run regression tests / view test coverage::
 

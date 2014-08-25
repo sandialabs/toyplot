@@ -43,21 +43,20 @@ If you want to generate documentation::
     $ sudo pip install sphinx_rtd_theme
     $ sudo pip install sphinxcontrib-napoleon
 
-..
 
-    Using Pip / Easy Install
-    ------------------------
+Using Pip / Easy Install
+------------------------
 
-    If your package manager doesn't support Toyplot, or doesn't have the latest
-    version, your next option should be Python setup tools like `pip` (preferred)
-    or `easy_install`.  You can always install the latest stable version of toyplot
-    and its dependencies with::
+If your package manager doesn't support Toyplot, or doesn't have the latest
+version, your next option should be Python setup tools like `pip` (preferred)
+or `easy_install`.  You can always install the latest stable version of toyplot
+and its dependencies with::
 
-        $ pip install toyplot
+    $ pip install toyplot
 
-    or::
+or::
 
-        $ easy_install toyplot
+    $ easy_install toyplot
 
 .. _From Source:
 

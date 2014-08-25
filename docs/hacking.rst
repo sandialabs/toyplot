@@ -20,10 +20,20 @@ your changes::
     $ cd toyplot
     $ python setup.py develop
 
+Versioning
+----------
+
+Toyplot version numbers will follow the `Semantic Versioning <http://semver.org>`_ standard.
+
+Coding Style
+------------
+
+The Toyplot source code will follow the `PEP-8 Style Guide for Python Code <http://legacy.python.org/dev/peps/pep-0008>`_ .
+
 Code Walkthrough
 ----------------
 
-Most of toyplot's public API is located in `toyplot/__init__.py` ... for most
+Most of Toyplot's public API is located in `toyplot/__init__.py` ... for most
 contributations, that's where you'll start.  If you're adding a new type of
 visualization, you'll need to create a new :class:`toyplot.Mark` derivative
 there.  Then, you'll create factory methods for creating instances of your

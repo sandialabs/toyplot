@@ -238,7 +238,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   ('index', 'toyplot.tex', u'Toyplot Documentation',
-   u'Author', 'manual'),
+   u'Sandia National Laboratories', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -268,7 +268,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'toyplot', u'Toyplot Documentation',
-     [u'Author'], 1)
+     [u'Sandia National Laboratories'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -282,7 +282,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'toyplot', u'Toyplot Documentation',
-   u'Author', 'toyplot', 'One line description of project.',
+   u'Sandia National Laboratories', 'toyplot', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -303,9 +303,9 @@ texinfo_documents = [
 
 # Bibliographic Dublin Core info.
 epub_title = u'toyplot'
-epub_author = u'Author'
-epub_publisher = u'Author'
-epub_copyright = u'2014, Author'
+epub_author = u'Sandia National Laboratories'
+epub_publisher = u'Sandia National Laboratories'
+epub_copyright = u'Copyright 2014 Sandia Corporation. Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain rights in this software.'
 
 # The basename for the epub file. It defaults to the project name.
 #epub_basename = u'toyplot'

@@ -1,20 +1,9 @@
 .. image:: ../artwork/toyplot.png
   :width: 200px
   :align: right
-  :class: logo-important
 
 Installing Toyplot
 ==================
-
-.. important:: **The Toyplot Sources Aren't Available Yet**
-
-  This is embarassing, but we're still waiting for our lawyer-gnomes to
-  finalize the copyright on Toyplot's source code.  Toyplot will be released
-  under a BSD-style license as soon as that happens, but in the meantime,
-  the following instructions won't work ... apologies!
-
-  Contact Timothy M. Shead <tshead@sandia.gov> if you have questions or
-  would like to be notified when Toyplot is released.
 
 Using Your OS Package Manager
 -----------------------------
@@ -54,19 +43,21 @@ If you want to generate documentation::
     $ sudo pip install sphinx_rtd_theme
     $ sudo pip install sphinxcontrib-napoleon
 
-Using Pip / Easy Install
-------------------------
+..
 
-If your package manager doesn't support Toyplot, or doesn't have the latest
-version, your next option should be Python setup tools like `pip` (preferred)
-or `easy_install`.  You can always install the latest stable version of toyplot
-and its dependencies with::
+    Using Pip / Easy Install
+    ------------------------
 
-    $ pip install toyplot
+    If your package manager doesn't support Toyplot, or doesn't have the latest
+    version, your next option should be Python setup tools like `pip` (preferred)
+    or `easy_install`.  You can always install the latest stable version of toyplot
+    and its dependencies with::
 
-or::
+        $ pip install toyplot
 
-    $ easy_install toyplot
+    or::
+
+        $ easy_install toyplot
 
 .. _From Source:
 

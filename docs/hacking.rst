@@ -1,20 +1,9 @@
 .. image:: ../artwork/toyplot.png
   :width: 200px
   :align: right
-  :class: logo-important
 
 Hacking Toyplot
 ===============
-
-.. important:: **The Toyplot Sources Aren't Available Yet**
-
-  This is embarassing, but we're still waiting for our lawyer-gnomes to
-  finalize the copyright on Toyplot's source code.  Toyplot will be released
-  under a BSD-style license as soon as that happens, but in the meantime,
-  the following instructions won't work ... apologies!
-
-  Contact Timothy M. Shead <tshead@sandia.gov> if you have questions or
-  would like to be notified when Toyplot is released.
 
 Getting Started
 ---------------

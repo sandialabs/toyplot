@@ -31,6 +31,7 @@ Documentation
    user-guide.rst
    hacking.rst
    reference.rst
+   contacts.rst
 
 Indices and tables
 ==================

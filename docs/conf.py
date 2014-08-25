@@ -56,7 +56,7 @@ master_doc = 'index'
 project = u'Toyplot'
 copyright = u"""2014, Sandia Corporation. Under the terms of Contract
 DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
-rights in this software.  SAND2014-15494W"""
+rights in this software."""
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -212,7 +212,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'toyplot.tex', u'toyplot Documentation',
+  ('index', 'toyplot.tex', u'Toyplot Documentation',
    u'Author', 'manual'),
 ]
 
@@ -242,7 +242,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'toyplot', u'toyplot Documentation',
+    ('index', 'toyplot', u'Toyplot Documentation',
      [u'Author'], 1)
 ]
 
@@ -256,7 +256,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'toyplot', u'toyplot Documentation',
+  ('index', 'toyplot', u'Toyplot Documentation',
    u'Author', 'toyplot', 'One line description of project.',
    'Miscellaneous'),
 ]

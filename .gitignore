@@ -1,0 +1,9 @@
+*.pyc
+.DS_Store
+.cover
+.coverage
+.ipynb_checkpoints
+build
+dist
+tests/failed
+toyplot.egg-info

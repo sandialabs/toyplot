@@ -1,0 +1,25 @@
+@import url("css/theme.css");
+
+.toyplot-color-Palette
+{
+  margin-bottom: 15px;
+}
+
+footer p
+{
+  background-image: url('SNL_Stacked_Black.png');
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: 150px;
+  padding: 10px 0 10px 180px;
+  text-align: left;
+  font-size: 10pt;
+  line-height: 12pt;
+  margin-left: 30px;
+  margin-right: 30px;
+}
+
+.logo-important
+{
+  margin-top: 100px !important;
+}

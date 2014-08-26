@@ -29,7 +29,7 @@ Documentation
    installation.rst
    tutorial.rst
    user-guide.rst
-   hacking.rst
+   contributing.rst
    reference.rst
    contacts.rst
 

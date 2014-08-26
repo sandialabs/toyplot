@@ -2,13 +2,17 @@
   :width: 200px
   :align: right
 
-Hacking Toyplot
-===============
+Contributing to Toyplot
+=======================
 
 Getting Started
 ---------------
 
-First, if you haven't already, you'll need to install Toyplot's
+If you haven't already, you'll want to get familiar with the Toyplot repository
+at http://github.com/sandialabs/toyplot ... there, you'll find the Toyplot
+sources, issue tracker, and wiki.
+
+Next, you'll need to install Toyplot's
 :ref:`dependencies<Toyplot Dependencies>`.  Then, you'll be ready to "install"
 Toyplot - but as a convenience, you'll want to use "develop mode".  Develop
 mode is a a feature provided by setuptools that links the Toyplot source code

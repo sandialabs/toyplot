@@ -34,7 +34,7 @@ build_dir = os.path.join(docs_dir, "_build")
 if os.path.exists(build_dir):
   shutil.rmtree(build_dir)
 
-for name in ["tutorial", "markers"]:
+for name in ["axes", "markers", "tutorial"]:
   convert_notebook(name)
 
 # Generate the HTML documentation.

@@ -2112,11 +2112,6 @@ class Canvas(object):
     self._children.append(Axes2D(xmin_range, xmax_range, ymin_range, ymax_range, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self, id=id))
     return self._children[-1]
 
-  def table(self, rows, columns, bounds=None, rect=None, corner=None, grid=None, gutter=50, id=None):
-    xmin_range, xmax_range, ymin_range, ymax_range = _region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-    self._children.append(Table(xmin_range=xmin_range, xmax_range=xmax_range, ymin_range=ymin_range, ymax_range=ymax_range, rows=rows, columns=columns, id=id))
-    return self._children[-1]
-
   def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style={}, label_style={}, id=None):
     """Add a legend to the canvas.
 

@@ -19,6 +19,28 @@ import toyplot.color.css
 import toyplot.html
 import toyplot.svg
 
+try:
+  import toyplot.eps
+except:
+  pass
+
+try:
+  import toyplot.mp4
+except:
+  pass
+
+try:
+  import toyplot.pdf
+except:
+  pass
+
+try:
+  import toyplot.png
+except:
+  pass
+
+
+
 #########################################################################################################################
 # Test fixtures.
 
@@ -64,36 +86,23 @@ def assert_dom_equal(a, b):
 
 def assert_canvas_matches(canvas, name):
   # Render every representation of the canvas for coverage ...
-  import toyplot.html
   html = StringIO.StringIO()
   toyplot.html.render(canvas, html)
 
-  try:
-    import toyplot.pdf
-  except:
-    pass
-  else:
-    pdf = StringIO.StringIO()
-    toyplot.pdf.render(canvas, pdf)
+  svg = StringIO.StringIO()
+  toyplot.svg.render(canvas, svg)
 
-  try:
-    import toyplot.png
-  except:
-    pass
-  else:
-    png = StringIO.StringIO()
-    toyplot.png.render(canvas, png)
-
-  try:
-    import toyplot.eps
-  except:
-    pass
-  else:
+  if hasattr(toyplot, "eps"):
     eps = StringIO.StringIO()
     toyplot.eps.render(canvas, eps)
 
-  svg = StringIO.StringIO()
-  toyplot.svg.render(canvas, svg)
+  if hasattr(toyplot, "pdf"):
+    pdf = StringIO.StringIO()
+    toyplot.pdf.render(canvas, pdf)
+
+  if hasattr(toyplot, "png"):
+    png = StringIO.StringIO()
+    toyplot.png.render(canvas, png)
 
   # Get rid of any past failures ...
   if os.path.exists("tests/failed/%s.svg" % name):
@@ -1823,11 +1832,7 @@ def test_html_ipython_html():
 # toyplot.mp4
 
 def test_mp4_render():
-  try:
-    import toyplot.mp4
-  except:
-    pass
-  else:
+  if hasattr(toyplot, "mp4"):
     canvas = toyplot.Canvas()
     axes = canvas.axes()
     text = canvas.text(100, 100, "")
@@ -1845,11 +1850,7 @@ def test_mp4_render():
 # toyplot.png
 
 def test_png_render_defaults():
-  try:
-    import toyplot.png
-  except:
-    pass
-  else:
+  if hasattr(toyplot, "png"):
     canvas = toyplot.Canvas()
     canvas.axes()
     image = toyplot.png.render(canvas)
@@ -1857,11 +1858,7 @@ def test_png_render_defaults():
     nose.tools.assert_equal(image[1:4], "PNG")
 
 def test_png_render_buffer():
-  try:
-    import toyplot.png
-  except:
-    pass
-  else:
+  if hasattr(toyplot, "png"):
     buffer = StringIO.StringIO()
     canvas = toyplot.Canvas()
     canvas.axes()
@@ -1869,21 +1866,13 @@ def test_png_render_buffer():
     nose.tools.assert_equal(buffer.getvalue()[1:4], "PNG")
 
 def test_png_render_path():
-  try:
-    import toyplot.png
-  except:
-    pass
-  else:
+  if hasattr(toyplot, "png"):
     canvas = toyplot.Canvas()
     canvas.axes()
     toyplot.png.render(canvas, os.path.join(tempfile.mkdtemp(), "test.png"))
 
 def test_png_render_frames():
-  try:
-    import toyplot.png
-  except:
-    pass
-  else:
+  if hasattr(toyplot, "png"):
     canvas = toyplot.Canvas()
     axes = canvas.axes()
     text = canvas.text(100, 100, "")
@@ -1898,11 +1887,7 @@ def test_png_render_frames():
       nose.tools.assert_equal(frame[1:4], "PNG")
 
 def test_cairo_small_font():
-  try:
-    import toyplot.png
-  except:
-    pass
-  else:
+  if hasattr(toyplot, "png"):
     canvas = toyplot.Canvas()
     axes = canvas.axes(label="Small Text!")
     axes.label.style={"font-size":"8px"}

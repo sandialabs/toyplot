@@ -42,7 +42,7 @@ If you want to generate documentation::
     $ sudo port select --set sphinx py27-sphinx
     $ sudo port select --set ipython ipython27
     $ sudo pip install sphinx_rtd_theme
-    $ sudo pip install sphinxcontrib-napoleon
+    $ sudo pip install numpydoc
 
 
 Using Pip / Easy Install

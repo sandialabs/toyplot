@@ -2096,13 +2096,35 @@ class Canvas(object):
 
     Parameters
     ----------
-    xlabel : string, optional
-      Human-readable label for the X axis.
-    ylabel : string, optional
-      Human-readable label for the Y axis.
-    xmin, xmax, ymin, ymax : float, optional
+    xmin, xmax, ymin, ymax: float, optional
       Used to explicitly override the axis domain (normally, the domain is
       implicitly defined by any marks added to the axes).
+    show: bool, optional
+      Set to `False` to hide both axes (the axes contents will still be visible).
+    xshow: bool, optional
+      Set to `False` to hide the X axis.
+    yshow: bool, optional
+      Set to `False` to hide the X axis.
+    label: string, optional
+      Human-readable label placed above the axes.
+    xlabel: string, optional
+      Human-readable label placed below the X axis.
+    ylabel: string, optional
+      Human-readable label placed to the side of the Y axis.
+    xticklocator: tick locator instance, optional
+      Controls the placement and formatting of the X axis ticks and tick labels.
+    yticklocator: tick locator instance, optional
+      Controls the placement and formatting of the Y axis ticks and tick labels.
+    xscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
+      Specifies the mapping from data to canvas coordinates along the X axis.
+    yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
+      Specifies the mapping from data to canvas coordinates along the Y axis.
+    palette: :class:`toyplot.color.Palette`, optional
+      Color palette used to automatically select per-series colors for plotted data.
+    padding: number, optional
+      Distance between the axes and plotted data, measured in :class:`toyplot.Canvas` drawing units.
+    tick_length: number, optional
+      Length of axes ticks, measured in :class:`toyplot.Canvas` drawing units.
 
     Returns
     -------

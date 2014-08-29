@@ -34,6 +34,6 @@ And the following are needed to generate this documentation:
 
 * Sphinx - documentation builder - http://sphinx-doc.org
 * Sphinx readthedocs theme - https://github.com/snide/sphinx_rtd_theme
-* napoleon - http://sphinxcontrib-napoleon.readthedocs.org/en/latest/
+* numpydoc - https://pypi.python.org/pypi/numpydoc
 * IPython - http://ipython.org
 

@@ -17,10 +17,6 @@ import toyplot
 import toyplot.color
 import toyplot.color.css
 import toyplot.html
-import toyplot.mp4
-import toyplot.pdf
-import toyplot.png
-import toyplot.eps
 import toyplot.svg
 
 #########################################################################################################################
@@ -68,17 +64,33 @@ def assert_dom_equal(a, b):
 
 def assert_canvas_matches(canvas, name):
   # Render every representation of the canvas for coverage ...
+  import toyplot.html
   html = StringIO.StringIO()
   toyplot.html.render(canvas, html)
 
-  pdf = StringIO.StringIO()
-  toyplot.pdf.render(canvas, pdf)
+  try:
+    import toyplot.pdf
+  except:
+    pass
+  else:
+    pdf = StringIO.StringIO()
+    toyplot.pdf.render(canvas, pdf)
 
-  png = StringIO.StringIO()
-  toyplot.png.render(canvas, png)
+  try:
+    import toyplot.png
+  except:
+    pass
+  else:
+    png = StringIO.StringIO()
+    toyplot.png.render(canvas, png)
 
-  ps = StringIO.StringIO()
-  toyplot.eps.render(canvas, ps)
+  try:
+    import toyplot.eps
+  except:
+    pass
+  else:
+    eps = StringIO.StringIO()
+    toyplot.eps.render(canvas, eps)
 
   svg = StringIO.StringIO()
   toyplot.svg.render(canvas, svg)
@@ -1811,60 +1823,90 @@ def test_html_ipython_html():
 # toyplot.mp4
 
 def test_mp4_render():
-  canvas = toyplot.Canvas()
-  axes = canvas.axes()
-  text = canvas.text(100, 100, "")
-  scatterplot = axes.scatterplot(numpy.arange(10))
-  def callback(frame):
-    frame.set_mark_style(text, {"fill-opacity":frame.time()})
-    frame.set_datum_text(text, 0, 0, "frame %s time %s duration %s" % (frame.index(), frame.time(), frame.duration()))
-    frame.set_datum_style(scatterplot, 0, frame.index(), {"stroke":"none"})
-  canvas.animate(10, callback)
-  def progress(frame):
+  try:
+    import toyplot.mp4
+  except:
     pass
-  toyplot.mp4.render(canvas, os.path.join(tempfile.mkdtemp(), "test.mp4"), progress=progress)
+  else:
+    canvas = toyplot.Canvas()
+    axes = canvas.axes()
+    text = canvas.text(100, 100, "")
+    scatterplot = axes.scatterplot(numpy.arange(10))
+    def callback(frame):
+      frame.set_mark_style(text, {"fill-opacity":frame.time()})
+      frame.set_datum_text(text, 0, 0, "frame %s time %s duration %s" % (frame.index(), frame.time(), frame.duration()))
+      frame.set_datum_style(scatterplot, 0, frame.index(), {"stroke":"none"})
+    canvas.animate(10, callback)
+    def progress(frame):
+      pass
+    toyplot.mp4.render(canvas, os.path.join(tempfile.mkdtemp(), "test.mp4"), progress=progress)
 
 ##################################################################################
 # toyplot.png
 
 def test_png_render_defaults():
-  canvas = toyplot.Canvas()
-  canvas.axes()
-  image = toyplot.png.render(canvas)
-  nose.tools.assert_is_instance(image, basestring)
-  nose.tools.assert_equal(image[1:4], "PNG")
+  try:
+    import toyplot.png
+  except:
+    pass
+  else:
+    canvas = toyplot.Canvas()
+    canvas.axes()
+    image = toyplot.png.render(canvas)
+    nose.tools.assert_is_instance(image, basestring)
+    nose.tools.assert_equal(image[1:4], "PNG")
 
 def test_png_render_buffer():
-  buffer = StringIO.StringIO()
-  canvas = toyplot.Canvas()
-  canvas.axes()
-  toyplot.png.render(canvas, buffer)
-  nose.tools.assert_equal(buffer.getvalue()[1:4], "PNG")
+  try:
+    import toyplot.png
+  except:
+    pass
+  else:
+    buffer = StringIO.StringIO()
+    canvas = toyplot.Canvas()
+    canvas.axes()
+    toyplot.png.render(canvas, buffer)
+    nose.tools.assert_equal(buffer.getvalue()[1:4], "PNG")
 
 def test_png_render_path():
-  canvas = toyplot.Canvas()
-  canvas.axes()
-  toyplot.png.render(canvas, os.path.join(tempfile.mkdtemp(), "test.png"))
+  try:
+    import toyplot.png
+  except:
+    pass
+  else:
+    canvas = toyplot.Canvas()
+    canvas.axes()
+    toyplot.png.render(canvas, os.path.join(tempfile.mkdtemp(), "test.png"))
 
 def test_png_render_frames():
-  canvas = toyplot.Canvas()
-  axes = canvas.axes()
-  text = canvas.text(100, 100, "")
-  scatterplot = axes.scatterplot(numpy.arange(10))
-  def callback(frame):
-    frame.set_mark_style(text, {"fill-opacity":frame.time()})
-    frame.set_datum_text(text, 0, 0, "frame %s" % frame.index())
-    frame.set_datum_style(scatterplot, 0, frame.index(), {"stroke":"none"})
-  canvas.animate(10, callback)
-  for frame in toyplot.png.render_frames(canvas):
-    nose.tools.assert_is_instance(frame, basestring)
-    nose.tools.assert_equal(frame[1:4], "PNG")
+  try:
+    import toyplot.png
+  except:
+    pass
+  else:
+    canvas = toyplot.Canvas()
+    axes = canvas.axes()
+    text = canvas.text(100, 100, "")
+    scatterplot = axes.scatterplot(numpy.arange(10))
+    def callback(frame):
+      frame.set_mark_style(text, {"fill-opacity":frame.time()})
+      frame.set_datum_text(text, 0, 0, "frame %s" % frame.index())
+      frame.set_datum_style(scatterplot, 0, frame.index(), {"stroke":"none"})
+    canvas.animate(10, callback)
+    for frame in toyplot.png.render_frames(canvas):
+      nose.tools.assert_is_instance(frame, basestring)
+      nose.tools.assert_equal(frame[1:4], "PNG")
 
 def test_cairo_small_font():
-  canvas = toyplot.Canvas()
-  axes = canvas.axes(label="Small Text!")
-  axes.label.style={"font-size":"8px"}
-  toyplot.png.render(canvas)
+  try:
+    import toyplot.png
+  except:
+    pass
+  else:
+    canvas = toyplot.Canvas()
+    axes = canvas.axes(label="Small Text!")
+    axes.label.style={"font-size":"8px"}
+    toyplot.png.render(canvas)
 
 ##################################################################################
 # toyplot.svg

@@ -17,17 +17,17 @@ def render(canvas, fobj=None):
 
   Parameters
   ----------
-  canvas : :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.Canvas`
     The canvas to be rendered.
 
-  fobj : file-like object or string, optional
+  fobj: file-like object or string, optional
     The file to write.  Use a string filepath to write data directly to disk.
     If `None` (the default), the HTML tree will be returned to the caller
     instead.
 
   Returns
   -------
-  html : xml.etree.ElementTree.Element or `None`
+  html: xml.etree.ElementTree.Element or `None`
     HTML representation of `canvas`, as a DOM tree, or `None` if the caller
     specifies the `fobj` parameter.
 

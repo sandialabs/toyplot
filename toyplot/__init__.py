@@ -590,7 +590,18 @@ class TextMark(Mark):
 ###############################################################################################
 # Tick Locators
 
-class ExplicitTickLocator(object):
+class TickLocator(object):
+  """Base class for tick locators - objects that compute the position and format of axis tick labels."""
+  def ticks(self, domain_min, domain_max):
+    """Return a set of ticks for the given domain.
+
+    Parameters
+    ----------
+    domain_min, domain_max: number
+    """
+    raise NotImplementedError()
+
+class ExplicitTickLocator(TickLocator):
   """Explicitly specify a collection of tick locations and labels for an axis.
 
   You must specify the set of locations, the set of labels, or both.  If you
@@ -601,10 +612,10 @@ class ExplicitTickLocator(object):
 
   Parameters
   ----------
-  locations : sequence of tick locations (numbers), optional
-  labels : sequence of tick labels (strings), optional
-  titles : sequence of tick titles (strings), optional
-  format : format string used to generate labels from tick locations, optional
+  locations: sequence of tick locations (numbers), optional
+  labels: sequence of tick labels (strings), optional
+  titles: sequence of tick titles (strings), optional
+  format: format string used to generate labels from tick locations, optional
   """
   def __init__(self, locations=None, labels=None, titles=None, format="{:g}"):
     if locations is not None and labels is not None:
@@ -627,13 +638,13 @@ class ExplicitTickLocator(object):
   def ticks(self, domain_min, domain_max):
     return self._locations, self._labels, self._titles
 
-class BasicTickLocator(object):
+class BasicTickLocator(TickLocator):
   """Generate N evenly spaced ticks that include the minimum and maximum values of a domain.
 
   Parameters
   ----------
-  count : number of ticks to generate, optional
-  format : format string used to generate labels from tick locations, optional
+  count: number of ticks to generate, optional
+  format: format string used to generate labels from tick locations, optional
   """
   def __init__(self, count=5, format="{:g}"):
     self._count = count
@@ -644,7 +655,7 @@ class BasicTickLocator(object):
     titles = numpy.repeat(None, len(labels))
     return locations, labels, titles
 
-class PositiveLogTickLocator(object):
+class PositiveLogTickLocator(TickLocator):
   """Generate ticks that are evenly spaced on a logarithmic scale, when the entire domain is positive.
   """
   def __init__(self, base=10):
@@ -656,7 +667,7 @@ class PositiveLogTickLocator(object):
     titles = numpy.repeat(None, len(labels))
     return locations, labels, titles
 
-class NegativeLogTickLocator(object):
+class NegativeLogTickLocator(TickLocator):
   """Generate ticks that are evenly spaced on a logarithmic scale, when the entire domain is negative.
   """
   def __init__(self, base=10):
@@ -668,7 +679,7 @@ class NegativeLogTickLocator(object):
     titles = numpy.repeat(None, len(labels))
     return locations, labels, titles
 
-class SymmetricLogTickLocator(object):
+class SymmetricLogTickLocator(TickLocator):
   """Generate ticks that are evenly spaced on a logarithmic scale, when the domain straddles zero.
   """
   def __init__(self, base=10):
@@ -683,7 +694,7 @@ class SymmetricLogTickLocator(object):
     titles = numpy.repeat(None, len(labels))
     return locations, labels, titles
 
-class HeckbertTickLocator(object):
+class HeckbertTickLocator(TickLocator):
   """Generate ticks using the "Nice numbers for graph labels" algorithm by Paul Heckbert.
 
   Note that this locator can produce ticks outside the minimum / maximum axis
@@ -691,7 +702,7 @@ class HeckbertTickLocator(object):
 
   Parameters
   ----------
-  count : number of ticks to generate
+  count: number of ticks to generate
   """
   def __init__(self, count=5):
     self._count = count
@@ -751,15 +762,15 @@ class HeckbertTickLocator(object):
 # manually set your view extent to include the min and max ticks if they are outside
 # the data range. This should produce the same results as the paper.
 
-class ExtendedTickLocator(object):
+class ExtendedTickLocator(TickLocator):
   """Generate ticks using "An Extension of Wilkinson's Algorithm for Positioning Tick Labels on Axes" by Talbot, Lin, and Hanrahan.
 
   Parameters
   ----------
-  count : desired number of ticks
+  count: desired number of ticks
     Note that the algorithm may produce fewer ticks than requested.
-  steps : prioritized list of "nice" values to use for generating ticks.
-  only_inside : boolean
+  steps: prioritized list of "nice" values to use for generating ticks.
+  only_inside: boolean
     If set to `True`, only ticks inside the axis domain will be generated.
   """
   def __init__(self, count=5, steps=None, weights=None, only_inside=False):
@@ -1321,31 +1332,31 @@ class Axes2D(object):
 
     Parameters
     ----------
-    a, b, c : array-like series data.
-    along : string, "x" or "y", optional
+    a, b, c: array-like series data.
+    along: string, "x" or "y", optional
       Specify "x" (the default) for vertical bars, or "y" for horizontal bars.
     baseline: array-like, "stacked", "symmetrical", "wiggle", or None
-    fill : array-like set of colors, optional
+    fill: array-like set of colors, optional
       Specify a single color for all bars, one color per series, or one color per bar.
       Color values can be explicit toyplot colors, or scalar values to be mapped
       to colors using the `colormap` or `palette` parameter.
-    colormap : :class:`toyplot.color.Map`, optional
+    colormap: :class:`toyplot.color.Map`, optional
       Colormap to be used for mapping scalar `fill` values to colors.  If
       unspecified, a default :class:`toyplot.color.LinearMap` is used.
-    palette : :class:`toyplot.color.Palette`, optional
+    palette: :class:`toyplot.color.Palette`, optional
       Palette to be used for mapping scalar `fill` values to colors.  If
       unspecified, a default :class:`toyplot.color.Palette` is used.
-    opacity : array-like set of opacities, optional
+    opacity: array-like set of opacities, optional
       Specify a single opacity for all bars, one opacity per series, or one opacity per bar.
-    title : array-like set of strings, optional
+    title: array-like set of strings, optional
       Specify a single title, one title per series, or one title per bar.
-    style : dict, optional
+    style: dict, optional
       Collection of CSS styles to be applied globally.
-    id : string, optional
+    id: string, optional
 
     Returns
     -------
-    bars : :class:`toyplot.BarBoundariesMark` or :class:`toyplot.BarMagnitudesMark`
+    bars: :class:`toyplot.BarBoundariesMark` or :class:`toyplot.BarMagnitudesMark`
     """
 
     if baseline is None:
@@ -1479,24 +1490,24 @@ class Axes2D(object):
 
     Parameters
     ----------
-    a, b, c : array-like sets of coordinates
+    a, b, c: array-like sets of coordinates
       If `a`, `b`, and `c` are provided, they specify the X coordinates, bottom
       coordinates, and top coordinates of the region respectively.  If only `a`
       and `b` are provided, they specify the top coordinates and bottom
       coordinates, with the X coordinates ranging from [0, N).  If only `a` is
       provided, it specifies the top of the region, with the bottom along the
       origin and the X coordinates ranging from [0, N).
-    title : string, optional
+    title: string, optional
       Human-readable title for the mark.  The SVG / HTML backends render the
       title as a tooltip.
-    style : dict, optional
+    style: dict, optional
       Collection of CSS styles to apply to the mark.  See
       :class:`toyplot.FillBoundariesMark` for a list of useful styles.
-    id : string, optional
+    id: string, optional
 
     Returns
     -------
-    mark : :class:`toyplot.FillBoundariesMark` or :class:`toyplot.FillMagnitudesMark`
+    mark: :class:`toyplot.FillBoundariesMark` or :class:`toyplot.FillMagnitudesMark`
     """
     if baseline is None:
       if a is not None and b is not None and c is not None:
@@ -1594,21 +1605,21 @@ class Axes2D(object):
 
     Parameters
     ----------
-    a, b : array-like sets of coordinates
+    a, b: array-like sets of coordinates
       If `a` and `b` are provided, they specify the X coordinates and Y
       coordinates of each point in the plot.  If only `a` is provided, it
       specifies the Y coordinates, and the X coordinates will range from [0, N).
-    title : string, optional
+    title: string, optional
       Human-readable title for the mark.  The SVG / HTML backends render the
       title as a tooltip.
-    style : dict, optional
+    style: dict, optional
       Collection of CSS styles to apply across all datums.  See
       :class:`toyplot.PlotMark` for a list of useful styles.
-    id : string, optional
+    id: string, optional
 
     Returns
     -------
-    plot : :class:`toyplot.PlotMark`
+    plot: :class:`toyplot.PlotMark`
     """
     if a is not None and b is not None:
       position = _require_scalar_vector(a)
@@ -1657,21 +1668,21 @@ class Axes2D(object):
 
     Parameters
     ----------
-    a, b : array-like sets of coordinates
+    a, b: array-like sets of coordinates
       If `a` and `b` are provided, they specify the X coordinates and Y
       coordinates of each point in the plot.  If only `a` is provided, it
       specifies the Y coordinates, and the X coordinates will range from [0, N).
-    title : string, optional
+    title: string, optional
       Human-readable title for the mark.  The SVG / HTML backends render the
       title as a tooltip.
-    style : dict, optional
+    style: dict, optional
       Collection of CSS styles to apply across all datums.  See
       :class:`toyplot.PlotMark` for a list of useful styles.
-    id : string, optional
+    id: string, optional
 
     Returns
     -------
-    plot : :class:`toyplot.PlotMark`
+    plot: :class:`toyplot.PlotMark`
     """
     if a is not None and b is not None:
       position = _require_scalar_vector(a)
@@ -1745,20 +1756,20 @@ class Axes2D(object):
 
     Parameters
     ----------
-    a, b : float
+    a, b: float
       Coordinates of the text anchor.
-    text : string
+    text: string
       The text to be displayed.
-    title : string, optional
+    title: string, optional
       Human-readable title for the mark.  The SVG / HTML backends render the
       title as a tooltip.
-    style : dict, optional
+    style: dict, optional
       Collection of CSS styles to apply to the mark.  See
       :class:`toyplot.TextMark` for a list of useful styles.
 
     Returns
     -------
-    text : :class:`toyplot.TextMark`
+    text: :class:`toyplot.TextMark`
     """
     a = _require_scalar_vector(a)
     b = _require_scalar_vector(b, len(a))
@@ -1792,19 +1803,19 @@ class Axes2D(object):
 
     Parameters
     ----------
-    y : array-like set of Y coordinates
+    y: array-like set of Y coordinates
       One horizontal line will be drawn through each Y coordinate provided.
-    title : string, optional
+    title: string, optional
       Human-readable title for the mark.  The SVG / HTML backends render the
       title as a tooltip.
-    style : dict, optional
+    style: dict, optional
       Collection of CSS styles to apply to the mark.  See
       :class:`toyplot.AxisLinesMark` for a list of useful styles.
-    id : string, optional
+    id: string, optional
 
     Returns
     -------
-    hlines : :class:`toyplot.AxisLinesMark`
+    hlines: :class:`toyplot.AxisLinesMark`
     """
     position = _require_scalar_vector(y)
 
@@ -1827,19 +1838,19 @@ class Axes2D(object):
 
     Parameters
     ----------
-    y : array-like set of Y coordinates
+    y: array-like set of Y coordinates
       One horizontal line will be drawn through each Y coordinate provided.
-    title : string, optional
+    title: string, optional
       Human-readable title for the mark.  The SVG / HTML backends render the
       title as a tooltip.
-    style : dict, optional
+    style: dict, optional
       Collection of CSS styles to apply to the mark.  See
       :class:`toyplot.AxisLinesMark` for a list of useful styles.
-    id : string, optional
+    id: string, optional
 
     Returns
     -------
-    hlines : :class:`toyplot.AxisLinesMark`
+    hlines: :class:`toyplot.AxisLinesMark`
     """
     position = _require_scalar_vector(x)
 
@@ -1869,23 +1880,23 @@ class Axes2D(object):
 
     Parameters
     ----------
-    marks : sequence of marks to add to the legend
+    marks: sequence of marks to add to the legend
       Each mark to be displayed in the legend should be specified using either
       a (label, mark) tuple or a (label, mark, style) tuple.  Each label should
       be the human-readable text to be displayed next to the mark.  The mark
       can be a string value "line" or "rect", a marker string "o", "s", "^",
       or an actual intance of :class:`toyplot.Mark`.
-    bounds : (xmin, xmax, ymin, ymax) tuple, optional
+    bounds: (xmin, xmax, ymin, ymax) tuple, optional
       Use the bounds property to position / size the legend by specifying the
       position of each of its boundaries.  The boundaries may be specified in
       absolute drawing units, or as a percentage of the axes width / height
       using strings that end with "%".
-    rect : (x, y, width, height) tuple, optional
+    rect: (x, y, width, height) tuple, optional
       Use the rect property to position / size the legend by specifying its
       upper-left-hand corner, width, and height.  Each parameter may be specified
       in absolute drawing units, or as a percentage of the axes width / height
       using strings that end with "%".
-    corner : (corner, width, height, inset) tuple, optional
+    corner: (corner, width, height, inset) tuple, optional
       Use the corner property to position / size the legend by specifying its
       width and height, plus an inset from a corner of the axes.  Allowed
       corner values are "top-left", "top", "top-right", "right",
@@ -1893,22 +1904,22 @@ class Axes2D(object):
       height may be specified in absolute drawing units, or as a percentage of
       the axes width / height using strings that end with "%".  The inset is
       specified in absolute drawing units.
-    grid : (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
+    grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
       Use the grid property to position / size the legend using a collection of
       grid cells filling the axes.  Specify the number of rows and columns in
       the grid, then specify either a zero-based cell index (which runs in
       left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
       a set of i, column-span, j, row-span coordinates so the legend can cover
       more than one cell.
-    gutter : size of the gutter around grid cells, optional
+    gutter: size of the gutter around grid cells, optional
       Specifies the amount of empty space to leave between grid cells When using the
       `grid` parameter to position the legend.
-    style : dict, optional
-    id : string, optional
+    style: dict, optional
+    id: string, optional
 
     Returns
     -------
-    legend : :class:`toyplot.LegendMark`
+    legend: :class:`toyplot.LegendMark`
     """
     gutter = _require_scalar(gutter)
     style = _require_style(style)
@@ -1961,8 +1972,8 @@ class AnimationFrame(object):
 
     Parameters
     ----------
-    mark : :class:`toyplot.Mark` instance
-    style : dict containing CSS style information
+    mark: :class:`toyplot.Mark` instance
+    style: dict containing CSS style information
     """
     if not isinstance(mark, Mark):
       raise ValueError("Mark style can only be set on toyplot.Mark instances.")
@@ -1973,9 +1984,9 @@ class AnimationFrame(object):
 
     Parameters
     ----------
-    mark : :class:`toyplot.Mark` instance
-    index : zero-based index of the datum to modify
-    style : dict containing CSS style information
+    mark: :class:`toyplot.Mark` instance
+    index: zero-based index of the datum to modify
+    style: dict containing CSS style information
     """
     if not isinstance(mark, (BarBoundariesMark, BarMagnitudesMark, PlotMark, TextMark)):
       raise ValueError("Cannot set datum style for %s." % type(mark))
@@ -1986,8 +1997,8 @@ class AnimationFrame(object):
 
     Parameters
     ----------
-    mark : :class:`toyplot.TextMark` instance
-    value : string
+    mark: :class:`toyplot.TextMark` instance
+    value: string
     """
     if not isinstance(mark, TextMark):
       raise ValueError("Mark text can only be set for toyplot.TextMark instances.")
@@ -2001,13 +2012,13 @@ class Canvas(object):
 
   Parameters
   ----------
-  width : integer, optional
+  width: integer, optional
     Width of the canvas in drawing units.  Defaults to 600 if unspecified.
-  height : integer, optional
+  height: integer, optional
     Height of the canvas in drawing units.  Defaults to the canvas width if unspecified.
-  style : dict, optional
+  style: dict, optional
     Collection of CSS styles to apply to the canvas.
-  autorender : boolean, optional
+  autorender: boolean, optional
     Turn autorendering on / off for this canvas.  Default:
     use the global autorender flag.
 
@@ -2021,10 +2032,10 @@ class Canvas(object):
   def __init__(self, width=None, height=None, style={}, id=None, autorender=None):
     self._width = width if width is not None else 600
     self._height = height if height is not None else self._width
-    self._style = {"background-color" : "transparent", "fill" : "#343434", "fill-opacity" : 1.0, "font-family":"helvetica", "font-size" : "12px", "opacity" : 1.0, "stroke" : "#343434", "stroke-opacity" : 1.0, "stroke-width" : 1.0}
+    self._style = {"background-color": "transparent", "fill": "#343434", "fill-opacity": 1.0, "font-family":"helvetica", "font-size": "12px", "opacity": 1.0, "stroke": "#343434", "stroke-opacity": 1.0, "stroke-width": 1.0}
     self._style.update(style)
     self._id = id
-    self._animation = collections.defaultdict(lambda : collections.defaultdict(list))
+    self._animation = collections.defaultdict(lambda: collections.defaultdict(list))
     self._children = []
 
     self.autorender(autorender if autorender is not None else toyplot.autorender)
@@ -2039,14 +2050,14 @@ class Canvas(object):
 
     Parameters
     ----------
-    frames : integer, tuple, or sequence
+    frames: integer, tuple, or sequence
       Pass a sequence of values that specify the time (in seconds) of the
       beginning / end of each frame.  Note that the number of frames will be the
       length of the sequence minus one.  Alternatively, you can pass a 2-tuple
       containing the number of frames and the frame rate in frames-per-second.
       Finally, you may simply specify the number of frames, in which case the
       rate will default to 30 frames-per-second.
-    callback : function
+    callback: function
       The callback function will be called once per frame, and will receive an
       instance of :class:`toyplot.AnimationFrame` as its sole argument.  The
       callback function can access the frame number, time, and duration from the
@@ -2081,7 +2092,7 @@ class Canvas(object):
 
     Parameters
     ----------
-    enable : boolean
+    enable: boolean
       Turn autorendering on / off.
     """
     if enable:
@@ -2101,24 +2112,16 @@ class Canvas(object):
       implicitly defined by any marks added to the axes).
     show: bool, optional
       Set to `False` to hide both axes (the axes contents will still be visible).
-    xshow: bool, optional
-      Set to `False` to hide the X axis.
-    yshow: bool, optional
-      Set to `False` to hide the X axis.
+    xshow, yshow: bool, optional
+      Set to `False` to hide either axis.
     label: string, optional
       Human-readable label placed above the axes.
-    xlabel: string, optional
-      Human-readable label placed below the X axis.
-    ylabel: string, optional
-      Human-readable label placed to the side of the Y axis.
-    xticklocator: tick locator instance, optional
-      Controls the placement and formatting of the X axis ticks and tick labels.
-    yticklocator: tick locator instance, optional
-      Controls the placement and formatting of the Y axis ticks and tick labels.
-    xscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
-      Specifies the mapping from data to canvas coordinates along the X axis.
-    yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
-      Specifies the mapping from data to canvas coordinates along the Y axis.
+    xlabel, ylabel: string, optional
+      Human-readable axis label.
+    xticklocator, yticklocator: :class:`toyplot.TickLocator`, optional
+      Controls the placement and formatting of axis ticks and tick labels.
+    xscale, yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
+      Specifies the mapping from data to canvas coordinates along an axis.
     palette: :class:`toyplot.color.Palette`, optional
       Color palette used to automatically select per-series colors for plotted data.
     padding: number, optional
@@ -2128,7 +2131,7 @@ class Canvas(object):
 
     Returns
     -------
-    axes : :class:`toyplot.Axes2D`
+    axes: :class:`toyplot.Axes2D`
     """
     xmin_range, xmax_range, ymin_range, ymax_range = _region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
     self._children.append(Axes2D(xmin_range, xmax_range, ymin_range, ymax_range, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self, id=id))
@@ -2139,23 +2142,23 @@ class Canvas(object):
 
     Parameters
     ----------
-    marks : sequence of marks to add to the legend
+    marks: sequence of marks to add to the legend
       Each mark to be displayed in the legend should be specified using either
       a (label, mark) tuple or a (label, mark, style) tuple.  Each label should
       be the human-readable text to be displayed next to the mark.  The mark
       can be a string value "line" or "rect", a marker string "o", "s", "^",
       or an actual intance of :class:`toyplot.Mark`.
-    bounds : (xmin, xmax, ymin, ymax) tuple, optional
+    bounds: (xmin, xmax, ymin, ymax) tuple, optional
       Use the bounds property to position / size the legend by specifying the
       position of each of its boundaries.  The boundaries may be specified in
       absolute drawing units, or as a percentage of the canvas width / height
       using strings that end with "%".
-    rect : (x, y, width, height) tuple, optional
+    rect: (x, y, width, height) tuple, optional
       Use the rect property to position / size the legend by specifying its
       upper-left-hand corner, width, and height.  Each parameter may be specified
       in absolute drawing units, or as a percentage of the canvas width / height
       using strings that end with "%".
-    corner : (corner, width, height, inset) tuple, optional
+    corner: (corner, width, height, inset) tuple, optional
       Use the corner property to position / size the legend by specifying its
       width and height, plus an inset from a corner of the canvas.  Allowed
       corner values are "top-left", "top", "top-right", "right",
@@ -2163,22 +2166,22 @@ class Canvas(object):
       height may be specified in absolute drawing units, or as a percentage of
       the canvas width / height using strings that end with "%".  The inset is
       specified in absolute drawing units.
-    grid : (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
+    grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
       Use the grid property to position / size the legend using a collection of
       grid cells filling the canvas.  Specify the number of rows and columns in
       the grid, then specify either a zero-based cell index (which runs in
       left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
       a set of i, column-span, j, row-span coordinates so the legend can cover
       more than one cell.
-    gutter : size of the gutter around grid cells, optional
+    gutter: size of the gutter around grid cells, optional
       Specifies the amount of empty space to leave between grid cells When using the
       `grid` parameter to position the legend.
-    style : dict, optional
-    id : string, optional
+    style: dict, optional
+    id: string, optional
 
     Returns
     -------
-    legend : :class:`toyplot.LegendMark`
+    legend: :class:`toyplot.LegendMark`
     """
     gutter = _require_scalar(gutter)
     style = _require_style(style)
@@ -2193,21 +2196,21 @@ class Canvas(object):
 
     Parameters
     ----------
-    x, y : float
+    x, y: float
       Coordinates of the text anchor in canvas drawing units.  Note that canvas
       Y coordinates increase from top-to-bottom.
-    text : string
+    text: string
       The text to be displayed.
-    title : string, optional
+    title: string, optional
       Human-readable title for the mark.  The SVG / HTML backends render the
       title as a tooltip.
-    style : dict, optional
+    style: dict, optional
       Collection of CSS styles to apply to the mark.  See
       :class:`toyplot.TextMark` for a list of useful styles.
 
     Returns
     -------
-    text : :class:`toyplot.TextMark`
+    text: :class:`toyplot.TextMark`
     """
     x = _require_scalar_vector(x)
     y = _require_scalar_vector(y, len(x))
@@ -2232,18 +2235,18 @@ class Canvas(object):
 
     Parameters
     ----------
-    begin : scalar
+    begin: scalar
       Specify the frame start time (in seconds).
-    end : scalar
+    end: scalar
       Specify the frame end time (in seconds).
-    index : integer, optional
+    index: integer, optional
       Specify an index for this frame.  Note that the index is simply a
       convenience for code that depends on accessing the index from the
       result AnimationFrame.
 
     Returns
     -------
-    frame : :class:`toyplot.AnimationFrame` instance.
+    frame: :class:`toyplot.AnimationFrame` instance.
     """
     if index is None:
       index = 0
@@ -2303,11 +2306,11 @@ def bars(a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=N
 
   Returns
   -------
-  canvas : :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.Canvas`
     A new canvas object.
-  axes : :class:`toyplot.Axes2D`
+  axes: :class:`toyplot.Axes2D`
     A new set of 2D axes that fill the canvas.
-  mark : :class:`toyplot.BarMagnitudesMark` or :class:`toyplot.BarBoundariesMark`
+  mark: :class:`toyplot.BarMagnitudesMark` or :class:`toyplot.BarBoundariesMark`
     The new bar mark.
   """
   canvas = Canvas(width=width, height=height, style=canvas_style)
@@ -2322,11 +2325,11 @@ def fill(a, b=None, c=None, along="x", baseline=None, fill=None, colormap=None, 
 
   Returns
   -------
-  canvas : :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.Canvas`
     A new canvas object.
-  axes : :class:`toyplot.Axes2D`
+  axes: :class:`toyplot.Axes2D`
     A new set of 2D axes that fill the canvas.
-  mark : :class:`toyplot.FillBoundariesMark` or :class:`toyplot.FillMagnitudesMark`
+  mark: :class:`toyplot.FillBoundariesMark` or :class:`toyplot.FillMagnitudesMark`
     The new bar mark.
   """
   canvas = Canvas(width=width, height=height, style=canvas_style)
@@ -2341,11 +2344,11 @@ def plot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette
 
   Returns
   -------
-  canvas : :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.Canvas`
     A new canvas object.
-  axes : :class:`toyplot.Axes2D`
+  axes: :class:`toyplot.Axes2D`
     A new set of 2D axes that fill the canvas.
-  mark : :class:`toyplot.PlotMark`
+  mark: :class:`toyplot.PlotMark`
     The new plot mark.
   """
   canvas = Canvas(width=width, height=height, style=canvas_style)
@@ -2360,11 +2363,11 @@ def scatterplot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_
 
   Returns
   -------
-  canvas : :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.Canvas`
     A new canvas object.
-  axes : :class:`toyplot.Axes2D`
+  axes: :class:`toyplot.Axes2D`
     A new set of 2D axes that fill the canvas.
-  mark : :class:`toyplot.PlotMark`
+  mark: :class:`toyplot.PlotMark`
     The new scatter plot mark.
   """
   canvas = Canvas(width=width, height=height, style=canvas_style)

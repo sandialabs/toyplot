@@ -41,25 +41,25 @@ def render(canvas, fobj=None, animation=False):
 
   Parameters
   ----------
-  canvas : :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.Canvas`
     The canvas to be rendered.
 
-  fobj : file-like object or string, optional
+  fobj: file-like object or string, optional
     The file to write.  Use a string filepath to write data directly to disk.
     If `None` (the default), the SVG tree will be returned to the caller
     instead.
 
-  animation : boolean, optional
+  animation: boolean, optional
     If `True`, return a representation of the changes to be made to the SVG
     tree for animation.
 
   Returns
   -------
-  svg : xml.etree.ElementTree.Element or `None`
+  svg: xml.etree.ElementTree.Element or `None`
     SVG representation of `canvas`, as a DOM tree, or `None` if the caller
     specifies the `fobj` parameter.
 
-  changes : JSON-compatible data structure, or `None`
+  changes: JSON-compatible data structure, or `None`
     JSON-compatible representation of the animated changes to `canvas`.
 
   Notes
@@ -84,7 +84,7 @@ def render(canvas, fobj=None, animation=False):
     fobj.write(xml.tostring(svg, method="xml"))
   else:
     if animation:
-      svg_animation = collections.defaultdict(lambda : collections.defaultdict(list))
+      svg_animation = collections.defaultdict(lambda: collections.defaultdict(list))
       for time, time_changes in canvas._animation.iteritems():
         svg_animation[time] # Ensure we have an entry for every time, even if there aren't any changes.
         for type, type_changes in time_changes.iteritems():
@@ -206,7 +206,7 @@ def _render_marker(root, cx, cy, size, marker, marker_style=None, label_style=No
 
   if shape_label is not None:
     xml.SubElement(marker_xml, "text", x=str(cx), y=str(cy), attrib=_css_attrib({"stroke":"none", "fill":"black", "text-anchor":"middle", "alignment-baseline":"middle", "font-size":"%spx" % (size * 0.75)}, label_style, shape_label_style)).text = shape_label
-_render_marker.variations = {"-" : ("|", 90), "x" : ("+", 45), "v" : ("^", 180), "<" : ("^", -90), ">" : ("^", 90), "d" : ("s", 45), "o-" : ("o|", 90), "ox" : ("o+", 45)}
+_render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<": ("^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
 def _render_Axes2D(root, item, parent, id_cache):
   item._finalize_domain()
@@ -684,17 +684,17 @@ def _render_item(root, item, parent, id_cache):
   else:
     raise Exception("Cannot render unknown type: %s" % (item_type,)) # pragma: no cover
 _render_item.methods = {
-  toyplot.Axes2D : _render_Axes2D,
-  toyplot.AxisLinesMark : _render_AxisLinesMark,
-  toyplot.BarBoundariesMark : _render_BarBoundariesMark,
-  toyplot.BarMagnitudesMark : _render_BarMagnitudesMark,
-  toyplot.FillBoundariesMark : _render_FillBoundariesMark,
-  toyplot.FillMagnitudesMark : _render_FillMagnitudesMark,
-  toyplot.LegendMark : _render_LegendMark,
-  toyplot.PlotMark : _render_PlotMark,
-  toyplot.RectMark : _render_RectMark,
-  toyplot.Table : _render_Table,
-  toyplot.TextMark : _render_TextMark,
-  toyplot.VColorBarMark : _render_VColorBarMark,
+  toyplot.Axes2D: _render_Axes2D,
+  toyplot.AxisLinesMark: _render_AxisLinesMark,
+  toyplot.BarBoundariesMark: _render_BarBoundariesMark,
+  toyplot.BarMagnitudesMark: _render_BarMagnitudesMark,
+  toyplot.FillBoundariesMark: _render_FillBoundariesMark,
+  toyplot.FillMagnitudesMark: _render_FillMagnitudesMark,
+  toyplot.LegendMark: _render_LegendMark,
+  toyplot.PlotMark: _render_PlotMark,
+  toyplot.RectMark: _render_RectMark,
+  toyplot.Table: _render_Table,
+  toyplot.TextMark: _render_TextMark,
+  toyplot.VColorBarMark: _render_VColorBarMark,
 }
 

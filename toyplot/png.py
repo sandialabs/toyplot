@@ -21,22 +21,22 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
   Parameters
   ----------
-  canvas : :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.Canvas`
     Canvas to be rendered.
-  fobj : file-like object or string, optional
+  fobj: file-like object or string, optional
     The file to write.  Use a string filepath to write data directly to disk.
     If `None` (the default), the PNG data will be returned to the caller
     instead.
-  width : number, optional
+  width: number, optional
     Specify the width of the output image in pixels.
-  height : number, optional
+  height: number, optional
     Specify the height of the output image in pixels.
-  scale : number, optional
+  scale: number, optional
     Ratio of output image pixels to `canvas` drawing units.
 
   Returns
   -------
-  png : PNG image data, or `None`
+  png: PNG image data, or `None`
     PNG representation of `canvas`, or `None` if the caller specifies the
     `fobj` parameter.
 
@@ -66,18 +66,18 @@ def render_frames(canvas, width=None, height=None, scale=None):
 
   Parameters
   ----------
-  canvas : :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.Canvas`
     Canvas to be rendered.
-  width : number, optional
+  width: number, optional
     Specify the width of the output image in pixels.
-  height : number, optional
+  height: number, optional
     Specify the height of the output image in pixels.
-  scale : number, optional
+  scale: number, optional
     Ratio of output image pixels to `canvas` drawing units.
 
   Returns
   -------
-  frames : Python generator expression that returns each PNG image in the sequence.
+  frames: Python generator expression that returns each PNG image in the sequence.
     The caller must iterate over the returned frames and is responsible for all
     subsequent processing, including disk I/O, video compression, etc.
 

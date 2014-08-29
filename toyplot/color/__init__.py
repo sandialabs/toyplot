@@ -85,13 +85,13 @@ class Palette(object):
 
   Parameters
   ----------
-  colors : sequence of color values, optional
+  colors: sequence of color values, optional
     Specifies the list of color values to store in the palette.  Each color may
     be a CSS color string, a toyplot color, a sequence of three RGB values, or
     a sequence of four RGBA values.  If `colors` is unspecified, the palette
     will be initialized with a default collection of colors.
 
-  reverse : boolean, optional
+  reverse: boolean, optional
     If `True`, the values in `colors` will be stored in reverse order.
 
   Notes
@@ -142,12 +142,12 @@ class Palette(object):
 
     Parameters
     ----------
-    index : integer
+    index: integer
       Specifies the index of the color to retrieve.
 
     Returns
     -------
-    color : toyplot color.
+    color: toyplot color.
     """
     return self._colors[int(index)]
 
@@ -156,12 +156,12 @@ class Palette(object):
 
     Parameters
     ----------
-    index : integer
+    index: integer
       Specifies the index of the color to retrieve.
 
     Returns
     -------
-    css : CSS RGBA color string.
+    css: CSS RGBA color string.
     """
     return toyplot.color.css.convert(self._colors[int(index)])
 
@@ -184,7 +184,7 @@ class CategoricalMap(object):
 
   Parameters
   ----------
-  palette : an instance of :class:`toyplot.color.Palette`
+  palette: an instance of :class:`toyplot.color.Palette`
     Defines the set of colors used by the map.
 
   Notes
@@ -205,11 +205,11 @@ class CategoricalMap(object):
 
     Parameters
     ----------
-    values : array-like collection of nonnegative integers
+    values: array-like collection of nonnegative integers
 
     Returns
     -------
-    colors : array of toyplot colors with the same shape as `values`.
+    colors: array of toyplot colors with the same shape as `values`.
     """
     values = numpy.array(values, dtype="int64")
     flat = numpy.ravel(values) % len(self._palette._colors)
@@ -221,14 +221,14 @@ class CategoricalMap(object):
 
     Parameters
     ----------
-    index : nonnegative integer
+    index: nonnegative integer
       Specifies the index of the color to retrieve.  Note that the palette
       repeats infinitely, so any nonnegative integer value will return a color
       from the palette.
 
     Returns
     -------
-    color : toyplot color.
+    color: toyplot color.
     """
     return self.colors(index, domain_min, domain_max)
 
@@ -237,14 +237,14 @@ class CategoricalMap(object):
 
     Parameters
     ----------
-    index : nonnegative integer
+    index: nonnegative integer
       Specifies the index of the color to retrieve.  Note that the palette
       repeats infinitely, so any nonnegative integer value will return a color
       from the palette.
 
     Returns
     -------
-    css : CSS color string.
+    css: CSS color string.
     """
     return toyplot.color.css.convert(self.colors(index, domain_min, domain_max))
 
@@ -268,15 +268,15 @@ class DivergingMap(object):
 
   Parameters
   ----------
-  low : toyplot color, optional
+  low: toyplot color, optional
     Defines the color used to represent low values.
 
-  high : toyplot color, optional
+  high: toyplot color, optional
     Defines the color used to represent high values.
 
-  domain_min : scalar, optional
+  domain_min: scalar, optional
 
-  domain_max : scalar, optional
+  domain_max: scalar, optional
 
   Notes
   -----
@@ -310,11 +310,11 @@ class DivergingMap(object):
 
     Parameters
     ----------
-    values : array-like collection of scalar values
+    values: array-like collection of scalar values
 
     Returns
     -------
-    colors : array of toyplot colors with the same shape as `values`
+    colors: array of toyplot colors with the same shape as `values`
     """
 
     values = numpy.array(values)
@@ -341,11 +341,11 @@ class DivergingMap(object):
 
     Parameters
     ----------
-    value : scalar value
+    value: scalar value
 
     Returns
     -------
-    color : toyplot color
+    color: toyplot color
     """
     return self.colors(value, domain_min, domain_max)
 
@@ -354,11 +354,11 @@ class DivergingMap(object):
 
     Parameters
     ----------
-    value : scalar value
+    value: scalar value
 
     Returns
     -------
-    css : CSS color string
+    css: CSS color string
     """
     return toyplot.color.css.convert(self.colors(value, domain_min, domain_max))
 
@@ -381,12 +381,12 @@ class LinearMap(object):
 
   Parameters
   ----------
-  palette : :class:`toyplot.color.Palette`
+  palette: :class:`toyplot.color.Palette`
     Defines the set of colors used by the map.
 
-  domain_min : scalar, optional
+  domain_min: scalar, optional
 
-  domain_max : scalar,  optional
+  domain_max: scalar,  optional
 
   Notes
   -----
@@ -404,11 +404,11 @@ class LinearMap(object):
 
     Parameters
     ----------
-    values : array-like collection of scalar values
+    values: array-like collection of scalar values
 
     Returns
     -------
-    colors : array of toyplot colors with the same shape as `values`.
+    colors: array of toyplot colors with the same shape as `values`.
     """
     values = numpy.array(values)
     domain_min = domain_min if domain_min is not None else self._domain_min if self._domain_min is not None else values.min()
@@ -428,11 +428,11 @@ class LinearMap(object):
 
     Parameters
     ----------
-    value : scalar value
+    value: scalar value
 
     Returns
     -------
-    color : toyplot color
+    color: toyplot color
     """
     return self.colors(value, domain_min, domain_max)
 
@@ -441,11 +441,11 @@ class LinearMap(object):
 
     Parameters
     ----------
-    value : scalar value
+    value: scalar value
 
     Returns
     -------
-    css : CSS color string
+    css: CSS color string
     """
     return toyplot.color.css.convert(self.colors(value, domain_min, domain_max))
 
@@ -466,19 +466,19 @@ def brewer(name, count=None, reverse=False):
 
   Parameters
   ----------
-  name : string
+  name: string
     The name of the ColorBrewer 2.0 palette.
 
-  count : integer, optional
+  count: integer, optional
     The number of values in the palette.  If unspecified, the named palette
     with the largest number of values is returned.
 
-  reverse : boolean, optional
+  reverse: boolean, optional
     If `True`, the values in `palette` will be stored in reverse order.
 
   Returns
   -------
-  palette : :py:class:`toyplot.color.Palette`
+  palette: :py:class:`toyplot.color.Palette`
   """
   if count is None:
     count = max([count for count in brewer._data[name].keys() if count not in ["type", "reverse"]])
@@ -527,7 +527,7 @@ brewer._data = {
 "GreenBluePurple":  {3: [(236,226,240), (166,189,219), (28,144,153)], 4: [(246,239,247), (189,201,225), (103,169,207), (2,129,138)], 5: [(246,239,247), (189,201,225), (103,169,207), (28,144,153), (1,108,89)], 6: [(246,239,247), (208,209,230), (166,189,219), (103,169,207), (28,144,153), (1,108,89)], 7: [(246,239,247), (208,209,230), (166,189,219), (103,169,207), (54,144,192), (2,129,138), (1,100,80)], 8: [(255,247,251), (236,226,240), (208,209,230), (166,189,219), (103,169,207), (54,144,192), (2,129,138), (1,100,80)], 9: [(255,247,251), (236,226,240), (208,209,230), (166,189,219), (103,169,207), (54,144,192), (2,129,138), (1,108,89), (1,70,54)], "type":"seq", "reverse":True},
 }
 
-brewer.palettes = {name : palettes.keys() for name, palettes in brewer._data.items()}
+brewer.palettes = {name: palettes.keys() for name, palettes in brewer._data.items()}
 
 def _brewer_names():
   return [name for name in sorted(brewer._data.keys())]
@@ -547,12 +547,12 @@ def diverging(name, domain_min=None, domain_max=None):
 
   Parameters
   ----------
-  name : string
+  name: string
     The name of the map.  Use :py:func:`toyplot.color.diverging.names` to retrieve a list of available names.
 
   Returns
   -------
-  map : :class:`toyplot.color.DivergingMap`
+  map: :class:`toyplot.color.DivergingMap`
   """
   low, high = diverging._data[name]
   return DivergingMap(low, high, domain_min, domain_max)

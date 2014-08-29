@@ -15,11 +15,11 @@ def render(svg, context):
 
   Parameters
   ----------
-  svg : xml.etree.ElementTree.Element
+  svg: xml.etree.ElementTree.Element
     SVG representation of a :class:`toyplot.Canvas` returned by
     :func:`toyplot.svg.render()`.
 
-  context : cairo.Context
+  context: cairo.Context
     Cairo context that will be used to render the plot.
   """
   def push_style(new, styles, context):

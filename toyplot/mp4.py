@@ -22,17 +22,17 @@ def render(canvas, filename, width=None, height=None, scale=None, progress=None)
 
   Parameters
   ----------
-  canvas : :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.Canvas`
     Canvas to be rendered.
-  filename : string
+  filename: string
     Output video filename.
-  width : number, optional
+  width: number, optional
     Specify the width of the output video in pixels.
-  height : number, optional
+  height: number, optional
     Specify the height of the output video in pixels.
-  scale : number, optional
+  scale: number, optional
     Ratio of output video pixels to `canvas` drawing units.
-  progress : callback function taking a single `frame` argument, optional
+  progress: callback function taking a single `frame` argument, optional
     Callback function that will receive the number of each frame as it's
     written; useful to provide an indication of progress to end-users.
 

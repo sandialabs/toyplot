@@ -16,17 +16,17 @@ def render(canvas, fobj, width=None, height=None, scale=None):
 
   Parameters
   ----------
-  canvas : :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.Canvas`
     Canvas to be rendered.
-  fobj : file-like object or string
+  fobj: file-like object or string
     The file to write.  Use a string filepath to write data directly to disk.
-  width : number or (number, string) tuple, optional
+  width: number or (number, string) tuple, optional
     Specify the width of the output image with optional units.  If the units
     aren't specified, defaults to points.
-  height : number or (number, string) tuple, optional
+  height: number or (number, string) tuple, optional
     Specify the height of the output image with optional units.  If the units
     aren't specified, defaults to points.
-  scale : number, optional
+  scale: number, optional
     Ratio of output image points to `canvas` drawing units.
 
   Examples

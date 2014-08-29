@@ -9,15 +9,15 @@ def show(canvas, title="Toyplot Figure"):
 
   Parameters
   ----------
-  canvas : :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.Canvas`
     The canvas to be displayed.
 
-  title : string, optional
+  title: string, optional
     Optional page title to be displayed in the browser.
 
   Returns
   -------
-  browser : selenium webdriver object that can be used to control the browser.
+  browser: selenium webdriver object that can be used to control the browser.
 
   Notes
   -----

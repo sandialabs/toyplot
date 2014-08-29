@@ -11,7 +11,7 @@ def points(value):
 
   Parameters
   ----------
-  value : number or (number, string) tuple
+  value: number or (number, string) tuple
     Value to be converted.  Pass a (value, units) tuple, or the units will be
     assumed to be "points".  Supported units include: centimeter, centimeters,
     cm, decimeter, decimeters, dm, in, inch, inches, m, meter, meters, pica,

@@ -473,7 +473,7 @@ class BarBoundariesMark(Mark):
   """Render multiple stacked bars defined by bar boundaries.
 
   Do not create BarBoundariesMark instances directly.  Use factory methods such as
-  :meth:`toyplot.Axes2D.bars` instead.
+  :func:`toyplot.bars` or :meth:`toyplot.Axes2D.bars` instead.
   """
   def __init__(self, along, position, series, fill, opacity, title, style, id):
     Mark.__init__(self, {"stroke":"none"}, style, id=id)
@@ -488,7 +488,7 @@ class BarMagnitudesMark(Mark):
   """Render multiple stacked bars defined by bar magnitudes.
 
   Do not create BarMagnitudesMark instances directly.  Use factory methods such as
-  :meth:`toyplot.Axes2D.bars` instead.
+  :func:`toyplot.bars` or :meth:`toyplot.Axes2D.bars` instead.
   """
   def __init__(self, along, position, baseline, series, fill, opacity, title, style, id):
     Mark.__init__(self, {"stroke":"none"}, style, id=id)
@@ -504,7 +504,7 @@ class FillBoundariesMark(Mark):
   """Render multiple stacked fill regions defined by boundaries.
 
   Do not create FillBoundariesMark instances directly.  Use factory methods such
-  as :meth:`toyplot.Axes2D.fill` instead.
+  as :func:`toyplot.fill` or :meth:`toyplot.Axes2D.fill` instead.
   """
   def __init__(self, along, position, series, fill, opacity, title, style, id):
     Mark.__init__(self, style, id=id)
@@ -519,7 +519,7 @@ class FillMagnitudesMark(Mark):
   """Render multiple stacked fill regions defined by magnitudes.
 
   Do not create FillMagnitudesMark instances directly.  Use factory methods such
-  as :meth:`toyplot.Axes2D.fill` instead.
+  as :func:`toyplot.fill` or :meth:`toyplot.Axes2D.fill` instead.
   """
   def __init__(self, along, position, baseline, series, fill, opacity, title, style, id):
     Mark.__init__(self, style, id=id)
@@ -535,7 +535,7 @@ class PlotMark(Mark):
   """Plot multiple bivariate data series using lines and/or markers.
 
   Do not create PlotMark instances directly.  Use factory methods such as
-  :meth:`toyplot.Axes2D.plot` and :meth:`toyplot.Axes2D.scatterplot` instead.
+  :func:`toyplot.plot`, :func:`toyplot.scatterplot`, :meth:`toyplot.Axes2D.plot` and :meth:`toyplot.Axes2D.scatterplot` instead.
   """
   def __init__(self, along, show_stroke, position, series, stroke, stroke_width, stroke_opacity, marker, size, fill, opacity, title, style, mstyle, mlstyle, id):
     _require_instance(position, numpy.ma.MaskedArray)
@@ -2280,24 +2280,76 @@ Canvas._ipython_register()
 toyplot.autorender = True
 
 def bars(a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={}, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style={}):
+  """Convenience function for creating a bar plot in a single call.
+
+  See :meth:`toyplot.Axes2D.bars`, :meth:`toyplot.Canvas.axes`, and :class:`toyplot.Canvas` for parameter descriptions.
+
+  Returns
+  -------
+  canvas : :class:`toyplot.Canvas`
+    A new canvas object.
+  axes : :class:`toyplot.Axes2D`
+    A new set of 2D axes that fill the canvas.
+  mark : :class:`toyplot.BarMagnitudesMark` or :class:`toyplot.BarBoundariesMark`
+    The new bar mark.
+  """
   canvas = Canvas(width=width, height=height, style=canvas_style)
   axes = canvas.axes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, label=label, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, padding=padding)
   mark = axes.bars(a=a, b=b, c=c, along=along, baseline=baseline, fill=fill, colormap=colormap, palette=palette, opacity=opacity, title=title, style=style, id=id)
   return canvas, axes, mark
 
 def fill(a, b=None, c=None, along="x", baseline=None, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={}, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style={}):
+  """Convenience function for creating a fill plot in a single call.
+
+  See :meth:`toyplot.Axes2D.fill`, :meth:`toyplot.Canvas.axes`, and :class:`toyplot.Canvas` for parameter descriptions.
+
+  Returns
+  -------
+  canvas : :class:`toyplot.Canvas`
+    A new canvas object.
+  axes : :class:`toyplot.Axes2D`
+    A new set of 2D axes that fill the canvas.
+  mark : :class:`toyplot.FillBoundariesMark` or :class:`toyplot.FillMagnitudesMark`
+    The new bar mark.
+  """
   canvas = Canvas(width=width, height=height, style=canvas_style)
   axes = canvas.axes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, label=label, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, padding=padding)
   mark = axes.fill(a=a, b=b, c=c, along=along, baseline=baseline, fill=fill, colormap=colormap, palette=palette, opacity=opacity, title=title, style=style, id=id)
   return canvas, axes, mark
 
 def plot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={}, mstyle={"stroke":"none"}, mlstyle={}, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style={}):
+  """Convenience function for creating a line plot in a single call.
+
+  See :meth:`toyplot.Axes2D.plot`, :meth:`toyplot.Canvas.axes`, and :class:`toyplot.Canvas` for parameter descriptions.
+
+  Returns
+  -------
+  canvas : :class:`toyplot.Canvas`
+    A new canvas object.
+  axes : :class:`toyplot.Axes2D`
+    A new set of 2D axes that fill the canvas.
+  mark : :class:`toyplot.PlotMark`
+    The new plot mark.
+  """
   canvas = Canvas(width=width, height=height, style=canvas_style)
   axes = canvas.axes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, label=label, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, padding=padding)
   mark = axes.plot(a=a, b=b, along=along, stroke=stroke, stroke_colormap=stroke_colormap, stroke_palette=stroke_palette, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, fill_colormap=fill_colormap, fill_palette=fill_palette, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle, id=id)
   return canvas, axes, mark
 
 def scatterplot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={"stroke":"none"}, mstyle={"stroke":"none"}, mlstyle={}, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style={}):
+  """Convenience function for creating a scatter plot in a single call.
+
+  See :meth:`toyplot.Axes2D.scatterplot`, :meth:`toyplot.Canvas.axes`, and :class:`toyplot.Canvas` for parameter descriptions.
+
+  Returns
+  -------
+  canvas : :class:`toyplot.Canvas`
+    A new canvas object.
+  axes : :class:`toyplot.Axes2D`
+    A new set of 2D axes that fill the canvas.
+  mark : :class:`toyplot.PlotMark`
+    The new scatter plot mark.
+  """
   canvas = Canvas(width=width, height=height, style=canvas_style)
   axes = canvas.axes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, label=label, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, padding=padding)
   mark = axes.scatterplot(a=a, b=b, along=along, stroke=stroke, stroke_colormap=stroke_colormap, stroke_palette=stroke_palette, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, fill_colormap=fill_colormap, fill_palette=fill_palette, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle, id=id)

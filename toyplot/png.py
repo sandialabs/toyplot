@@ -93,7 +93,7 @@ def render_frames(canvas, width=None, height=None, scale=None):
   """
   svg, svg_animation = toyplot.svg.render(canvas, animation=True)
   scale = canvas._pixel_scale(width=width, height=height, scale=scale)
-  for time, changes in sorted(svg_animation.iteritems()):
+  for time, changes in sorted(svg_animation.items()):
     toyplot.svg.apply_changes(svg, changes)
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, int(scale * canvas._width), int(scale * canvas._height))
     context = cairo.Context(surface)

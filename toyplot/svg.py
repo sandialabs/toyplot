@@ -77,7 +77,7 @@ def render(canvas, fobj=None, animation=False):
   for child in canvas._children:
     _render_item(svg, child, canvas, id_cache)
 
-  if isinstance(fobj, basestring):
+  if isinstance(fobj, toyplot.string_type):
     with open(fobj, "w") as file:
       file.write(xml.tostring(svg, method="xml"))
   elif fobj is not None:
@@ -85,9 +85,9 @@ def render(canvas, fobj=None, animation=False):
   else:
     if animation:
       svg_animation = collections.defaultdict(lambda: collections.defaultdict(list))
-      for time, time_changes in canvas._animation.iteritems():
+      for time, time_changes in canvas._animation.items():
         svg_animation[time] # Ensure we have an entry for every time, even if there aren't any changes.
-        for type, type_changes in time_changes.iteritems():
+        for type, type_changes in time_changes.items():
           for change in type_changes:
             svg_animation[time][type].append([id_cache(change[0])] + list(change[1:]))
       return svg, svg_animation
@@ -153,7 +153,7 @@ def _flat_contiguous(a):
 def _render_marker(root, cx, cy, size, marker, marker_style=None, label_style=None, extra_class=None):
   if marker is None:
     return
-  if isinstance(marker, basestring):
+  if isinstance(marker, toyplot.string_type):
     marker = {"shape":marker}
   shape = marker.get("shape", None)
   shape_angle = marker.get("angle", 0)

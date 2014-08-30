@@ -19,7 +19,7 @@ def points(value):
   """
   if isinstance(value, numbers.Number):
     value = (value, "points")
-  if not (isinstance(value, tuple) and len(value) == 2 and isinstance(value[0], numbers.Number) and isinstance(value[1], basestring)):
+  if not (isinstance(value, tuple) and len(value) == 2 and isinstance(value[0], numbers.Number) and isinstance(value[1], toyplot.string_type)):
     raise ValueError("Value must be a number or a (number, string) tuple.")
   value, units = value
   if units.lower() not in points._conversions:

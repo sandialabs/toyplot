@@ -4,7 +4,7 @@
 
 from __future__ import division
 
-import StringIO
+import io
 import collections
 import nose.tools
 import numpy
@@ -86,22 +86,22 @@ def assert_dom_equal(a, b):
 
 def assert_canvas_matches(canvas, name):
   # Render every representation of the canvas for coverage ...
-  html = StringIO.StringIO()
+  html = io.BytesIO()
   toyplot.html.render(canvas, html)
 
-  svg = StringIO.StringIO()
+  svg = io.BytesIO()
   toyplot.svg.render(canvas, svg)
 
   if hasattr(toyplot, "eps"):
-    eps = StringIO.StringIO()
+    eps = io.BytesIO()
     toyplot.eps.render(canvas, eps)
 
   if hasattr(toyplot, "pdf"):
-    pdf = StringIO.StringIO()
+    pdf = io.BytesIO()
     toyplot.pdf.render(canvas, pdf)
 
   if hasattr(toyplot, "png"):
-    png = StringIO.StringIO()
+    png = io.BytesIO()
     toyplot.png.render(canvas, png)
 
   # Get rid of any past failures ...
@@ -123,7 +123,7 @@ def assert_canvas_matches(canvas, name):
   except Exception as e:
     if not os.path.exists("tests/failed"):
       os.mkdir("tests/failed")
-    with open("tests/failed/%s.svg" % name, "w") as file:
+    with open("tests/failed/%s.svg" % name, "wb") as file:
       file.write(svg.getvalue())
     raise AssertionError("Test output tests/failed/%s.svg doesn't match tests/reference/%s.svg (%s)" % (name, name, e))
 
@@ -1531,7 +1531,7 @@ def test_canvas_time():
 def test_canvas_repr_html():
   canvas = toyplot.Canvas(autorender="html")
   html = canvas._repr_html_()
-  nose.tools.assert_is_instance(html, basestring)
+  nose.tools.assert_is_instance(html, toyplot.string_type)
 
 def test_locator_defaults():
   x = numpy.linspace(0, 2 * numpy.pi, 100)
@@ -1854,12 +1854,12 @@ def test_png_render_defaults():
     canvas = toyplot.Canvas()
     canvas.axes()
     image = toyplot.png.render(canvas)
-    nose.tools.assert_is_instance(image, basestring)
+    nose.tools.assert_is_instance(image, toyplot.string_type)
     nose.tools.assert_equal(image[1:4], "PNG")
 
 def test_png_render_buffer():
   if hasattr(toyplot, "png"):
-    buffer = StringIO.StringIO()
+    buffer = io.BytesIO()
     canvas = toyplot.Canvas()
     canvas.axes()
     toyplot.png.render(canvas, buffer)
@@ -1883,7 +1883,7 @@ def test_png_render_frames():
       frame.set_datum_style(scatterplot, 0, frame.index(), {"stroke":"none"})
     canvas.animate(10, callback)
     for frame in toyplot.png.render_frames(canvas):
-      nose.tools.assert_is_instance(frame, basestring)
+      nose.tools.assert_is_instance(frame, toyplot.string_type)
       nose.tools.assert_equal(frame[1:4], "PNG")
 
 def test_cairo_small_font():

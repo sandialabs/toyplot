@@ -46,7 +46,7 @@ def _msh_to_lab(M, s, h):
   return L, a, b
 
 def _require_color(color):
-  if isinstance(color, basestring):
+  if isinstance(color, toyplot.string_type):
     return toyplot.color.css.parse(color)
   elif isinstance(color, (numpy.void, numpy.ndarray)) and color.dtype == dtype:
     return color

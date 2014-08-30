@@ -26,7 +26,7 @@ class Table(object):
 
   def __getitem__(self, key):
     # Return a single column
-    if isinstance(key, basestring):
+    if isinstance(key, toyplot.string_type):
       return self._columns[key]
     # Return a single row
     if isinstance(key, numbers.Integral):

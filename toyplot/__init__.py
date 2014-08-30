@@ -12,6 +12,14 @@ import toyplot.color.css
 import toyplot.units
 
 ###############################################################################################
+# Python 2/3 compatibility
+
+try:
+  string_type = basestring
+except:
+  string_type = str
+
+###############################################################################################
 # Helpers
 
 def _null_min(a, b):
@@ -88,17 +96,17 @@ def _require_scalar_matrix(value, rows=None, columns=None):
   return array
 
 def _require_string(value):
-  if not isinstance(value, basestring):
+  if not isinstance(value, string_type):
     raise ValueError("Expected a string, received %s." % value)
   return value
 
 def _require_optional_string(value):
-  if not isinstance(value, (basestring, type(None))):
+  if not isinstance(value, (string_type, type(None))):
     raise ValueError("Expected a string value or None, received %s." % value)
   return value
 
 def _require_marker_array(value, length=None):
-  if isinstance(value, (basestring, tuple)):
+  if isinstance(value, (string_type, tuple)):
     array = [value] * (1 if length is None else length)
   else:
     array = value
@@ -140,7 +148,7 @@ def _region(xmin, xmax, ymin, ymax, bounds=None, rect=None, corner=None, grid=No
   def length(min, max, value):
     if isinstance(value, numbers.Number):
       return value
-    if isinstance(value, basestring):
+    if isinstance(value, string_type):
       value = value.strip()
       if value[-1] == "%":
         value = float(value[:-1]) * 0.01

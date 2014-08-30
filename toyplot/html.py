@@ -288,7 +288,7 @@ def render(canvas, fobj=None):
   if len(svg_animation) > 1:
     times = numpy.array(sorted(svg_animation.keys()))
     durations = times[1:] - times[:-1]
-    changes = [change for time, change in sorted(svg_animation.iteritems())]
+    changes = [change for time, change in sorted(svg_animation.items())]
 
     vcr_controls = xml.SubElement(controls, "div", attrib={"class":"toyplot-vcr-controls"})
     xml.SubElement(vcr_controls, "input", title="Frame", type="range", min="0", max=str(len(times)-2), step="1", value="0", id="%s-current-frame" % root.get("id"))
@@ -457,7 +457,7 @@ def render(canvas, fobj=None):
       json.dumps(changes),
       )
 
-  if isinstance(fobj, basestring):
+  if isinstance(fobj, toyplot.string_type):
     with open(fobj, "w") as file:
       file.write(xml.tostring(root, method="html"))
   elif fobj is not None:

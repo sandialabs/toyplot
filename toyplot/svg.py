@@ -119,7 +119,7 @@ def _css_style(*styles):
   for style in styles:
     if style is not None:
       computed_style.update(style)
-  return "".join(["%s:%s;" % (key, value) for key, value in computed_style.items()])
+  return ";".join(["%s:%s" % (key, value) for key, value in sorted(computed_style.items())])
 
 def _css_attrib(*styles):
   computed_style = {}
@@ -128,7 +128,7 @@ def _css_attrib(*styles):
       computed_style.update(style)
   attrib = {}
   if len(computed_style):
-    attrib["style"] =  "".join(["%s:%s;" % (key, value) for key, value in computed_style.items()])
+    attrib["style"] =  ";".join(["%s:%s" % (key, value) for key, value in sorted(computed_style.items())])
   return attrib
 
 class _id_cache(object):
@@ -237,7 +237,7 @@ def _render_Axes2D(root, item, parent, id_cache):
         axes_data["y"].append({"scale":"log", "base":base, "range":{"min":item._ymin_range + item._padding, "max":item._project_y(1.0)}, "domain":{"min":1.0, "max":item._ymax_computed}})
 
   item_xml = xml.SubElement(root, "g", id=id_cache(item), attrib={"class":"toyplot-Axes2D"})
-  xml.SubElement(item_xml, "toyplot:axes").text = json.dumps(axes_data)
+  xml.SubElement(item_xml, "toyplot:axes").text = json.dumps(axes_data, sort_keys=True)
 
   clip_xml = xml.SubElement(item_xml, "clipPath", id="t" + uuid.uuid4().hex)
   xml.SubElement(clip_xml, "rect", x=str(item._xmin_range), y=str(item._ymin_range), width=str(item._xmax_range - item._xmin_range), height=str(item._ymax_range - item._ymin_range))
@@ -364,7 +364,7 @@ def _render_BarBoundariesMark(root, item, parent, id_cache):
 
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-BarBoundariesMark"})
 
-  xml.SubElement(item_xml, "toyplot:data-table", title="Bar Data").text = json.dumps({"names":["position"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[item._position.tolist()] + [s.tolist() for s in item._series.T]})
+  xml.SubElement(item_xml, "toyplot:data-table", title="Bar Data").text = json.dumps({"names":["position"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[item._position.tolist()] + [s.tolist() for s in item._series.T]}, sort_keys=True)
 
   for boundary1, boundary2, fill, opacity, title in zip(boundaries.T[:-1], boundaries.T[1:], item._fill.T, item._opacity.T, item._title.T):
     not_null = numpy.invert(numpy.logical_or(numpy.ma.getmaskarray(boundary1), numpy.ma.getmaskarray(boundary2)))
@@ -403,7 +403,7 @@ def _render_BarMagnitudesMark(root, item, parent, id_cache):
 
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-BarMagnitudesMark"})
 
-  xml.SubElement(item_xml, "toyplot:data-table", title="Bar Data").text = json.dumps({"names":["position0", "position1"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[p.tolist() for p in item._position.T] + [s.tolist() for s in item._series.T]})
+  xml.SubElement(item_xml, "toyplot:data-table", title="Bar Data").text = json.dumps({"names":["position0", "position1"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[p.tolist() for p in item._position.T] + [s.tolist() for s in item._series.T]}, sort_keys=True)
 
   for boundary1, boundary2, fill, opacity, title in zip(boundaries.T[:-1], boundaries.T[1:], item._fill.T, item._opacity.T, item._title.T):
     series_xml = xml.SubElement(item_xml, "g", attrib={"class":"toyplot-Series"})
@@ -425,7 +425,7 @@ def _render_FillBoundariesMark(root, item, parent, id_cache):
 
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-FillBoundariesMark"})
 
-  xml.SubElement(item_xml, "toyplot:data-table", title="Fill Data").text = json.dumps({"names":["position"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[item._position.tolist()] + [s.tolist() for s in item._series.T]})
+  xml.SubElement(item_xml, "toyplot:data-table", title="Fill Data").text = json.dumps({"names":["position"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[item._position.tolist()] + [s.tolist() for s in item._series.T]}, sort_keys=True)
 
   for boundary1, boundary2, fill, opacity, title in zip(boundaries.T[:-1], boundaries.T[1:], item._fill, item._opacity, item._title):
     not_null = numpy.invert(numpy.logical_or(numpy.ma.getmaskarray(boundary1), numpy.ma.getmaskarray(boundary2)))
@@ -459,7 +459,7 @@ def _render_FillMagnitudesMark(root, item, parent, id_cache):
 
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-FillMagnitudesMark"})
 
-  xml.SubElement(item_xml, "toyplot:data-table", title="Fill Data").text = json.dumps({"names":["position"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[item._position.tolist()] + [s.tolist() for s in item._series.T]})
+  xml.SubElement(item_xml, "toyplot:data-table", title="Fill Data").text = json.dumps({"names":["position"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[item._position.tolist()] + [s.tolist() for s in item._series.T]}, sort_keys=True)
 
   for boundary1, boundary2, fill, opacity, title in zip(boundaries.T[:-1], boundaries.T[1:], item._fill, item._opacity, item._title):
     series_style = {"fill":toyplot.color.css.convert(fill), "opacity":opacity}
@@ -555,7 +555,7 @@ def _render_PlotMark(root, item, parent, id_cache):
 
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-PlotMark"})
 
-  xml.SubElement(item_xml, "toyplot:data-table", title="Plot Data").text = json.dumps({"names":["position"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[item._position.tolist()] + [s.tolist() for s in item._series.T]})
+  xml.SubElement(item_xml, "toyplot:data-table", title="Plot Data").text = json.dumps({"names":["position"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[item._position.tolist()] + [s.tolist() for s in item._series.T]}, sort_keys=True)
 
   for series, stroke, stroke_width, stroke_opacity, title, marker, size, fill, opacity  in zip(series.T, item._stroke.T, item._stroke_width.T, item._stroke_opacity.T, item._title.T, item._marker.T, item._size.T, item._fill.T, item._opacity.T):
     not_null = numpy.invert(numpy.logical_or(numpy.ma.getmaskarray(position), numpy.ma.getmaskarray(series)))
@@ -601,7 +601,7 @@ def _render_RectMark(root, item, parent, id_cache):
       y1 = parent._project_y(item._series.T[0])
       y2 = parent._project_y(item._series.T[1])
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-RectMark"})
-  xml.SubElement(item_xml, "toyplot:data-table", title="Rect Data").text = json.dumps({"names":["series%s" % s for s in range(item._series.shape[1])], "data":[s.tolist() for s in item._series.T]})
+  xml.SubElement(item_xml, "toyplot:data-table", title="Rect Data").text = json.dumps({"names":["series%s" % s for s in range(item._series.shape[1])], "data":[s.tolist() for s in item._series.T]}, sort_keys=True)
   series_xml = xml.SubElement(item_xml, "g", attrib={"class":"toyplot-Series"})
   for dx1, dx2, dy1, dy2, dfill, dopacity, dtitle in zip(x1, x2, y1, y2, item._fill, item._opacity, item._title):
     dstyle = {"fill":toyplot.color.css.convert(dfill), "opacity":dopacity}
@@ -626,7 +626,7 @@ def _render_TextMark(root, item, parent, id_cache):
     y = item._series.T[1]
 
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-TextMark"})
-  xml.SubElement(item_xml, "toyplot:data-table", title="Text Data").text = json.dumps({"names":["text"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[item._text.tolist()] + [s.tolist() for s in item._series.T]})
+  xml.SubElement(item_xml, "toyplot:data-table", title="Text Data").text = json.dumps({"names":["text"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[item._text.tolist()] + [s.tolist() for s in item._series.T]}, sort_keys=True)
   series_xml = xml.SubElement(item_xml, "g", attrib={"class":"toyplot-Series"})
   for dx, dy, dtext, dangle, dfill, dopacity, dtitle in zip(x, y, item._text, item._angle, item._fill, item._opacity, item._title):
     dstyle = {"fill":toyplot.color.css.convert(dfill), "opacity":dopacity}

@@ -458,7 +458,7 @@ def render(canvas, fobj=None):
       )
 
   if isinstance(fobj, toyplot.string_type):
-    with open(fobj, "w") as file:
+    with open(fobj, "wb") as file:
       file.write(xml.tostring(root, method="html"))
   elif fobj is not None:
     fobj.write(xml.tostring(root, method="html"))

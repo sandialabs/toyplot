@@ -32,6 +32,6 @@ def show(canvas, title="Toyplot Figure"):
   body.append(figure)
 
   fd, path = tempfile.mkstemp(suffix=".html")
-  with os.fdopen(fd, "w") as file:
+  with os.fdopen(fd, "wb") as file:
     file.write(xml.tostring(html, method="html"))
   webbrowser.open("file://" + path, new=1, autoraise=True)

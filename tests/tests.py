@@ -60,8 +60,9 @@ def assert_masked_array(a, dtype, b, mask):
 def assert_dom_equal(a, b):
   if a.tag.split("}")[-1] != b.tag.split("}")[-1]:
     raise AssertionError("Tag %s != %s" % (a.tag, b.tag))
-  if a.text != b.text:
-    raise AssertionError("Text %s != %s" % (a.text, b.text))
+  if a.tag not in ["{http://www.sandia.gov/toyplot}axes", "{http://www.sandia.gov/toyplot}data-table"]:
+    if a.text != b.text:
+      raise AssertionError("%s Text %s != %s" % (a.tag, a.text, b.text))
   if a.tail != b.tail:
     raise AssertionError("Tail %s != %s" % (a.tail, b.tail))
   for key in a.attrib:
@@ -110,7 +111,7 @@ def assert_canvas_matches(canvas, name):
 
   # If there's no stored SVG reference for this canvas, create one ...
   if not os.path.exists("tests/reference/%s.svg" % name):
-    with open("tests/reference/%s.svg" % name, "w") as file:
+    with open("tests/reference/%s.svg" % name, "wb") as file:
       file.write(svg.getvalue())
     raise AssertionError("Created new reference file tests/reference/%s.svg ... you should verify its contents before re-running the test." % name)
 
@@ -133,15 +134,15 @@ def assert_html_matches(html, name):
   if os.path.exists(test_file):
     os.remove(test_file)
   if os.path.exists(reference_file):
-    reference_html = open(reference_file).read()
+    reference_html = open(reference_file, "rb").read()
     if html != reference_html:
       if not os.path.exists("tests/failed"):
         os.mkdir("tests/failed")
-      with open(test_file, "w") as file:
+      with open(test_file, "wb") as file:
         file.write(html)
       raise AssertionError("Test output %s doesn't match %s." % (test_file, reference_file))
   else:
-    with open(reference_file, "w") as file:
+    with open(reference_file, "wb") as file:
       file.write(html)
     raise AssertionError("Created new reference file %s.  You should verify its contents before re-running the test." % (reference_file))
 

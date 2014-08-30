@@ -25,12 +25,12 @@ for index, path in enumerate(paths):
   extension = os.path.splitext(path)[1]
   if extension == ".svg":
     dom = xml.dom.minidom.parse(path)
-    with open(os.path.join(directory, "%s.svg" % index), "w") as file:
+    with open(os.path.join(directory, "%s.svg" % index), "wb") as file:
       file.write(dom.toprettyxml(indent="  "))
     comparison_paths.append(os.path.join(directory, "%s.svg" % index))
   elif extension == ".html":
-    html = open(path).read()
-    with open(os.path.join(directory, "%s.html" % index), "w") as file:
+    html = open(path, "rb").read()
+    with open(os.path.join(directory, "%s.html" % index), "wb") as file:
       file.write(html)
     comparison_paths.append(os.path.join(directory, "%s.html" % index))
 

@@ -78,7 +78,7 @@ def render(canvas, fobj=None, animation=False):
     _render_item(svg, child, canvas, id_cache)
 
   if isinstance(fobj, toyplot.string_type):
-    with open(fobj, "w") as file:
+    with open(fobj, "wb") as file:
       file.write(xml.tostring(svg, method="xml"))
   elif fobj is not None:
     fobj.write(xml.tostring(svg, method="xml"))
@@ -237,6 +237,9 @@ def _render_Axes2D(root, item, parent, id_cache):
         axes_data["y"].append({"scale":"log", "base":base, "range":{"min":item._ymin_range + item._padding, "max":item._project_y(1.0)}, "domain":{"min":1.0, "max":item._ymax_computed}})
 
   item_xml = xml.SubElement(root, "g", id=id_cache(item), attrib={"class":"toyplot-Axes2D"})
+  import pprint
+  pprint.pprint(axes_data)
+  pprint.pprint(type(axes_data["x"][0]["domain"]["min"]))
   xml.SubElement(item_xml, "toyplot:axes").text = json.dumps(axes_data, sort_keys=True)
 
   clip_xml = xml.SubElement(item_xml, "clipPath", id="t" + uuid.uuid4().hex)

@@ -89,7 +89,7 @@ def render_frames(canvas, width=None, height=None, scale=None):
   Examples
   --------
   >>> for frame, png in enumerate(toyplot.cairo.render_png_frames(canvas)):
-  ...   open("frame-%s.png" % frame).write(png)
+  ...   open("frame-%s.png" % frame, "wb").write(png)
   """
   svg, svg_animation = toyplot.svg.render(canvas, animation=True)
   scale = canvas._pixel_scale(width=width, height=height, scale=scale)

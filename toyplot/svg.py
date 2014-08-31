@@ -73,7 +73,7 @@ def render(canvas, fobj=None, animation=False):
 
   id_cache = _id_cache()
 
-  svg = xml.Element("svg", xmlns="http://www.w3.org/2000/svg", attrib={"xmlns:toyplot":"http://www.sandia.gov/toyplot"}, width="%spx" % canvas._width, height="%spx" % canvas._height, style=_css_style(canvas._style), id=id_cache(canvas))
+  svg = xml.Element("svg", xmlns="http://www.w3.org/2000/svg", attrib={"xmlns:toyplot":"http://www.sandia.gov/toyplot"}, width="%rpx" % canvas._width, height="%rpx" % canvas._height, style=_css_style(canvas._style), id=id_cache(canvas))
   for child in canvas._children:
     _render_item(svg, child, canvas, id_cache)
 
@@ -171,41 +171,41 @@ def _render_marker(root, cx, cy, size, marker, marker_style=None, label_style=No
     attrib["class"] = extra_class
   marker_xml = xml.SubElement(root, "g", attrib=attrib)
   if shape == "|":
-    xml.SubElement(marker_xml, "line", transform="rotate(%s, %s, %s)" % (shape_angle, cx, cy), x1=str(cx), x2=str(cx), y1=str(cy - (size / 2)), y2=str(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
   elif shape == "+":
-    xml.SubElement(marker_xml, "line", transform="rotate(%s, %s, %s)" % (shape_angle, cx, cy), x1=str(cx), x2=str(cx), y1=str(cy - (size / 2)), y2=str(cy + (size / 2)))
-    xml.SubElement(marker_xml, "line", transform="rotate(%s, %s, %s)" % (shape_angle, cx, cy), x1=str(cx - (size / 2)), x2=str(cx + (size / 2)), y1=str(cy), y2=str(cy))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx - (size / 2)), x2=repr(cx + (size / 2)), y1=repr(cy), y2=repr(cy))
   elif shape == "*":
-    xml.SubElement(marker_xml, "line", transform="rotate(%s, %s, %s)" % (shape_angle, cx, cy), x1=str(cx), x2=str(cx), y1=str(cy - (size / 2)), y2=str(cy + (size / 2)))
-    xml.SubElement(marker_xml, "line", transform="rotate(%s, %s, %s)" % (shape_angle - 60, cx, cy), x1=str(cx), x2=str(cx), y1=str(cy - (size / 2)), y2=str(cy + (size / 2)))
-    xml.SubElement(marker_xml, "line", transform="rotate(%s, %s, %s)" % (shape_angle + 60, cx, cy), x1=str(cx), x2=str(cx), y1=str(cy - (size / 2)), y2=str(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle - 60, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle + 60, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
   elif shape == "^":
-    xml.SubElement(marker_xml, "polygon", transform="rotate(%s, %s, %s)" % (shape_angle, cx, cy), points=" ".join(["%s,%s" % (xp, yp) for xp, yp in [(cx - (size / 2), cy + (size / 2)), (cx, cy - (size / 2)), (cx + (size / 2), cy + (size / 2))]]))
+    xml.SubElement(marker_xml, "polygon", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), points=" ".join(["%r,%r" % (xp, yp) for xp, yp in [(cx - (size / 2), cy + (size / 2)), (cx, cy - (size / 2)), (cx + (size / 2), cy + (size / 2))]]))
   elif shape == "s":
-    xml.SubElement(marker_xml, "rect", transform="rotate(%s, %s, %s)" % (shape_angle, cx, cy), x=str(cx-(size / 2)), y=str(cy-(size / 2)), width=str(size), height=str(size))
+    xml.SubElement(marker_xml, "rect", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x=repr(cx-(size / 2)), y=repr(cy-(size / 2)), width=repr(size), height=repr(size))
   elif shape == "o":
-    xml.SubElement(marker_xml, "circle", cx=str(cx), cy=str(cy), r=str(size / 2))
+    xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
   elif shape == "oo":
-    xml.SubElement(marker_xml, "circle", cx=str(cx), cy=str(cy), r=str(size / 2))
-    xml.SubElement(marker_xml, "circle", cx=str(cx), cy=str(cy), r=str(size / 4))
+    xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
+    xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 4))
   elif shape == "o|":
-    xml.SubElement(marker_xml, "circle", cx=str(cx), cy=str(cy), r=str(size / 2))
-    xml.SubElement(marker_xml, "line", transform="rotate(%s, %s, %s)" % (shape_angle, cx, cy), x1=str(cx), x2=str(cx), y1=str(cy - (size / 2)), y2=str(cy + (size / 2)))
+    xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
   elif shape == "o+":
-    xml.SubElement(marker_xml, "circle", cx=str(cx), cy=str(cy), r=str(size / 2))
-    xml.SubElement(marker_xml, "line", transform="rotate(%s, %s, %s)" % (shape_angle, cx, cy), x1=str(cx), x2=str(cx), y1=str(cy - (size / 2)), y2=str(cy + (size / 2)))
-    xml.SubElement(marker_xml, "line", transform="rotate(%s, %s, %s)" % (shape_angle, cx, cy), x1=str(cx - (size / 2)), x2=str(cx + (size / 2)), y1=str(cy), y2=str(cy))
+    xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx - (size / 2)), x2=repr(cx + (size / 2)), y1=repr(cy), y2=repr(cy))
   elif shape == "o*":
-    xml.SubElement(marker_xml, "circle", cx=str(cx), cy=str(cy), r=str(size / 2))
-    xml.SubElement(marker_xml, "line", transform="rotate(%s, %s, %s)" % (shape_angle, cx, cy), x1=str(cx), x2=str(cx), y1=str(cy - (size / 2)), y2=str(cy + (size / 2)))
-    xml.SubElement(marker_xml, "line", transform="rotate(%s, %s, %s)" % (shape_angle - 60, cx, cy), x1=str(cx), x2=str(cx), y1=str(cy - (size / 2)), y2=str(cy + (size / 2)))
-    xml.SubElement(marker_xml, "line", transform="rotate(%s, %s, %s)" % (shape_angle + 60, cx, cy), x1=str(cx), x2=str(cx), y1=str(cy - (size / 2)), y2=str(cy + (size / 2)))
+    xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle - 60, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle + 60, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
   elif shape == "path":
     shape_path = marker.get("path")
-    xml.SubElement(marker_xml, "path", transform="translate(%s, %s) scale(%s) translate(%s, %s)" % (cx, cy, size, -cx, -cy), d="M " + str(cx) + " " + str(cy) + shape_path)
+    xml.SubElement(marker_xml, "path", transform="translate(%r, %r) scale(%r) translate(%r, %r)" % (cx, cy, size, -cx, -cy), d="M " + repr(cx) + " " + repr(cy) + shape_path)
 
   if shape_label is not None:
-    xml.SubElement(marker_xml, "text", x=str(cx), y=str(cy), attrib=_css_attrib({"stroke":"none", "fill":"black", "text-anchor":"middle", "alignment-baseline":"middle", "font-size":"%spx" % (size * 0.75)}, label_style, shape_label_style)).text = shape_label
+    xml.SubElement(marker_xml, "text", x=repr(cx), y=repr(cy), attrib=_css_attrib({"stroke":"none", "fill":"black", "text-anchor":"middle", "alignment-baseline":"middle", "font-size":"%rpx" % (size * 0.75)}, label_style, shape_label_style)).text = shape_label
 _render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<": ("^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
 def _render_Axes2D(root, item, parent, id_cache):
@@ -247,17 +247,17 @@ def _render_Axes2D(root, item, parent, id_cache):
   xml.SubElement(item_xml, "toyplot:axes").text = json.dumps(axes_data, cls=custom_encoder, sort_keys=True)
 
   clip_xml = xml.SubElement(item_xml, "clipPath", id="t" + uuid.uuid4().hex)
-  xml.SubElement(clip_xml, "rect", x=str(item._xmin_range), y=str(item._ymin_range), width=str(item._xmax_range - item._xmin_range), height=str(item._ymax_range - item._ymin_range))
+  xml.SubElement(clip_xml, "rect", x=repr(item._xmin_range), y=repr(item._ymin_range), width=repr(item._xmax_range - item._xmin_range), height=repr(item._ymax_range - item._ymin_range))
 
   children_xml = xml.SubElement(item_xml, "g", attrib={"class":"toyplot-coordinate-events", "clip-path":"url(#%s)" % clip_xml.get("id")}, style=_css_style({"cursor":"crosshair"}))
-  xml.SubElement(children_xml, "rect", x=str(item._xmin_range), y=str(item._ymin_range), width=str(item._xmax_range - item._xmin_range), height=str(item._ymax_range - item._ymin_range), style=_css_style({"visibility":"hidden", "pointer-events":"all"}))
+  xml.SubElement(children_xml, "rect", x=repr(item._xmin_range), y=repr(item._ymin_range), width=repr(item._xmax_range - item._xmin_range), height=repr(item._ymax_range - item._ymin_range), style=_css_style({"visibility":"hidden", "pointer-events":"all"}))
   for child in item._children:
     _render_item(children_xml, child, item, id_cache)
 
   if item.coordinates._show:
     coordinates_xml = xml.SubElement(item_xml, "g", style=_css_style({"visibility":"hidden"}), attrib={"class":"toyplot-coordinates"})
-    xml.SubElement(coordinates_xml, "rect", x=str(item.coordinates._xmin_range), y=str(item.coordinates._ymin_range), width=str(item.coordinates._xmax_range - item.coordinates._xmin_range), height=str(item.coordinates._ymax_range - item.coordinates._ymin_range), style=_css_style(item.coordinates._style))
-    xml.SubElement(coordinates_xml, "text", x=str((item.coordinates._xmin_range + item.coordinates._xmax_range) * 0.5), y=str((item.coordinates._ymin_range + item.coordinates._ymax_range) * 0.5), style=_css_style(item.coordinates.label._style))
+    xml.SubElement(coordinates_xml, "rect", x=repr(item.coordinates._xmin_range), y=repr(item.coordinates._ymin_range), width=repr(item.coordinates._xmax_range - item.coordinates._xmin_range), height=repr(item.coordinates._ymax_range - item.coordinates._ymin_range), style=_css_style(item.coordinates._style))
+    xml.SubElement(coordinates_xml, "text", x=repr((item.coordinates._xmin_range + item.coordinates._xmax_range) * 0.5), y=repr((item.coordinates._ymin_range + item.coordinates._ymax_range) * 0.5), style=_css_style(item.coordinates.label._style))
 
   if item._show:
     if item.x.spine._position == "low":
@@ -281,7 +281,7 @@ def _render_Axes2D(root, item, parent, id_cache):
         if item._xmin_implicit is not None:
           x1 = max(x1, item._project_x(item._xmin_implicit))
           x2 = min(x2, item._project_x(item._xmax_implicit))
-        xml.SubElement(item_xml, "line", x1=str(x1), y1=str(spine_y), x2=str(x2), y2=str(spine_y), style=_css_style(item.x.spine._style))
+        xml.SubElement(item_xml, "line", x1=repr(x1), y1=repr(spine_y), x2=repr(x2), y2=repr(spine_y), style=_css_style(item.x.spine._style))
 
       if item.x.ticks._show:
         ticks_group = xml.SubElement(item_xml, "g")
@@ -289,24 +289,24 @@ def _render_Axes2D(root, item, parent, id_cache):
           x = item._project_x(location)
           y1 = item._ymax_range
           y2 = item._ymax_range - item.x.ticks._length
-          xml.SubElement(ticks_group, "line", x1=str(x), y1=str(y1), x2=str(x), y2=str(y2), style=_css_style(item.x.ticks._style, tick_style))
+          xml.SubElement(ticks_group, "line", x1=repr(x), y1=repr(y1), x2=repr(x), y2=repr(y2), style=_css_style(item.x.ticks._style, tick_style))
 
       if item.x.ticks.labels._show:
         ticks_group = xml.SubElement(item_xml, "g")
         for location, label, title, label_style in zip(item._xtick_locations, item._xtick_labels, item._xtick_titles, item.x.ticks.labels.label.styles(item._xtick_locations)):
           x = item._project_x(location)
           y = item._ymax_range
-          label_xml = xml.SubElement(ticks_group, "text", x=str(x), y=str(y), style=_css_style({"text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"-80%"}, item.x.ticks.labels._style, label_style))
+          label_xml = xml.SubElement(ticks_group, "text", x=repr(x), y=repr(y), style=_css_style({"text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"-80%"}, item.x.ticks.labels._style, label_style))
           label_xml.text = label
           if item.x.ticks.labels._angle:
-            label_xml.set("transform", "rotate(%s, %s, %s)" % (item.x.ticks.labels._angle, x, y))
+            label_xml.set("transform", "rotate(%r, %r, %r)" % (item.x.ticks.labels._angle, x, y))
           if title is not None:
             xml.SubElement(label_xml, "title").text = str(title)
 
       if item.x.label._text is not None:
         x = (item._xmin_range + item._xmax_range) * 0.5
         y = item._ymax_range
-        xml.SubElement(item_xml, "text", x=str(x), y=str(y), style=_css_style(item.x.label._style)).text = item.x.label._text
+        xml.SubElement(item_xml, "text", x=repr(x), y=repr(y), style=_css_style(item.x.label._style)).text = item.x.label._text
 
     if item.y._show:
       if item.y.spine._show:
@@ -315,7 +315,7 @@ def _render_Axes2D(root, item, parent, id_cache):
         if item._ymin_implicit is not None:
           y1 = max(y1, item._project_y(item._ymax_implicit))
           y2 = min(y2, item._project_y(item._ymin_implicit))
-        xml.SubElement(item_xml, "line", x1=str(spine_x), y1=str(y1), x2=str(spine_x), y2=str(y2), style=_css_style(item.y.spine._style))
+        xml.SubElement(item_xml, "line", x1=repr(spine_x), y1=repr(y1), x2=repr(spine_x), y2=repr(y2), style=_css_style(item.y.spine._style))
 
       if item.y.ticks._show:
         ticks_group = xml.SubElement(item_xml, "g")
@@ -323,29 +323,29 @@ def _render_Axes2D(root, item, parent, id_cache):
           y = item._project_y(location)
           x1 = item._xmin_range
           x2 = item._xmin_range + item.y.ticks._length
-          xml.SubElement(ticks_group, "line", x1=str(x1), y1=str(y), x2=str(x2), y2=str(y), style=_css_style(item.y.ticks._style, tick_style))
+          xml.SubElement(ticks_group, "line", x1=repr(x1), y1=repr(y), x2=repr(x2), y2=repr(y), style=_css_style(item.y.ticks._style, tick_style))
 
       if item.y.ticks.labels._show:
         ticks_group = xml.SubElement(item_xml, "g")
         for location, label, title, label_style in zip(item._ytick_locations, item._ytick_labels, item._ytick_titles, item.y.ticks.labels.label.styles(item._ytick_locations)):
           x = item._xmin_range
           y = item._project_y(location)
-          label_xml = xml.SubElement(ticks_group, "text", x=str(x), y=str(y), style=_css_style({"text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"80%"}, item.y.ticks.labels._style, label_style))
+          label_xml = xml.SubElement(ticks_group, "text", x=repr(x), y=repr(y), style=_css_style({"text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"80%"}, item.y.ticks.labels._style, label_style))
           label_xml.text = label
           if item.y.ticks.labels._angle:
-            label_xml.set("transform", "rotate(%s, %s, %s)" % (item.y.ticks.labels._angle, x, y))
+            label_xml.set("transform", "rotate(%r, %r, %r)" % (item.y.ticks.labels._angle, x, y))
           if title is not None:
             xml.SubElement(label_xml, "title").text = str(title)
 
       if item.y.label._text is not None:
         x = item._xmin_range
         y = (item._ymin_range + item._ymax_range) * 0.5
-        xml.SubElement(item_xml, "text", x=str(x), y=str(y), transform="rotate(-90, %s, %s)" % (x, y), style=_css_style(item.y.label._style)).text = item.y.label._text
+        xml.SubElement(item_xml, "text", x=repr(x), y=repr(y), transform="rotate(-90, %r, %r)" % (x, y), style=_css_style(item.y.label._style)).text = item.y.label._text
 
     if item.label._text is not None:
       x = (item._xmin_range + item._xmax_range) * 0.5
       y = item._ymin_range
-      xml.SubElement(item_xml, "text", x=str(x), y=str(y), style=_css_style(item.label._style)).text = item.label._text
+      xml.SubElement(item_xml, "text", x=repr(x), y=repr(y), style=_css_style(item.label._style)).text = item.label._text
 
 def _render_BarBoundariesMark(root, item, parent, id_cache):
   bar1 = item._position.T[0]
@@ -380,7 +380,7 @@ def _render_BarBoundariesMark(root, item, parent, id_cache):
     for dbar1, dbar2, dboundary1, dboundary2, dfill, dopacity, dtitle in zip(bar1[not_null], bar2[not_null], boundary1[not_null], boundary2[not_null], fill[not_null], opacity[not_null], title[not_null]):
       dstyle = {"fill":toyplot.color.css.convert(dfill), "opacity":dopacity}
       dstyle.update(item._style)
-      datum_xml = xml.SubElement(series_xml, "rect", attrib={"class":"toyplot-Datum", axis1:str(min(dbar1, dbar2)), axis2:str(min(dboundary1, dboundary2)), distance1:str(numpy.abs(dbar1 - dbar2)), distance2:str(numpy.abs(dboundary1 - dboundary2))}, style=_css_style(dstyle))
+      datum_xml = xml.SubElement(series_xml, "rect", attrib={"class":"toyplot-Datum", axis1:repr(min(dbar1, dbar2)), axis2:repr(min(dboundary1, dboundary2)), distance1:repr(numpy.abs(dbar1 - dbar2)), distance2:repr(numpy.abs(dboundary1 - dboundary2))}, style=_css_style(dstyle))
       if dtitle is not None:
         xml.SubElement(datum_xml, "title").text = str(dtitle)
 
@@ -417,7 +417,7 @@ def _render_BarMagnitudesMark(root, item, parent, id_cache):
     for dbar1, dbar2, dboundary1, dboundary2, dfill, dopacity, dtitle in zip(bar1[not_null], bar2[not_null], boundary1[not_null], boundary2[not_null], fill[not_null], opacity[not_null], title[not_null]):
       dstyle = {"fill":toyplot.color.css.convert(dfill), "opacity":dopacity}
       dstyle.update(item._style)
-      datum_xml = xml.SubElement(series_xml, "rect", attrib={"class":"toyplot-Datum", axis1:str(min(dbar1, dbar2)), axis2:str(min(dboundary1, dboundary2)), distance1:str(numpy.abs(dbar1 - dbar2)), distance2:str(numpy.abs(dboundary1 - dboundary2))}, style=_css_style(dstyle))
+      datum_xml = xml.SubElement(series_xml, "rect", attrib={"class":"toyplot-Datum", axis1:repr(min(dbar1, dbar2)), axis2:repr(min(dboundary1, dboundary2)), distance1:repr(numpy.abs(dbar1 - dbar2)), distance2:repr(numpy.abs(dboundary1 - dboundary2))}, style=_css_style(dstyle))
       if dtitle is not None:
         xml.SubElement(datum_xml, "title").text = str(dtitle)
 
@@ -446,7 +446,7 @@ def _render_FillBoundariesMark(root, item, parent, id_cache):
         coordinates = zip(numpy.concatenate((position[segment], position[segment][::-1])), numpy.concatenate((boundary1[segment], boundary2[segment][::-1])))
       elif item._along == "y":
         coordinates = zip(numpy.concatenate((boundary1[segment], boundary2[segment][::-1])), numpy.concatenate((position[segment], position[segment][::-1])))
-      series_xml = xml.SubElement(item_xml, "polygon", points=" ".join(["%s,%s" % (xi, yi) for xi, yi in coordinates]), style=_css_style(series_style))
+      series_xml = xml.SubElement(item_xml, "polygon", points=" ".join(["%r,%r" % (xi, yi) for xi, yi in coordinates]), style=_css_style(series_style))
       if title is not None:
         xml.SubElement(series_xml, "title").text = str(title)
 
@@ -476,7 +476,7 @@ def _render_FillMagnitudesMark(root, item, parent, id_cache):
         coordinates = zip(numpy.concatenate((position[segment], position[segment][::-1])), numpy.concatenate((boundary1[segment], boundary2[segment][::-1])))
       elif item._along == "y":
         coordinates = zip(numpy.concatenate((boundary1[segment], boundary2[segment][::-1])), numpy.concatenate((position[segment], position[segment][::-1])))
-      series_xml = xml.SubElement(item_xml, "polygon", points=" ".join(["%s,%s" % (xi, yi) for xi, yi in coordinates]), style=_css_style(series_style))
+      series_xml = xml.SubElement(item_xml, "polygon", points=" ".join(["%r,%r" % (xi, yi) for xi, yi in coordinates]), style=_css_style(series_style))
       if title is not None:
         xml.SubElement(series_xml, "title").text = str(title)
 
@@ -503,7 +503,7 @@ def _render_AxisLinesMark(root, item, parent, id_cache):
   for dposition, dstroke, dopacity, dtitle in zip(position, item._stroke, item._opacity, item._title):
     dstyle = {"stroke":toyplot.color.css.convert(dstroke), "opacity":dopacity}
     dstyle.update(item._style)
-    datum_xml = xml.SubElement(series_xml, "line", attrib={"class":"toyplot-Datum",p1:str(dposition), p2:str(dposition), b1:str(boundary1), b2:str(boundary2)}, style=_css_style(dstyle))
+    datum_xml = xml.SubElement(series_xml, "line", attrib={"class":"toyplot-Datum",p1:repr(dposition), p2:repr(dposition), b1:repr(boundary1), b2:repr(boundary2)}, style=_css_style(dstyle))
     if dtitle is not None:
       xml.SubElement(datum_xml, "title").text = str(dtitle)
 
@@ -512,7 +512,7 @@ def _render_LegendMark(root, item, parent, id_cache):
   y = item._ymin
   width = item._xmax - item._xmin
   height = item._ymax - item._ymin
-  xml.SubElement(root, "rect", x=str(x), y=str(y), width=str(width), height=str(height), style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-LegendMark"})
+  xml.SubElement(root, "rect", x=repr(x), y=repr(y), width=repr(width), height=repr(height), style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-LegendMark"})
 
   mark_count = len(item._marks)
   if mark_count:
@@ -531,17 +531,17 @@ def _render_LegendMark(root, item, parent, id_cache):
         mark_label, mark_type, mark_style = mark
 
       if mark_type == "line":
-        xml.SubElement(root, "line", x1=str(mark_x), y1=str(mark_y + mark_height), x2=str(mark_x + mark_width), y2=str(mark_y), style=_css_style(mark_style))
+        xml.SubElement(root, "line", x1=repr(mark_x), y1=repr(mark_y + mark_height), x2=repr(mark_x + mark_width), y2=repr(mark_y), style=_css_style(mark_style))
       elif mark_type == "rect":
-        xml.SubElement(root, "rect", x=str(mark_x), y=str(mark_y), width=str(mark_width), height=str(mark_height), style=_css_style({"stroke":"none"}, mark_style))
+        xml.SubElement(root, "rect", x=repr(mark_x), y=repr(mark_y), width=repr(mark_width), height=repr(mark_height), style=_css_style({"stroke":"none"}, mark_style))
       elif isinstance(mark_type, toyplot.PlotMark):
         dstyle = {"stroke":toyplot.color.css.convert(mark_type._stroke[0])}
         dstyle.update(mark_type._style)
-        xml.SubElement(root, "line", x1=str(mark_x), y1=str(mark_y + mark_height), x2=str(mark_x + mark_width), y2=str(mark_y), style=_css_style(dstyle, mark_style))
+        xml.SubElement(root, "line", x1=repr(mark_x), y1=repr(mark_y + mark_height), x2=repr(mark_x + mark_width), y2=repr(mark_y), style=_css_style(dstyle, mark_style))
       elif isinstance(mark_type, (toyplot.BarBoundariesMark, toyplot.BarMagnitudesMark, toyplot.FillBoundariesMark, toyplot.FillMagnitudesMark)):
         dstyle = {"fill":toyplot.color.css.convert(mark_type._fill[0]), "opacity":mark_type._opacity[0]}
         dstyle.update(mark_type._style)
-        xml.SubElement(root, "rect", x=str(mark_x), y=str(mark_y), width=str(mark_width), height=str(mark_height), style=_css_style(dstyle, mark_style))
+        xml.SubElement(root, "rect", x=repr(mark_x), y=repr(mark_y), width=repr(mark_width), height=repr(mark_height), style=_css_style(dstyle, mark_style))
       else:
         computed_style = {"stroke":"black", "fill":"none"}
         computed_style.update(mark_style)
@@ -549,7 +549,7 @@ def _render_LegendMark(root, item, parent, id_cache):
 
       label_x = x + mark_width + (2 * mark_gutter)
       label_y = y + ((i + 1) * mark_gutter) + (i * mark_height) + (mark_height / 2)
-      xml.SubElement(root, "text", x=str(label_x), y=str(label_y), style=_css_style({"alignment-baseline":"middle", "stroke":"none"}, item._label_style)).text = mark_label
+      xml.SubElement(root, "text", x=repr(label_x), y=repr(label_y), style=_css_style({"alignment-baseline":"middle", "stroke":"none"}, item._label_style)).text = mark_label
 
 def _render_PlotMark(root, item, parent, id_cache):
   if isinstance(parent, toyplot.Axes2D):
@@ -583,9 +583,9 @@ def _render_PlotMark(root, item, parent, id_cache):
       for segment in segments:
         start, stop, step = segment.indices(len(not_null))
         for i in range(start, start+1):
-          d.append("M %s %s" % (x[i], y[i]))
+          d.append("M %r %r" % (x[i], y[i]))
         for i in range(start+1, stop):
-          d.append("L %s %s" % (x[i], y[i]))
+          d.append("L %r %r" % (x[i], y[i]))
       xml.SubElement(series_xml, "path", d=" ".join(d), style=_css_style(stroke_style))
     for dx, dy, dmarker, dsize, dfill, dopacity in zip(x[not_null], y[not_null], marker[not_null], size[not_null], fill[not_null], opacity[not_null]):
       dstyle = {"fill":toyplot.color.css.convert(dfill),"opacity":dopacity}
@@ -613,7 +613,7 @@ def _render_RectMark(root, item, parent, id_cache):
   for dx1, dx2, dy1, dy2, dfill, dopacity, dtitle in zip(x1, x2, y1, y2, item._fill, item._opacity, item._title):
     dstyle = {"fill":toyplot.color.css.convert(dfill), "opacity":dopacity}
     dstyle.update(item._style)
-    datum_xml = xml.SubElement(series_xml, "rect", attrib={"class":"toyplot-Datum"}, x=str(min(dx1, dx2)), y=str(min(dy1, dy2)), width=str(numpy.abs(dx1 - dx2)), height=str(numpy.abs(dy1 - dy2)), style=_css_style(dstyle))
+    datum_xml = xml.SubElement(series_xml, "rect", attrib={"class":"toyplot-Datum"}, x=repr(min(dx1, dx2)), y=repr(min(dy1, dy2)), width=repr(numpy.abs(dx1 - dx2)), height=repr(numpy.abs(dy1 - dy2)), style=_css_style(dstyle))
     if dtitle is not None:
       xml.SubElement(datum_xml, "title").text = str(dtitle)
 
@@ -638,7 +638,7 @@ def _render_TextMark(root, item, parent, id_cache):
   for dx, dy, dtext, dangle, dfill, dopacity, dtitle in zip(x, y, item._text, item._angle, item._fill, item._opacity, item._title):
     dstyle = {"fill":toyplot.color.css.convert(dfill), "opacity":dopacity}
     dstyle.update(item._style)
-    datum_xml = xml.SubElement(series_xml, "text", attrib={"class":"toyplot-Datum"}, x=str(dx), y=str(dy), transform="rotate(%s, %s, %s)" % (dangle, dx, dy), style=_css_style(dstyle))
+    datum_xml = xml.SubElement(series_xml, "text", attrib={"class":"toyplot-Datum"}, x=repr(dx), y=repr(dy), transform="rotate(%r, %r, %r)" % (dangle, dx, dy), style=_css_style(dstyle))
     if dtext is not None:
       datum_xml.text = str(dtext)
     if dtitle is not None:
@@ -659,7 +659,7 @@ def _render_VColorBarMark(root, item, parent, id_cache):
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-VColorBarMark"})
   for sample, y1, y2 in zip(samples, swatches[:-1], swatches[1:]):
     color = item._project_color(sample)
-    xml.SubElement(item_xml, "rect", x=str(xmin), y=str(y1), width=str(xmax - xmin), height=str((y2-y1) + (swatch_size / 2)), style=_css_style({"stroke":"none", "fill":toyplot.color.css.convert(color)}))
+    xml.SubElement(item_xml, "rect", x=repr(xmin), y=repr(y1), width=repr(xmax - xmin), height=repr((y2-y1) + (swatch_size / 2)), style=_css_style({"stroke":"none", "fill":toyplot.color.css.convert(color)}))
 
   if item.ticks._show:
     ticks_group = xml.SubElement(item_xml, "g")
@@ -667,14 +667,14 @@ def _render_VColorBarMark(root, item, parent, id_cache):
       y = item._project_y(location)
       x1 = item._xmax_range
       x2 = item._xmax_range + item.ticks._length
-      xml.SubElement(ticks_group, "line", x1=str(x1), y1=str(y), x2=str(x2), y2=str(y), style=_css_style(item.ticks._style, tick_style))
+      xml.SubElement(ticks_group, "line", x1=repr(x1), y1=repr(y), x2=repr(x2), y2=repr(y), style=_css_style(item.ticks._style, tick_style))
 
   if item.ticks.labels._show:
     ticks_group = xml.SubElement(item_xml, "g")
     for location, label, title, label_style in zip(item._tick_locations, item._tick_labels, item._tick_titles, item.ticks.labels.label.styles(item._tick_locations)):
       x = item._xmax_range + (item.ticks._length if item.ticks._show else 0)
       y = item._project_y(location)
-      label_xml = xml.SubElement(ticks_group, "text", x=str(x), y=str(y), transform="rotate(-90, %s, %s)" % (x, y), style=_css_style({"text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"-80%"}, item.ticks.labels._style, label_style))
+      label_xml = xml.SubElement(ticks_group, "text", x=repr(x), y=repr(y), transform="rotate(-90, %r, %r)" % (x, y), style=_css_style({"text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"-80%"}, item.ticks.labels._style, label_style))
       label_xml.text = label
       if title is not None:
         xml.SubElement(label_xml, "title").text = str(title)
@@ -682,7 +682,7 @@ def _render_VColorBarMark(root, item, parent, id_cache):
   if item.label._text is not None:
     x = item._xmax_range + (item.ticks._length if item.ticks._show else 0)
     y = (item._ymin_range + item._ymax_range) * 0.5
-    xml.SubElement(item_xml, "text", x=str(x), y=str(y), transform="rotate(-90, %s, %s)" % (x, y), style=_css_style(item.label._style)).text = item.label._text
+    xml.SubElement(item_xml, "text", x=repr(x), y=repr(y), transform="rotate(-90, %r, %r)" % (x, y), style=_css_style(item.label._style)).text = item.label._text
 
 def _render_item(root, item, parent, id_cache):
   item_type = type(item)

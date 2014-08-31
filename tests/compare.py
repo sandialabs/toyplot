@@ -26,7 +26,7 @@ for index, path in enumerate(paths):
   if extension == ".svg":
     dom = xml.dom.minidom.parse(path)
     with open(os.path.join(directory, "%s.svg" % index), "wb") as file:
-      file.write(dom.toprettyxml(indent="  "))
+      file.write(dom.toprettyxml(encoding="UTF-8", indent="  "))
     comparison_paths.append(os.path.join(directory, "%s.svg" % index))
   elif extension == ".html":
     html = open(path, "rb").read()

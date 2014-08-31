@@ -534,7 +534,7 @@ def _brewer_names():
 brewer.names = _brewer_names
 
 def _brewer_counts(name):
-  return [count for  count in sorted(brewer._data[name].keys()) if count != "type"]
+  return sorted([count for count in brewer._data[name].keys() if count not in["type", "reverse"]])
 brewer.counts = _brewer_counts
 
 def _brewer_category(name):

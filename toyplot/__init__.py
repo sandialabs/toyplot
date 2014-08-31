@@ -19,6 +19,11 @@ try:
 except:
   string_type = str
 
+try:
+  bytes_type = bytes
+except:
+  bytes_type = str
+
 ###############################################################################################
 # Helpers
 

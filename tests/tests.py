@@ -69,15 +69,15 @@ def assert_dom_equal(a, b):
     if key in ["xmlns"]:
       continue
     if key not in b.attrib:
-      raise AssertionError("Missing attribute %s" % (key))
+      raise AssertionError("Missing attribute '%s'." % (key))
   for key in b.attrib:
     if key not in a.attrib:
-      raise AssertionError("Extra attribute %s" % (key))
+      raise AssertionError("Unexpected attribute '%s'." % (key))
   for key in a.attrib:
     if key in ["xmlns", "id", "clip-path"]:
       continue
     if a.attrib[key] != b.attrib[key]:
-      raise AssertionError("Attribute %s value mismatch" % (key))
+      raise AssertionError("Attribute '%s': expected\n%s\nreceived\n%s\n" % (key, a.attrib[key], b.attrib[key]))
 
   if len(list(a)) != len(list(b)):
     raise AssertionError("Number of children doesn't match")
@@ -1532,7 +1532,7 @@ def test_canvas_time():
 def test_canvas_repr_html():
   canvas = toyplot.Canvas(autorender="html")
   html = canvas._repr_html_()
-  nose.tools.assert_is_instance(html, toyplot.string_type)
+  nose.tools.assert_is_instance(html, toyplot.bytes_type)
 
 def test_locator_defaults():
   x = numpy.linspace(0, 2 * numpy.pi, 100)

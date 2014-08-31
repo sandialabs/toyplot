@@ -236,11 +236,15 @@ def _render_Axes2D(root, item, parent, id_cache):
         axes_data["y"].append({"scale":"linear", "range":{"min":item._project_y(1.0), "max":item._project_y(-1.0)}, "domain":{"min":-1.0, "max":1.0}})
         axes_data["y"].append({"scale":"log", "base":base, "range":{"min":item._ymin_range + item._padding, "max":item._project_y(1.0)}, "domain":{"min":1.0, "max":item._ymax_computed}})
 
+  class custom_encoder(json.JSONEncoder):
+    def default(self, obj):
+      if isinstance(obj, numpy.generic):
+        return numpy.asscalar(obj)
+      print(type(obj))
+      return json.JSONEncoder.default(self, obj)
+
   item_xml = xml.SubElement(root, "g", id=id_cache(item), attrib={"class":"toyplot-Axes2D"})
-  import pprint
-  pprint.pprint(axes_data)
-  pprint.pprint(type(axes_data["x"][0]["domain"]["min"]))
-  xml.SubElement(item_xml, "toyplot:axes").text = json.dumps(axes_data, sort_keys=True)
+  xml.SubElement(item_xml, "toyplot:axes").text = json.dumps(axes_data, cls=custom_encoder, sort_keys=True)
 
   clip_xml = xml.SubElement(item_xml, "clipPath", id="t" + uuid.uuid4().hex)
   xml.SubElement(clip_xml, "rect", x=str(item._xmin_range), y=str(item._ymin_range), width=str(item._xmax_range - item._xmin_range), height=str(item._ymax_range - item._ymin_range))

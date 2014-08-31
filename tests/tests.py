@@ -1633,11 +1633,11 @@ def test_color_palette_getitem():
 def test_color_palette_iter():
   palette = toyplot.color.Palette([(1, 0, 0), (0, 1, 0), (0, 0, 1)])
   color = iter(palette)
-  assert_color_equal(color.next(), (1, 0, 0, 1))
-  assert_color_equal(color.next(), (0, 1, 0, 1))
-  assert_color_equal(color.next(), (0, 0, 1, 1))
+  assert_color_equal(next(color), (1, 0, 0, 1))
+  assert_color_equal(next(color), (0, 1, 0, 1))
+  assert_color_equal(next(color), (0, 0, 1, 1))
   with nose.tools.assert_raises(StopIteration):
-    color.next()
+    next(color)
 
 def test_color_palette_color():
   palette = toyplot.color.Palette([(1, 0, 0), (0, 1, 0), (0, 0, 1)])

@@ -633,7 +633,7 @@ class ExplicitTickLocator(TickLocator):
       locations = numpy.array(locations).astype("float64")
       labels = [format.format(location) for location in locations]
     elif labels is not None:
-      labels = numpy.array(labels).astype("string")
+      labels = numpy.array(labels).astype("str")
       locations = numpy.arange(len(labels))
     else:
       raise ValueError("Must supply locations, labels, or both.")

@@ -503,7 +503,7 @@ def _render_AxisLinesMark(root, item, parent, id_cache):
       p2="x2"
       b1="y1"
       b2="y2"
-      position = parent._project_x(item._position)
+      position = parent._project_x(item._table[item._coordinate[0]])
       boundary1 = parent._ymin_range
       boundary2 = parent._ymax_range
     elif item._along == "y":
@@ -511,12 +511,12 @@ def _render_AxisLinesMark(root, item, parent, id_cache):
       p2="y2"
       b1="x1"
       b2="x2"
-      position = parent._project_y(item._position)
+      position = parent._project_y(item._table[item._coordinate[0]])
       boundary1 = parent._xmin_range
       boundary2 = parent._xmax_range
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-AxisLinesMark"})
   series_xml = xml.SubElement(item_xml, "g", attrib={"class":"toyplot-Series"})
-  for dposition, dstroke, dopacity, dtitle in zip(position, item._stroke, item._opacity, item._title):
+  for dposition, dstroke, dopacity, dtitle in zip(position, item._table[item._stroke[0]], item._table[item._opacity[0]], item._table[item._title[0]]):
     dstyle = {"stroke":toyplot.color.css.convert(dstroke), "opacity":dopacity}
     dstyle.update(item._style)
     datum_xml = xml.SubElement(series_xml, "line", attrib={"class":"toyplot-Datum",p1:repr(dposition), p2:repr(dposition), b1:repr(boundary1), b2:repr(boundary2)}, style=_css_style(dstyle))
@@ -639,14 +639,14 @@ def _render_Table(root, item, parent, id_cache):
 def _render_TextMark(root, item, parent, id_cache):
   if isinstance(parent, toyplot.Axes2D):
     if item._along == "x":
-      x = parent._project_x(item._table[item._position1[0]])
-      y = parent._project_y(item._table[item._position2[0]])
+      x = parent._project_x(item._table[item._coordinate1[0]])
+      y = parent._project_y(item._table[item._coordinate2[0]])
     elif item._along == "y":
-      x = parent._project_x(item._table[item._position2[0]])
-      y = parent._project_y(item._table[item._position1[0]])
+      x = parent._project_x(item._table[item._coordinate2[0]])
+      y = parent._project_y(item._table[item._coordinate1[0]])
   else:
-    x = item._table[item._position1[0]]
-    y = item._table[item._position2[0]]
+    x = item._table[item._coordinate1[0]]
+    y = item._table[item._coordinate2[0]]
 
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-TextMark"})
   _render_data_table(item_xml, item._table, title="Text Data")

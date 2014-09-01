@@ -68,6 +68,18 @@ def _require_instance(value, types):
   if not isinstance(value, types):
     raise ValueError("Expected %s, received %s." % (types, type(value)))
 
+def _require_in(value, choices):
+  if value not in choices:
+    raise ValueError("Expected one of %s, received %s" % (",".join([str(choice) for choice in choices]), value))
+
+def _require_table_keys(table, keys, length=None):
+  keys = _require_string_vector(keys, length=length)
+  allowed = list(table.keys())
+  for key in keys:
+    if key not in allowed:
+      raise ValueError("Table key must match one of %s, received %s" % (",".join(allowed), key))
+  return keys
+
 def _require_scalar(value):
   if not isinstance(value, numbers.Number):
     raise ValueError("Expected a number, received %s." % value)
@@ -486,13 +498,21 @@ class AxisLinesMark(Mark):
   Do not create AxisLinesMark instances directly.  Use factory methods such as
   :meth:`toyplot.Axes2D.hlines` and :meth:`toyplot.Axes2D.vlines` instead.
   """
-  def __init__(self, along, position, stroke, opacity, title, style, id):
+  def __init__(self, table, along, coordinate, stroke, opacity, title, style, id):
+    _require_instance(table, toyplot.data.Table)
+    _require_in(along, ["x", "y"])
+    coordinate = _require_table_keys(table, coordinate, length=1)
+    stroke = _require_table_keys(table, stroke, length=1)
+    opacity = _require_table_keys(table, opacity, length=1)
+    title = _require_table_keys(table, title, length=1)
+
     Mark.__init__(self, style, id=id)
+    self._table = table
     self._along = along
-    self._position = position # M coordinates
-    self._stroke = stroke     # M stroke colors
-    self._opacity = opacity   # M opacities
-    self._title = title       # M titles
+    self._coordinate = coordinate # 1 coordinate column
+    self._stroke = stroke         # 1 stroke color column
+    self._opacity = opacity       # 1 opacity column
+    self._title = title           # 1 title column
 
 class BarBoundariesMark(Mark):
   """Render multiple stacked bars defined by bar boundaries.
@@ -602,27 +622,27 @@ class TextMark(Mark):
   Do not create TextMark instances directly.  Use factory methods such as
   :meth:`toyplot.Canvas.text` or :meth:`toyplot.Axes2D.text` instead.
   """
-  def __init__(self, table, along, position1, position2, text, angle, fill, opacity, title, style, id):
-    if along not in ["x", "y"]:
-      raise Exception("Expected 'x' or 'y' for along, received %s." % along)
-    position1 = _require_string_vector(position1, 1)
-    position2 = _require_string_vector(position2, 1)
-    text = _require_string_vector(text, 1)
-    angle = _require_string_vector(angle, 1)
-    fill = _require_string_vector(fill, 1)
-    opacity = _require_string_vector(opacity, 1)
-    title = _require_string_vector(title, 1)
+  def __init__(self, table, along, coordinate1, coordinate2, text, angle, fill, opacity, title, style, id):
+    _require_instance(table, toyplot.data.Table)
+    _require_in(along, ["x", "y"])
+    coordinate1 = _require_table_keys(table, coordinate1, length=1)
+    coordinate2 = _require_table_keys(table, coordinate2, length=1)
+    text = _require_table_keys(table, text, length=1)
+    angle = _require_table_keys(table, angle, length=1)
+    fill = _require_table_keys(table, fill, length=1)
+    opacity = _require_table_keys(table, opacity, length=1)
+    title = _require_table_keys(table, title, length=1)
 
     Mark.__init__(self, style, id=id)
     self._table = table
     self._along = along
-    self._position1 = position1 # 1 coordinate column
-    self._position2 = position2 # 1 coordinate column
-    self._text = text           # 1 text column
-    self._angle = angle         # 1 angle column
-    self._fill = fill           # 1 fill color column
-    self._opacity = opacity     # 1 opacity column
-    self._title = title         # 1 title column
+    self._coordinate1 = coordinate1 # 1 coordinate column
+    self._coordinate2 = coordinate2 # 1 coordinate column
+    self._text = text               # 1 text column
+    self._angle = angle             # 1 angle column
+    self._fill = fill               # 1 fill color column
+    self._opacity = opacity         # 1 opacity column
+    self._title = title             # 1 title column
 
 ###############################################################################################
 # Tick Locators
@@ -1809,8 +1829,8 @@ class Axes2D(object):
     text: :class:`toyplot.TextMark`
     """
     table = toyplot.data.Table()
-    table["position1"] = _require_scalar_vector(a)
-    table["position2"] = _require_scalar_vector(b, table.shape[0])
+    table["coordinate1"] = _require_scalar_vector(a)
+    table["coordinate2"] = _require_scalar_vector(b, table.shape[0])
     table["text"] = _broadcast_object(text, table.shape[0])
     table["angle"] = _broadcast_scalar(angle, table.shape[0])
     table["fill"] = _broadcast_object(fill, table.shape[0])
@@ -1826,11 +1846,11 @@ class Axes2D(object):
     computed_style.update(style)
 
     if along == "x":
-      self._update_domain(table["position1"], table["position2"])
+      self._update_domain(table["coordinate1"], table["coordinate2"])
     elif along == "y":
-      self._update_domain(table["position2"], table["position1"])
+      self._update_domain(table["coordinate2"], table["coordinate1"])
 
-    self._children.append(TextMark(table=table, along=along, position1="position1", position2="position2", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=computed_style, id=id))
+    self._children.append(TextMark(table=table, along=along, coordinate1="coordinate1", coordinate2="coordinate2", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=computed_style, id=id))
     return self._children[-1]
 
   def hlines(self, y, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style={}, id=None):
@@ -1855,16 +1875,18 @@ class Axes2D(object):
     -------
     hlines: :class:`toyplot.AxisLinesMark`
     """
-    position = _require_scalar_vector(y)
-
-    stroke = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, position.shape[0], colormap=colormap, palette=palette)
-    opacity = _broadcast_scalar(opacity, position.shape[0])
-    title = _broadcast_object(title, position.shape[0])
+    table = toyplot.data.Table()
+    table["coordinate"] = _require_scalar_vector(y)
+    table["stroke"] = _broadcast_object(stroke, table.shape[0])
+    table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
+    table["title"] = _broadcast_object(title, table.shape[0])
     style = _require_style(style)
     id = _require_optional_id(id)
 
-    self._update_domain(numpy.array([]), position)
-    self._children.append(AxisLinesMark(along="y", position=position, stroke=stroke, opacity=opacity, title=title, style=style, id=id))
+    table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
+
+    self._update_domain(numpy.array([]), table["coordinate"])
+    self._children.append(AxisLinesMark(table=table, along="y", coordinate="coordinate", stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def vlines(self, x, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style={}, id=None):
@@ -1875,8 +1897,8 @@ class Axes2D(object):
 
     Parameters
     ----------
-    y: array-like set of Y coordinates
-      One horizontal line will be drawn through each Y coordinate provided.
+    x: array-like set of X coordinates
+      One vertical line will be drawn through each X coordinate provided.
     title: string, optional
       Human-readable title for the mark.  The SVG / HTML backends render the
       title as a tooltip.
@@ -1889,27 +1911,19 @@ class Axes2D(object):
     -------
     hlines: :class:`toyplot.AxisLinesMark`
     """
-    position = _require_scalar_vector(x)
-
-    stroke = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, position.shape[0], colormap=colormap, palette=palette)
-    opacity = _broadcast_scalar(opacity, position.shape[0])
-    title = _broadcast_object(title, position.shape[0])
+    table = toyplot.data.Table()
+    table["coordinate"] = _require_scalar_vector(x)
+    table["stroke"] = _broadcast_object(stroke, table.shape[0])
+    table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
+    table["title"] = _broadcast_object(title, table.shape[0])
     style = _require_style(style)
     id = _require_optional_id(id)
 
-    self._update_domain(position, numpy.array([]))
-    self._children.append(AxisLinesMark(along="x", position=position, stroke=stroke, opacity=opacity, title=title, style=style, id=id))
+    table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
+
+    self._update_domain(table["coordinate"], numpy.array([]))
+    self._children.append(AxisLinesMark(table=table, along="x", coordinate="coordinate", stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
-
-
-
-
-
-
-
-
-
-
 
   def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style={}, label_style={}, id=None):
     """Add a legend to the axes.
@@ -2263,7 +2277,7 @@ class Canvas(object):
     computed_style = {"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}
     computed_style.update(style)
 
-    self._children.append(TextMark(table=table, along="x", position1="x", position2="y", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=computed_style, id=id))
+    self._children.append(TextMark(table=table, along="x", coordinate1="x", coordinate2="y", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=computed_style, id=id))
     return self._children[-1]
 
   def time(self, begin, end, index=None):

@@ -16,6 +16,7 @@ import xml.etree.ElementTree as xml
 import toyplot
 import toyplot.color
 import toyplot.color.css
+import toyplot.data
 import toyplot.html
 import toyplot.svg
 
@@ -145,6 +146,61 @@ def assert_html_matches(html, name):
     with open(reference_file, "wb") as file:
       file.write(html)
     raise AssertionError("Created new reference file %s.  You should verify its contents before re-running the test." % (reference_file))
+
+#########################################################################################################################
+# toyplot.data
+
+def test_data_table():
+  table = toyplot.data.Table()
+  nose.tools.assert_equal(table.keys(), [])
+  nose.tools.assert_equal(table.shape, (0, 0))
+
+  table["a"] = numpy.arange(10)
+  nose.tools.assert_equal(table.keys(), ["a"])
+  nose.tools.assert_equal(table.shape, (10, 1))
+
+  table["b"] = numpy.arange(10) ** 2
+  nose.tools.assert_equal(table.keys(), ["a", "b"])
+  nose.tools.assert_equal(table.shape, (10, 2))
+  numpy.testing.assert_array_equal(table["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
+
+  assert_html_matches(table._repr_html_(), "data-table")
+
+  t2 = table.columns(["b", "a"])
+  nose.tools.assert_equal(t2.keys(), ["b", "a"])
+  nose.tools.assert_equal(t2.shape, (10, 2))
+
+  del t2["a"]
+  nose.tools.assert_equal(t2.keys(), ["b"])
+  nose.tools.assert_equal(t2.shape, (10, 1))
+
+  t3 = table[slice(0, 6, 2)]
+  nose.tools.assert_equal(t3.keys(), ["a", "b"])
+  nose.tools.assert_equal(t3.shape, (3, 2))
+  numpy.testing.assert_array_equal(t3["a"], [0, 2, 4])
+
+  t4 = table[5]
+  nose.tools.assert_equal(t4.keys(), ["a", "b"])
+  nose.tools.assert_equal(t4.shape, (1, 2))
+  numpy.testing.assert_array_equal(t4["a"], [5])
+
+  t5 = table.rows([1, 2, 3])
+  nose.tools.assert_equal(t5.keys(), ["a", "b"])
+  nose.tools.assert_equal(t5.shape, (3, 2))
+  numpy.testing.assert_array_equal(t5["a"], [1, 2, 3])
+
+  t6 = table.rows(8)
+  nose.tools.assert_equal(t6.keys(), ["a", "b"])
+  nose.tools.assert_equal(t6.shape, (1, 2))
+  numpy.testing.assert_array_equal(t6["a"], [8])
+
+  with nose.tools.assert_raises(ValueError):
+    table["c"] = numpy.random.random(4)
+  with nose.tools.assert_raises(ValueError):
+    table["c"] = numpy.random.random((10, 4))
+
+  with nose.tools.assert_raises(ValueError):
+    table = toyplot.data.Table({"ones":numpy.ones(10), "zeros":numpy.zeros(10)})
 
 #########################################################################################################################
 # toyplot

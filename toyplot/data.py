@@ -12,13 +12,13 @@ class Table(object):
   """Encapsulates an ordered, heterogeneous collection of labelled data series.
   """
   def __init__(self, data=None):
-    if data is None:
-      data = collections.OrderedDict()
+    self._columns = collections.OrderedDict()
 
-    if not isinstance(data, collections.OrderedDict):
-      raise ValueError("Unsupported data type: %s" % type(data))
-
-    self._columns = data
+    if data is not None:
+      if not isinstance(data, collections.OrderedDict):
+        raise ValueError("Unsupported data type: %s" % type(data))
+      for key, value in data.items():
+        self[key] = value
 
   def __getitem__(self, index):
     # Return a single column by name
@@ -30,12 +30,12 @@ class Table(object):
     return Table(collections.OrderedDict([(key, self._columns[key][index]) for key in self._columns.keys()]))
 
   def __setitem__(self, key, value):
-    if isinstance(value, numpy.ndarray):
-      if value.ndim != 1:
-        raise ValueError("Only 1D arrays are allowed.")
-      for column in self._columns.values():
-        if column.shape != value.shape:
-          raise ValueError("Expected %s values, received %s." % (column.shape[0], value.shape[0]))
+    value = numpy.array(value)
+    if value.ndim != 1:
+      raise ValueError("Only 1D arrays are allowed.")
+    for column in self._columns.values():
+      if column.shape != value.shape:
+        raise ValueError("Expected %s values, received %s." % (column.shape[0], value.shape[0]))
     self._columns[key] = value
 
   def __delitem__(self, key):
@@ -60,18 +60,18 @@ class Table(object):
 
     return xml.tostring(root_xml, method="html")
 
+  @property
+  def shape(self):
+    return (self._columns.values()[0].shape[0] if len(self._columns) else 0, len(self._columns))
+
   def keys(self):
     return self._columns.keys()
 
   def columns(self, keys):
     return Table(collections.OrderedDict([(key, self._columns[key]) for key in keys]))
 
-  def rows(self, keys):
-    if isinstance(keys, numbers.Integral):
-      index = numpy.array([keys])
-    elif isinstance(keys, slice):
-      index = keys
-    else:
-      index = numpy.array(keys)
+  def rows(self, index):
+    if isinstance(index, numbers.Integral):
+      index = slice(index, index + 1)
     return Table(collections.OrderedDict([(key, self._columns[key][index]) for key in self._columns.keys()]))
 

@@ -64,8 +64,14 @@ class Table(object):
   def shape(self):
     return (self._columns.values()[0].shape[0] if len(self._columns) else 0, len(self._columns))
 
+  def items(self):
+    return self._columns.items()
+
   def keys(self):
     return self._columns.keys()
+
+  def values(self):
+    return self._columns.values()
 
   def columns(self, keys):
     return Table(collections.OrderedDict([(key, self._columns[key]) for key in keys]))

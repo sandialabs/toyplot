@@ -150,6 +150,22 @@ def _flat_contiguous(a):
       i += n
   return result
 
+def _render_data_table(root_xml, table, title):
+  names = []
+  data = []
+  for name, column in table.items():
+    if column.dtype == toyplot.color.dtype:
+      for suffix, channel in zip([":red", ":green", ":blue", ":alpha"], ["r", "g", "b", "a"]):
+        names.append(name + suffix)
+        data.append(column[channel].tolist())
+    else:
+      names.append(name)
+      data.append(column.tolist())
+
+  xml_data_table = xml.SubElement(root_xml, "toyplot:data-table", title=title)
+  xml_data_table.text = json.dumps({"names":names, "data":data}, sort_keys=True)
+  return xml_data_table
+
 def _render_marker(root, cx, cy, size, marker, marker_style=None, label_style=None, extra_class=None):
   if marker is None:
     return
@@ -623,19 +639,19 @@ def _render_Table(root, item, parent, id_cache):
 def _render_TextMark(root, item, parent, id_cache):
   if isinstance(parent, toyplot.Axes2D):
     if item._along == "x":
-      x = parent._project_x(item._series.T[0])
-      y = parent._project_y(item._series.T[1])
+      x = parent._project_x(item._table[item._position1[0]])
+      y = parent._project_y(item._table[item._position2[0]])
     elif item._along == "y":
-      x = parent._project_x(item._series.T[1])
-      y = parent._project_y(item._series.T[0])
+      x = parent._project_x(item._table[item._position2[0]])
+      y = parent._project_y(item._table[item._position1[0]])
   else:
-    x = item._series.T[0]
-    y = item._series.T[1]
+    x = item._table[item._position1[0]]
+    y = item._table[item._position2[0]]
 
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-TextMark"})
-  xml.SubElement(item_xml, "toyplot:data-table", title="Text Data").text = json.dumps({"names":["text"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[item._text.tolist()] + [s.tolist() for s in item._series.T]}, sort_keys=True)
+  _render_data_table(item_xml, item._table, title="Text Data")
   series_xml = xml.SubElement(item_xml, "g", attrib={"class":"toyplot-Series"})
-  for dx, dy, dtext, dangle, dfill, dopacity, dtitle in zip(x, y, item._text, item._angle, item._fill, item._opacity, item._title):
+  for dx, dy, dtext, dangle, dfill, dopacity, dtitle in zip(x, y, item._table[item._text[0]], item._table[item._angle[0]], item._table[item._fill[0]], item._table[item._opacity[0]], item._table[item._title[0]]):
     dstyle = {"fill":toyplot.color.css.convert(dfill), "opacity":dopacity}
     dstyle.update(item._style)
     datum_xml = xml.SubElement(series_xml, "text", attrib={"class":"toyplot-Datum"}, x=repr(dx), y=repr(dy), transform="rotate(%r, %r, %r)" % (dangle, dx, dy), style=_css_style(dstyle))

@@ -258,6 +258,11 @@ def test_require_string():
   with nose.tools.assert_raises(ValueError):
     nose.tools.assert_equal(toyplot._require_string(1), 1)
 
+def test_require_string_vector():
+  numpy.testing.assert_array_equal(toyplot._require_string_vector("a"), ["a"])
+  numpy.testing.assert_array_equal(toyplot._require_string_vector(["a", "b", "c"]), ["a", "b", "c"])
+  numpy.testing.assert_array_equal(toyplot._require_string_vector([1, 2, 3]), ["1", "2", "3"])
+
 def test_require_optional_string():
   nose.tools.assert_equal(toyplot._require_optional_string("foo"), "foo")
   nose.tools.assert_equal(toyplot._require_optional_string(u"foo"), u"foo")

@@ -9,6 +9,7 @@ import itertools
 import numbers
 import numpy.ma
 import toyplot.color.css
+import toyplot.data
 import toyplot.units
 
 ###############################################################################################
@@ -104,6 +105,17 @@ def _require_string(value):
   if not isinstance(value, string_type):
     raise ValueError("Expected a string, received %s." % value)
   return value
+
+def _require_string_vector(value, length=None):
+  if isinstance(value, (toyplot.string_type)):
+    value = [value]
+  array = numpy.ma.array(value).astype("str")
+  if array.ndim != 1:
+    raise ValueError("Expected a vector.")
+  if length is not None:
+    if len(array) != length:
+      raise ValueError("Expected %s values, received %s" % (length, len(array)))
+  return array
 
 def _require_optional_string(value):
   if not isinstance(value, (string_type, type(None))):
@@ -590,15 +602,27 @@ class TextMark(Mark):
   Do not create TextMark instances directly.  Use factory methods such as
   :meth:`toyplot.Canvas.text` or :meth:`toyplot.Axes2D.text` instead.
   """
-  def __init__(self, along, series, text, angle, fill, opacity, title, style, id):
+  def __init__(self, table, along, position1, position2, text, angle, fill, opacity, title, style, id):
+    if along not in ["x", "y"]:
+      raise Exception("Expected 'x' or 'y' for along, received %s." % along)
+    position1 = _require_string_vector(position1, 1)
+    position2 = _require_string_vector(position2, 1)
+    text = _require_string_vector(text, 1)
+    angle = _require_string_vector(angle, 1)
+    fill = _require_string_vector(fill, 1)
+    opacity = _require_string_vector(opacity, 1)
+    title = _require_string_vector(title, 1)
+
     Mark.__init__(self, style, id=id)
+    self._table = table
     self._along = along
-    self._series = series   # M x 2 coordinates
-    self._text = text       # M strings
-    self._angle = angle     # M angles
-    self._fill = fill       # M fill colors
-    self._opacity = opacity # M opacities
-    self._title = title     # M titles
+    self._position1 = position1 # 1 coordinate column
+    self._position2 = position2 # 1 coordinate column
+    self._text = text           # 1 text column
+    self._angle = angle         # 1 angle column
+    self._fill = fill           # 1 fill color column
+    self._opacity = opacity     # 1 opacity column
+    self._title = title         # 1 title column
 
 ###############################################################################################
 # Tick Locators
@@ -1784,28 +1808,29 @@ class Axes2D(object):
     -------
     text: :class:`toyplot.TextMark`
     """
-    a = _require_scalar_vector(a)
-    b = _require_scalar_vector(b, len(a))
-    series = numpy.column_stack((a, b))
-
-    text = _broadcast_object(text, series.shape[0])
-    angle = _broadcast_scalar(angle, series.shape[0])
-    default_color = next(self._text_colors)
-    fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape[0], colormap=colormap, palette=palette)
-    opacity = _broadcast_scalar(opacity, series.shape[0])
-    title = _broadcast_object(title, series.shape[0])
+    table = toyplot.data.Table()
+    table["position1"] = _require_scalar_vector(a)
+    table["position2"] = _require_scalar_vector(b, table.shape[0])
+    table["text"] = _broadcast_object(text, table.shape[0])
+    table["angle"] = _broadcast_scalar(angle, table.shape[0])
+    table["fill"] = _broadcast_object(fill, table.shape[0])
+    table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
+    table["title"] = _broadcast_object(title, table.shape[0])
     style = _require_style(style)
     id = _require_optional_id(id)
+
+    default_color = next(self._text_colors)
+    table["toyplot:fill"] = toyplot.color._broadcast_color(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
 
     computed_style = {"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}
     computed_style.update(style)
 
     if along == "x":
-      self._update_domain(a, b)
+      self._update_domain(table["position1"], table["position2"])
     elif along == "y":
-      self._update_domain(b, a)
+      self._update_domain(table["position2"], table["position1"])
 
-    self._children.append(TextMark(along=along, series=series, text=text, angle=angle, fill=fill, opacity=opacity, title=title, style=computed_style, id=id))
+    self._children.append(TextMark(table=table, along=along, position1="position1", position2="position2", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=computed_style, id=id))
     return self._children[-1]
 
   def hlines(self, y, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style={}, id=None):
@@ -2225,22 +2250,22 @@ class Canvas(object):
     -------
     text: :class:`toyplot.TextMark`
     """
-    x = _require_scalar_vector(x)
-    y = _require_scalar_vector(y, len(x))
-    series = numpy.column_stack((x, y))
-
-    text = _broadcast_object(text, series.shape[0])
-    angle = _broadcast_scalar(angle, series.shape[0])
-    fill = toyplot.color._broadcast_color("black" if fill is None else fill, series.shape[0], colormap=colormap, palette=palette)
-    opacity = _broadcast_scalar(opacity, series.shape[0])
-    title = _broadcast_object(title, series.shape[0])
+    table = toyplot.data.Table()
+    table["x"] = _require_scalar_vector(x)
+    table["y"] = _require_scalar_vector(y, table.shape[0])
+    table["text"] = _broadcast_object(text, table.shape[0])
+    table["angle"] = _broadcast_scalar(angle, table.shape[0])
+    table["fill"] = _broadcast_object(fill, table.shape[0])
+    table["toyplot:fill"] = toyplot.color._broadcast_color("black" if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
+    table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
+    table["title"] = _broadcast_object(title, table.shape[0])
     style = _require_style(style)
     id = _require_optional_id(id)
 
     computed_style = {"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}
     computed_style.update(style)
 
-    self._children.append(TextMark(along="x", series=series, text=text, angle=angle, fill=fill, opacity=opacity, title=title, style=computed_style, id=id))
+    self._children.append(TextMark(table=table, along="x", position1="x", position2="y", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=computed_style, id=id))
     return self._children[-1]
 
   def time(self, begin, end, index=None):

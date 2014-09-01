@@ -221,7 +221,7 @@ def _render_marker(root, cx, cy, size, marker, marker_style=None, label_style=No
     xml.SubElement(marker_xml, "path", transform="translate(%r, %r) scale(%r) translate(%r, %r)" % (cx, cy, size, -cx, -cy), d="M " + repr(cx) + " " + repr(cy) + shape_path)
 
   if shape_label is not None:
-    xml.SubElement(marker_xml, "text", x=repr(cx), y=repr(cy), attrib=_css_attrib({"stroke":"none", "fill":"black", "text-anchor":"middle", "alignment-baseline":"middle", "font-size":"%rpx" % (size * 0.75)}, label_style, shape_label_style)).text = shape_label
+    xml.SubElement(marker_xml, "text", x=repr(cx), y=repr(cy), attrib=_css_attrib({"stroke":"none", "fill":toyplot.color.near_black, "text-anchor":"middle", "alignment-baseline":"middle", "font-size":"%rpx" % (size * 0.75)}, label_style, shape_label_style)).text = shape_label
 _render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<": ("^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
 def _render_Axes2D(root, item, parent, id_cache):
@@ -559,7 +559,7 @@ def _render_LegendMark(root, item, parent, id_cache):
         dstyle.update(mark_type._style)
         xml.SubElement(root, "rect", x=repr(mark_x), y=repr(mark_y), width=repr(mark_width), height=repr(mark_height), style=_css_style(dstyle, mark_style))
       else:
-        computed_style = {"stroke":"black", "fill":"none"}
+        computed_style = {"stroke":toyplot.color.near_black, "fill":"none"}
         computed_style.update(mark_style)
         _render_marker(root, mark_x + (mark_width / 2), mark_y + (mark_height / 2), min(mark_width, mark_height), mark_type, computed_style, {})
 

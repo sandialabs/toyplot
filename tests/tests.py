@@ -280,7 +280,7 @@ def test_require_marker_array():
 
 def test_require_style():
   nose.tools.assert_equal(toyplot._require_style({}), {})
-  nose.tools.assert_equal(toyplot._require_style({"stroke":"black"}), {"stroke":"black"})
+  nose.tools.assert_equal(toyplot._require_style({"stroke":toyplot.color.near_black}), {"stroke":toyplot.color.near_black})
   with nose.tools.assert_raises(ValueError):
     nose.tools.assert_equal(toyplot._require_style(None), None)
   with nose.tools.assert_raises(ValueError):
@@ -1463,8 +1463,8 @@ def test_axes_scatterplot_singular():
   assert_canvas_matches(canvas, "axes-scatterplot-singular")
 
 def test_axes_scatterplot_markers():
-  marker_style = {"stroke":"black", "fill":"cornsilk"}
-  label_style = {"stroke":"none", "fill":"black"}
+  marker_style = {"stroke":toyplot.color.near_black, "fill":"cornsilk"}
+  label_style = {"stroke":"none", "fill":toyplot.color.near_black}
   markers=[
     None,
     "",
@@ -2008,7 +2008,7 @@ def test_axes():
 def test_axes_layout():
   canvas = toyplot.Canvas()
   axes = canvas.axes(label="Title", xlabel="X Label", ylabel="Y Label", xmin=0, xmax=1, ymin=0, ymax=1)
-  axes.text(0.5, 0.5, "Axes Region", style={"fill":"black", "text-anchor":"middle", "alignment-baseline":"middle"})
+  axes.text(0.5, 0.5, "Axes Region", style={"fill":toyplot.color.near_black, "text-anchor":"middle", "alignment-baseline":"middle"})
   assert_canvas_matches(canvas, "axes-layout")
 
 def test_legend():
@@ -2026,16 +2026,16 @@ def test_legend():
     ("Fill", fill),
     ("Explicit Line", "line", {"stroke":"red", "stroke-width":1.0}),
     ("Explicit Rect", "rect", {"fill":"green"}),
-    ("Explicit Marker", "^", {"fill":"lightblue", "stroke":"black"}),
-    ("Explicit Marker", "o", {"fill":"yellow", "stroke":"black"}),
-    ("Explicit Marker", "s", {"fill":"pink", "stroke":"black"})],
+    ("Explicit Marker", "^", {"fill":"lightblue", "stroke":toyplot.color.near_black}),
+    ("Explicit Marker", "o", {"fill":"yellow", "stroke":toyplot.color.near_black}),
+    ("Explicit Marker", "s", {"fill":"pink", "stroke":toyplot.color.near_black})],
     bounds=(100, 200, 350, 550),
     )
   assert_canvas_matches(canvas, "legend")
 
 def test_bounds_placement():
-  style = {"stroke":"black"}
-  canvas = toyplot.Canvas(800, 600, style={"border":"1px solid black"})
+  style = {"stroke":toyplot.color.near_black}
+  canvas = toyplot.Canvas(800, 600, style={"border":"1px solid %s" % toyplot.color.near_black})
   canvas.legend([], style=style, bounds=(400-100, 400+100, 20, 50))
   canvas.legend([], style=style, bounds=("25%", 400+100, 80, 110))
   canvas.legend([], style=style, bounds=(400-100, "75%", 140, 170))
@@ -2048,8 +2048,8 @@ def test_bounds_placement():
   assert_canvas_matches(canvas, "bounds-placement")
 
 def test_corner_placement():
-  style = {"stroke":"black"}
-  canvas = toyplot.Canvas(800, 600, style={"border":"1px solid black"})
+  style = {"stroke":toyplot.color.near_black}
+  canvas = toyplot.Canvas(800, 600, style={"border":"1px solid %s" % toyplot.color.near_black})
   canvas.legend([("top", "^")], style=style, corner=("top", 100, 30, 10))
   canvas.legend([("top-right", "^")], style=style, corner=("top-right", 100, 30, 10))
   canvas.legend([("right", "^")], style=style, corner=("right", 100, 30, 10))
@@ -2064,7 +2064,7 @@ def test_corner_placement():
 
 def test_grid_placement():
   x = numpy.linspace(0, 2 * numpy.pi, 1000)
-  canvas = toyplot.Canvas(800, 600, style={"border":"1px solid black"})
+  canvas = toyplot.Canvas(800, 600, style={"border":"1px solid %s" % toyplot.color.near_black})
   inset = canvas.axes(grid=(3, 3, 0), label="3x3 Grid")
   inset.plot(x, numpy.sin(x))
   inset = canvas.axes(grid=(3, 3, 0, 1, 1, 2), label="3x3 Grid colspan=2")

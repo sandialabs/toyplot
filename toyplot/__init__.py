@@ -1857,8 +1857,7 @@ class Axes2D(object):
     """
     position = _require_scalar_vector(y)
 
-    default_color = "black"
-    stroke = toyplot.color._broadcast_color(default_color if stroke is None else stroke, position.shape[0], colormap=colormap, palette=palette)
+    stroke = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, position.shape[0], colormap=colormap, palette=palette)
     opacity = _broadcast_scalar(opacity, position.shape[0])
     title = _broadcast_object(title, position.shape[0])
     style = _require_style(style)
@@ -1892,8 +1891,7 @@ class Axes2D(object):
     """
     position = _require_scalar_vector(x)
 
-    default_color = "black"
-    stroke = toyplot.color._broadcast_color(default_color if stroke is None else stroke, position.shape[0], colormap=colormap, palette=palette)
+    stroke = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, position.shape[0], colormap=colormap, palette=palette)
     opacity = _broadcast_scalar(opacity, position.shape[0])
     title = _broadcast_object(title, position.shape[0])
     style = _require_style(style)
@@ -2070,7 +2068,7 @@ class Canvas(object):
   def __init__(self, width=None, height=None, style={}, id=None, autorender=None):
     self._width = width if width is not None else 600
     self._height = height if height is not None else self._width
-    self._style = {"background-color": "transparent", "fill": "#343434", "fill-opacity": 1.0, "font-family":"helvetica", "font-size": "12px", "opacity": 1.0, "stroke": "#343434", "stroke-opacity": 1.0, "stroke-width": 1.0}
+    self._style = {"background-color": "transparent", "fill": toyplot.color.near_black, "fill-opacity": 1.0, "font-family":"helvetica", "font-size": "12px", "opacity": 1.0, "stroke": toyplot.color.near_black, "stroke-opacity": 1.0, "stroke-width": 1.0}
     self._style.update(style)
     self._id = id
     self._animation = collections.defaultdict(lambda: collections.defaultdict(list))
@@ -2256,7 +2254,7 @@ class Canvas(object):
     table["text"] = _broadcast_object(text, table.shape[0])
     table["angle"] = _broadcast_scalar(angle, table.shape[0])
     table["fill"] = _broadcast_object(fill, table.shape[0])
-    table["toyplot:fill"] = toyplot.color._broadcast_color("black" if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
+    table["toyplot:fill"] = toyplot.color._broadcast_color(toyplot.color.near_black if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
     table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
     table["title"] = _broadcast_object(title, table.shape[0])
     style = _require_style(style)

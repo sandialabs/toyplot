@@ -11,6 +11,8 @@ import xml.etree.ElementTree as xml
 
 dtype = {"names":["r", "g", "b", "a"], "formats":["float64", "float64", "float64", "float64"]}
 
+near_black = "#292724"
+
 def rgb(r, g, b):
   """Create a toyplot color from RGB values."""
   return numpy.array((r, g, b, 1.0), dtype=dtype)

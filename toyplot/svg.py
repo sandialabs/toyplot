@@ -614,19 +614,19 @@ def _render_PlotMark(root, item, parent, id_cache):
 def _render_RectMark(root, item, parent, id_cache):
   if isinstance(parent, toyplot.Axes2D):
     if item._along == "x":
-      x1 = parent._project_x(item._series.T[0])
-      x2 = parent._project_x(item._series.T[1])
-      y1 = parent._project_y(item._series.T[2])
-      y2 = parent._project_y(item._series.T[3])
+      x1 = parent._project_x(item._table[item._left[0]])
+      x2 = parent._project_x(item._table[item._right[0]])
+      y1 = parent._project_y(item._table[item._top[0]])
+      y2 = parent._project_y(item._table[item._bottom[0]])
     elif item._along == "y":
-      x1 = parent._project_x(item._series.T[2])
-      x2 = parent._project_x(item._series.T[3])
-      y1 = parent._project_y(item._series.T[0])
-      y2 = parent._project_y(item._series.T[1])
+      x1 = parent._project_x(item._table[item._top[0]])
+      x2 = parent._project_x(item._table[item._bottom[0]])
+      y1 = parent._project_y(item._table[item._left[0]])
+      y2 = parent._project_y(item._table[item._right[0]])
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-RectMark"})
-  xml.SubElement(item_xml, "toyplot:data-table", title="Rect Data").text = json.dumps({"names":["series%s" % s for s in range(item._series.shape[1])], "data":[s.tolist() for s in item._series.T]}, sort_keys=True)
+  _render_data_table(item_xml, item._table, title="Rect Data")
   series_xml = xml.SubElement(item_xml, "g", attrib={"class":"toyplot-Series"})
-  for dx1, dx2, dy1, dy2, dfill, dopacity, dtitle in zip(x1, x2, y1, y2, item._fill, item._opacity, item._title):
+  for dx1, dx2, dy1, dy2, dfill, dopacity, dtitle in zip(x1, x2, y1, y2, item._table[item._fill[0]], item._table[item._opacity[0]], item._table[item._title[0]]):
     dstyle = {"fill":toyplot.color.css.convert(dfill), "opacity":dopacity}
     dstyle.update(item._style)
     datum_xml = xml.SubElement(series_xml, "rect", attrib={"class":"toyplot-Datum"}, x=repr(min(dx1, dx2)), y=repr(min(dy1, dy2)), width=repr(numpy.abs(dx1 - dx2)), height=repr(numpy.abs(dy1 - dy2)), style=_css_style(dstyle))

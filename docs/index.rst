@@ -24,12 +24,14 @@ Documentation
 .. toctree::
    :maxdepth: 2
 
+   features.rst
    ethos.rst
    dependencies.rst
    installation.rst
    tutorial.rst
    user-guide.rst
    contributing.rst
+   release-notes.rst
    reference.rst
    contacts.rst
 

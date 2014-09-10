@@ -27,12 +27,13 @@ your changes::
 Versioning
 ----------
 
-Toyplot version numbers will follow the `Semantic Versioning <http://semver.org>`_ standard.
+Toyplot version numbers follow the `Semantic Versioning <http://semver.org>`_ standard.
 
 Coding Style
 ------------
 
-The Toyplot source code will follow the `PEP-8 Style Guide for Python Code <http://legacy.python.org/dev/peps/pep-0008>`_ .
+The Toyplot source code follows the `PEP-8 Style Guide for Python Code <http://legacy.python.org/dev/peps/pep-0008>`_,
+except that we use two spaces for indentation instead of four.
 
 Code Walkthrough
 ----------------

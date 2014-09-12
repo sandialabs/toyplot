@@ -50,16 +50,13 @@ class Table(object):
     for name in self._columns.keys():
       xml.SubElement(header_xml, "th", style="text-align:center;border:none").text = str(name)
 
-    try:
-      iterators = [iter(column) for column in self._columns.values()]
-      while True:
-        for index, iterator in enumerate(iterators):
-          value = iterator.next()
-          if index == 0:
-            row_xml = xml.SubElement(root_xml, "tr", style="border:none")
-          xml.SubElement(row_xml, "td", style="border:none").text = str(value)
-    except StopIteration:
-      pass
+    iterators = [iter(column) for column in self._columns.values()]
+    for row_index in numpy.arange(len(self)):
+      for index, iterator in enumerate(iterators):
+        value = iterator.next()
+        if index == 0:
+          row_xml = xml.SubElement(root_xml, "tr", style="border:none")
+        xml.SubElement(row_xml, "td", style="border:none").text = str(value)
 
     return xml.tostring(root_xml, method="html")
 

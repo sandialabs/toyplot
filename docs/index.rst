@@ -33,7 +33,7 @@ Documentation
    contributing.rst
    release-notes.rst
    reference.rst
-   contacts.rst
+   support.rst
 
 Indices and tables
 ==================

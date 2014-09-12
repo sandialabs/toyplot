@@ -26,19 +26,29 @@ def render(table, fobj=None):
   """
   table = toyplot._require_instance(table, toyplot.data.Table)
 
+  # Setup formatters for each column.
+  formatters = []
+  for column in table.values():
+    if column.dtype.kind == "f":
+      formatters.append("{:.3g}".format)
+    else:
+      formatters.append(str)
+
+  # Setup iterators for each column.
+  iterators = [iter(column) for column in table.values()]
+
   latex = "\\begin{tabular}"
   latex += "{" + " ".join(["l" for key in table.keys()]) + "}\n"
   latex += " & ".join(table.keys()) + " \\\\\n"
   latex += "\\hline\n"
 
   try:
-    iterators = [iter(column) for column in table._columns.values()]
     while True:
-      for index, iterator in enumerate(iterators):
+      for index, (iterator, formatter) in enumerate(zip(iterators, formatters)):
         value = iterator.next()
         if index != 0:
           latex += " & "
-        latex += str(value)
+        latex += formatter(value)
       latex += " \\\\\n"
   except StopIteration:
     pass

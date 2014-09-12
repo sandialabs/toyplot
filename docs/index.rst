@@ -24,8 +24,8 @@ Documentation
 .. toctree::
    :maxdepth: 2
 
-   features.rst
    ethos.rst
+   features.rst
    dependencies.rst
    installation.rst
    tutorial.rst

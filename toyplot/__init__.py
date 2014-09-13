@@ -1671,7 +1671,7 @@ class Axes2D(object):
       self._children.append(FillMagnitudesMark(along=along, position=position, baseline=baseline, series=series, fill=fill, opacity=opacity, title=title, style=computed_style, id=id))
       return self._children[-1]
 
-  def plot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={}, mstyle={"stroke":"none"}, mlstyle={}, id=None):
+  def plot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={}, mstyle={}, mlstyle={}, id=None):
     """Add a bivariate plot to the axes.
 
     Parameters
@@ -1726,15 +1726,21 @@ class Axes2D(object):
     computed_style = {"fill":"none"}
     computed_style.update(style)
 
+    computed_mstyle = {"stroke":"none"}
+    computed_mstyle.update(mstyle)
+
+    computed_mlstyle = {}
+    computed_mlstyle.update(mlstyle)
+
     if along == "x":
       self._update_domain(position, series)
     elif along == "y":
       self._update_domain(series, position)
 
-    self._children.append(PlotMark(along=along, show_stroke=True, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=computed_style, mstyle=mstyle, mlstyle=mlstyle, id=id))
+    self._children.append(PlotMark(along=along, show_stroke=True, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=computed_style, mstyle=computed_mstyle, mlstyle=computed_mlstyle, id=id))
     return self._children[-1]
 
-  def scatterplot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={"stroke":"none"}, mstyle={"stroke":"none"}, mlstyle={}, id=None):
+  def scatterplot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={}, mstyle={}, mlstyle={}, id=None):
     """Add a bivariate plot to the axes.
 
     Parameters
@@ -1789,15 +1795,21 @@ class Axes2D(object):
     mlstyle = _require_style(mlstyle)
     id = _require_optional_id(id)
 
-    computed_style = {"fill":"none"}
+    computed_style = {"stroke":"none"}
     computed_style.update(style)
+
+    computed_mstyle = {"stroke":"none"}
+    computed_mstyle.update(mstyle)
+
+    computed_mlstyle = {}
+    computed_mlstyle.update(mlstyle)
 
     if along == "x":
       self._update_domain(position, series)
     elif along == "y":
       self._update_domain(series, position)
 
-    self._children.append(PlotMark(along=along, show_stroke=False, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=computed_style, mstyle=mstyle, mlstyle=mlstyle, id=id))
+    self._children.append(PlotMark(along=along, show_stroke=False, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=computed_style, mstyle=computed_mstyle, mlstyle=computed_mlstyle, id=id))
     return self._children[-1]
 
   def rect(self, a, b, c, d, along="x", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={"stroke":"none"}, id=None):
@@ -2402,7 +2414,7 @@ def fill(a, b=None, c=None, along="x", baseline=None, fill=None, colormap=None, 
   mark = axes.fill(a=a, b=b, c=c, along=along, baseline=baseline, fill=fill, colormap=colormap, palette=palette, opacity=opacity, title=title, style=style, id=id)
   return canvas, axes, mark
 
-def plot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={}, mstyle={"stroke":"none"}, mlstyle={}, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style={}):
+def plot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={}, mstyle={}, mlstyle={}, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style={}):
   """Convenience function for creating a line plot in a single call.
 
   See :meth:`toyplot.Axes2D.plot`, :meth:`toyplot.Canvas.axes`, and :class:`toyplot.Canvas` for parameter descriptions.
@@ -2421,7 +2433,7 @@ def plot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette
   mark = axes.plot(a=a, b=b, along=along, stroke=stroke, stroke_colormap=stroke_colormap, stroke_palette=stroke_palette, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, fill_colormap=fill_colormap, fill_palette=fill_palette, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle, id=id)
   return canvas, axes, mark
 
-def scatterplot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={"stroke":"none"}, mstyle={"stroke":"none"}, mlstyle={}, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style={}):
+def scatterplot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={}, mstyle={}, mlstyle={}, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style={}):
   """Convenience function for creating a scatter plot in a single call.
 
   See :meth:`toyplot.Axes2D.scatterplot`, :meth:`toyplot.Canvas.axes`, and :class:`toyplot.Canvas` for parameter descriptions.

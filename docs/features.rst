@@ -1,11 +1,11 @@
-.. _Features:
-
 .. image:: ../artwork/toyplot.png
   :width: 300px
   :align: right
 
-Toyplot Features
-================
+.. _features:
+
+Features
+========
 
 * Plot types: bar plots, filled region plots, line plots, scatter plots, rectangle plots, text plots.
 * Styling: all plot elements stylable using CSS.

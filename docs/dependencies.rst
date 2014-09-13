@@ -2,10 +2,10 @@
   :width: 200px
   :align: right
 
-.. _Toyplot Dependencies:
+.. _dependencies:
 
-Toyplot Dependencies
-====================
+Dependencies
+============
 
 Toyplot has the following required dependencies:
 

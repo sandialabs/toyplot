@@ -2,8 +2,8 @@
   :width: 200px
   :align: right
 
-Contributing to Toyplot
-=======================
+Contributing
+============
 
 Getting Started
 ---------------
@@ -13,7 +13,7 @@ at http://github.com/sandialabs/toyplot ... there, you'll find the Toyplot
 sources, issue tracker, and wiki.
 
 Next, you'll need to install Toyplot's
-:ref:`dependencies<Toyplot Dependencies>`.  Then, you'll be ready to "install"
+:ref:`dependencies`.  Then, you'll be ready to "install"
 Toyplot - but as a convenience, you'll want to use "develop mode".  Develop
 mode is a a feature provided by setuptools that links the Toyplot source code
 to the install directory instead of copying it ... that way you can edit the

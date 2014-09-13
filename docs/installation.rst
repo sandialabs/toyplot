@@ -2,8 +2,8 @@
   :width: 200px
   :align: right
 
-Installing Toyplot
-==================
+Installation
+============
 
 Using Your OS Package Manager
 -----------------------------
@@ -18,7 +18,7 @@ MacPorts-Specific Instructions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There isn't a MacPorts port for Toyplot yet, but you can still use MacPorts
-to install Toyplot's :ref:`dependencies<Toyplot Dependencies>` before installing
+to install Toyplot's :ref:`dependencies` before installing
 Toyplot using pip::
 
     $ sudo port install python27

@@ -1,8 +1,8 @@
-.. _Release Notes:
-
 .. image:: ../artwork/toyplot.png
   :width: 200px
   :align: right
+
+.. _release-notes:
 
 Release Notes
 =============

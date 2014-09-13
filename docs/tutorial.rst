@@ -15,7 +15,7 @@ Toyplot.
 Note: This tutorial was created in an
 `IPython <http://www.ipython.org>`__ notebook and assumes that you're
 following-along in a notebook of your own. If you aren't using a
-notebook, you should jump ahead to the section on :ref:`Rendering` for
+notebook, you should jump ahead to the section on :ref:`rendering` for
 some important information on how to display your figures.
 
 To begin, we're going to import numpy (so we can create data to use for
@@ -8126,9 +8126,9 @@ feature automatically renders a canvas onto the notebook page using
 Toyplot's preferred HTML+SVG representation. If you're working in a
 noninterative environment, you'll need to explicitly tell Toyplot how
 and when to render your canvas, using one of Toyplot's rendering
-:ref:`backends <backends>`. For example, if you're using Toyplot from
-plain Python shell, you could use the :mod:`toyplot.browser` backend
-to display a canvas in a new web browser window, using the same HTML+SVG
+:ref:`backends`. For example, if you're using Toyplot from plain
+Python shell, you could use the :mod:`toyplot.browser` backend to
+display a canvas in a new web browser window, using the same HTML+SVG
 representation:
 
 .. code:: python

@@ -2,8 +2,8 @@
   :width: 200px
   :align: right
 
-Toyplot User Guide
-==================
+User Guide
+==========
 
 Contents:
 

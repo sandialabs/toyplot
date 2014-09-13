@@ -2,8 +2,8 @@
   :width: 200px
   :align: right
 
-Toyplot Support
-===============
+Support
+=======
 
 For Toyplot questions, comments, or suggestions, try our forums at:
 

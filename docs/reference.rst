@@ -2,8 +2,8 @@
   :width: 200px
   :align: right
 
-The Toyplot Reference
-=====================
+Reference
+=========
 
 Contents:
 

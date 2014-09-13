@@ -10,8 +10,8 @@ The Toyplot Ethos
 What began as a quick workaround to reduce the size of animated figures in
 IPython quickly grew into Toyplot, "the kid-sized plotting toolkit with
 grownup-sized goals".  In a nutshell, we think that scientists and engineers
-should expect more from their plots, including: explicit support for
-reproducibility and open science, greater clarity, and better aesthetics.
+should expect more from their plots, from explicit support for
+reproducibility and open science to greater clarity and better aesthetics.
 
 We especially feel that, in an age of ubiquitous electronic media and the web,
 it makes little sense to publish using media (such as PDF) designed to mimic

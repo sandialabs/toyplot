@@ -41,7 +41,7 @@ class module_proxy(object):
     else:
       return module_proxy()
 
-for module_name in ["cairo", "numpy", "numpy.ma", "pangocairo"]:
+for module_name in ["cairo", "numpy", "numpy.ma", "pango", "pangocairo"]:
   sys.modules[module_name] = module_proxy()
 
 # If extensions (or modules to document with autodoc) are in another directory,

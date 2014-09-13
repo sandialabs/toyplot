@@ -13,7 +13,7 @@ at http://github.com/sandialabs/toyplot ... there, you'll find the Toyplot
 sources, issue tracker, and wiki.
 
 Next, you'll need to install Toyplot's
-:ref:`dependencies`.  Then, you'll be ready to "install"
+:ref:`dependencies`.  Then, you'll be ready to install
 Toyplot - but as a convenience, you'll want to use "develop mode".  Develop
 mode is a a feature provided by setuptools that links the Toyplot source code
 to the install directory instead of copying it ... that way you can edit the
@@ -92,9 +92,9 @@ To build the documentation, run::
     $ cd toyplot
     $ python docs/setup.py
 
-Note that the tutorial documentation is written as an IPython notebook, so the
-docs/setup.py script requires IPython so it can convert the notebook into a
-restructured text file for inclusion with the rest of the documentation.
+Note that significant subsets of the documentation are written using IPython notebooks, so the
+docs/setup.py script requires IPython to convert the notebooks into 
+restructured text files for inclusion with the rest of the documentation.
 
 Once the documentation is built, you can view it by opening
 `toyplot/docs/_build/html/index.html` in a web browser.

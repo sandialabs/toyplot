@@ -14,8 +14,8 @@ should expect more from their plots, from explicit support for
 reproducibility and open science to greater clarity and better aesthetics.
 
 We especially feel that, in an age of ubiquitous electronic media and the web,
-it makes little sense to publish using media (such as PDF) designed to mimic
-the limitations of static paper.  Toyplot embraces the tools of the web - SVG,
+it makes little sense to publish using media (like PDF) designed to mimic
+the limitations of static paper.  Toyplot embraces the standards of the internet - SVG,
 HTML, and Javascript - as its primary medium, so we can make useful new
 interactions part of the everyday experiences of data graphic users.  Because
 we're passionate about publishing and sharing results, Toyplot graphics are
@@ -30,7 +30,7 @@ With most toolkits, interactivity means throwaway features like pan-and-zoom.  F
 Toyplot, we're exploring simple-but-effective ideas to address the questions a
 colleague might ask when viewing a graphic in the real world: "What's the value
 at this weird peak?" "Where do those two series cross?" "Can I get a copy of the data?" 
-We're working on efficient animation that doesn't wreck the quality of your graphic
+We're working on efficient animation that doesn't compromise the quality of your graphic
 with compression artifacts; and interactive data cursors that display quantities
 of interest and descriptive statistics just by hovering the mouse.  And since
 the raw data is already implicitly embedded in a graphic, why not support

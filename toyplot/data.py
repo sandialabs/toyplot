@@ -41,22 +41,22 @@ class Table(object):
   def __delitem__(self, key):
     return self._columns.__delitem__(key)
 
+  def __len__(self):
+    return self._columns.values()[0].shape[0] if len(self._columns) else 0
+
   def _repr_html_(self):
     root_xml = xml.Element("table", style="border-collapse:collapse; border:none; color: %s" % toyplot.color.near_black)
     header_xml = xml.SubElement(root_xml, "tr", style="border:none;border-bottom:1px solid %s" % toyplot.color.near_black)
     for name in self._columns.keys():
       xml.SubElement(header_xml, "th", style="text-align:center;border:none").text = str(name)
 
-    try:
-      iterators = [iter(column) for column in self._columns.values()]
-      while True:
-        for index, iterator in enumerate(iterators):
-          value = iterator.next()
-          if index == 0:
-            row_xml = xml.SubElement(root_xml, "tr", style="border:none")
-          xml.SubElement(row_xml, "td", style="border:none").text = str(value)
-    except StopIteration:
-      pass
+    iterators = [iter(column) for column in self._columns.values()]
+    for row_index in numpy.arange(len(self)):
+      for index, iterator in enumerate(iterators):
+        value = iterator.next()
+        if index == 0:
+          row_xml = xml.SubElement(root_xml, "tr", style="border:none")
+        xml.SubElement(row_xml, "td", style="border:none").text = str(value)
 
     return xml.tostring(root_xml, method="html")
 

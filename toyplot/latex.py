@@ -5,7 +5,7 @@
 import numpy
 import toyplot.data
 
-def render(table, fobj=None):
+def render(table, fobj=None, hlines=None):
   """Render the LaTeX representation of a table.
 
   Parameters
@@ -18,6 +18,10 @@ def render(table, fobj=None):
     If `None` (the default), the LaTeX markup will be returned to the caller
     instead.
 
+  hlines: sequence of row indices, optional
+    For each index :math:`n`, renders a horizontal line between row :math:`n-1`
+    and :math:`n`.
+
   Returns
   -------
   latex: string or `None`
@@ -26,22 +30,35 @@ def render(table, fobj=None):
   """
   table = toyplot._require_instance(table, toyplot.data.Table)
 
+  # Setup formatters for each column.
+  formatters = []
+  for column in table.values():
+    if column.dtype.kind == "f":
+      formatters.append("{:.3g}".format)
+    else:
+      formatters.append(str)
+
+  # Setup iterators for each column.
+  iterators = [iter(column) for column in table.values()]
+
+  # Setup hlines
+  if hlines is None:
+    hlines = []
+
   latex = "\\begin{tabular}"
   latex += "{" + " ".join(["l" for key in table.keys()]) + "}\n"
   latex += " & ".join(table.keys()) + " \\\\\n"
   latex += "\\hline\n"
 
-  try:
-    iterators = [iter(column) for column in table._columns.values()]
-    while True:
-      for index, iterator in enumerate(iterators):
-        value = iterator.next()
-        if index != 0:
-          latex += " & "
-        latex += str(value)
-      latex += " \\\\\n"
-  except StopIteration:
-    pass
+  for row_index in numpy.arange(len(table)):
+    if row_index in hlines:
+      latex += "\\hline\n"
+    for index, (iterator, formatter) in enumerate(zip(iterators, formatters)):
+      value = iterator.next()
+      if index != 0:
+        latex += " & "
+      latex += formatter(value)
+    latex += " \\\\\n"
 
   latex += "\\end{tabular}\n"
 

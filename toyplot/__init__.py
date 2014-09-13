@@ -28,6 +28,23 @@ except:
   bytes_type = str
 
 ###############################################################################################
+# Style Helpers
+
+def _require_style(style):
+  """Verify that the given object is usable as a style."""
+  if not isinstance(style, (dict, type(None))):
+    raise ValueError("Expected a dictionary of CSS styles or None, received %s." % style)
+  return style
+
+def _combine_styles(*styles):
+  """Combine zero-to-many styles, returning a dict."""
+  computed_style = {}
+  for style in styles:
+    if style is not None:
+      computed_style.update(style)
+  return computed_style
+
+###############################################################################################
 # Helpers
 
 def _null_min(a, b):
@@ -96,7 +113,7 @@ def _require_scalar_array(value):
 def _require_scalar_vector(value, length=None):
   array = _require_scalar_array(value)
   if array.shape == ():
-    array = numpy.ma.repeat(array, 1 if length is None else length)
+    array = numpy.ma.repeat(array, 1)
   if array.ndim != 1:
     raise ValueError("Expected a vector.")
   if length is not None:
@@ -146,11 +163,6 @@ def _require_marker_array(value, length=None):
     if len(array) != length:
       raise ValueError("Expected %s values, received %s." % (length, len(array)))
   return array
-
-def _require_style(style):
-  if not isinstance(style, dict):
-    raise ValueError("Expected a dictionary of CSS styles, received %s." % style)
-  return style
 
 def _require_optional_id(id):
   return _require_optional_string(id)
@@ -259,9 +271,7 @@ def _region(xmin, xmax, ymin, ymax, bounds=None, rect=None, corner=None, grid=No
 
 class Mark(object):
   def __init__(self, *styles, **kwargs):
-    self._style = {}
-    for style in styles:
-      self._style.update(style)
+    self._style = _combine_styles(*styles)
     self._id = kwargs.get("id", None)
 
 class LegendMark(Mark):
@@ -304,10 +314,9 @@ class VColorBarMark(Mark):
       self._max = value
 
   class LabelHelper(object):
-    def __init__(self, label, style={}):
+    def __init__(self, label, style):
       self._text = label
-      self._style = {"font-size":"12px", "font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"-200%"}
-      self._style.update(style)
+      self._style = _combine_styles({"font-size":"12px", "font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"-200%"}, _require_style(style))
     @property
     def text(self):
       return self._text
@@ -319,7 +328,7 @@ class VColorBarMark(Mark):
       return self._style
     @style.setter
     def style(self, value):
-      self._style.update(value)
+      self._style = _combine_styles(self._style, _require_style(value))
 
   class PerTickHelper(object):
     class TickProxy(object):
@@ -330,9 +339,7 @@ class VColorBarMark(Mark):
         return self._tick.get("style", {})
       @style.setter
       def style(self, value):
-        style = self._tick.get("style", {})
-        style.update(value)
-        self._tick["style"] = style
+        self._tick["style"] = _combine_styles(self._tick.get("style"), _require_style(value))
     def __init__(self):
       self._indices = collections.defaultdict(dict)
       self._values = collections.defaultdict(dict)
@@ -383,7 +390,7 @@ class VColorBarMark(Mark):
       return self._style
     @style.setter
     def style(self, value):
-      self._style.update(value)
+      self._style = _combine_styles(self._style, _require_style(value))
 
   class TickLabelsHelper(object):
     def __init__(self):
@@ -401,7 +408,7 @@ class VColorBarMark(Mark):
       return self._style
     @style.setter
     def style(self, value):
-      self._style.update(value)
+      self._style = _combine_styles(self._style, _require_style(value))
 
   def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, label, colormap, padding, tick_length, min, max, tick_locator, style, id):
     Mark.__init__(self, style)
@@ -416,7 +423,7 @@ class VColorBarMark(Mark):
     self._vmax_implicit = None
     self._padding = padding
     self.domain = VColorBarMark.DomainHelper(min, max)
-    self.label = VColorBarMark.LabelHelper(label=label)
+    self.label = VColorBarMark.LabelHelper(label=label, style=None)
     self.ticks = VColorBarMark.TicksHelper(tick_length, tick_locator)
     self._id = id
 
@@ -1010,8 +1017,7 @@ class Axes2D(object):
       self._xmax_range = xmax_range
       self._ymin_range = ymin_range
       self._ymax_range = ymax_range
-      self._style = {"stroke":"none", "fill":"white", "opacity":0.75}
-      self._style.update(style)
+      self._style = _combine_styles({"stroke":"none", "fill":"white", "opacity":0.75}, _require_style(style))
       self.label = Axes2D.CoordinatesLabelHelper(style={})
     @property
     def show(self):
@@ -1024,18 +1030,17 @@ class Axes2D(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style.update(value)
+      self._style = _combine_styles(self._style, _require_style(value))
 
   class CoordinatesLabelHelper(object):
     def __init__(self, style):
-      self._style = {"font-size":"10px", "font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}
-      self._style.update(style)
+      self._style = _combine_styles({"font-size":"10px", "font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, _require_style(style))
     @property
     def style(self):
       return self._style
     @style.setter
     def style(self, value):
-      self._style.update(value)
+      self._style = _combine_styles(self._style, _require_style(value))
 
   class DomainHelper(object):
     def __init__(self, min, max):
@@ -1055,10 +1060,9 @@ class Axes2D(object):
       self._max = value
 
   class LabelHelper(object):
-    def __init__(self, label, style={}):
+    def __init__(self, label, style):
       self._text = label
-      self._style = {"font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}
-      self._style.update(style)
+      self._style = _combine_styles({"font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, _require_style(style))
     @property
     def text(self):
       return self._text
@@ -1070,7 +1074,7 @@ class Axes2D(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style.update(value)
+      self._style = _combine_styles(self._style, _require_style(value))
 
   class SpineHelper(object):
     def __init__(self):
@@ -1094,7 +1098,7 @@ class Axes2D(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style.update(value)
+      self._style = _combine_styles(self._style, _require_style(value))
 
   class PerTickHelper(object):
     class TickProxy(object):
@@ -1105,9 +1109,7 @@ class Axes2D(object):
         return self._tick.get("style", {})
       @style.setter
       def style(self, value):
-        style = self._tick.get("style", {})
-        style.update(value)
-        self._tick["style"] = style
+        self._tick["style"] = _combine_styles(self._tick.get("style"), _require_style(value))
     def __init__(self):
       self._indices = collections.defaultdict(dict)
       self._values = collections.defaultdict(dict)
@@ -1158,7 +1160,7 @@ class Axes2D(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style.update(value)
+      self._style = _combine_styles(self._style, _require_style(value))
 
   class TickLabelsHelper(object):
     def __init__(self, angle):
@@ -1183,7 +1185,7 @@ class Axes2D(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style.update(value)
+      self._style = _combine_styles(self._style, _require_style(value))
 
   def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, xmin, xmax, ymin, ymax, show, xshow, yshow, label, xlabel, ylabel, xticklocator, yticklocator, xscale, yscale, palette, padding, tick_length, parent, id):
     self._xmin_range = xmin_range
@@ -1368,7 +1370,7 @@ class Axes2D(object):
   def _project_y(self, y):
     return self._yprojection(y)
 
-  def bars(self, a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={}, id=None):
+  def bars(self, a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
     """Add stacked bars to the axes.
 
     This command generates one-or-more series of stacked bars.  For
@@ -1464,18 +1466,15 @@ class Axes2D(object):
       fill = toyplot.color._broadcast_color(default_color if fill is None else fill, (series.shape[0], series.shape[1]-1), colormap=colormap, palette=palette)
       opacity = _broadcast_scalar(opacity, (series.shape[0], series.shape[1]-1))
       title = _broadcast_object(title, (series.shape[0], series.shape[1]-1))
-      style = _require_style(style)
+      style = _combine_styles({"stroke":"white", "stroke-width":1.0}, _require_style(style))
       id = _require_optional_id(id)
-
-      computed_style = {"stroke":"white", "stroke-width":1.0}
-      computed_style.update(style)
 
       if along == "x":
         self._update_domain(position, series)
       elif along == "y":
         self._update_domain(series, position)
 
-      self._children.append(BarBoundariesMark(along=along, position=position, series=series, fill=fill, opacity=opacity, title=title, style=computed_style, id=id))
+      self._children.append(BarBoundariesMark(along=along, position=position, series=series, fill=fill, opacity=opacity, title=title, style=style, id=id))
       return self._children[-1]
     else: # baseline is not None
       if a is not None and b is not None and c is not None:
@@ -1515,7 +1514,7 @@ class Axes2D(object):
       fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape, colormap=colormap, palette=palette)
       opacity = _broadcast_scalar(opacity, series.shape)
       title = _broadcast_object(title, series.shape)
-      style = _require_style(style)
+      style = _combine_styles({"stroke":"white", "stroke-width":1.0}, _require_style(style))
       id = _require_optional_id(id)
 
       if baseline == "stacked":
@@ -1530,9 +1529,6 @@ class Axes2D(object):
             baseline += series.T[j]
         baseline *= -(1.0 / (n + 1))
 
-      computed_style = {"stroke":"white", "stroke-width":1.0}
-      computed_style.update(style)
-
       boundaries = numpy.cumsum(numpy.column_stack((baseline, series)), axis=1)
 
       if along == "x":
@@ -1540,10 +1536,10 @@ class Axes2D(object):
       elif along == "y":
         self._update_domain(boundaries, position)
 
-      self._children.append(BarMagnitudesMark(along=along, position=position, baseline=baseline, series=series, fill=fill, opacity=opacity, title=title, style=computed_style, id=id))
+      self._children.append(BarMagnitudesMark(along=along, position=position, baseline=baseline, series=series, fill=fill, opacity=opacity, title=title, style=style, id=id))
       return self._children[-1]
 
-  def colorbar(self, values=None, palette=None, colormap=None, label=None, min=None, max=None, id=None, tick_length=5, tick_locator=None, offset=0, width=10, style={}):
+  def colorbar(self, values=None, palette=None, colormap=None, label=None, min=None, max=None, id=None, tick_length=5, tick_locator=None, offset=0, width=10, style=None):
     if colormap is None:
       if palette is None:
         palette = toyplot.color.brewer("BlueGreen")
@@ -1556,7 +1552,7 @@ class Axes2D(object):
     self._parent._children.append(mark)
     return mark
 
-  def fill(self, a, b=None, c=None, along="x", baseline=None, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={}, id=None):
+  def fill(self, a, b=None, c=None, along="x", baseline=None, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
     """Fill multiple regions separated by curves.
 
     Parameters
@@ -1611,18 +1607,15 @@ class Axes2D(object):
       fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape[1]-1, colormap=colormap, palette=palette)
       opacity = _broadcast_scalar(opacity, series.shape[1]-1)
       title = _broadcast_object(title, series.shape[1]-1)
-      style = _require_style(style)
+      style = _combine_styles({"stroke":"none"}, _require_style(style))
       id = _require_optional_id(id)
-
-      computed_style = {"stroke":"none"}
-      computed_style.update(style)
 
       if along == "x":
         self._update_domain(position, series)
       elif along == "y":
         self._update_domain(series, position)
 
-      self._children.append(FillBoundariesMark(along=along, position=position, series=series, fill=fill, opacity=opacity, title=title, style=computed_style, id=id))
+      self._children.append(FillBoundariesMark(along=along, position=position, series=series, fill=fill, opacity=opacity, title=title, style=style, id=id))
       return self._children[-1]
     else: # baseline is not None
       if a is not None and b is not None:
@@ -1644,11 +1637,8 @@ class Axes2D(object):
       fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape[1], colormap=colormap, palette=palette)
       opacity = _broadcast_scalar(opacity, series.shape[1])
       title = _broadcast_object(title, series.shape[1])
-      style = _require_style(style)
+      style = _combine_styles({"stroke":"none"}, _require_style(style))
       id = _require_optional_id(id)
-
-      computed_style = {"stroke":"none"}
-      computed_style.update(style)
 
       if baseline == "stacked":
         baseline = numpy.ma.zeros(series.shape[0])
@@ -1668,10 +1658,10 @@ class Axes2D(object):
       elif along == "y":
         self._update_domain(boundaries, position)
 
-      self._children.append(FillMagnitudesMark(along=along, position=position, baseline=baseline, series=series, fill=fill, opacity=opacity, title=title, style=computed_style, id=id))
+      self._children.append(FillMagnitudesMark(along=along, position=position, baseline=baseline, series=series, fill=fill, opacity=opacity, title=title, style=style, id=id))
       return self._children[-1]
 
-  def plot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={}, mstyle={}, mlstyle={}, id=None):
+  def plot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None, id=None):
     """Add a bivariate plot to the axes.
 
     Parameters
@@ -1718,29 +1708,20 @@ class Axes2D(object):
     fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
     opacity = _broadcast_scalar(opacity, series.shape)
     title = _broadcast_object(title, series.shape[1])
-    style = _require_style(style)
-    mstyle = _require_style(mstyle)
-    mlstyle = _require_style(mlstyle)
+    style = _combine_styles({"fill":"none"}, _require_style(style))
+    mstyle = _combine_styles({"stroke":"none"}, _require_style(mstyle))
+    mlstyle = _combine_styles(_require_style(mlstyle))
     id = _require_optional_id(id)
-
-    computed_style = {"fill":"none"}
-    computed_style.update(style)
-
-    computed_mstyle = {"stroke":"none"}
-    computed_mstyle.update(mstyle)
-
-    computed_mlstyle = {}
-    computed_mlstyle.update(mlstyle)
 
     if along == "x":
       self._update_domain(position, series)
     elif along == "y":
       self._update_domain(series, position)
 
-    self._children.append(PlotMark(along=along, show_stroke=True, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=computed_style, mstyle=computed_mstyle, mlstyle=computed_mlstyle, id=id))
+    self._children.append(PlotMark(along=along, show_stroke=True, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle, id=id))
     return self._children[-1]
 
-  def scatterplot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={}, mstyle={}, mlstyle={}, id=None):
+  def scatterplot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None, id=None):
     """Add a bivariate plot to the axes.
 
     Parameters
@@ -1790,26 +1771,17 @@ class Axes2D(object):
     fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
     opacity = _broadcast_scalar(opacity, series.shape)
     title = _broadcast_object(title, series.shape[1])
-    style = _require_style(style)
-    mstyle = _require_style(mstyle)
-    mlstyle = _require_style(mlstyle)
+    style = _combine_styles({"stroke":"none"}, _require_style(style))
+    mstyle = _combine_styles({"stroke":"none"}, _require_style(mstyle))
+    mlstyle = _combine_styles(_require_style(mlstyle))
     id = _require_optional_id(id)
-
-    computed_style = {"stroke":"none"}
-    computed_style.update(style)
-
-    computed_mstyle = {"stroke":"none"}
-    computed_mstyle.update(mstyle)
-
-    computed_mlstyle = {}
-    computed_mlstyle.update(mlstyle)
 
     if along == "x":
       self._update_domain(position, series)
     elif along == "y":
       self._update_domain(series, position)
 
-    self._children.append(PlotMark(along=along, show_stroke=False, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=computed_style, mstyle=computed_mstyle, mlstyle=computed_mlstyle, id=id))
+    self._children.append(PlotMark(along=along, show_stroke=False, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle, id=id))
     return self._children[-1]
 
   def rect(self, a, b, c, d, along="x", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={"stroke":"none"}, id=None):
@@ -1821,7 +1793,7 @@ class Axes2D(object):
     table["fill"] = _broadcast_object(fill, table.shape[0])
     table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
     table["title"] = _broadcast_object(title, table.shape[0])
-    style = _require_style(style)
+    style = _combine_styles(_require_style(style))
     id = _require_optional_id(id)
 
     default_color = next(self._rect_colors)
@@ -1835,7 +1807,7 @@ class Axes2D(object):
     self._children.append(RectMark(table=table, along=along, left="left", right="right", top="top", bottom="bottom", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
-  def text(self, a, b, text, along="x", angle=0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={}, id=None):
+  def text(self, a, b, text, along="x", angle=0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
     """Add text to the axes.
 
     Parameters
@@ -1863,24 +1835,21 @@ class Axes2D(object):
     table["fill"] = _broadcast_object(fill, table.shape[0])
     table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
     table["title"] = _broadcast_object(title, table.shape[0])
-    style = _require_style(style)
+    style = _combine_styles({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, _require_style(style))
     id = _require_optional_id(id)
 
     default_color = next(self._text_colors)
     table["toyplot:fill"] = toyplot.color._broadcast_color(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
-
-    computed_style = {"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}
-    computed_style.update(style)
 
     if along == "x":
       self._update_domain(table["coordinate1"], table["coordinate2"])
     elif along == "y":
       self._update_domain(table["coordinate2"], table["coordinate1"])
 
-    self._children.append(TextMark(table=table, along=along, coordinate1="coordinate1", coordinate2="coordinate2", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=computed_style, id=id))
+    self._children.append(TextMark(table=table, along=along, coordinate1="coordinate1", coordinate2="coordinate2", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
-  def hlines(self, y, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style={}, id=None):
+  def hlines(self, y, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
     """Add horizontal line(s) to the axes.
 
     Horizontal lines are convenient because they're guaranteed to fill the axes from
@@ -1907,7 +1876,7 @@ class Axes2D(object):
     table["stroke"] = _broadcast_object(stroke, table.shape[0])
     table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
     table["title"] = _broadcast_object(title, table.shape[0])
-    style = _require_style(style)
+    style = _combine_styles(_require_style(style))
     id = _require_optional_id(id)
 
     table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
@@ -1916,7 +1885,7 @@ class Axes2D(object):
     self._children.append(AxisLinesMark(table=table, along="y", coordinate="coordinate", stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
-  def vlines(self, x, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style={}, id=None):
+  def vlines(self, x, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
     """Add vertical line(s) to the axes.
 
     Vertical lines are convenient because they're guaranteed to fill the axes from
@@ -1943,7 +1912,7 @@ class Axes2D(object):
     table["stroke"] = _broadcast_object(stroke, table.shape[0])
     table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
     table["title"] = _broadcast_object(title, table.shape[0])
-    style = _require_style(style)
+    style = _combine_styles(_require_style(style))
     id = _require_optional_id(id)
 
     table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
@@ -1952,7 +1921,7 @@ class Axes2D(object):
     self._children.append(AxisLinesMark(table=table, along="x", coordinate="coordinate", stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
-  def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style={}, label_style={}, id=None):
+  def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style=None, label_style=None, id=None):
     """Add a legend to the axes.
 
     Parameters
@@ -1999,7 +1968,8 @@ class Axes2D(object):
     legend: :class:`toyplot.LegendMark`
     """
     gutter = _require_scalar(gutter)
-    style = _require_style(style)
+    style = _combine_styles(_require_style(style))
+    label_style = _combine_styles(_require_style(label_style))
     id = _require_optional_id(id)
 
     xmin, xmax, ymin, ymax = _region(self._xmin_range, self._xmax_range, self._ymin_range, self._ymax_range, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
@@ -2106,11 +2076,10 @@ class Canvas(object):
 
   >>> canvas = toyplot.Canvas(800, 600, style={"background-color":"yellow"})
   """
-  def __init__(self, width=None, height=None, style={}, id=None, autorender=None):
+  def __init__(self, width=None, height=None, style=None, id=None, autorender=None):
     self._width = width if width is not None else 600
     self._height = height if height is not None else self._width
-    self._style = {"background-color": "transparent", "fill": toyplot.color.near_black, "fill-opacity": 1.0, "font-family":"helvetica", "font-size": "12px", "opacity": 1.0, "stroke": toyplot.color.near_black, "stroke-opacity": 1.0, "stroke-width": 1.0}
-    self._style.update(style)
+    self._style = _combine_styles({"background-color": "transparent", "fill": toyplot.color.near_black, "fill-opacity": 1.0, "font-family":"helvetica", "font-size": "12px", "opacity": 1.0, "stroke": toyplot.color.near_black, "stroke-opacity": 1.0, "stroke-width": 1.0}, style)
     self._id = id
     self._animation = collections.defaultdict(lambda: collections.defaultdict(list))
     self._children = []
@@ -2214,7 +2183,7 @@ class Canvas(object):
     self._children.append(Axes2D(xmin_range, xmax_range, ymin_range, ymax_range, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self, id=id))
     return self._children[-1]
 
-  def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style={}, label_style={}, id=None):
+  def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style=None, label_style=None, id=None):
     """Add a legend to the canvas.
 
     Parameters
@@ -2261,14 +2230,15 @@ class Canvas(object):
     legend: :class:`toyplot.LegendMark`
     """
     gutter = _require_scalar(gutter)
-    style = _require_style(style)
+    style = _combine_styles(_require_style(style))
+    label_style = _combine_styles(_require_style(label_style))
     id = _require_optional_id(id)
 
     xmin, xmax, ymin, ymax = _region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
     self._children.append(LegendMark(xmin, xmax, ymin, ymax, marks, style, label_style, id))
     return self._children[-1]
 
-  def text(self, x, y, text, angle=0.0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={}, id=None):
+  def text(self, x, y, text, angle=0.0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
     """Add text to the canvas.
 
     Parameters
@@ -2298,13 +2268,10 @@ class Canvas(object):
     table["toyplot:fill"] = toyplot.color._broadcast_color(toyplot.color.near_black if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
     table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
     table["title"] = _broadcast_object(title, table.shape[0])
-    style = _require_style(style)
+    style = _combine_styles({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, _require_style(style))
     id = _require_optional_id(id)
 
-    computed_style = {"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}
-    computed_style.update(style)
-
-    self._children.append(TextMark(table=table, along="x", coordinate1="x", coordinate2="y", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=computed_style, id=id))
+    self._children.append(TextMark(table=table, along="x", coordinate1="x", coordinate2="y", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def time(self, begin, end, index=None):
@@ -2376,7 +2343,7 @@ Canvas._autorender_list = []
 Canvas._ipython_register()
 toyplot.autorender = True
 
-def bars(a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={}, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style={}):
+def bars(a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style=None):
   """Convenience function for creating a bar plot in a single call.
 
   See :meth:`toyplot.Axes2D.bars`, :meth:`toyplot.Canvas.axes`, and :class:`toyplot.Canvas` for parameter descriptions.
@@ -2395,7 +2362,7 @@ def bars(a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=N
   mark = axes.bars(a=a, b=b, c=c, along=along, baseline=baseline, fill=fill, colormap=colormap, palette=palette, opacity=opacity, title=title, style=style, id=id)
   return canvas, axes, mark
 
-def fill(a, b=None, c=None, along="x", baseline=None, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={}, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style={}):
+def fill(a, b=None, c=None, along="x", baseline=None, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style=None):
   """Convenience function for creating a fill plot in a single call.
 
   See :meth:`toyplot.Axes2D.fill`, :meth:`toyplot.Canvas.axes`, and :class:`toyplot.Canvas` for parameter descriptions.
@@ -2414,7 +2381,7 @@ def fill(a, b=None, c=None, along="x", baseline=None, fill=None, colormap=None, 
   mark = axes.fill(a=a, b=b, c=c, along=along, baseline=baseline, fill=fill, colormap=colormap, palette=palette, opacity=opacity, title=title, style=style, id=id)
   return canvas, axes, mark
 
-def plot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={}, mstyle={}, mlstyle={}, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style={}):
+def plot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style=None):
   """Convenience function for creating a line plot in a single call.
 
   See :meth:`toyplot.Axes2D.plot`, :meth:`toyplot.Canvas.axes`, and :class:`toyplot.Canvas` for parameter descriptions.
@@ -2433,7 +2400,7 @@ def plot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette
   mark = axes.plot(a=a, b=b, along=along, stroke=stroke, stroke_colormap=stroke_colormap, stroke_palette=stroke_palette, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, fill_colormap=fill_colormap, fill_palette=fill_palette, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle, id=id)
   return canvas, axes, mark
 
-def scatterplot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style={}, mstyle={}, mlstyle={}, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style={}):
+def scatterplot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None, id=None, xmin=None, xmax=None, ymin=None, ymax=None, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style=None):
   """Convenience function for creating a scatter plot in a single call.
 
   See :meth:`toyplot.Axes2D.scatterplot`, :meth:`toyplot.Canvas.axes`, and :class:`toyplot.Canvas` for parameter descriptions.

@@ -205,6 +205,23 @@ def test_data_table():
 #########################################################################################################################
 # toyplot
 
+def test_require_style():
+  nose.tools.assert_equal(toyplot._require_style(None), None)
+  nose.tools.assert_equal(toyplot._require_style({}), {})
+  nose.tools.assert_equal(toyplot._require_style({"stroke":toyplot.color.near_black}), {"stroke":toyplot.color.near_black})
+  with nose.tools.assert_raises(ValueError):
+    toyplot._require_style([])
+  with nose.tools.assert_raises(ValueError):
+    toyplot._require_style("")
+
+def test_combine_styles():
+  nose.tools.assert_equal(toyplot._combine_styles(None), {})
+  nose.tools.assert_equal(toyplot._combine_styles({}), {})
+  nose.tools.assert_equal(toyplot._combine_styles({"a":"b"}, None), {"a":"b"})
+  nose.tools.assert_equal(toyplot._combine_styles({"a":"b"}, {}), {"a":"b"})
+  nose.tools.assert_equal(toyplot._combine_styles({"a":"b"}, {"c":"d"}), {"a":"b","c":"d"})
+  nose.tools.assert_equal(toyplot._combine_styles({"a":"b"}, {"a":"d"}), {"a":"d"})
+
 def test_require_scalar():
   nose.tools.assert_equal(toyplot._require_scalar(1), 1)
   nose.tools.assert_equal(toyplot._require_scalar(1.2), 1.2)
@@ -229,9 +246,10 @@ def test_require_scalar_array():
 
 def test_require_scalar_vector():
   numpy.testing.assert_array_equal(toyplot._require_scalar_vector(1), [1])
-  numpy.testing.assert_array_equal(toyplot._require_scalar_vector(1, length=3), [1, 1, 1])
   numpy.testing.assert_array_equal(toyplot._require_scalar_vector([1, 2, 3]), [1, 2, 3])
   numpy.testing.assert_array_equal(toyplot._require_scalar_vector([1, 2, 3], length=3), [1, 2, 3])
+  with nose.tools.assert_raises(ValueError):
+    toyplot._require_scalar_vector(1, length=3)
   with nose.tools.assert_raises(ValueError):
     toyplot._require_scalar_vector([1, 2, 3], length=2)
   with nose.tools.assert_raises(ValueError):
@@ -277,14 +295,6 @@ def test_require_marker_array():
   numpy.testing.assert_array_equal(toyplot._require_marker_array([1, 2, "foo"]), [1, 2, "foo"])
   with nose.tools.assert_raises(ValueError):
     toyplot._require_marker_array(["foo", "bar"], 3)
-
-def test_require_style():
-  nose.tools.assert_equal(toyplot._require_style({}), {})
-  nose.tools.assert_equal(toyplot._require_style({"stroke":toyplot.color.near_black}), {"stroke":toyplot.color.near_black})
-  with nose.tools.assert_raises(ValueError):
-    nose.tools.assert_equal(toyplot._require_style(None), None)
-  with nose.tools.assert_raises(ValueError):
-    nose.tools.assert_equal(toyplot._require_style(""), "")
 
 def test_require_optional_id():
   nose.tools.assert_equal(toyplot._require_optional_id("foo"), "foo")

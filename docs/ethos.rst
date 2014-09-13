@@ -26,9 +26,12 @@ notebook and passed through several publishing steps on the way to becoming our
 documentation.  Of course, we provide backends to publish Toyplot figures to
 legacy formats including PNG, PDF, Encapsulated Postscript, and MP4.
 
-Interactivity includes obvious things such as zooming and panning.  But beyond
-that, Toyplot is exploring ideas including efficient animation that doesn't impact
-the quality of the graphic, and interactive data cursors that display quantities
+With most toolkits, interactivity means throwaway features like pan-and-zoom.  For
+Toyplot, we're exploring simple-but-effective ideas to address the questions a
+colleague might ask when viewing a graphic in the real world: "What's the value
+at this weird peak?" "Where do those two series cross?" "Can I get a copy of the data?" 
+We're working on efficient animation that doesn't wreck the quality of your graphic
+with compression artifacts; and interactive data cursors that display quantities
 of interest and descriptive statistics just by hovering the mouse.  And since
 the raw data is already implicitly embedded in a graphic, why not support
 reproducibility by making it easy to export, so the viewer can work with it

@@ -195,6 +195,8 @@ def test_data_table():
   numpy.testing.assert_array_equal(t6["a"], [8])
 
   with nose.tools.assert_raises(ValueError):
+    table[3] = numpy.arange(10)
+  with nose.tools.assert_raises(ValueError):
     table["c"] = numpy.random.random(4)
   with nose.tools.assert_raises(ValueError):
     table["c"] = numpy.random.random((10, 4))

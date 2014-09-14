@@ -30,6 +30,8 @@ class Table(object):
     return Table(collections.OrderedDict([(key, self._columns[key][index]) for key in self._columns.keys()]))
 
   def __setitem__(self, key, value):
+    if not isinstance(key, toyplot.string_type):
+      raise ValueError("Column name must be a string.")
     value = numpy.array(value)
     if value.ndim != 1:
       raise ValueError("Only 1D arrays are allowed.")

@@ -619,12 +619,8 @@ def _render_Table(root, item, parent, id_cache):
 
 def _render_TextMark(root, item, parent, id_cache):
   if isinstance(parent, toyplot.Axes2D):
-    if item._along == "x":
-      x = parent._project_x(item._table[item._coordinate1[0]])
-      y = parent._project_y(item._table[item._coordinate2[0]])
-    elif item._along == "y":
-      x = parent._project_x(item._table[item._coordinate2[0]])
-      y = parent._project_y(item._table[item._coordinate1[0]])
+    x = parent._project_x(item._table[item._coordinate1[0]])
+    y = parent._project_y(item._table[item._coordinate2[0]])
   else:
     x = item._table[item._coordinate1[0]]
     y = item._table[item._coordinate2[0]]

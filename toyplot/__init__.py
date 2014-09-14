@@ -644,7 +644,7 @@ class TextMark(Mark):
   Do not create TextMark instances directly.  Use factory methods such as
   :meth:`toyplot.Canvas.text` or :meth:`toyplot.Axes2D.text` instead.
   """
-  def __init__(self, table, along, coordinate1, coordinate2, text, angle, fill, opacity, title, style, id):
+  def __init__(self, table, coordinate1, coordinate2, text, angle, fill, opacity, title, style, id):
     table = _require_instance(table, toyplot.data.Table)
     coordinate1 = _require_table_keys(table, coordinate1, length=1)
     coordinate2 = _require_table_keys(table, coordinate2, length=1)
@@ -656,7 +656,6 @@ class TextMark(Mark):
 
     Mark.__init__(self, style, id=id)
     self._table = table
-    self._along = along
     self._coordinate1 = coordinate1 # 1 coordinate column
     self._coordinate2 = coordinate2 # 1 coordinate column
     self._text = text               # 1 text column
@@ -1807,7 +1806,7 @@ class Axes2D(object):
     self._children.append(RectMark(table=table, along=along, left="left", right="right", top="top", bottom="bottom", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
-  def text(self, a, b, text, along="x", angle=0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
+  def text(self, a, b, text, angle=0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
     """Add text to the axes.
 
     Parameters
@@ -1841,12 +1840,9 @@ class Axes2D(object):
     default_color = next(self._text_colors)
     table["toyplot:fill"] = toyplot.color._broadcast_color(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
 
-    if along == "x":
-      self._update_domain(table["coordinate1"], table["coordinate2"])
-    elif along == "y":
-      self._update_domain(table["coordinate2"], table["coordinate1"])
+    self._update_domain(table["coordinate1"], table["coordinate2"])
 
-    self._children.append(TextMark(table=table, along=along, coordinate1="coordinate1", coordinate2="coordinate2", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(TextMark(table=table, coordinate1="coordinate1", coordinate2="coordinate2", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def hlines(self, y, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
@@ -2271,7 +2267,7 @@ class Canvas(object):
     style = _combine_styles({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, _require_style(style))
     id = _require_optional_id(id)
 
-    self._children.append(TextMark(table=table, along="x", coordinate1="x", coordinate2="y", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(TextMark(table=table, coordinate1="x", coordinate2="y", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def time(self, begin, end, index=None):

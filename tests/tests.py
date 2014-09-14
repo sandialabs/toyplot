@@ -1545,15 +1545,6 @@ def test_axes_text():
   axes.text(x, y, text)
   assert_canvas_matches(canvas, "axes-text")
 
-def test_axes_text_along_y():
-  canvas = toyplot.Canvas()
-  axes = canvas.axes()
-  x = numpy.linspace(0, 1)
-  y = numpy.sin(x * 10)
-  text = ["s%s" % index for index in range(len(x))]
-  axes.text(x, y, text, along="y")
-  assert_canvas_matches(canvas, "axes-text-along-y")
-
 def test_axes_text_angle_fill():
   x = numpy.zeros(10)
   y = x

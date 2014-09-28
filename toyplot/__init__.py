@@ -508,7 +508,7 @@ class AxisLinesMark(Mark):
   Do not create AxisLinesMark instances directly.  Use factory methods such as
   :meth:`toyplot.Axes2D.hlines` and :meth:`toyplot.Axes2D.vlines` instead.
   """
-  def __init__(self, table, along, coordinate, stroke, opacity, title, style, id):
+  def __init__(self, table, coordinate, axis, stroke, opacity, title, style, id):
     table = _require_instance(table, toyplot.data.Table)
     coordinate = _require_table_keys(table, coordinate, length=1)
     stroke = _require_table_keys(table, stroke, length=1)
@@ -517,8 +517,8 @@ class AxisLinesMark(Mark):
 
     Mark.__init__(self, style, id=id)
     self._table = table
-    self._along = along
     self._coordinate = coordinate # 1 coordinate column
+    self._axis = axis
     self._stroke = stroke         # 1 stroke color column
     self._opacity = opacity       # 1 opacity column
     self._title = title           # 1 title column
@@ -1868,7 +1868,7 @@ class Axes2D(object):
     hlines: :class:`toyplot.AxisLinesMark`
     """
     table = toyplot.data.Table()
-    table["coordinate"] = _require_scalar_vector(y)
+    table["y"] = _require_scalar_vector(y)
     table["stroke"] = _broadcast_object(stroke, table.shape[0])
     table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
     table["title"] = _broadcast_object(title, table.shape[0])
@@ -1877,8 +1877,8 @@ class Axes2D(object):
 
     table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
 
-    self._update_domain(numpy.array([]), table["coordinate"])
-    self._children.append(AxisLinesMark(table=table, along="y", coordinate="coordinate", stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
+    self._update_domain(numpy.array([]), table["y"])
+    self._children.append(AxisLinesMark(table=table, coordinate="y", axis="y", stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def vlines(self, x, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
@@ -1904,7 +1904,7 @@ class Axes2D(object):
     hlines: :class:`toyplot.AxisLinesMark`
     """
     table = toyplot.data.Table()
-    table["coordinate"] = _require_scalar_vector(x)
+    table["x"] = _require_scalar_vector(x)
     table["stroke"] = _broadcast_object(stroke, table.shape[0])
     table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
     table["title"] = _broadcast_object(title, table.shape[0])
@@ -1913,8 +1913,8 @@ class Axes2D(object):
 
     table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
 
-    self._update_domain(table["coordinate"], numpy.array([]))
-    self._children.append(AxisLinesMark(table=table, along="x", coordinate="coordinate", stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
+    self._update_domain(table["x"], numpy.array([]))
+    self._children.append(AxisLinesMark(table=table, coordinate="x", axis="x", stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style=None, label_style=None, id=None):

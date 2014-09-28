@@ -595,12 +595,12 @@ def _render_PlotMark(root, item, parent, id_cache):
 
 def _render_RectMark(root, item, parent, id_cache):
   if isinstance(parent, toyplot.Axes2D):
-    if item._along == "x":
+    if item._left_right_axis == "x":
       x1 = parent._project_x(item._table[item._left[0]])
       x2 = parent._project_x(item._table[item._right[0]])
       y1 = parent._project_y(item._table[item._top[0]])
       y2 = parent._project_y(item._table[item._bottom[0]])
-    elif item._along == "y":
+    elif item._left_right_axis == "y":
       x1 = parent._project_x(item._table[item._top[0]])
       x2 = parent._project_x(item._table[item._bottom[0]])
       y1 = parent._project_y(item._table[item._left[0]])

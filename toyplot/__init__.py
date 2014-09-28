@@ -618,23 +618,26 @@ class RectMark(Mark):
   Do not create RectMark instances directly.  Use factory methods such as
   :meth:`toyplot.Axes2D.rect` instead.
   """
-  def __init__(self, table, along, left, right, top, bottom, fill, opacity, title, style, id):
+  def __init__(self, table, left, right, left_right_axis, top, bottom, top_bottom_axis, fill, opacity, title, style, id):
     table = _require_instance(table, toyplot.data.Table)
     left = _require_table_keys(table, left, length=1)
     right = _require_table_keys(table, right, length=1)
+    left_right_axis = _require_string_vector(left_right_axis, length=1)
     top = _require_table_keys(table, top, length=1)
     bottom = _require_table_keys(table, bottom, length=1)
+    top_bottom_axis = _require_string_vector(top_bottom_axis, length=1)
     fill = _require_table_keys(table, fill, length=1)
     opacity = _require_table_keys(table, opacity, length=1)
     title = _require_table_keys(table, title, length=1)
 
     Mark.__init__(self, style, id=id)
     self._table = table
-    self._along = along
     self._left = left       # 1 coordinate column
     self._right = right     # 1 coordinate column
+    self._left_right_axis = left_right_axis # 1 axis identifier
     self._top = top         # 1 coordinate column
     self._bottom = bottom   # 1 coordinate column
+    self._top_bottom_axis = top_bottom_axis # 1 axis identifier
     self._fill = fill       # 1 fill color column
     self._opacity = opacity # 1 opacity column
     self._title = title     # 1 title column
@@ -1800,11 +1803,15 @@ class Axes2D(object):
     table["toyplot:fill"] = toyplot.color._broadcast_color(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
 
     if along == "x":
+      left_right_axis = "x"
+      top_bottom_axis = "y"
       self._update_domain(numpy.concatenate((table["left"], table["right"])), numpy.concatenate((table["top"], table["bottom"])))
     elif along == "y":
+      left_right_axis = "y"
+      top_bottom_axis = "x"
       self._update_domain(numpy.concatenate((table["top"], table["bottom"])), numpy.concatenate((table["left"], table["right"])))
 
-    self._children.append(RectMark(table=table, along=along, left="left", right="right", top="top", bottom="bottom", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(RectMark(table=table, left="left", right="right", left_right_axis=left_right_axis, top="top", bottom="bottom", top_bottom_axis=top_bottom_axis, fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def text(self, a, b, text, angle=0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):

@@ -486,20 +486,20 @@ def _render_FillMagnitudesMark(root, item, parent, id_cache):
 
 def _render_AxisLinesMark(root, item, parent, id_cache):
   if isinstance(parent, toyplot.Axes2D):
-    if item._axis == "x":
+    if item._axes[0] == "x":
       p1="x1"
       p2="x2"
       b1="y1"
       b2="y2"
-      position = parent._project_x(item._table[item._coordinate[0]])
+      position = parent._project_x(item._table[item._coordinates[0]])
       boundary1 = parent._ymin_range
       boundary2 = parent._ymax_range
-    elif item._axis == "y":
+    elif item._axes[0] == "y":
       p1="y1"
       p2="y2"
       b1="x1"
       b2="x2"
-      position = parent._project_y(item._table[item._coordinate[0]])
+      position = parent._project_y(item._table[item._coordinates[0]])
       boundary1 = parent._xmin_range
       boundary2 = parent._xmax_range
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-AxisLinesMark"})

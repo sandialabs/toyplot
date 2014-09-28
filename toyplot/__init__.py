@@ -644,10 +644,10 @@ class TextMark(Mark):
   Do not create TextMark instances directly.  Use factory methods such as
   :meth:`toyplot.Canvas.text` or :meth:`toyplot.Axes2D.text` instead.
   """
-  def __init__(self, table, coordinate1, coordinate2, text, angle, fill, opacity, title, style, id):
+  def __init__(self, table, coordinates, axes, text, angle, fill, opacity, title, style, id):
     table = _require_instance(table, toyplot.data.Table)
-    coordinate1 = _require_table_keys(table, coordinate1, length=1)
-    coordinate2 = _require_table_keys(table, coordinate2, length=1)
+    coordinates = _require_table_keys(table, coordinates)
+    axes = _require_string_vector(axes, length=len(coordinates))
     text = _require_table_keys(table, text, length=1)
     angle = _require_table_keys(table, angle, length=1)
     fill = _require_table_keys(table, fill, length=1)
@@ -656,8 +656,8 @@ class TextMark(Mark):
 
     Mark.__init__(self, style, id=id)
     self._table = table
-    self._coordinate1 = coordinate1 # 1 coordinate column
-    self._coordinate2 = coordinate2 # 1 coordinate column
+    self._coordinates = coordinates # D coordinate columns
+    self._axes = axes               # D axis identifiers
     self._text = text               # 1 text column
     self._angle = angle             # 1 angle column
     self._fill = fill               # 1 fill color column
@@ -1827,8 +1827,8 @@ class Axes2D(object):
     text: :class:`toyplot.TextMark`
     """
     table = toyplot.data.Table()
-    table["coordinate1"] = _require_scalar_vector(a)
-    table["coordinate2"] = _require_scalar_vector(b, table.shape[0])
+    table["x"] = _require_scalar_vector(a)
+    table["y"] = _require_scalar_vector(b, table.shape[0])
     table["text"] = _broadcast_object(text, table.shape[0])
     table["angle"] = _broadcast_scalar(angle, table.shape[0])
     table["fill"] = _broadcast_object(fill, table.shape[0])
@@ -1840,9 +1840,9 @@ class Axes2D(object):
     default_color = next(self._text_colors)
     table["toyplot:fill"] = toyplot.color._broadcast_color(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
 
-    self._update_domain(table["coordinate1"], table["coordinate2"])
+    self._update_domain(table["x"], table["y"])
 
-    self._children.append(TextMark(table=table, coordinate1="coordinate1", coordinate2="coordinate2", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(TextMark(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def hlines(self, y, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
@@ -2267,7 +2267,7 @@ class Canvas(object):
     style = _combine_styles({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, _require_style(style))
     id = _require_optional_id(id)
 
-    self._children.append(TextMark(table=table, coordinate1="x", coordinate2="y", text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(TextMark(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def time(self, begin, end, index=None):

@@ -618,12 +618,11 @@ def _render_Table(root, item, parent, id_cache):
   item_xml = xml.SubElement(root, "g", id=id_cache(item), attrib={"class":"toyplot-Table"})
 
 def _render_TextMark(root, item, parent, id_cache):
+  x = item._table[item._coordinates[numpy.where(item._axes == "x")[0][0]]]
+  y = item._table[item._coordinates[numpy.where(item._axes == "y")[0][0]]]
   if isinstance(parent, toyplot.Axes2D):
-    x = parent._project_x(item._table[item._coordinate1[0]])
-    y = parent._project_y(item._table[item._coordinate2[0]])
-  else:
-    x = item._table[item._coordinate1[0]]
-    y = item._table[item._coordinate2[0]]
+    x = parent._project_x(x)
+    y = parent._project_y(y)
 
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-TextMark"})
   _render_data_table(item_xml, item._table, title="Text Data")

@@ -90,14 +90,15 @@ def _require_instance(value, types):
 
 def _require_in(value, choices):
   if value not in choices:
-    raise ValueError("Expected one of %s, received %s" % (",".join([str(choice) for choice in choices]), value))
+    raise ValueError("Expected one of %s, received %s." % (",".join([str(choice) for choice in choices]), value))
+  return value
 
 def _require_table_keys(table, keys, length=None):
   keys = _require_string_vector(keys, length=length)
   allowed = list(table.keys())
   for key in keys:
     if key not in allowed:
-      raise ValueError("Table key must match one of %s, received %s" % (",".join(allowed), key))
+      raise ValueError("Table key must match one of %s, received %s." % (", ".join(allowed), key))
   return keys
 
 def _require_scalar(value):
@@ -576,15 +577,24 @@ class FillMagnitudesMark(Mark):
   Do not create FillMagnitudesMark instances directly.  Use factory methods such
   as :func:`toyplot.fill` or :meth:`toyplot.Axes2D.fill` instead.
   """
-  def __init__(self, along, position, baseline, series, fill, opacity, title, style, id):
+  def __init__(self, table, position, position_axis, baseline, magnitudes, magnitude_axis, fill, opacity, title, style, id):
+    table = _require_instance(table, toyplot.data.Table)
+    position = _require_table_keys(table, position, length=1)
+    position_axis = _require_string_vector(position_axis, length=1)
+    baseline = _require_table_keys(table, baseline, length=1)
+    magnitudes = _require_table_keys(table, magnitudes)
+    magnitude_axis = _require_string_vector(magnitude_axis, length=1)
+
     Mark.__init__(self, style, id=id)
-    self._along = along
-    self._position = position # M coordinates
-    self._baseline = baseline # M baseline coordinates
-    self._series = series     # M x N fill magnitudes
-    self._fill = fill         # N fill colors
-    self._opacity = opacity   # N opacities
-    self._title = title       # N titles
+    self._table = table
+    self._position = position     # 1 coordinate column
+    self._position_axis = position_axis # 1 axis identifier
+    self._baseline = baseline     # 1 baseline column
+    self._magnitudes = magnitudes # N fill magnitude columns
+    self._magnitude_axis = magnitude_axis # 1 axis identifier
+    self._fill = fill             # N fill colors
+    self._opacity = opacity       # N opacities
+    self._title = title           # N titles
 
 class PlotMark(Mark):
   """Plot multiple bivariate data series using lines and/or markers.
@@ -1621,6 +1631,8 @@ class Axes2D(object):
       self._children.append(FillBoundariesMark(along=along, position=position, series=series, fill=fill, opacity=opacity, title=title, style=style, id=id))
       return self._children[-1]
     else: # baseline is not None
+      along = _require_in(along, ["x", "y"])
+
       if a is not None and b is not None:
         b = _require_scalar_array(b)
         if b.ndim == 1:
@@ -1661,7 +1673,19 @@ class Axes2D(object):
       elif along == "y":
         self._update_domain(boundaries, position)
 
-      self._children.append(FillMagnitudesMark(along=along, position=position, baseline=baseline, series=series, fill=fill, opacity=opacity, title=title, style=style, id=id))
+      position_axis = along
+      magnitude_axis = "y" if along == "x" else "x"
+
+      table = toyplot.data.Table()
+      table[position_axis] = position
+      table["baseline"] = baseline
+      magnitudes = []
+      for index, column in enumerate(series.T):
+        key = magnitude_axis + str(index)
+        table[key] = column
+        magnitudes.append(key)
+
+      self._children.append(FillMagnitudesMark(table=table, position=position_axis, position_axis=position_axis, baseline="baseline", magnitudes=magnitudes, magnitude_axis=magnitude_axis, fill=fill, opacity=opacity, title=title, style=style, id=id))
       return self._children[-1]
 
   def plot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None, id=None):

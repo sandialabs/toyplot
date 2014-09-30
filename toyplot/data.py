@@ -32,7 +32,7 @@ class Table(object):
   def __setitem__(self, key, value):
     if not isinstance(key, toyplot.string_type):
       raise ValueError("Column name must be a string.")
-    value = numpy.array(value)
+    value = numpy.ma.array(value)
     if value.ndim != 1:
       raise ValueError("Only 1D arrays are allowed.")
     for column in self._columns.values():

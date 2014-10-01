@@ -12,3 +12,4 @@ Contents:
 
    axes.rst
    markers.rst
+   rendering.rst

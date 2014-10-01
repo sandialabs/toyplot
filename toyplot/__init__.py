@@ -562,11 +562,19 @@ class FillBoundariesMark(Mark):
   Do not create FillBoundariesMark instances directly.  Use factory methods such
   as :func:`toyplot.fill` or :meth:`toyplot.Axes2D.fill` instead.
   """
-  def __init__(self, along, position, series, fill, opacity, title, style, id):
+  def __init__(self, table, position, position_axis, boundaries, boundary_axis, fill, opacity, title, style, id):
+    table = _require_instance(table, toyplot.data.Table)
+    position = _require_table_keys(table, position, length=1)
+    position_axis = _require_string_vector(position_axis, length=1)
+    boundaries = _require_table_keys(table, boundaries)
+    boundary_axis = _require_string_vector(boundary_axis, length=1)
+
     Mark.__init__(self, style, id=id)
-    self._along = along
-    self._position = position # M coordinates
-    self._series = series     # M x N fill boundaries
+    self._table = table
+    self._position = position # 1 coordinate column
+    self._position_axis = position_axis # 1 axis identifier
+    self._boundaries = boundaries # N fill boundary columns
+    self._boundary_axis = boundary_axis # 1 axis identifier
     self._fill = fill         # N-1 fill colors
     self._opacity = opacity   # N-1 opacities
     self._title = title       # N-1 titles
@@ -1589,6 +1597,8 @@ class Axes2D(object):
     -------
     mark: :class:`toyplot.FillBoundariesMark` or :class:`toyplot.FillMagnitudesMark`
     """
+    along = _require_in(along, ["x", "y"])
+
     if baseline is None:
       if a is not None and b is not None and c is not None:
         position = _require_scalar_vector(a)
@@ -1628,11 +1638,20 @@ class Axes2D(object):
       elif along == "y":
         self._update_domain(series, position)
 
-      self._children.append(FillBoundariesMark(along=along, position=position, series=series, fill=fill, opacity=opacity, title=title, style=style, id=id))
+      position_axis = along
+      boundary_axis = "y" if along == "x" else "x"
+
+      table = toyplot.data.Table()
+      table[position_axis] = position
+      boundaries = []
+      for index, column in enumerate(series.T):
+        key = boundary_axis + str(index)
+        table[key] = column
+        boundaries.append(key)
+
+      self._children.append(FillBoundariesMark(table=table, position=position_axis, position_axis=position_axis, boundaries=boundaries, boundary_axis=boundary_axis, fill=fill, opacity=opacity, title=title, style=style, id=id))
       return self._children[-1]
     else: # baseline is not None
-      along = _require_in(along, ["x", "y"])
-
       if a is not None and b is not None:
         b = _require_scalar_array(b)
         if b.ndim == 1:

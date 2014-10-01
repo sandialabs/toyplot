@@ -428,17 +428,21 @@ def _render_BarMagnitudesMark(root, item, parent, id_cache):
         xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 def _render_FillBoundariesMark(root, item, parent, id_cache):
+  boundaries = numpy.ma.column_stack([item._table[key] for key in item._boundaries])
+
   if isinstance(parent, toyplot.Axes2D):
-    if item._along == "x":
-      position = parent._project_x(item._position)
-      boundaries = parent._project_y(item._series)
-    elif item._along == "y":
-      position = parent._project_y(item._position)
-      boundaries = parent._project_x(item._series)
+    if item._position_axis == "x":
+      position = parent._project_x(item._table[item._position[0]])
+    else:
+      position = parent._project_y(item._table[item._position[0]])
+
+    if item._boundary_axis == "x":
+      boundaries = parent._project_x(boundaries)
+    else:
+      boundaries = parent._project_y(boundaries)
 
   item_xml = xml.SubElement(root, "g", style=_css_style(item._style), id=id_cache(item), attrib={"class":"toyplot-FillBoundariesMark"})
-
-  xml.SubElement(item_xml, "toyplot:data-table", title="Fill Data").text = json.dumps({"names":["position"] + ["series%s" % s for s in range(item._series.shape[1])], "data":[item._position.tolist()] + [s.tolist() for s in item._series.T]}, sort_keys=True)
+  _render_data_table(item_xml, item._table, title="Fill Data")
 
   for boundary1, boundary2, fill, opacity, title in zip(boundaries.T[:-1], boundaries.T[1:], item._fill, item._opacity, item._title):
     not_null = numpy.invert(numpy.logical_or(numpy.ma.getmaskarray(boundary1), numpy.ma.getmaskarray(boundary2)))
@@ -447,9 +451,9 @@ def _render_FillBoundariesMark(root, item, parent, id_cache):
     series_style = toyplot._combine_styles({"fill":toyplot.color.css.convert(fill), "opacity":opacity}, item._style)
 
     for segment in segments:
-      if item._along == "x":
+      if item._position_axis == "x":
         coordinates = zip(numpy.concatenate((position[segment], position[segment][::-1])), numpy.concatenate((boundary1[segment], boundary2[segment][::-1])))
-      elif item._along == "y":
+      elif item._position_axis == "y":
         coordinates = zip(numpy.concatenate((boundary1[segment], boundary2[segment][::-1])), numpy.concatenate((position[segment], position[segment][::-1])))
       series_xml = xml.SubElement(item_xml, "polygon", points=" ".join(["%r,%r" % (xi, yi) for xi, yi in coordinates]), style=_css_style(series_style))
       if title is not None:

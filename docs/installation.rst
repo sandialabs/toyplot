@@ -23,12 +23,13 @@ Toyplot using pip::
 
     $ sudo port install python27
     $ sudo port select --set python python27
+    $ sudo port install py27-colormath
+    $ sudo port install py27-multipledispatch
     $ sudo port install py27-numpy
     $ sudo port install py27-pygtk
     $ sudo port install ffmpeg
     $ sudo port install py27-pip
     $ sudo port select --set pip pip27
-    $ sudo pip install colormath
     $ sudo pip install toyplot
 
 If you want to run regression tests / view test coverage::
@@ -41,23 +42,22 @@ If you want to generate documentation::
     $ sudo port install py27-ipython +notebook +parallel
     $ sudo port select --set sphinx py27-sphinx
     $ sudo port select --set ipython ipython27
+    $ sudo port install pandoc
     $ sudo pip install sphinx_rtd_theme
     $ sudo pip install sphinxcontrib-napoleon
-
 
 Using Pip / Easy Install
 ------------------------
 
 If your package manager doesn't support Toyplot, or doesn't have the latest
-version, your next option should be Python setup tools like `pip` (preferred)
-or `easy_install`.  You can always install the latest stable version of toyplot
-and its dependencies with::
+version, your next option should be Python setup tools like `pip`.  You can
+always install the latest stable version of toyplot and its **required**
+dependencies with::
 
     $ pip install toyplot
 
-or::
-
-    $ easy_install toyplot
+To install Toyplot's **optional** :ref:`Dependencies`, you'll need to use a combination
+of pip and your system package manager.
 
 .. _From Source:
 
@@ -69,8 +69,7 @@ you can install it using the source code::
 
     $ git clone https://github.com/sandialabs/toyplot
     $ cd toyplot
-    $ python setup.py install
+    $ sudo python setup.py install
 
 The setup script copies Toyplot into your Python site-packages directory, and
-it's ready to go.  Note that you may need root / sudo access to run setup.py,
-if you're installing using a system-wide Python instance.
+it's ready to go.

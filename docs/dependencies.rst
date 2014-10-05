@@ -10,30 +10,36 @@ Dependencies
 Toyplot has the following required dependencies:
 
 * Python 2.7 - http://python.org
-* numpy - http://numpy.org
 * colormath - https://github.com/gtaylor/python-colormath
+* multipledispatch - https://github.com/mrocklin/multipledispatch
+* numpy - http://numpy.org
 
-You'll need the following if you intend to generate PDF, PNG, Encapsulated
-Postscript, or MP4 versions of your Toyplot figures:
+Optionally, you'll need the following if you intend to generate PDF, PNG, or
+Encapsulated Postscript, versions of your Toyplot figures:
 
 * pycairo - http://cairographics.org/pycairo
 * python pango bindings - typically distributed as part of pygtk - http://www.pygtk.org
-* ffmpeg - https://www.ffmpeg.org - required to generate MP4 videos.
 
-The following isn't needed to run Toyplot once it's installed, but it's required
-to run the setup script when installing Toyplot from source:
+If you plan to generate MP4 videos from animated Toyplot figures, you'll need
+ffmpeg:
+
+* ffmpeg - https://www.ffmpeg.org
+
+If you're installing Toyplot from source, you'll need setuptools to run the
+Toyplot setup.py script:
 
 * setuptools - http://pythonhosted.org//setuptools
 
-The following are required to run regression tests / view test coverage:
+The following are required if you want to run Toyplot's regression tests and view
+code coverage:
 
 * nose - unit test framework - https://nose.readthedocs.org/en/latest/
 * coverage - code coverage module - http://nedbatchelder.com/code/coverage/
 
-And the following are needed to generate this documentation:
+And you'll need to following if you want to generate this documentation:
 
 * Sphinx - documentation builder - http://sphinx-doc.org
 * Sphinx readthedocs theme - https://github.com/snide/sphinx_rtd_theme
 * napoleon - http://sphinxcontrib-napoleon.readthedocs.org/en/latest/
 * IPython - http://ipython.org
-
+* Pandoc - http://johnmacfarlane.net/pandoc

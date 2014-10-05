@@ -21,7 +21,11 @@ setup(
     "Topic :: Scientific/Engineering :: Visualization",
     ],
   description = "A modern plotting toolkit supporting electronic publishing and reproducibility.",
-  install_requires = ["numpy>=1.7", "colormath"],
+  install_requires = [
+    "colormath",
+    "multipledispatch",
+    "numpy>=1.7",
+    ],
   long_description = """Toyplot is the kid-sized plotting toolkit for Python with grownup-sized goals:
   * Develop beautiful interactive, animated plots that embrace the unique capabilities of electronic publishing and support repoducibility.
   * Create the best possible data graphics "out-of-the-box", maximizing data ink and minimizing chartjunk.

@@ -16,5 +16,6 @@ Contents:
    toyplot.compatibility.rst
    toyplot.mark.rst
    toyplot.require.rst
+   toyplot.units.rst
 
    backends.rst

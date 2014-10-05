@@ -11,6 +11,7 @@ import numpy.ma
 import toyplot.color.css
 import toyplot.compatibility
 import toyplot.data
+import toyplot.mark
 import toyplot.require
 import toyplot.units
 
@@ -19,7 +20,7 @@ __version__ = "0.3"
 ###############################################################################################
 # Style Helpers
 
-def _combine_styles(*styles):
+def combine_styles(*styles):
   """Combine zero-to-many styles, returning a dict."""
   computed_style = {}
   for style in styles:
@@ -164,425 +165,6 @@ def _region(xmin, xmax, ymin, ymax, bounds=None, rect=None, corner=None, grid=No
       )
   # If nothing else fits, consume the entire region
   return (xmin + gutter, xmax - gutter, ymin + gutter, ymax - gutter)
-
-###############################################################################################
-# Basic Toyplot marks
-
-class Mark(object):
-  def __init__(self, *styles, **kwargs):
-    self._style = _combine_styles(*styles)
-    self._id = kwargs.get("id", None)
-
-class LegendMark(Mark):
-  """Render a figure legend (a collection of markers and labels).
-
-  Do not create LegendMark instances directly.  Use factory methods such as
-  :meth:`toyplot.Canvas.legend` or :meth:`toyplot.Axes2D.legend` instead.
-  """
-  def __init__(self, xmin, xmax, ymin, ymax, marks, style, label_style, id):
-    Mark.__init__(self, {"fill":"none", "stroke":"none"}, style, id=id)
-    self._xmin = xmin
-    self._xmax = xmax
-    self._ymin = ymin
-    self._ymax = ymax
-    self._gutter = 10
-    self._marks = marks
-    self._label_style = label_style
-
-class VColorBarMark(Mark):
-  """Displays a one-dimensional mapping from values to colors.
-
-  Do not create VColorbarMark instances directly.  Use factory methods such
-  as :meth:`toyplot.Axes2D.colorbar` instead.
-  """
-  class DomainHelper(object):
-    def __init__(self, min, max):
-      self._min = min
-      self._max = max
-    @property
-    def min(self):
-      return self._min
-    @min.setter
-    def min(self, value):
-      self._min = value
-    @property
-    def max(self):
-      return self._max
-    @max.setter
-    def max(self, value):
-      self._max = value
-
-  class LabelHelper(object):
-    def __init__(self, label, style):
-      self._text = label
-      self._style = _combine_styles({"font-size":"12px", "font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"-200%"}, toyplot.require.style(style))
-    @property
-    def text(self):
-      return self._text
-    @text.setter
-    def text(self, value):
-      self._text = value
-    @property
-    def style(self):
-      return self._style
-    @style.setter
-    def style(self, value):
-      self._style = _combine_styles(self._style, toyplot.require.style(value))
-
-  class PerTickHelper(object):
-    class TickProxy(object):
-      def __init__(self, tick):
-        self._tick = tick
-      @property
-      def style(self):
-        return self._tick.get("style", {})
-      @style.setter
-      def style(self, value):
-        self._tick["style"] = _combine_styles(self._tick.get("style"), toyplot.require.style(value))
-    def __init__(self):
-      self._indices = collections.defaultdict(dict)
-      self._values = collections.defaultdict(dict)
-    def __call__(self, index=None, value=None, style=None):
-      if index is None and value is None:
-        raise ValueError("Must specify tick index or value.")
-      if index is not None and value is not None:
-        raise ValueError("Must specify either index or value, not both.")
-      if index is not None:
-        return VColorBarMark.PerTickHelper.TickProxy(self._indices[index])
-      if value is not None:
-        return VColorBarMark.PerTickHelper.TickProxy(self._values[value])
-    def styles(self, values):
-      results = [self._indices[index].get("style", None) if index in self._indices else None for index in range(len(values))]
-      for value in self._values:
-        deltas = numpy.abs(values - value)
-        results[numpy.argmin(deltas)] = self._values[value].get("style", None)
-      return results
-
-  class TicksHelper(object):
-    def __init__(self, length, locator):
-      self._locator = locator
-      self._show = False
-      self._length = length
-      self._style = {}
-      self.labels = VColorBarMark.TickLabelsHelper()
-      self.tick = VColorBarMark.PerTickHelper()
-    @property
-    def locator(self):
-      return self._locator
-    @locator.setter
-    def locator(self, value):
-      self._locator = value
-    @property
-    def show(self):
-      return self._show
-    @show.setter
-    def show(self, value):
-      self._show = value
-    @property
-    def length(self):
-      return self._length
-    @length.setter
-    def length(self, value):
-      self._length = value
-    @property
-    def style(self):
-      return self._style
-    @style.setter
-    def style(self, value):
-      self._style = _combine_styles(self._style, toyplot.require.style(value))
-
-  class TickLabelsHelper(object):
-    def __init__(self):
-      self._show = True
-      self._style = {"font-size":"10px", "font-weight":"normal", "stroke":"none"}
-      self.label = VColorBarMark.PerTickHelper()
-    @property
-    def show(self):
-      return self._show
-    @show.setter
-    def show(self, value):
-      self._show = value
-    @property
-    def style(self):
-      return self._style
-    @style.setter
-    def style(self, value):
-      self._style = _combine_styles(self._style, toyplot.require.style(value))
-
-  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, label, colormap, padding, tick_length, min, max, tick_locator, style, id):
-    Mark.__init__(self, style)
-
-    self._xmin_range = xmin_range
-    self._xmax_range = xmax_range
-    self._ymin_range = ymin_range
-    self._ymax_range = ymax_range
-    self._scale = "linear"
-    self._colormap = colormap
-    self._vmin_implicit = None
-    self._vmax_implicit = None
-    self._padding = padding
-    self.domain = VColorBarMark.DomainHelper(min, max)
-    self.label = VColorBarMark.LabelHelper(label=label, style=None)
-    self.ticks = VColorBarMark.TicksHelper(tick_length, tick_locator)
-    self._id = id
-
-  def _update_domain(self, vmin, vmax):
-    self._vmin_implicit = _null_min(vmin, self._vmin_implicit)
-    self._vmax_implicit = _null_max(vmax, self._vmax_implicit)
-
-  def _finalize_domain(self):
-    # Begin with the implicit domain defined by any explicitly-specified data.
-    vmin = self._vmin_implicit
-    vmax = self._vmax_implicit
-
-    # If there is no implicit domain (we don't have any data), default to the origin.
-    if vmin is None:
-      vmin = 0
-    if vmax is None:
-      vmax = 0
-
-    # Allow users to override the domain.
-    if self.domain._min is not None:
-      vmin = self.domain._min
-    if self.domain._max is not None:
-      vmax = self.domain._max
-
-    # Ensure that the domain is never empty.
-    if vmin == vmax:
-      vmin -= 0.5
-      vmax += 0.5
-
-    def get_locator(locator, scale, domain_min, domain_max):
-      if locator is not None:
-        return locator
-      if scale == "linear":
-        return ExtendedTickLocator()
-
-    # Calculate tick locations and labels.
-    locator = get_locator(self.ticks._locator, self._scale, vmin, vmax)
-
-    self._tick_locations, self._tick_labels, self._tick_titles = locator.ticks(vmin, vmax)
-
-    # Allow tick locations to grow (never shrink) the domain.
-    if len(self._tick_locations):
-      vmin = min(vmin, self._tick_locations[0])
-      vmax = max(vmax, self._tick_locations[-1])
-
-    self._vmin_computed = vmin
-    self._vmax_computed = vmax
-
-    def linear_projection(domain_min, domain_max, range_min, range_max):
-      def implementation(x):
-        return (1 - ((x - domain_min) / (domain_max - domain_min))) * (range_max - range_min) + range_min
-      return implementation
-
-    if self._scale == "linear":
-      self._projection = linear_projection(vmin, vmax, self._ymin_range + self._padding, self._ymax_range - self._padding)
-
-  def _project_y(self, v):
-    return self._projection(v)
-
-  def _project_color(self, v):
-    return self._colormap.colors(v, self._vmin_computed, self._vmax_computed)
-
-###############################################################################################
-# Table
-
-class Table(object):
-  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, rows, columns, id):
-    self._xmin_range = xmin_range
-    self._xmax_range = xmax_range
-    self._ymin_range = ymin_range
-    self._ymax_range = ymax_range
-    self._rows = rows
-    self._columns = columns
-    self._id = id
-
-###############################################################################################
-# Higher-level marks
-
-class AxisLinesMark(Mark):
-  """Render multiple lines parallel to an axis.
-
-  Do not create AxisLinesMark instances directly.  Use factory methods such as
-  :meth:`toyplot.Axes2D.hlines` and :meth:`toyplot.Axes2D.vlines` instead.
-  """
-  def __init__(self, table, coordinates, axes, stroke, opacity, title, style, id):
-    table = toyplot.require.instance(table, toyplot.data.Table)
-    coordinates = toyplot.require.table_keys(table, coordinates, length=1)
-    axes = toyplot.require.string_vector(axes, len(coordinates))
-    stroke = toyplot.require.table_keys(table, stroke, length=1)
-    opacity = toyplot.require.table_keys(table, opacity, length=1)
-    title = toyplot.require.table_keys(table, title, length=1)
-
-    Mark.__init__(self, style, id=id)
-    self._table = table
-    self._coordinates = coordinates # 1 coordinate column
-    self._axes = axes               # 1 axis identifier
-    self._stroke = stroke           # 1 stroke color column
-    self._opacity = opacity         # 1 opacity column
-    self._title = title             # 1 title column
-
-class BarBoundariesMark(Mark):
-  """Render multiple stacked bars defined by bar boundaries.
-
-  Do not create BarBoundariesMark instances directly.  Use factory methods such as
-  :func:`toyplot.bars` or :meth:`toyplot.Axes2D.bars` instead.
-  """
-  def __init__(self, along, position, series, fill, opacity, title, style, id):
-    Mark.__init__(self, {"stroke":"none"}, style, id=id)
-    self._along = along
-    self._position = position # M x 2 coordinates
-    self._series = series     # M x N bar boundaries
-    self._fill = fill         # M x N-1 fill colors
-    self._opacity = opacity   # M x N-1 opacities
-    self._title = title       # M x N-1 titles
-
-class BarMagnitudesMark(Mark):
-  """Render multiple stacked bars defined by bar magnitudes.
-
-  Do not create BarMagnitudesMark instances directly.  Use factory methods such as
-  :func:`toyplot.bars` or :meth:`toyplot.Axes2D.bars` instead.
-  """
-  def __init__(self, along, position, baseline, series, fill, opacity, title, style, id):
-    Mark.__init__(self, {"stroke":"none"}, style, id=id)
-    self._along = along
-    self._position = position # M x 2 coordinates
-    self._baseline = baseline # M baseline coordinates
-    self._series = series     # M x N bar magnitudes
-    self._fill = fill         # M x N fill colors
-    self._opacity = opacity   # M x N opacities
-    self._title = title       # M x N titles
-
-class FillBoundariesMark(Mark):
-  """Render multiple stacked fill regions defined by boundaries.
-
-  Do not create FillBoundariesMark instances directly.  Use factory methods such
-  as :func:`toyplot.fill` or :meth:`toyplot.Axes2D.fill` instead.
-  """
-  def __init__(self, table, position, position_axis, boundaries, boundary_axis, fill, opacity, title, style, id):
-    table = toyplot.require.instance(table, toyplot.data.Table)
-    position = toyplot.require.table_keys(table, position, length=1)
-    position_axis = toyplot.require.string_vector(position_axis, length=1)
-    boundaries = toyplot.require.table_keys(table, boundaries)
-    boundary_axis = toyplot.require.string_vector(boundary_axis, length=1)
-
-    Mark.__init__(self, style, id=id)
-    self._table = table
-    self._position = position # 1 coordinate column
-    self._position_axis = position_axis # 1 axis identifier
-    self._boundaries = boundaries # N fill boundary columns
-    self._boundary_axis = boundary_axis # 1 axis identifier
-    self._fill = fill         # N-1 fill colors
-    self._opacity = opacity   # N-1 opacities
-    self._title = title       # N-1 titles
-
-class FillMagnitudesMark(Mark):
-  """Render multiple stacked fill regions defined by magnitudes.
-
-  Do not create FillMagnitudesMark instances directly.  Use factory methods such
-  as :func:`toyplot.fill` or :meth:`toyplot.Axes2D.fill` instead.
-  """
-  def __init__(self, table, position, position_axis, baseline, magnitudes, magnitude_axis, fill, opacity, title, style, id):
-    table = toyplot.require.instance(table, toyplot.data.Table)
-    position = toyplot.require.table_keys(table, position, length=1)
-    position_axis = toyplot.require.string_vector(position_axis, length=1)
-    baseline = toyplot.require.table_keys(table, baseline, length=1)
-    magnitudes = toyplot.require.table_keys(table, magnitudes)
-    magnitude_axis = toyplot.require.string_vector(magnitude_axis, length=1)
-
-    Mark.__init__(self, style, id=id)
-    self._table = table
-    self._position = position     # 1 coordinate column
-    self._position_axis = position_axis # 1 axis identifier
-    self._baseline = baseline     # 1 baseline column
-    self._magnitudes = magnitudes # N fill magnitude columns
-    self._magnitude_axis = magnitude_axis # 1 axis identifier
-    self._fill = fill             # N fill colors
-    self._opacity = opacity       # N opacities
-    self._title = title           # N titles
-
-class PlotMark(Mark):
-  """Plot multiple bivariate data series using lines and/or markers.
-
-  Do not create PlotMark instances directly.  Use factory methods such as
-  :func:`toyplot.plot`, :func:`toyplot.scatterplot`, :meth:`toyplot.Axes2D.plot` and :meth:`toyplot.Axes2D.scatterplot` instead.
-  """
-  def __init__(self, along, show_stroke, position, series, stroke, stroke_width, stroke_opacity, marker, size, fill, opacity, title, style, mstyle, mlstyle, id):
-    toyplot.require.instance(position, numpy.ma.MaskedArray)
-    toyplot.require.instance(series, numpy.ma.MaskedArray)
-
-    Mark.__init__(self, style, id=id)
-    self._along = along
-    self._show_stroke = show_stroke
-    self._position = position             # M coordinates
-    self._series = series                 # M x N coordinates
-    self._stroke = stroke                 # N stroke colors
-    self._stroke_width = stroke_width     # N stroke widths
-    self._stroke_opacity = stroke_opacity # N stroke opacities
-    self._marker = marker                 # M x N markers
-    self._size = size                     # M x N marker sizes
-    self._fill = fill                     # M x N marker fill colors
-    self._opacity = opacity               # M x N marker opacities
-    self._title = title                   # N titles
-    self._mstyle = mstyle
-    self._mlstyle = mlstyle
-
-class RectMark(Mark):
-  """Plot axis-aligned rectangles.
-
-  Do not create RectMark instances directly.  Use factory methods such as
-  :meth:`toyplot.Axes2D.rect` instead.
-  """
-  def __init__(self, table, left, right, left_right_axis, top, bottom, top_bottom_axis, fill, opacity, title, style, id):
-    table = toyplot.require.instance(table, toyplot.data.Table)
-    left = toyplot.require.table_keys(table, left, length=1)
-    right = toyplot.require.table_keys(table, right, length=1)
-    left_right_axis = toyplot.require.string_vector(left_right_axis, length=1)
-    top = toyplot.require.table_keys(table, top, length=1)
-    bottom = toyplot.require.table_keys(table, bottom, length=1)
-    top_bottom_axis = toyplot.require.string_vector(top_bottom_axis, length=1)
-    fill = toyplot.require.table_keys(table, fill, length=1)
-    opacity = toyplot.require.table_keys(table, opacity, length=1)
-    title = toyplot.require.table_keys(table, title, length=1)
-
-    Mark.__init__(self, style, id=id)
-    self._table = table
-    self._left = left       # 1 coordinate column
-    self._right = right     # 1 coordinate column
-    self._left_right_axis = left_right_axis # 1 axis identifier
-    self._top = top         # 1 coordinate column
-    self._bottom = bottom   # 1 coordinate column
-    self._top_bottom_axis = top_bottom_axis # 1 axis identifier
-    self._fill = fill       # 1 fill color column
-    self._opacity = opacity # 1 opacity column
-    self._title = title     # 1 title column
-
-class TextMark(Mark):
-  """Render text.
-
-  Do not create TextMark instances directly.  Use factory methods such as
-  :meth:`toyplot.Canvas.text` or :meth:`toyplot.Axes2D.text` instead.
-  """
-  def __init__(self, table, coordinates, axes, text, angle, fill, opacity, title, style, id):
-    table = toyplot.require.instance(table, toyplot.data.Table)
-    coordinates = toyplot.require.table_keys(table, coordinates)
-    axes = toyplot.require.string_vector(axes, length=len(coordinates))
-    text = toyplot.require.table_keys(table, text, length=1)
-    angle = toyplot.require.table_keys(table, angle, length=1)
-    fill = toyplot.require.table_keys(table, fill, length=1)
-    opacity = toyplot.require.table_keys(table, opacity, length=1)
-    title = toyplot.require.table_keys(table, title, length=1)
-
-    Mark.__init__(self, style, id=id)
-    self._table = table
-    self._coordinates = coordinates # D coordinate columns
-    self._axes = axes               # D axis identifiers
-    self._text = text               # 1 text column
-    self._angle = angle             # 1 angle column
-    self._fill = fill               # 1 fill color column
-    self._opacity = opacity         # 1 opacity column
-    self._title = title             # 1 title column
 
 ###############################################################################################
 # Tick Locators
@@ -936,7 +518,7 @@ class Axes2D(object):
       self._xmax_range = xmax_range
       self._ymin_range = ymin_range
       self._ymax_range = ymax_range
-      self._style = _combine_styles({"stroke":"none", "fill":"white", "opacity":0.75}, toyplot.require.style(style))
+      self._style = combine_styles({"stroke":"none", "fill":"white", "opacity":0.75}, toyplot.require.style(style))
       self.label = Axes2D.CoordinatesLabelHelper(style={})
     @property
     def show(self):
@@ -949,17 +531,17 @@ class Axes2D(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = _combine_styles(self._style, toyplot.require.style(value))
+      self._style = combine_styles(self._style, toyplot.require.style(value))
 
   class CoordinatesLabelHelper(object):
     def __init__(self, style):
-      self._style = _combine_styles({"font-size":"10px", "font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
+      self._style = combine_styles({"font-size":"10px", "font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
     @property
     def style(self):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = _combine_styles(self._style, toyplot.require.style(value))
+      self._style = combine_styles(self._style, toyplot.require.style(value))
 
   class DomainHelper(object):
     def __init__(self, min, max):
@@ -981,7 +563,7 @@ class Axes2D(object):
   class LabelHelper(object):
     def __init__(self, label, style):
       self._text = label
-      self._style = _combine_styles({"font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
+      self._style = combine_styles({"font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
     @property
     def text(self):
       return self._text
@@ -993,7 +575,7 @@ class Axes2D(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = _combine_styles(self._style, toyplot.require.style(value))
+      self._style = combine_styles(self._style, toyplot.require.style(value))
 
   class SpineHelper(object):
     def __init__(self):
@@ -1017,7 +599,7 @@ class Axes2D(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = _combine_styles(self._style, toyplot.require.style(value))
+      self._style = combine_styles(self._style, toyplot.require.style(value))
 
   class PerTickHelper(object):
     class TickProxy(object):
@@ -1028,7 +610,7 @@ class Axes2D(object):
         return self._tick.get("style", {})
       @style.setter
       def style(self, value):
-        self._tick["style"] = _combine_styles(self._tick.get("style"), toyplot.require.style(value))
+        self._tick["style"] = combine_styles(self._tick.get("style"), toyplot.require.style(value))
     def __init__(self):
       self._indices = collections.defaultdict(dict)
       self._values = collections.defaultdict(dict)
@@ -1079,7 +661,7 @@ class Axes2D(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = _combine_styles(self._style, toyplot.require.style(value))
+      self._style = combine_styles(self._style, toyplot.require.style(value))
 
   class TickLabelsHelper(object):
     def __init__(self, angle):
@@ -1104,7 +686,7 @@ class Axes2D(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = _combine_styles(self._style, toyplot.require.style(value))
+      self._style = combine_styles(self._style, toyplot.require.style(value))
 
   def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, xmin, xmax, ymin, ymax, show, xshow, yshow, label, xlabel, ylabel, xticklocator, yticklocator, xscale, yscale, palette, padding, tick_length, parent, id):
     self._xmin_range = xmin_range
@@ -1348,7 +930,7 @@ class Axes2D(object):
 
     Returns
     -------
-    bars: :class:`toyplot.BarBoundariesMark` or :class:`toyplot.BarMagnitudesMark`
+    bars: :class:`toyplot.mark.BarBoundaries` or :class:`toyplot.mark.BarMagnitudes`
     """
 
     if baseline is None:
@@ -1385,7 +967,7 @@ class Axes2D(object):
       fill = toyplot.color._broadcast_color(default_color if fill is None else fill, (series.shape[0], series.shape[1]-1), colormap=colormap, palette=palette)
       opacity = _broadcast_scalar(opacity, (series.shape[0], series.shape[1]-1))
       title = _broadcast_object(title, (series.shape[0], series.shape[1]-1))
-      style = _combine_styles({"stroke":"white", "stroke-width":1.0}, toyplot.require.style(style))
+      style = combine_styles({"stroke":"white", "stroke-width":1.0}, toyplot.require.style(style))
       id = toyplot.require.optional_id(id)
 
       if along == "x":
@@ -1393,7 +975,7 @@ class Axes2D(object):
       elif along == "y":
         self._update_domain(series, position)
 
-      self._children.append(BarBoundariesMark(along=along, position=position, series=series, fill=fill, opacity=opacity, title=title, style=style, id=id))
+      self._children.append(toyplot.mark.BarBoundaries(along=along, position=position, series=series, fill=fill, opacity=opacity, title=title, style=style, id=id))
       return self._children[-1]
     else: # baseline is not None
       if a is not None and b is not None and c is not None:
@@ -1433,7 +1015,7 @@ class Axes2D(object):
       fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape, colormap=colormap, palette=palette)
       opacity = _broadcast_scalar(opacity, series.shape)
       title = _broadcast_object(title, series.shape)
-      style = _combine_styles({"stroke":"white", "stroke-width":1.0}, toyplot.require.style(style))
+      style = combine_styles({"stroke":"white", "stroke-width":1.0}, toyplot.require.style(style))
       id = toyplot.require.optional_id(id)
 
       if baseline == "stacked":
@@ -1455,7 +1037,7 @@ class Axes2D(object):
       elif along == "y":
         self._update_domain(boundaries, position)
 
-      self._children.append(BarMagnitudesMark(along=along, position=position, baseline=baseline, series=series, fill=fill, opacity=opacity, title=title, style=style, id=id))
+      self._children.append(toyplot.mark.BarMagnitudes(along=along, position=position, baseline=baseline, series=series, fill=fill, opacity=opacity, title=title, style=style, id=id))
       return self._children[-1]
 
   def colorbar(self, values=None, palette=None, colormap=None, label=None, min=None, max=None, id=None, tick_length=5, tick_locator=None, offset=0, width=10, style=None):
@@ -1465,7 +1047,7 @@ class Axes2D(object):
       colormap = toyplot.color.LinearMap(palette=palette)
     style = toyplot.require.style(style)
 
-    mark = VColorBarMark(xmin_range=self._xmax_range + offset, xmax_range=self._xmax_range + offset + width, ymin_range=self._ymin_range, ymax_range=self._ymax_range, label=label, colormap=colormap, padding=self._padding, tick_length=tick_length, min=min, max=max, tick_locator=tick_locator, style=style, id=id)
+    mark = toyplot.mark.VColorBar(xmin_range=self._xmax_range + offset, xmax_range=self._xmax_range + offset + width, ymin_range=self._ymin_range, ymax_range=self._ymax_range, label=label, colormap=colormap, padding=self._padding, tick_length=tick_length, min=min, max=max, tick_locator=tick_locator, style=style, id=id)
     if values is not None:
       mark._update_domain(numpy.min(values), numpy.max(values))
     self._parent._children.append(mark)
@@ -1488,12 +1070,12 @@ class Axes2D(object):
       title as a tooltip.
     style: dict, optional
       Collection of CSS styles to apply to the mark.  See
-      :class:`toyplot.FillBoundariesMark` for a list of useful styles.
+      :class:`toyplot.mark.FillBoundaries` for a list of useful styles.
     id: string, optional
 
     Returns
     -------
-    mark: :class:`toyplot.FillBoundariesMark` or :class:`toyplot.FillMagnitudesMark`
+    mark: :class:`toyplot.mark.FillBoundaries` or :class:`toyplot.mark.FillMagnitudes`
     """
     along = toyplot.require.value_in(along, ["x", "y"])
 
@@ -1528,7 +1110,7 @@ class Axes2D(object):
       fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape[1]-1, colormap=colormap, palette=palette)
       opacity = _broadcast_scalar(opacity, series.shape[1]-1)
       title = _broadcast_object(title, series.shape[1]-1)
-      style = _combine_styles({"stroke":"none"}, toyplot.require.style(style))
+      style = combine_styles({"stroke":"none"}, toyplot.require.style(style))
       id = toyplot.require.optional_id(id)
 
       if along == "x":
@@ -1547,7 +1129,7 @@ class Axes2D(object):
         table[key] = column
         boundaries.append(key)
 
-      self._children.append(FillBoundariesMark(table=table, position=position_axis, position_axis=position_axis, boundaries=boundaries, boundary_axis=boundary_axis, fill=fill, opacity=opacity, title=title, style=style, id=id))
+      self._children.append(toyplot.mark.FillBoundaries(table=table, position=position_axis, position_axis=position_axis, boundaries=boundaries, boundary_axis=boundary_axis, fill=fill, opacity=opacity, title=title, style=style, id=id))
       return self._children[-1]
     else: # baseline is not None
       if a is not None and b is not None:
@@ -1569,7 +1151,7 @@ class Axes2D(object):
       fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape[1], colormap=colormap, palette=palette)
       opacity = _broadcast_scalar(opacity, series.shape[1])
       title = _broadcast_object(title, series.shape[1])
-      style = _combine_styles({"stroke":"none"}, toyplot.require.style(style))
+      style = combine_styles({"stroke":"none"}, toyplot.require.style(style))
       id = toyplot.require.optional_id(id)
 
       if baseline == "stacked":
@@ -1602,7 +1184,7 @@ class Axes2D(object):
         table[key] = column
         magnitudes.append(key)
 
-      self._children.append(FillMagnitudesMark(table=table, position=position_axis, position_axis=position_axis, baseline="baseline", magnitudes=magnitudes, magnitude_axis=magnitude_axis, fill=fill, opacity=opacity, title=title, style=style, id=id))
+      self._children.append(toyplot.mark.FillMagnitudes(table=table, position=position_axis, position_axis=position_axis, baseline="baseline", magnitudes=magnitudes, magnitude_axis=magnitude_axis, fill=fill, opacity=opacity, title=title, style=style, id=id))
       return self._children[-1]
 
   def plot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None, id=None):
@@ -1619,12 +1201,12 @@ class Axes2D(object):
       title as a tooltip.
     style: dict, optional
       Collection of CSS styles to apply across all datums.  See
-      :class:`toyplot.PlotMark` for a list of useful styles.
+      :class:`toyplot.mark.Plot` for a list of useful styles.
     id: string, optional
 
     Returns
     -------
-    plot: :class:`toyplot.PlotMark`
+    plot: :class:`toyplot.mark.Plot`
     """
     if a is not None and b is not None:
       position = toyplot.require.scalar_vector(a)
@@ -1652,9 +1234,9 @@ class Axes2D(object):
     fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
     opacity = _broadcast_scalar(opacity, series.shape)
     title = _broadcast_object(title, series.shape[1])
-    style = _combine_styles({"fill":"none"}, toyplot.require.style(style))
-    mstyle = _combine_styles({"stroke":"none"}, toyplot.require.style(mstyle))
-    mlstyle = _combine_styles(toyplot.require.style(mlstyle))
+    style = combine_styles({"fill":"none"}, toyplot.require.style(style))
+    mstyle = combine_styles({"stroke":"none"}, toyplot.require.style(mstyle))
+    mlstyle = combine_styles(toyplot.require.style(mlstyle))
     id = toyplot.require.optional_id(id)
 
     if along == "x":
@@ -1662,7 +1244,7 @@ class Axes2D(object):
     elif along == "y":
       self._update_domain(series, position)
 
-    self._children.append(PlotMark(along=along, show_stroke=True, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle, id=id))
+    self._children.append(toyplot.mark.Plot(along=along, show_stroke=True, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle, id=id))
     return self._children[-1]
 
   def scatterplot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None, id=None):
@@ -1679,12 +1261,12 @@ class Axes2D(object):
       title as a tooltip.
     style: dict, optional
       Collection of CSS styles to apply across all datums.  See
-      :class:`toyplot.PlotMark` for a list of useful styles.
+      :class:`toyplot.toyplot.Plot` for a list of useful styles.
     id: string, optional
 
     Returns
     -------
-    plot: :class:`toyplot.PlotMark`
+    plot: :class:`toyplot.mark.Plot`
     """
     if a is not None and b is not None:
       position = toyplot.require.scalar_vector(a)
@@ -1715,9 +1297,9 @@ class Axes2D(object):
     fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
     opacity = _broadcast_scalar(opacity, series.shape)
     title = _broadcast_object(title, series.shape[1])
-    style = _combine_styles({"stroke":"none"}, toyplot.require.style(style))
-    mstyle = _combine_styles({"stroke":"none"}, toyplot.require.style(mstyle))
-    mlstyle = _combine_styles(toyplot.require.style(mlstyle))
+    style = combine_styles({"stroke":"none"}, toyplot.require.style(style))
+    mstyle = combine_styles({"stroke":"none"}, toyplot.require.style(mstyle))
+    mlstyle = combine_styles(toyplot.require.style(mlstyle))
     id = toyplot.require.optional_id(id)
 
     if along == "x":
@@ -1725,7 +1307,7 @@ class Axes2D(object):
     elif along == "y":
       self._update_domain(series, position)
 
-    self._children.append(PlotMark(along=along, show_stroke=False, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle, id=id))
+    self._children.append(toyplot.mark.Plot(along=along, show_stroke=False, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle, id=id))
     return self._children[-1]
 
   def rect(self, a, b, c, d, along="x", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={"stroke":"none"}, id=None):
@@ -1737,7 +1319,7 @@ class Axes2D(object):
     table["fill"] = _broadcast_object(fill, table.shape[0])
     table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
     table["title"] = _broadcast_object(title, table.shape[0])
-    style = _combine_styles(toyplot.require.style(style))
+    style = combine_styles(toyplot.require.style(style))
     id = toyplot.require.optional_id(id)
 
     default_color = next(self._rect_colors)
@@ -1752,7 +1334,7 @@ class Axes2D(object):
       top_bottom_axis = "x"
       self._update_domain(numpy.concatenate((table["top"], table["bottom"])), numpy.concatenate((table["left"], table["right"])))
 
-    self._children.append(RectMark(table=table, left="left", right="right", left_right_axis=left_right_axis, top="top", bottom="bottom", top_bottom_axis=top_bottom_axis, fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(toyplot.mark.Rect(table=table, left="left", right="right", left_right_axis=left_right_axis, top="top", bottom="bottom", top_bottom_axis=top_bottom_axis, fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def text(self, a, b, text, angle=0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
@@ -1769,11 +1351,11 @@ class Axes2D(object):
       title as a tooltip.
     style: dict, optional
       Collection of CSS styles to apply to the mark.  See
-      :class:`toyplot.TextMark` for a list of useful styles.
+      :class:`toyplot.mark.Text` for a list of useful styles.
 
     Returns
     -------
-    text: :class:`toyplot.TextMark`
+    text: :class:`toyplot.mark.Text`
     """
     table = toyplot.data.Table()
     table["x"] = toyplot.require.scalar_vector(a)
@@ -1783,7 +1365,7 @@ class Axes2D(object):
     table["fill"] = _broadcast_object(fill, table.shape[0])
     table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
     table["title"] = _broadcast_object(title, table.shape[0])
-    style = _combine_styles({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
+    style = combine_styles({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
     id = toyplot.require.optional_id(id)
 
     default_color = next(self._text_colors)
@@ -1791,7 +1373,7 @@ class Axes2D(object):
 
     self._update_domain(table["x"], table["y"])
 
-    self._children.append(TextMark(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def hlines(self, y, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
@@ -1809,25 +1391,25 @@ class Axes2D(object):
       title as a tooltip.
     style: dict, optional
       Collection of CSS styles to apply to the mark.  See
-      :class:`toyplot.AxisLinesMark` for a list of useful styles.
+      :class:`toyplot.mark.AxisLines` for a list of useful styles.
     id: string, optional
 
     Returns
     -------
-    hlines: :class:`toyplot.AxisLinesMark`
+    hlines: :class:`toyplot.mark.AxisLines`
     """
     table = toyplot.data.Table()
     table["y"] = toyplot.require.scalar_vector(y)
     table["stroke"] = _broadcast_object(stroke, table.shape[0])
     table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
     table["title"] = _broadcast_object(title, table.shape[0])
-    style = _combine_styles(toyplot.require.style(style))
+    style = combine_styles(toyplot.require.style(style))
     id = toyplot.require.optional_id(id)
 
     table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
 
     self._update_domain(numpy.array([]), table["y"])
-    self._children.append(AxisLinesMark(table=table, coordinates=["y"], axes=["y"], stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(toyplot.mark.AxisLines(table=table, coordinates=["y"], axes=["y"], stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def vlines(self, x, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
@@ -1845,25 +1427,25 @@ class Axes2D(object):
       title as a tooltip.
     style: dict, optional
       Collection of CSS styles to apply to the mark.  See
-      :class:`toyplot.AxisLinesMark` for a list of useful styles.
+      :class:`toyplot.mark.AxisLines` for a list of useful styles.
     id: string, optional
 
     Returns
     -------
-    hlines: :class:`toyplot.AxisLinesMark`
+    hlines: :class:`toyplot.mark.AxisLines`
     """
     table = toyplot.data.Table()
     table["x"] = toyplot.require.scalar_vector(x)
     table["stroke"] = _broadcast_object(stroke, table.shape[0])
     table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
     table["title"] = _broadcast_object(title, table.shape[0])
-    style = _combine_styles(toyplot.require.style(style))
+    style = combine_styles(toyplot.require.style(style))
     id = toyplot.require.optional_id(id)
 
     table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
 
     self._update_domain(table["x"], numpy.array([]))
-    self._children.append(AxisLinesMark(table=table, coordinates=["x"], axes=["x"], stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(toyplot.mark.AxisLines(table=table, coordinates=["x"], axes=["x"], stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style=None, label_style=None, id=None):
@@ -1876,7 +1458,7 @@ class Axes2D(object):
       a (label, mark) tuple or a (label, mark, style) tuple.  Each label should
       be the human-readable text to be displayed next to the mark.  The mark
       can be a string value "line" or "rect", a marker string "o", "s", "^",
-      or an actual intance of :class:`toyplot.Mark`.
+      or an actual intance of :class:`toyplot.mark.Mark`.
     bounds: (xmin, xmax, ymin, ymax) tuple, optional
       Use the bounds property to position / size the legend by specifying the
       position of each of its boundaries.  The boundaries may be specified in
@@ -1910,15 +1492,15 @@ class Axes2D(object):
 
     Returns
     -------
-    legend: :class:`toyplot.LegendMark`
+    legend: :class:`toyplot.mark.Legend`
     """
     gutter = toyplot.require.scalar(gutter)
-    style = _combine_styles(toyplot.require.style(style))
-    label_style = _combine_styles(toyplot.require.style(label_style))
+    style = combine_styles(toyplot.require.style(style))
+    label_style = combine_styles(toyplot.require.style(label_style))
     id = toyplot.require.optional_id(id)
 
     xmin, xmax, ymin, ymax = _region(self._xmin_range, self._xmax_range, self._ymin_range, self._ymax_range, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-    self._children.append(LegendMark(xmin, xmax, ymin, ymax, marks, style, label_style, id))
+    self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style, id))
     return self._children[-1]
 
 ###############################################################################################
@@ -1964,36 +1546,36 @@ class AnimationFrame(object):
 
     Parameters
     ----------
-    mark: :class:`toyplot.Mark` instance
+    mark: :class:`toyplot.mark.Mark` instance
     style: dict containing CSS style information
     """
-    if not isinstance(mark, Mark):
-      raise ValueError("Mark style can only be set on toyplot.Mark instances.")
+    if not isinstance(mark, toyplot.mark.Mark):
+      raise ValueError("Mark style can only be set on toyplot.mark.Mark instances.")
     self._changes[self._begin]["set-mark-style"].append((mark, style))
 
   def set_datum_style(self, mark, series, datum, style):
-    """Change the style of one datum in a :class:`toyplot.Mark` at the current frame.
+    """Change the style of one datum in a :class:`toyplot.mark.Mark` at the current frame.
 
     Parameters
     ----------
-    mark: :class:`toyplot.Mark` instance
+    mark: :class:`toyplot.mark.Mark` instance
     index: zero-based index of the datum to modify
     style: dict containing CSS style information
     """
-    if not isinstance(mark, (BarBoundariesMark, BarMagnitudesMark, PlotMark, TextMark)):
+    if not isinstance(mark, (toyplot.mark.BarBoundaries, toyplot.mark.BarMagnitudes, toyplot.mark.Plot, toyplot.mark.Text)):
       raise ValueError("Cannot set datum style for %s." % type(mark))
     self._changes[self._begin]["set-datum-style"].append((mark, series, datum, style))
 
   def set_datum_text(self, mark, series, datum, text):
-    """Change the text in a :class:`toyplot.TextMark` at the current frame.
+    """Change the text in a :class:`toyplot.mark.Text` at the current frame.
 
     Parameters
     ----------
-    mark: :class:`toyplot.TextMark` instance
+    mark: :class:`toyplot.mark.Text` instance
     value: string
     """
-    if not isinstance(mark, TextMark):
-      raise ValueError("Mark text can only be set for toyplot.TextMark instances.")
+    if not isinstance(mark, toyplot.mark.Text):
+      raise ValueError("Mark text can only be set for toyplot.mark.Text instances.")
     self._changes[self._begin]["set-datum-text"].append((mark, series, datum, text))
 
 ###############################################################################################
@@ -2024,7 +1606,7 @@ class Canvas(object):
   def __init__(self, width=None, height=None, style=None, id=None, autorender=None):
     self._width = width if width is not None else 600
     self._height = height if height is not None else self._width
-    self._style = _combine_styles({"background-color": "transparent", "fill": toyplot.color.near_black, "fill-opacity": 1.0, "font-family":"helvetica", "font-size": "12px", "opacity": 1.0, "stroke": toyplot.color.near_black, "stroke-opacity": 1.0, "stroke-width": 1.0}, style)
+    self._style = combine_styles({"background-color": "transparent", "fill": toyplot.color.near_black, "fill-opacity": 1.0, "font-family":"helvetica", "font-size": "12px", "opacity": 1.0, "stroke": toyplot.color.near_black, "stroke-opacity": 1.0, "stroke-width": 1.0}, style)
     self._id = id
     self._animation = collections.defaultdict(lambda: collections.defaultdict(list))
     self._children = []
@@ -2138,7 +1720,7 @@ class Canvas(object):
       a (label, mark) tuple or a (label, mark, style) tuple.  Each label should
       be the human-readable text to be displayed next to the mark.  The mark
       can be a string value "line" or "rect", a marker string "o", "s", "^",
-      or an actual intance of :class:`toyplot.Mark`.
+      or an actual intance of :class:`toyplot.mark.Mark`.
     bounds: (xmin, xmax, ymin, ymax) tuple, optional
       Use the bounds property to position / size the legend by specifying the
       position of each of its boundaries.  The boundaries may be specified in
@@ -2172,15 +1754,15 @@ class Canvas(object):
 
     Returns
     -------
-    legend: :class:`toyplot.LegendMark`
+    legend: :class:`toyplot.mark.Legend`
     """
     gutter = toyplot.require.scalar(gutter)
-    style = _combine_styles(toyplot.require.style(style))
-    label_style = _combine_styles(toyplot.require.style(label_style))
+    style = combine_styles(toyplot.require.style(style))
+    label_style = combine_styles(toyplot.require.style(label_style))
     id = toyplot.require.optional_id(id)
 
     xmin, xmax, ymin, ymax = _region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-    self._children.append(LegendMark(xmin, xmax, ymin, ymax, marks, style, label_style, id))
+    self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style, id))
     return self._children[-1]
 
   def text(self, x, y, text, angle=0.0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
@@ -2198,11 +1780,11 @@ class Canvas(object):
       title as a tooltip.
     style: dict, optional
       Collection of CSS styles to apply to the mark.  See
-      :class:`toyplot.TextMark` for a list of useful styles.
+      :class:`toyplot.mark.Text` for a list of useful styles.
 
     Returns
     -------
-    text: :class:`toyplot.TextMark`
+    text: :class:`toyplot.mark.Text`
     """
     table = toyplot.data.Table()
     table["x"] = toyplot.require.scalar_vector(x)
@@ -2213,10 +1795,10 @@ class Canvas(object):
     table["toyplot:fill"] = toyplot.color._broadcast_color(toyplot.color.near_black if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
     table["opacity"] = _broadcast_scalar(opacity, table.shape[0])
     table["title"] = _broadcast_object(title, table.shape[0])
-    style = _combine_styles({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
+    style = combine_styles({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
     id = toyplot.require.optional_id(id)
 
-    self._children.append(TextMark(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
     return self._children[-1]
 
   def time(self, begin, end, index=None):
@@ -2299,7 +1881,7 @@ def bars(a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=N
     A new canvas object.
   axes: :class:`toyplot.Axes2D`
     A new set of 2D axes that fill the canvas.
-  mark: :class:`toyplot.BarMagnitudesMark` or :class:`toyplot.BarBoundariesMark`
+  mark: :class:`toyplot.mark.BarMagnitudes` or :class:`toyplot.mark.BarBoundaries`
     The new bar mark.
   """
   canvas = Canvas(width=width, height=height, style=canvas_style)
@@ -2318,7 +1900,7 @@ def fill(a, b=None, c=None, along="x", baseline=None, fill=None, colormap=None, 
     A new canvas object.
   axes: :class:`toyplot.Axes2D`
     A new set of 2D axes that fill the canvas.
-  mark: :class:`toyplot.FillBoundariesMark` or :class:`toyplot.FillMagnitudesMark`
+  mark: :class:`toyplot.mark.FillBoundaries` or :class:`toyplot.mark.FillMagnitudes`
     The new bar mark.
   """
   canvas = Canvas(width=width, height=height, style=canvas_style)
@@ -2337,7 +1919,7 @@ def plot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette
     A new canvas object.
   axes: :class:`toyplot.Axes2D`
     A new set of 2D axes that fill the canvas.
-  mark: :class:`toyplot.PlotMark`
+  mark: :class:`toyplot.mark.Plot`
     The new plot mark.
   """
   canvas = Canvas(width=width, height=height, style=canvas_style)
@@ -2356,7 +1938,7 @@ def scatterplot(a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_
     A new canvas object.
   axes: :class:`toyplot.Axes2D`
     A new set of 2D axes that fill the canvas.
-  mark: :class:`toyplot.PlotMark`
+  mark: :class:`toyplot.mark.Plot`
     The new scatter plot mark.
   """
   canvas = Canvas(width=width, height=height, style=canvas_style)

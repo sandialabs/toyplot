@@ -217,13 +217,13 @@ def test_require_style():
   with nose.tools.assert_raises(ValueError):
     toyplot.require.style("")
 
-def test_combine_styles():
-  nose.tools.assert_equal(toyplot._combine_styles(None), {})
-  nose.tools.assert_equal(toyplot._combine_styles({}), {})
-  nose.tools.assert_equal(toyplot._combine_styles({"a":"b"}, None), {"a":"b"})
-  nose.tools.assert_equal(toyplot._combine_styles({"a":"b"}, {}), {"a":"b"})
-  nose.tools.assert_equal(toyplot._combine_styles({"a":"b"}, {"c":"d"}), {"a":"b","c":"d"})
-  nose.tools.assert_equal(toyplot._combine_styles({"a":"b"}, {"a":"d"}), {"a":"d"})
+def testcombine_styles():
+  nose.tools.assert_equal(toyplot.combine_styles(None), {})
+  nose.tools.assert_equal(toyplot.combine_styles({}), {})
+  nose.tools.assert_equal(toyplot.combine_styles({"a":"b"}, None), {"a":"b"})
+  nose.tools.assert_equal(toyplot.combine_styles({"a":"b"}, {}), {"a":"b"})
+  nose.tools.assert_equal(toyplot.combine_styles({"a":"b"}, {"c":"d"}), {"a":"b","c":"d"})
+  nose.tools.assert_equal(toyplot.combine_styles({"a":"b"}, {"a":"d"}), {"a":"d"})
 
 def test_require_scalar():
   nose.tools.assert_equal(toyplot.require.scalar(1), 1)

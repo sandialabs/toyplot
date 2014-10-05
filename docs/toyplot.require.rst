@@ -1,5 +1,5 @@
 toyplot.require module
-====================
+======================
 
 .. automodule:: toyplot.require
     :members:

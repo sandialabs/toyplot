@@ -198,7 +198,7 @@ class VColorBar(Mark):
       if locator is not None:
         return locator
       if scale == "linear":
-        return toyplot.ExtendedTickLocator()
+        return toyplot.locator.Extended()
 
     # Calculate tick locations and labels.
     locator = get_locator(self.ticks._locator, self._scale, vmin, vmax)

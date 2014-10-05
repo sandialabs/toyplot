@@ -15,6 +15,7 @@ Contents:
    toyplot.color.css.rst
    toyplot.compatibility.rst
    toyplot.mark.rst
+   toyplot.locator.rst
    toyplot.require.rst
    toyplot.units.rst
 

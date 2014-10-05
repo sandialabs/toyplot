@@ -19,6 +19,7 @@ import toyplot.color.css
 import toyplot.compatibility
 import toyplot.data
 import toyplot.html
+import toyplot.locator
 import toyplot.svg
 
 try:
@@ -433,7 +434,7 @@ def test_axes_x_ticks_locator():
   canvas = toyplot.Canvas()
   axes = canvas.axes()
   axes.x.ticks.show=True
-  locator=toyplot.BasicTickLocator(count=11)
+  locator=toyplot.locator.Basic(count=11)
   axes.x.ticks.locator=locator
   nose.tools.assert_is(axes.x.ticks.locator, locator)
   assert_canvas_matches(canvas, "axes-x-ticks-locator")
@@ -569,7 +570,7 @@ def test_axes_y_ticks_locator():
   canvas = toyplot.Canvas()
   axes = canvas.axes()
   axes.y.ticks.show=True
-  axes.y.ticks.locator=toyplot.BasicTickLocator(count=11)
+  axes.y.ticks.locator=toyplot.locator.Basic(count=11)
   assert_canvas_matches(canvas, "axes-y-ticks-locator")
 
 def test_axes_y_ticks_tick_index_style():
@@ -634,8 +635,8 @@ def test_axes_y_domain():
 def test_axes_tick_titles():
   canvas = toyplot.Canvas()
   axes = canvas.axes()
-  axes.x.ticks.locator=toyplot.ExplicitTickLocator(locations=[-0.5, 0, 0.5], titles=["Foo", "Bar", "Baz"])
-  axes.y.ticks.locator=toyplot.ExplicitTickLocator(locations=[-0.5, 0, 0.5], titles=["Red", "Green", "Blue"])
+  axes.x.ticks.locator=toyplot.locator.Explicit(locations=[-0.5, 0, 0.5], titles=["Foo", "Bar", "Baz"])
+  axes.y.ticks.locator=toyplot.locator.Explicit(locations=[-0.5, 0, 0.5], titles=["Red", "Green", "Blue"])
   assert_canvas_matches(canvas, "axes-tick-titles")
 
 def test_axes_colorbar():
@@ -701,7 +702,7 @@ def test_axes_colorbar_ticks_locator():
   axes = canvas.axes(label="Axes Label", xlabel="X Label", ylabel="Y Label")
   colorbar = axes.colorbar(palette=toyplot.color.brewer("BlueYellowRed"))
   colorbar.ticks.show=True
-  locator=toyplot.ExplicitTickLocator(locations=[-0.5, 0.0, 0.5], titles=["blue", "yellow", "red"])
+  locator=toyplot.locator.Explicit(locations=[-0.5, 0.0, 0.5], titles=["blue", "yellow", "red"])
   colorbar.ticks.locator=locator
   nose.tools.assert_is(colorbar.ticks.locator, locator)
   assert_canvas_matches(canvas, "axes-colorbar-ticks-locator")
@@ -1609,51 +1610,51 @@ def test_locator_defaults():
 def test_basic_tick_locator():
   x = numpy.linspace(0, 2 * numpy.pi, 100)
   canvas = toyplot.Canvas()
-  axes = canvas.axes(xticklocator=toyplot.BasicTickLocator(count=10, format="{:.3g}"))
-  axes.y.ticks.locator=toyplot.BasicTickLocator(count=3, format="{:.1f}")
+  axes = canvas.axes(xticklocator=toyplot.locator.Basic(count=10, format="{:.3g}"))
+  axes.y.ticks.locator=toyplot.locator.Basic(count=3, format="{:.1f}")
   axes.plot(x, numpy.sin(x))
   assert_canvas_matches(canvas, "basic-tick-locator")
 
 def test_explicit_tick_locator_locations():
   x = numpy.linspace(0, 2 * numpy.pi, 100)
   canvas = toyplot.Canvas()
-  axes = canvas.axes(xticklocator=toyplot.ExplicitTickLocator(locations=[0, 2, numpy.pi, 4, 6]))
+  axes = canvas.axes(xticklocator=toyplot.locator.Explicit(locations=[0, 2, numpy.pi, 4, 6]))
   axes.plot(x, numpy.sin(x))
   assert_canvas_matches(canvas, "explicit-tick-locator-locations")
 
 def test_explicit_tick_locator_locations_labels():
   x = numpy.linspace(0, 2 * numpy.pi, 100)
   canvas = toyplot.Canvas()
-  axes = canvas.axes(xticklocator=toyplot.ExplicitTickLocator(locations=[0, numpy.pi, 2 * numpy.pi], labels=["0", "pi", "2pi"]))
-  axes.y.ticks.locator=toyplot.ExplicitTickLocator([-1, 1], ["-1", "1"])
+  axes = canvas.axes(xticklocator=toyplot.locator.Explicit(locations=[0, numpy.pi, 2 * numpy.pi], labels=["0", "pi", "2pi"]))
+  axes.y.ticks.locator=toyplot.locator.Explicit([-1, 1], ["-1", "1"])
   axes.plot(x, numpy.sin(x))
   assert_canvas_matches(canvas, "explicit-tick-locator-locations-labels")
 
 def test_explicit_tick_locator_labels():
   x = numpy.linspace(0, 2 * numpy.pi, 100)
   canvas = toyplot.Canvas()
-  axes = canvas.axes(xticklocator=toyplot.ExplicitTickLocator(labels=["red", "green", "blue"]))
-  axes.y.ticks.locator=toyplot.ExplicitTickLocator([-1, 1], ["-1", "1"])
+  axes = canvas.axes(xticklocator=toyplot.locator.Explicit(labels=["red", "green", "blue"]))
+  axes.y.ticks.locator=toyplot.locator.Explicit([-1, 1], ["-1", "1"])
   axes.plot(x, numpy.sin(x))
   assert_canvas_matches(canvas, "explicit-tick-locator-labels")
 
 def test_explicit_tick_locator_failure():
   with nose.tools.assert_raises(ValueError):
-    toyplot.ExplicitTickLocator()
+    toyplot.locator.Explicit()
 
 def test_extended_tick_locator():
   x = numpy.linspace(0, 2 * numpy.pi, 100)
   canvas = toyplot.Canvas()
-  axes = canvas.axes(xticklocator=toyplot.ExtendedTickLocator(count=12))
-  axes.y.ticks.locator=toyplot.ExtendedTickLocator(count=5)
+  axes = canvas.axes(xticklocator=toyplot.locator.Extended(count=12))
+  axes.y.ticks.locator=toyplot.locator.Extended(count=5)
   axes.plot(x, numpy.sin(x))
   assert_canvas_matches(canvas, "extended-tick-locator")
 
 def test_heckbert_tick_locator():
   x = numpy.linspace(0, 2 * numpy.pi, 100)
   canvas = toyplot.Canvas()
-  axes = canvas.axes(xticklocator=toyplot.HeckbertTickLocator(count=10))
-  axes.y.ticks.locator=toyplot.HeckbertTickLocator(count=3)
+  axes = canvas.axes(xticklocator=toyplot.locator.Heckbert(count=10))
+  axes.y.ticks.locator=toyplot.locator.Heckbert(count=3)
   axes.plot(x, numpy.sin(x))
   assert_canvas_matches(canvas, "heckbert-tick-locator")
 

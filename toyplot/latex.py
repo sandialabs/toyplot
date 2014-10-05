@@ -4,6 +4,7 @@
 
 import numpy
 import toyplot.data
+import toyplot.require
 
 def render(table, fobj=None, hlines=None):
   """Render the LaTeX representation of a table.
@@ -28,7 +29,7 @@ def render(table, fobj=None, hlines=None):
     LaTeX representation of `table`, as a string, or `None` if the caller
     specifies the `fobj` parameter.
   """
-  table = toyplot._require_instance(table, toyplot.data.Table)
+  table = toyplot.require.instance(table, toyplot.data.Table)
 
   # Setup formatters for each column.
   formatters = []

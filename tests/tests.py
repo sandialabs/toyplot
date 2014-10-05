@@ -208,13 +208,13 @@ def test_data_table():
 # toyplot
 
 def test_require_style():
-  nose.tools.assert_equal(toyplot._require_style(None), None)
-  nose.tools.assert_equal(toyplot._require_style({}), {})
-  nose.tools.assert_equal(toyplot._require_style({"stroke":toyplot.color.near_black}), {"stroke":toyplot.color.near_black})
+  nose.tools.assert_equal(toyplot.require.style(None), None)
+  nose.tools.assert_equal(toyplot.require.style({}), {})
+  nose.tools.assert_equal(toyplot.require.style({"stroke":toyplot.color.near_black}), {"stroke":toyplot.color.near_black})
   with nose.tools.assert_raises(ValueError):
-    toyplot._require_style([])
+    toyplot.require.style([])
   with nose.tools.assert_raises(ValueError):
-    toyplot._require_style("")
+    toyplot.require.style("")
 
 def test_combine_styles():
   nose.tools.assert_equal(toyplot._combine_styles(None), {})
@@ -225,85 +225,85 @@ def test_combine_styles():
   nose.tools.assert_equal(toyplot._combine_styles({"a":"b"}, {"a":"d"}), {"a":"d"})
 
 def test_require_scalar():
-  nose.tools.assert_equal(toyplot._require_scalar(1), 1)
-  nose.tools.assert_equal(toyplot._require_scalar(1.2), 1.2)
+  nose.tools.assert_equal(toyplot.require.scalar(1), 1)
+  nose.tools.assert_equal(toyplot.require.scalar(1.2), 1.2)
   with nose.tools.assert_raises(ValueError):
-    nose.tools.assert_equal(toyplot._require_scalar("foo"), "foo")
+    nose.tools.assert_equal(toyplot.require.scalar("foo"), "foo")
 
 def test_require_scalar_array():
-  assert_masked_array(toyplot._require_scalar_array(1), "float64", [1], [False])
-  assert_masked_array(toyplot._require_scalar_array(1.1), "float64", [1.1], [False])
-  assert_masked_array(toyplot._require_scalar_array("1.2"), "float64", [1.2], [False])
-  assert_masked_array(toyplot._require_scalar_array([1, 2, 3]), "float64", [1, 2, 3], [False, False, False])
-  assert_masked_array(toyplot._require_scalar_array(["1", "2", 3]), "float64", [1, 2, 3], [False, False, False])
-  assert_masked_array(toyplot._require_scalar_array([[1, 2], [3, 4]]), "float64", [[1, 2], [3, 4]], [[False, False], [False, False]])
-  assert_masked_array(toyplot._require_scalar_array(numpy.array([1, 2, 3])), "float64", [1, 2, 3], [False, False, False])
-  assert_masked_array(toyplot._require_scalar_array(numpy.ma.array([1, 2, 3], mask=[False, True, False])), "float64", [1, 2, 3], [False, True, False])
-  assert_masked_array(toyplot._require_scalar_array(numpy.array([1, numpy.nan, 3])), "float64", [1, numpy.nan, 3], [False, True, False])
-  assert_masked_array(toyplot._require_scalar_array(numpy.ma.array([1, numpy.nan, 3], mask=[False, False, True])), "float64", [1, numpy.nan, 3], [False, True, True])
+  assert_masked_array(toyplot.require.scalar_array(1), "float64", [1], [False])
+  assert_masked_array(toyplot.require.scalar_array(1.1), "float64", [1.1], [False])
+  assert_masked_array(toyplot.require.scalar_array("1.2"), "float64", [1.2], [False])
+  assert_masked_array(toyplot.require.scalar_array([1, 2, 3]), "float64", [1, 2, 3], [False, False, False])
+  assert_masked_array(toyplot.require.scalar_array(["1", "2", 3]), "float64", [1, 2, 3], [False, False, False])
+  assert_masked_array(toyplot.require.scalar_array([[1, 2], [3, 4]]), "float64", [[1, 2], [3, 4]], [[False, False], [False, False]])
+  assert_masked_array(toyplot.require.scalar_array(numpy.array([1, 2, 3])), "float64", [1, 2, 3], [False, False, False])
+  assert_masked_array(toyplot.require.scalar_array(numpy.ma.array([1, 2, 3], mask=[False, True, False])), "float64", [1, 2, 3], [False, True, False])
+  assert_masked_array(toyplot.require.scalar_array(numpy.array([1, numpy.nan, 3])), "float64", [1, numpy.nan, 3], [False, True, False])
+  assert_masked_array(toyplot.require.scalar_array(numpy.ma.array([1, numpy.nan, 3], mask=[False, False, True])), "float64", [1, numpy.nan, 3], [False, True, True])
   with nose.tools.assert_raises(ValueError):
-    toyplot._require_scalar_array("foo")
+    toyplot.require.scalar_array("foo")
   with nose.tools.assert_raises(ValueError):
-    toyplot._require_scalar_array(["1", "foo"])
+    toyplot.require.scalar_array(["1", "foo"])
 
 def test_require_scalar_vector():
-  numpy.testing.assert_array_equal(toyplot._require_scalar_vector(1), [1])
-  numpy.testing.assert_array_equal(toyplot._require_scalar_vector([1, 2, 3]), [1, 2, 3])
-  numpy.testing.assert_array_equal(toyplot._require_scalar_vector([1, 2, 3], length=3), [1, 2, 3])
+  numpy.testing.assert_array_equal(toyplot.require.scalar_vector(1), [1])
+  numpy.testing.assert_array_equal(toyplot.require.scalar_vector([1, 2, 3]), [1, 2, 3])
+  numpy.testing.assert_array_equal(toyplot.require.scalar_vector([1, 2, 3], length=3), [1, 2, 3])
   with nose.tools.assert_raises(ValueError):
-    toyplot._require_scalar_vector(1, length=3)
+    toyplot.require.scalar_vector(1, length=3)
   with nose.tools.assert_raises(ValueError):
-    toyplot._require_scalar_vector([1, 2, 3], length=2)
+    toyplot.require.scalar_vector([1, 2, 3], length=2)
   with nose.tools.assert_raises(ValueError):
-    toyplot._require_scalar_vector([[1, 2], [3, 4]])
+    toyplot.require.scalar_vector([[1, 2], [3, 4]])
 
 def test_require_scalar_matrix():
   with nose.tools.assert_raises(ValueError):
-    toyplot._require_scalar_matrix(1)
+    toyplot.require.scalar_matrix(1)
   with nose.tools.assert_raises(ValueError):
-    toyplot._require_scalar_matrix([1, 2, 3])
-  numpy.testing.assert_array_equal(toyplot._require_scalar_matrix([[1, 2], [3, 4]]), [[1, 2], [3, 4]])
+    toyplot.require.scalar_matrix([1, 2, 3])
+  numpy.testing.assert_array_equal(toyplot.require.scalar_matrix([[1, 2], [3, 4]]), [[1, 2], [3, 4]])
   with nose.tools.assert_raises(ValueError):
-    toyplot._require_scalar_matrix([[1, 2], [3, 4]], rows=3)
+    toyplot.require.scalar_matrix([[1, 2], [3, 4]], rows=3)
   with nose.tools.assert_raises(ValueError):
-    toyplot._require_scalar_matrix([[1, 2], [3, 4]], columns=3)
+    toyplot.require.scalar_matrix([[1, 2], [3, 4]], columns=3)
   with nose.tools.assert_raises(ValueError):
-    toyplot._require_scalar_matrix([[[1, 2], [3, 4]]])
+    toyplot.require.scalar_matrix([[[1, 2], [3, 4]]])
 
 def test_require_string():
-  nose.tools.assert_equal(toyplot._require_string("foo"), "foo")
-  nose.tools.assert_equal(toyplot._require_string(u"foo"), u"foo")
+  nose.tools.assert_equal(toyplot.require.string("foo"), "foo")
+  nose.tools.assert_equal(toyplot.require.string(u"foo"), u"foo")
   with nose.tools.assert_raises(ValueError):
-    nose.tools.assert_equal(toyplot._require_string(None), None)
+    nose.tools.assert_equal(toyplot.require.string(None), None)
   with nose.tools.assert_raises(ValueError):
-    nose.tools.assert_equal(toyplot._require_string(1), 1)
+    nose.tools.assert_equal(toyplot.require.string(1), 1)
 
 def test_require_string_vector():
-  numpy.testing.assert_array_equal(toyplot._require_string_vector("a"), ["a"])
-  numpy.testing.assert_array_equal(toyplot._require_string_vector(["a", "b", "c"]), ["a", "b", "c"])
-  numpy.testing.assert_array_equal(toyplot._require_string_vector([1, 2, 3]), ["1", "2", "3"])
+  numpy.testing.assert_array_equal(toyplot.require.string_vector("a"), ["a"])
+  numpy.testing.assert_array_equal(toyplot.require.string_vector(["a", "b", "c"]), ["a", "b", "c"])
+  numpy.testing.assert_array_equal(toyplot.require.string_vector([1, 2, 3]), ["1", "2", "3"])
 
 def test_require_optional_string():
-  nose.tools.assert_equal(toyplot._require_optional_string("foo"), "foo")
-  nose.tools.assert_equal(toyplot._require_optional_string(u"foo"), u"foo")
-  nose.tools.assert_equal(toyplot._require_optional_string(None), None)
+  nose.tools.assert_equal(toyplot.require.optional_string("foo"), "foo")
+  nose.tools.assert_equal(toyplot.require.optional_string(u"foo"), u"foo")
+  nose.tools.assert_equal(toyplot.require.optional_string(None), None)
   with nose.tools.assert_raises(ValueError):
-    nose.tools.assert_equal(toyplot._require_optional_string(1), 1)
+    nose.tools.assert_equal(toyplot.require.optional_string(1), 1)
 
 def test_require_marker_array():
-  numpy.testing.assert_array_equal(toyplot._require_marker_array("foo"), ["foo"])
-  numpy.testing.assert_array_equal(toyplot._require_marker_array(["foo", "bar"]), ["foo", "bar"])
-  numpy.testing.assert_array_equal(toyplot._require_marker_array([1, 2]), [1, 2])
-  numpy.testing.assert_array_equal(toyplot._require_marker_array([1, 2, "foo"]), [1, 2, "foo"])
+  numpy.testing.assert_array_equal(toyplot.require.marker_array("foo"), ["foo"])
+  numpy.testing.assert_array_equal(toyplot.require.marker_array(["foo", "bar"]), ["foo", "bar"])
+  numpy.testing.assert_array_equal(toyplot.require.marker_array([1, 2]), [1, 2])
+  numpy.testing.assert_array_equal(toyplot.require.marker_array([1, 2, "foo"]), [1, 2, "foo"])
   with nose.tools.assert_raises(ValueError):
-    toyplot._require_marker_array(["foo", "bar"], 3)
+    toyplot.require.marker_array(["foo", "bar"], 3)
 
 def test_require_optional_id():
-  nose.tools.assert_equal(toyplot._require_optional_id("foo"), "foo")
-  nose.tools.assert_equal(toyplot._require_optional_id(u"foo"), u"foo")
-  nose.tools.assert_equal(toyplot._require_optional_id(None), None)
+  nose.tools.assert_equal(toyplot.require.optional_id("foo"), "foo")
+  nose.tools.assert_equal(toyplot.require.optional_id(u"foo"), u"foo")
+  nose.tools.assert_equal(toyplot.require.optional_id(None), None)
   with nose.tools.assert_raises(ValueError):
-    nose.tools.assert_equal(toyplot._require_optional_id(1), 1)
+    nose.tools.assert_equal(toyplot.require.optional_id(1), 1)
 
 def test_broadcast_scalar():
   numpy.testing.assert_equal(toyplot._broadcast_scalar(1, 3), [1,1,1])

@@ -18,7 +18,7 @@ def render(canvas, fobj=None):
 
   Parameters
   ----------
-  canvas: :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.canvas.Canvas`
     The canvas to be rendered.
 
   fobj: file-like object or string, optional

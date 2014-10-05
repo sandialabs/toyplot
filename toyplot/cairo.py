@@ -16,7 +16,7 @@ def render(svg, context):
   Parameters
   ----------
   svg: xml.etree.ElementTree.Element
-    SVG representation of a :class:`toyplot.Canvas` returned by
+    SVG representation of a :class:`toyplot.canvas.Canvas` returned by
     :func:`toyplot.svg.render()`.
 
   context: cairo.Context

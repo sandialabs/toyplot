@@ -19,7 +19,7 @@ class Legend(Mark):
   """Render a figure legend (a collection of markers and labels).
 
   Do not create Legend instances directly.  Use factory methods such as
-  :meth:`toyplot.Canvas.legend` or :meth:`toyplot.Axes2D.legend` instead.
+  :meth:`toyplot.canvas.Canvas.legend` or :meth:`toyplot.Axes2D.legend` instead.
   """
   def __init__(self, xmin, xmax, ymin, ymax, marks, style, label_style, id):
     Mark.__init__(self, {"fill":"none", "stroke":"none"}, style, id=id)
@@ -391,7 +391,7 @@ class Text(Mark):
   """Render text.
 
   Do not create Text instances directly.  Use factory methods such as
-  :meth:`toyplot.Canvas.text` or :meth:`toyplot.Axes2D.text` instead.
+  :meth:`toyplot.canvas.Canvas.text` or :meth:`toyplot.Axes2D.text` instead.
   """
   def __init__(self, table, coordinates, axes, text, angle, fill, opacity, title, style, id):
     table = toyplot.require.instance(table, toyplot.data.Table)

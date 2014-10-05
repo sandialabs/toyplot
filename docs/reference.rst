@@ -11,11 +11,13 @@ Contents:
    :maxdepth: 2
 
    toyplot.rst
-   toyplot.color.rst
+   toyplot.canvas.rst
    toyplot.color.css.rst
+   toyplot.color.rst
    toyplot.compatibility.rst
-   toyplot.mark.rst
+   toyplot.config.rst
    toyplot.locator.rst
+   toyplot.mark.rst
    toyplot.require.rst
    toyplot.units.rst
 

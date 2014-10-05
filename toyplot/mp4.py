@@ -22,7 +22,7 @@ def render(canvas, filename, width=None, height=None, scale=None, progress=None)
 
   Parameters
   ----------
-  canvas: :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.canvas.Canvas`
     Canvas to be rendered.
   filename: string
     Output video filename.

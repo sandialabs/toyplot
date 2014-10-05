@@ -7,7 +7,7 @@ def show(canvas, title="Toyplot Figure"):
 
   Parameters
   ----------
-  canvas: :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.canvas.Canvas`
     The canvas to be displayed.
 
   title: string, optional

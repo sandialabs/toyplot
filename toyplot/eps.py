@@ -16,7 +16,7 @@ def render(canvas, fobj, width=None, height=None, scale=None):
 
   Parameters
   ----------
-  canvas: :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.canvas.Canvas`
     Canvas to be rendered.
   fobj: file-like object or string
     The file to write.  Use a string filepath to write data directly to disk.

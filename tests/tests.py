@@ -1568,7 +1568,7 @@ def test_axes_legend():
   assert_canvas_matches(canvas, "axes-legend")
 
 def test_animation_frame_sanity_checks():
-  frame = toyplot.AnimationFrame(index=1, begin=2.3, end=2.4, changes=collections.defaultdict(lambda : collections.defaultdict(list)))
+  frame = toyplot.canvas.AnimationFrame(index=1, begin=2.3, end=2.4, changes=collections.defaultdict(lambda : collections.defaultdict(list)))
   nose.tools.assert_equal(frame.index(), 1)
   nose.tools.assert_equal(frame.time(), 2.3)
   numpy.testing.assert_almost_equal(frame.duration(), 0.1)

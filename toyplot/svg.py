@@ -42,7 +42,7 @@ def render(canvas, fobj=None, animation=False):
 
   Parameters
   ----------
-  canvas: :class:`toyplot.Canvas`
+  canvas: :class:`toyplot.canvas.Canvas`
     The canvas to be rendered.
 
   fobj: file-like object or string, optional
@@ -227,7 +227,7 @@ def _render_marker(root, cx, cy, size, marker, marker_style=None, label_style=No
     xml.SubElement(marker_xml, "text", x=repr(cx), y=repr(cy), attrib=_css_attrib({"stroke":"none", "fill":toyplot.color.near_black, "text-anchor":"middle", "alignment-baseline":"middle", "font-size":"%rpx" % (size * 0.75)}, label_style, shape_label_style)).text = shape_label
 _render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<": ("^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
-@dispatch(toyplot.Canvas, toyplot.Axes2D, _RenderContext)
+@dispatch(toyplot.canvas.Canvas, toyplot.Axes2D, _RenderContext)
 def _render(canvas, axes, context):
   axes._finalize_domain()
 
@@ -528,7 +528,7 @@ def _render(axes, mark, context):
     if dtitle is not None:
       xml.SubElement(datum_xml, "title").text = str(dtitle)
 
-@dispatch((toyplot.Canvas, toyplot.Axes2D), toyplot.mark.Legend, _RenderContext)
+@dispatch((toyplot.canvas.Canvas, toyplot.Axes2D), toyplot.mark.Legend, _RenderContext)
 def _render(canvas, legend, context):
   x = legend._xmin
   y = legend._ymin
@@ -633,7 +633,7 @@ def _render(axes, mark, context):
     if dtitle is not None:
       xml.SubElement(datum_xml, "title").text = str(dtitle)
 
-@dispatch((toyplot.Canvas, toyplot.Axes2D), toyplot.mark.Text, _RenderContext)
+@dispatch((toyplot.canvas.Canvas, toyplot.Axes2D), toyplot.mark.Text, _RenderContext)
 def _render(parent, mark, context):
   x = mark._table[mark._coordinates[numpy.where(mark._axes == "x")[0][0]]]
   y = mark._table[mark._coordinates[numpy.where(mark._axes == "y")[0][0]]]
@@ -653,7 +653,7 @@ def _render(parent, mark, context):
     if dtitle is not None:
       xml.SubElement(datum_xml, "title").text = str(dtitle)
 
-@dispatch(toyplot.Canvas, toyplot.mark.VColorBar, _RenderContext)
+@dispatch(toyplot.canvas.Canvas, toyplot.mark.VColorBar, _RenderContext)
 def _render(canvas, mark, context):
   mark._finalize_domain()
 

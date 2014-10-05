@@ -11,6 +11,7 @@ import json
 import numbers
 import numpy
 import toyplot.color.css
+import toyplot.compatibility
 import uuid
 import xml.etree.ElementTree as xml
 
@@ -75,7 +76,7 @@ def render(canvas, fobj=None, animation=False):
   for child in canvas._children:
     _render(canvas, child, context.push(svg))
 
-  if isinstance(fobj, toyplot.string_type):
+  if isinstance(fobj, toyplot.compatibility.string_type):
     with open(fobj, "wb") as file:
       file.write(xml.tostring(svg, method="xml"))
   elif fobj is not None:
@@ -170,7 +171,7 @@ def _render_data_table(root_xml, table, title):
 def _render_marker(root, cx, cy, size, marker, marker_style=None, label_style=None, extra_class=None):
   if marker is None:
     return
-  if isinstance(marker, toyplot.string_type):
+  if isinstance(marker, toyplot.compatibility.string_type):
     marker = {"shape":marker}
   shape = marker.get("shape", None)
   shape_angle = marker.get("angle", 0)

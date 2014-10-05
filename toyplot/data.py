@@ -6,6 +6,7 @@ import collections
 import numbers
 import numpy
 import toyplot.color
+import toyplot.compatibility
 import xml.etree.ElementTree as xml
 
 class Table(object):
@@ -22,7 +23,7 @@ class Table(object):
 
   def __getitem__(self, index):
     # Return a single column by name
-    if isinstance(index, toyplot.string_type):
+    if isinstance(index, toyplot.compatibility.string_type):
       return self._columns[index]
     # Return a single row by index
     if isinstance(index, numbers.Integral):
@@ -30,7 +31,7 @@ class Table(object):
     return Table(collections.OrderedDict([(key, self._columns[key][index]) for key in self._columns.keys()]))
 
   def __setitem__(self, key, value):
-    if not isinstance(key, toyplot.string_type):
+    if not isinstance(key, toyplot.compatibility.string_type):
       raise ValueError("Column name must be a string.")
     value = numpy.ma.array(value)
     if value.ndim != 1:

@@ -4,6 +4,7 @@
 
 import json
 import numpy
+import toyplot.compatibility
 import toyplot.svg
 import uuid
 import xml.etree.ElementTree as xml
@@ -457,7 +458,7 @@ def render(canvas, fobj=None):
       json.dumps(changes),
       )
 
-  if isinstance(fobj, toyplot.string_type):
+  if isinstance(fobj, toyplot.compatibility.string_type):
     with open(fobj, "wb") as file:
       file.write(xml.tostring(root, method="html"))
   elif fobj is not None:

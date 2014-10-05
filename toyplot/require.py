@@ -5,6 +5,7 @@
 import numbers
 import numpy
 import toyplot
+import toyplot.compatibility
 
 def style(style):
   """Verify that the given object is usable as a style."""
@@ -65,12 +66,12 @@ def scalar_matrix(value, rows=None, columns=None):
   return array
 
 def string(value):
-  if not isinstance(value, toyplot.string_type):
+  if not isinstance(value, toyplot.compatibility.string_type):
     raise ValueError("Expected a string, received %s." % value)
   return value
 
 def string_vector(value, length=None):
-  if isinstance(value, (toyplot.string_type)):
+  if isinstance(value, (toyplot.compatibility.string_type)):
     value = [value]
   array = numpy.ma.array(value).astype("str")
   if array.ndim != 1:
@@ -81,12 +82,12 @@ def string_vector(value, length=None):
   return array
 
 def optional_string(value):
-  if not isinstance(value, (toyplot.string_type, type(None))):
+  if not isinstance(value, (toyplot.compatibility.string_type, type(None))):
     raise ValueError("Expected a string value or None, received %s." % value)
   return value
 
 def marker_array(value, length=None):
-  if isinstance(value, (toyplot.string_type, tuple)):
+  if isinstance(value, (toyplot.compatibility.string_type, tuple)):
     array = [value] * (1 if length is None else length)
   else:
     array = value

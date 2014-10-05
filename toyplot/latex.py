@@ -3,6 +3,7 @@
 # rights in this software.
 
 import numpy
+import toyplot.compatibility
 import toyplot.data
 import toyplot.require
 
@@ -63,7 +64,7 @@ def render(table, fobj=None, hlines=None):
 
   latex += "\\end{tabular}\n"
 
-  if isinstance(fobj, toyplot.string_type):
+  if isinstance(fobj, toyplot.compatibility.string_type):
     with open(fobj, "wb") as file:
       file.write(latex)
   elif fobj is not None:

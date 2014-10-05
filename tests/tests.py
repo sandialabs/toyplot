@@ -16,6 +16,7 @@ import xml.etree.ElementTree as xml
 import toyplot
 import toyplot.color
 import toyplot.color.css
+import toyplot.compatibility
 import toyplot.data
 import toyplot.html
 import toyplot.svg
@@ -1596,7 +1597,7 @@ def test_canvas_time():
 def test_canvas_repr_html():
   canvas = toyplot.Canvas(autorender="html")
   html = canvas._repr_html_()
-  nose.tools.assert_is_instance(html, toyplot.bytes_type)
+  nose.tools.assert_is_instance(html, toyplot.compatibility.bytes_type)
 
 def test_locator_defaults():
   x = numpy.linspace(0, 2 * numpy.pi, 100)
@@ -1919,7 +1920,7 @@ def test_png_render_defaults():
     canvas = toyplot.Canvas()
     canvas.axes()
     image = toyplot.png.render(canvas)
-    nose.tools.assert_is_instance(image, toyplot.string_type)
+    nose.tools.assert_is_instance(image, toyplot.compatibility.string_type)
     nose.tools.assert_equal(image[1:4], "PNG")
 
 def test_png_render_buffer():
@@ -1948,7 +1949,7 @@ def test_png_render_frames():
       frame.set_datum_style(scatterplot, 0, frame.index(), {"stroke":"none"})
     canvas.animate(10, callback)
     for frame in toyplot.png.render_frames(canvas):
-      nose.tools.assert_is_instance(frame, toyplot.string_type)
+      nose.tools.assert_is_instance(frame, toyplot.compatibility.string_type)
       nose.tools.assert_equal(frame[1:4], "PNG")
 
 def test_cairo_small_font():

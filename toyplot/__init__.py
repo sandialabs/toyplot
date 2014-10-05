@@ -9,24 +9,12 @@ import itertools
 import numbers
 import numpy.ma
 import toyplot.color.css
+import toyplot.compatibility
 import toyplot.data
 import toyplot.require
 import toyplot.units
 
 __version__ = "0.3"
-
-###############################################################################################
-# Python 2/3 compatibility
-
-try:
-  string_type = basestring
-except:
-  string_type = str
-
-try:
-  bytes_type = bytes
-except:
-  bytes_type = str
 
 ###############################################################################################
 # Style Helpers
@@ -103,7 +91,7 @@ def _region(xmin, xmax, ymin, ymax, bounds=None, rect=None, corner=None, grid=No
   def length(min, max, value):
     if isinstance(value, numbers.Number):
       return value
-    if isinstance(value, string_type):
+    if isinstance(value, toyplot.compatibility.string_type):
       value = value.strip()
       if value[-1] == "%":
         value = float(value[:-1]) * 0.01

@@ -13,6 +13,7 @@ Contents:
    toyplot.rst
    toyplot.color.rst
    toyplot.color.css.rst
+   toyplot.compatibility.rst
    toyplot.require.rst
 
    backends.rst

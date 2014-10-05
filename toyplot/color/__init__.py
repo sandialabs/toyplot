@@ -7,6 +7,7 @@ from __future__ import division
 import colorsys
 import numpy
 import toyplot.color.css
+import toyplot.compatibility
 import xml.etree.ElementTree as xml
 
 dtype = {"names":["r", "g", "b", "a"], "formats":["float64", "float64", "float64", "float64"]}
@@ -48,7 +49,7 @@ def _msh_to_lab(M, s, h):
   return L, a, b
 
 def _require_color(color):
-  if isinstance(color, toyplot.string_type):
+  if isinstance(color, toyplot.compatibility.string_type):
     return toyplot.color.css.parse(color)
   elif isinstance(color, (numpy.void, numpy.ndarray)) and color.dtype == dtype:
     return color

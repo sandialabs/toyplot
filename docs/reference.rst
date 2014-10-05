@@ -11,6 +11,7 @@ Contents:
    :maxdepth: 2
 
    toyplot.rst
+   toyplot.axes.rst
    toyplot.canvas.rst
    toyplot.color.css.rst
    toyplot.color.rst

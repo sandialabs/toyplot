@@ -277,7 +277,7 @@ def render(canvas, fobj=None):
           coordinates[i].style.visibility = "hidden";
       }
 
-      var axes = document.querySelectorAll("#" + root_id + " .toyplot-Axes2D .toyplot-coordinate-events");
+      var axes = document.querySelectorAll("#" + root_id + " .toyplot-axes-Cartesian2 .toyplot-coordinate-events");
       for(var i = 0; i != axes.length; ++i)
       {
         axes[i].onmousemove = display_coordinates;

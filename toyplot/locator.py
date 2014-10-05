@@ -13,6 +13,15 @@ class TickLocator(object):
     Parameters
     ----------
     domain_min, domain_max: number
+
+    Returns
+    -------
+    locations : sequence of numbers
+      Axis locations where ticks should be displayed.
+    labels : sequence of strings
+      Labels for each tick location.
+    titles : sequence of strings
+      Titles for each tick location.  Typically, backends render titles as tooltips.
     """
     raise NotImplementedError()
 
@@ -22,15 +31,19 @@ class Explicit(TickLocator):
   You must specify the set of locations, the set of labels, or both.  If you
   only specify locations, the labels will be generated using a formatting
   string.  If you only specify labels, the locations will default to integers
-  in the range $[0, n)$.  The latter behavior is especially useful for
+  in the range :math:`[0, n)`.  The latter behavior is especially useful for
   categorical axes.
 
   Parameters
   ----------
-  locations: sequence of tick locations (numbers), optional
-  labels: sequence of tick labels (strings), optional
-  titles: sequence of tick titles (strings), optional
-  format: format string used to generate labels from tick locations, optional
+  locations : sequence numbers, optional
+    Axis locations where ticks should be displayed.
+  labels : sequence of strings, optional
+    Labels for each tick location.
+  titles : sequence of strings, optional
+    Titles for each tick location.  Typically, backends render titles as tooltips.
+  format : string, optional
+    Format string used to generate labels from tick locations.
   """
   def __init__(self, locations=None, labels=None, titles=None, format="{:g}"):
     if locations is not None and labels is not None:
@@ -51,6 +64,21 @@ class Explicit(TickLocator):
     self._titles = titles
 
   def ticks(self, domain_min, domain_max):
+    """Return a set of ticks for the given domain.
+
+    Parameters
+    ----------
+    domain_min, domain_max: number
+
+    Returns
+    -------
+    locations : sequence of numbers
+      The axis locations where ticks / labels should be positioned.
+    labels : sequence of strings
+      Labels for each tick location.
+    titles : sequence of strings
+      Titles for each tick location.  Typically, backends render titles as tooltips.
+    """
     return self._locations, self._labels, self._titles
 
 class Basic(TickLocator):
@@ -58,13 +86,31 @@ class Basic(TickLocator):
 
   Parameters
   ----------
-  count: number of ticks to generate, optional
-  format: format string used to generate labels from tick locations, optional
+  count: number, optional
+    Number of ticks to generate.
+  format : string, optional
+    Format string used to generate labels from tick locations.
   """
   def __init__(self, count=5, format="{:g}"):
     self._count = count
     self._format = format
+
   def ticks(self, domain_min, domain_max):
+    """Return a set of ticks for the given domain.
+
+    Parameters
+    ----------
+    domain_min, domain_max: number
+
+    Returns
+    -------
+    locations : sequence of numbers
+      The axis locations where ticks should be positioned.
+    labels : sequence of strings
+      Labels for each tick location.
+    titles : sequence of strings
+      Titles for each tick location.  Typically, backends render titles as tooltips.
+    """
     locations = numpy.linspace(domain_min, domain_max, self._count, endpoint=True)
     labels = [self._format.format(location) for location in locations]
     titles = numpy.repeat(None, len(labels))
@@ -72,10 +118,31 @@ class Basic(TickLocator):
 
 class PositiveLog(TickLocator):
   """Generate ticks that are evenly spaced on a logarithmic scale, when the entire domain is positive.
+
+  Parameters
+  ----------
+  base : number, optional
+    Logarithm base.
   """
   def __init__(self, base=10):
     self._base = base
+
   def ticks(self, domain_min, domain_max):
+    """Return a set of ticks for the given domain.
+
+    Parameters
+    ----------
+    domain_min, domain_max: number
+
+    Returns
+    -------
+    locations : sequence of numbers
+      The axis locations where ticks should be positioned.
+    labels : sequence of strings
+      Labels for each tick location.
+    titles : sequence of strings
+      Titles for each tick location.  Typically, backends render titles as tooltips.
+    """
     exponents = numpy.arange(numpy.floor(numpy.log10(domain_min) / numpy.log10(self._base)), numpy.ceil(numpy.log10(domain_max) / numpy.log10(self._base)) + 1)
     locations = numpy.power(self._base, exponents)
     labels = ["%se%s" % (self._base, int(exponent)) for exponent in exponents]
@@ -84,10 +151,30 @@ class PositiveLog(TickLocator):
 
 class NegativeLog(TickLocator):
   """Generate ticks that are evenly spaced on a logarithmic scale, when the entire domain is negative.
+
+  Parameters
+  ----------
+  base : number, optional
+    Logarithm base.
   """
   def __init__(self, base=10):
     self._base = base
   def ticks(self, domain_min, domain_max):
+    """Return a set of ticks for the given domain.
+
+    Parameters
+    ----------
+    domain_min, domain_max: number
+
+    Returns
+    -------
+    locations : sequence of numbers
+      The axis locations where ticks should be positioned.
+    labels : sequence of strings
+      Labels for each tick location.
+    titles : sequence of strings
+      Titles for each tick location.  Typically, backends render titles as tooltips.
+    """
     exponents = numpy.arange(numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)), numpy.floor(numpy.log10(numpy.abs(domain_max)) / numpy.log10(self._base)) -1, -1)
     locations = -numpy.power(self._base, exponents)
     labels = ["-%se%s" % (self._base, int(exponent)) for exponent in exponents]
@@ -96,10 +183,30 @@ class NegativeLog(TickLocator):
 
 class SymmetricLog(TickLocator):
   """Generate ticks that are evenly spaced on a logarithmic scale, when the domain straddles zero.
+
+  Parameters
+  ----------
+  base : number, optional
+    Logarithm base.
   """
   def __init__(self, base=10):
     self._base = base
   def ticks(self, domain_min, domain_max):
+    """Return a set of ticks for the given domain.
+
+    Parameters
+    ----------
+    domain_min, domain_max: number
+
+    Returns
+    -------
+    locations : sequence of numbers
+      The axis locations where ticks should be positioned.
+    labels : sequence of strings
+      Labels for each tick location.
+    titles : sequence of strings
+      Titles for each tick location.  Typically, backends render titles as tooltips.
+    """
     negative_exponents = numpy.arange(numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)), -1, -1) if domain_min != 0 else []
     linear_locations = [0]
     positive_exponents = numpy.arange(0, numpy.ceil(numpy.log10(domain_max) / numpy.log10(self._base)) + 1) if domain_max != 0 else []
@@ -121,7 +228,23 @@ class Heckbert(TickLocator):
   """
   def __init__(self, count=5):
     self._count = count
+
   def ticks(self, domain_min, domain_max):
+    """Return a set of ticks for the given domain.
+
+    Parameters
+    ----------
+    domain_min, domain_max: number
+
+    Returns
+    -------
+    locations : sequence of numbers
+      The axis locations where ticks should be positioned.
+    labels : sequence of strings
+      Labels for each tick location.
+    titles : sequence of strings
+      Titles for each tick location.  Typically, backends render titles as tooltips.
+    """
     def nicenum(x, rounding):
       exponent = numpy.floor(numpy.log10(x))
       fraction = x / numpy.power(10, exponent)
@@ -182,9 +305,11 @@ class Extended(TickLocator):
 
   Parameters
   ----------
-  count: desired number of ticks
-    Note that the algorithm may produce fewer ticks than requested.
-  steps: prioritized list of "nice" values to use for generating ticks.
+  count: number, optional
+    Desired number of ticks.  Note that the algorithm may produce fewer ticks
+    than requested.
+  steps: sequence of numbers, optional
+    Prioritized list of "nice" values to use for generating ticks.
   only_inside: boolean
     If set to `True`, only ticks inside the axis domain will be generated.
   """
@@ -195,6 +320,21 @@ class Extended(TickLocator):
     self._only_inside = only_inside
 
   def ticks(self, domain_min, domain_max):
+    """Return a set of ticks for the given domain.
+
+    Parameters
+    ----------
+    domain_min, domain_max: number
+
+    Returns
+    -------
+    locations : sequence of numbers
+      The axis locations where ticks should be positioned.
+    labels : sequence of strings
+      Labels for each tick location.
+    titles : sequence of strings
+      Titles for each tick location.  Typically, backends render titles as tooltips.
+    """
     def coverage(dmin, dmax, lmin, lmax):
       range = dmax-dmin
       return 1 - 0.5 * (numpy.power(dmax-lmax, 2)+numpy.power(dmin-lmin, 2)) / numpy.power(0.1 * range, 2)

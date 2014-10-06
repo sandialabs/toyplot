@@ -42,7 +42,7 @@ Most of Toyplot's public API is located in `toyplot/__init__.py` ... for most
 contributations, that's where you'll start.  If you're adding a new type of
 visualization, you'll need to create a new :class:`toyplot.Mark` derivative
 there.  Then, you'll create factory methods for creating instances of your
-new mark in :class:`toyplot.axes.Cartesian` and/or :class:`toyplot.Canvas`.  Once
+new mark in :class:`toyplot.axes.Cartesian` and/or :class:`toyplot.canvas.Canvas`.  Once
 you've done that, you'll need to write code to render your new mark
 in `toyplot/svg.py`.  That's it ... all of the other backends are rendered
 from the SVG representation.
@@ -64,7 +64,7 @@ Modifying Regression Tests
 To add new tests or modify existing tests, edit `tests/tests.py`.
 
 Many of the tests function by comparing the SVG representation of a
-:class:`toyplot.Canvas` against a reference stored in `tests/reference`.  These
+:class:`toyplot.canvas.Canvas` against a reference stored in `tests/reference`.  These
 tests all end with a call to `assert_canvas_matches(canvas, "test-name")`,
 which compares the canvas to the file `tests/reference/test-name.svg`.  The
 first time to you run a new test that uses :func:`assert_canvas_matches`, it

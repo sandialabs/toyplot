@@ -1,7 +1,7 @@
-toyplot.color.css module
+toyplot.broadcast module
 ========================
 
-.. automodule:: toyplot.color.css
+.. automodule:: toyplot.broadcast
     :members:
     :undoc-members:
     :show-inheritance:

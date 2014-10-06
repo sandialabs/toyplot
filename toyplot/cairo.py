@@ -3,12 +3,14 @@
 # rights in this software.
 
 from __future__ import absolute_import
+from __future__ import division
+
 
 import cairo
 import numpy
 import pango
 import pangocairo
-import toyplot.color.css
+import toyplot.color
 
 def render(svg, context):
   """Render the SVG representation of a canvas to a Cairo context.
@@ -47,13 +49,13 @@ def render(svg, context):
   def get_color_rgba(style, name):
     if name not in style:
       return None
-    color = toyplot.color.css.parse(style[name])
+    color = toyplot.color.from_css(style[name])
     return (color["r"], color["g"], color["b"], color["a"])
 
   def get_fill(style):
     if "fill" not in style:
       return None
-    color = toyplot.color.css.parse(style["fill"])
+    color = toyplot.color.from_css(style["fill"])
     if color is None:
       return color
 
@@ -64,7 +66,7 @@ def render(svg, context):
   def get_stroke(style):
     if "stroke" not in style:
       return None
-    color = toyplot.color.css.parse(style["stroke"])
+    color = toyplot.color.from_css(style["stroke"])
     if color is None:
       return color
 

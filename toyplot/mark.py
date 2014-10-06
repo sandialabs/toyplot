@@ -2,14 +2,16 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+from __future__ import division
+
 import collections
 import numpy
-import toyplot
 import toyplot.require
+
 
 class Mark(object):
   def __init__(self, *styles, **kwargs):
-    self._style = toyplot.combine_styles(*styles)
+    self._style = toyplot.style.combine(*styles)
     self._id = kwargs.get("id", None)
 
 ###############################################################################################
@@ -57,7 +59,7 @@ class VColorBar(Mark):
   class LabelHelper(object):
     def __init__(self, label, style):
       self._text = label
-      self._style = toyplot.combine_styles({"font-size":"12px", "font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"-200%"}, toyplot.require.style(style))
+      self._style = toyplot.style.combine({"font-size":"12px", "font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"-200%"}, toyplot.require.style(style))
     @property
     def text(self):
       return self._text
@@ -69,7 +71,7 @@ class VColorBar(Mark):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = toyplot.combine_styles(self._style, toyplot.require.style(value))
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
   class PerTickHelper(object):
     class TickProxy(object):
@@ -80,7 +82,7 @@ class VColorBar(Mark):
         return self._tick.get("style", {})
       @style.setter
       def style(self, value):
-        self._tick["style"] = toyplot.combine_styles(self._tick.get("style"), toyplot.require.style(value))
+        self._tick["style"] = toyplot.style.combine(self._tick.get("style"), toyplot.require.style(value))
     def __init__(self):
       self._indices = collections.defaultdict(dict)
       self._values = collections.defaultdict(dict)
@@ -131,7 +133,7 @@ class VColorBar(Mark):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = toyplot.combine_styles(self._style, toyplot.require.style(value))
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
   class TickLabelsHelper(object):
     def __init__(self):
@@ -149,7 +151,7 @@ class VColorBar(Mark):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = toyplot.combine_styles(self._style, toyplot.require.style(value))
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
   def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, label, colormap, padding, tick_length, min, max, tick_locator, style, id):
     Mark.__init__(self, style)
@@ -169,8 +171,8 @@ class VColorBar(Mark):
     self._id = id
 
   def _update_domain(self, vmin, vmax):
-    self._vmin_implicit = toyplot._null_min(vmin, self._vmin_implicit)
-    self._vmax_implicit = toyplot._null_max(vmax, self._vmax_implicit)
+    self._vmin_implicit = vmin if self._vmin_implicit is None else self._vmin_implicit if vmin is None else min(vmin, self._vmin_implicit)
+    self._vmax_implicit = vmax if self._vmax_implicit is None else self._vmax_implicit if vmin is None else max(vmax, self._vmax_implicit)
 
   def _finalize_domain(self):
     # Begin with the implicit domain defined by any explicitly-specified data.

@@ -2,8 +2,10 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+from __future__ import division
+
 import numpy
-import toyplot
+import toyplot.broadcast
 
 class TickLocator(object):
   """Base class for tick locators - objects that compute the position and format of axis tick labels."""
@@ -48,7 +50,7 @@ class Explicit(TickLocator):
   def __init__(self, locations=None, labels=None, titles=None, format="{:g}"):
     if locations is not None and labels is not None:
       locations = numpy.array(locations).astype("float64")
-      labels = toyplot._broadcast_string(labels, len(locations))
+      labels = toyplot.broadcast.string(labels, len(locations))
     elif locations is not None:
       locations = numpy.array(locations).astype("float64")
       labels = [format.format(location) for location in locations]
@@ -57,7 +59,7 @@ class Explicit(TickLocator):
       locations = numpy.arange(len(labels))
     else:
       raise ValueError("Must supply locations, labels, or both.")
-    titles = toyplot._broadcast_object(titles, len(locations))
+    titles = toyplot.broadcast.object(titles, len(locations))
 
     self._locations = locations
     self._labels = labels

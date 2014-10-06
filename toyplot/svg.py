@@ -12,7 +12,7 @@ import numbers
 import numpy
 import toyplot.axes
 import toyplot.canvas
-import toyplot.color.css
+import toyplot.color
 import toyplot.compatibility
 import toyplot.mark
 import uuid
@@ -23,14 +23,14 @@ def apply_changes(svg, changes):
     if change_type == "set-mark-style":
       for mark_id, style in instructions:
         mark = svg.find(".//*[@id='%s']" % mark_id)
-        style = toyplot.combine_styles(dict([declaration.split(":") for declaration in mark.get("style").split(";") if declaration != ""]), style)
+        style = toyplot.style.combine(dict([declaration.split(":") for declaration in mark.get("style").split(";") if declaration != ""]), style)
         mark.set("style", _css_style(style))
     elif change_type == "set-datum-style":
       for mark_id, series, datum, style in instructions:
         mark_xml = svg.find(".//*[@id='%s']" % mark_id)
         series_xml = mark_xml.findall("*[@class='toyplot-Series']")[series]
         datum_xml = series_xml.findall("*[@class='toyplot-Datum']")[datum]
-        style = toyplot.combine_styles(dict([declaration.split(":") for declaration in datum_xml.get("style").split(";") if declaration != ""]), style)
+        style = toyplot.style.combine(dict([declaration.split(":") for declaration in datum_xml.get("style").split(";") if declaration != ""]), style)
         datum_xml.set("style", _css_style(style))
     elif change_type == "set-datum-text":
       for mark_id, series, datum, text in instructions:
@@ -117,11 +117,11 @@ def render(canvas, fobj=None, animation=False):
 
 
 def _css_style(*styles):
-  style = toyplot.combine_styles(*styles)
+  style = toyplot.style.combine(*styles)
   return ";".join(["%s:%s" % (key, value) for key, value in sorted(style.items())])
 
 def _css_attrib(*styles):
-  style = toyplot.combine_styles(*styles)
+  style = toyplot.style.combine(*styles)
   attrib = {}
   if len(style):
     attrib["style"] =  ";".join(["%s:%s" % (key, value) for key, value in sorted(style.items())])
@@ -400,7 +400,7 @@ def _render(axes, mark, context):
 
     series_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Series"})
     for dbar1, dbar2, dboundary1, dboundary2, dfill, dopacity, dtitle in zip(bar1[not_null], bar2[not_null], boundary1[not_null], boundary2[not_null], fill[not_null], opacity[not_null], title[not_null]):
-      dstyle = toyplot.combine_styles({"fill":toyplot.color.css.convert(dfill), "opacity":dopacity}, mark._style)
+      dstyle = toyplot.style.combine({"fill":toyplot.color.to_css(dfill), "opacity":dopacity}, mark._style)
       datum_xml = xml.SubElement(series_xml, "rect", attrib={"class":"toyplot-Datum", axis1:repr(min(dbar1, dbar2)), axis2:repr(min(dboundary1, dboundary2)), distance1:repr(numpy.abs(dbar1 - dbar2)), distance2:repr(numpy.abs(dboundary1 - dboundary2))}, style=_css_style(dstyle))
       if dtitle is not None:
         xml.SubElement(datum_xml, "title").text = str(dtitle)
@@ -436,7 +436,7 @@ def _render(axes, mark, context):
   for boundary1, boundary2, fill, opacity, title in zip(boundaries.T[:-1], boundaries.T[1:], mark._fill.T, mark._opacity.T, mark._title.T):
     series_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Series"})
     for dbar1, dbar2, dboundary1, dboundary2, dfill, dopacity, dtitle in zip(bar1[not_null], bar2[not_null], boundary1[not_null], boundary2[not_null], fill[not_null], opacity[not_null], title[not_null]):
-      dstyle = toyplot.combine_styles({"fill":toyplot.color.css.convert(dfill), "opacity":dopacity}, mark._style)
+      dstyle = toyplot.style.combine({"fill":toyplot.color.to_css(dfill), "opacity":dopacity}, mark._style)
       datum_xml = xml.SubElement(series_xml, "rect", attrib={"class":"toyplot-Datum", axis1:repr(min(dbar1, dbar2)), axis2:repr(min(dboundary1, dboundary2)), distance1:repr(numpy.abs(dbar1 - dbar2)), distance2:repr(numpy.abs(dboundary1 - dboundary2))}, style=_css_style(dstyle))
       if dtitle is not None:
         xml.SubElement(datum_xml, "title").text = str(dtitle)
@@ -462,7 +462,7 @@ def _render(axes, mark, context):
     not_null = numpy.invert(numpy.logical_or(numpy.ma.getmaskarray(boundary1), numpy.ma.getmaskarray(boundary2)))
     segments = _flat_contiguous(not_null)
 
-    series_style = toyplot.combine_styles({"fill":toyplot.color.css.convert(fill), "opacity":opacity}, mark._style)
+    series_style = toyplot.style.combine({"fill":toyplot.color.to_css(fill), "opacity":opacity}, mark._style)
 
     for segment in segments:
       if mark._position_axis == "x":
@@ -494,7 +494,7 @@ def _render(axes, mark, context):
   _render_data_table(mark_xml, mark._table, title="Fill Data")
 
   for boundary1, boundary2, fill, opacity, title in zip(boundaries.T[:-1], boundaries.T[1:], mark._fill, mark._opacity, mark._title):
-    series_style = toyplot.combine_styles({"fill":toyplot.color.css.convert(fill), "opacity":opacity}, mark._style)
+    series_style = toyplot.style.combine({"fill":toyplot.color.to_css(fill), "opacity":opacity}, mark._style)
     for segment in segments:
       if mark._position_axis == "x":
         coordinates = zip(numpy.concatenate((position[segment], position[segment][::-1])), numpy.concatenate((boundary1[segment], boundary2[segment][::-1])))
@@ -525,7 +525,7 @@ def _render(axes, mark, context):
   mark_xml = xml.SubElement(context.root, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class":"toyplot-mark-AxisLines"})
   series_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Series"})
   for dposition, dstroke, dopacity, dtitle in zip(position, mark._table[mark._stroke[0]], mark._table[mark._opacity[0]], mark._table[mark._title[0]]):
-    dstyle = toyplot.combine_styles({"stroke":toyplot.color.css.convert(dstroke), "opacity":dopacity}, mark._style)
+    dstyle = toyplot.style.combine({"stroke":toyplot.color.to_css(dstroke), "opacity":dopacity}, mark._style)
     datum_xml = xml.SubElement(series_xml, "line", attrib={"class":"toyplot-Datum",p1:repr(dposition), p2:repr(dposition), b1:repr(boundary1), b2:repr(boundary2)}, style=_css_style(dstyle))
     if dtitle is not None:
       xml.SubElement(datum_xml, "title").text = str(dtitle)
@@ -559,13 +559,13 @@ def _render(canvas, legend, context):
       elif mark_type == "rect":
         xml.SubElement(context.root, "rect", x=repr(mark_x), y=repr(mark_y), width=repr(mark_width), height=repr(mark_height), style=_css_style({"stroke":"none"}, mark_style))
       elif isinstance(mark_type, toyplot.mark.Plot):
-        dstyle = toyplot.combine_styles({"stroke":toyplot.color.css.convert(mark_type._stroke[0])}, mark_type._style)
+        dstyle = toyplot.style.combine({"stroke":toyplot.color.to_css(mark_type._stroke[0])}, mark_type._style)
         xml.SubElement(context.root, "line", x1=repr(mark_x), y1=repr(mark_y + mark_height), x2=repr(mark_x + mark_width), y2=repr(mark_y), style=_css_style(dstyle, mark_style))
       elif isinstance(mark_type, (toyplot.mark.BarBoundaries, toyplot.mark.BarMagnitudes, toyplot.mark.FillBoundaries, toyplot.mark.FillMagnitudes)):
-        dstyle = toyplot.combine_styles({"fill":toyplot.color.css.convert(mark_type._fill[0]), "opacity":mark_type._opacity[0]}, mark_type._style)
+        dstyle = toyplot.style.combine({"fill":toyplot.color.to_css(mark_type._fill[0]), "opacity":mark_type._opacity[0]}, mark_type._style)
         xml.SubElement(context.root, "rect", x=repr(mark_x), y=repr(mark_y), width=repr(mark_width), height=repr(mark_height), style=_css_style(dstyle, mark_style))
       else:
-        computed_style = toyplot.combine_styles({"stroke":toyplot.color.near_black, "fill":"none"}, mark_style)
+        computed_style = toyplot.style.combine({"stroke":toyplot.color.near_black, "fill":"none"}, mark_style)
         _render_marker(context.root, mark_x + (mark_width / 2), mark_y + (mark_height / 2), min(mark_width, mark_height), mark_type, computed_style, {})
 
       label_x = x + mark_width + (2 * mark_gutter)
@@ -590,7 +590,7 @@ def _render(axes, mark, context):
     segments = _flat_contiguous(not_null)
 
     size = numpy.sqrt(size)
-    stroke_style = toyplot.combine_styles({"stroke":toyplot.color.css.convert(stroke), "stroke-width":stroke_width, "stroke-opacity":stroke_opacity}, mark._style)
+    stroke_style = toyplot.style.combine({"stroke":toyplot.color.to_css(stroke), "stroke-width":stroke_width, "stroke-opacity":stroke_opacity}, mark._style)
     if mark._along == "x":
       x = position
       y = series
@@ -608,7 +608,7 @@ def _render(axes, mark, context):
           d.append("L %r %r" % (x[i], y[i]))
       xml.SubElement(series_xml, "path", d=" ".join(d), style=_css_style(stroke_style))
     for dx, dy, dmarker, dsize, dfill, dopacity in zip(x[not_null], y[not_null], marker[not_null], size[not_null], fill[not_null], opacity[not_null]):
-      dstyle = toyplot.combine_styles({"fill":toyplot.color.css.convert(dfill),"opacity":dopacity}, mark._mstyle)
+      dstyle = toyplot.style.combine({"fill":toyplot.color.to_css(dfill),"opacity":dopacity}, mark._mstyle)
       _render_marker(series_xml, dx, dy, dsize, dmarker, dstyle, mark._mlstyle, extra_class="toyplot-Datum")
 
     if title is not None:
@@ -630,7 +630,7 @@ def _render(axes, mark, context):
   _render_data_table(mark_xml, mark._table, title="Rect Data")
   series_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Series"})
   for dx1, dx2, dy1, dy2, dfill, dopacity, dtitle in zip(x1, x2, y1, y2, mark._table[mark._fill[0]], mark._table[mark._opacity[0]], mark._table[mark._title[0]]):
-    dstyle = toyplot.combine_styles({"fill":toyplot.color.css.convert(dfill), "opacity":dopacity}, mark._style)
+    dstyle = toyplot.style.combine({"fill":toyplot.color.to_css(dfill), "opacity":dopacity}, mark._style)
     datum_xml = xml.SubElement(series_xml, "rect", attrib={"class":"toyplot-Datum"}, x=repr(min(dx1, dx2)), y=repr(min(dy1, dy2)), width=repr(numpy.abs(dx1 - dx2)), height=repr(numpy.abs(dy1 - dy2)), style=_css_style(dstyle))
     if dtitle is not None:
       xml.SubElement(datum_xml, "title").text = str(dtitle)
@@ -648,7 +648,7 @@ def _render(parent, mark, context):
   _render_data_table(mark_xml, mark._table, title="Text Data")
   series_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Series"})
   for dx, dy, dtext, dangle, dfill, dopacity, dtitle in zip(x, y, mark._table[mark._text[0]], mark._table[mark._angle[0]], mark._table[mark._fill[0]], mark._table[mark._opacity[0]], mark._table[mark._title[0]]):
-    dstyle = toyplot.combine_styles({"fill":toyplot.color.css.convert(dfill), "opacity":dopacity}, mark._style)
+    dstyle = toyplot.style.combine({"fill":toyplot.color.to_css(dfill), "opacity":dopacity}, mark._style)
     datum_xml = xml.SubElement(series_xml, "text", attrib={"class":"toyplot-Datum"}, x=repr(dx), y=repr(dy), transform="rotate(%r, %r, %r)" % (dangle, dx, dy), style=_css_style(dstyle))
     if dtext is not None:
       datum_xml.text = str(dtext)
@@ -671,7 +671,7 @@ def _render(canvas, mark, context):
   mark_xml = xml.SubElement(context.root, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class":"toyplot-mark-VColorBar"})
   for sample, y1, y2 in zip(samples, swatches[:-1], swatches[1:]):
     color = mark._project_color(sample)
-    xml.SubElement(mark_xml, "rect", x=repr(xmin), y=repr(y1), width=repr(xmax - xmin), height=repr((y2-y1) + (swatch_size / 2)), style=_css_style({"stroke":"none", "fill":toyplot.color.css.convert(color)}))
+    xml.SubElement(mark_xml, "rect", x=repr(xmin), y=repr(y1), width=repr(xmax - xmin), height=repr((y2-y1) + (swatch_size / 2)), style=_css_style({"stroke":"none", "fill":toyplot.color.to_css(color)}))
 
   if mark.ticks._show:
     ticks_group = xml.SubElement(mark_xml, "g")

@@ -3,6 +3,8 @@
 # rights in this software.
 
 from __future__ import absolute_import
+from __future__ import division
+
 
 def show(canvas, title="Toyplot Figure"):
   """Display a canvas in a web browser.

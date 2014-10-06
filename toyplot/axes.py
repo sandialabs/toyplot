@@ -2,10 +2,60 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+from __future__ import division
+
 import collections
 import itertools
 import numpy
+import toyplot.broadcast
 import toyplot.color
+import toyplot.data
+import toyplot.layout
+import toyplot.locator
+import toyplot.mark
+import toyplot.require
+
+###############################################################################################
+# Helpers
+
+def _null_min(a, b):
+  """Return the minimum of two values, with special logic to handle None."""
+  if a is None:
+    return b
+  if b is None:
+    return a
+  return min(a, b)
+
+def _null_max(a, b):
+  """Return the maximum of two values, with special logic to handle None."""
+  if a is None:
+    return b
+  if b is None:
+    return a
+  return max(a, b)
+
+def _flat_non_null(array):
+  if isinstance(array, numpy.ma.MaskedArray):
+    array = array.compressed()
+  elif isinstance(array, numpy.ndarray):
+    array = array.ravel()
+  array = array[numpy.invert(numpy.isnan(array))]
+  return array
+
+def _signed_log(x, base):
+  """Return the log of a number, retaining its sign (e.g. return -3 for log-base-10 of -1000)."""
+  return numpy.sign(x) * numpy.log10(numpy.abs(x)) / numpy.log10(base)
+
+def _symmetric_log(x, base, threshold=1):
+  if isinstance(x, numpy.ndarray):
+    masked = numpy.ma.masked_inside(x, -threshold, threshold, copy=False)
+    return numpy.where(masked.mask, x, numpy.sign(x) * (threshold + (numpy.ma.log10(numpy.abs(masked)) / numpy.log10(base))))
+  if numpy.abs(x) < threshold:
+    return x
+  return numpy.sign(x) * (threshold + numpy.log10(numpy.abs(x)))
+
+###############################################################################################
+# Axes
 
 class Cartesian2(object):
   """Standard two-dimensional Cartesian coordinate system.
@@ -55,7 +105,7 @@ class Cartesian2(object):
       self._xmax_range = xmax_range
       self._ymin_range = ymin_range
       self._ymax_range = ymax_range
-      self._style = toyplot.combine_styles({"stroke":"none", "fill":"white", "opacity":0.75}, toyplot.require.style(style))
+      self._style = toyplot.style.combine({"stroke":"none", "fill":"white", "opacity":0.75}, toyplot.require.style(style))
       self.label = Cartesian2.CoordinatesLabelHelper(style={})
     @property
     def show(self):
@@ -68,17 +118,17 @@ class Cartesian2(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = toyplot.combine_styles(self._style, toyplot.require.style(value))
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
   class CoordinatesLabelHelper(object):
     def __init__(self, style):
-      self._style = toyplot.combine_styles({"font-size":"10px", "font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
+      self._style = toyplot.style.combine({"font-size":"10px", "font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
     @property
     def style(self):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = toyplot.combine_styles(self._style, toyplot.require.style(value))
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
   class DomainHelper(object):
     def __init__(self, min, max):
@@ -100,7 +150,7 @@ class Cartesian2(object):
   class LabelHelper(object):
     def __init__(self, label, style):
       self._text = label
-      self._style = toyplot.combine_styles({"font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
+      self._style = toyplot.style.combine({"font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
     @property
     def text(self):
       return self._text
@@ -112,7 +162,7 @@ class Cartesian2(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = toyplot.combine_styles(self._style, toyplot.require.style(value))
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
   class SpineHelper(object):
     def __init__(self):
@@ -136,7 +186,7 @@ class Cartesian2(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = toyplot.combine_styles(self._style, toyplot.require.style(value))
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
   class PerTickHelper(object):
     class TickProxy(object):
@@ -147,7 +197,7 @@ class Cartesian2(object):
         return self._tick.get("style", {})
       @style.setter
       def style(self, value):
-        self._tick["style"] = toyplot.combine_styles(self._tick.get("style"), toyplot.require.style(value))
+        self._tick["style"] = toyplot.style.combine(self._tick.get("style"), toyplot.require.style(value))
     def __init__(self):
       self._indices = collections.defaultdict(dict)
       self._values = collections.defaultdict(dict)
@@ -198,7 +248,7 @@ class Cartesian2(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = toyplot.combine_styles(self._style, toyplot.require.style(value))
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
   class TickLabelsHelper(object):
     def __init__(self, angle):
@@ -223,7 +273,7 @@ class Cartesian2(object):
       return self._style
     @style.setter
     def style(self, value):
-      self._style = toyplot.combine_styles(self._style, toyplot.require.style(value))
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
   def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, xmin, xmax, ymin, ymax, show, xshow, yshow, label, xlabel, ylabel, xticklocator, yticklocator, xscale, yscale, palette, padding, tick_length, parent, id):
     self._xmin_range = xmin_range
@@ -271,16 +321,16 @@ class Cartesian2(object):
     self._padding = value
 
   def _update_domain(self, x, y):
-    x = toyplot._flat_non_null(x)
-    y = toyplot._flat_non_null(y)
+    x = _flat_non_null(x)
+    y = _flat_non_null(y)
 
     if len(x):
-      self._xmin_implicit = toyplot._null_min(x.min(), self._xmin_implicit)
-      self._xmax_implicit = toyplot._null_max(x.max(), self._xmax_implicit)
+      self._xmin_implicit = _null_min(x.min(), self._xmin_implicit)
+      self._xmax_implicit = _null_max(x.max(), self._xmax_implicit)
 
     if len(y):
-      self._ymin_implicit = toyplot._null_min(y.min(), self._ymin_implicit)
-      self._ymax_implicit = toyplot._null_max(y.max(), self._ymax_implicit)
+      self._ymin_implicit = _null_min(y.min(), self._ymin_implicit)
+      self._ymax_implicit = _null_max(y.max(), self._ymax_implicit)
 
   def _finalize_domain(self):
     # Begin with the implicit domain defined by our children.
@@ -359,12 +409,12 @@ class Cartesian2(object):
 
     def x_log_projection(domain_min, domain_max, range_min, range_max, base):
       def implementation(x):
-        return (toyplot._signed_log(x, base) - toyplot._signed_log(domain_min, base)) / (toyplot._signed_log(domain_max, base) - toyplot._signed_log(domain_min, base)) * (range_max - range_min) + range_min
+        return (_signed_log(x, base) - _signed_log(domain_min, base)) / (_signed_log(domain_max, base) - _signed_log(domain_min, base)) * (range_max - range_min) + range_min
       return implementation
 
     def x_symlog_projection(domain_min, domain_max, range_min, range_max, base):
       def implementation(x):
-        return (toyplot._symmetric_log(x, base) - toyplot._symmetric_log(domain_min, base)) / (toyplot._symmetric_log(domain_max, base) - toyplot._symmetric_log(domain_min, base)) * (range_max - range_min) + range_min
+        return (_symmetric_log(x, base) - _symmetric_log(domain_min, base)) / (_symmetric_log(domain_max, base) - _symmetric_log(domain_min, base)) * (range_max - range_min) + range_min
       return implementation
 
     def y_linear_projection(domain_min, domain_max, range_min, range_max):
@@ -374,12 +424,12 @@ class Cartesian2(object):
 
     def y_log_projection(domain_min, domain_max, range_min, range_max, base):
       def implementation(x):
-        return (1 - ((toyplot._signed_log(x, base) - toyplot._signed_log(domain_min, base)) / (toyplot._signed_log(domain_max, base) - toyplot._signed_log(domain_min, base)))) * (range_max - range_min) + range_min
+        return (1 - ((_signed_log(x, base) - _signed_log(domain_min, base)) / (_signed_log(domain_max, base) - _signed_log(domain_min, base)))) * (range_max - range_min) + range_min
       return implementation
 
     def y_symlog_projection(domain_min, domain_max, range_min, range_max, base):
       def implementation(x):
-        return (1 - ((toyplot._symmetric_log(x, base) - toyplot._symmetric_log(domain_min, base)) / (toyplot._symmetric_log(domain_max, base) - toyplot._symmetric_log(domain_min, base)))) * (range_max - range_min) + range_min
+        return (1 - ((_symmetric_log(x, base) - _symmetric_log(domain_min, base)) / (_symmetric_log(domain_max, base) - _symmetric_log(domain_min, base)))) * (range_max - range_min) + range_min
       return implementation
 
     if self.x._scale == "linear":
@@ -502,9 +552,9 @@ class Cartesian2(object):
 
       default_color = [next(self._bar_colors) for i in range(series.shape[1]-1)]
       fill = toyplot.color._broadcast_color(default_color if fill is None else fill, (series.shape[0], series.shape[1]-1), colormap=colormap, palette=palette)
-      opacity = toyplot._broadcast_scalar(opacity, (series.shape[0], series.shape[1]-1))
-      title = toyplot._broadcast_object(title, (series.shape[0], series.shape[1]-1))
-      style = toyplot.combine_styles({"stroke":"white", "stroke-width":1.0}, toyplot.require.style(style))
+      opacity = toyplot.broadcast.scalar(opacity, (series.shape[0], series.shape[1]-1))
+      title = toyplot.broadcast.object(title, (series.shape[0], series.shape[1]-1))
+      style = toyplot.style.combine({"stroke":"white", "stroke-width":1.0}, toyplot.require.style(style))
       id = toyplot.require.optional_id(id)
 
       if along == "x":
@@ -550,9 +600,9 @@ class Cartesian2(object):
 
       default_color = [next(self._bar_colors) for i in range(series.shape[1])]
       fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape, colormap=colormap, palette=palette)
-      opacity = toyplot._broadcast_scalar(opacity, series.shape)
-      title = toyplot._broadcast_object(title, series.shape)
-      style = toyplot.combine_styles({"stroke":"white", "stroke-width":1.0}, toyplot.require.style(style))
+      opacity = toyplot.broadcast.scalar(opacity, series.shape)
+      title = toyplot.broadcast.object(title, series.shape)
+      style = toyplot.style.combine({"stroke":"white", "stroke-width":1.0}, toyplot.require.style(style))
       id = toyplot.require.optional_id(id)
 
       if baseline == "stacked":
@@ -645,9 +695,9 @@ class Cartesian2(object):
 
       default_color = [next(self._fill_colors) for i in range(series.shape[1]-1)]
       fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape[1]-1, colormap=colormap, palette=palette)
-      opacity = toyplot._broadcast_scalar(opacity, series.shape[1]-1)
-      title = toyplot._broadcast_object(title, series.shape[1]-1)
-      style = toyplot.combine_styles({"stroke":"none"}, toyplot.require.style(style))
+      opacity = toyplot.broadcast.scalar(opacity, series.shape[1]-1)
+      title = toyplot.broadcast.object(title, series.shape[1]-1)
+      style = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(style))
       id = toyplot.require.optional_id(id)
 
       if along == "x":
@@ -686,9 +736,9 @@ class Cartesian2(object):
 
       default_color = [next(self._fill_colors) for i in range(series.shape[1])]
       fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape[1], colormap=colormap, palette=palette)
-      opacity = toyplot._broadcast_scalar(opacity, series.shape[1])
-      title = toyplot._broadcast_object(title, series.shape[1])
-      style = toyplot.combine_styles({"stroke":"none"}, toyplot.require.style(style))
+      opacity = toyplot.broadcast.scalar(opacity, series.shape[1])
+      title = toyplot.broadcast.object(title, series.shape[1])
+      style = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(style))
       id = toyplot.require.optional_id(id)
 
       if baseline == "stacked":
@@ -764,16 +814,16 @@ class Cartesian2(object):
 
     default_color = [next(self._plot_colors) for i in range(series.shape[1])]
     stroke = toyplot.color._broadcast_color(default_color if stroke is None else stroke, series.shape[1], colormap=stroke_colormap, palette=stroke_palette)
-    stroke_width = toyplot._broadcast_scalar(stroke_width, series.shape[1])
-    stroke_opacity = toyplot._broadcast_scalar(stroke_opacity, series.shape[1])
-    marker = toyplot._broadcast_object(marker, series.shape)
-    size = toyplot._broadcast_scalar(size, series.shape)
+    stroke_width = toyplot.broadcast.scalar(stroke_width, series.shape[1])
+    stroke_opacity = toyplot.broadcast.scalar(stroke_opacity, series.shape[1])
+    marker = toyplot.broadcast.object(marker, series.shape)
+    size = toyplot.broadcast.scalar(size, series.shape)
     fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
-    opacity = toyplot._broadcast_scalar(opacity, series.shape)
-    title = toyplot._broadcast_object(title, series.shape[1])
-    style = toyplot.combine_styles({"fill":"none"}, toyplot.require.style(style))
-    mstyle = toyplot.combine_styles({"stroke":"none"}, toyplot.require.style(mstyle))
-    mlstyle = toyplot.combine_styles(toyplot.require.style(mlstyle))
+    opacity = toyplot.broadcast.scalar(opacity, series.shape)
+    title = toyplot.broadcast.object(title, series.shape[1])
+    style = toyplot.style.combine({"fill":"none"}, toyplot.require.style(style))
+    mstyle = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(mstyle))
+    mlstyle = toyplot.style.combine(toyplot.require.style(mlstyle))
     id = toyplot.require.optional_id(id)
 
     if along == "x":
@@ -827,16 +877,16 @@ class Cartesian2(object):
 
     default_color = [next(self._scatterplot_colors) for i in range(series.shape[1])]
     stroke = toyplot.color._broadcast_color(default_color if stroke is None else stroke, series.shape[1], colormap=stroke_colormap, palette=stroke_palette)
-    stroke_width = toyplot._broadcast_scalar(stroke_width, series.shape[1])
-    stroke_opacity = toyplot._broadcast_scalar(stroke_opacity, series.shape[1])
-    marker = toyplot._broadcast_object(marker, series.shape)
-    size = toyplot._broadcast_scalar(size, series.shape)
+    stroke_width = toyplot.broadcast.scalar(stroke_width, series.shape[1])
+    stroke_opacity = toyplot.broadcast.scalar(stroke_opacity, series.shape[1])
+    marker = toyplot.broadcast.object(marker, series.shape)
+    size = toyplot.broadcast.scalar(size, series.shape)
     fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
-    opacity = toyplot._broadcast_scalar(opacity, series.shape)
-    title = toyplot._broadcast_object(title, series.shape[1])
-    style = toyplot.combine_styles({"stroke":"none"}, toyplot.require.style(style))
-    mstyle = toyplot.combine_styles({"stroke":"none"}, toyplot.require.style(mstyle))
-    mlstyle = toyplot.combine_styles(toyplot.require.style(mlstyle))
+    opacity = toyplot.broadcast.scalar(opacity, series.shape)
+    title = toyplot.broadcast.object(title, series.shape[1])
+    style = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(style))
+    mstyle = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(mstyle))
+    mlstyle = toyplot.style.combine(toyplot.require.style(mlstyle))
     id = toyplot.require.optional_id(id)
 
     if along == "x":
@@ -853,10 +903,10 @@ class Cartesian2(object):
     table["right"] = toyplot.require.scalar_vector(b, length=table.shape[0])
     table["top"] = toyplot.require.scalar_vector(c, length=table.shape[0])
     table["bottom"] = toyplot.require.scalar_vector(d, length=table.shape[0])
-    table["fill"] = toyplot._broadcast_object(fill, table.shape[0])
-    table["opacity"] = toyplot._broadcast_scalar(opacity, table.shape[0])
-    table["title"] = toyplot._broadcast_object(title, table.shape[0])
-    style = toyplot.combine_styles(toyplot.require.style(style))
+    table["fill"] = toyplot.broadcast.object(fill, table.shape[0])
+    table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
+    table["title"] = toyplot.broadcast.object(title, table.shape[0])
+    style = toyplot.style.combine(toyplot.require.style(style))
     id = toyplot.require.optional_id(id)
 
     default_color = next(self._rect_colors)
@@ -897,12 +947,12 @@ class Cartesian2(object):
     table = toyplot.data.Table()
     table["x"] = toyplot.require.scalar_vector(a)
     table["y"] = toyplot.require.scalar_vector(b, table.shape[0])
-    table["text"] = toyplot._broadcast_object(text, table.shape[0])
-    table["angle"] = toyplot._broadcast_scalar(angle, table.shape[0])
-    table["fill"] = toyplot._broadcast_object(fill, table.shape[0])
-    table["opacity"] = toyplot._broadcast_scalar(opacity, table.shape[0])
-    table["title"] = toyplot._broadcast_object(title, table.shape[0])
-    style = toyplot.combine_styles({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
+    table["text"] = toyplot.broadcast.object(text, table.shape[0])
+    table["angle"] = toyplot.broadcast.scalar(angle, table.shape[0])
+    table["fill"] = toyplot.broadcast.object(fill, table.shape[0])
+    table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
+    table["title"] = toyplot.broadcast.object(title, table.shape[0])
+    style = toyplot.style.combine({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
     id = toyplot.require.optional_id(id)
 
     default_color = next(self._text_colors)
@@ -937,10 +987,10 @@ class Cartesian2(object):
     """
     table = toyplot.data.Table()
     table["y"] = toyplot.require.scalar_vector(y)
-    table["stroke"] = toyplot._broadcast_object(stroke, table.shape[0])
-    table["opacity"] = toyplot._broadcast_scalar(opacity, table.shape[0])
-    table["title"] = toyplot._broadcast_object(title, table.shape[0])
-    style = toyplot.combine_styles(toyplot.require.style(style))
+    table["stroke"] = toyplot.broadcast.object(stroke, table.shape[0])
+    table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
+    table["title"] = toyplot.broadcast.object(title, table.shape[0])
+    style = toyplot.style.combine(toyplot.require.style(style))
     id = toyplot.require.optional_id(id)
 
     table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
@@ -973,10 +1023,10 @@ class Cartesian2(object):
     """
     table = toyplot.data.Table()
     table["x"] = toyplot.require.scalar_vector(x)
-    table["stroke"] = toyplot._broadcast_object(stroke, table.shape[0])
-    table["opacity"] = toyplot._broadcast_scalar(opacity, table.shape[0])
-    table["title"] = toyplot._broadcast_object(title, table.shape[0])
-    style = toyplot.combine_styles(toyplot.require.style(style))
+    table["stroke"] = toyplot.broadcast.object(stroke, table.shape[0])
+    table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
+    table["title"] = toyplot.broadcast.object(title, table.shape[0])
+    style = toyplot.style.combine(toyplot.require.style(style))
     id = toyplot.require.optional_id(id)
 
     table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
@@ -1032,11 +1082,11 @@ class Cartesian2(object):
     legend: :class:`toyplot.mark.Legend`
     """
     gutter = toyplot.require.scalar(gutter)
-    style = toyplot.combine_styles(toyplot.require.style(style))
-    label_style = toyplot.combine_styles(toyplot.require.style(label_style))
+    style = toyplot.style.combine(toyplot.require.style(style))
+    label_style = toyplot.style.combine(toyplot.require.style(label_style))
     id = toyplot.require.optional_id(id)
 
-    xmin, xmax, ymin, ymax = toyplot._region(self._xmin_range, self._xmax_range, self._ymin_range, self._ymax_range, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+    xmin, xmax, ymin, ymax = toyplot.layout.region(self._xmin_range, self._xmax_range, self._ymin_range, self._ymax_range, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
     self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style, id))
     return self._children[-1]
 

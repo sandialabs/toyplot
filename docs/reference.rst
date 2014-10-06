@@ -12,14 +12,17 @@ Contents:
 
    toyplot.rst
    toyplot.axes.rst
+   toyplot.broadcast.rst
    toyplot.canvas.rst
-   toyplot.color.css.rst
    toyplot.color.rst
    toyplot.compatibility.rst
    toyplot.config.rst
+   toyplot.data.rst
+   toyplot.layout.rst
    toyplot.locator.rst
    toyplot.mark.rst
    toyplot.require.rst
+   toyplot.style.rst
    toyplot.units.rst
 
    backends.rst

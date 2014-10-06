@@ -15,7 +15,6 @@ import xml.etree.ElementTree as xml
 
 import toyplot
 import toyplot.color
-import toyplot.color.css
 import toyplot.compatibility
 import toyplot.data
 import toyplot.html
@@ -218,13 +217,13 @@ def test_require_style():
   with nose.tools.assert_raises(ValueError):
     toyplot.require.style("")
 
-def testcombine_styles():
-  nose.tools.assert_equal(toyplot.combine_styles(None), {})
-  nose.tools.assert_equal(toyplot.combine_styles({}), {})
-  nose.tools.assert_equal(toyplot.combine_styles({"a":"b"}, None), {"a":"b"})
-  nose.tools.assert_equal(toyplot.combine_styles({"a":"b"}, {}), {"a":"b"})
-  nose.tools.assert_equal(toyplot.combine_styles({"a":"b"}, {"c":"d"}), {"a":"b","c":"d"})
-  nose.tools.assert_equal(toyplot.combine_styles({"a":"b"}, {"a":"d"}), {"a":"d"})
+def test_style_combine():
+  nose.tools.assert_equal(toyplot.style.combine(None), {})
+  nose.tools.assert_equal(toyplot.style.combine({}), {})
+  nose.tools.assert_equal(toyplot.style.combine({"a":"b"}, None), {"a":"b"})
+  nose.tools.assert_equal(toyplot.style.combine({"a":"b"}, {}), {"a":"b"})
+  nose.tools.assert_equal(toyplot.style.combine({"a":"b"}, {"c":"d"}), {"a":"b","c":"d"})
+  nose.tools.assert_equal(toyplot.style.combine({"a":"b"}, {"a":"d"}), {"a":"d"})
 
 def test_require_scalar():
   nose.tools.assert_equal(toyplot.require.scalar(1), 1)
@@ -308,20 +307,20 @@ def test_require_optional_id():
     nose.tools.assert_equal(toyplot.require.optional_id(1), 1)
 
 def test_broadcast_scalar():
-  numpy.testing.assert_equal(toyplot._broadcast_scalar(1, 3), [1,1,1])
-  numpy.testing.assert_equal(toyplot._broadcast_scalar(1, (3, 3)), [[1,1,1],[1,1,1],[1,1,1]])
-  numpy.testing.assert_equal(toyplot._broadcast_scalar([1,2,3], 3), [1,2,3])
-  numpy.testing.assert_equal(toyplot._broadcast_scalar([1,2,3], (3, 3)), [[1,2,3],[1,2,3],[1,2,3]])
-  numpy.testing.assert_equal(toyplot._broadcast_scalar([[1,2,3],[4, 5, 6],[7, 8, 9]], (3, 3)), [[1,2,3],[4,5,6],[7,8,9]])
-  numpy.testing.assert_equal(toyplot._broadcast_scalar([1,2,3], (3, 1)), [[1],[2],[3]])
+  numpy.testing.assert_equal(toyplot.broadcast.scalar(1, 3), [1,1,1])
+  numpy.testing.assert_equal(toyplot.broadcast.scalar(1, (3, 3)), [[1,1,1],[1,1,1],[1,1,1]])
+  numpy.testing.assert_equal(toyplot.broadcast.scalar([1,2,3], 3), [1,2,3])
+  numpy.testing.assert_equal(toyplot.broadcast.scalar([1,2,3], (3, 3)), [[1,2,3],[1,2,3],[1,2,3]])
+  numpy.testing.assert_equal(toyplot.broadcast.scalar([[1,2,3],[4, 5, 6],[7, 8, 9]], (3, 3)), [[1,2,3],[4,5,6],[7,8,9]])
+  numpy.testing.assert_equal(toyplot.broadcast.scalar([1,2,3], (3, 1)), [[1],[2],[3]])
 
 def test_broadcast_string():
-  numpy.testing.assert_equal(toyplot._broadcast_string("1", 3), ["1","1","1"])
-  numpy.testing.assert_equal(toyplot._broadcast_string("1", (3, 3)), [["1","1","1"],["1","1","1"],["1","1","1"]])
-  numpy.testing.assert_equal(toyplot._broadcast_string(["1","2","3"], 3), ["1","2","3"])
-  numpy.testing.assert_equal(toyplot._broadcast_string(["1","2","3"], (3, 3)), [["1","2","3"],["1","2","3"],["1","2","3"]])
-  numpy.testing.assert_equal(toyplot._broadcast_string([["1","2","3"],["4","5","6"],["7","8","9"]], (3, 3)), [["1","2","3"],["4","5","6"],["7","8","9"]])
-  numpy.testing.assert_equal(toyplot._broadcast_string(["1","2","3"], (3, 1)), [["1"],["2"],["3"]])
+  numpy.testing.assert_equal(toyplot.broadcast.string("1", 3), ["1","1","1"])
+  numpy.testing.assert_equal(toyplot.broadcast.string("1", (3, 3)), [["1","1","1"],["1","1","1"],["1","1","1"]])
+  numpy.testing.assert_equal(toyplot.broadcast.string(["1","2","3"], 3), ["1","2","3"])
+  numpy.testing.assert_equal(toyplot.broadcast.string(["1","2","3"], (3, 3)), [["1","2","3"],["1","2","3"],["1","2","3"]])
+  numpy.testing.assert_equal(toyplot.broadcast.string([["1","2","3"],["4","5","6"],["7","8","9"]], (3, 3)), [["1","2","3"],["4","5","6"],["7","8","9"]])
+  numpy.testing.assert_equal(toyplot.broadcast.string(["1","2","3"], (3, 1)), [["1"],["2"],["3"]])
 
 def test_axes():
   canvas = toyplot.Canvas()
@@ -1826,44 +1825,41 @@ def test_color_diverging_map_css():
   nose.tools.assert_equal(map.css(1), "rgba(69.5%,0.296%,15.5%,1)")
   nose.tools.assert_equal(map.css(2), "rgba(69.5%,0.296%,15.5%,1)")
 
-##################################################################################
-# toyplot.color.css
+def test_color_to_css():
+  nose.tools.assert_equal(toyplot.color.to_css(toyplot.color.rgba(1, .5, .4, 1)), "rgba(100%,50%,40%,1)")
 
-def test_color_css_convert():
-  nose.tools.assert_equal(toyplot.color.css.convert(toyplot.color.rgba(1, .5, .4, 1)), "rgba(100%,50%,40%,1)")
+def test_color_from_css_name():
+  assert_color_equal(toyplot.color.from_css("red"), (1, 0, 0, 1))
+  assert_color_equal(toyplot.color.from_css("Red"), (1, 0, 0, 1))
+  assert_color_equal(toyplot.color.from_css("RED"), (1, 0, 0, 1))
+  assert_color_equal(toyplot.color.from_css("aqua"), (0, 1, 1, 1))
+  assert_color_equal(toyplot.color.from_css("ivory"), (1, 1, 240/255, 1))
+  assert_color_equal(toyplot.color.from_css("transparent"), (0, 0, 0, 0))
+  nose.tools.assert_equal(toyplot.color.from_css("baloney"), None)
 
-def test_color_css_parse_name():
-  assert_color_equal(toyplot.color.css.parse("red"), (1, 0, 0, 1))
-  assert_color_equal(toyplot.color.css.parse("Red"), (1, 0, 0, 1))
-  assert_color_equal(toyplot.color.css.parse("RED"), (1, 0, 0, 1))
-  assert_color_equal(toyplot.color.css.parse("aqua"), (0, 1, 1, 1))
-  assert_color_equal(toyplot.color.css.parse("ivory"), (1, 1, 240/255, 1))
-  assert_color_equal(toyplot.color.css.parse("transparent"), (0, 0, 0, 0))
-  nose.tools.assert_equal(toyplot.color.css.parse("baloney"), None)
+def test_color_from_css_hex3():
+  assert_color_equal(toyplot.color.from_css("#f0f"), (1, 0, 1, 1))
+  assert_color_equal(toyplot.color.from_css("#F0F"), (1, 0, 1, 1))
+  assert_color_equal(toyplot.color.from_css("#F8F"), (1, 8/15, 1, 1))
 
-def test_color_css_parse_hex3():
-  assert_color_equal(toyplot.color.css.parse("#f0f"), (1, 0, 1, 1))
-  assert_color_equal(toyplot.color.css.parse("#F0F"), (1, 0, 1, 1))
-  assert_color_equal(toyplot.color.css.parse("#F8F"), (1, 8/15, 1, 1))
+def test_color_from_css_hex6():
+  assert_color_equal(toyplot.color.from_css("#ff00ff"), (1, 0, 1, 1))
+  assert_color_equal(toyplot.color.from_css("#FF00ff"), (1, 0, 1, 1))
+  assert_color_equal(toyplot.color.from_css("#FF88ff"), (1, 8/15, 1, 1))
 
-def test_color_css_parse_hex6():
-  assert_color_equal(toyplot.color.css.parse("#ff00ff"), (1, 0, 1, 1))
-  assert_color_equal(toyplot.color.css.parse("#FF00ff"), (1, 0, 1, 1))
-  assert_color_equal(toyplot.color.css.parse("#FF88ff"), (1, 8/15, 1, 1))
+def test_color_from_css_rgb():
+  assert_color_equal(toyplot.color.from_css("rgb(255, 128, 3)"), (255/255, 128/255, 3/255, 1))
+  assert_color_equal(toyplot.color.from_css("rgb(76%, 32%, 89%)"), (.76, .32, .89, 1))
 
-def test_color_css_parse_rgb():
-  assert_color_equal(toyplot.color.css.parse("rgb(255, 128, 3)"), (255/255, 128/255, 3/255, 1))
-  assert_color_equal(toyplot.color.css.parse("rgb(76%, 32%, 89%)"), (.76, .32, .89, 1))
+def test_color_from_css_rgba():
+  assert_color_equal(toyplot.color.from_css("rgba(255, 128, 3, 0.45)"), (255/255, 128/255, 3/255, 0.45))
+  assert_color_equal(toyplot.color.from_css("rgba(76%, 32%, 89%, .76)"), (.76, .32, .89, .76))
 
-def test_color_css_parse_rgba():
-  assert_color_equal(toyplot.color.css.parse("rgba(255, 128, 3, 0.45)"), (255/255, 128/255, 3/255, 0.45))
-  assert_color_equal(toyplot.color.css.parse("rgba(76%, 32%, 89%, .76)"), (.76, .32, .89, .76))
+def test_color_from_css_hsl():
+  assert_color_equal(toyplot.color.from_css("hsl(0, 100%, 50%)"), (1, 0, 0, 1))
 
-def test_color_css_parse_hsl():
-  assert_color_equal(toyplot.color.css.parse("hsl(0, 100%, 50%)"), (1, 0, 0, 1))
-
-def test_color_css_parse_hsla():
-  assert_color_equal(toyplot.color.css.parse("hsla(0, 100%, 50%, 0.32)"), (1, 0, 0, 0.32))
+def test_color_from_css_hsla():
+  assert_color_equal(toyplot.color.from_css("hsla(0, 100%, 50%, 0.32)"), (1, 0, 0, 0.32))
 
 ##################################################################################
 # toyplot.html

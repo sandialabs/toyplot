@@ -6,7 +6,7 @@ from __future__ import division
 
 import colorsys
 import numpy
-import toyplot.color.css
+import re
 import toyplot.compatibility
 import xml.etree.ElementTree as xml
 
@@ -50,7 +50,7 @@ def _msh_to_lab(M, s, h):
 
 def _require_color(color):
   if isinstance(color, toyplot.compatibility.string_type):
-    return toyplot.color.css.parse(color)
+    return from_css(color)
   elif isinstance(color, (numpy.void, numpy.ndarray)) and color.dtype == dtype:
     return color
   elif isinstance(color, (tuple, list, numpy.ndarray)) and len(color) == 3:
@@ -126,7 +126,7 @@ class Palette(object):
   def _repr_html_(self):
     root_xml = xml.Element("div", style="overflow:hidden; height:auto", attrib={"class":"toyplot-color-Palette"})
     for color in self._colors:
-      xml.SubElement(root_xml, "div", style="float:left;width:20px;height:20px;background-color:%s" % toyplot.color.css.convert(color))
+      xml.SubElement(root_xml, "div", style="float:left;width:20px;height:20px;background-color:%s" % to_css(color))
     return xml.tostring(root_xml, method="html")
 
   def __add__(self, other):
@@ -166,7 +166,7 @@ class Palette(object):
     -------
     css: CSS RGBA color string.
     """
-    return toyplot.color.css.convert(self._colors[int(index)])
+    return to_css(self._colors[int(index)])
 
 def _mix(a, b, amount):
   return (a * (1 - amount)) + (b * (amount))
@@ -249,12 +249,12 @@ class CategoricalMap(object):
     -------
     css: CSS color string.
     """
-    return toyplot.color.css.convert(self.colors(index, domain_min, domain_max))
+    return to_css(self.colors(index, domain_min, domain_max))
 
   def _repr_html_(self):
     root_xml = xml.Element("div", style="overflow:hidden; height:auto", attrib={"class":"toyplot-color-CategoricalMap"})
     for color in self._palette._colors:
-      xml.SubElement(root_xml, "div", style="float:left;width:20px;height:20px;background-color:%s" % toyplot.color.css.convert(color))
+      xml.SubElement(root_xml, "div", style="float:left;width:20px;height:20px;background-color:%s" % to_css(color))
     return xml.tostring(root_xml, method="html")
 
 class DivergingMap(object):
@@ -363,14 +363,14 @@ class DivergingMap(object):
     -------
     css: CSS color string
     """
-    return toyplot.color.css.convert(self.colors(value, domain_min, domain_max))
+    return to_css(self.colors(value, domain_min, domain_max))
 
   def _repr_html_(self):
     domain_min = self._domain_min if self._domain_min is not None else 0
     domain_max = self._domain_max if self._domain_max is not None else 1
     root_xml = xml.Element("div", style="overflow:hidden; height:auto", attrib={"class":"toyplot-color-DivergingMap"})
     for color in self.colors(numpy.linspace(domain_min, domain_max, 100, endpoint=True)):
-      xml.SubElement(root_xml, "div", style="float:left;width:1px;height:20px;background-color:%s" % toyplot.color.css.convert(color))
+      xml.SubElement(root_xml, "div", style="float:left;width:1px;height:20px;background-color:%s" % to_css(color))
     return xml.tostring(root_xml, method="html")
 
 class LinearMap(object):
@@ -450,14 +450,14 @@ class LinearMap(object):
     -------
     css: CSS color string
     """
-    return toyplot.color.css.convert(self.colors(value, domain_min, domain_max))
+    return to_css(self.colors(value, domain_min, domain_max))
 
   def _repr_html_(self):
     domain_min = self._domain_min if self._domain_min is not None else 0
     domain_max = self._domain_max if self._domain_max is not None else 1
     root_xml = xml.Element("div", style="overflow:hidden; height:auto", attrib={"class":"toyplot-color-LinearMap"})
     for color in self.colors(numpy.linspace(domain_min, domain_max, 100, endpoint=True)):
-      xml.SubElement(root_xml, "div", style="float:left;width:1px;height:20px;background-color:%s" % toyplot.color.css.convert(color))
+      xml.SubElement(root_xml, "div", style="float:left;width:1px;height:20px;background-color:%s" % to_css(color))
     return xml.tostring(root_xml, method="html")
 
 def brewer(name, count=None, reverse=False):
@@ -571,4 +571,237 @@ diverging._data = {
 def _diverging_names():
   return [name for name in sorted(diverging._data.keys())]
 diverging.names = _diverging_names
+
+def to_css(color):
+  """Convert a color value to a CSS color.
+
+  Parameters
+  ----------
+  color: RGBA tuple with values in the range [0, 1].
+    Color value, which is converted to a CSS rgba() color.
+
+  Returns
+  -------
+  css: string
+    """
+  return "rgba(%.3g%%,%.3g%%,%.3g%%,%.3g)" % (color["r"] * 100, color["g"] * 100, color["b"] * 100, color["a"])
+
+def from_css(css):
+  """Convert a CSS color to an RGBA tuple.
+
+  Parameters
+  ----------
+  css: string
+
+  Returns
+  -------
+  color: RGBA tuple with all values in the range [0, 1]
+  """
+  if css.lower() in from_css.names:
+    color = from_css.names[css.lower()]
+    return toyplot.color.rgba(color[0] / 255.0, color[1] / 255.0, color[2] / 255.0, 1.0)
+
+  if css.lower() == "transparent":
+    return toyplot.color.rgba(0, 0, 0, 0)
+
+  match = from_css.hex3(css)
+  if match:
+    r, g, b = [int(group * 2, 16) / 255.0 for group in match.groups()]
+    return toyplot.color.rgba(r, g, b, 1)
+
+  match = from_css.hex6(css)
+  if match:
+    r, g, b = [int(group, 16) / 255.0 for group in match.groups()]
+    return toyplot.color.rgba(r, g, b, 1)
+
+  match = from_css.rgb(css)
+  if match:
+    r, g, b = [int(group) / 255.0 for group in match.groups()]
+    return toyplot.color.rgba(r, g, b, 1)
+
+  match = from_css.rgb_percent(css)
+  if match:
+    r, g, b = [float(group) / 100.0 for group in match.groups()]
+    return toyplot.color.rgba(r, g, b, 1)
+
+  match = from_css.rgba(css)
+  if match:
+    r, g, b, a = [int(group) / 255.0 for group in match.groups()[:3]] + [float(match.groups()[3])]
+    return toyplot.color.rgba(r, g, b, a)
+
+  match = from_css.rgba_percent(css)
+  if match:
+    r, g, b, a = [float(group) / 100.0 for group in match.groups()[:3]] + [float(match.groups()[3])]
+    return toyplot.color.rgba(r, g, b, a)
+
+  match = from_css.hsl(css)
+  if match:
+    h, s, l = [float(group) for group in match.groups()]
+    r, g, b = colorsys.hls_to_rgb((h / 360.0) % 1, l / 100.0, s / 100.0)
+    return toyplot.color.rgba(r, g, b, 1)
+
+  match = from_css.hsla(css)
+  if match:
+    h, s, l, a = [float(group) for group in match.groups()]
+    r, g, b = colorsys.hls_to_rgb((h / 360.0) % 1, l / 100.0, s / 100.0)
+    return toyplot.color.rgba(r, g, b, a)
+
+from_css.hex3 = re.compile("^#([\da-f])([\da-f])([\da-f])$", re.I).match
+from_css.hex6 = re.compile("^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$", re.I).match
+from_css.rgb = re.compile("rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\)").match
+from_css.rgb_percent = re.compile("rgb\(\s*(.*)%\s*,\s*(.*)%\s*,\s*(.*)%\)").match
+from_css.rgba = re.compile("rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(.*)\)").match
+from_css.rgba_percent = re.compile("rgba\(\s*(.*)%\s*,\s*(.*)%\s*,\s*(.*)%,\s*(.*)\)").match
+from_css.hsl = re.compile("hsl\(\s*(.*)\s*,\s*(.*)%\s*,\s*(.*)%\)").match
+from_css.hsla = re.compile("hsla\(\s*(.*)\s*,\s*(.*)%\s*,\s*(.*)%,\s*(.*)\)").match
+
+from_css.names = {
+  "aliceblue": (240,248,255),
+  "antiquewhite": (250,235,215),
+  "aqua": (0,255,255),
+  "aquamarine": (127,255,212),
+  "azure": (240,255,255),
+  "beige": (245,245,220),
+  "bisque": (255,228,196),
+  "black": (0,0,0),
+  "blanchedalmond": (255,235,205),
+  "blue": (0,0,255),
+  "blueviolet": (138,43,226),
+  "brown": (165,42,42),
+  "burlywood": (222,184,135),
+  "cadetblue": (95,158,160),
+  "chartreuse": (127,255,0),
+  "chocolate": (210,105,30),
+  "coral": (255,127,80),
+  "cornflowerblue": (100,149,237),
+  "cornsilk": (255,248,220),
+  "crimson": (220,20,60),
+  "cyan": (0,255,255),
+  "darkblue": (0,0,139),
+  "darkcyan": (0,139,139),
+  "darkgoldenrod": (184,134,11),
+  "darkgray": (169,169,169),
+  "darkgreen": (0,100,0),
+  "darkgrey": (169,169,169),
+  "darkkhaki": (189,183,107),
+  "darkmagenta": (139,0,139),
+  "darkolivegreen": (85,107,47),
+  "darkorange": (255,140,0),
+  "darkorchid": (153,50,204),
+  "darkred": (139,0,0),
+  "darksalmon": (233,150,122),
+  "darkseagreen": (143,188,143),
+  "darkslateblue": (72,61,139),
+  "darkslategray": (47,79,79),
+  "darkslategrey": (47,79,79),
+  "darkturquoise": (0,206,209),
+  "darkviolet": (148,0,211),
+  "deeppink": (255,20,147),
+  "deepskyblue": (0,191,255),
+  "dimgray": (105,105,105),
+  "dimgrey": (105,105,105),
+  "dodgerblue": (30,144,255),
+  "firebrick": (178,34,34),
+  "floralwhite": (255,250,240),
+  "forestgreen": (34,139,34),
+  "fuchsia": (255,0,255),
+  "gainsboro": (220,220,220),
+  "ghostwhite": (248,248,255),
+  "gold": (255,215,0),
+  "goldenrod": (218,165,32),
+  "gray": (128,128,128),
+  "green": (0,128,0),
+  "greenyellow": (173,255,47),
+  "grey": (128,128,128),
+  "honeydew": (240,255,240),
+  "hotpink": (255,105,180),
+  "indianred": (205,92,92),
+  "indigo": (75,0,130),
+  "ivory": (255,255,240),
+  "khaki": (240,230,140),
+  "lavender": (230,230,250),
+  "lavenderblush": (255,240,245),
+  "lawngreen": (124,252,0),
+  "lemonchiffon": (255,250,205),
+  "lightblue": (173,216,230),
+  "lightcoral": (240,128,128),
+  "lightcyan": (224,255,255),
+  "lightgoldenrodyellow": (250,250,210),
+  "lightgray": (211,211,211),
+  "lightgreen": (144,238,144),
+  "lightgrey": (211,211,211),
+  "lightpink": (255,182,193),
+  "lightsalmon": (255,160,122),
+  "lightseagreen": (32,178,170),
+  "lightskyblue": (135,206,250),
+  "lightslategray": (119,136,153),
+  "lightslategrey": (119,136,153),
+  "lightsteelblue": (176,196,222),
+  "lightyellow": (255,255,224),
+  "lime": (0,255,0),
+  "limegreen": (50,205,50),
+  "linen": (250,240,230),
+  "magenta": (255,0,255),
+  "maroon": (128,0,0),
+  "mediumaquamarine": (102,205,170),
+  "mediumblue": (0,0,205),
+  "mediumorchid": (186,85,211),
+  "mediumpurple": (147,112,219),
+  "mediumseagreen": (60,179,113),
+  "mediumslateblue": (123,104,238),
+  "mediumspringgreen": (0,250,154),
+  "mediumturquoise": (72,209,204),
+  "mediumvioletred": (199,21,133),
+  "midnightblue": (25,25,112),
+  "mintcream": (245,255,250),
+  "mistyrose": (255,228,225),
+  "moccasin": (255,228,181),
+  "navajowhite": (255,222,173),
+  "navy": (0,0,128),
+  "oldlace": (253,245,230),
+  "olive": (128,128,0),
+  "olivedrab": (107,142,35),
+  "orange": (255,165,0),
+  "orangered": (255,69,0),
+  "orchid": (218,112,214),
+  "palegoldenrod": (238,232,170),
+  "palegreen": (152,251,152),
+  "paleturquoise": (175,238,238),
+  "palevioletred": (219,112,147),
+  "papayawhip": (255,239,213),
+  "peachpuff": (255,218,185),
+  "peru": (205,133,63),
+  "pink": (255,192,203),
+  "plum": (221,160,221),
+  "powderblue": (176,224,230),
+  "purple": (128,0,128),
+  "red": (255,0,0),
+  "rosybrown": (188,143,143),
+  "royalblue": (65,105,225),
+  "saddlebrown": (139,69,19),
+  "salmon": (250,128,114),
+  "sandybrown": (244,164,96),
+  "seagreen": (46,139,87),
+  "seashell": (255,245,238),
+  "sienna": (160,82,45),
+  "silver": (192,192,192),
+  "skyblue": (135,206,235),
+  "slateblue": (106,90,205),
+  "slategray": (112,128,144),
+  "slategrey": (112,128,144),
+  "snow": (255,250,250),
+  "springgreen": (0,255,127),
+  "steelblue": (70,130,180),
+  "tan": (210,180,140),
+  "teal": (0,128,128),
+  "thistle": (216,191,216),
+  "tomato": (255,99,71),
+  "turquoise": (64,224,208),
+  "violet": (238,130,238),
+  "wheat": (245,222,179),
+  "white": (255,255,255),
+  "whitesmoke": (245,245,245),
+  "yellow": (255,255,0),
+  "yellowgreen": (154,205,50),
+}
 

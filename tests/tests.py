@@ -1828,38 +1828,38 @@ def test_color_diverging_map_css():
 def test_color_to_css():
   nose.tools.assert_equal(toyplot.color.to_css(toyplot.color.rgba(1, .5, .4, 1)), "rgba(100%,50%,40%,1)")
 
-def test_color_from_css_name():
-  assert_color_equal(toyplot.color.from_css("red"), (1, 0, 0, 1))
-  assert_color_equal(toyplot.color.from_css("Red"), (1, 0, 0, 1))
-  assert_color_equal(toyplot.color.from_css("RED"), (1, 0, 0, 1))
-  assert_color_equal(toyplot.color.from_css("aqua"), (0, 1, 1, 1))
-  assert_color_equal(toyplot.color.from_css("ivory"), (1, 1, 240/255, 1))
-  assert_color_equal(toyplot.color.from_css("transparent"), (0, 0, 0, 0))
-  nose.tools.assert_equal(toyplot.color.from_css("baloney"), None)
+def test_color_css_name():
+  assert_color_equal(toyplot.color.css("red"), (1, 0, 0, 1))
+  assert_color_equal(toyplot.color.css("Red"), (1, 0, 0, 1))
+  assert_color_equal(toyplot.color.css("RED"), (1, 0, 0, 1))
+  assert_color_equal(toyplot.color.css("aqua"), (0, 1, 1, 1))
+  assert_color_equal(toyplot.color.css("ivory"), (1, 1, 240/255, 1))
+  assert_color_equal(toyplot.color.css("transparent"), (0, 0, 0, 0))
+  nose.tools.assert_equal(toyplot.color.css("baloney"), None)
 
-def test_color_from_css_hex3():
-  assert_color_equal(toyplot.color.from_css("#f0f"), (1, 0, 1, 1))
-  assert_color_equal(toyplot.color.from_css("#F0F"), (1, 0, 1, 1))
-  assert_color_equal(toyplot.color.from_css("#F8F"), (1, 8/15, 1, 1))
+def test_color_css_hex3():
+  assert_color_equal(toyplot.color.css("#f0f"), (1, 0, 1, 1))
+  assert_color_equal(toyplot.color.css("#F0F"), (1, 0, 1, 1))
+  assert_color_equal(toyplot.color.css("#F8F"), (1, 8/15, 1, 1))
 
-def test_color_from_css_hex6():
-  assert_color_equal(toyplot.color.from_css("#ff00ff"), (1, 0, 1, 1))
-  assert_color_equal(toyplot.color.from_css("#FF00ff"), (1, 0, 1, 1))
-  assert_color_equal(toyplot.color.from_css("#FF88ff"), (1, 8/15, 1, 1))
+def test_color_css_hex6():
+  assert_color_equal(toyplot.color.css("#ff00ff"), (1, 0, 1, 1))
+  assert_color_equal(toyplot.color.css("#FF00ff"), (1, 0, 1, 1))
+  assert_color_equal(toyplot.color.css("#FF88ff"), (1, 8/15, 1, 1))
 
-def test_color_from_css_rgb():
-  assert_color_equal(toyplot.color.from_css("rgb(255, 128, 3)"), (255/255, 128/255, 3/255, 1))
-  assert_color_equal(toyplot.color.from_css("rgb(76%, 32%, 89%)"), (.76, .32, .89, 1))
+def test_color_css_rgb():
+  assert_color_equal(toyplot.color.css("rgb(255, 128, 3)"), (255/255, 128/255, 3/255, 1))
+  assert_color_equal(toyplot.color.css("rgb(76%, 32%, 89%)"), (.76, .32, .89, 1))
 
-def test_color_from_css_rgba():
-  assert_color_equal(toyplot.color.from_css("rgba(255, 128, 3, 0.45)"), (255/255, 128/255, 3/255, 0.45))
-  assert_color_equal(toyplot.color.from_css("rgba(76%, 32%, 89%, .76)"), (.76, .32, .89, .76))
+def test_color_css_rgba():
+  assert_color_equal(toyplot.color.css("rgba(255, 128, 3, 0.45)"), (255/255, 128/255, 3/255, 0.45))
+  assert_color_equal(toyplot.color.css("rgba(76%, 32%, 89%, .76)"), (.76, .32, .89, .76))
 
-def test_color_from_css_hsl():
-  assert_color_equal(toyplot.color.from_css("hsl(0, 100%, 50%)"), (1, 0, 0, 1))
+def test_color_css_hsl():
+  assert_color_equal(toyplot.color.css("hsl(0, 100%, 50%)"), (1, 0, 0, 1))
 
-def test_color_from_css_hsla():
-  assert_color_equal(toyplot.color.from_css("hsla(0, 100%, 50%, 0.32)"), (1, 0, 0, 0.32))
+def test_color_css_hsla():
+  assert_color_equal(toyplot.color.css("hsla(0, 100%, 50%, 0.32)"), (1, 0, 0, 0.32))
 
 ##################################################################################
 # toyplot.html

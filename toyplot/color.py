@@ -15,22 +15,22 @@ dtype = {"names":["r", "g", "b", "a"], "formats":["float64", "float64", "float64
 near_black = "#292724"
 
 def rgb(r, g, b):
-  """Create a toyplot color from RGB values."""
+  """Construct a Toyplot color from RGB values."""
   return numpy.array((r, g, b, 1.0), dtype=dtype)
 
 def rgba(r, g, b, a):
-  """Create a toyplot color from RGBA values."""
+  """Construct a Toyplot color from RGBA values."""
   return numpy.array((r, g, b, a), dtype=dtype)
 
 def lab(L, a, b):
-  """Create a toyplot color from Lab values."""
+  """Construct a Toyplot color from Lab values."""
   from colormath.color_objects import sRGBColor, LabColor
   from colormath.color_conversions import convert_color
   RGB = convert_color(LabColor(L, a, b), sRGBColor)
   return rgb(*RGB.get_value_tuple())
 
-def _to_lab(color):
-  """Convert a toyplot color to Lab values."""
+def to_lab(color):
+  """Convert a Toyplot color to Lab values."""
   from colormath.color_objects import sRGBColor, LabColor
   from colormath.color_conversions import convert_color
   Lab = convert_color(sRGBColor(color["r"], color["g"], color["b"]), LabColor)
@@ -50,7 +50,7 @@ def _msh_to_lab(M, s, h):
 
 def _require_color(color):
   if isinstance(color, toyplot.compatibility.string_type):
-    return from_css(color)
+    return css(color)
   elif isinstance(color, (numpy.void, numpy.ndarray)) and color.dtype == dtype:
     return color
   elif isinstance(color, (tuple, list, numpy.ndarray)) and len(color) == 3:
@@ -58,7 +58,7 @@ def _require_color(color):
   elif isinstance(color, (tuple, list, numpy.ndarray)) and len(color) == 4:
     return rgba(color[0], color[1], color[2], color[3])
   else:
-    raise ValueError("Expected a CSS color string or a toyplot.color.value.")
+    raise ValueError("Expected a CSS color string or a Toyplot.color.value.")
 
 def _broadcast_color(colors, shape, colormap=None, palette=None):
   if isinstance(colors, numpy.ndarray):
@@ -90,7 +90,7 @@ class Palette(object):
   ----------
   colors: sequence of color values, optional
     Specifies the list of color values to store in the palette.  Each color may
-    be a CSS color string, a toyplot color, a sequence of three RGB values, or
+    be a CSS color string, a Toyplot color, a sequence of three RGB values, or
     a sequence of four RGBA values.  If `colors` is unspecified, the palette
     will be initialized with a default collection of colors.
 
@@ -150,7 +150,7 @@ class Palette(object):
 
     Returns
     -------
-    color: toyplot color.
+    color: Toyplot color.
     """
     return self._colors[int(index)]
 
@@ -212,7 +212,7 @@ class CategoricalMap(object):
 
     Returns
     -------
-    colors: array of toyplot colors with the same shape as `values`.
+    colors: array of Toyplot colors with the same shape as `values`.
     """
     values = numpy.array(values, dtype="int64")
     flat = numpy.ravel(values) % len(self._palette._colors)
@@ -231,7 +231,7 @@ class CategoricalMap(object):
 
     Returns
     -------
-    color: toyplot color.
+    color: Toyplot color.
     """
     return self.colors(index, domain_min, domain_max)
 
@@ -271,10 +271,10 @@ class DivergingMap(object):
 
   Parameters
   ----------
-  low: toyplot color, optional
+  low: Toyplot color, optional
     Defines the color used to represent low values.
 
-  high: toyplot color, optional
+  high: Toyplot color, optional
     Defines the color used to represent high values.
 
   domain_min: scalar, optional
@@ -301,8 +301,8 @@ class DivergingMap(object):
     if high is None:
       high = rgb( 0.706, 0.016, 0.150)
 
-    self._low = _lab_to_msh(*_to_lab(low))
-    self._high = _lab_to_msh(*_to_lab(high))
+    self._low = _lab_to_msh(*to_lab(low))
+    self._high = _lab_to_msh(*to_lab(high))
     self._mid_low = middle(self._low)
     self._mid_high = middle(self._high)
     self._domain_min = domain_min
@@ -317,7 +317,7 @@ class DivergingMap(object):
 
     Returns
     -------
-    colors: array of toyplot colors with the same shape as `values`
+    colors: array of Toyplot colors with the same shape as `values`
     """
 
     values = numpy.array(values)
@@ -348,7 +348,7 @@ class DivergingMap(object):
 
     Returns
     -------
-    color: toyplot color
+    color: Toyplot color
     """
     return self.colors(value, domain_min, domain_max)
 
@@ -411,7 +411,7 @@ class LinearMap(object):
 
     Returns
     -------
-    colors: array of toyplot colors with the same shape as `values`.
+    colors: array of Toyplot colors with the same shape as `values`.
     """
     values = numpy.array(values)
     domain_min = domain_min if domain_min is not None else self._domain_min if self._domain_min is not None else values.min()
@@ -435,7 +435,7 @@ class LinearMap(object):
 
     Returns
     -------
-    color: toyplot color
+    color: Toyplot color
     """
     return self.colors(value, domain_min, domain_max)
 
@@ -573,7 +573,7 @@ def _diverging_names():
 diverging.names = _diverging_names
 
 def to_css(color):
-  """Convert a color value to a CSS color.
+  """Convert a Toyplot color to a CSS string.
 
   Parameters
   ----------
@@ -586,76 +586,75 @@ def to_css(color):
     """
   return "rgba(%.3g%%,%.3g%%,%.3g%%,%.3g)" % (color["r"] * 100, color["g"] * 100, color["b"] * 100, color["a"])
 
-def from_css(css):
-  """Convert a CSS color to an RGBA tuple.
+def css(value):
+  """Construct a Toyplot color from a CSS string.
 
   Parameters
   ----------
-  css: string
+  value: string
 
   Returns
   -------
   color: RGBA tuple with all values in the range [0, 1]
   """
-  if css.lower() in from_css.names:
-    color = from_css.names[css.lower()]
-    return toyplot.color.rgba(color[0] / 255.0, color[1] / 255.0, color[2] / 255.0, 1.0)
+  if value.lower() in css.names:
+    color = css.names[value.lower()]
+    return rgba(color[0] / 255.0, color[1] / 255.0, color[2] / 255.0, 1.0)
 
-  if css.lower() == "transparent":
-    return toyplot.color.rgba(0, 0, 0, 0)
+  if value.lower() == "transparent":
+    return rgba(0, 0, 0, 0)
 
-  match = from_css.hex3(css)
+  match = css.hex3(value)
   if match:
     r, g, b = [int(group * 2, 16) / 255.0 for group in match.groups()]
-    return toyplot.color.rgba(r, g, b, 1)
+    return rgba(r, g, b, 1)
 
-  match = from_css.hex6(css)
+  match = css.hex6(value)
   if match:
     r, g, b = [int(group, 16) / 255.0 for group in match.groups()]
-    return toyplot.color.rgba(r, g, b, 1)
+    return rgba(r, g, b, 1)
 
-  match = from_css.rgb(css)
+  match = css.rgb(value)
   if match:
     r, g, b = [int(group) / 255.0 for group in match.groups()]
-    return toyplot.color.rgba(r, g, b, 1)
+    return rgba(r, g, b, 1)
 
-  match = from_css.rgb_percent(css)
+  match = css.rgb_percent(value)
   if match:
     r, g, b = [float(group) / 100.0 for group in match.groups()]
-    return toyplot.color.rgba(r, g, b, 1)
+    return rgba(r, g, b, 1)
 
-  match = from_css.rgba(css)
+  match = css.rgba(value)
   if match:
     r, g, b, a = [int(group) / 255.0 for group in match.groups()[:3]] + [float(match.groups()[3])]
-    return toyplot.color.rgba(r, g, b, a)
+    return rgba(r, g, b, a)
 
-  match = from_css.rgba_percent(css)
+  match = css.rgba_percent(value)
   if match:
     r, g, b, a = [float(group) / 100.0 for group in match.groups()[:3]] + [float(match.groups()[3])]
-    return toyplot.color.rgba(r, g, b, a)
+    return rgba(r, g, b, a)
 
-  match = from_css.hsl(css)
+  match = css.hsl(value)
   if match:
     h, s, l = [float(group) for group in match.groups()]
     r, g, b = colorsys.hls_to_rgb((h / 360.0) % 1, l / 100.0, s / 100.0)
-    return toyplot.color.rgba(r, g, b, 1)
+    return rgba(r, g, b, 1)
 
-  match = from_css.hsla(css)
+  match = css.hsla(value)
   if match:
     h, s, l, a = [float(group) for group in match.groups()]
     r, g, b = colorsys.hls_to_rgb((h / 360.0) % 1, l / 100.0, s / 100.0)
-    return toyplot.color.rgba(r, g, b, a)
+    return rgba(r, g, b, a)
 
-from_css.hex3 = re.compile("^#([\da-f])([\da-f])([\da-f])$", re.I).match
-from_css.hex6 = re.compile("^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$", re.I).match
-from_css.rgb = re.compile("rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\)").match
-from_css.rgb_percent = re.compile("rgb\(\s*(.*)%\s*,\s*(.*)%\s*,\s*(.*)%\)").match
-from_css.rgba = re.compile("rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(.*)\)").match
-from_css.rgba_percent = re.compile("rgba\(\s*(.*)%\s*,\s*(.*)%\s*,\s*(.*)%,\s*(.*)\)").match
-from_css.hsl = re.compile("hsl\(\s*(.*)\s*,\s*(.*)%\s*,\s*(.*)%\)").match
-from_css.hsla = re.compile("hsla\(\s*(.*)\s*,\s*(.*)%\s*,\s*(.*)%,\s*(.*)\)").match
-
-from_css.names = {
+css.hex3 = re.compile("^#([\da-f])([\da-f])([\da-f])$", re.I).match
+css.hex6 = re.compile("^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$", re.I).match
+css.rgb = re.compile("rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\)").match
+css.rgb_percent = re.compile("rgb\(\s*(.*)%\s*,\s*(.*)%\s*,\s*(.*)%\)").match
+css.rgba = re.compile("rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(.*)\)").match
+css.rgba_percent = re.compile("rgba\(\s*(.*)%\s*,\s*(.*)%\s*,\s*(.*)%,\s*(.*)\)").match
+css.hsl = re.compile("hsl\(\s*(.*)\s*,\s*(.*)%\s*,\s*(.*)%\)").match
+css.hsla = re.compile("hsla\(\s*(.*)\s*,\s*(.*)%\s*,\s*(.*)%,\s*(.*)\)").match
+css.names = {
   "aliceblue": (240,248,255),
   "antiquewhite": (250,235,215),
   "aqua": (0,255,255),

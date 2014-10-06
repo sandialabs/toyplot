@@ -21,7 +21,7 @@ class Legend(Mark):
   """Render a figure legend (a collection of markers and labels).
 
   Do not create Legend instances directly.  Use factory methods such as
-  :meth:`toyplot.canvas.Canvas.legend` or :meth:`toyplot.axes.Cartesian2.legend` instead.
+  :meth:`toyplot.canvas.Canvas.legend` or :meth:`toyplot.axes.Cartesian.legend` instead.
   """
   def __init__(self, xmin, xmax, ymin, ymax, marks, style, label_style, id):
     Mark.__init__(self, {"fill":"none", "stroke":"none"}, style, id=id)
@@ -37,7 +37,7 @@ class VColorBar(Mark):
   """Displays a one-dimensional mapping from values to colors.
 
   Do not create VColorbarMark instances directly.  Use factory methods such
-  as :meth:`toyplot.axes.Cartesian2.colorbar` instead.
+  as :meth:`toyplot.axes.Cartesian.colorbar` instead.
   """
   class DomainHelper(object):
     def __init__(self, min, max):
@@ -236,7 +236,7 @@ class AxisLines(Mark):
   """Render multiple lines parallel to an axis.
 
   Do not create AxisLines instances directly.  Use factory methods such as
-  :meth:`toyplot.axes.Cartesian2.hlines` and :meth:`toyplot.axes.Cartesian2.vlines` instead.
+  :meth:`toyplot.axes.Cartesian.hlines` and :meth:`toyplot.axes.Cartesian.vlines` instead.
   """
   def __init__(self, table, coordinates, axes, stroke, opacity, title, style, id):
     table = toyplot.require.instance(table, toyplot.data.Table)
@@ -258,7 +258,7 @@ class BarBoundaries(Mark):
   """Render multiple stacked bars defined by bar boundaries.
 
   Do not create BarBoundaries instances directly.  Use factory methods such as
-  :func:`toyplot.bars` or :meth:`toyplot.axes.Cartesian2.bars` instead.
+  :func:`toyplot.bars` or :meth:`toyplot.axes.Cartesian.bars` instead.
   """
   def __init__(self, along, position, series, fill, opacity, title, style, id):
     Mark.__init__(self, {"stroke":"none"}, style, id=id)
@@ -273,7 +273,7 @@ class BarMagnitudes(Mark):
   """Render multiple stacked bars defined by bar magnitudes.
 
   Do not create BarMagnitudes instances directly.  Use factory methods such as
-  :func:`toyplot.bars` or :meth:`toyplot.axes.Cartesian2.bars` instead.
+  :func:`toyplot.bars` or :meth:`toyplot.axes.Cartesian.bars` instead.
   """
   def __init__(self, along, position, baseline, series, fill, opacity, title, style, id):
     Mark.__init__(self, {"stroke":"none"}, style, id=id)
@@ -289,7 +289,7 @@ class FillBoundaries(Mark):
   """Render multiple stacked fill regions defined by boundaries.
 
   Do not create FillBoundaries instances directly.  Use factory methods such
-  as :func:`toyplot.fill` or :meth:`toyplot.axes.Cartesian2.fill` instead.
+  as :func:`toyplot.fill` or :meth:`toyplot.axes.Cartesian.fill` instead.
   """
   def __init__(self, table, position, position_axis, boundaries, boundary_axis, fill, opacity, title, style, id):
     table = toyplot.require.instance(table, toyplot.data.Table)
@@ -312,7 +312,7 @@ class FillMagnitudes(Mark):
   """Render multiple stacked fill regions defined by magnitudes.
 
   Do not create FillMagnitudes instances directly.  Use factory methods such
-  as :func:`toyplot.fill` or :meth:`toyplot.axes.Cartesian2.fill` instead.
+  as :func:`toyplot.fill` or :meth:`toyplot.axes.Cartesian.fill` instead.
   """
   def __init__(self, table, position, position_axis, baseline, magnitudes, magnitude_axis, fill, opacity, title, style, id):
     table = toyplot.require.instance(table, toyplot.data.Table)
@@ -337,7 +337,7 @@ class Plot(Mark):
   """Plot multiple bivariate data series using lines and/or markers.
 
   Do not create Plot instances directly.  Use factory methods such as
-  :func:`toyplot.plot`, :func:`toyplot.scatterplot`, :meth:`toyplot.axes.Cartesian2.plot` and :meth:`toyplot.axes.Cartesian2.scatterplot` instead.
+  :func:`toyplot.plot`, :func:`toyplot.scatterplot`, :meth:`toyplot.axes.Cartesian.plot` and :meth:`toyplot.axes.Cartesian.scatterplot` instead.
   """
   def __init__(self, along, show_stroke, position, series, stroke, stroke_width, stroke_opacity, marker, size, fill, opacity, title, style, mstyle, mlstyle, id):
     toyplot.require.instance(position, numpy.ma.MaskedArray)
@@ -363,7 +363,7 @@ class Rect(Mark):
   """Plot axis-aligned rectangles.
 
   Do not create Rect instances directly.  Use factory methods such as
-  :meth:`toyplot.axes.Cartesian2.rect` instead.
+  :meth:`toyplot.axes.Cartesian.rect` instead.
   """
   def __init__(self, table, left, right, left_right_axis, top, bottom, top_bottom_axis, fill, opacity, title, style, id):
     table = toyplot.require.instance(table, toyplot.data.Table)
@@ -393,7 +393,7 @@ class Text(Mark):
   """Render text.
 
   Do not create Text instances directly.  Use factory methods such as
-  :meth:`toyplot.canvas.Canvas.text` or :meth:`toyplot.axes.Cartesian2.text` instead.
+  :meth:`toyplot.canvas.Canvas.text` or :meth:`toyplot.axes.Cartesian.text` instead.
   """
   def __init__(self, table, coordinates, axes, text, angle, fill, opacity, title, style, id):
     table = toyplot.require.instance(table, toyplot.data.Table)

@@ -42,7 +42,7 @@ Most of Toyplot's public API is located in `toyplot/__init__.py` ... for most
 contributations, that's where you'll start.  If you're adding a new type of
 visualization, you'll need to create a new :class:`toyplot.Mark` derivative
 there.  Then, you'll create factory methods for creating instances of your
-new mark in :class:`toyplot.Axes2D` and/or :class:`toyplot.Canvas`.  Once
+new mark in :class:`toyplot.axes.Cartesian` and/or :class:`toyplot.Canvas`.  Once
 you've done that, you'll need to write code to render your new mark
 in `toyplot/svg.py`.  That's it ... all of the other backends are rendered
 from the SVG representation.

@@ -229,7 +229,7 @@ def _render_marker(root, cx, cy, size, marker, marker_style=None, label_style=No
     xml.SubElement(marker_xml, "text", x=repr(cx), y=repr(cy), attrib=_css_attrib({"stroke":"none", "fill":toyplot.color.near_black, "text-anchor":"middle", "alignment-baseline":"middle", "font-size":"%rpx" % (size * 0.75)}, label_style, shape_label_style)).text = shape_label
 _render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<": ("^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
-@dispatch(toyplot.canvas.Canvas, toyplot.axes.Cartesian2, _RenderContext)
+@dispatch(toyplot.canvas.Canvas, toyplot.axes.Cartesian, _RenderContext)
 def _render(canvas, axes, context):
   axes._finalize_domain()
 
@@ -265,7 +265,7 @@ def _render(canvas, axes, context):
       print(type(obj))
       return json.JSONEncoder.default(self, obj)
 
-  axes_xml = xml.SubElement(context.root, "g", id=context.get_id(axes), attrib={"class":"toyplot-axes-Cartesian2"})
+  axes_xml = xml.SubElement(context.root, "g", id=context.get_id(axes), attrib={"class":"toyplot-axes-Cartesian"})
   xml.SubElement(axes_xml, "toyplot:axes").text = json.dumps(axes_data, cls=custom_encoder, sort_keys=True)
 
   clip_xml = xml.SubElement(axes_xml, "clipPath", id="t" + uuid.uuid4().hex)
@@ -369,7 +369,7 @@ def _render(canvas, axes, context):
       y = axes._ymin_range
       xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(axes.label._style)).text = axes.label._text
 
-@dispatch(toyplot.axes.Cartesian2, toyplot.mark.BarBoundaries, _RenderContext)
+@dispatch(toyplot.axes.Cartesian, toyplot.mark.BarBoundaries, _RenderContext)
 def _render(axes, mark, context):
   bar1 = mark._position.T[0]
   bar2 = mark._position.T[1]
@@ -405,7 +405,7 @@ def _render(axes, mark, context):
       if dtitle is not None:
         xml.SubElement(datum_xml, "title").text = str(dtitle)
 
-@dispatch(toyplot.axes.Cartesian2, toyplot.mark.BarMagnitudes, _RenderContext)
+@dispatch(toyplot.axes.Cartesian, toyplot.mark.BarMagnitudes, _RenderContext)
 def _render(axes, mark, context):
   bar1 = mark._position.T[0]
   bar2 = mark._position.T[1]
@@ -441,7 +441,7 @@ def _render(axes, mark, context):
       if dtitle is not None:
         xml.SubElement(datum_xml, "title").text = str(dtitle)
 
-@dispatch(toyplot.axes.Cartesian2, toyplot.mark.FillBoundaries, _RenderContext)
+@dispatch(toyplot.axes.Cartesian, toyplot.mark.FillBoundaries, _RenderContext)
 def _render(axes, mark, context):
   boundaries = numpy.ma.column_stack([mark._table[key] for key in mark._boundaries])
 
@@ -473,7 +473,7 @@ def _render(axes, mark, context):
       if title is not None:
         xml.SubElement(series_xml, "title").text = str(title)
 
-@dispatch(toyplot.axes.Cartesian2, toyplot.mark.FillMagnitudes, _RenderContext)
+@dispatch(toyplot.axes.Cartesian, toyplot.mark.FillMagnitudes, _RenderContext)
 def _render(axes, mark, context):
   magnitudes = numpy.ma.column_stack([mark._table[mark._baseline[0]]] + [mark._table[key] for key in mark._magnitudes])
   boundaries = numpy.ma.cumsum(magnitudes, axis=1)
@@ -504,7 +504,7 @@ def _render(axes, mark, context):
       if title is not None:
         xml.SubElement(series_xml, "title").text = str(title)
 
-@dispatch(toyplot.axes.Cartesian2, toyplot.mark.AxisLines, _RenderContext)
+@dispatch(toyplot.axes.Cartesian, toyplot.mark.AxisLines, _RenderContext)
 def _render(axes, mark, context):
   if mark._axes[0] == "x":
     p1="x1"
@@ -530,7 +530,7 @@ def _render(axes, mark, context):
     if dtitle is not None:
       xml.SubElement(datum_xml, "title").text = str(dtitle)
 
-@dispatch((toyplot.canvas.Canvas, toyplot.axes.Cartesian2), toyplot.mark.Legend, _RenderContext)
+@dispatch((toyplot.canvas.Canvas, toyplot.axes.Cartesian), toyplot.mark.Legend, _RenderContext)
 def _render(canvas, legend, context):
   x = legend._xmin
   y = legend._ymin
@@ -572,7 +572,7 @@ def _render(canvas, legend, context):
       label_y = y + ((i + 1) * mark_gutter) + (i * mark_height) + (mark_height / 2)
       xml.SubElement(context.root, "text", x=repr(label_x), y=repr(label_y), style=_css_style({"alignment-baseline":"middle", "stroke":"none"}, legend._label_style)).text = mark_label
 
-@dispatch(toyplot.axes.Cartesian2, toyplot.mark.Plot, _RenderContext)
+@dispatch(toyplot.axes.Cartesian, toyplot.mark.Plot, _RenderContext)
 def _render(axes, mark, context):
   if mark._along == "x":
     position = axes._project_x(mark._position)
@@ -614,7 +614,7 @@ def _render(axes, mark, context):
     if title is not None:
       xml.SubElement(series_xml, "title").text = str(title)
 
-@dispatch(toyplot.axes.Cartesian2, toyplot.mark.Rect, _RenderContext)
+@dispatch(toyplot.axes.Cartesian, toyplot.mark.Rect, _RenderContext)
 def _render(axes, mark, context):
   if mark._left_right_axis == "x":
     x1 = axes._project_x(mark._table[mark._left[0]])
@@ -635,12 +635,12 @@ def _render(axes, mark, context):
     if dtitle is not None:
       xml.SubElement(datum_xml, "title").text = str(dtitle)
 
-@dispatch((toyplot.canvas.Canvas, toyplot.axes.Cartesian2), toyplot.mark.Text, _RenderContext)
+@dispatch((toyplot.canvas.Canvas, toyplot.axes.Cartesian), toyplot.mark.Text, _RenderContext)
 def _render(parent, mark, context):
   x = mark._table[mark._coordinates[numpy.where(mark._axes == "x")[0][0]]]
   y = mark._table[mark._coordinates[numpy.where(mark._axes == "y")[0][0]]]
 
-  if isinstance(parent, toyplot.axes.Cartesian2):
+  if isinstance(parent, toyplot.axes.Cartesian):
     x = parent._project_x(x)
     y = parent._project_y(y)
 

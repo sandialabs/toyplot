@@ -57,18 +57,18 @@ def _symmetric_log(x, base, threshold=1):
 ###############################################################################################
 # Axes
 
-class Cartesian2(object):
+class Cartesian(object):
   """Standard two-dimensional Cartesian coordinate system.
 
-  Do not create Cartesian2 instances directly.  Use factory methods such
+  Do not create Cartesian instances directly.  Use factory methods such
   as :meth:`toyplot.canvas.Canvas.axes` instead.
   """
   class AxisHelper(object):
     def __init__(self, show, label, label_style, min, max, tick_length, tick_locator, tick_angle, scale):
-      self.spine = Cartesian2.SpineHelper()
-      self.ticks = Cartesian2.TicksHelper(tick_length, tick_locator, tick_angle)
-      self.label = Cartesian2.LabelHelper(label, label_style)
-      self.domain = Cartesian2.DomainHelper(min, max)
+      self.spine = Cartesian.SpineHelper()
+      self.ticks = Cartesian.TicksHelper(tick_length, tick_locator, tick_angle)
+      self.label = Cartesian.LabelHelper(label, label_style)
+      self.domain = Cartesian.DomainHelper(min, max)
       self._show = show
       self.scale = scale
     @property
@@ -106,7 +106,7 @@ class Cartesian2(object):
       self._ymin_range = ymin_range
       self._ymax_range = ymax_range
       self._style = toyplot.style.combine({"stroke":"none", "fill":"white", "opacity":0.75}, toyplot.require.style(style))
-      self.label = Cartesian2.CoordinatesLabelHelper(style={})
+      self.label = Cartesian.CoordinatesLabelHelper(style={})
     @property
     def show(self):
       return self._show
@@ -207,9 +207,9 @@ class Cartesian2(object):
       if index is not None and value is not None:
         raise ValueError("Must specify either index or value, not both.")
       if index is not None:
-        return Cartesian2.PerTickHelper.TickProxy(self._indices[index])
+        return Cartesian.PerTickHelper.TickProxy(self._indices[index])
       elif value is not None:
-        return Cartesian2.PerTickHelper.TickProxy(self._values[value])
+        return Cartesian.PerTickHelper.TickProxy(self._values[value])
     def styles(self, values):
       results = [self._indices[index].get("style", None) if index in self._indices else None for index in range(len(values))]
       for value in self._values:
@@ -223,8 +223,8 @@ class Cartesian2(object):
       self._show = False
       self._length = length
       self._style = {}
-      self.labels = Cartesian2.TickLabelsHelper(angle)
-      self.tick = Cartesian2.PerTickHelper()
+      self.labels = Cartesian.TickLabelsHelper(angle)
+      self.tick = Cartesian.PerTickHelper()
     @property
     def locator(self):
       return self._locator
@@ -255,7 +255,7 @@ class Cartesian2(object):
       self._show = True
       self._angle = angle
       self._style = {"font-size":"10px", "font-weight":"normal", "stroke":"none"}
-      self.label = Cartesian2.PerTickHelper()
+      self.label = Cartesian.PerTickHelper()
     @property
     def show(self):
       return self._show
@@ -297,10 +297,10 @@ class Cartesian2(object):
     self._text_colors = itertools.cycle(palette)
 
     self._show = show
-    self.coordinates = Cartesian2.CoordinatesHelper(show=True, xmin_range=xmax_range - 100, xmax_range=xmax_range - 10, ymin_range = ymin_range + 10, ymax_range = ymin_range + 24, style={})
-    self.label = Cartesian2.LabelHelper(label=label, style={"font-size":"14px", "baseline-shift":"100%"})
-    self.x = Cartesian2.AxisHelper(show=xshow, label=xlabel, label_style={"baseline-shift":"-200%"}, min=xmin, max=xmax, tick_length=tick_length, tick_locator=xticklocator, tick_angle=0, scale=xscale)
-    self.y = Cartesian2.AxisHelper(show=yshow, label=ylabel, label_style={"baseline-shift":"200%"}, min=ymin, max=ymax, tick_length=tick_length, tick_locator=yticklocator, tick_angle=-90, scale=yscale)
+    self.coordinates = Cartesian.CoordinatesHelper(show=True, xmin_range=xmax_range - 100, xmax_range=xmax_range - 10, ymin_range = ymin_range + 10, ymax_range = ymin_range + 24, style={})
+    self.label = Cartesian.LabelHelper(label=label, style={"font-size":"14px", "baseline-shift":"100%"})
+    self.x = Cartesian.AxisHelper(show=xshow, label=xlabel, label_style={"baseline-shift":"-200%"}, min=xmin, max=xmax, tick_length=tick_length, tick_locator=xticklocator, tick_angle=0, scale=xscale)
+    self.y = Cartesian.AxisHelper(show=yshow, label=ylabel, label_style={"baseline-shift":"200%"}, min=ymin, max=ymax, tick_length=tick_length, tick_locator=yticklocator, tick_angle=-90, scale=yscale)
 
     self._parent = parent
     self._id = id

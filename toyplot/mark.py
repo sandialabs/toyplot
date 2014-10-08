@@ -32,6 +32,8 @@ class AxisLines(Mark):
     stroke = toyplot.require.table_keys(table, stroke, length=1)
     opacity = toyplot.require.table_keys(table, opacity, length=1)
     title = toyplot.require.table_keys(table, title, length=1)
+    style = toyplot.require.style(style)
+    id = toyplot.require.optional_id(id)
 
     Mark.__init__(self, style, id=id)
     self._table = table
@@ -115,6 +117,8 @@ class FillBoundaries(Mark):
     position_axis = toyplot.require.string_vector(position_axis, length=1)
     boundaries = toyplot.require.table_keys(table, boundaries)
     boundary_axis = toyplot.require.string_vector(boundary_axis, length=1)
+    style = toyplot.require.style(style)
+    id = toyplot.require.optional_id(id)
 
     Mark.__init__(self, style, id=id)
     self._table = table
@@ -139,6 +143,8 @@ class FillMagnitudes(Mark):
     baseline = toyplot.require.table_keys(table, baseline, length=1)
     magnitudes = toyplot.require.table_keys(table, magnitudes)
     magnitude_axis = toyplot.require.string_vector(magnitude_axis, length=1)
+    style = toyplot.require.style(style)
+    id = toyplot.require.optional_id(id)
 
     Mark.__init__(self, style, id=id)
     self._table = table
@@ -194,6 +200,8 @@ class Rect(Mark):
     fill = toyplot.require.table_keys(table, fill, length=1)
     opacity = toyplot.require.table_keys(table, opacity, length=1)
     title = toyplot.require.table_keys(table, title, length=1)
+    style = toyplot.require.style(style)
+    id = toyplot.require.optional_id(id)
 
     Mark.__init__(self, style, id=id)
     self._table = table
@@ -222,6 +230,8 @@ class Text(Mark):
     fill = toyplot.require.table_keys(table, fill, length=1)
     opacity = toyplot.require.table_keys(table, opacity, length=1)
     title = toyplot.require.table_keys(table, title, length=1)
+    style = toyplot.require.style(style)
+    id = toyplot.require.optional_id(id)
 
     Mark.__init__(self, style, id=id)
     self._table = table

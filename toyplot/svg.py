@@ -569,7 +569,7 @@ def _render(canvas, legend, context):
 
       label_x = x + mark_width + (2 * mark_gutter)
       label_y = y + ((i + 1) * mark_gutter) + (i * mark_height) + (mark_height / 2)
-      xml.SubElement(context.root, "text", x=repr(label_x), y=repr(label_y), style=_css_style({"alignment-baseline":"middle", "stroke":"none"}, legend._label_style)).text = mark_label
+      xml.SubElement(context.root, "text", x=repr(label_x), y=repr(label_y), style=_css_style({"alignment-baseline":"middle", "stroke":"none"}, legend._lstyle)).text = mark_label
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Plot, _RenderContext)
 def _render(axes, mark, context):

@@ -15,8 +15,8 @@ import toyplot.require
 class Mark(object):
   """Base class for all Toyplot marks.
   """
-  def __init__(self, *styles, **kwargs):
-    self._style = toyplot.style.combine(*styles)
+  def __init__(self):
+    pass
 
 class AxisLines(Mark):
   """Render multiple lines parallel to an axis.
@@ -33,13 +33,14 @@ class AxisLines(Mark):
     title = toyplot.require.table_keys(table, title, length=1)
     style = toyplot.require.style(style)
 
-    Mark.__init__(self, style)
+    Mark.__init__(self)
     self._table = table
     self._coordinates = coordinates # 1 coordinate column
     self._axes = axes               # 1 axis identifier
     self._stroke = stroke           # 1 stroke color column
     self._opacity = opacity         # 1 opacity column
     self._title = title             # 1 title column
+    self._style = style             # Line style
 
 class BarBoundaries(Mark):
   """Render multiple stacked bars defined by bar boundaries.
@@ -59,7 +60,7 @@ class BarBoundaries(Mark):
     title = toyplot.require.table_keys(table, title, length=len(boundaries)-1)
     style = toyplot.require.style(style)
 
-    Mark.__init__(self, {"stroke":"none"}, style)
+    Mark.__init__(self)
     self._table = table
     self._left = left         # 1 coordinate column
     self._right = right       # 1 coordinate column
@@ -69,6 +70,7 @@ class BarBoundaries(Mark):
     self._fill = fill         #  N-1 fill color columns
     self._opacity = opacity   #  N-1 opacity columns
     self._title = title       #  N-1 title columns
+    self._style = toyplot.style.combine({"stroke":"none"}, style) # Bar style
 
 class BarMagnitudes(Mark):
   """Render multiple stacked bars defined by bar magnitudes.
@@ -89,7 +91,7 @@ class BarMagnitudes(Mark):
     title = toyplot.require.table_keys(table, title, length=len(magnitudes))
     style = toyplot.require.style(style)
 
-    Mark.__init__(self, {"stroke":"none"}, style)
+    Mark.__init__(self)
     self._table = table
     self._left = left         # 1 coordinate column
     self._right = right       # 1 coordinate column
@@ -100,6 +102,7 @@ class BarMagnitudes(Mark):
     self._fill = fill         #  N fill color columns
     self._opacity = opacity   #  N opacity columns
     self._title = title       #  N title columns
+    self._style = toyplot.style.combine({"stroke":"none"}, style) # Bar style
 
 class FillBoundaries(Mark):
   """Render multiple stacked fill regions defined by boundaries.
@@ -115,7 +118,7 @@ class FillBoundaries(Mark):
     boundary_axis = toyplot.require.string_vector(boundary_axis, length=1)
     style = toyplot.require.style(style)
 
-    Mark.__init__(self, style)
+    Mark.__init__(self)
     self._table = table
     self._position = position # 1 coordinate column
     self._position_axis = position_axis # 1 axis identifier
@@ -124,6 +127,7 @@ class FillBoundaries(Mark):
     self._fill = fill         # N-1 fill colors
     self._opacity = opacity   # N-1 opacities
     self._title = title       # N-1 titles
+    self._style = style       # Fill style
 
 class FillMagnitudes(Mark):
   """Render multiple stacked fill regions defined by magnitudes.
@@ -140,7 +144,7 @@ class FillMagnitudes(Mark):
     magnitude_axis = toyplot.require.string_vector(magnitude_axis, length=1)
     style = toyplot.require.style(style)
 
-    Mark.__init__(self, style)
+    Mark.__init__(self)
     self._table = table
     self._position = position     # 1 coordinate column
     self._position_axis = position_axis # 1 axis identifier
@@ -150,6 +154,7 @@ class FillMagnitudes(Mark):
     self._fill = fill             # N fill colors
     self._opacity = opacity       # N opacities
     self._title = title           # N titles
+    self._style = style           # Fill style
 
 class Plot(Mark):
   """Plot multiple bivariate data series using lines and/or markers.
@@ -161,7 +166,7 @@ class Plot(Mark):
     toyplot.require.instance(position, numpy.ma.MaskedArray)
     toyplot.require.instance(series, numpy.ma.MaskedArray)
 
-    Mark.__init__(self, style)
+    Mark.__init__(self)
     self._along = along
     self._show_stroke = show_stroke
     self._position = position             # M coordinates
@@ -174,8 +179,9 @@ class Plot(Mark):
     self._fill = fill                     # M x N marker fill colors
     self._opacity = opacity               # M x N marker opacities
     self._title = title                   # N titles
-    self._mstyle = mstyle
-    self._mlstyle = mlstyle
+    self._style = style                   # Line style
+    self._mstyle = mstyle                 # Marker style
+    self._mlstyle = mlstyle               # Marker label style
 
 class Rect(Mark):
   """Plot axis-aligned rectangles.
@@ -196,7 +202,7 @@ class Rect(Mark):
     title = toyplot.require.table_keys(table, title, length=1)
     style = toyplot.require.style(style)
 
-    Mark.__init__(self, style)
+    Mark.__init__(self)
     self._table = table
     self._left = left       # 1 coordinate column
     self._right = right     # 1 coordinate column
@@ -207,6 +213,7 @@ class Rect(Mark):
     self._fill = fill       # 1 fill color column
     self._opacity = opacity # 1 opacity column
     self._title = title     # 1 title column
+    self._style = style     # Rectangle style
 
 class Text(Mark):
   """Render text.
@@ -225,7 +232,7 @@ class Text(Mark):
     title = toyplot.require.table_keys(table, title, length=1)
     style = toyplot.require.style(style)
 
-    Mark.__init__(self, style)
+    Mark.__init__(self)
     self._table = table
     self._coordinates = coordinates # D coordinate columns
     self._axes = axes               # D axis identifiers
@@ -234,6 +241,7 @@ class Text(Mark):
     self._fill = fill               # 1 fill color column
     self._opacity = opacity         # 1 opacity column
     self._title = title             # 1 title column
+    self._style = style             # Text style
 
 ###############################################################################################
 # More specialized marks
@@ -244,15 +252,16 @@ class Legend(Mark):
   Do not create Legend instances directly.  Use factory methods such as
   :meth:`toyplot.canvas.Canvas.legend` or :meth:`toyplot.axes.Cartesian.legend` instead.
   """
-  def __init__(self, xmin, xmax, ymin, ymax, marks, style, label_style):
-    Mark.__init__(self, {"fill":"none", "stroke":"none"}, style)
+  def __init__(self, xmin, xmax, ymin, ymax, marks, style, lstyle):
+    Mark.__init__(self)
     self._xmin = xmin
     self._xmax = xmax
     self._ymin = ymin
     self._ymax = ymax
     self._gutter = 10
     self._marks = marks
-    self._label_style = label_style
+    self._style = toyplot.style.combine({"fill":"none", "stroke":"none"}, style) # Styles the box surrounding the legend
+    self._lstyle = lstyle # Styles the legend labels
 
 class VColorBar(Mark):
   """Displays a one-dimensional mapping from values to colors.
@@ -375,7 +384,7 @@ class VColorBar(Mark):
       self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
   def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, label, colormap, padding, tick_length, min, max, tick_locator, style):
-    Mark.__init__(self, style)
+    Mark.__init__(self)
 
     self._xmin_range = xmin_range
     self._xmax_range = xmax_range
@@ -389,6 +398,7 @@ class VColorBar(Mark):
     self.domain = VColorBar.DomainHelper(min, max)
     self.label = VColorBar.LabelHelper(label=label, style=None)
     self.ticks = VColorBar.TicksHelper(tick_length, tick_locator)
+    self._style = style
 
   def _update_domain(self, vmin, vmax):
     self._vmin_implicit = vmin if self._vmin_implicit is None else self._vmin_implicit if vmin is None else min(vmin, self._vmin_implicit)

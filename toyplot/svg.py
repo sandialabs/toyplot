@@ -371,37 +371,37 @@ def _render(canvas, axes, context):
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.BarBoundaries, _RenderContext)
 def _render(axes, mark, context):
-  bar1 = mark._position.T[0]
-  bar2 = mark._position.T[1]
+  left = mark._table[mark._left[0]]
+  right = mark._table[mark._right[0]]
+  boundaries = numpy.ma.column_stack([mark._table[key] for key in mark._boundaries])
 
-  if mark._along == "x":
+  if mark._left_right_axis == "x":
     axis1 = "x"
     axis2 = "y"
     distance1 = "width"
     distance2 = "height"
-    bar1 = axes._project_x(bar1)
-    bar2 = axes._project_x(bar2)
-    boundaries = axes._project_y(mark._series)
-  elif mark._along == "y":
+    left = axes._project_x(left)
+    right = axes._project_x(right)
+    boundaries = axes._project_y(boundaries)
+  elif mark._left_right_axis == "y":
     axis1 = "y"
     axis2 = "x"
     distance1 = "height"
     distance2 = "width"
-    bar1 = axes._project_y(bar1)
-    bar2 = axes._project_y(bar2)
-    boundaries = axes._project_x(mark._series)
+    left = axes._project_y(left)
+    right = axes._project_y(right)
+    boundaries = axes._project_x(boundaries)
 
   mark_xml = xml.SubElement(context.root, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class":"toyplot-mark-BarBoundaries"})
+  _render_data_table(mark_xml, mark._table, title="Bar Data")
 
-  xml.SubElement(mark_xml, "toyplot:data-table", title="Bar Data").text = json.dumps({"names":["position"] + ["series%s" % s for s in range(mark._series.shape[1])], "data":[mark._position.tolist()] + [s.tolist() for s in mark._series.T]}, sort_keys=True)
-
-  for boundary1, boundary2, fill, opacity, title in zip(boundaries.T[:-1], boundaries.T[1:], mark._fill.T, mark._opacity.T, mark._title.T):
+  for boundary1, boundary2, fill, opacity, title in zip(boundaries.T[:-1], boundaries.T[1:], [mark._table[key] for key in mark._fill], [mark._table[key] for key in mark._opacity], [mark._table[key] for key in mark._title]):
     not_null = numpy.invert(numpy.logical_or(numpy.ma.getmaskarray(boundary1), numpy.ma.getmaskarray(boundary2)))
 
     series_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Series"})
-    for dbar1, dbar2, dboundary1, dboundary2, dfill, dopacity, dtitle in zip(bar1[not_null], bar2[not_null], boundary1[not_null], boundary2[not_null], fill[not_null], opacity[not_null], title[not_null]):
+    for dleft, dright, dboundary1, dboundary2, dfill, dopacity, dtitle in zip(left[not_null], right[not_null], boundary1[not_null], boundary2[not_null], fill[not_null], opacity[not_null], title[not_null]):
       dstyle = toyplot.style.combine({"fill":toyplot.color.to_css(dfill), "opacity":dopacity}, mark._style)
-      datum_xml = xml.SubElement(series_xml, "rect", attrib={"class":"toyplot-Datum", axis1:repr(min(dbar1, dbar2)), axis2:repr(min(dboundary1, dboundary2)), distance1:repr(numpy.abs(dbar1 - dbar2)), distance2:repr(numpy.abs(dboundary1 - dboundary2))}, style=_css_style(dstyle))
+      datum_xml = xml.SubElement(series_xml, "rect", attrib={"class":"toyplot-Datum", axis1:repr(min(dleft, dright)), axis2:repr(min(dboundary1, dboundary2)), distance1:repr(numpy.abs(dleft - dright)), distance2:repr(numpy.abs(dboundary1 - dboundary2))}, style=_css_style(dstyle))
       if dtitle is not None:
         xml.SubElement(datum_xml, "title").text = str(dtitle)
 

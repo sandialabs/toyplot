@@ -260,14 +260,29 @@ class BarBoundaries(Mark):
   Do not create BarBoundaries instances directly.  Use factory methods such as
   :func:`toyplot.bars` or :meth:`toyplot.axes.Cartesian.bars` instead.
   """
-  def __init__(self, along, position, series, fill, opacity, title, style, id):
+  def __init__(self, table, left, right, left_right_axis, boundaries, boundary_axis, fill, opacity, title, style, id):
+    table = toyplot.require.instance(table, toyplot.data.Table)
+    left = toyplot.require.table_keys(table, left, length=1)
+    right = toyplot.require.table_keys(table, right, length=1)
+    left_right_axis = toyplot.require.string_vector(left_right_axis, length=1)
+    boundaries = toyplot.require.table_keys(table, boundaries, min_length=2)
+    boundary_axis = toyplot.require.string_vector(boundary_axis, length=1)
+    fill = toyplot.require.table_keys(table, fill, length=len(boundaries)-1)
+    opacity = toyplot.require.table_keys(table, opacity, length=len(boundaries)-1)
+    title = toyplot.require.table_keys(table, title, length=len(boundaries)-1)
+    style = toyplot.require.style(style)
+    id = toyplot.require.optional_id(id)
+
     Mark.__init__(self, {"stroke":"none"}, style, id=id)
-    self._along = along
-    self._position = position # M x 2 coordinates
-    self._series = series     # M x N bar boundaries
-    self._fill = fill         # M x N-1 fill colors
-    self._opacity = opacity   # M x N-1 opacities
-    self._title = title       # M x N-1 titles
+    self._table = table
+    self._left = left         # 1 coordinate column
+    self._right = right       # 1 coordinate column
+    self._left_right_axis = left_right_axis # 1 axis identifier
+    self._boundaries = boundaries # N bar boundary columns
+    self._boundary_axis = boundary_axis # 1 axis identifier
+    self._fill = fill         #  N-1 fill color columns
+    self._opacity = opacity   #  N-1 opacity columns
+    self._title = title       #  N-1 title columns
 
 class BarMagnitudes(Mark):
   """Render multiple stacked bars defined by bar magnitudes.
@@ -296,6 +311,7 @@ class BarMagnitudes(Mark):
     self._left_right_axis = left_right_axis # 1 axis identifier
     self._baseline = baseline # 1 baseline column
     self._magnitudes = magnitudes # N bar magnitude columns
+    self._magnitude_axis = magnitude_axis # 1 axis identifier
     self._fill = fill         #  N fill color columns
     self._opacity = opacity   #  N opacity columns
     self._title = title       #  N title columns

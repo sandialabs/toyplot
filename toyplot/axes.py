@@ -563,7 +563,31 @@ class Cartesian(object):
       elif along == "y":
         self._update_domain(series, position)
 
-      self._children.append(toyplot.mark.BarBoundaries(along=along, position=position, series=series, fill=fill, opacity=opacity, title=title, style=style, id=id))
+      left_right_axis = along
+      boundary_axis = "y" if along == "x" else "x"
+
+      table = toyplot.data.Table()
+      table["left"] = position.T[0]
+      table["right"] = position.T[1]
+      boundary_keys = []
+      fill_keys = []
+      opacity_keys = []
+      title_keys = []
+
+      boundary_keys.append(boundary_axis + "0")
+      table[boundary_keys[-1]] = series.T[0]
+
+      for index, (boundary_column, fill_column, opacity_column, title_column) in enumerate(zip(series.T[1:], fill.T, opacity.T, title.T)):
+        boundary_keys.append("boundary" + str(index+1))
+        fill_keys.append("fill" + str(index))
+        opacity_keys.append("opacity" + str(index))
+        title_keys.append("title" + str(index))
+        table[boundary_keys[-1]] = boundary_column
+        table[fill_keys[-1]] = fill_column
+        table[opacity_keys[-1]] = opacity_column
+        table[title_keys[-1]] = title_column
+
+      self._children.append(toyplot.mark.BarBoundaries(table=table, left="left", right="right", left_right_axis=left_right_axis, boundaries=boundary_keys, boundary_axis=boundary_axis, fill=fill_keys, opacity=opacity_keys, title=title_keys, style=style, id=id))
       return self._children[-1]
     else: # baseline is not None
       if a is not None and b is not None and c is not None:
@@ -636,7 +660,7 @@ class Cartesian(object):
       opacity_keys = []
       title_keys = []
       for index, (magnitude_column, fill_column, opacity_column, title_column) in enumerate(zip(series.T, fill.T, opacity.T, title.T)):
-        magnitude_keys.append("magnitude_axis" + str(index))
+        magnitude_keys.append("magnitude" + str(index))
         fill_keys.append("fill" + str(index))
         opacity_keys.append("opacity" + str(index))
         title_keys.append("title" + str(index))

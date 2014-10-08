@@ -519,6 +519,7 @@ class Cartesian(object):
     -------
     bars: :class:`toyplot.mark.BarBoundaries` or :class:`toyplot.mark.BarMagnitudes`
     """
+    along = toyplot.require.value_in(along, ["x", "y"])
 
     if baseline is None:
       if a is not None and b is not None and c is not None:
@@ -618,13 +619,33 @@ class Cartesian(object):
         baseline *= -(1.0 / (n + 1))
 
       boundaries = numpy.cumsum(numpy.column_stack((baseline, series)), axis=1)
-
       if along == "x":
         self._update_domain(position, boundaries)
       elif along == "y":
         self._update_domain(boundaries, position)
 
-      self._children.append(toyplot.mark.BarMagnitudes(along=along, position=position, baseline=baseline, series=series, fill=fill, opacity=opacity, title=title, style=style, id=id))
+      left_right_axis = along
+      magnitude_axis = "y" if along == "x" else "x"
+
+      table = toyplot.data.Table()
+      table["left"] = position.T[0]
+      table["right"] = position.T[1]
+      table["baseline"] = baseline
+      magnitude_keys = []
+      fill_keys = []
+      opacity_keys = []
+      title_keys = []
+      for index, (magnitude_column, fill_column, opacity_column, title_column) in enumerate(zip(series.T, fill.T, opacity.T, title.T)):
+        magnitude_keys.append("magnitude_axis" + str(index))
+        fill_keys.append("fill" + str(index))
+        opacity_keys.append("opacity" + str(index))
+        title_keys.append("title" + str(index))
+        table[magnitude_keys[-1]] = magnitude_column
+        table[fill_keys[-1]] = fill_column
+        table[opacity_keys[-1]] = opacity_column
+        table[title_keys[-1]] = title_column
+
+      self._children.append(toyplot.mark.BarMagnitudes(table=table, left="left", right="right", left_right_axis=left_right_axis, baseline="baseline", magnitudes=magnitude_keys, magnitude_axis=magnitude_axis, fill=fill_keys, opacity=opacity_keys, title=title_keys, style=style, id=id))
       return self._children[-1]
 
   def colorbar(self, values=None, palette=None, colormap=None, label=None, min=None, max=None, id=None, tick_length=5, tick_locator=None, offset=0, width=10, style=None):

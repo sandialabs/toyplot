@@ -275,15 +275,30 @@ class BarMagnitudes(Mark):
   Do not create BarMagnitudes instances directly.  Use factory methods such as
   :func:`toyplot.bars` or :meth:`toyplot.axes.Cartesian.bars` instead.
   """
-  def __init__(self, along, position, baseline, series, fill, opacity, title, style, id):
+  def __init__(self, table, left, right, left_right_axis, baseline, magnitudes, magnitude_axis, fill, opacity, title, style, id):
+    table = toyplot.require.instance(table, toyplot.data.Table)
+    left = toyplot.require.table_keys(table, left, length=1)
+    right = toyplot.require.table_keys(table, right, length=1)
+    left_right_axis = toyplot.require.string_vector(left_right_axis, length=1)
+    baseline = toyplot.require.table_keys(table, baseline, length=1)
+    magnitudes = toyplot.require.table_keys(table, magnitudes, min_length=1)
+    magnitude_axis = toyplot.require.string_vector(magnitude_axis, length=1)
+    fill = toyplot.require.table_keys(table, fill, length=len(magnitudes))
+    opacity = toyplot.require.table_keys(table, opacity, length=len(magnitudes))
+    title = toyplot.require.table_keys(table, title, length=len(magnitudes))
+    style = toyplot.require.style(style)
+    id = toyplot.require.optional_id(id)
+
     Mark.__init__(self, {"stroke":"none"}, style, id=id)
-    self._along = along
-    self._position = position # M x 2 coordinates
-    self._baseline = baseline # M baseline coordinates
-    self._series = series     # M x N bar magnitudes
-    self._fill = fill         # M x N fill colors
-    self._opacity = opacity   # M x N opacities
-    self._title = title       # M x N titles
+    self._table = table
+    self._left = left         # 1 coordinate column
+    self._right = right       # 1 coordinate column
+    self._left_right_axis = left_right_axis # 1 axis identifier
+    self._baseline = baseline # 1 baseline column
+    self._magnitudes = magnitudes # N bar magnitude columns
+    self._fill = fill         #  N fill color columns
+    self._opacity = opacity   #  N opacity columns
+    self._title = title       #  N title columns
 
 class FillBoundaries(Mark):
   """Render multiple stacked fill regions defined by boundaries.

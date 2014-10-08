@@ -25,8 +25,8 @@ def value_in(value, choices):
     raise ValueError("Expected one of %s, received %s." % (",".join([str(choice) for choice in choices]), value))
   return value
 
-def table_keys(table, keys, length=None):
-  keys = string_vector(keys, length=length)
+def table_keys(table, keys, length=None, min_length=None):
+  keys = string_vector(keys, length=length, min_length=min_length)
   allowed = list(table.keys())
   for key in keys:
     if key not in allowed:
@@ -71,7 +71,7 @@ def string(value):
     raise ValueError("Expected a string, received %s." % value)
   return value
 
-def string_vector(value, length=None):
+def string_vector(value, length=None, min_length=None):
   if isinstance(value, (toyplot.compatibility.string_type)):
     value = [value]
   array = numpy.ma.array(value).astype("str")
@@ -80,6 +80,9 @@ def string_vector(value, length=None):
   if length is not None:
     if len(array) != length:
       raise ValueError("Expected %s values, received %s" % (length, len(array)))
+  if min_length is not None:
+    if len(array) < min_length:
+      raise ValueError("Expected %s or more values, received %s" % (min_length, len(array)))
   return array
 
 def optional_string(value):

@@ -17,7 +17,6 @@ class Mark(object):
   """
   def __init__(self, *styles, **kwargs):
     self._style = toyplot.style.combine(*styles)
-    self._id = kwargs.get("id", None)
 
 class AxisLines(Mark):
   """Render multiple lines parallel to an axis.
@@ -25,7 +24,7 @@ class AxisLines(Mark):
   Do not create AxisLines instances directly.  Use factory methods such as
   :meth:`toyplot.axes.Cartesian.hlines` and :meth:`toyplot.axes.Cartesian.vlines` instead.
   """
-  def __init__(self, table, coordinates, axes, stroke, opacity, title, style, id):
+  def __init__(self, table, coordinates, axes, stroke, opacity, title, style):
     table = toyplot.require.instance(table, toyplot.data.Table)
     coordinates = toyplot.require.table_keys(table, coordinates, length=1)
     axes = toyplot.require.string_vector(axes, len(coordinates))
@@ -33,9 +32,8 @@ class AxisLines(Mark):
     opacity = toyplot.require.table_keys(table, opacity, length=1)
     title = toyplot.require.table_keys(table, title, length=1)
     style = toyplot.require.style(style)
-    id = toyplot.require.optional_id(id)
 
-    Mark.__init__(self, style, id=id)
+    Mark.__init__(self, style)
     self._table = table
     self._coordinates = coordinates # 1 coordinate column
     self._axes = axes               # 1 axis identifier
@@ -49,7 +47,7 @@ class BarBoundaries(Mark):
   Do not create BarBoundaries instances directly.  Use factory methods such as
   :func:`toyplot.bars` or :meth:`toyplot.axes.Cartesian.bars` instead.
   """
-  def __init__(self, table, left, right, left_right_axis, boundaries, boundary_axis, fill, opacity, title, style, id):
+  def __init__(self, table, left, right, left_right_axis, boundaries, boundary_axis, fill, opacity, title, style):
     table = toyplot.require.instance(table, toyplot.data.Table)
     left = toyplot.require.table_keys(table, left, length=1)
     right = toyplot.require.table_keys(table, right, length=1)
@@ -60,9 +58,8 @@ class BarBoundaries(Mark):
     opacity = toyplot.require.table_keys(table, opacity, length=len(boundaries)-1)
     title = toyplot.require.table_keys(table, title, length=len(boundaries)-1)
     style = toyplot.require.style(style)
-    id = toyplot.require.optional_id(id)
 
-    Mark.__init__(self, {"stroke":"none"}, style, id=id)
+    Mark.__init__(self, {"stroke":"none"}, style)
     self._table = table
     self._left = left         # 1 coordinate column
     self._right = right       # 1 coordinate column
@@ -79,7 +76,7 @@ class BarMagnitudes(Mark):
   Do not create BarMagnitudes instances directly.  Use factory methods such as
   :func:`toyplot.bars` or :meth:`toyplot.axes.Cartesian.bars` instead.
   """
-  def __init__(self, table, left, right, left_right_axis, baseline, magnitudes, magnitude_axis, fill, opacity, title, style, id):
+  def __init__(self, table, left, right, left_right_axis, baseline, magnitudes, magnitude_axis, fill, opacity, title, style):
     table = toyplot.require.instance(table, toyplot.data.Table)
     left = toyplot.require.table_keys(table, left, length=1)
     right = toyplot.require.table_keys(table, right, length=1)
@@ -91,9 +88,8 @@ class BarMagnitudes(Mark):
     opacity = toyplot.require.table_keys(table, opacity, length=len(magnitudes))
     title = toyplot.require.table_keys(table, title, length=len(magnitudes))
     style = toyplot.require.style(style)
-    id = toyplot.require.optional_id(id)
 
-    Mark.__init__(self, {"stroke":"none"}, style, id=id)
+    Mark.__init__(self, {"stroke":"none"}, style)
     self._table = table
     self._left = left         # 1 coordinate column
     self._right = right       # 1 coordinate column
@@ -111,16 +107,15 @@ class FillBoundaries(Mark):
   Do not create FillBoundaries instances directly.  Use factory methods such
   as :func:`toyplot.fill` or :meth:`toyplot.axes.Cartesian.fill` instead.
   """
-  def __init__(self, table, position, position_axis, boundaries, boundary_axis, fill, opacity, title, style, id):
+  def __init__(self, table, position, position_axis, boundaries, boundary_axis, fill, opacity, title, style):
     table = toyplot.require.instance(table, toyplot.data.Table)
     position = toyplot.require.table_keys(table, position, length=1)
     position_axis = toyplot.require.string_vector(position_axis, length=1)
     boundaries = toyplot.require.table_keys(table, boundaries)
     boundary_axis = toyplot.require.string_vector(boundary_axis, length=1)
     style = toyplot.require.style(style)
-    id = toyplot.require.optional_id(id)
 
-    Mark.__init__(self, style, id=id)
+    Mark.__init__(self, style)
     self._table = table
     self._position = position # 1 coordinate column
     self._position_axis = position_axis # 1 axis identifier
@@ -136,7 +131,7 @@ class FillMagnitudes(Mark):
   Do not create FillMagnitudes instances directly.  Use factory methods such
   as :func:`toyplot.fill` or :meth:`toyplot.axes.Cartesian.fill` instead.
   """
-  def __init__(self, table, position, position_axis, baseline, magnitudes, magnitude_axis, fill, opacity, title, style, id):
+  def __init__(self, table, position, position_axis, baseline, magnitudes, magnitude_axis, fill, opacity, title, style):
     table = toyplot.require.instance(table, toyplot.data.Table)
     position = toyplot.require.table_keys(table, position, length=1)
     position_axis = toyplot.require.string_vector(position_axis, length=1)
@@ -144,9 +139,8 @@ class FillMagnitudes(Mark):
     magnitudes = toyplot.require.table_keys(table, magnitudes)
     magnitude_axis = toyplot.require.string_vector(magnitude_axis, length=1)
     style = toyplot.require.style(style)
-    id = toyplot.require.optional_id(id)
 
-    Mark.__init__(self, style, id=id)
+    Mark.__init__(self, style)
     self._table = table
     self._position = position     # 1 coordinate column
     self._position_axis = position_axis # 1 axis identifier
@@ -163,11 +157,11 @@ class Plot(Mark):
   Do not create Plot instances directly.  Use factory methods such as
   :func:`toyplot.plot`, :func:`toyplot.scatterplot`, :meth:`toyplot.axes.Cartesian.plot` and :meth:`toyplot.axes.Cartesian.scatterplot` instead.
   """
-  def __init__(self, along, show_stroke, position, series, stroke, stroke_width, stroke_opacity, marker, size, fill, opacity, title, style, mstyle, mlstyle, id):
+  def __init__(self, along, show_stroke, position, series, stroke, stroke_width, stroke_opacity, marker, size, fill, opacity, title, style, mstyle, mlstyle):
     toyplot.require.instance(position, numpy.ma.MaskedArray)
     toyplot.require.instance(series, numpy.ma.MaskedArray)
 
-    Mark.__init__(self, style, id=id)
+    Mark.__init__(self, style)
     self._along = along
     self._show_stroke = show_stroke
     self._position = position             # M coordinates
@@ -189,7 +183,7 @@ class Rect(Mark):
   Do not create Rect instances directly.  Use factory methods such as
   :meth:`toyplot.axes.Cartesian.rect` instead.
   """
-  def __init__(self, table, left, right, left_right_axis, top, bottom, top_bottom_axis, fill, opacity, title, style, id):
+  def __init__(self, table, left, right, left_right_axis, top, bottom, top_bottom_axis, fill, opacity, title, style):
     table = toyplot.require.instance(table, toyplot.data.Table)
     left = toyplot.require.table_keys(table, left, length=1)
     right = toyplot.require.table_keys(table, right, length=1)
@@ -201,9 +195,8 @@ class Rect(Mark):
     opacity = toyplot.require.table_keys(table, opacity, length=1)
     title = toyplot.require.table_keys(table, title, length=1)
     style = toyplot.require.style(style)
-    id = toyplot.require.optional_id(id)
 
-    Mark.__init__(self, style, id=id)
+    Mark.__init__(self, style)
     self._table = table
     self._left = left       # 1 coordinate column
     self._right = right     # 1 coordinate column
@@ -221,7 +214,7 @@ class Text(Mark):
   Do not create Text instances directly.  Use factory methods such as
   :meth:`toyplot.canvas.Canvas.text` or :meth:`toyplot.axes.Cartesian.text` instead.
   """
-  def __init__(self, table, coordinates, axes, text, angle, fill, opacity, title, style, id):
+  def __init__(self, table, coordinates, axes, text, angle, fill, opacity, title, style):
     table = toyplot.require.instance(table, toyplot.data.Table)
     coordinates = toyplot.require.table_keys(table, coordinates)
     axes = toyplot.require.string_vector(axes, length=len(coordinates))
@@ -231,9 +224,8 @@ class Text(Mark):
     opacity = toyplot.require.table_keys(table, opacity, length=1)
     title = toyplot.require.table_keys(table, title, length=1)
     style = toyplot.require.style(style)
-    id = toyplot.require.optional_id(id)
 
-    Mark.__init__(self, style, id=id)
+    Mark.__init__(self, style)
     self._table = table
     self._coordinates = coordinates # D coordinate columns
     self._axes = axes               # D axis identifiers
@@ -252,8 +244,8 @@ class Legend(Mark):
   Do not create Legend instances directly.  Use factory methods such as
   :meth:`toyplot.canvas.Canvas.legend` or :meth:`toyplot.axes.Cartesian.legend` instead.
   """
-  def __init__(self, xmin, xmax, ymin, ymax, marks, style, label_style, id):
-    Mark.__init__(self, {"fill":"none", "stroke":"none"}, style, id=id)
+  def __init__(self, xmin, xmax, ymin, ymax, marks, style, label_style):
+    Mark.__init__(self, {"fill":"none", "stroke":"none"}, style)
     self._xmin = xmin
     self._xmax = xmax
     self._ymin = ymin
@@ -382,7 +374,7 @@ class VColorBar(Mark):
     def style(self, value):
       self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
-  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, label, colormap, padding, tick_length, min, max, tick_locator, style, id):
+  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, label, colormap, padding, tick_length, min, max, tick_locator, style):
     Mark.__init__(self, style)
 
     self._xmin_range = xmin_range
@@ -397,7 +389,6 @@ class VColorBar(Mark):
     self.domain = VColorBar.DomainHelper(min, max)
     self.label = VColorBar.LabelHelper(label=label, style=None)
     self.ticks = VColorBar.TicksHelper(tick_length, tick_locator)
-    self._id = id
 
   def _update_domain(self, vmin, vmax):
     self._vmin_implicit = vmin if self._vmin_implicit is None else self._vmin_implicit if vmin is None else min(vmin, self._vmin_implicit)

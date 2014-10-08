@@ -112,11 +112,10 @@ class Canvas(object):
 
   >>> canvas = toyplot.Canvas(800, 600, style={"background-color":"yellow"})
   """
-  def __init__(self, width=None, height=None, style=None, id=None, autorender=None):
+  def __init__(self, width=None, height=None, style=None, autorender=None):
     self._width = width if width is not None else 600
     self._height = height if height is not None else self._width
     self._style = toyplot.style.combine({"background-color": "transparent", "fill": toyplot.color.near_black, "fill-opacity": 1.0, "font-family":"helvetica", "font-size": "12px", "opacity": 1.0, "stroke": toyplot.color.near_black, "stroke-opacity": 1.0, "stroke-width": 1.0}, style)
-    self._id = id
     self._animation = collections.defaultdict(lambda: collections.defaultdict(list))
     self._children = []
 
@@ -184,7 +183,7 @@ class Canvas(object):
       if self in Canvas._autorender_list:
         Canvas._autorender_list.remove(self)
 
-  def axes(self, bounds=None, rect=None, corner=None, grid=None, gutter=50, xmin=None, xmax=None, ymin=None, ymax=None, show=True, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=10, tick_length=5, id=None):
+  def axes(self, bounds=None, rect=None, corner=None, grid=None, gutter=50, xmin=None, xmax=None, ymin=None, ymax=None, show=True, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=10, tick_length=5):
     """Add a set of 2D axes to the canvas.
 
     Parameters
@@ -216,10 +215,10 @@ class Canvas(object):
     axes: :class:`toyplot.axes.Cartesian`
     """
     xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-    self._children.append(toyplot.axes.Cartesian(xmin_range, xmax_range, ymin_range, ymax_range, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self, id=id))
+    self._children.append(toyplot.axes.Cartesian(xmin_range, xmax_range, ymin_range, ymax_range, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self))
     return self._children[-1]
 
-  def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style=None, label_style=None, id=None):
+  def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style=None, label_style=None):
     """Add a legend to the canvas.
 
     Parameters
@@ -268,13 +267,12 @@ class Canvas(object):
     gutter = toyplot.require.scalar(gutter)
     style = toyplot.style.combine(toyplot.require.style(style))
     label_style = toyplot.style.combine(toyplot.require.style(label_style))
-    id = toyplot.require.optional_id(id)
 
     xmin, xmax, ymin, ymax = toyplot.layout.region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-    self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style, id))
+    self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style))
     return self._children[-1]
 
-  def text(self, x, y, text, angle=0.0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
+  def text(self, x, y, text, angle=0.0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None):
     """Add text to the canvas.
 
     Parameters
@@ -305,9 +303,8 @@ class Canvas(object):
     table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
     table["title"] = toyplot.broadcast.object(title, table.shape[0])
     style = toyplot.style.combine({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
-    id = toyplot.require.optional_id(id)
 
-    self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style))
     return self._children[-1]
 
   def time(self, begin, end, index=None):

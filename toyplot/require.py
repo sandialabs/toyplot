@@ -100,6 +100,3 @@ def marker_array(value, length=None):
       raise ValueError("Expected %s values, received %s." % (length, len(array)))
   return array
 
-def optional_id(id):
-  return optional_string(id)
-

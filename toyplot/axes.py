@@ -275,7 +275,7 @@ class Cartesian(object):
     def style(self, value):
       self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
-  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, xmin, xmax, ymin, ymax, show, xshow, yshow, label, xlabel, ylabel, xticklocator, yticklocator, xscale, yscale, palette, padding, tick_length, parent, id):
+  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, xmin, xmax, ymin, ymax, show, xshow, yshow, label, xlabel, ylabel, xticklocator, yticklocator, xscale, yscale, palette, padding, tick_length, parent):
     self._xmin_range = xmin_range
     self._xmax_range = xmax_range
     self._ymin_range = ymin_range
@@ -303,8 +303,6 @@ class Cartesian(object):
     self.y = Cartesian.AxisHelper(show=yshow, label=ylabel, label_style={"baseline-shift":"200%"}, min=ymin, max=ymax, tick_length=tick_length, tick_locator=yticklocator, tick_angle=-90, scale=yscale)
 
     self._parent = parent
-    self._id = id
-
     self._children = []
 
   @property
@@ -458,7 +456,7 @@ class Cartesian(object):
   def _project_y(self, y):
     return self._yprojection(y)
 
-  def bars(self, a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
+  def bars(self, a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None):
     """Add stacked bars to the axes.
 
     This command generates one-or-more series of stacked bars.  For
@@ -513,7 +511,6 @@ class Cartesian(object):
       Specify a single title, one title per series, or one title per bar.
     style: dict, optional
       Collection of CSS styles to be applied globally.
-    id: string, optional
 
     Returns
     -------
@@ -556,7 +553,6 @@ class Cartesian(object):
       opacity = toyplot.broadcast.scalar(opacity, (series.shape[0], series.shape[1]-1))
       title = toyplot.broadcast.object(title, (series.shape[0], series.shape[1]-1))
       style = toyplot.style.combine({"stroke":"white", "stroke-width":1.0}, toyplot.require.style(style))
-      id = toyplot.require.optional_id(id)
 
       if along == "x":
         self._update_domain(position, series)
@@ -587,7 +583,7 @@ class Cartesian(object):
         table[opacity_keys[-1]] = opacity_column
         table[title_keys[-1]] = title_column
 
-      self._children.append(toyplot.mark.BarBoundaries(table=table, left="left", right="right", left_right_axis=left_right_axis, boundaries=boundary_keys, boundary_axis=boundary_axis, fill=fill_keys, opacity=opacity_keys, title=title_keys, style=style, id=id))
+      self._children.append(toyplot.mark.BarBoundaries(table=table, left="left", right="right", left_right_axis=left_right_axis, boundaries=boundary_keys, boundary_axis=boundary_axis, fill=fill_keys, opacity=opacity_keys, title=title_keys, style=style))
       return self._children[-1]
     else: # baseline is not None
       if a is not None and b is not None and c is not None:
@@ -628,7 +624,6 @@ class Cartesian(object):
       opacity = toyplot.broadcast.scalar(opacity, series.shape)
       title = toyplot.broadcast.object(title, series.shape)
       style = toyplot.style.combine({"stroke":"white", "stroke-width":1.0}, toyplot.require.style(style))
-      id = toyplot.require.optional_id(id)
 
       if baseline == "stacked":
         baseline = numpy.zeros(series.shape[0])
@@ -669,23 +664,23 @@ class Cartesian(object):
         table[opacity_keys[-1]] = opacity_column
         table[title_keys[-1]] = title_column
 
-      self._children.append(toyplot.mark.BarMagnitudes(table=table, left="left", right="right", left_right_axis=left_right_axis, baseline="baseline", magnitudes=magnitude_keys, magnitude_axis=magnitude_axis, fill=fill_keys, opacity=opacity_keys, title=title_keys, style=style, id=id))
+      self._children.append(toyplot.mark.BarMagnitudes(table=table, left="left", right="right", left_right_axis=left_right_axis, baseline="baseline", magnitudes=magnitude_keys, magnitude_axis=magnitude_axis, fill=fill_keys, opacity=opacity_keys, title=title_keys, style=style))
       return self._children[-1]
 
-  def colorbar(self, values=None, palette=None, colormap=None, label=None, min=None, max=None, id=None, tick_length=5, tick_locator=None, offset=0, width=10, style=None):
+  def colorbar(self, values=None, palette=None, colormap=None, label=None, min=None, max=None, tick_length=5, tick_locator=None, offset=0, width=10, style=None):
     if colormap is None:
       if palette is None:
         palette = toyplot.color.brewer("BlueGreen")
       colormap = toyplot.color.LinearMap(palette=palette)
     style = toyplot.require.style(style)
 
-    mark = toyplot.mark.VColorBar(xmin_range=self._xmax_range + offset, xmax_range=self._xmax_range + offset + width, ymin_range=self._ymin_range, ymax_range=self._ymax_range, label=label, colormap=colormap, padding=self._padding, tick_length=tick_length, min=min, max=max, tick_locator=tick_locator, style=style, id=id)
+    mark = toyplot.mark.VColorBar(xmin_range=self._xmax_range + offset, xmax_range=self._xmax_range + offset + width, ymin_range=self._ymin_range, ymax_range=self._ymax_range, label=label, colormap=colormap, padding=self._padding, tick_length=tick_length, min=min, max=max, tick_locator=tick_locator, style=style)
     if values is not None:
       mark._update_domain(numpy.min(values), numpy.max(values))
     self._parent._children.append(mark)
     return mark
 
-  def fill(self, a, b=None, c=None, along="x", baseline=None, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
+  def fill(self, a, b=None, c=None, along="x", baseline=None, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None):
     """Fill multiple regions separated by curves.
 
     Parameters
@@ -703,7 +698,6 @@ class Cartesian(object):
     style: dict, optional
       Collection of CSS styles to apply to the mark.  See
       :class:`toyplot.mark.FillBoundaries` for a list of useful styles.
-    id: string, optional
 
     Returns
     -------
@@ -743,7 +737,6 @@ class Cartesian(object):
       opacity = toyplot.broadcast.scalar(opacity, series.shape[1]-1)
       title = toyplot.broadcast.object(title, series.shape[1]-1)
       style = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(style))
-      id = toyplot.require.optional_id(id)
 
       if along == "x":
         self._update_domain(position, series)
@@ -761,7 +754,7 @@ class Cartesian(object):
         table[key] = column
         boundaries.append(key)
 
-      self._children.append(toyplot.mark.FillBoundaries(table=table, position=position_axis, position_axis=position_axis, boundaries=boundaries, boundary_axis=boundary_axis, fill=fill, opacity=opacity, title=title, style=style, id=id))
+      self._children.append(toyplot.mark.FillBoundaries(table=table, position=position_axis, position_axis=position_axis, boundaries=boundaries, boundary_axis=boundary_axis, fill=fill, opacity=opacity, title=title, style=style))
       return self._children[-1]
     else: # baseline is not None
       if a is not None and b is not None:
@@ -784,7 +777,6 @@ class Cartesian(object):
       opacity = toyplot.broadcast.scalar(opacity, series.shape[1])
       title = toyplot.broadcast.object(title, series.shape[1])
       style = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(style))
-      id = toyplot.require.optional_id(id)
 
       if baseline == "stacked":
         baseline = numpy.ma.zeros(series.shape[0])
@@ -816,10 +808,10 @@ class Cartesian(object):
         table[key] = column
         magnitudes.append(key)
 
-      self._children.append(toyplot.mark.FillMagnitudes(table=table, position=position_axis, position_axis=position_axis, baseline="baseline", magnitudes=magnitudes, magnitude_axis=magnitude_axis, fill=fill, opacity=opacity, title=title, style=style, id=id))
+      self._children.append(toyplot.mark.FillMagnitudes(table=table, position=position_axis, position_axis=position_axis, baseline="baseline", magnitudes=magnitudes, magnitude_axis=magnitude_axis, fill=fill, opacity=opacity, title=title, style=style))
       return self._children[-1]
 
-  def plot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None, id=None):
+  def plot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None):
     """Add a bivariate plot to the axes.
 
     Parameters
@@ -834,7 +826,6 @@ class Cartesian(object):
     style: dict, optional
       Collection of CSS styles to apply across all datums.  See
       :class:`toyplot.mark.Plot` for a list of useful styles.
-    id: string, optional
 
     Returns
     -------
@@ -869,17 +860,16 @@ class Cartesian(object):
     style = toyplot.style.combine({"fill":"none"}, toyplot.require.style(style))
     mstyle = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(mstyle))
     mlstyle = toyplot.style.combine(toyplot.require.style(mlstyle))
-    id = toyplot.require.optional_id(id)
 
     if along == "x":
       self._update_domain(position, series)
     elif along == "y":
       self._update_domain(series, position)
 
-    self._children.append(toyplot.mark.Plot(along=along, show_stroke=True, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle, id=id))
+    self._children.append(toyplot.mark.Plot(along=along, show_stroke=True, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle))
     return self._children[-1]
 
-  def scatterplot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None, id=None):
+  def scatterplot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None):
     """Add a bivariate plot to the axes.
 
     Parameters
@@ -894,7 +884,6 @@ class Cartesian(object):
     style: dict, optional
       Collection of CSS styles to apply across all datums.  See
       :class:`toyplot.toyplot.Plot` for a list of useful styles.
-    id: string, optional
 
     Returns
     -------
@@ -932,17 +921,16 @@ class Cartesian(object):
     style = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(style))
     mstyle = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(mstyle))
     mlstyle = toyplot.style.combine(toyplot.require.style(mlstyle))
-    id = toyplot.require.optional_id(id)
 
     if along == "x":
       self._update_domain(position, series)
     elif along == "y":
       self._update_domain(series, position)
 
-    self._children.append(toyplot.mark.Plot(along=along, show_stroke=False, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle, id=id))
+    self._children.append(toyplot.mark.Plot(along=along, show_stroke=False, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle))
     return self._children[-1]
 
-  def rect(self, a, b, c, d, along="x", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={"stroke":"none"}, id=None):
+  def rect(self, a, b, c, d, along="x", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={"stroke":"none"}):
     table = toyplot.data.Table()
     table["left"] = toyplot.require.scalar_vector(a)
     table["right"] = toyplot.require.scalar_vector(b, length=table.shape[0])
@@ -952,7 +940,6 @@ class Cartesian(object):
     table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
     table["title"] = toyplot.broadcast.object(title, table.shape[0])
     style = toyplot.style.combine(toyplot.require.style(style))
-    id = toyplot.require.optional_id(id)
 
     default_color = next(self._rect_colors)
     table["toyplot:fill"] = toyplot.color._broadcast_color(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
@@ -966,10 +953,10 @@ class Cartesian(object):
       top_bottom_axis = "x"
       self._update_domain(numpy.concatenate((table["top"], table["bottom"])), numpy.concatenate((table["left"], table["right"])))
 
-    self._children.append(toyplot.mark.Rect(table=table, left="left", right="right", left_right_axis=left_right_axis, top="top", bottom="bottom", top_bottom_axis=top_bottom_axis, fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(toyplot.mark.Rect(table=table, left="left", right="right", left_right_axis=left_right_axis, top="top", bottom="bottom", top_bottom_axis=top_bottom_axis, fill="toyplot:fill", opacity="opacity", title="title", style=style))
     return self._children[-1]
 
-  def text(self, a, b, text, angle=0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
+  def text(self, a, b, text, angle=0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None):
     """Add text to the axes.
 
     Parameters
@@ -998,17 +985,16 @@ class Cartesian(object):
     table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
     table["title"] = toyplot.broadcast.object(title, table.shape[0])
     style = toyplot.style.combine({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
-    id = toyplot.require.optional_id(id)
 
     default_color = next(self._text_colors)
     table["toyplot:fill"] = toyplot.color._broadcast_color(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
 
     self._update_domain(table["x"], table["y"])
 
-    self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style))
     return self._children[-1]
 
-  def hlines(self, y, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
+  def hlines(self, y, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style=None):
     """Add horizontal line(s) to the axes.
 
     Horizontal lines are convenient because they're guaranteed to fill the axes from
@@ -1024,7 +1010,6 @@ class Cartesian(object):
     style: dict, optional
       Collection of CSS styles to apply to the mark.  See
       :class:`toyplot.mark.AxisLines` for a list of useful styles.
-    id: string, optional
 
     Returns
     -------
@@ -1036,15 +1021,14 @@ class Cartesian(object):
     table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
     table["title"] = toyplot.broadcast.object(title, table.shape[0])
     style = toyplot.style.combine(toyplot.require.style(style))
-    id = toyplot.require.optional_id(id)
 
     table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
 
     self._update_domain(numpy.array([]), table["y"])
-    self._children.append(toyplot.mark.AxisLines(table=table, coordinates=["y"], axes=["y"], stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(toyplot.mark.AxisLines(table=table, coordinates=["y"], axes=["y"], stroke="toyplot:stroke", opacity="opacity", title="title", style=style))
     return self._children[-1]
 
-  def vlines(self, x, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, id=None):
+  def vlines(self, x, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style=None):
     """Add vertical line(s) to the axes.
 
     Vertical lines are convenient because they're guaranteed to fill the axes from
@@ -1060,7 +1044,6 @@ class Cartesian(object):
     style: dict, optional
       Collection of CSS styles to apply to the mark.  See
       :class:`toyplot.mark.AxisLines` for a list of useful styles.
-    id: string, optional
 
     Returns
     -------
@@ -1072,15 +1055,14 @@ class Cartesian(object):
     table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
     table["title"] = toyplot.broadcast.object(title, table.shape[0])
     style = toyplot.style.combine(toyplot.require.style(style))
-    id = toyplot.require.optional_id(id)
 
     table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
 
     self._update_domain(table["x"], numpy.array([]))
-    self._children.append(toyplot.mark.AxisLines(table=table, coordinates=["x"], axes=["x"], stroke="toyplot:stroke", opacity="opacity", title="title", style=style, id=id))
+    self._children.append(toyplot.mark.AxisLines(table=table, coordinates=["x"], axes=["x"], stroke="toyplot:stroke", opacity="opacity", title="title", style=style))
     return self._children[-1]
 
-  def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style=None, label_style=None, id=None):
+  def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style=None, label_style=None):
     """Add a legend to the axes.
 
     Parameters
@@ -1120,7 +1102,6 @@ class Cartesian(object):
       Specifies the amount of empty space to leave between grid cells When using the
       `grid` parameter to position the legend.
     style: dict, optional
-    id: string, optional
 
     Returns
     -------
@@ -1129,9 +1110,8 @@ class Cartesian(object):
     gutter = toyplot.require.scalar(gutter)
     style = toyplot.style.combine(toyplot.require.style(style))
     label_style = toyplot.style.combine(toyplot.require.style(label_style))
-    id = toyplot.require.optional_id(id)
 
     xmin, xmax, ymin, ymax = toyplot.layout.region(self._xmin_range, self._xmax_range, self._ymin_range, self._ymax_range, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-    self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style, id))
+    self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style))
     return self._children[-1]
 

@@ -299,13 +299,6 @@ def test_require_marker_array():
   with nose.tools.assert_raises(ValueError):
     toyplot.require.marker_array(["foo", "bar"], 3)
 
-def test_require_optional_id():
-  nose.tools.assert_equal(toyplot.require.optional_id("foo"), "foo")
-  nose.tools.assert_equal(toyplot.require.optional_id(u"foo"), u"foo")
-  nose.tools.assert_equal(toyplot.require.optional_id(None), None)
-  with nose.tools.assert_raises(ValueError):
-    nose.tools.assert_equal(toyplot.require.optional_id(1), 1)
-
 def test_broadcast_scalar():
   numpy.testing.assert_equal(toyplot.broadcast.scalar(1, 3), [1,1,1])
   numpy.testing.assert_equal(toyplot.broadcast.scalar(1, (3, 3)), [[1,1,1],[1,1,1],[1,1,1]])

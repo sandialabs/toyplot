@@ -160,24 +160,43 @@ class Plot(Mark):
   """Plot multiple bivariate data series using lines and/or markers.
 
   Do not create Plot instances directly.  Use factory methods such as
-  :func:`toyplot.plot`, :func:`toyplot.scatterplot`, :meth:`toyplot.axes.Cartesian.plot` and :meth:`toyplot.axes.Cartesian.scatterplot` instead.
+  :func:`toyplot.plot`, :func:`toyplot.scatterplot`,
+  :meth:`toyplot.axes.Cartesian.plot` and
+  :meth:`toyplot.axes.Cartesian.scatterplot` instead.
   """
-  def __init__(self, along, show_stroke, position, series, stroke, stroke_width, stroke_opacity, marker, size, fill, opacity, title, style, mstyle, mlstyle):
-    toyplot.require.instance(position, numpy.ma.MaskedArray)
-    toyplot.require.instance(series, numpy.ma.MaskedArray)
+  def __init__(self, table, coordinates, coordinate_axes, series, series_axis, show_stroke, stroke, stroke_width, stroke_opacity, marker, size, fill, opacity, title, style, mstyle, mlstyle):
+    table = toyplot.require.instance(table, toyplot.data.Table)
+    coordinates = toyplot.require.table_keys(table, coordinates, min_length=1)
+    coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=len(coordinates))
+    series = toyplot.require.table_keys(table, series, min_length=1)
+    series_axis = toyplot.require.string_vector(series_axis, length=1)
+    # show_stroke
+    # stroke
+    # stroke_width
+    # stroke_opacity
+    marker = toyplot.require.table_keys(table, marker, length=len(series))
+    size = toyplot.require.table_keys(table, size, length=len(series))
+    fill = toyplot.require.table_keys(table, fill, length=len(series))
+    opacity = toyplot.require.table_keys(table, opacity, length=len(series))
+    # title
+    style = toyplot.require.style(style)
+    mstyle = toyplot.require.style(mstyle)
+    mlstyle = toyplot.require.style(mlstyle)
 
     Mark.__init__(self)
-    self._along = along
-    self._show_stroke = show_stroke
-    self._position = position             # M coordinates
-    self._series = series                 # M x N coordinates
+    self._table = table
+    self._coordinates = coordinates       # D-1 coordinate columns
+    self._coordinate_axes = coordinate_axes # D-1 axis identifiers
+    self._series = series                 # N coordinate columns
+    self._series_axis = series_axis       # 1 axis identifier
+    self._show_stroke = show_stroke       # Boolean
     self._stroke = stroke                 # N stroke colors
     self._stroke_width = stroke_width     # N stroke widths
     self._stroke_opacity = stroke_opacity # N stroke opacities
-    self._marker = marker                 # M x N markers
-    self._size = size                     # M x N marker sizes
-    self._fill = fill                     # M x N marker fill colors
-    self._opacity = opacity               # M x N marker opacities
+    self._marker = marker                 # N marker columns
+    self._size = size                     # N marker size columns
+    self._fill = fill                     # N marker fill color columns
+    self._opacity = opacity               # N marker opacity columns
     self._title = title                   # N titles
     self._style = style                   # Line style
     self._mstyle = mstyle                 # Marker style

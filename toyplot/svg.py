@@ -573,27 +573,29 @@ def _render(canvas, legend, context):
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Plot, _RenderContext)
 def _render(axes, mark, context):
-  if mark._along == "x":
-    position = axes._project_x(mark._position)
-    series = axes._project_y(mark._series)
-  elif mark._along == "y":
-    position = axes._project_y(mark._position)
-    series = axes._project_x(mark._series)
+  position = mark._table[mark._coordinates[0]]
+  series = numpy.ma.column_stack([mark._table[key] for key in mark._series])
+
+  if mark._coordinate_axes[0] == "x":
+    position = axes._project_x(position)
+    series = axes._project_y(series)
+  elif mark._coordinate_axes[0] == "y":
+    position = axes._project_y(position)
+    series = axes._project_x(series)
 
   mark_xml = xml.SubElement(context.root, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class":"toyplot-mark-Plot"})
+  _render_data_table(mark_xml, mark._table, title="Plot Data")
 
-  xml.SubElement(mark_xml, "toyplot:data-table", title="Plot Data").text = json.dumps({"names":["position"] + ["series%s" % s for s in range(mark._series.shape[1])], "data":[mark._position.tolist()] + [s.tolist() for s in mark._series.T]}, sort_keys=True)
-
-  for series, stroke, stroke_width, stroke_opacity, title, marker, size, fill, opacity  in zip(series.T, mark._stroke.T, mark._stroke_width.T, mark._stroke_opacity.T, mark._title.T, mark._marker.T, mark._size.T, mark._fill.T, mark._opacity.T):
+  for series, stroke, stroke_width, stroke_opacity, title, marker, size, fill, opacity  in zip(series.T, mark._stroke.T, mark._stroke_width.T, mark._stroke_opacity.T, mark._title.T, [mark._table[key] for key in mark._marker], [mark._table[key] for key in mark._size], [mark._table[key] for key in mark._fill], [mark._table[key] for key in mark._opacity]):
     not_null = numpy.invert(numpy.logical_or(numpy.ma.getmaskarray(position), numpy.ma.getmaskarray(series)))
     segments = _flat_contiguous(not_null)
 
     size = numpy.sqrt(size)
     stroke_style = toyplot.style.combine({"stroke":toyplot.color.to_css(stroke), "stroke-width":stroke_width, "stroke-opacity":stroke_opacity}, mark._style)
-    if mark._along == "x":
+    if mark._coordinate_axes[0] == "x":
       x = position
       y = series
-    elif mark._along == "y":
+    elif mark._coordinate_axes[0] == "y":
       x = series
       y = position
     series_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Series"})

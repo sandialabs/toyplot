@@ -831,6 +831,8 @@ class Cartesian(object):
     -------
     plot: :class:`toyplot.mark.Plot`
     """
+    along = toyplot.require.value_in(along, ["x", "y"])
+
     if a is not None and b is not None:
       position = toyplot.require.scalar_vector(a)
       b = toyplot.require.scalar_array(b)
@@ -866,7 +868,29 @@ class Cartesian(object):
     elif along == "y":
       self._update_domain(series, position)
 
-    self._children.append(toyplot.mark.Plot(along=along, show_stroke=True, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle))
+    coordinate_axes = along
+    series_axis = "y" if along == "x" else "x"
+
+    table = toyplot.data.Table()
+    table[coordinate_axes] = position
+    series_keys = []
+    marker_keys = []
+    size_keys = []
+    fill_keys = []
+    opacity_keys = []
+    for index, (series_column, marker_column, size_column, fill_column, opacity_column) in enumerate(zip(series.T, marker.T, size.T, fill.T, opacity.T)):
+      series_keys.append(series_axis + str(index))
+      marker_keys.append("marker" + str(index))
+      size_keys.append("size" + str(index))
+      fill_keys.append("fill" + str(index))
+      opacity_keys.append("opacity" + str(index))
+      table[series_keys[-1]] = series_column
+      table[marker_keys[-1]] = marker_column
+      table[size_keys[-1]] = size_column
+      table[fill_keys[-1]] = fill_column
+      table[opacity_keys[-1]] = opacity_column
+
+    self._children.append(toyplot.mark.Plot(table=table, coordinates=coordinate_axes, coordinate_axes=coordinate_axes, series=series_keys, series_axis=series_axis, show_stroke=True, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker_keys, size=size_keys, fill=fill_keys, opacity=opacity_keys, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle))
     return self._children[-1]
 
   def scatterplot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None):
@@ -889,6 +913,8 @@ class Cartesian(object):
     -------
     plot: :class:`toyplot.mark.Plot`
     """
+    along = toyplot.require.value_in(along, ["x", "y"])
+
     if a is not None and b is not None:
       position = toyplot.require.scalar_vector(a)
       b = numpy.ma.array(b).astype("float64")
@@ -927,7 +953,29 @@ class Cartesian(object):
     elif along == "y":
       self._update_domain(series, position)
 
-    self._children.append(toyplot.mark.Plot(along=along, show_stroke=False, position=position, series=series, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle))
+    coordinate_axes = along
+    series_axis = "y" if along == "x" else "x"
+
+    table = toyplot.data.Table()
+    table[coordinate_axes] = position
+    series_keys = []
+    marker_keys = []
+    size_keys = []
+    fill_keys = []
+    opacity_keys = []
+    for index, (series_column, marker_column, size_column, fill_column, opacity_column) in enumerate(zip(series.T, marker.T, size.T, fill.T, opacity.T)):
+      series_keys.append(series_axis + str(index))
+      marker_keys.append("marker" + str(index))
+      size_keys.append("size" + str(index))
+      fill_keys.append("fill" + str(index))
+      opacity_keys.append("opacity" + str(index))
+      table[series_keys[-1]] = series_column
+      table[marker_keys[-1]] = marker_column
+      table[size_keys[-1]] = size_column
+      table[fill_keys[-1]] = fill_column
+      table[opacity_keys[-1]] = opacity_column
+
+    self._children.append(toyplot.mark.Plot(table=table, coordinates=coordinate_axes, coordinate_axes=coordinate_axes, series=series_keys, series_axis=series_axis, show_stroke=False, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker_keys, size=size_keys, fill=fill_keys, opacity=opacity_keys, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle))
     return self._children[-1]
 
   def rect(self, a, b, c, d, along="x", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={"stroke":"none"}):

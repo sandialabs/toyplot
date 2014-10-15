@@ -17,4 +17,5 @@ Contents:
    toyplot.png.rst
    toyplot.selenium.rst
    toyplot.svg.rst
+   toyplot.webm.rst
 

@@ -2,8 +2,8 @@
   :width: 200px
   :align: right
 
-Reference
-=========
+API Reference
+=============
 
 Contents:
 

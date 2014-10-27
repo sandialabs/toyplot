@@ -34,6 +34,7 @@ Documentation
    release-notes.rst
    reference.rst
    support.rst
+   credits.rst
 
 Indices and tables
 ==================

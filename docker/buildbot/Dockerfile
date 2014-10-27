@@ -2,7 +2,9 @@ FROM toyplot/sshd
 MAINTAINER Timothy M. Shead <tshead@sandia.gov>
 
 # Install yum packages.
-RUN yum install -y buildbot-master buildbot-slave git numpy python-coverage python-nose python-sphinx python-sphinx_rtd_theme vim
+RUN yum install -y buildbot-master buildbot-slave git numpy python-coverage python-nose python-pip python-sphinx python-sphinx_rtd_theme vim
+
+RUN pip install colormath multipledispatch
 
 # Setup the root user.
 RUN echo 'root:toyplot' | chpasswd

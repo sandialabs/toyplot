@@ -7,7 +7,9 @@ from __future__ import division
 import io
 import collections
 import difflib
+import json
 import nose.tools
+import numbers
 import numpy
 import os
 import sys
@@ -60,6 +62,25 @@ def assert_masked_array(a, dtype, b, mask):
   numpy.testing.assert_array_equal(a, b)
   numpy.testing.assert_array_equal(a.mask, mask)
 
+def json_comparison_string(o):
+  """Convert a Python object to a JSON string representation that can be used for comparison.
+
+  Limits the precision of floating-point numbers.
+  """
+  if o is None:
+    return "null"
+  if isinstance(o, toyplot.compatibility.string_type):
+    return "\"" + o + "\""
+  if isinstance(o, numbers.Integral):
+    return str(o)
+  if isinstance(o, numbers.Real):
+    return "%.9g" % o
+  if isinstance(o, collections.Sequence):
+    return "[" + ",".join([json_comparison_string(i) for i in o]) + "]"
+  if isinstance(o, collections.Mapping):
+    return "{" + ",".join(["\"" + key + "\":" + json_comparison_string(value) for key, value in o.items()]) + "}"
+  raise Exception("Unexpected value: %s" % o)
+
 def xml_comparison_string(element):
   """Convert an XML element to a pretty string representation that can be used for comparison.
 
@@ -68,7 +89,7 @@ def xml_comparison_string(element):
   """
   def format_value(value):
     try:
-      return "%.7f" % float(value)
+      return "%.9g" % float(value)
     except:
       return value
 
@@ -81,7 +102,11 @@ def xml_comparison_string(element):
         buffer.write(" %s='%s'" % (key, " ".join([format_value(v) for v in value.split(" ")])))
       else:
         buffer.write(" %s='%s'" % (key, format_value(value)))
-    buffer.write(">%s\n" % (element.text if element.text is not None else ""))
+
+    text = element.text if element.text is not None else ""
+    if element.tag == "{http://www.sandia.gov/toyplot}data-table":
+      text = str(json_comparison_string(json.loads(element.text)))
+    buffer.write(">%s\n" % text)
     for child in list(element):
       write_element(child, buffer, indent+"  ")
     buffer.write("%s</%s>\n" % (indent, element.tag))

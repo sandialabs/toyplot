@@ -6,6 +6,7 @@ from __future__ import division
 
 import io
 import collections
+import difflib
 import nose.tools
 import numpy
 import os
@@ -126,7 +127,8 @@ def assert_canvas_matches(canvas, name):
   reference_string = xml_comparison_string(reference_dom)
 
   try:
-    nose.tools.assert_equal(svg_string, reference_string)
+    if svg_string != reference_string:
+      raise Exception("".join(list(difflib.context_diff(svg_string.split("\n"), reference_string.split("\n"), fromfile="test svg" % name, tofile="reference svg"))))
   except Exception as e:
     if not os.path.exists("tests/diffs"):
       os.mkdir("tests/diffs")
@@ -138,7 +140,7 @@ def assert_canvas_matches(canvas, name):
       os.mkdir("tests/failed")
     with open("tests/failed/%s.svg" % name, "wb") as file:
       file.write(svg.getvalue())
-    raise AssertionError("Test output tests/failed/%s.svg doesn't match tests/reference/%s.svg (%s)" % (name, name, e))
+    raise AssertionError("Test output tests/failed/%s.svg doesn't match tests/reference/%s.svg:\n%s" % (name, name))
 
 def assert_html_matches(html, name):
   reference_file = "tests/reference/%s.html" % name

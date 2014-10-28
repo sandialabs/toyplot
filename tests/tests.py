@@ -106,7 +106,7 @@ def xml_comparison_string(element):
         buffer.write(" %s='%s'" % (key, format_value(value)))
 
     text = element.text if element.text is not None else ""
-    if element.tag == "{http://www.sandia.gov/toyplot}data-table":
+    if element.tag in ["{http://www.sandia.gov/toyplot}data-table", "{http://www.sandia.gov/toyplot}axes"]:
       text = str(json_comparison_string(json.loads(element.text)))
     buffer.write(">%s\n" % text)
     for child in list(element):

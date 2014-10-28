@@ -128,7 +128,7 @@ def assert_canvas_matches(canvas, name):
 
   try:
     if svg_string != reference_string:
-      raise Exception("".join(list(difflib.context_diff(svg_string.split("\n"), reference_string.split("\n"), fromfile="test svg" % name, tofile="reference svg"))))
+      raise Exception("".join(list(difflib.context_diff(svg_string.split("\n"), reference_string.split("\n"), fromfile="test svg", tofile="reference svg"))))
   except Exception as e:
     if not os.path.exists("tests/diffs"):
       os.mkdir("tests/diffs")

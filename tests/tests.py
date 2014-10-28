@@ -60,7 +60,7 @@ def assert_masked_array(a, dtype, b, mask):
   numpy.testing.assert_array_equal(a.mask, mask)
 
 def assert_dom_equal(a, b):
-  if a.tag.split("}")[-1] != b.tag.split("}")[-1]:
+  if a.tag != b.tag:
     raise AssertionError("Tag %s != %s" % (a.tag, b.tag))
   if a.tag not in ["{http://www.sandia.gov/toyplot}axes", "{http://www.sandia.gov/toyplot}data-table"]:
     if a.text != b.text:
@@ -68,17 +68,24 @@ def assert_dom_equal(a, b):
   if a.tail != b.tail:
     raise AssertionError("Tail %s != %s" % (a.tail, b.tail))
   for key in a.attrib:
-    if key in ["xmlns"]:
-      continue
     if key not in b.attrib:
       raise AssertionError("Missing attribute '%s'." % (key))
   for key in b.attrib:
     if key not in a.attrib:
       raise AssertionError("Unexpected attribute '%s'." % (key))
   for key in a.attrib:
-    if key in ["xmlns", "id", "clip-path"]:
+    if key in ["id", "clip-path"]:
       continue
-    if a.attrib[key] != b.attrib[key]:
+    a_value = a.attrib[key]
+    b_value = b.attrib[key]
+    try:
+      a_value = float(a_value)
+      b_value = float(b_value)
+      numpy.testing.assert_almost_equal(a_value, b_value)
+    except:
+      pass
+
+    if a_value != b_value:
       raise AssertionError("Attribute '%s': expected\n%s\nreceived\n%s\n" % (key, a.attrib[key], b.attrib[key]))
 
   if len(list(a)) != len(list(b)):

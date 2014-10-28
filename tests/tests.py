@@ -66,16 +66,21 @@ def xml_comparison_string(element):
   Filters-out elements and attributes (like id) that shouldn't be compared,
   and limits the precision of floating-point numbers.
   """
+  def format_value(value):
+    try:
+      return "%.7f" % float(value)
+    except:
+      return value
+
   def write_element(element, buffer, indent):
     buffer.write("%s<%s" % (indent, element.tag))
     for key, value in element.items():
       if key in ["id", "clip-path"]:
         continue
-      try:
-        value = float(value)
-        buffer.write(" %s='%.7g'" % (key, value))
-      except:
-        buffer.write(" %s='%s'" % (key, value))
+      if key == "d" and element.tag == "{http://www.w3.org/2000/svg}path":
+        buffer.write(" %s='%s'" % (key, " ".join([format_value(v) for v in value.split(" ")])))
+      else:
+        buffer.write(" %s='%s'" % (key, format_value(value)))
     buffer.write(">%s\n" % (element.text if element.text is not None else ""))
     for child in list(element):
       write_element(child, buffer, indent+"  ")

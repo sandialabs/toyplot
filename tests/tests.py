@@ -59,40 +59,30 @@ def assert_masked_array(a, dtype, b, mask):
   numpy.testing.assert_array_equal(a, b)
   numpy.testing.assert_array_equal(a.mask, mask)
 
-def assert_dom_equal(a, b):
-  if a.tag != b.tag:
-    raise AssertionError("Tag %s != %s" % (a.tag, b.tag))
-  if a.tag not in ["{http://www.sandia.gov/toyplot}axes", "{http://www.sandia.gov/toyplot}data-table"]:
-    if a.text != b.text:
-      raise AssertionError("%s Text %s != %s" % (a.tag, a.text, b.text))
-  if a.tail != b.tail:
-    raise AssertionError("Tail %s != %s" % (a.tail, b.tail))
-  for key in a.attrib:
-    if key not in b.attrib:
-      raise AssertionError("Missing attribute '%s'." % (key))
-  for key in b.attrib:
-    if key not in a.attrib:
-      raise AssertionError("Unexpected attribute '%s'." % (key))
-  for key in a.attrib:
-    if key in ["id", "clip-path"]:
-      continue
-    a_value = a.attrib[key]
-    b_value = b.attrib[key]
-    try:
-      a_value = float(a_value)
-      b_value = float(b_value)
-      numpy.testing.assert_almost_equal(a_value, b_value)
-    except:
-      pass
+def xml_comparison_string(element):
+  """Convert an XML element to a pretty string representation that can be used for comparison.
 
-    if a_value != b_value:
-      raise AssertionError("Attribute '%s': expected\n%s\nreceived\n%s\n" % (key, a.attrib[key], b.attrib[key]))
+  Filters-out elements and attributes (like id) that shouldn't be compared,
+  and limits the precision of floating-point numbers.
+  """
+  def write_element(element, buffer, indent):
+    buffer.write("%s<%s" % (indent, element.tag))
+    for key, value in element.items():
+      if key in ["id", "clip-path"]:
+        continue
+      try:
+        value = float(value)
+        buffer.write(" %s='%.7g'" % (key, value))
+      except:
+        buffer.write(" %s='%s'" % (key, value))
+    buffer.write(">%s\n" % (element.text if element.text is not None else ""))
+    for child in list(element):
+      write_element(child, buffer, indent+"  ")
+    buffer.write("%s</%s>\n" % (indent, element.tag))
 
-  if len(list(a)) != len(list(b)):
-    raise AssertionError("Number of children doesn't match")
-
-  for child_a, child_b in zip(list(a), list(b)):
-    assert_dom_equal(child_a, child_b)
+  buffer = io.BytesIO()
+  write_element(element, buffer, indent="")
+  return buffer.getvalue()
 
 def assert_canvas_matches(canvas, name):
   # Render every representation of the canvas for coverage ...
@@ -115,6 +105,10 @@ def assert_canvas_matches(canvas, name):
     toyplot.png.render(canvas, png)
 
   # Get rid of any past failures ...
+  if os.path.exists("tests/diffs/%s.svg" % name):
+    os.remove("tests/diffs/%s.svg" % name)
+  if os.path.exists("tests/diffs/%s.reference.svg" % name):
+    os.remove("tests/diffs/%s.reference.svg" % name)
   if os.path.exists("tests/failed/%s.svg" % name):
     os.remove("tests/failed/%s.svg" % name)
 
@@ -128,9 +122,18 @@ def assert_canvas_matches(canvas, name):
   svg_dom = xml.fromstring(svg.getvalue())
   reference_dom = xml.parse("tests/reference/%s.svg" % name).getroot()
 
+  svg_string = xml_comparison_string(svg_dom)
+  reference_string = xml_comparison_string(reference_dom)
+
   try:
-    assert_dom_equal(svg_dom, reference_dom)
+    nose.tools.assert_equal(svg_string, reference_string)
   except Exception as e:
+    if not os.path.exists("tests/diffs"):
+      os.mkdir("tests/diffs")
+    with open("tests/diffs/%s.svg" % name, "wb") as file:
+      file.write(svg_string)
+    with open("tests/diffs/%s.reference.svg" % name, "wb") as file:
+      file.write(reference_string)
     if not os.path.exists("tests/failed"):
       os.mkdir("tests/failed")
     with open("tests/failed/%s.svg" % name, "wb") as file:
@@ -154,6 +157,18 @@ def assert_html_matches(html, name):
     with open(reference_file, "wb") as file:
       file.write(html)
     raise AssertionError("Created new reference file %s.  You should verify its contents before re-running the test." % (reference_file))
+
+#########################################################################################################################
+# Test test fixtures.
+
+def test_xml_comparison_string():
+  nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg/>")), "<svg>\n</svg>\n")
+  nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a/></svg>")), "<svg>\n  <a>\n  </a>\n</svg>\n")
+  nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a>foo</a></svg>")), "<svg>\n  <a>foo\n  </a>\n</svg>\n")
+  nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a b='c'>foo</a></svg>")), "<svg>\n  <a b='c'>foo\n  </a>\n</svg>\n")
+  nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a b='.333333333333333'>foo</a></svg>")), "<svg>\n  <a b='0.3333333'>foo\n  </a>\n</svg>\n")
+  nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a b='.666666666666666'>foo</a></svg>")), "<svg>\n  <a b='0.6666667'>foo\n  </a>\n</svg>\n")
+  nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a id='1234'/></svg>")), "<svg>\n  <a>\n  </a>\n</svg>\n")
 
 #########################################################################################################################
 # toyplot.data

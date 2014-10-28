@@ -140,7 +140,7 @@ def assert_canvas_matches(canvas, name):
       os.mkdir("tests/failed")
     with open("tests/failed/%s.svg" % name, "wb") as file:
       file.write(svg.getvalue())
-    raise AssertionError("Test output tests/failed/%s.svg doesn't match tests/reference/%s.svg:\n%s" % (name, name))
+    raise AssertionError("Test output tests/failed/%s.svg doesn't match tests/reference/%s.svg:\n%s" % (name, name, e))
 
 def assert_html_matches(html, name):
   reference_file = "tests/reference/%s.html" % name

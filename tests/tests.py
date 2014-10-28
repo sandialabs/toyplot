@@ -99,7 +99,9 @@ def xml_comparison_string(element):
       if key in ["id", "clip-path"]:
         continue
       if key == "d" and element.tag == "{http://www.w3.org/2000/svg}path":
-        buffer.write(" %s='%s'" % (key, " ".join([format_value(v) for v in value.split(" ")])))
+        buffer.write(" %s='%s'" % (key, " ".join([format_value(d) for d in value.split(" ")])))
+      elif key == "points" and element.tag == "{http://www.w3.org/2000/svg}polygon":
+        buffer.write(" %s='%s'" % (key, " ".join([",".join([format_value(i) for i in p.split(",")]) for p in value.split(" ")])))
       else:
         buffer.write(" %s='%s'" % (key, format_value(value)))
 
@@ -198,8 +200,8 @@ def test_xml_comparison_string():
   nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a/></svg>")), "<svg>\n  <a>\n  </a>\n</svg>\n")
   nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a>foo</a></svg>")), "<svg>\n  <a>foo\n  </a>\n</svg>\n")
   nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a b='c'>foo</a></svg>")), "<svg>\n  <a b='c'>foo\n  </a>\n</svg>\n")
-  nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a b='.333333333333333'>foo</a></svg>")), "<svg>\n  <a b='0.3333333'>foo\n  </a>\n</svg>\n")
-  nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a b='.666666666666666'>foo</a></svg>")), "<svg>\n  <a b='0.6666667'>foo\n  </a>\n</svg>\n")
+  nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a b='.333333333333333'>foo</a></svg>")), "<svg>\n  <a b='0.333333333'>foo\n  </a>\n</svg>\n")
+  nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a b='.666666666666666'>foo</a></svg>")), "<svg>\n  <a b='0.666666667'>foo\n  </a>\n</svg>\n")
   nose.tools.assert_equal(xml_comparison_string(xml.fromstring("<svg><a id='1234'/></svg>")), "<svg>\n  <a>\n  </a>\n</svg>\n")
 
 #########################################################################################################################

@@ -12,6 +12,7 @@ import nose.tools
 import numbers
 import numpy
 import os
+import re
 import sys
 import tempfile
 import xml.etree.ElementTree as xml
@@ -100,6 +101,8 @@ def xml_comparison_string(element):
         continue
       if key == "d" and element.tag == "{http://www.w3.org/2000/svg}path":
         buffer.write(" %s='%s'" % (key, " ".join([format_value(d) for d in value.split(" ")])))
+      elif key == "transform":
+        buffer.write(" %s='%s'" % (key, "".join([format_value(d) for d in re.split("(,|\(|\))", value)])))
       elif key == "points" and element.tag == "{http://www.w3.org/2000/svg}polygon":
         buffer.write(" %s='%s'" % (key, " ".join([",".join([format_value(i) for i in p.split(",")]) for p in value.split(" ")])))
       else:

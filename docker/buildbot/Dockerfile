@@ -1,9 +1,13 @@
 FROM toyplot/sshd
 MAINTAINER Timothy M. Shead <tshead@sandia.gov>
 
-# Install yum packages.
-RUN yum install -y buildbot-master buildbot-slave git numpy python-coverage python-nose python-pip python-sphinx python-sphinx_rtd_theme vim
+# Configure yum.
+RUN yum install -y --nogpgcheck http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
+# Install yum packages.
+RUN yum install -y buildbot-master buildbot-slave ffmpeg git numpy pygtk2 python-coverage python-nose python-pip python-sphinx python-sphinx_rtd_theme vim
+
+# Install pip packages.
 RUN pip install colormath multipledispatch
 
 # Setup the root user.

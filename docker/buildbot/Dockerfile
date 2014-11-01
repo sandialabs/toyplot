@@ -8,7 +8,7 @@ RUN yum install -y --nogpgcheck http://download1.rpmfusion.org/free/fedora/rpmfu
 RUN yum install -y buildbot-master buildbot-slave ffmpeg git numpy pygtk2 python-coverage python-nose python-pip python-sphinx python-sphinx_rtd_theme vim
 
 # Install pip packages.
-RUN pip install colormath multipledispatch
+RUN pip install behave colormath multipledispatch
 
 # Setup the root user.
 RUN echo 'root:toyplot' | chpasswd
@@ -24,12 +24,9 @@ RUN touch /home/toyplot/.gitconfig
 RUN HOME=/home/toyplot git config --global push.default simple
 RUN HOME=/home/toyplot git config --global color.ui true
 ADD .vimrc /home/toyplot/.vimrc
+ADD master.cfg /home/toyplot/buildmaster/master.cfg
 
 # Don't remove this, as it controls the user used to start supervisord in the base image.
 USER root
-
-ADD master.cfg /home/toyplot/buildmaster/master.cfg
-RUN chown toyplot:toyplot /home/toyplot/buildmaster/master.cfg
-
 ADD buildbot.conf /etc/supervisord.d/buildbot.conf
 RUN mkdir -p /var/log/buildbot

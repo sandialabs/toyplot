@@ -2131,10 +2131,3 @@ def test_grid_placement():
   inset.plot(x, numpy.sin(x))
   assert_canvas_matches(canvas, "grid-placement")
 
-def test_units_points():
-  nose.tools.assert_equal(toyplot.units.points(72.0), 72.0)
-  with nose.tools.assert_raises(ValueError):
-    toyplot.units.points("72")
-  nose.tools.assert_equal(toyplot.units.points((1, "inch")), 72.0)
-  with nose.tools.assert_raises(ValueError):
-    toyplot.units.points((1, "furlong"))

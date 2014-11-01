@@ -10,11 +10,11 @@ without the use of code-modification tools like `2to3`.  The
 """
 try:
   string_type = basestring
-except:
+except: # pragma: no cover
   string_type = str
 
 try:
   bytes_type = bytes
-except:
+except: # pragma: no cover
   bytes_type = str
 

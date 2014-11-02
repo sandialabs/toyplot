@@ -72,4 +72,4 @@ def render(canvas, filename, width=None, height=None, scale=None, progress=None)
       progress(frame)
     ffmpeg.stdin.write(png)
   ffmpeg.stdin.close()
-
+  ffmpeg.wait()

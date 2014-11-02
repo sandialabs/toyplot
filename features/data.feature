@@ -25,3 +25,13 @@ Feature: Data Table
       | input                             | response             |
       | a dict containing columns         | raises ValueError    |
 
+  Scenario Outline: Table rendering
+    Given a toyplot.data.table with some data
+    Then the table can be rendered as a <format>
+
+    Examples:
+      | format                  |
+      | latex string            |
+      | latex fobj              |
+      | latex file              |
+      | latex string with hline |

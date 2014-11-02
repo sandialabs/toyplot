@@ -4,7 +4,11 @@ import numpy.testing
 
 import collections
 import numpy
+import os
+import tempfile
 import toyplot.data
+import toyplot.latex
+import StringIO
 
 @given(u'a new toyplot.data.table')
 def step_impl(context):
@@ -120,4 +124,66 @@ def step_impl(context):
 def step_impl(context):
   with nose.tools.assert_raises(ValueError):
     toyplot.data.Table(context.value)
+
+@given(u'a toyplot.data.table with some data')
+def step_impl(context):
+  numpy.random.seed(1234)
+  context.value = toyplot.data.Table()
+  context.value["foo"] = numpy.arange(10)
+  context.value["bar"] = numpy.random.random(10)
+  context.value["baz"] = numpy.random.choice(["red", "green", "blue"], size=10)
+
+latex_without_hline = r"""\begin{tabular}{l l l}
+foo & bar & baz \\
+\hline
+0 & 0.192 & blue \\
+1 & 0.622 & red \\
+2 & 0.438 & red \\
+3 & 0.785 & red \\
+4 & 0.78 & green \\
+5 & 0.273 & red \\
+6 & 0.276 & green \\
+7 & 0.802 & blue \\
+8 & 0.958 & blue \\
+9 & 0.876 & blue \\
+\end{tabular}
+"""
+
+@then(u'the table can be rendered as a latex string')
+def step_impl(context):
+  nose.tools.assert_equal(toyplot.latex.render(context.value), latex_without_hline)
+
+@then(u'the table can be rendered as a latex fobj')
+def step_impl(context):
+  buffer = StringIO.StringIO()
+  toyplot.latex.render(context.value, buffer)
+  nose.tools.assert_equal(buffer.getvalue(), latex_without_hline)
+
+@then(u'the table can be rendered as a latex file')
+def step_impl(context):
+  path = os.path.join(tempfile.mkdtemp(), "test.tex")
+  toyplot.latex.render(context.value, path)
+  nose.tools.assert_equal(open(path, "r").read(), latex_without_hline)
+
+latex_with_hline = r"""\begin{tabular}{l l l}
+foo & bar & baz \\
+\hline
+0 & 0.192 & blue \\
+1 & 0.622 & red \\
+2 & 0.438 & red \\
+3 & 0.785 & red \\
+4 & 0.78 & green \\
+\hline
+5 & 0.273 & red \\
+6 & 0.276 & green \\
+7 & 0.802 & blue \\
+8 & 0.958 & blue \\
+9 & 0.876 & blue \\
+\end{tabular}
+"""
+
+@then(u'the table can be rendered as a latex string with hline')
+def step_impl(context):
+  nose.tools.assert_equal(toyplot.latex.render(context.value, hlines=[5]), latex_with_hline)
+
 

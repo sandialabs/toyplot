@@ -1,4 +1,4 @@
-Feature: Data Table
+Feature: Table
   Scenario: Table manipulation
     Given a new toyplot.data.table
     Then adding columns should change the table

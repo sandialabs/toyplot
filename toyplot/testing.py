@@ -4,6 +4,7 @@
 
 import io
 import os
+import numpy.testing
 
 root_dir = os.path.dirname(os.path.dirname(__file__))
 failed_dir = os.path.join(root_dir, "features", "failed")
@@ -25,6 +26,17 @@ def _assert_content_equal(content, test_file, reference_file):
       file.write(content)
     raise AssertionError("Created new reference file %s.  You should verify its contents before re-running the test." % (reference_file))
 
+def assert_color_equal(a, b):
+  """Raise an exception if a toyplot color doesn't match a reference.
+
+  Parameters
+  ----------
+  a: toyplot RGBA color, required
+  b: 4-tuple
+  """
+  if a is None and b is None:
+    return
+  numpy.testing.assert_array_almost_equal((a["r"], a["g"], a["b"], a["a"]), b)
 
 def assert_html_equal(html, name):
   """Raise an exception if HTML content doesn't match a reference.

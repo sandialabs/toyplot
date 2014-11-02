@@ -1,4 +1,4 @@
-Feature: Rendered animations
+Feature: Video output
   Scenario Outline: Render animated canvas
     Given an animated canvas
     When rendering a <format> video

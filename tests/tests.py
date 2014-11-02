@@ -32,11 +32,6 @@ except:
   pass
 
 try:
-  import toyplot.mp4
-except:
-  pass
-
-try:
   import toyplot.pdf
 except:
   pass
@@ -1886,24 +1881,6 @@ def test_html_ipython_html():
   canvas = toyplot.Canvas()
   canvas.axes()
   canvas._repr_html_()
-
-##################################################################################
-# toyplot.mp4
-
-def test_mp4_render():
-  if hasattr(toyplot, "mp4"):
-    canvas = toyplot.Canvas()
-    axes = canvas.axes()
-    text = canvas.text(100, 100, "")
-    scatterplot = axes.scatterplot(numpy.arange(10))
-    def callback(frame):
-      frame.set_mark_style(text, {"fill-opacity":frame.time()})
-      frame.set_datum_text(text, 0, 0, "frame %s time %s duration %s" % (frame.index(), frame.time(), frame.duration()))
-      frame.set_datum_style(scatterplot, 0, frame.index(), {"stroke":"none"})
-    canvas.animate(10, callback)
-    def progress(frame):
-      pass
-    toyplot.mp4.render(canvas, os.path.join(tempfile.mkdtemp(), "test.mp4"), progress=progress)
 
 ##################################################################################
 # toyplot.png

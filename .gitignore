@@ -8,3 +8,4 @@ dist
 tests/diffs
 tests/failed
 toyplot.egg-info
+opsnr.stt

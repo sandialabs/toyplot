@@ -1725,29 +1725,6 @@ def test_color_lighten():
   palette = toyplot.color.lighten(toyplot.color.Palette().color(0))
   assert_html_matches(palette._repr_html_(), "color-lighten")
 
-def test_color_brewer():
-  palette = toyplot.color.brewer("BlueYellowRed")
-  assert_html_matches(palette._repr_html_(), "color-brewer")
-
-def test_color_brewer_count():
-  palette = toyplot.color.brewer("BlueYellowRed", 5)
-  assert_html_matches(palette._repr_html_(), "color-brewer-count")
-
-def test_color_brewer_reverse():
-  palette = toyplot.color.brewer("BlueYellowRed", 5, reverse=True)
-  assert_html_matches(palette._repr_html_(), "color-brewer-reverse")
-
-def test_color_brewer_all():
-  for name in toyplot.color.brewer.names():
-    for count in toyplot.color.brewer.counts(name):
-      toyplot.color.brewer.category(name)
-
-def test_color_brewer_palettes():
-  def test(name):
-    assert_html_matches(toyplot.color.brewer(name)._repr_html_(), "color-brewer-%s" % name)
-  for name in toyplot.color.brewer.names():
-    yield test, name
-
 def test_color_categorical_map():
   colormap = toyplot.color.CategoricalMap(toyplot.color.brewer("BlueGreenBrown", 3))
   assert_html_matches(colormap._repr_html_(), "color-categorical-map")

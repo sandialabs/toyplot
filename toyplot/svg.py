@@ -87,7 +87,7 @@ def render(canvas, fobj=None, animation=False):
   else:
     if animation:
       svg_animation = collections.defaultdict(lambda: collections.defaultdict(list))
-      for time, time_changes in canvas._animation.items():
+      for time, time_changes in canvas._animation.items()[:-1]:
         svg_animation[time] # Ensure we have an entry for every time, even if there aren't any changes.
         for type, type_changes in time_changes.items():
           for change in type_changes:

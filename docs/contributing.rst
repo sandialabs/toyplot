@@ -50,18 +50,25 @@ from the SVG representation.
 Running Regression Tests
 ------------------------
 
-To run the Toyplot test suite, simply run nose from the top-level Toyplot
-source directory::
+To run the Toyplot test suite, simply run `regression.py` from the
+top-level source directory::
 
     $ cd toyplot
-    $ nosetests
+    $ python regression.py
 
 The tests will run, providing feedback on successes / failures.
 
-Modifying Regression Tests
+Writing Regression Tests
 --------------------------
 
-To add new tests or modify existing tests, edit `tests/tests.py`.
+.. note::
+
+  Toyplot is in the midst of a transition from `nose <https://nose.readthedocs.org/en/latest/>`_
+  to `behave <http://pythonhosted.org/behave>`_ for running regression tests.  New tests should
+  be added to the `features` directory using behave.  The following outlines how the old tests
+  were written, and wll remain as a reference until they are all replaced.
+
+Existing tests are located in `tests/tests.py`.
 
 Many of the tests function by comparing the SVG representation of a
 :class:`toyplot.canvas.Canvas` against a reference stored in `tests/reference`.  These
@@ -80,9 +87,9 @@ corresponding reference SVG in `tests/reference/test-name.svg`.
 Test Coverage
 -------------
 
-When you run the test suite with nose, it also automatically generates code
-coverage statistics.  To see the coverage results, open `toyplot/.cover/index.html`
-in a web browser.
+When you run the test suite with `regression.py`, it also automatically
+generates code coverage statistics.  To see the coverage results, open
+`.cover/index.html` in a web browser.
 
 Building the Documentation
 --------------------------
@@ -92,9 +99,10 @@ To build the documentation, run::
     $ cd toyplot
     $ python docs/setup.py
 
-Note that significant subsets of the documentation are written using IPython notebooks, so the
-docs/setup.py script requires IPython to convert the notebooks into 
-restructured text files for inclusion with the rest of the documentation.
+Note that significant subsets of the documentation are written using IPython
+notebooks, so the docs/setup.py script requires IPython to convert the
+notebooks into restructured text files for inclusion with the rest of the
+documentation.
 
 Once the documentation is built, you can view it by opening
-`toyplot/docs/_build/html/index.html` in a web browser.
+`docs/_build/html/index.html` in a web browser.

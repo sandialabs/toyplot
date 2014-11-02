@@ -53,7 +53,7 @@ class Table(object):
     root_xml = xml.Element("table", style="border-collapse:collapse; border:none; color: %s" % toyplot.color.near_black)
     header_xml = xml.SubElement(root_xml, "tr", style="border:none;border-bottom:1px solid %s" % toyplot.color.near_black)
     for name in self._columns.keys():
-      xml.SubElement(header_xml, "th", style="text-align:center;border:none").text = str(name)
+      xml.SubElement(header_xml, "th", style="text-align:left;border:none").text = str(name)
 
     iterators = [iter(column) for column in self._columns.values()]
     for row_index in numpy.arange(len(self)):

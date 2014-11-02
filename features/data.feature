@@ -27,7 +27,7 @@ Feature: Data Table
 
   Scenario Outline: Table rendering
     Given a toyplot.data.table with some data
-    Then the table can be rendered as a <format>
+    Then the table can be rendered as format <format>
 
     Examples:
       | format                  |
@@ -35,3 +35,4 @@ Feature: Data Table
       | latex fobj              |
       | latex file              |
       | latex string with hline |
+      | ipython html string     |

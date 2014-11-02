@@ -12,6 +12,7 @@ Contents:
    toyplot.cairo.rst
    toyplot.eps.rst
    toyplot.html.rst
+   toyplot.latex.rst
    toyplot.mp4.rst
    toyplot.pdf.rst
    toyplot.png.rst

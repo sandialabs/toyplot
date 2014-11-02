@@ -8,7 +8,10 @@ import os
 import tempfile
 import toyplot.data
 import toyplot.latex
+import toyplot.testing
 import StringIO
+
+root_dir = os.path.dirname(os.path.dirname(__file__))
 
 @given(u'a new toyplot.data.table')
 def step_impl(context):
@@ -133,57 +136,28 @@ def step_impl(context):
   context.value["bar"] = numpy.random.random(10)
   context.value["baz"] = numpy.random.choice(["red", "green", "blue"], size=10)
 
-latex_without_hline = r"""\begin{tabular}{l l l}
-foo & bar & baz \\
-\hline
-0 & 0.192 & blue \\
-1 & 0.622 & red \\
-2 & 0.438 & red \\
-3 & 0.785 & red \\
-4 & 0.78 & green \\
-5 & 0.273 & red \\
-6 & 0.276 & green \\
-7 & 0.802 & blue \\
-8 & 0.958 & blue \\
-9 & 0.876 & blue \\
-\end{tabular}
-"""
-
-@then(u'the table can be rendered as a latex string')
+@then(u'the table can be rendered as format latex string')
 def step_impl(context):
-  nose.tools.assert_equal(toyplot.latex.render(context.value), latex_without_hline)
+  toyplot.testing.assert_latex_equal(toyplot.latex.render(context.value), "data-table")
 
-@then(u'the table can be rendered as a latex fobj')
+@then(u'the table can be rendered as format latex fobj')
 def step_impl(context):
   buffer = StringIO.StringIO()
   toyplot.latex.render(context.value, buffer)
-  nose.tools.assert_equal(buffer.getvalue(), latex_without_hline)
+  toyplot.testing.assert_latex_equal(buffer.getvalue(), "data-table")
 
-@then(u'the table can be rendered as a latex file')
+@then(u'the table can be rendered as format latex file')
 def step_impl(context):
   path = os.path.join(tempfile.mkdtemp(), "test.tex")
   toyplot.latex.render(context.value, path)
-  nose.tools.assert_equal(open(path, "r").read(), latex_without_hline)
+  toyplot.testing.assert_latex_equal(open(path, "r").read(), "data-table")
 
-latex_with_hline = r"""\begin{tabular}{l l l}
-foo & bar & baz \\
-\hline
-0 & 0.192 & blue \\
-1 & 0.622 & red \\
-2 & 0.438 & red \\
-3 & 0.785 & red \\
-4 & 0.78 & green \\
-\hline
-5 & 0.273 & red \\
-6 & 0.276 & green \\
-7 & 0.802 & blue \\
-8 & 0.958 & blue \\
-9 & 0.876 & blue \\
-\end{tabular}
-"""
-
-@then(u'the table can be rendered as a latex string with hline')
+@then(u'the table can be rendered as format latex string with hline')
 def step_impl(context):
-  nose.tools.assert_equal(toyplot.latex.render(context.value, hlines=[5]), latex_with_hline)
+  toyplot.testing.assert_latex_equal(toyplot.latex.render(context.value, hlines=[5]), "data-table-with-hline")
+
+@then(u'the table can be rendered as format ipython html string')
+def step_impl(context):
+  toyplot.testing.assert_html_equal(context.value._repr_html_(), "data-table")
 
 

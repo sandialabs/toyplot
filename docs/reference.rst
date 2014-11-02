@@ -23,6 +23,7 @@ Contents:
    toyplot.mark.rst
    toyplot.require.rst
    toyplot.style.rst
+   toyplot.testing.rst
    toyplot.units.rst
 
    backends.rst

@@ -20,7 +20,7 @@ Encapsulated Postscript, versions of your Toyplot figures:
 * pycairo - http://cairographics.org/pycairo
 * python pango bindings - typically distributed as part of pygtk - http://www.pygtk.org
 
-If you plan to generate MP4 videos from animated Toyplot figures, you'll need
+If you plan to generate MP4 or WebM videos from animated Toyplot figures, you'll need
 ffmpeg:
 
 * ffmpeg - https://www.ffmpeg.org
@@ -30,14 +30,14 @@ Toyplot setup.py script:
 
 * setuptools - http://pythonhosted.org//setuptools
 
-The following are required if you want to run Toyplot's regression tests and view
+The following are required to run Toyplot's regression tests and view
 code coverage:
 
 * behave - BDD test framework - http://pythonhosted.org/behave
 * nose - unit test framework - https://nose.readthedocs.org/en/latest/
 * coverage - code coverage module - http://nedbatchelder.com/code/coverage/
 
-And you'll need to following if you want to generate this documentation:
+And you'll need to following to generate this documentation:
 
 * Sphinx - documentation builder - http://sphinx-doc.org
 * Sphinx readthedocs theme - https://github.com/snide/sphinx_rtd_theme

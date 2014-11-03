@@ -272,7 +272,7 @@ class Canvas(object):
     self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style))
     return self._children[-1]
 
-  def table(self, data, colwidth=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
+  def table(self, data, colwidth=None, colformat=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
     """Add a set of table axes to the canvas.
 
     Parameters
@@ -289,7 +289,7 @@ class Canvas(object):
     data = toyplot.data.Table(data)
 
     xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-    self._children.append(toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, colwidth=colwidth, data=data, parent=self))
+    self._children.append(toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, colwidth=colwidth, colformat=colformat, data=data, parent=self))
     return self._children[-1]
 
   def text(self, x, y, text, angle=0.0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None):

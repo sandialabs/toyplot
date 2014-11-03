@@ -28,4 +28,11 @@ class ColumnFormatter(object):
 
 class DefaultFormatter(ColumnFormatter):
   def format(self, column):
-    return (numpy.char.mod("%r", column), None, None)
+    return (numpy.char.mod("%s", column), None, None)
+
+class FloatFormatter(ColumnFormatter):
+  def __init__(self, format="%.3g"):
+    self._format = format
+
+  def format(self, column):
+    return (numpy.char.mod(self._format, column), None, None)

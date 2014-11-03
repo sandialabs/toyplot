@@ -1170,7 +1170,7 @@ class Cartesian(object):
 class Table(object):
   """Experimental table coordinate system.
   """
-  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, colwidth, data, parent):
+  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, colwidth, colformat, data, parent):
     self._xmin_range = xmin_range
     self._xmax_range = xmax_range
     self._ymin_range = ymin_range
@@ -1179,7 +1179,18 @@ class Table(object):
     self._data = data
     self._parent = parent
     self._children = []
+
     self._formatters = [toyplot.format.DefaultFormatter() for key in data.keys()]
+    for index, column in enumerate(data.values()):
+      if issubclass(column.dtype.type, numpy.floating):
+        self._formatters[index] = toyplot.format.FloatFormatter()
+
+    if colformat is not None:
+      for index, key in enumerate(data.keys()):
+        if key in colformat:
+          self._formatters[index] = colformat[key]
+        if index in colformat:
+          self._formatters[index] = colformat[index]
 
   def _boundaries(self):
     column_widths = numpy.zeros(self._data.shape[1])

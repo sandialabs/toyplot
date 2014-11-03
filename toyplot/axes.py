@@ -1170,19 +1170,41 @@ class Cartesian(object):
 class Table(object):
   """Experimental table coordinate system.
   """
-  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, data, parent):
+  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, colwidth, data, parent):
     self._xmin_range = xmin_range
     self._xmax_range = xmax_range
     self._ymin_range = ymin_range
     self._ymax_range = ymax_range
+    self._colwidth = colwidth
     self._data = data
     self._parent = parent
     self._children = []
     self._formatters = [toyplot.format.DefaultFormatter() for key in data.keys()]
 
-  def cell_axes(self, row, column, xmin=None, xmax=None, ymin=None, ymax=None, show=False, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=10, tick_length=5):
-    x_boundaries = numpy.linspace(self._xmin_range, self._xmax_range, self._data.shape[1] + 1, endpoint=True)
+  def _boundaries(self):
+    column_widths = numpy.zeros(self._data.shape[1])
+    for index, key in enumerate(self._data.keys()):
+      if key in self._colwidth:
+        column_widths[index] = self._colwidth[key]
+      if index in self._colwidth:
+        column_widths[index] = self._colwidth[index]
+
+    table_width = self._xmax_range - self._xmin_range
+    available_width = table_width - numpy.sum(column_widths[column_widths != 0])
+    default_width = available_width / numpy.count_nonzero(column_widths == 0)
+    column_widths[column_widths == 0] = default_width
+
+    x_boundaries = self._xmin_range + numpy.concatenate(([0], numpy.cumsum(column_widths)))
+
+    #x_boundaries = numpy.linspace(self._xmin_range, self._xmax_range, self._data.shape[1] + 1, endpoint=True)
     y_boundaries = numpy.linspace(self._ymin_range, self._ymax_range, self._data.shape[0] + 2, endpoint=True)
-    self._children.append(toyplot.axes.Cartesian(x_boundaries[column], x_boundaries[column+1], y_boundaries[row], y_boundaries[row+1], xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self))
-    return self._children[-1]
+    return x_boundaries, y_boundaries
+
+
+  def cell_axes(self, row, column, xmin=None, xmax=None, ymin=None, ymax=None, show=False, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=10, tick_length=5):
+    x_boundaries, y_boundaries = self._boundaries()
+    axes = toyplot.axes.Cartesian(x_boundaries[column], x_boundaries[column+1], y_boundaries[row], y_boundaries[row+1], xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self)
+    axes.coordinates.show = False
+    self._children.append(axes)
+    return axes
 

@@ -373,8 +373,7 @@ def _render(canvas, axes, context):
 def _render(canvas, axes, context):
   axes_xml = xml.SubElement(context.root, "g", id=context.get_id(axes), attrib={"class":"toyplot-axes-Table"})
 
-  x_boundaries = numpy.linspace(axes._xmin_range, axes._xmax_range, axes._data.shape[1] + 1, endpoint=True)
-  y_boundaries = numpy.linspace(axes._ymin_range, axes._ymax_range, axes._data.shape[0] + 2, endpoint=True)
+  x_boundaries, y_boundaries = axes._boundaries()
 
   # Render column headers.
   for column_index, key in enumerate(axes._data.keys()):

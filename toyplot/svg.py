@@ -372,10 +372,31 @@ def _render(canvas, axes, context):
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Table, _RenderContext)
 def _render(canvas, axes, context):
   axes_xml = xml.SubElement(context.root, "g", id=context.get_id(axes), attrib={"class":"toyplot-axes-Table"})
-  for x in numpy.linspace(axes._xmin_range, axes._xmax_range, axes._columns + 1, endpoint=True):
+
+  x_boundaries = numpy.linspace(axes._xmin_range, axes._xmax_range, axes._data.shape[1] + 1, endpoint=True)
+  y_boundaries = numpy.linspace(axes._ymin_range, axes._ymax_range, axes._data.shape[0] + 2, endpoint=True)
+
+  # Render column headers.
+  for column_index, key in enumerate(axes._data.keys()):
+    x = (x_boundaries[column_index] + x_boundaries[column_index + 1]) / 2
+    y = (y_boundaries[0] + y_boundaries[1]) / 2
+    xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style({"fill":"black"})).text = key
+
+  # Render column contents.
+  for column_index, column in enumerate(axes._data.values()):
+    for row_index, value in enumerate(column):
+      x = (x_boundaries[column_index] + x_boundaries[column_index + 1]) / 2
+      y = (y_boundaries[row_index + 1] + y_boundaries[row_index + 2]) / 2
+      xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style({"fill":"black"})).text = str(value)
+
+  # Render grid lines.
+  for x in x_boundaries:
     xml.SubElement(axes_xml, "line", x1=repr(x), y1=repr(axes._ymin_range), x2=repr(x), y2=repr(axes._ymax_range), style=_css_style({"stroke":"black"}))
-  for y in numpy.linspace(axes._ymin_range, axes._ymax_range, axes._rows + 1, endpoint=True):
+
+  for y in y_boundaries:
     xml.SubElement(axes_xml, "line", x1=repr(axes._xmin_range), y1=repr(y), x2=repr(axes._xmax_range), y2=repr(y), style=_css_style({"stroke":"black"}))
+
+  # Render children.
   for child in axes._children:
     _render(axes._parent, child, context.push(axes_xml))
 

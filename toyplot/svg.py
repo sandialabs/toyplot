@@ -383,11 +383,16 @@ def _render(canvas, axes, context):
 
   # Render column contents.
   for column_index, column in enumerate(axes._data.values()):
+    x = (x_boundaries[column_index] + x_boundaries[column_index + 1]) / 2
     left, separator, right = axes._formatters[column_index].format(column)
     for row_index, value in enumerate(left):
-      x = (x_boundaries[column_index] + x_boundaries[column_index + 1]) / 2
       y = (y_boundaries[row_index + 1] + y_boundaries[row_index + 2]) / 2
-      xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(axes._style)).text = value
+
+      xml.SubElement(axes_xml, "text", x=repr(x - 2), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"end"}))).text = value
+      if separator is not None:
+        xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(axes._style)).text = separator[row_index]
+      if right is not None:
+        xml.SubElement(axes_xml, "text", x=repr(x + 2), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"begin"}))).text = right[row_index]
 
   # Render grid lines.
   for x in x_boundaries:

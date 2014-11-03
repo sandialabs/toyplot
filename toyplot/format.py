@@ -35,4 +35,13 @@ class FloatFormatter(ColumnFormatter):
     self._format = format
 
   def format(self, column):
-    return (numpy.char.mod(self._format, column), None, None)
+    left = []
+    separator = []
+    right = []
+    for value in column:
+      value = (self._format % value).split(".")
+      left.append(value[0])
+      separator.append(".")
+      right.append(value[1])
+
+    return (left, separator, right)

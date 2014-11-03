@@ -1179,6 +1179,9 @@ class Table(object):
     self._data = data
     self._parent = parent
     self._children = []
+    self._style = {"stroke":"none", "fill":toyplot.color.near_black, "text-anchor":"middle", "alignment-baseline":"middle"}
+    self._hstyle = {"stroke":"none", "fill":toyplot.color.near_black, "font-weight":"bold", "text-anchor":"middle", "alignment-baseline":"middle"}
+    self._gstyle = {"stroke":toyplot.color.near_black}
 
     self._formatters = [toyplot.format.DefaultFormatter() for key in data.keys()]
     for index, column in enumerate(data.values()):
@@ -1212,7 +1215,7 @@ class Table(object):
     return x_boundaries, y_boundaries
 
 
-  def cell_axes(self, row, column, xmin=None, xmax=None, ymin=None, ymax=None, show=False, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=10, tick_length=5):
+  def cell_axes(self, row, column, xmin=None, xmax=None, ymin=None, ymax=None, show=False, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=5, tick_length=5):
     x_boundaries, y_boundaries = self._boundaries()
     axes = toyplot.axes.Cartesian(x_boundaries[column], x_boundaries[column+1], y_boundaries[row], y_boundaries[row+1], xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self)
     axes.coordinates.show = False

@@ -379,7 +379,7 @@ def _render(canvas, axes, context):
   for column_index, key in enumerate(axes._data.keys()):
     x = (x_boundaries[column_index] + x_boundaries[column_index + 1]) / 2
     y = (y_boundaries[0] + y_boundaries[1]) / 2
-    xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style({"fill":"black"})).text = key
+    xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(axes._hstyle)).text = key
 
   # Render column contents.
   for column_index, column in enumerate(axes._data.values()):
@@ -387,14 +387,14 @@ def _render(canvas, axes, context):
     for row_index, value in enumerate(left):
       x = (x_boundaries[column_index] + x_boundaries[column_index + 1]) / 2
       y = (y_boundaries[row_index + 1] + y_boundaries[row_index + 2]) / 2
-      xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style({"fill":"black"})).text = value
+      xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(axes._style)).text = value
 
   # Render grid lines.
   for x in x_boundaries:
-    xml.SubElement(axes_xml, "line", x1=repr(x), y1=repr(axes._ymin_range), x2=repr(x), y2=repr(axes._ymax_range), style=_css_style({"stroke":"black"}))
+    xml.SubElement(axes_xml, "line", x1=repr(x), y1=repr(axes._ymin_range), x2=repr(x), y2=repr(axes._ymax_range), style=_css_style(axes._gstyle))
 
   for y in y_boundaries:
-    xml.SubElement(axes_xml, "line", x1=repr(axes._xmin_range), y1=repr(y), x2=repr(axes._xmax_range), y2=repr(y), style=_css_style({"stroke":"black"}))
+    xml.SubElement(axes_xml, "line", x1=repr(axes._xmin_range), y1=repr(y), x2=repr(axes._xmax_range), y2=repr(y), style=_css_style(axes._gstyle))
 
   # Render children.
   for child in axes._children:

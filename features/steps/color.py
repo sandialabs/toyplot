@@ -4,6 +4,7 @@ from behave import *
 
 import json
 import nose.tools
+import numpy
 import toyplot.color
 import toyplot.testing
 
@@ -55,5 +56,47 @@ def step_impl(context):
 @then(u'the Color Brewer palette should have its colors reversed')
 def step_impl(context):
   toyplot.testing.assert_html_equal(context.palette._repr_html_(), "color-brewer-reverse")
+
+@when(u'broadcasting one color to a 2d array')
+def step_impl(context):
+  context.value = toyplot.color.broadcast("red", (4, 4))
+
+@then(u'toyplot.color.broadcast should broadcast the value to the 2d array')
+def step_impl(context):
+  nose.tools.assert_equal(context.value.shape, (4, 4))
+  for value in numpy.nditer(context.value):
+    toyplot.testing.assert_color_equal(value, (1, 0, 0, 1))
+
+@when(u'broadcasting a list of colors to a 1d array')
+def step_impl(context):
+  context.value = toyplot.color.broadcast(["red", "rgb(0, 255, 0)", (0, 0, 1, 1)], 3)
+
+@then(u'toyplot.color.broadcast should broadcast the list to the 1d array')
+def step_impl(context):
+  numpy.testing.assert_array_equal(context.value, toyplot.color.array([(1, 0, 0, 1), (0, 1, 0, 1), (0, 0, 1, 1)]))
+
+@when(u'broadcasting a list of colors to a 2d array')
+def step_impl(context):
+  context.value = toyplot.color.broadcast(["red", "blue"], (3, 2))
+
+@then(u'toyplot.color.broadcast should broadcast the list to the 2d array')
+def step_impl(context):
+  numpy.testing.assert_array_equal(context.value, toyplot.color.array([[(1, 0, 0, 1), (0, 0, 1, 1)],[(1, 0, 0, 1), (0, 0, 1, 1)],[(1, 0, 0, 1), (0, 0, 1, 1)]])) 
+
+@when(u'broadcasting a 1d array of css colors to a 1d array')
+def step_impl(context):
+  context.value = toyplot.color.broadcast(numpy.array(["red", "blue"]), 2)
+
+@then(u'toyplot.color.broadcast should broadcast the 1d array of colors to the 1d array')
+def step_impl(context):
+  numpy.testing.assert_array_equal(context.value, toyplot.color.array([(1, 0, 0, 1), (0, 0, 1, 1)])) 
+
+@when(u'broadcasting a 1d array of css colors to a 2d array')
+def step_impl(context):
+  context.value = toyplot.color.broadcast(numpy.array(["red", "blue"]), (2, 2))
+
+@then(u'toyplot.color.broadcast should broadcast the 1d array of colors to the 2d array')
+def step_impl(context):
+  numpy.testing.assert_array_equal(context.value, toyplot.color.array([[(1, 0, 0, 1), (0, 0, 1, 1)],[(1, 0, 0, 1), (0, 0, 1, 1)]])) 
 
 

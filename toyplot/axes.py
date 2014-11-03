@@ -550,7 +550,7 @@ class Cartesian(object):
         position = numpy.ma.column_stack((numpy.arange(series.shape[0]) - 0.5, numpy.arange(series.shape[0]) + 0.5))
 
       default_color = [next(self._bar_colors) for i in range(series.shape[1]-1)]
-      fill = toyplot.color._broadcast_color(default_color if fill is None else fill, (series.shape[0], series.shape[1]-1), colormap=colormap, palette=palette)
+      fill = toyplot.color.broadcast(default_color if fill is None else fill, (series.shape[0], series.shape[1]-1), colormap=colormap, palette=palette)
       opacity = toyplot.broadcast.scalar(opacity, (series.shape[0], series.shape[1]-1))
       title = toyplot.broadcast.object(title, (series.shape[0], series.shape[1]-1))
       style = toyplot.style.combine({"stroke":"white", "stroke-width":1.0}, toyplot.require.style(style))
@@ -621,7 +621,7 @@ class Cartesian(object):
           position = numpy.ma.column_stack((numpy.arange(series.shape[0]) - 0.5, numpy.arange(series.shape[0]) + 0.5))
 
       default_color = [next(self._bar_colors) for i in range(series.shape[1])]
-      fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape, colormap=colormap, palette=palette)
+      fill = toyplot.color.broadcast(default_color if fill is None else fill, series.shape, colormap=colormap, palette=palette)
       opacity = toyplot.broadcast.scalar(opacity, series.shape)
       title = toyplot.broadcast.object(title, series.shape)
       style = toyplot.style.combine({"stroke":"white", "stroke-width":1.0}, toyplot.require.style(style))
@@ -734,7 +734,7 @@ class Cartesian(object):
           position = numpy.ma.arange(series.shape[0])
 
       default_color = [next(self._fill_colors) for i in range(series.shape[1]-1)]
-      fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape[1]-1, colormap=colormap, palette=palette)
+      fill = toyplot.color.broadcast(default_color if fill is None else fill, series.shape[1]-1, colormap=colormap, palette=palette)
       opacity = toyplot.broadcast.scalar(opacity, series.shape[1]-1)
       title = toyplot.broadcast.object(title, series.shape[1]-1)
       style = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(style))
@@ -774,7 +774,7 @@ class Cartesian(object):
         position = numpy.ma.arange(series.shape[0])
 
       default_color = [next(self._fill_colors) for i in range(series.shape[1])]
-      fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape[1], colormap=colormap, palette=palette)
+      fill = toyplot.color.broadcast(default_color if fill is None else fill, series.shape[1], colormap=colormap, palette=palette)
       opacity = toyplot.broadcast.scalar(opacity, series.shape[1])
       title = toyplot.broadcast.object(title, series.shape[1])
       style = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(style))
@@ -852,12 +852,12 @@ class Cartesian(object):
         position = numpy.ma.arange(series.shape[0])
 
     default_color = [next(self._plot_colors) for i in range(series.shape[1])]
-    stroke = toyplot.color._broadcast_color(default_color if stroke is None else stroke, series.shape[1], colormap=stroke_colormap, palette=stroke_palette)
+    stroke = toyplot.color.broadcast(default_color if stroke is None else stroke, series.shape[1], colormap=stroke_colormap, palette=stroke_palette)
     stroke_width = toyplot.broadcast.scalar(stroke_width, series.shape[1])
     stroke_opacity = toyplot.broadcast.scalar(stroke_opacity, series.shape[1])
     marker = toyplot.broadcast.object(marker, series.shape)
     size = toyplot.broadcast.scalar(size, series.shape)
-    fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
+    fill = toyplot.color.broadcast(default_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
     opacity = toyplot.broadcast.scalar(opacity, series.shape)
     title = toyplot.broadcast.object(title, series.shape[1])
     style = toyplot.style.combine({"fill":"none"}, toyplot.require.style(style))
@@ -937,12 +937,12 @@ class Cartesian(object):
         position = numpy.ma.arange(series.shape[0])
 
     default_color = [next(self._scatterplot_colors) for i in range(series.shape[1])]
-    stroke = toyplot.color._broadcast_color(default_color if stroke is None else stroke, series.shape[1], colormap=stroke_colormap, palette=stroke_palette)
+    stroke = toyplot.color.broadcast(default_color if stroke is None else stroke, series.shape[1], colormap=stroke_colormap, palette=stroke_palette)
     stroke_width = toyplot.broadcast.scalar(stroke_width, series.shape[1])
     stroke_opacity = toyplot.broadcast.scalar(stroke_opacity, series.shape[1])
     marker = toyplot.broadcast.object(marker, series.shape)
     size = toyplot.broadcast.scalar(size, series.shape)
-    fill = toyplot.color._broadcast_color(default_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
+    fill = toyplot.color.broadcast(default_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
     opacity = toyplot.broadcast.scalar(opacity, series.shape)
     title = toyplot.broadcast.object(title, series.shape[1])
     style = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(style))
@@ -991,7 +991,7 @@ class Cartesian(object):
     style = toyplot.style.combine(toyplot.require.style(style))
 
     default_color = next(self._rect_colors)
-    table["toyplot:fill"] = toyplot.color._broadcast_color(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
+    table["toyplot:fill"] = toyplot.color.broadcast(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
 
     if along == "x":
       left_right_axis = "x"
@@ -1036,7 +1036,7 @@ class Cartesian(object):
     style = toyplot.style.combine({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
 
     default_color = next(self._text_colors)
-    table["toyplot:fill"] = toyplot.color._broadcast_color(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
+    table["toyplot:fill"] = toyplot.color.broadcast(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
 
     self._update_domain(table["x"], table["y"])
 
@@ -1071,7 +1071,7 @@ class Cartesian(object):
     table["title"] = toyplot.broadcast.object(title, table.shape[0])
     style = toyplot.style.combine(toyplot.require.style(style))
 
-    table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
+    table["toyplot:stroke"] = toyplot.color.broadcast(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
 
     self._update_domain(numpy.array([]), table["y"])
     self._children.append(toyplot.mark.AxisLines(table=table, coordinates=["y"], axes=["y"], stroke="toyplot:stroke", opacity="opacity", title="title", style=style))
@@ -1105,7 +1105,7 @@ class Cartesian(object):
     table["title"] = toyplot.broadcast.object(title, table.shape[0])
     style = toyplot.style.combine(toyplot.require.style(style))
 
-    table["toyplot:stroke"] = toyplot.color._broadcast_color(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
+    table["toyplot:stroke"] = toyplot.color.broadcast(toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
 
     self._update_domain(table["x"], numpy.array([]))
     self._children.append(toyplot.mark.AxisLines(table=table, coordinates=["x"], axes=["x"], stroke="toyplot:stroke", opacity="opacity", title="title", style=style))

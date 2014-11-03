@@ -12,6 +12,10 @@ import xml.etree.ElementTree as xml
 
 dtype = {"names":["r", "g", "b", "a"], "formats":["float64", "float64", "float64", "float64"]}
 
+def array(values):
+  """Construct an array of Toyplot color values."""
+  return numpy.array(values, dtype=dtype)
+
 near_black = "#292724"
 
 def rgb(r, g, b):
@@ -51,6 +55,8 @@ def _msh_to_lab(M, s, h):
 def _require_color(color):
   if isinstance(color, toyplot.compatibility.string_type):
     return css(color)
+  elif isinstance(color, numpy.ndarray) and color.ndim == 0 and issubclass(color.dtype.type, numpy.character):
+    return css(str(color))
   elif isinstance(color, (numpy.void, numpy.ndarray)) and color.dtype == dtype:
     return color
   elif isinstance(color, (tuple, list, numpy.ndarray)) and len(color) == 3:
@@ -60,11 +66,13 @@ def _require_color(color):
   else:
     raise ValueError("Expected a CSS color string or a Toyplot.color.value.")
 
-def _broadcast_color(colors, shape, colormap=None, palette=None):
+def broadcast(colors, shape, colormap=None, palette=None):
   if isinstance(colors, numpy.ndarray):
     if 0 <= colors.ndim and colors.ndim <= 2 and colors.dtype == dtype:
       array = colors
-    if 0 <= colors.ndim and colors.ndim <= 2 and colors.dtype.char in "bhilqBHILQefdg":
+    elif 0 <= colors.ndim and colors.ndim <= 2 and issubclass(colors.dtype.type, numpy.flexible):
+      array = numpy.array([_require_color(color) for color in numpy.nditer(colors)], dtype=dtype)
+    elif 0 <= colors.ndim and colors.ndim <= 2 and colors.dtype.char in "bhilqBHILQefdg":
       if palette is None:
         palette = toyplot.color.brewer("BlueGreen")
       if colormap is None:

@@ -319,7 +319,7 @@ class Canvas(object):
     table["text"] = toyplot.broadcast.object(text, table.shape[0])
     table["angle"] = toyplot.broadcast.scalar(angle, table.shape[0])
     table["fill"] = toyplot.broadcast.object(fill, table.shape[0])
-    table["toyplot:fill"] = toyplot.color._broadcast_color(toyplot.color.near_black if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
+    table["toyplot:fill"] = toyplot.color.broadcast(toyplot.color.near_black if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
     table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
     table["title"] = toyplot.broadcast.object(title, table.shape[0])
     style = toyplot.style.combine({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))

@@ -31,7 +31,7 @@ def step_impl(context):
   nose.tools.assert_equal(context.value.keys(), ["a"])
   nose.tools.assert_equal(context.value.shape, (10, 1))
 
-  context.value["b"] = numpy.arange(10) ** 2
+  context.value["b"] = context.value["a"] ** 2
   nose.tools.assert_equal(context.value.keys(), ["a", "b"])
   nose.tools.assert_equal(context.value.shape, (10, 2))
   numpy.testing.assert_array_equal(context.value["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
@@ -108,20 +108,34 @@ def step_impl(context):
   nose.tools.assert_equal(context.value.keys(), [])
   nose.tools.assert_equal(context.value.values(), [])
 
+@when(u'toyplot.data.Table is initialized with a toyplot.data.Table')
+def step_impl(context):
+  table = toyplot.data.Table()
+  table["a"] = numpy.arange(10)
+  table["b"] = table["a"] ** 2
+  context.value = table
+
 @when(u'toyplot.data.Table is initialized with an OrderedDict containing columns')
 def step_impl(context):
-  context.value = collections.OrderedDict([("ones", numpy.ones(10)), ("zeros", numpy.zeros(10))])
+  context.value = collections.OrderedDict([("a", numpy.arange(10)), ("b", numpy.arange(10) ** 2)])
 
 @then(u'the toyplot.data.Table contains the columns')
 def step_impl(context):
   value = toyplot.data.Table(context.value)
-  nose.tools.assert_equal(value.keys(), ["ones", "zeros"])
-  numpy.testing.assert_array_equal(value["ones"], [1] * 10)
-  numpy.testing.assert_array_equal(value["zeros"], [0] * 10)
+  nose.tools.assert_equal(value.keys(), ["a", "b"])
+  numpy.testing.assert_array_equal(value["a"], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  numpy.testing.assert_array_equal(value["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
 
 @when(u'toyplot.data.Table is initialized with a dict containing columns')
 def step_impl(context):
-  context.value = {"ones" : numpy.ones(10), "zeros" : numpy.zeros(10)}
+  context.value = {"b" : numpy.arange(10) ** 2, "a" : numpy.arange(10)}
+
+@then(u'the toyplot.data.Table contains the columns, sorted by key')
+def step_impl(context):
+  value = toyplot.data.Table(context.value)
+  nose.tools.assert_equal(value.keys(), ["a", "b"])
+  numpy.testing.assert_array_equal(value["a"], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  numpy.testing.assert_array_equal(value["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
 
 @then(u'the toyplot.data.Table raises ValueError')
 def step_impl(context):

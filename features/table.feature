@@ -17,13 +17,11 @@ Feature: Table
     Then the toyplot.data.Table <response>
 
     Examples: Valid Inputs
-      | input                             | response             |
-      | nothing                           | is empty             |
-      | an OrderedDict containing columns | contains the columns |
-
-    Examples: Invalid Inputs
-      | input                             | response             |
-      | a dict containing columns         | raises ValueError    |
+      | input                             | response                            |
+      | nothing                           | is empty                            |
+      | a toyplot.data.Table              | contains the columns                |
+      | an OrderedDict containing columns | contains the columns                |
+      | a dict containing columns         | contains the columns, sorted by key |
 
   Scenario Outline: Table rendering
     Given a toyplot.data.table with some data

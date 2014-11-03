@@ -18,10 +18,17 @@ class Table(object):
     self._columns = collections.OrderedDict()
 
     if data is not None:
-      if not isinstance(data, collections.OrderedDict):
+      if isinstance(data, collections.OrderedDict):
+        for key, value in data.items():
+          self[key] = value
+      elif isinstance(data, toyplot.data.Table):
+        for key, value in data.items():
+          self[key] = value
+      elif isinstance(data, dict):
+        for key in sorted(data.keys()):
+          self[key] = data[key]
+      else:
         raise ValueError("Unsupported data type: %s" % type(data))
-      for key, value in data.items():
-        self[key] = value
 
   def __getitem__(self, index):
     # Return a single column by name

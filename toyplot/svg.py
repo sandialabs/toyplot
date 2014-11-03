@@ -369,6 +369,16 @@ def _render(canvas, axes, context):
       y = axes._ymin_range
       xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(axes.label._style)).text = axes.label._text
 
+@dispatch(toyplot.canvas.Canvas, toyplot.axes.Table, _RenderContext)
+def _render(canvas, axes, context):
+  axes_xml = xml.SubElement(context.root, "g", id=context.get_id(axes), attrib={"class":"toyplot-axes-Table"})
+  for x in numpy.linspace(axes._xmin_range, axes._xmax_range, axes._columns + 1, endpoint=True):
+    xml.SubElement(axes_xml, "line", x1=repr(x), y1=repr(axes._ymin_range), x2=repr(x), y2=repr(axes._ymax_range), style=_css_style({"stroke":"black"}))
+  for y in numpy.linspace(axes._ymin_range, axes._ymax_range, axes._rows + 1, endpoint=True):
+    xml.SubElement(axes_xml, "line", x1=repr(axes._xmin_range), y1=repr(y), x2=repr(axes._xmax_range), y2=repr(y), style=_css_style({"stroke":"black"}))
+  for child in axes._children:
+    _render(axes._parent, child, context.push(axes_xml))
+
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.BarBoundaries, _RenderContext)
 def _render(axes, mark, context):
   left = mark._table[mark._left[0]]

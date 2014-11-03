@@ -55,7 +55,7 @@ def _symmetric_log(x, base, threshold=1):
   return numpy.sign(x) * (threshold + numpy.log10(numpy.abs(x)))
 
 ###############################################################################################
-# Axes
+# Cartesian
 
 class Cartesian(object):
   """Standard two-dimensional Cartesian coordinate system.
@@ -1161,5 +1161,27 @@ class Cartesian(object):
 
     xmin, xmax, ymin, ymax = toyplot.layout.region(self._xmin_range, self._xmax_range, self._ymin_range, self._ymax_range, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
     self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style))
+    return self._children[-1]
+
+##########################################################################
+# Table
+
+class Table(object):
+  """Experimental table coordinate system.
+  """
+  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, rows, columns, parent):
+    self._xmin_range = xmin_range
+    self._xmax_range = xmax_range
+    self._ymin_range = ymin_range
+    self._ymax_range = ymax_range
+    self._rows = rows
+    self._columns = columns
+    self._parent = parent
+    self._children = []
+
+  def cell_axes(self, row, column, xmin=None, xmax=None, ymin=None, ymax=None, show=False, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=10, tick_length=5):
+    x_boundaries = numpy.linspace(self._xmin_range, self._xmax_range, self._columns + 1, endpoint=True)
+    y_boundaries = numpy.linspace(self._ymin_range, self._ymax_range, self._rows + 1, endpoint=True)
+    self._children.append(toyplot.axes.Cartesian(x_boundaries[column], x_boundaries[column+1], y_boundaries[row], y_boundaries[row+1], xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self))
     return self._children[-1]
 

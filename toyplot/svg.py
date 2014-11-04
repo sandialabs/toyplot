@@ -383,65 +383,49 @@ def _render(canvas, axes, context):
 
   # Render column contents.
   for column_index, column in enumerate(axes._columns):
-    prefix, separator, suffix = column.formatted
-
-    em = 12
+    column_style = toyplot.style.combine(axes._style, column.style)
 
     column_left = x_boundaries[column_index]
     column_right = x_boundaries[column_index + 1]
     column_center = (column_left + column_right) / 2
 
-    formatted_width = em * numpy.amax(numpy.array([len(i) for i in prefix]) + numpy.array([len(i) for i in separator]) + numpy.array([len(i) for i in suffix]))
-    formatted_left = column_center - (formatted_width / 2)
-    formatted_right = column_center + (formatted_width / 2)
+    padding = 5
+    formatted_left = column_left + padding
+    formatted_right = column_right - padding
 
-    if column.justify == "left":
-      x = formatted_left + column.offset
-      for row_index, (dprefix, dseparator, dsuffix) in enumerate(zip(prefix, separator, suffix)):
-        y = (y_boundaries[row_index + 1] + y_boundaries[row_index + 2]) / 2
+    prefix, separator, suffix = column.formatted
 
-        if dprefix and dseparator and dsuffix:
-          pass
-#          xml.SubElement(axes_xml, "text", x=repr(x - 2), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"end"}))).text = dprefix
-#          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"middle"}))).text = dseparator
-#          xml.SubElement(axes_xml, "text", x=repr(x + 2), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"begin"}))).text = dsuffix
-        elif dprefix and dsuffix:
-          pass
-#          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"end"}))).text = dprefix
-#          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"begin"}))).text = dsuffix
-        elif dprefix:
-          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"begin"}))).text = dprefix
-    elif column.justify == "center":
-      x = column_center + column.offset
-      for row_index, (dprefix, dseparator, dsuffix) in enumerate(zip(prefix, separator, suffix)):
-        y = (y_boundaries[row_index + 1] + y_boundaries[row_index + 2]) / 2
+    for row_index, row in enumerate(axes._rows):
+      row_style = toyplot.style.combine(column_style, row.style)
+      cell_style = toyplot.style.combine(row_style, axes._cells[row_index, column_index].style)
 
-        if dprefix and dseparator and dsuffix:
-          xml.SubElement(axes_xml, "text", x=repr(x - 2), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"end"}))).text = dprefix
-          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"middle"}))).text = dseparator
-          xml.SubElement(axes_xml, "text", x=repr(x + 2), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"begin"}))).text = dsuffix
-        elif dprefix and dsuffix:
-          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"end"}))).text = dprefix
-          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"begin"}))).text = dsuffix
-        elif dprefix:
-          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"middle"}))).text = dprefix
+      dprefix = prefix[row_index]
+      dseparator = separator[row_index]
+      dsuffix = suffix[row_index]
 
-    elif column.justify == "right":
-      x = formatted_right + column.offset
-      for row_index, (dprefix, dseparator, dsuffix) in enumerate(zip(prefix, separator, suffix)):
-        y = (y_boundaries[row_index + 1] + y_boundaries[row_index + 2]) / 2
+      y = (y_boundaries[row_index + 1] + y_boundaries[row_index + 2]) / 2
+
+      if column.justify == "left":
+        x = formatted_left + column.offset
+        xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"begin"}))).text = dprefix + dseparator + dsuffix
+      elif column.justify == "center":
+        x = column_center
+        xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"middle"}))).text = dprefix + dseparator + dsuffix
+      elif column.justify == "right":
+        x = formatted_right + column.offset
+        xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"end"}))).text = dprefix + dseparator + dsuffix
+      elif column.justify is "separator":
+        x = column_center + column.offset
 
         if dprefix and dseparator and dsuffix:
-          pass
-#          xml.SubElement(axes_xml, "text", x=repr(x - 2), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"end"}))).text = dprefix
-#          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"middle"}))).text = dseparator
-#          xml.SubElement(axes_xml, "text", x=repr(x + 2), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"begin"}))).text = dsuffix
+          xml.SubElement(axes_xml, "text", x=repr(x - 2), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"end"}))).text = dprefix
+          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"middle"}))).text = dseparator
+          xml.SubElement(axes_xml, "text", x=repr(x + 2), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"begin"}))).text = dsuffix
         elif dprefix and dsuffix:
-          pass
-#          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"end"}))).text = dprefix
-#          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"begin"}))).text = dsuffix
+          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"end"}))).text = dprefix
+          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"begin"}))).text = dsuffix
         elif dprefix:
-          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"end"}))).text = dprefix
+          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"middle"}))).text = dprefix
 
   # Render grid lines.
   for x in x_boundaries[0:0]:

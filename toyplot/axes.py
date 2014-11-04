@@ -1171,20 +1171,14 @@ class Cartesian(object):
 class Table(object):
   """Experimental table coordinate system.
   """
-  class ColumnHelper(object):
-    def __init__(self, data, show, width, justify, format, offset):
+  class Column(object):
+    def __init__(self, data):
       self._data = data
-      self._show = show
-      self._width = width
-      self._justify = justify
-      self._format = format
-      self._offset = offset
-    @property
-    def show(self):
-      return self._show
-    @show.setter
-    def show(self, value):
-      self._show = value
+      self._width = None
+      self._justify = "center"
+      self._format = toyplot.format.DefaultFormatter()
+      self._offset = 0
+      self._style = None
     @property
     def width(self):
       return self._width
@@ -1210,22 +1204,52 @@ class Table(object):
     def offset(self, value):
       self._offset = value
     @property
+    def style(self):
+      return self._style
+    @style.setter
+    def style(self, value):
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
+    @property
     def formatted(self):
       return self._format.format(self._data)
 
-  class RowHelper(object):
-    pass
+  class Row(object):
+    def __init__(self):
+      self._style = None
+    @property
+    def style(self):
+      return self._style
+    @style.setter
+    def style(self, value):
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
-  class CellHelper(object):
+  class Cell(object):
+    def __init__(self):
+      self._style = None
+    @property
+    def style(self):
+      return self._style
+    @style.setter
+    def style(self, value):
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
+
+  class CellReference(object):
     def __init__(self, row, column, rowspan, colspan, parent):
       self._row = row
       self._column = column
       self._rowspan = rowspan
       self._colspan = colspan
       self._parent = parent
+
+    def _set_style(self, value):
+      for row in range(self._row, self._row + self._rowspan):
+        for column in range(self._column, self._column + self._colspan):
+          self._parent._cells[row, column].style = value
+    style = property(fset=_set_style)
+
     def axes(self, xmin=None, xmax=None, ymin=None, ymax=None, show=False, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=5, tick_length=5):
       x_boundaries, y_boundaries = self._parent._boundaries()
-      axes = toyplot.axes.Cartesian(x_boundaries[self._column], x_boundaries[self._column+self._colspan], y_boundaries[self._row], y_boundaries[self._row+self._rowspan], xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self._parent)
+      axes = toyplot.axes.Cartesian(x_boundaries[self._column], x_boundaries[self._column+self._colspan], y_boundaries[self._row + 1], y_boundaries[self._row+1+self._rowspan], xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self._parent)
       axes.coordinates.show = False
       self._parent._children.append(axes)
       return axes
@@ -1242,11 +1266,18 @@ class Table(object):
     self._gstyle = {"stroke":toyplot.color.near_black}
 
     self._keys = data.keys()
-    self._rows = [toyplot.axes.Table.RowHelper() for row in range(data.shape[0])]
-    self._columns = [toyplot.axes.Table.ColumnHelper(data=column, show=True, width=None, justify="center", format=toyplot.format.DefaultFormatter(), offset=0) for column in data.values()]
-    for index, column in enumerate(data.values()):
-      if issubclass(column.dtype.type, numpy.floating):
-        self._columns[index].format = toyplot.format.FloatFormatter()
+    self._columns = numpy.array([toyplot.axes.Table.Column(data=column) for column in data.values()])
+    self._rows = numpy.array([toyplot.axes.Table.Row() for row in range(data.shape[0])])
+    self._cells = numpy.array([[toyplot.axes.Table.Cell() for column in range(data.shape[1])] for row in range(data.shape[0])])
+
+    for column in self._columns:
+      if issubclass(column._data.dtype.type, numpy.floating):
+        column.format = toyplot.format.FloatFormatter()
+        column.justify = "separator"
+      elif issubclass(column._data.dtype.type, numpy.character):
+        column.justify = "left"
+      elif issubclass(column._data.dtype.type, numpy.integer):
+        column.justify = "right"
 
   def _boundaries(self):
     column_widths = numpy.zeros(len(self._columns))
@@ -1263,10 +1294,13 @@ class Table(object):
     y_boundaries = numpy.linspace(self._ymin_range, self._ymax_range, len(self._rows) + 2, endpoint=True)
     return x_boundaries, y_boundaries
 
+  def row(self, index):
+    return self._rows[index]
+
   def column(self, key):
     if isinstance(key, numbers.Integral):
       return self._columns[key]
     return self._columns[self._keys.index(key)]
 
   def cell(self, row, column, rowspan=1, colspan=1):
-    return toyplot.axes.Table.CellHelper(row, column, rowspan, colspan, self)
+    return toyplot.axes.Table.CellReference(row, column, rowspan, colspan, self)

@@ -17,31 +17,24 @@ class ColumnFormatter(object):
 
     Returns
     -------
-    left : numpy.ndarray of strings
-      Formatted data to be displayed to the left of the separator.
-    separator : numpy.ndarray of strings, or None
-      Optional separator between formatted data.
-    right : numpy.ndarray of strings, or None
-      Optional formatted data to be displayed to the right of the separator.
+    prefix : sequence of strings
+      Formatted data to be displayed before the separator.
+    separator : sequence of strings
+      Optional separator between formatted data, or empty strings.
+    suffix : numpy.ndarray of strings, or None
+      Optional formatted data to be displayed after the separator, or empty strings.
     """
     raise NotImplementedError()
 
 class DefaultFormatter(ColumnFormatter):
   def format(self, column):
-    return (numpy.char.mod("%s", column), None, None)
+    return (numpy.char.mod("%s", column), [""] * len(column), [""] * len(column))
 
 class FloatFormatter(ColumnFormatter):
-  def __init__(self, format="%.3g"):
+  def __init__(self, format="%.6g"):
     self._format = format
 
   def format(self, column):
-    left = []
-    separator = []
-    right = []
-    for value in column:
-      value = (self._format % value).split(".")
-      left.append(value[0])
-      separator.append(".")
-      right.append(value[1])
-
-    return (left, separator, right)
+    formatted = [(self._format % value).split(".") + ["."] for value in column]
+    prefix, suffix, separator = zip(*formatted)
+    return (prefix, separator, suffix)

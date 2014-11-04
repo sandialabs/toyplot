@@ -1172,12 +1172,13 @@ class Table(object):
   """Experimental table coordinate system.
   """
   class ColumnHelper(object):
-    def __init__(self, data, show, width, justify, format):
+    def __init__(self, data, show, width, justify, format, offset):
       self._data = data
       self._show = show
       self._width = width
       self._justify = justify
       self._format = format
+      self._offset = offset
     @property
     def show(self):
       return self._show
@@ -1202,6 +1203,15 @@ class Table(object):
     @format.setter
     def format(self, value):
       self._format = value
+    @property
+    def offset(self):
+      return self._offset
+    @offset.setter
+    def offset(self, value):
+      self._offset = value
+    @property
+    def formatted(self):
+      return self._format.format(self._data)
 
   class RowHelper(object):
     pass
@@ -1231,7 +1241,7 @@ class Table(object):
 
     self._keys = data.keys()
     self._rows = [toyplot.axes.Table.RowHelper() for row in range(data.shape[0])]
-    self._columns = [toyplot.axes.Table.ColumnHelper(data=column, show=True, width=None, justify="left", format=toyplot.format.DefaultFormatter()) for column in data.values()]
+    self._columns = [toyplot.axes.Table.ColumnHelper(data=column, show=True, width=None, justify="center", format=toyplot.format.DefaultFormatter(), offset=0) for column in data.values()]
     for index, column in enumerate(data.values()):
       if issubclass(column.dtype.type, numpy.floating):
         self._columns[index].format = toyplot.format.FloatFormatter()

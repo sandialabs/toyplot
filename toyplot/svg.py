@@ -376,21 +376,21 @@ def _render(canvas, axes, context):
   x_boundaries, y_boundaries = axes._boundaries()
 
   # Render column headers.
-  for column_index, key in enumerate(axes._data.keys()):
+  for column_index, key in enumerate(axes._keys):
     x = (x_boundaries[column_index] + x_boundaries[column_index + 1]) / 2
     y = (y_boundaries[0] + y_boundaries[1]) / 2
-    xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(axes._hstyle)).text = key
+    xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._hstyle, {"text-anchor":"middle"}))).text = key
 
   # Render column contents.
-  for column_index, column in enumerate(axes._data.values()):
+  for column_index, column in enumerate(axes._columns):
     x = (x_boundaries[column_index] + x_boundaries[column_index + 1]) / 2
-    left, separator, right = axes._formatters[column_index].format(column)
+    left, separator, right = column.format.format(column._data)
     for row_index, value in enumerate(left):
       y = (y_boundaries[row_index + 1] + y_boundaries[row_index + 2]) / 2
 
       xml.SubElement(axes_xml, "text", x=repr(x - 2), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"end"}))).text = value
       if separator is not None:
-        xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(axes._style)).text = separator[row_index]
+        xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"middle"}))).text = separator[row_index]
       if right is not None:
         xml.SubElement(axes_xml, "text", x=repr(x + 2), y=repr(y), style=_css_style(toyplot.style.combine(axes._style, {"text-anchor":"begin"}))).text = right[row_index]
 

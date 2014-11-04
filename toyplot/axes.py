@@ -6,6 +6,7 @@ from __future__ import division
 
 import collections
 import itertools
+import numbers
 import numpy
 import toyplot.broadcast
 import toyplot.color
@@ -1170,38 +1171,76 @@ class Cartesian(object):
 class Table(object):
   """Experimental table coordinate system.
   """
-  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, colwidth, colformat, data, parent):
+  class ColumnHelper(object):
+    def __init__(self, data, show, width, justify, format):
+      self._data = data
+      self._show = show
+      self._width = width
+      self._justify = justify
+      self._format = format
+    @property
+    def show(self):
+      return self._show
+    @show.setter
+    def show(self, value):
+      self._show = value
+    @property
+    def width(self):
+      return self._width
+    @width.setter
+    def width(self, value):
+      self._width = value
+    @property
+    def justify(self):
+      return self._justify
+    @justify.setter
+    def justify(self, value):
+      self._justify = value
+    @property
+    def format(self):
+      return self._format
+    @format.setter
+    def format(self, value):
+      self._format = value
+
+  class RowHelper(object):
+    pass
+
+  class CellHelper(object):
+    def __init__(self, row, column, parent):
+      self._row = row
+      self._column = column
+      self._parent = parent
+    def axes(self, xmin=None, xmax=None, ymin=None, ymax=None, show=False, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=5, tick_length=5):
+      x_boundaries, y_boundaries = self._parent._boundaries()
+      axes = toyplot.axes.Cartesian(x_boundaries[self._column], x_boundaries[self._column+1], y_boundaries[self._row], y_boundaries[self._row+1], xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self._parent)
+      axes.coordinates.show = False
+      self._parent._children.append(axes)
+      return axes
+
+  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, data, parent):
     self._xmin_range = xmin_range
     self._xmax_range = xmax_range
     self._ymin_range = ymin_range
     self._ymax_range = ymax_range
-    self._colwidth = colwidth
-    self._data = data
     self._parent = parent
     self._children = []
-    self._style = {"stroke":"none", "fill":toyplot.color.near_black, "text-anchor":"middle", "alignment-baseline":"middle"}
-    self._hstyle = {"stroke":"none", "fill":toyplot.color.near_black, "font-weight":"bold", "text-anchor":"middle", "alignment-baseline":"middle"}
+    self._style = {"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle"}
+    self._hstyle = {"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle", "font-weight":"bold"}
     self._gstyle = {"stroke":toyplot.color.near_black}
 
-    self._formatters = [toyplot.format.DefaultFormatter() for key in data.keys()]
+    self._keys = data.keys()
+    self._rows = [toyplot.axes.Table.RowHelper() for row in range(data.shape[0])]
+    self._columns = [toyplot.axes.Table.ColumnHelper(data=column, show=True, width=None, justify="left", format=toyplot.format.DefaultFormatter()) for column in data.values()]
     for index, column in enumerate(data.values()):
       if issubclass(column.dtype.type, numpy.floating):
-        self._formatters[index] = toyplot.format.FloatFormatter()
-
-    if colformat is not None:
-      for index, key in enumerate(data.keys()):
-        if key in colformat:
-          self._formatters[index] = colformat[key]
-        if index in colformat:
-          self._formatters[index] = colformat[index]
+        self._columns[index].format = toyplot.format.FloatFormatter()
 
   def _boundaries(self):
-    column_widths = numpy.zeros(self._data.shape[1])
-    for index, key in enumerate(self._data.keys()):
-      if key in self._colwidth:
-        column_widths[index] = self._colwidth[key]
-      if index in self._colwidth:
-        column_widths[index] = self._colwidth[index]
+    column_widths = numpy.zeros(len(self._columns))
+    for index, column in enumerate(self._columns):
+      if column.width is not None:
+        column_widths[index] = column.width
 
     table_width = self._xmax_range - self._xmin_range
     available_width = table_width - numpy.sum(column_widths[column_widths != 0])
@@ -1209,16 +1248,13 @@ class Table(object):
     column_widths[column_widths == 0] = default_width
 
     x_boundaries = self._xmin_range + numpy.concatenate(([0], numpy.cumsum(column_widths)))
-
-    #x_boundaries = numpy.linspace(self._xmin_range, self._xmax_range, self._data.shape[1] + 1, endpoint=True)
-    y_boundaries = numpy.linspace(self._ymin_range, self._ymax_range, self._data.shape[0] + 2, endpoint=True)
+    y_boundaries = numpy.linspace(self._ymin_range, self._ymax_range, len(self._rows) + 2, endpoint=True)
     return x_boundaries, y_boundaries
 
+  def column(self, key):
+    if isinstance(key, numbers.Integral):
+      return self._columns[key]
+    return self._columns[self._keys.index(key)]
 
-  def cell_axes(self, row, column, xmin=None, xmax=None, ymin=None, ymax=None, show=False, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=5, tick_length=5):
-    x_boundaries, y_boundaries = self._boundaries()
-    axes = toyplot.axes.Cartesian(x_boundaries[column], x_boundaries[column+1], y_boundaries[row], y_boundaries[row+1], xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self)
-    axes.coordinates.show = False
-    self._children.append(axes)
-    return axes
-
+  def cell(self, row, column):
+    return toyplot.axes.Table.CellHelper(row, column, self)

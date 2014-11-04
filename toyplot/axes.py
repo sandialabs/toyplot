@@ -1217,13 +1217,15 @@ class Table(object):
     pass
 
   class CellHelper(object):
-    def __init__(self, row, column, parent):
+    def __init__(self, row, column, rowspan, colspan, parent):
       self._row = row
       self._column = column
+      self._rowspan = rowspan
+      self._colspan = colspan
       self._parent = parent
     def axes(self, xmin=None, xmax=None, ymin=None, ymax=None, show=False, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=5, tick_length=5):
       x_boundaries, y_boundaries = self._parent._boundaries()
-      axes = toyplot.axes.Cartesian(x_boundaries[self._column], x_boundaries[self._column+1], y_boundaries[self._row], y_boundaries[self._row+1], xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self._parent)
+      axes = toyplot.axes.Cartesian(x_boundaries[self._column], x_boundaries[self._column+self._colspan], y_boundaries[self._row], y_boundaries[self._row+self._rowspan], xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self._parent)
       axes.coordinates.show = False
       self._parent._children.append(axes)
       return axes
@@ -1266,5 +1268,5 @@ class Table(object):
       return self._columns[key]
     return self._columns[self._keys.index(key)]
 
-  def cell(self, row, column):
-    return toyplot.axes.Table.CellHelper(row, column, self)
+  def cell(self, row, column, rowspan=1, colspan=1):
+    return toyplot.axes.Table.CellHelper(row, column, rowspan, colspan, self)

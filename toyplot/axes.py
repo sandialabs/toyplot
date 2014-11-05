@@ -1225,6 +1225,7 @@ class Table(object):
 
   class Cell(object):
     def __init__(self):
+      self._content = None
       self._style = None
     @property
     def style(self):
@@ -1240,6 +1241,12 @@ class Table(object):
       self._rowspan = rowspan
       self._colspan = colspan
       self._parent = parent
+
+    def _set_content(self, value):
+      for row in range(self._row, self._row + self._rowspan):
+        for column in range(self._column, self._column + self._colspan):
+          self._parent._cells[row, column]._content = value
+    content = property(fset=_set_content)
 
     def _set_style(self, value):
       for row in range(self._row, self._row + self._rowspan):

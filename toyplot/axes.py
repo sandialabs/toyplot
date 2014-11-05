@@ -1283,6 +1283,31 @@ class Table(object):
       self._parent._children.append(axes)
       return axes
 
+  class Grid(object):
+    def __init__(self, rows, columns):
+      self._hlines = numpy.empty((rows + 2, columns), dtype=object)
+      self._vlines = numpy.empty((rows + 1, columns + 1), dtype=object)
+      self._separation = 2
+      self._style = {"stroke":toyplot.color.near_black, "stroke-width":0.5}
+    @property
+    def hlines(self):
+      return self._hlines
+    @property
+    def vlines(self):
+      return self._vlines
+    @property
+    def separation(self):
+      return self._separation
+    @separation.setter
+    def separation(self, value):
+      self._separation = value
+    @property
+    def style(self):
+      return self._style
+    @style.setter
+    def style(self, value):
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
+
   def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, data, parent):
     self._xmin_range = xmin_range
     self._xmax_range = xmax_range
@@ -1292,17 +1317,14 @@ class Table(object):
     self._children = []
     self._style = {"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle"}
     self._hstyle = {"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle", "font-weight":"bold"}
-    self._gstyle = {"stroke":toyplot.color.near_black, "stroke-width":0.5}
 
     self._keys = data.keys()
     self._columns = numpy.array([toyplot.axes.Table.Column(data=column) for column in data.values()])
     self._rows = numpy.array([toyplot.axes.Table.Row() for row in range(data.shape[0])])
     self._cells = numpy.array([[toyplot.axes.Table.Cell() for column in range(data.shape[1])] for row in range(data.shape[0])])
+    self._grid = toyplot.axes.Table.Grid(data.shape[0], data.shape[1])
 
-    self._hlines = numpy.empty((data.shape[0] + 2, data.shape[1]), dtype=object)
-    self._vlines = numpy.empty((data.shape[0] + 1, data.shape[1] + 1), dtype=object)
-
-    self._hlines[1,...] = "single"
+    self._grid.hlines[1,...] = "single"
 
     for column in self._columns:
       if issubclass(column._data.dtype.type, numpy.floating):
@@ -1329,12 +1351,8 @@ class Table(object):
     return x_boundaries, y_boundaries
 
   @property
-  def hlines(self):
-    return self._hlines
-
-  @property
-  def vlines(self):
-    return self._vlines
+  def grid(self):
+    return self._grid
 
   def row(self, index):
     return self._rows[index]

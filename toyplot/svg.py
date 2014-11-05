@@ -435,7 +435,7 @@ def _render(canvas, axes, context):
     _render(axes._parent, child, context.push(axes_xml))
 
   # Render grid lines.
-  separation = 2
+  separation = axes.grid.separation / 2
 
   def contiguous(a):
     i = 0
@@ -447,23 +447,23 @@ def _render(canvas, axes, context):
       i += n
     return result
 
-  for row_index, row in enumerate(axes._hlines):
+  for row_index, row in enumerate(axes._grid._hlines):
     y = y_boundaries[row_index]
     for start, end, line_type in contiguous(row):
       if line_type == "single":
-        xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y), x2=repr(x_boundaries[end]), y2=repr(y), style=_css_style(axes._gstyle))
+        xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y), x2=repr(x_boundaries[end]), y2=repr(y), style=_css_style(axes._grid._style))
       elif line_type == "double":
-        xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y - separation / 2), x2=repr(x_boundaries[end]), y2=repr(y - separation / 2), style=_css_style(axes._gstyle))
-        xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y + separation / 2), x2=repr(x_boundaries[end]), y2=repr(y + separation / 2), style=_css_style(axes._gstyle))
+        xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y - separation), x2=repr(x_boundaries[end]), y2=repr(y - separation), style=_css_style(axes._grid._style))
+        xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y + separation), x2=repr(x_boundaries[end]), y2=repr(y + separation), style=_css_style(axes._grid._style))
 
-  for column_index, column in enumerate(axes._vlines.T):
+  for column_index, column in enumerate(axes._grid._vlines.T):
     x = x_boundaries[column_index]
     for start, end, line_type in contiguous(column):
       if line_type == "single":
-        xml.SubElement(axes_xml, "line", x1=repr(x), y1=repr(y_boundaries[start]), x2=repr(x), y2=repr(y_boundaries[end]), style=_css_style(axes._gstyle))
+        xml.SubElement(axes_xml, "line", x1=repr(x), y1=repr(y_boundaries[start]), x2=repr(x), y2=repr(y_boundaries[end]), style=_css_style(axes._grid._style))
       elif line_type == "double":
-        xml.SubElement(axes_xml, "line", x1=repr(x - separation / 2), y1=repr(y_boundaries[start]), x2=repr(x - separation / 2), y2=repr(y_boundaries[end]), style=_css_style(axes._gstyle))
-        xml.SubElement(axes_xml, "line", x1=repr(x + separation / 2), y1=repr(y_boundaries[start]), x2=repr(x + separation / 2), y2=repr(y_boundaries[end]), style=_css_style(axes._gstyle))
+        xml.SubElement(axes_xml, "line", x1=repr(x - separation), y1=repr(y_boundaries[start]), x2=repr(x - separation), y2=repr(y_boundaries[end]), style=_css_style(axes._grid._style))
+        xml.SubElement(axes_xml, "line", x1=repr(x + separation), y1=repr(y_boundaries[start]), x2=repr(x + separation), y2=repr(y_boundaries[end]), style=_css_style(axes._grid._style))
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.BarBoundaries, _RenderContext)
 def _render(axes, mark, context):

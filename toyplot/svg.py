@@ -376,10 +376,10 @@ def _render(canvas, axes, context):
   x_boundaries, y_boundaries = axes._boundaries()
 
   # Render column headers.
-  for column_index, key in enumerate(axes._keys):
+  for column_index, (key, column) in enumerate(zip(axes._keys, axes._columns)):
     x = (x_boundaries[column_index] + x_boundaries[column_index + 1]) / 2
     y = (y_boundaries[0] + y_boundaries[1]) / 2
-    xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._hstyle, {"text-anchor":"middle"}))).text = key
+    xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._hstyle, column.header.style, {"text-anchor":"middle"}))).text = key if column.header.content is None else column.header.content
 
   # Render column contents.
   for column_index, column in enumerate(axes._columns):
@@ -430,6 +430,10 @@ def _render(canvas, axes, context):
         elif cell_prefix:
           xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"middle"}))).text = cell_prefix
 
+  # Render children.
+  for child in axes._children:
+    _render(axes._parent, child, context.push(axes_xml))
+
   # Render grid lines.
   separation = 2
 
@@ -460,10 +464,6 @@ def _render(canvas, axes, context):
       elif line_type == "double":
         xml.SubElement(axes_xml, "line", x1=repr(x - separation / 2), y1=repr(y_boundaries[start]), x2=repr(x - separation / 2), y2=repr(y_boundaries[end]), style=_css_style(axes._gstyle))
         xml.SubElement(axes_xml, "line", x1=repr(x + separation / 2), y1=repr(y_boundaries[start]), x2=repr(x + separation / 2), y2=repr(y_boundaries[end]), style=_css_style(axes._gstyle))
-
-  # Render children.
-  for child in axes._children:
-    _render(axes._parent, child, context.push(axes_xml))
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.BarBoundaries, _RenderContext)
 def _render(axes, mark, context):

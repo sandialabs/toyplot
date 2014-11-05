@@ -1171,14 +1171,36 @@ class Cartesian(object):
 class Table(object):
   """Experimental table coordinate system.
   """
+  class HeaderCell(object):
+    def __init__(self):
+      self._content = None
+      self._style = None
+    @property
+    def content(self):
+      return self._content
+    @content.setter
+    def content(self, value):
+      self._content = value
+    @property
+    def style(self):
+      return self._style
+    @style.setter
+    def style(self, value):
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
+
   class Column(object):
     def __init__(self, data):
+      self._header = toyplot.axes.Table.HeaderCell()
+
       self._data = data
       self._width = None
       self._justify = "center"
       self._format = toyplot.format.DefaultFormatter()
       self._offset = 0
       self._style = None
+    @property
+    def header(self):
+      return self._header
     @property
     def width(self):
       return self._width
@@ -1270,7 +1292,7 @@ class Table(object):
     self._children = []
     self._style = {"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle"}
     self._hstyle = {"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle", "font-weight":"bold"}
-    self._gstyle = {"stroke":toyplot.color.near_black}
+    self._gstyle = {"stroke":toyplot.color.near_black, "stroke-width":0.5}
 
     self._keys = data.keys()
     self._columns = numpy.array([toyplot.axes.Table.Column(data=column) for column in data.values()])

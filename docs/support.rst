@@ -5,9 +5,9 @@
 Support
 =======
 
-For Toyplot questions, comments, or suggestions, try our forums at:
+For Toyplot questions, comments, or suggestions, get in touch with the team at:
 
-* http://ost.io/@sandialabs/toyplot
+* https://gitter.im/sandialabs/toyplot
 
 Visit our GitHub repository for access to source code, issue tracker, and the wiki:
 

@@ -1277,6 +1277,11 @@ class Table(object):
     self._rows = numpy.array([toyplot.axes.Table.Row() for row in range(data.shape[0])])
     self._cells = numpy.array([[toyplot.axes.Table.Cell() for column in range(data.shape[1])] for row in range(data.shape[0])])
 
+    self._hlines = numpy.empty((data.shape[0] + 2, data.shape[1]), dtype=object)
+    self._vlines = numpy.empty((data.shape[0] + 1, data.shape[1] + 1), dtype=object)
+
+    self._hlines[1,...] = "single"
+
     for column in self._columns:
       if issubclass(column._data.dtype.type, numpy.floating):
         column.format = toyplot.format.FloatFormatter()
@@ -1300,6 +1305,14 @@ class Table(object):
     x_boundaries = self._xmin_range + numpy.concatenate(([0], numpy.cumsum(column_widths)))
     y_boundaries = numpy.linspace(self._ymin_range, self._ymax_range, len(self._rows) + 2, endpoint=True)
     return x_boundaries, y_boundaries
+
+  @property
+  def hlines(self):
+    return self._hlines
+
+  @property
+  def vlines(self):
+    return self._vlines
 
   def row(self, index):
     return self._rows[index]

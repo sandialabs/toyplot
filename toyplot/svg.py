@@ -431,11 +431,35 @@ def _render(canvas, axes, context):
           xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"middle"}))).text = cell_prefix
 
   # Render grid lines.
-  for x in x_boundaries[0:0]:
-    xml.SubElement(axes_xml, "line", x1=repr(x), y1=repr(axes._ymin_range), x2=repr(x), y2=repr(axes._ymax_range), style=_css_style(axes._gstyle))
+  separation = 2
 
-  for y in y_boundaries[1:2]:
-    xml.SubElement(axes_xml, "line", x1=repr(axes._xmin_range), y1=repr(y), x2=repr(axes._xmax_range), y2=repr(y), style=_css_style(axes._gstyle))
+  def contiguous(a):
+    i = 0
+    result = []
+    for (k, g) in itertools.groupby(a.ravel()):
+      n = len(list(g))
+      if k:
+        result.append((i, i + n, k))
+      i += n
+    return result
+
+  for row_index, row in enumerate(axes._hlines):
+    y = y_boundaries[row_index]
+    for start, end, line_type in contiguous(row):
+      if line_type == "single":
+        xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y), x2=repr(x_boundaries[end]), y2=repr(y), style=_css_style(axes._gstyle))
+      elif line_type == "double":
+        xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y - separation / 2), x2=repr(x_boundaries[end]), y2=repr(y - separation / 2), style=_css_style(axes._gstyle))
+        xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y + separation / 2), x2=repr(x_boundaries[end]), y2=repr(y + separation / 2), style=_css_style(axes._gstyle))
+
+  for column_index, column in enumerate(axes._vlines.T):
+    x = x_boundaries[column_index]
+    for start, end, line_type in contiguous(column):
+      if line_type == "single":
+        xml.SubElement(axes_xml, "line", x1=repr(x), y1=repr(y_boundaries[start]), x2=repr(x), y2=repr(y_boundaries[end]), style=_css_style(axes._gstyle))
+      elif line_type == "double":
+        xml.SubElement(axes_xml, "line", x1=repr(x - separation / 2), y1=repr(y_boundaries[start]), x2=repr(x - separation / 2), y2=repr(y_boundaries[end]), style=_css_style(axes._gstyle))
+        xml.SubElement(axes_xml, "line", x1=repr(x + separation / 2), y1=repr(y_boundaries[start]), x2=repr(x + separation / 2), y2=repr(y_boundaries[end]), style=_css_style(axes._gstyle))
 
   # Render children.
   for child in axes._children:

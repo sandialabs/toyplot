@@ -15,163 +15,163 @@ root_dir = os.path.dirname(os.path.dirname(__file__))
 
 @given(u'a new toyplot.data.table')
 def step_impl(context):
-  context.value = toyplot.data.Table()
+  context.data = toyplot.data.Table()
 
 @then(u'the table should be empty')
 def step_impl(context):
-  nose.tools.assert_equal(len(context.value), 0)
-  nose.tools.assert_equal(context.value.shape, (0, 0))
-  nose.tools.assert_equal(context.value.items(), [])
-  nose.tools.assert_equal(context.value.keys(), [])
-  nose.tools.assert_equal(context.value.values(), [])
+  nose.tools.assert_equal(len(context.data), 0)
+  nose.tools.assert_equal(context.data.shape, (0, 0))
+  nose.tools.assert_equal(context.data.items(), [])
+  nose.tools.assert_equal(context.data.keys(), [])
+  nose.tools.assert_equal(context.data.values(), [])
 
 @then(u'adding columns should change the table')
 def step_impl(context):
-  context.value["a"] = numpy.arange(10)
-  nose.tools.assert_equal(context.value.keys(), ["a"])
-  nose.tools.assert_equal(context.value.shape, (10, 1))
+  context.data["a"] = numpy.arange(10)
+  nose.tools.assert_equal(context.data.keys(), ["a"])
+  nose.tools.assert_equal(context.data.shape, (10, 1))
 
-  context.value["b"] = context.value["a"] ** 2
-  nose.tools.assert_equal(context.value.keys(), ["a", "b"])
-  nose.tools.assert_equal(context.value.shape, (10, 2))
-  numpy.testing.assert_array_equal(context.value["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
+  context.data["b"] = context.data["a"] ** 2
+  nose.tools.assert_equal(context.data.keys(), ["a", "b"])
+  nose.tools.assert_equal(context.data.shape, (10, 2))
+  numpy.testing.assert_array_equal(context.data["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
 
-  context.value["c"] = numpy.zeros(10)
-  nose.tools.assert_equal(context.value.keys(), ["a", "b", "c"])
-  nose.tools.assert_equal(context.value.shape, (10, 3))
-  numpy.testing.assert_array_equal(context.value["c"], [0] * 10)
+  context.data["c"] = numpy.zeros(10)
+  nose.tools.assert_equal(context.data.keys(), ["a", "b", "c"])
+  nose.tools.assert_equal(context.data.shape, (10, 3))
+  numpy.testing.assert_array_equal(context.data["c"], [0] * 10)
 
 @then(u'extracting columns should return a new table')
 def step_impl(context):
-  value = context.value.columns(["b", "a"])
-  nose.tools.assert_equal(value.keys(), ["b", "a"])
-  nose.tools.assert_equal(value.shape, (10, 2))
+  table = context.data.columns(["b", "a"])
+  nose.tools.assert_equal(table.keys(), ["b", "a"])
+  nose.tools.assert_equal(table.shape, (10, 2))
 
 @then(u'deleting columns should change the table')
 def step_impl(context):
-  del context.value["c"]
-  nose.tools.assert_equal(context.value.keys(), ["a", "b"])
-  nose.tools.assert_equal(context.value.shape, (10, 2))
+  del context.data["c"]
+  nose.tools.assert_equal(context.data.keys(), ["a", "b"])
+  nose.tools.assert_equal(context.data.shape, (10, 2))
 
 @then(u'indexing should return a new table with one row')
 def step_impl(context):
-  value = context.value[5]
-  nose.tools.assert_equal(value.keys(), ["a", "b"])
-  nose.tools.assert_equal(value.shape, (1, 2))
-  numpy.testing.assert_array_equal(value["a"], [5])
+  table = context.data[5]
+  nose.tools.assert_equal(table.keys(), ["a", "b"])
+  nose.tools.assert_equal(table.shape, (1, 2))
+  numpy.testing.assert_array_equal(table["a"], [5])
 
 @then(u'slicing should return a new table with a range of rows')
 def step_impl(context):
-  value = context.value[slice(0, 6, 2)]
-  nose.tools.assert_equal(value.keys(), ["a", "b"])
-  nose.tools.assert_equal(value.shape, (3, 2))
-  numpy.testing.assert_array_equal(value["a"], [0, 2, 4])
+  table = context.data[slice(0, 6, 2)]
+  nose.tools.assert_equal(table.keys(), ["a", "b"])
+  nose.tools.assert_equal(table.shape, (3, 2))
+  numpy.testing.assert_array_equal(table["a"], [0, 2, 4])
 
 @then(u'extracting rows by index should return a new table with one row')
 def step_impl(context):
-  value = context.value.rows(8)
-  nose.tools.assert_equal(value.keys(), ["a", "b"])
-  nose.tools.assert_equal(value.shape, (1, 2))
-  numpy.testing.assert_array_equal(value["a"], [8])
+  table = context.data.rows(8)
+  nose.tools.assert_equal(table.keys(), ["a", "b"])
+  nose.tools.assert_equal(table.shape, (1, 2))
+  numpy.testing.assert_array_equal(table["a"], [8])
 
 @then(u'extracting rows using multiple indices should return a new table with the specified rows')
 def step_impl(context):
-  value = context.value.rows([1, 2, 3])
-  nose.tools.assert_equal(value.keys(), ["a", "b"])
-  nose.tools.assert_equal(value.shape, (3, 2))
-  numpy.testing.assert_array_equal(value["a"], [1, 2, 3])
+  table = context.data.rows([1, 2, 3])
+  nose.tools.assert_equal(table.keys(), ["a", "b"])
+  nose.tools.assert_equal(table.shape, (3, 2))
+  numpy.testing.assert_array_equal(table["a"], [1, 2, 3])
 
 @then(u'new columns must have a string name')
 def step_impl(context):
   with nose.tools.assert_raises(ValueError):
-    context.value[3] = numpy.arange(10)
+    context.data[3] = numpy.arange(10)
 
 @then(u'new columns must have the same number of rows as existing columns')
 def step_impl(context):
   with nose.tools.assert_raises(ValueError):
-    context.value["c"] = numpy.random.random(4)
+    context.data["c"] = numpy.random.random(4)
 
 @then(u'new columns must be one-dimensional')
 def step_impl(context):
   with nose.tools.assert_raises(ValueError):
-    context.value["c"] = numpy.random.random((10, 4))
+    context.data["c"] = numpy.random.random((10, 4))
 
 @when(u'toyplot.data.Table is initialized with nothing')
 def step_impl(context):
-  context.value = toyplot.data.Table()
+  context.data = toyplot.data.Table()
 
 @then(u'the toyplot.data.Table is empty')
 def step_impl(context):
-  nose.tools.assert_equal(len(context.value), 0)
-  nose.tools.assert_equal(context.value.shape, (0, 0))
-  nose.tools.assert_equal(context.value.items(), [])
-  nose.tools.assert_equal(context.value.keys(), [])
-  nose.tools.assert_equal(context.value.values(), [])
+  nose.tools.assert_equal(len(context.data), 0)
+  nose.tools.assert_equal(context.data.shape, (0, 0))
+  nose.tools.assert_equal(context.data.items(), [])
+  nose.tools.assert_equal(context.data.keys(), [])
+  nose.tools.assert_equal(context.data.values(), [])
 
 @when(u'toyplot.data.Table is initialized with a toyplot.data.Table')
 def step_impl(context):
   table = toyplot.data.Table()
   table["a"] = numpy.arange(10)
   table["b"] = table["a"] ** 2
-  context.value = table
+  context.data = table
 
 @when(u'toyplot.data.Table is initialized with an OrderedDict containing columns')
 def step_impl(context):
-  context.value = collections.OrderedDict([("a", numpy.arange(10)), ("b", numpy.arange(10) ** 2)])
+  context.data = collections.OrderedDict([("a", numpy.arange(10)), ("b", numpy.arange(10) ** 2)])
 
 @then(u'the toyplot.data.Table contains the columns')
 def step_impl(context):
-  value = toyplot.data.Table(context.value)
-  nose.tools.assert_equal(value.keys(), ["a", "b"])
-  numpy.testing.assert_array_equal(value["a"], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-  numpy.testing.assert_array_equal(value["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
+  table = toyplot.data.Table(context.data)
+  nose.tools.assert_equal(table.keys(), ["a", "b"])
+  numpy.testing.assert_array_equal(table["a"], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  numpy.testing.assert_array_equal(table["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
 
 @when(u'toyplot.data.Table is initialized with a dict containing columns')
 def step_impl(context):
-  context.value = {"b" : numpy.arange(10) ** 2, "a" : numpy.arange(10)}
+  context.data = {"b" : numpy.arange(10) ** 2, "a" : numpy.arange(10)}
 
 @then(u'the toyplot.data.Table contains the columns, sorted by key')
 def step_impl(context):
-  value = toyplot.data.Table(context.value)
-  nose.tools.assert_equal(value.keys(), ["a", "b"])
-  numpy.testing.assert_array_equal(value["a"], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-  numpy.testing.assert_array_equal(value["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
+  table = toyplot.data.Table(context.data)
+  nose.tools.assert_equal(table.keys(), ["a", "b"])
+  numpy.testing.assert_array_equal(table["a"], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+  numpy.testing.assert_array_equal(table["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
 
 @then(u'the toyplot.data.Table raises ValueError')
 def step_impl(context):
   with nose.tools.assert_raises(ValueError):
-    toyplot.data.Table(context.value)
+    toyplot.data.Table(context.data)
 
 @given(u'a toyplot.data.table with some data')
 def step_impl(context):
   numpy.random.seed(1234)
-  context.value = toyplot.data.Table()
-  context.value["foo"] = numpy.arange(10)
-  context.value["bar"] = numpy.random.random(10)
-  context.value["baz"] = numpy.random.choice(["red", "green", "blue"], size=10)
+  context.data = toyplot.data.Table()
+  context.data["foo"] = numpy.arange(10)
+  context.data["bar"] = numpy.random.random(10)
+  context.data["baz"] = numpy.random.choice(["red", "green", "blue"], size=10)
 
 @then(u'the table can be rendered as format latex string')
 def step_impl(context):
-  toyplot.testing.assert_latex_equal(toyplot.latex.render(context.value), "data-table")
+  toyplot.testing.assert_latex_equal(toyplot.latex.render(context.data), "data-table")
 
 @then(u'the table can be rendered as format latex fobj')
 def step_impl(context):
   buffer = StringIO.StringIO()
-  toyplot.latex.render(context.value, buffer)
+  toyplot.latex.render(context.data, buffer)
   toyplot.testing.assert_latex_equal(buffer.getvalue(), "data-table")
 
 @then(u'the table can be rendered as format latex file')
 def step_impl(context):
   path = os.path.join(tempfile.mkdtemp(), "test.tex")
-  toyplot.latex.render(context.value, path)
+  toyplot.latex.render(context.data, path)
   toyplot.testing.assert_latex_equal(open(path, "r").read(), "data-table")
 
 @then(u'the table can be rendered as format latex string with hline')
 def step_impl(context):
-  toyplot.testing.assert_latex_equal(toyplot.latex.render(context.value, hlines=[5]), "data-table-with-hline")
+  toyplot.testing.assert_latex_equal(toyplot.latex.render(context.data, hlines=[5]), "data-table-with-hline")
 
 @then(u'the table can be rendered as format ipython html string')
 def step_impl(context):
-  toyplot.testing.assert_html_equal(context.value._repr_html_(), "data-table")
+  toyplot.testing.assert_html_equal(context.data._repr_html_(), "data-table")
 
 

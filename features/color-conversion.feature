@@ -3,7 +3,7 @@ Feature: Color conversion
     When toyplot.color.css receives <input>
     Then toyplot.color.css should return <output>
 
-    Examples: Valid Inputs
+    Examples:
       | input                    | output                          |
       | red                      | (1, 0, 0, 1)                    |
       | Red                      | (1, 0, 0, 1)                    |
@@ -23,15 +23,12 @@ Feature: Color conversion
       | rgba(76%, 32%, 89%, .76) | (.76, .32, .89, .76)            |
       | hsl(0, 100%, 50%)        | (1, 0, 0, 1)                    |
       | hsla(0, 100%, 50%, 0.32) | (1, 0, 0, 0.32)                 |
-
-    Examples: Invalid Inputs
-      | input                    | output                          |
       | baloney                  | None                            |
 
   Scenario Outline: Conversion to css
     When toyplot.color.to_css receives <input>
     Then toyplot.color.to_css should return <output>
 
-    Examples: Valid Inputs
+    Examples:
       | input                            | output                  |
       | toyplot.color.rgba(1, .5, .4, 1) | rgba(100%,50%,40%,1)    |

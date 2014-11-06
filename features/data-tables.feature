@@ -1,5 +1,5 @@
-Feature: Table
-  Scenario: Table manipulation
+Feature: Data tables
+  Scenario: Data table manipulation
     Given a new toyplot.data.table
     Then adding columns should change the table
     And extracting columns should return a new table
@@ -12,18 +12,18 @@ Feature: Table
     And new columns must have the same number of rows as existing columns
     And new columns must be one-dimensional
 
-  Scenario Outline: Table creation
+  Scenario Outline: Data table creation
     When toyplot.data.Table is initialized with <input>
     Then the toyplot.data.Table <response>
 
-    Examples: Valid Inputs
+    Examples:
       | input                             | response                            |
       | nothing                           | is empty                            |
       | a toyplot.data.Table              | contains the columns                |
       | an OrderedDict containing columns | contains the columns                |
       | a dict containing columns         | contains the columns, sorted by key |
 
-  Scenario Outline: Table rendering
+  Scenario Outline: Data table rendering
     Given a toyplot.data.table with some data
     Then the table can be rendered as format <format>
 

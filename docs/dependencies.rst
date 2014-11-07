@@ -34,8 +34,9 @@ The following are required to run Toyplot's regression tests and view
 code coverage:
 
 * behave - BDD test framework - http://pythonhosted.org/behave
-* nose - unit test framework - https://nose.readthedocs.org/en/latest/
-* coverage - code coverage module - http://nedbatchelder.com/code/coverage/
+* coverage - code coverage module - http://nedbatchelder.com/code/coverage
+* mock - mocking and testing library - http://www.voidspace.org.uk/python/mock
+* nose - unit test framework - https://nose.readthedocs.org/en/latest
 
 And you'll need to following to generate this documentation:
 

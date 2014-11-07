@@ -8,7 +8,7 @@ RUN yum install -y --nogpgcheck http://download1.rpmfusion.org/free/fedora/rpmfu
 RUN yum install -y buildbot-master buildbot-slave ffmpeg git numpy pygtk2 python-coverage python-nose python-pip python-sphinx python-sphinx_rtd_theme vim
 
 # Install pip packages.
-RUN pip install behave colormath multipledispatch
+RUN pip install behave colormath mock multipledispatch
 
 # Setup the root user.
 RUN echo 'root:toyplot' | chpasswd

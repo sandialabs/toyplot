@@ -54,7 +54,7 @@ class Table(object):
     return self._columns.__delitem__(key)
 
   def __len__(self):
-    return self._columns.values()[0].shape[0] if len(self._columns) else 0
+    return list(self._columns.values())[0].shape[0] if len(self._columns) else 0
 
   def _repr_html_(self):
     root_xml = xml.Element("table", style="border-collapse:collapse; border:none; color: %s" % toyplot.color.near_black)

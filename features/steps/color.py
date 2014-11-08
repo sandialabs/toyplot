@@ -81,7 +81,7 @@ def step_impl(context):
 
 @then(u'toyplot.color.broadcast should broadcast the list to the 2d array')
 def step_impl(context):
-  numpy.testing.assert_array_equal(context.value, toyplot.color.array([[(1, 0, 0, 1), (0, 0, 1, 1)],[(1, 0, 0, 1), (0, 0, 1, 1)],[(1, 0, 0, 1), (0, 0, 1, 1)]])) 
+  numpy.testing.assert_array_equal(context.value, toyplot.color.array([[(1, 0, 0, 1), (0, 0, 1, 1)],[(1, 0, 0, 1), (0, 0, 1, 1)],[(1, 0, 0, 1), (0, 0, 1, 1)]]))
 
 @when(u'broadcasting a 1d array of css colors to a 1d array')
 def step_impl(context):
@@ -89,7 +89,7 @@ def step_impl(context):
 
 @then(u'toyplot.color.broadcast should broadcast the 1d array of colors to the 1d array')
 def step_impl(context):
-  numpy.testing.assert_array_equal(context.value, toyplot.color.array([(1, 0, 0, 1), (0, 0, 1, 1)])) 
+  numpy.testing.assert_array_equal(context.value, toyplot.color.array([(1, 0, 0, 1), (0, 0, 1, 1)]))
 
 @when(u'broadcasting a 1d array of css colors to a 2d array')
 def step_impl(context):
@@ -97,6 +97,51 @@ def step_impl(context):
 
 @then(u'toyplot.color.broadcast should broadcast the 1d array of colors to the 2d array')
 def step_impl(context):
-  numpy.testing.assert_array_equal(context.value, toyplot.color.array([[(1, 0, 0, 1), (0, 0, 1, 1)],[(1, 0, 0, 1), (0, 0, 1, 1)]])) 
+  numpy.testing.assert_array_equal(context.value, toyplot.color.array([[(1, 0, 0, 1), (0, 0, 1, 1)],[(1, 0, 0, 1), (0, 0, 1, 1)]]))
+
+@given(u'a collection of diverging color maps')
+def step_impl(context):
+  context.color_maps = [(name, toyplot.color.diverging(name)) for name in toyplot.color.diverging.names()]
+
+@then(u'each diverging color map can be rendered as ipython html')
+def step_impl(context):
+  for name, color_map in context.color_maps:
+    toyplot.testing.assert_html_equal(color_map._repr_html_(), "color-diverging-map-%s" % name)
+
+@when(u'the user creates a default diverging color map')
+def step_impl(context):
+  context.color_map = toyplot.color.DivergingMap()
+
+@then(u'the default diverging color map can be rendered as ipython html')
+def step_impl(context):
+  toyplot.testing.assert_html_equal(context.color_map._repr_html_(), "color-diverging-map")
+
+@when(u'the user creates a custom diverging color map')
+def step_impl(context):
+  context.color_map = toyplot.color.DivergingMap(toyplot.color.rgb(0.7, 0, 0), toyplot.color.rgb(0, 0.6, 0))
+
+@then(u'the custom diverging color map can be rendered as ipython html')
+def step_impl(context):
+  toyplot.testing.assert_html_equal(context.color_map._repr_html_(), "color-diverging-map-custom")
+
+@when(u'the user creates a default diverging color map with domain')
+def step_impl(context):
+  context.color_map = toyplot.color.DivergingMap(domain_min=0, domain_max=1)
+
+@then(u'individual values can be mapped to colors by the diverging color map')
+def step_impl(context):
+  toyplot.testing.assert_color_equal(context.color_map.color(-1), [ 0.33479085,  0.28308437,  0.75649522,  1.        ])
+  toyplot.testing.assert_color_equal(context.color_map.color(0), [ 0.33479085,  0.28308437,  0.75649522,  1.        ])
+  toyplot.testing.assert_color_equal(context.color_map.color(0.5), [ 0.86541961,  0.86538428,  0.86533315,  1.        ])
+  toyplot.testing.assert_color_equal(context.color_map.color(1), [ 0.69462562,  0.00296461,  0.15458183,  1.        ])
+  toyplot.testing.assert_color_equal(context.color_map.color(2), [ 0.69462562,  0.00296461,  0.15458183,  1.        ])
+
+@then(u'individual values can be mapped to css colors by the diverging color map')
+def step_impl(context):
+  nose.tools.assert_equal(context.color_map.css(-1), "rgba(33.5%,28.3%,75.6%,1)")
+  nose.tools.assert_equal(context.color_map.css(0), "rgba(33.5%,28.3%,75.6%,1)")
+  nose.tools.assert_equal(context.color_map.css(0.5), "rgba(86.5%,86.5%,86.5%,1)")
+  nose.tools.assert_equal(context.color_map.css(1), "rgba(69.5%,0.296%,15.5%,1)")
+  nose.tools.assert_equal(context.color_map.css(2), "rgba(69.5%,0.296%,15.5%,1)")
 
 

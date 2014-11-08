@@ -1475,36 +1475,6 @@ def test_color_linear_map_css():
   nose.tools.assert_equal(map.css(1), "rgba(0%,0%,100%,1)")
   nose.tools.assert_equal(map.css(2), "rgba(0%,0%,100%,1)")
 
-def test_color_diverging_map():
-  map = toyplot.color.DivergingMap()
-  assert_html_matches(map._repr_html_(), "color-diverging-map")
-
-def test_color_diverging_maps():
-  def test(name):
-    assert_html_matches(toyplot.color.diverging(name)._repr_html_(), "color-diverging-map-%s" % name)
-  for name in toyplot.color.diverging.names():
-    yield test, name
-
-def test_color_diverging_map_custom():
-  map = toyplot.color.DivergingMap(toyplot.color.rgb(0.7, 0, 0), toyplot.color.rgb(0, 0.6, 0))
-  assert_html_matches(map._repr_html_(), "color-diverging-map-custom")
-
-def test_color_diverging_map_color():
-  map = toyplot.color.DivergingMap(domain_min=0, domain_max=1)
-  assert_color_equal(map.color(-1), [ 0.33479085,  0.28308437,  0.75649522,  1.        ])
-  assert_color_equal(map.color(0), [ 0.33479085,  0.28308437,  0.75649522,  1.        ])
-  assert_color_equal(map.color(0.5), [ 0.86541961,  0.86538428,  0.86533315,  1.        ])
-  assert_color_equal(map.color(1), [ 0.69462562,  0.00296461,  0.15458183,  1.        ])
-  assert_color_equal(map.color(2), [ 0.69462562,  0.00296461,  0.15458183,  1.        ])
-
-def test_color_diverging_map_css():
-  map = toyplot.color.DivergingMap(domain_min=0, domain_max=1)
-  nose.tools.assert_equal(map.css(-1), "rgba(33.5%,28.3%,75.6%,1)")
-  nose.tools.assert_equal(map.css(0), "rgba(33.5%,28.3%,75.6%,1)")
-  nose.tools.assert_equal(map.css(0.5), "rgba(86.5%,86.5%,86.5%,1)")
-  nose.tools.assert_equal(map.css(1), "rgba(69.5%,0.296%,15.5%,1)")
-  nose.tools.assert_equal(map.css(2), "rgba(69.5%,0.296%,15.5%,1)")
-
 ##################################################################################
 # toyplot.html
 

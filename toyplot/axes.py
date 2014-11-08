@@ -1360,7 +1360,7 @@ class Table(object):
   def column(self, key):
     if isinstance(key, numbers.Integral):
       return self._columns[key]
-    return self._columns[self._keys.index(key)]
+    return self._columns[list(self._keys).index(key)]
 
   def cell(self, row, column, rowspan=1, colspan=1):
     return toyplot.axes.Table.CellReference(row, column, rowspan, colspan, self)

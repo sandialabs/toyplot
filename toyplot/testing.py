@@ -9,6 +9,7 @@ import json
 import os
 import numbers
 import numpy.testing
+import re
 import toyplot.html
 import xml.etree.ElementTree as xml
 

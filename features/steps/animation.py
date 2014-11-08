@@ -10,11 +10,6 @@ import tempfile
 import toyplot
 
 try:
-  import cStringIO as StringIO
-except:
-  import StringIO
-
-try:
   import toyplot.mp4
 except:
   pass

@@ -3,13 +3,13 @@ import nose.tools
 import numpy.testing
 
 import collections
+import io
 import numpy
 import os
 import tempfile
 import toyplot.data
 import toyplot.latex
 import toyplot.testing
-import StringIO
 
 root_dir = os.path.dirname(os.path.dirname(__file__))
 
@@ -156,7 +156,7 @@ def step_impl(context):
 
 @then(u'the table can be rendered as format latex fobj')
 def step_impl(context):
-  buffer = StringIO.StringIO()
+  buffer = io.BytesIO()
   toyplot.latex.render(context.data, buffer)
   toyplot.testing.assert_latex_equal(buffer.getvalue(), "data-table")
 

@@ -74,7 +74,7 @@ class Table(object):
 
   @property
   def shape(self):
-    return (self._columns.values()[0].shape[0] if len(self._columns) else 0, len(self._columns))
+    return (list(self._columns.values())[0].shape[0] if len(self._columns) else 0, len(self._columns))
 
   def items(self):
     return self._columns.items()

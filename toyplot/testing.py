@@ -33,6 +33,22 @@ def _assert_content_equal(content, test_file, reference_file):
       file.write(content)
     raise AssertionError("Created new reference file %s.  You should verify its contents before re-running the test." % (reference_file))
 
+def _assert_string_equal(content, test_file, reference_file, encoding="utf-8"):
+  if os.path.exists(test_file):
+    os.remove(test_file)
+  if os.path.exists(reference_file):
+    reference = open(reference_file, "rb").read()
+    if content != reference:
+      if not os.path.exists(failed_dir):
+        os.mkdir(failed_dir)
+      with open(test_file, "wb") as file:
+        file.write(content.encode(encoding))
+      raise AssertionError("Test output %s doesn't match %s." % (test_file, reference_file))
+  else:
+    with open(reference_file, "wb") as file:
+      file.write(content.encode(encoding))
+    raise AssertionError("Created new reference file %s.  You should verify its contents before re-running the test." % (reference_file))
+
 def _json_comparison_string(o):
   """Convert a Python object to a JSON string representation that can be used for comparison.
 
@@ -131,7 +147,7 @@ def assert_latex_equal(latex, name):
 
   test_file = os.path.join(failed_dir, "%s.tex" % name)
   reference_file = os.path.join(reference_dir, "%s.tex" % name)
-  _assert_content_equal(latex, test_file, reference_file)
+  _assert_string_equal(latex, test_file, reference_file)
 
 def assert_canvas_equal(canvas, name):
   test_file = os.path.join(failed_dir, "%s.svg" % name)

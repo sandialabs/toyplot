@@ -5,10 +5,11 @@ MAINTAINER Timothy M. Shead <tshead@sandia.gov>
 RUN yum install -y --nogpgcheck http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
 # Install yum packages.
-RUN yum install -y buildbot-master buildbot-slave ffmpeg git numpy pygtk2 python-coverage python-nose python-pip python-sphinx python-sphinx_rtd_theme vim
+RUN yum install -y buildbot-master buildbot-slave ffmpeg git numpy python3-numpy pygtk2 python-coverage python-mock python-nose python-pip python-sphinx python-sphinx_rtd_theme python3-coverage python3-mock python3-nose python3-pip python3-sphinx python3-sphinx_rtd_theme vim
 
 # Install pip packages.
-RUN pip install behave colormath mock multipledispatch
+RUN pip install colormath multipledispatch git+https://github.com/behave/behave
+RUN python3-pip install colormath multipledispatch git+https://github.com/behave/behave
 
 # Setup the root user.
 RUN echo 'root:toyplot' | chpasswd
@@ -19,7 +20,8 @@ RUN echo 'toyplot:toyplot' | chpasswd
 USER toyplot
 RUN echo "alias vi=vim" >> /home/toyplot/.bash_profile
 RUN cd /home/toyplot; buildbot create-master buildmaster
-RUN cd /home/toyplot; buildslave create-slave buildworker localhost:9989 basic-worker pass
+RUN cd /home/toyplot; buildslave create-slave python27-worker localhost:9989 python27-worker pass
+RUN cd /home/toyplot; buildslave create-slave python33-worker localhost:9989 python33-worker pass
 RUN touch /home/toyplot/.gitconfig
 RUN HOME=/home/toyplot git config --global push.default simple
 RUN HOME=/home/toyplot git config --global color.ui true

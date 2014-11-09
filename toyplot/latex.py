@@ -19,8 +19,8 @@ def render(table, fobj=None, hlines=None):
 
   fobj: file-like object or string, optional
     The file to write.  Use a string filepath to write data directly to disk.
-    If `None` (the default), the LaTeX markup will be returned to the caller
-    instead.
+    The LaTex markup in the file will be encoded using UTF-8.  If `None` (the
+    default), the LaTeX markup will be returned to the caller instead.
 
   hlines: sequence of row indices, optional
     For each index :math:`n`, renders a horizontal line between row :math:`n-1`
@@ -49,7 +49,7 @@ def render(table, fobj=None, hlines=None):
   if hlines is None:
     hlines = []
 
-  latex = "\\begin{tabular}"
+  latex = u"\\begin{tabular}"
   latex += "{" + " ".join(["l" for key in table.keys()]) + "}\n"
   latex += " & ".join(table.keys()) + " \\\\\n"
   latex += "\\hline\n"
@@ -68,9 +68,9 @@ def render(table, fobj=None, hlines=None):
 
   if isinstance(fobj, toyplot.compatibility.string_type):
     with open(fobj, "wb") as file:
-      file.write(latex)
+      file.write(latex.encode("utf8"))
   elif fobj is not None:
-    fobj.write(latex)
+    fobj.write(latex.encode("utf8"))
   else:
     return latex
 

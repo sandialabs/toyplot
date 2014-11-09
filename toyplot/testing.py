@@ -65,28 +65,28 @@ def _xml_comparison_string(element):
       return value
 
   def write_element(element, buffer, indent):
-    buffer.write("%s<%s" % (indent, element.tag))
+    buffer.write(u"%s<%s" % (indent, element.tag))
     for key, value in element.items():
       if key in ["id", "clip-path"]:
         continue
       if key == "d" and element.tag == "{http://www.w3.org/2000/svg}path":
-        buffer.write(" %s='%s'" % (key, " ".join([format_value(d) for d in value.split(" ")])))
+        buffer.write(u" %s='%s'" % (key, " ".join([format_value(d) for d in value.split(" ")])))
       elif key == "transform":
-        buffer.write(" %s='%s'" % (key, "".join([format_value(d) for d in re.split("(,|\(|\))", value)])))
+        buffer.write(u" %s='%s'" % (key, "".join([format_value(d) for d in re.split("(,|\(|\))", value)])))
       elif key == "points" and element.tag == "{http://www.w3.org/2000/svg}polygon":
-        buffer.write(" %s='%s'" % (key, " ".join([",".join([format_value(i) for i in p.split(",")]) for p in value.split(" ")])))
+        buffer.write(u" %s='%s'" % (key, " ".join([",".join([format_value(i) for i in p.split(",")]) for p in value.split(" ")])))
       else:
-        buffer.write(" %s='%s'" % (key, format_value(value)))
+        buffer.write(u" %s='%s'" % (key, format_value(value)))
 
     text = element.text if element.text is not None else ""
     if element.tag in ["{http://www.sandia.gov/toyplot}data-table", "{http://www.sandia.gov/toyplot}axes"]:
       text = str(_json_comparison_string(json.loads(element.text)))
-    buffer.write(">%s\n" % text)
+    buffer.write(u">%s\n" % text)
     for child in list(element):
       write_element(child, buffer, indent+"  ")
-    buffer.write("%s</%s>\n" % (indent, element.tag))
+    buffer.write(u"%s</%s>\n" % (indent, element.tag))
 
-  buffer = io.BytesIO()
+  buffer = io.StringIO()
   write_element(element, buffer, indent="")
   return buffer.getvalue()
 

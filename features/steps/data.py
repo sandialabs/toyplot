@@ -22,22 +22,22 @@ def step_impl(context):
   nose.tools.assert_equal(len(context.data), 0)
   nose.tools.assert_equal(context.data.shape, (0, 0))
   nose.tools.assert_equal(context.data.items(), [])
-  nose.tools.assert_equal(context.data.keys(), [])
+  nose.tools.assert_equal(list(context.data.keys()), [])
   nose.tools.assert_equal(context.data.values(), [])
 
 @then(u'adding columns should change the table')
 def step_impl(context):
   context.data["a"] = numpy.arange(10)
-  nose.tools.assert_equal(context.data.keys(), ["a"])
+  nose.tools.assert_equal(list(context.data.keys()), ["a"])
   nose.tools.assert_equal(context.data.shape, (10, 1))
 
   context.data["b"] = context.data["a"] ** 2
-  nose.tools.assert_equal(context.data.keys(), ["a", "b"])
+  nose.tools.assert_equal(list(context.data.keys()), ["a", "b"])
   nose.tools.assert_equal(context.data.shape, (10, 2))
   numpy.testing.assert_array_equal(context.data["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
 
   context.data["c"] = numpy.zeros(10)
-  nose.tools.assert_equal(context.data.keys(), ["a", "b", "c"])
+  nose.tools.assert_equal(list(context.data.keys()), ["a", "b", "c"])
   nose.tools.assert_equal(context.data.shape, (10, 3))
   numpy.testing.assert_array_equal(context.data["c"], [0] * 10)
 
@@ -50,7 +50,7 @@ def step_impl(context):
 @then(u'deleting columns should change the table')
 def step_impl(context):
   del context.data["c"]
-  nose.tools.assert_equal(context.data.keys(), ["a", "b"])
+  nose.tools.assert_equal(list(context.data.keys()), ["a", "b"])
   nose.tools.assert_equal(context.data.shape, (10, 2))
 
 @then(u'indexing should return a new table with one row')
@@ -105,7 +105,7 @@ def step_impl(context):
   nose.tools.assert_equal(len(context.data), 0)
   nose.tools.assert_equal(context.data.shape, (0, 0))
   nose.tools.assert_equal(context.data.items(), [])
-  nose.tools.assert_equal(context.data.keys(), [])
+  nose.tools.assert_equal(list(context.data.keys()), [])
   nose.tools.assert_equal(context.data.values(), [])
 
 @when(u'toyplot.data.Table is initialized with a toyplot.data.Table')

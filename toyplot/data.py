@@ -65,7 +65,7 @@ class Table(object):
     iterators = [iter(column) for column in self._columns.values()]
     for row_index in numpy.arange(len(self)):
       for index, iterator in enumerate(iterators):
-        value = iterator.next()
+        value = next(iterator)
         if index == 0:
           row_xml = xml.SubElement(root_xml, "tr", style="border:none")
         xml.SubElement(row_xml, "td", style="border:none").text = str(value)

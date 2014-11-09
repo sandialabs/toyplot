@@ -58,7 +58,7 @@ def render(table, fobj=None, hlines=None):
     if row_index in hlines:
       latex += "\\hline\n"
     for index, (iterator, formatter) in enumerate(zip(iterators, formatters)):
-      value = iterator.next()
+      value = next(iterator)
       if index != 0:
         latex += " & "
       latex += formatter(value)

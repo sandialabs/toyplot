@@ -37,7 +37,7 @@ def _assert_string_equal(content, test_file, reference_file, encoding="utf-8"):
   if os.path.exists(test_file):
     os.remove(test_file)
   if os.path.exists(reference_file):
-    reference = open(reference_file, "rb").read()
+    reference = toyplot.compatibility.unicode_type(open(reference_file, "rb").read(), encoding=encoding)
     if content != reference:
       if not os.path.exists(failed_dir):
         os.mkdir(failed_dir)

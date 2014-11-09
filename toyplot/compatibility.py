@@ -14,6 +14,12 @@ except: # pragma: no cover
   string_type = str
 
 try:
+  basestring
+  unicode_type = unicode
+except:
+  unicode_type = str
+
+try:
   bytes_type = bytes
 except: # pragma: no cover
   bytes_type = str

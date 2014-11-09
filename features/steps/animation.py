@@ -36,18 +36,25 @@ def step_impl(context):
 def step_impl(context, type):
   nose.tools.assert_in(type, ["mp4", "webm"])
 
-  if hasattr(toyplot, type):
-    backend = getattr(toyplot, type)
-    def progress(frame):
-      pass
-    context.path = os.path.join(tempfile.mkdtemp(), "test.%s" % type)
-    backend.render(context.canvas, context.path, progress=progress)
-    sys.stderr.write("**** %s ****\n" % context.path)
-    sys.stderr.flush()
+  # Return quietly if the video backend isn't available
+  if not hasattr(toyplot, type):
+    return
+
+  backend = getattr(toyplot, type)
+  def progress(frame):
+    pass
+  context.path = os.path.join(tempfile.mkdtemp(), "test.%s" % type)
+  backend.render(context.canvas, context.path, progress=progress)
+  sys.stderr.write("**** %s ****\n" % context.path)
+  sys.stderr.flush()
 
 @then(u'the backend should return a {type} video')
 def step_impl(context, type):
   nose.tools.assert_in(type, ["mp4", "webm"])
+
+  # Return quietly if the video backend isn't available
+  if not hasattr(toyplot, type):
+    return
 
   command = ["ffprobe", "-print_format", "json", "-show_format", "-show_streams", "-count_frames", context.path]
   ffprobe = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

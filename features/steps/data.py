@@ -158,7 +158,7 @@ def step_impl(context):
 def step_impl(context):
   buffer = io.BytesIO()
   toyplot.latex.render(context.data, buffer)
-  toyplot.testing.assert_latex_equal(buffer.getvalue(), "data-table")
+  toyplot.testing.assert_latex_equal(toyplot.compatibility.unicode_type(buffer.getvalue(), "utf-8"), "data-table")
 
 @then(u'the table can be rendered as format latex file')
 def step_impl(context):

@@ -104,9 +104,9 @@ def step_impl(context):
 def step_impl(context):
   nose.tools.assert_equal(len(context.data), 0)
   nose.tools.assert_equal(context.data.shape, (0, 0))
-  nose.tools.assert_equal(context.data.items(), [])
+  nose.tools.assert_equal(list(context.data.items()), [])
   nose.tools.assert_equal(list(context.data.keys()), [])
-  nose.tools.assert_equal(context.data.values(), [])
+  nose.tools.assert_equal(list(context.data.values()), [])
 
 @when(u'toyplot.data.Table is initialized with a toyplot.data.Table')
 def step_impl(context):
@@ -122,7 +122,7 @@ def step_impl(context):
 @then(u'the toyplot.data.Table contains the columns')
 def step_impl(context):
   table = toyplot.data.Table(context.data)
-  nose.tools.assert_equal(table.keys(), ["a", "b"])
+  nose.tools.assert_equal(list(table.keys()), ["a", "b"])
   numpy.testing.assert_array_equal(table["a"], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
   numpy.testing.assert_array_equal(table["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
 
@@ -133,7 +133,7 @@ def step_impl(context):
 @then(u'the toyplot.data.Table contains the columns, sorted by key')
 def step_impl(context):
   table = toyplot.data.Table(context.data)
-  nose.tools.assert_equal(table.keys(), ["a", "b"])
+  nose.tools.assert_equal(list(table.keys()), ["a", "b"])
   numpy.testing.assert_array_equal(table["a"], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
   numpy.testing.assert_array_equal(table["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
 

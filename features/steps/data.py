@@ -44,7 +44,7 @@ def step_impl(context):
 @then(u'extracting columns should return a new table')
 def step_impl(context):
   table = context.data.columns(["b", "a"])
-  nose.tools.assert_equal(table.keys(), ["b", "a"])
+  nose.tools.assert_equal(list(table.keys()), ["b", "a"])
   nose.tools.assert_equal(table.shape, (10, 2))
 
 @then(u'deleting columns should change the table')
@@ -56,28 +56,28 @@ def step_impl(context):
 @then(u'indexing should return a new table with one row')
 def step_impl(context):
   table = context.data[5]
-  nose.tools.assert_equal(table.keys(), ["a", "b"])
+  nose.tools.assert_equal(list(table.keys()), ["a", "b"])
   nose.tools.assert_equal(table.shape, (1, 2))
   numpy.testing.assert_array_equal(table["a"], [5])
 
 @then(u'slicing should return a new table with a range of rows')
 def step_impl(context):
   table = context.data[slice(0, 6, 2)]
-  nose.tools.assert_equal(table.keys(), ["a", "b"])
+  nose.tools.assert_equal(list(table.keys()), ["a", "b"])
   nose.tools.assert_equal(table.shape, (3, 2))
   numpy.testing.assert_array_equal(table["a"], [0, 2, 4])
 
 @then(u'extracting rows by index should return a new table with one row')
 def step_impl(context):
   table = context.data.rows(8)
-  nose.tools.assert_equal(table.keys(), ["a", "b"])
+  nose.tools.assert_equal(list(table.keys()), ["a", "b"])
   nose.tools.assert_equal(table.shape, (1, 2))
   numpy.testing.assert_array_equal(table["a"], [8])
 
 @then(u'extracting rows using multiple indices should return a new table with the specified rows')
 def step_impl(context):
   table = context.data.rows([1, 2, 3])
-  nose.tools.assert_equal(table.keys(), ["a", "b"])
+  nose.tools.assert_equal(list(table.keys()), ["a", "b"])
   nose.tools.assert_equal(table.shape, (3, 2))
   numpy.testing.assert_array_equal(table["a"], [1, 2, 3])
 

@@ -9,6 +9,7 @@ Feature: Data tables
     And extracting rows by index should return a new table with one row
     And extracting rows using multiple indices should return a new table with the specified rows
     And new columns must have a string name
+    And new column names must be ascii, or a unicode string
     And new columns must have the same number of rows as existing columns
     And new columns must be one-dimensional
 

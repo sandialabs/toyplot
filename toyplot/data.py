@@ -41,7 +41,11 @@ class Table(object):
 
   def __setitem__(self, key, value):
     if not isinstance(key, toyplot.compatibility.string_type):
-      raise ValueError("Column name must be a string.")
+      raise ValueError("Column name '%s' must be a string." % key)
+    try:
+      key = toyplot.compatibility.unicode_type(key)
+    except UnicodeDecodeError as e:
+      raise ValueError("Column name '%s' must be ASCII or Unicode." % key)
     value = numpy.ma.array(value)
     if value.ndim != 1:
       raise ValueError("Only 1D arrays are allowed.")
@@ -60,7 +64,7 @@ class Table(object):
     root_xml = xml.Element("table", style="border-collapse:collapse; border:none; color: %s" % toyplot.color.near_black)
     header_xml = xml.SubElement(root_xml, "tr", style="border:none;border-bottom:1px solid %s" % toyplot.color.near_black)
     for name in self._columns.keys():
-      xml.SubElement(header_xml, "th", style="text-align:left;border:none").text = str(name)
+      xml.SubElement(header_xml, "th", style="text-align:left;border:none").text = toyplot.compatibility.unicode_type(name)
 
     iterators = [iter(column) for column in self._columns.values()]
     for row_index in numpy.arange(len(self)):
@@ -68,9 +72,9 @@ class Table(object):
         value = next(iterator)
         if index == 0:
           row_xml = xml.SubElement(root_xml, "tr", style="border:none")
-        xml.SubElement(row_xml, "td", style="border:none").text = str(value)
+        xml.SubElement(row_xml, "td", style="border:none").text = toyplot.compatibility.unicode_type(value)
 
-    return xml.tostring(root_xml, method="html")
+    return xml.tostring(root_xml, method="html", encoding="utf-8")
 
   @property
   def shape(self):

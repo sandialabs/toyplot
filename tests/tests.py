@@ -1302,63 +1302,9 @@ def test_canvas_repr_html():
   html = canvas._repr_html_()
   nose.tools.assert_is_instance(html, toyplot.compatibility.bytes_type)
 
-def test_locator_defaults():
-  x = numpy.linspace(0, 2 * numpy.pi, 100)
-  canvas = toyplot.Canvas()
-  axes = canvas.axes()
-  axes.plot(x, numpy.sin(x))
-  assert_canvas_matches(canvas, "locator-defaults")
-
-def test_basic_tick_locator():
-  x = numpy.linspace(0, 2 * numpy.pi, 100)
-  canvas = toyplot.Canvas()
-  axes = canvas.axes(xticklocator=toyplot.locator.Basic(count=10, format="{:.3g}"))
-  axes.y.ticks.locator=toyplot.locator.Basic(count=3, format="{:.1f}")
-  axes.plot(x, numpy.sin(x))
-  assert_canvas_matches(canvas, "basic-tick-locator")
-
-def test_explicit_tick_locator_locations():
-  x = numpy.linspace(0, 2 * numpy.pi, 100)
-  canvas = toyplot.Canvas()
-  axes = canvas.axes(xticklocator=toyplot.locator.Explicit(locations=[0, 2, numpy.pi, 4, 6]))
-  axes.plot(x, numpy.sin(x))
-  assert_canvas_matches(canvas, "explicit-tick-locator-locations")
-
-def test_explicit_tick_locator_locations_labels():
-  x = numpy.linspace(0, 2 * numpy.pi, 100)
-  canvas = toyplot.Canvas()
-  axes = canvas.axes(xticklocator=toyplot.locator.Explicit(locations=[0, numpy.pi, 2 * numpy.pi], labels=["0", "pi", "2pi"]))
-  axes.y.ticks.locator=toyplot.locator.Explicit([-1, 1], ["-1", "1"])
-  axes.plot(x, numpy.sin(x))
-  assert_canvas_matches(canvas, "explicit-tick-locator-locations-labels")
-
-def test_explicit_tick_locator_labels():
-  x = numpy.linspace(0, 2 * numpy.pi, 100)
-  canvas = toyplot.Canvas()
-  axes = canvas.axes(xticklocator=toyplot.locator.Explicit(labels=["red", "green", "blue"]))
-  axes.y.ticks.locator=toyplot.locator.Explicit([-1, 1], ["-1", "1"])
-  axes.plot(x, numpy.sin(x))
-  assert_canvas_matches(canvas, "explicit-tick-locator-labels")
-
 def test_explicit_tick_locator_failure():
   with nose.tools.assert_raises(ValueError):
     toyplot.locator.Explicit()
-
-def test_extended_tick_locator():
-  x = numpy.linspace(0, 2 * numpy.pi, 100)
-  canvas = toyplot.Canvas()
-  axes = canvas.axes(xticklocator=toyplot.locator.Extended(count=12))
-  axes.y.ticks.locator=toyplot.locator.Extended(count=5)
-  axes.plot(x, numpy.sin(x))
-  assert_canvas_matches(canvas, "extended-tick-locator")
-
-def test_heckbert_tick_locator():
-  x = numpy.linspace(0, 2 * numpy.pi, 100)
-  canvas = toyplot.Canvas()
-  axes = canvas.axes(xticklocator=toyplot.locator.Heckbert(count=10))
-  axes.y.ticks.locator=toyplot.locator.Heckbert(count=3)
-  axes.plot(x, numpy.sin(x))
-  assert_canvas_matches(canvas, "heckbert-tick-locator")
 
 ##################################################################################
 # toyplot.html

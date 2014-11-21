@@ -35,6 +35,7 @@ class FloatFormatter(ColumnFormatter):
     self._format = format
 
   def format(self, column):
-    formatted = [(self._format % value).split(".") + ["."] for value in column]
+    formatted = [(self._format % value).split(".") for value in column]
+    formatted = [group + ["", ""] if len(group) == 1 else group + ["."] for group in formatted]
     prefix, suffix, separator = zip(*formatted)
     return (prefix, separator, suffix)

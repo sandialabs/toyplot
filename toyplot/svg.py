@@ -420,15 +420,10 @@ def _render(canvas, axes, context):
 
         if cell_content:
           xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"middle"}))).text = cell_content
-        elif cell_prefix and cell_separator and cell_suffix:
+        else:
           xml.SubElement(axes_xml, "text", x=repr(x - 2), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"end"}))).text = cell_prefix
           xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"middle"}))).text = cell_separator
           xml.SubElement(axes_xml, "text", x=repr(x + 2), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"begin"}))).text = cell_suffix
-        elif cell_prefix and cell_suffix:
-          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"end"}))).text = cell_prefix
-          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"begin"}))).text = cell_suffix
-        elif cell_prefix:
-          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"middle"}))).text = cell_prefix
 
   # Render children.
   for child in axes._children:

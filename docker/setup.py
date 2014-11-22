@@ -5,7 +5,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("command", nargs="?", default="build", choices=["build", "push"])
 arguments = parser.parse_args()
 
-images = ["supervisord", "sshd", "buildbot"]
+images = ["supervisord", "buildbot"]
 
 if arguments.command == "build":
   for image in images:

@@ -1,4 +1,4 @@
-FROM toyplot/sshd
+FROM toyplot/supervisord
 MAINTAINER Timothy M. Shead <tshead@sandia.gov>
 
 # Configure yum.
@@ -11,14 +11,13 @@ RUN yum install -y buildbot-master buildbot-slave ffmpeg git numpy python3-numpy
 RUN pip install colormath multipledispatch git+https://github.com/behave/behave
 RUN python3-pip install colormath multipledispatch git+https://github.com/behave/behave
 
-# Setup the root user.
-RUN echo 'root:toyplot' | chpasswd
-
 # Setup the toyplot user.
 RUN /usr/sbin/useradd --create-home --home-dir /home/toyplot --shell /bin/bash -G wheel toyplot
 RUN echo 'toyplot:toyplot' | chpasswd
 USER toyplot
-RUN echo "alias vi=vim" >> /home/toyplot/.bash_profile
+RUN echo "alias vi=vim" >> /home/toyplot/.bashrc
+RUN echo "alias ls='ls --color=auto'" >> /home/toyplot/.bashrc
+RUN echo "export TERM=xterm-256color" >> /home/toyplot/.bash_profile
 RUN cd /home/toyplot; buildbot create-master buildmaster
 RUN cd /home/toyplot; buildslave create-slave python27-worker localhost:9989 python27-worker pass
 RUN cd /home/toyplot; buildslave create-slave python33-worker localhost:9989 python33-worker pass

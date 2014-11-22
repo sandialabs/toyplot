@@ -144,4 +144,54 @@ def step_impl(context):
   nose.tools.assert_equal(context.color_map.css(1), "rgba(69.5%,0.296%,15.5%,1)")
   nose.tools.assert_equal(context.color_map.css(2), "rgba(69.5%,0.296%,15.5%,1)")
 
+@given(u'a linear color map')
+def step_impl(context):
+  context.color_map = toyplot.color.LinearMap(toyplot.color.Palette(["red", "blue"]), domain_min=0, domain_max=1)
+
+@then(u'the linear color map can be rendered as ipython html')
+def step_impl(context):
+  toyplot.testing.assert_html_equal(context.color_map._repr_html_(), "color-linear-map")
+
+@then(u'the linear color map can map scalar values to toyplot colors')
+def step_impl(context):
+  toyplot.testing.assert_color_equal(context.color_map.color(-1), (1, 0, 0, 1))
+  toyplot.testing.assert_color_equal(context.color_map.color(0), (1, 0, 0, 1))
+  toyplot.testing.assert_color_equal(context.color_map.color(0.5), (0.5, 0, 0.5, 1))
+  toyplot.testing.assert_color_equal(context.color_map.color(1), (0, 0, 1, 1))
+  toyplot.testing.assert_color_equal(context.color_map.color(2), (0, 0, 1, 1))
+
+@then(u'the linear color map can map scalar values to css colors')
+def step_impl(context):
+  nose.tools.assert_equal(context.color_map.css(-1), "rgba(100%,0%,0%,1)")
+  nose.tools.assert_equal(context.color_map.css(0), "rgba(100%,0%,0%,1)")
+  nose.tools.assert_equal(context.color_map.css(0.5), "rgba(50%,0%,50%,1)")
+  nose.tools.assert_equal(context.color_map.css(1), "rgba(0%,0%,100%,1)")
+  nose.tools.assert_equal(context.color_map.css(2), "rgba(0%,0%,100%,1)")
+
+@given(u'a starting color')
+def step_impl(context):
+  context.color = toyplot.color.Palette().color(0)
+
+@then(u'the color can be used to generate a palette of lighter shades')
+def step_impl(context):
+  palette = toyplot.color.lighten(context.color)
+  toyplot.testing.assert_html_equal(palette._repr_html_(), "color-lighten")
+
+@given(u'two color palettes')
+def step_impl(context):
+  context.palettes = [toyplot.color.brewer("Reds"), toyplot.color.brewer("Blues")]
+
+@then(u'the color palettes can be concatenated into a single palette')
+def step_impl(context):
+  palette = context.palettes[0] + context.palettes[1]
+  toyplot.testing.assert_html_equal(palette._repr_html_(), "color-palette-add")
+
+@given(u'a color palette')
+def step_impl(context):
+  context.palette = toyplot.color.brewer("Reds")
+
+@then(u'another palette can be appended')
+def step_impl(context):
+  context.palette += toyplot.color.brewer("Blues")
+  toyplot.testing.assert_html_equal(context.palette._repr_html_(), "color-palette-iadd")
 

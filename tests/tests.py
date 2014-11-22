@@ -1363,26 +1363,6 @@ def test_color_palette_css():
   nose.tools.assert_equal(palette.css(0), "rgba(100%,0%,0%,1)")
   nose.tools.assert_equal(palette.css(-1), "rgba(0%,0%,100%,1)")
 
-def test_color_palette_add():
-  palette = toyplot.color.brewer("Reds") + toyplot.color.brewer("Blues")
-  assert_html_matches(palette._repr_html_(), "color-palette-add")
-
-  with nose.tools.assert_raises(NotImplementedError):
-    toyplot.color.Palette() + "foo"
-
-def test_color_palette_iadd():
-  palette = toyplot.color.Palette()
-  palette += toyplot.color.brewer("Greens")
-  assert_html_matches(palette._repr_html_(), "color-palette-iadd")
-
-  with nose.tools.assert_raises(NotImplementedError):
-    palette = toyplot.color.Palette()
-    palette += "foo"
-
-def test_color_lighten():
-  palette = toyplot.color.lighten(toyplot.color.Palette().color(0))
-  assert_html_matches(palette._repr_html_(), "color-lighten")
-
 def test_color_categorical_map():
   colormap = toyplot.color.CategoricalMap(toyplot.color.brewer("BlueGreenBrown", 3))
   assert_html_matches(colormap._repr_html_(), "color-categorical-map")
@@ -1400,26 +1380,6 @@ def test_color_categorical_map_css():
   colormap = toyplot.color.CategoricalMap(toyplot.color.Palette(["red", "lime", "blue", (1, 1, 1)]))
   nose.tools.assert_equal(colormap.css(0), "rgba(100%,0%,0%,1)")
   nose.tools.assert_equal(colormap.css(-1), "rgba(100%,100%,100%,1)")
-
-def test_color_linear_map():
-  map = toyplot.color.LinearMap(toyplot.color.brewer("BlueYellowRed"))
-  assert_html_matches(map._repr_html_(), "color-linear-map")
-
-def test_color_linear_map_color():
-  map = toyplot.color.LinearMap(toyplot.color.Palette(["red", "blue"]), domain_min=0, domain_max=1)
-  assert_color_equal(map.color(-1), (1, 0, 0, 1))
-  assert_color_equal(map.color(0), (1, 0, 0, 1))
-  assert_color_equal(map.color(0.5), (0.5, 0, 0.5, 1))
-  assert_color_equal(map.color(1), (0, 0, 1, 1))
-  assert_color_equal(map.color(2), (0, 0, 1, 1))
-
-def test_color_linear_map_css():
-  map = toyplot.color.LinearMap(toyplot.color.Palette(["red", "blue"]), domain_min=0, domain_max=1)
-  nose.tools.assert_equal(map.css(-1), "rgba(100%,0%,0%,1)")
-  nose.tools.assert_equal(map.css(0), "rgba(100%,0%,0%,1)")
-  nose.tools.assert_equal(map.css(0.5), "rgba(50%,0%,50%,1)")
-  nose.tools.assert_equal(map.css(1), "rgba(0%,0%,100%,1)")
-  nose.tools.assert_equal(map.css(2), "rgba(0%,0%,100%,1)")
 
 ##################################################################################
 # toyplot.html

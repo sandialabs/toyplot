@@ -15,3 +15,15 @@ Feature: Color palettes
   Scenario: Reversed Color Brewer palette
     When the user creates a reversed Color Brewer palette
     Then the Color Brewer palette should have its colors reversed
+
+  Scenario: Lighten color palettes
+    Given a starting color
+    Then the color can be used to generate a palette of lighter shades
+
+  Scenario: Concatenate color palettes
+    Given two color palettes
+    Then the color palettes can be concatenated into a single palette
+
+  Scenario: Incrementally grow color palettes
+    Given a color palette
+    Then another palette can be appended

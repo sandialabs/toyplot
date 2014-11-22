@@ -10,7 +10,7 @@ def step_impl(context):
 
 @then(u'formatting strings with the toyplot.format.DefaultFormatter should produce valid output')
 def step_impl(context):
-  column = numpy.arange(4).astype("string")
+  column = numpy.array(["0", "1", "2", "3"])
   prefixes, separators, suffixes = context.formatter.format(column)
   numpy.testing.assert_array_equal(prefixes, ["0", "1", "2", "3"])
   numpy.testing.assert_array_equal(separators, [""] * 4)

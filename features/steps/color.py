@@ -195,3 +195,24 @@ def step_impl(context):
   context.palette += toyplot.color.brewer("Blues")
   toyplot.testing.assert_html_equal(context.palette._repr_html_(), "color-palette-iadd")
 
+@given(u'a default color palette')
+def step_impl(context):
+  context.palette = toyplot.color.Palette()
+
+@then(u'the palette should contain 8 colors')
+def step_impl(context):
+  nose.tools.assert_equal(len(context.palette), 8)
+
+@then(u'the default palette can be rendered as ipython html')
+def step_impl(context):
+  toyplot.testing.assert_html_equal(context.palette._repr_html_(), "color-palette")
+
+@given(u'a reversed default color palette')
+def step_impl(context):
+  context.palette = toyplot.color.Palette(reverse=True)
+
+@then(u'the reversed palette can be rendered as ipython html')
+def step_impl(context):
+  toyplot.testing.assert_html_equal(context.palette._repr_html_(), "color-palette-reverse")
+
+

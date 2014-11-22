@@ -1,5 +1,14 @@
 Feature: Color palettes
 
+  Scenario: Default color palette
+    Given a default color palette
+    Then the palette should contain 8 colors
+    And the default palette can be rendered as ipython html
+
+  Scenario: Reversed color palette
+    Given a reversed default color palette
+    Then the reversed palette can be rendered as ipython html
+
   Scenario: Color Brewer palettes
     Given a collection of Color Brewer palettes
     Then each palette can be rendered as ipython html

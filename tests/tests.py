@@ -1318,21 +1318,9 @@ def test_color_require_color():
   with nose.tools.assert_raises(ValueError):
     toyplot.color._require_color(5)
 
-def test_color_palette():
-  palette = toyplot.color.Palette()
-  assert_html_matches(palette._repr_html_(), "color-palette")
-
-def test_color_palette_reverse():
-  palette = toyplot.color.Palette(reverse=True)
-  assert_html_matches(palette._repr_html_(), "color-palette-reverse")
-
 def test_color_palette_css_names():
   palette = toyplot.color.Palette(["red", "green", "blue", (1, 1, 0)])
   assert_html_matches(palette._repr_html_(), "color-palette-css-names")
-
-def test_color_palette_len():
-  palette = toyplot.color.Palette()
-  nose.tools.assert_equal(len(palette), 8)
 
 def test_color_palette_getitem():
   palette = toyplot.color.Palette([(1, 0, 0), (0, 1, 0), (0, 0, 1)])

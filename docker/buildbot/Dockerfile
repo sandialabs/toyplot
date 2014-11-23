@@ -27,6 +27,10 @@ RUN HOME=/home/toyplot git config --global color.ui true
 ADD .vimrc /home/toyplot/.vimrc
 ADD master.cfg /home/toyplot/buildmaster/master.cfg
 
+# Expose the buildmaster directory as a volume, so configuration and build results
+# can be retained between upgrades.
+VOLUME /home/toyplot/buildmaster
+
 # Don't remove this, as it controls the user used to start supervisord in the base image.
 USER root
 ADD buildbot.conf /etc/supervisord.d/buildbot.conf

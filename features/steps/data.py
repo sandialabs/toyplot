@@ -86,11 +86,6 @@ def step_impl(context):
   with nose.tools.assert_raises(ValueError):
     context.data[3] = numpy.arange(10)
 
-@then(u'new column names must be ascii, or a unicode string')
-def step_impl(context):
-  with nose.tools.assert_raises(ValueError):
-    context.data[toyplot.compatibility.bytes_type("T\xefm")] = numpy.arange(10)
-
 @then(u'new columns must have the same number of rows as existing columns')
 def step_impl(context):
   with nose.tools.assert_raises(ValueError):

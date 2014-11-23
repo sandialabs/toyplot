@@ -42,10 +42,7 @@ class Table(object):
   def __setitem__(self, key, value):
     if not isinstance(key, toyplot.compatibility.string_type):
       raise ValueError("Column name '%s' must be a string." % key)
-    try:
-      key = toyplot.compatibility.unicode_type(key)
-    except UnicodeDecodeError as e:
-      raise ValueError("Column name '%s' must be ASCII or Unicode." % key)
+    key = toyplot.compatibility.unicode_type(key)
     value = numpy.ma.array(value)
     if value.ndim != 1:
       raise ValueError("Only 1D arrays are allowed.")

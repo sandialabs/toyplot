@@ -11,6 +11,7 @@ import numbers
 import numpy.testing
 import re
 import toyplot.html
+import toyplot.svg
 import xml.etree.ElementTree as xml
 
 root_dir = os.path.dirname(os.path.dirname(__file__))
@@ -153,7 +154,7 @@ def assert_canvas_equal(canvas, name):
   test_file = os.path.join(failed_dir, "%s.svg" % name)
   reference_file = os.path.join(reference_dir, "%s.svg" % name)
 
-  # Render multiple representation of the canvas for coverage ...
+  # Render multiple representations of the canvas for coverage ...
   html = io.BytesIO()
   toyplot.html.render(canvas, html)
 

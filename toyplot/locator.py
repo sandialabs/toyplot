@@ -7,7 +7,10 @@ from __future__ import division
 import numpy
 import toyplot.broadcast
 
-def _log_format(base, exponent):
+def _log_format(base, exponent, location, format):
+  if format is not None:
+    return format.format(location, base=base, exponent=exponent)
+
   exponent_str = "".join([_log_format.superscript[character] for character in str(int(exponent))])
   result = u"%s\u200a%s" % (base, exponent_str)
   return result
@@ -145,6 +148,33 @@ class PositiveLog(TickLocator):
   ----------
   base : number, optional
     Logarithm base.
+  format : string, optional
+    Python format string, see
+    `Format String Syntax <https://docs.python.org/2/library/string.html#format-string-syntax>`_
+    for the syntax.  The format string will be called with a single positional
+    argument containing the locator value, and two keyword arguments `base`
+    and `exponent`.  If omitted, the locator will generate high-quality
+    labels using superscript notation.
+
+  Examples
+  --------
+
+  Generate locator labels using fixed decimal point notation and two significant digits:
+
+  >>> locator = toyplot.locator.PositiveLog(format="{:.2g}")
+
+  Generate locator labels using scientific notation and three significant digits:
+
+  >>> locator = toyplot.locator.PositiveLog(format="{:.3e}")
+
+  Generate locator labels using mixed scientific and decimal notation and four significant digits:
+
+  >>> locator = toyplot.locator.PositiveLog(format="{:.4g}")
+
+  Generate locator labels using "carat" notation:
+
+  >>> locator = toyplot.locator.PositiveLog(format="{base}^{exponent}")
+
   """
   def __init__(self, base=10, format=None):
     self._base = base
@@ -168,10 +198,7 @@ class PositiveLog(TickLocator):
     """
     exponents = numpy.arange(numpy.floor(numpy.log10(domain_min) / numpy.log10(self._base)), numpy.ceil(numpy.log10(domain_max) / numpy.log10(self._base)) + 1)
     locations = numpy.power(self._base, exponents)
-    if self._format:
-      labels = [self._format.format(location) for location in locations]
-    else:
-      labels = [_log_format(self._base, int(exponent)) for exponent in exponents]
+    labels = [_log_format(self._base, int(exponent), location, self._format) for exponent, location in zip(exponents, locations)]
     titles = numpy.repeat(None, len(labels))
     return locations, labels, titles
 
@@ -182,9 +209,37 @@ class NegativeLog(TickLocator):
   ----------
   base : number, optional
     Logarithm base.
+  format : string, optional
+    Python format string, see
+    `Format String Syntax <https://docs.python.org/2/library/string.html#format-string-syntax>`_
+    for the syntax.  The format string will be called with a single positional
+    argument containing the locator value, and two keyword arguments `base`
+    and `exponent`.  If omitted, the locator will generate high-quality
+    labels using superscript notation.
+
+  Examples
+  --------
+
+  Generate locator labels using fixed decimal point notation and two significant digits:
+
+  >>> locator = toyplot.locator.NegativeLog(format="{:.2g}")
+
+  Generate locator labels using scientific notation and three significant digits:
+
+  >>> locator = toyplot.locator.NegativeLog(format="{:.3e}")
+
+  Generate locator labels using mixed scientific and decimal notation and four significant digits:
+
+  >>> locator = toyplot.locator.NegativeLog(format="{:.4g}")
+
+  Generate locator labels using "carat" notation:
+
+  >>> locator = toyplot.locator.NegativeLog(format="{base}^{exponent}")
+
   """
-  def __init__(self, base=10):
+  def __init__(self, base=10, format=None):
     self._base = base
+    self._format = format
 
   def ticks(self, domain_min, domain_max):
     """Return a set of ticks for the given domain.
@@ -204,7 +259,7 @@ class NegativeLog(TickLocator):
     """
     exponents = numpy.arange(numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)), numpy.floor(numpy.log10(numpy.abs(domain_max)) / numpy.log10(self._base)) -1, -1)
     locations = -numpy.power(self._base, exponents)
-    labels = ["-" + _log_format(self._base, int(exponent)) for exponent in exponents]
+    labels = ["-" + _log_format(self._base, int(exponent), location, self._format) for exponent, location in zip(exponents, locations)]
     titles = numpy.repeat(None, len(labels))
     return locations, labels, titles
 
@@ -215,9 +270,38 @@ class SymmetricLog(TickLocator):
   ----------
   base : number, optional
     Logarithm base.
+  format : string, optional
+    Python format string, see
+    `Format String Syntax <https://docs.python.org/2/library/string.html#format-string-syntax>`_
+    for the syntax.  The format string will be called with a single positional
+    argument containing the locator value, and two keyword arguments `base`
+    and `exponent`.  If omitted, the locator will generate high-quality
+    labels using superscript notation.
+
+  Examples
+  --------
+
+  Generate locator labels using fixed decimal point notation and two significant digits:
+
+  >>> locator = toyplot.locator.SymmetricLog(format="{:.2g}")
+
+  Generate locator labels using scientific notation and three significant digits:
+
+  >>> locator = toyplot.locator.SymmetricLog(format="{:.3e}")
+
+  Generate locator labels using mixed scientific and decimal notation and four significant digits:
+
+  >>> locator = toyplot.locator.SymmetricLog(format="{:.4g}")
+
+  Generate locator labels using "carat" notation:
+
+  >>> locator = toyplot.locator.SymmetricLog(format="{base}^{exponent}")
+
   """
-  def __init__(self, base=10):
+  def __init__(self, base=10, format=None):
     self._base = base
+    self._format = format
+
   def ticks(self, domain_min, domain_max):
     """Return a set of ticks for the given domain.
 
@@ -235,11 +319,13 @@ class SymmetricLog(TickLocator):
       Titles for each tick location.  Typically, backends render titles as tooltips.
     """
     negative_exponents = numpy.arange(numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)), -1, -1) if domain_min != 0 else []
+    negative_locations = -numpy.power(self._base, negative_exponents)
     linear_locations = [0]
     positive_exponents = numpy.arange(0, numpy.ceil(numpy.log10(domain_max) / numpy.log10(self._base)) + 1) if domain_max != 0 else []
+    positive_locations = numpy.power(self._base, positive_exponents)
 
-    locations = numpy.concatenate((-numpy.power(self._base, negative_exponents), linear_locations, numpy.power(self._base, positive_exponents)))
-    labels = ["-" + _log_format(self._base, int(exponent)) for exponent in negative_exponents] + [str(location) for location in linear_locations] + [_log_format(self._base, int(exponent)) for exponent in positive_exponents]
+    locations = numpy.concatenate((negative_locations, linear_locations, positive_locations))
+    labels = ["-" + _log_format(self._base, int(exponent), location, self._format) for exponent, location in zip(negative_exponents, negative_locations)] + [str(location) for location in linear_locations] + [_log_format(self._base, int(exponent), location, self._format) for exponent, location in zip(positive_exponents, positive_locations)]
     titles = numpy.repeat(None, len(labels))
     return locations, labels, titles
 

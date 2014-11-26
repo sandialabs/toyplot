@@ -7,6 +7,26 @@ from __future__ import division
 import numpy
 import toyplot.broadcast
 
+def _log_format(base, exponent):
+  exponent_str = "".join([_log_format.superscript[character] for character in str(int(exponent))])
+  result = u"%s\u200a%s" % (base, exponent_str)
+  return result
+
+_log_format.superscript = {
+    "-" : u"\u207b\u200a",
+    "0" : u"\u2070",
+    "1" : u"\u00b9",
+    "2" : u"\u00b2",
+    "3" : u"\u00b3",
+    "4" : u"\u2074",
+    "5" : u"\u2075",
+    "6" : u"\u2076",
+    "7" : u"\u2077",
+    "8" : u"\u2078",
+    "9" : u"\u2079",
+    }
+
+
 class TickLocator(object):
   """Base class for tick locators - objects that compute the position and format of axis tick labels."""
   def ticks(self, domain_min, domain_max):
@@ -126,8 +146,9 @@ class PositiveLog(TickLocator):
   base : number, optional
     Logarithm base.
   """
-  def __init__(self, base=10):
+  def __init__(self, base=10, format=None):
     self._base = base
+    self._format = format
 
   def ticks(self, domain_min, domain_max):
     """Return a set of ticks for the given domain.
@@ -147,7 +168,10 @@ class PositiveLog(TickLocator):
     """
     exponents = numpy.arange(numpy.floor(numpy.log10(domain_min) / numpy.log10(self._base)), numpy.ceil(numpy.log10(domain_max) / numpy.log10(self._base)) + 1)
     locations = numpy.power(self._base, exponents)
-    labels = ["%se%s" % (self._base, int(exponent)) for exponent in exponents]
+    if self._format:
+      labels = [self._format.format(location) for location in locations]
+    else:
+      labels = [_log_format(self._base, int(exponent)) for exponent in exponents]
     titles = numpy.repeat(None, len(labels))
     return locations, labels, titles
 
@@ -161,6 +185,7 @@ class NegativeLog(TickLocator):
   """
   def __init__(self, base=10):
     self._base = base
+
   def ticks(self, domain_min, domain_max):
     """Return a set of ticks for the given domain.
 
@@ -179,7 +204,7 @@ class NegativeLog(TickLocator):
     """
     exponents = numpy.arange(numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)), numpy.floor(numpy.log10(numpy.abs(domain_max)) / numpy.log10(self._base)) -1, -1)
     locations = -numpy.power(self._base, exponents)
-    labels = ["-%se%s" % (self._base, int(exponent)) for exponent in exponents]
+    labels = ["-" + _log_format(self._base, int(exponent)) for exponent in exponents]
     titles = numpy.repeat(None, len(labels))
     return locations, labels, titles
 
@@ -214,7 +239,7 @@ class SymmetricLog(TickLocator):
     positive_exponents = numpy.arange(0, numpy.ceil(numpy.log10(domain_max) / numpy.log10(self._base)) + 1) if domain_max != 0 else []
 
     locations = numpy.concatenate((-numpy.power(self._base, negative_exponents), linear_locations, numpy.power(self._base, positive_exponents)))
-    labels = ["-%se%s" % (self._base, int(exponent)) for exponent in negative_exponents] + [str(location) for location in linear_locations] + ["%se%s" % (self._base, int(exponent)) for exponent in positive_exponents]
+    labels = ["-" + _log_format(self._base, int(exponent)) for exponent in negative_exponents] + [str(location) for location in linear_locations] + [_log_format(self._base, int(exponent)) for exponent in positive_exponents]
     titles = numpy.repeat(None, len(labels))
     return locations, labels, titles
 

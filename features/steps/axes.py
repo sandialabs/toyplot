@@ -416,7 +416,7 @@ def step_impl(context):
 def step_impl(context):
   context.axes.cell(1, 1).content = "My Cell"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-cell-content")
- 
+
 @then(u'the table can be rendered with embedded plots')
 def step_impl(context):
   numpy.random.seed(1234)
@@ -425,25 +425,123 @@ def step_impl(context):
   context.axes.cell(2, 3).axes().bars(numpy.random.choice([-1, 1], size=30), fill=numpy.random.choice(["red", "blue"], size=30))
   context.axes.cell(3, 3, rowspan=2).axes().fill(3 + numpy.cos(numpy.linspace(0, 5)) + numpy.sin(numpy.linspace(0, 20)))
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-embedded-plots")
- 
+
 @then(u'the table can be rendered with custom column widths')
 def step_impl(context):
   context.axes.column("foo").width = 50
   context.axes.column("baz").width = 250
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-custom-column-widths")
- 
+
 @then(u'the table can be rendered with left justification')
 def step_impl(context):
   context.axes.column("foo").justify = "left"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-left-justification")
- 
+
 @then(u'the table can be rendered with center justification')
 def step_impl(context):
   context.axes.column("baz").justify = "center"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-center-justification")
- 
+
 @then(u'the table can be rendered with right justification')
 def step_impl(context):
   context.axes.column("baz").justify = "right"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-right-justification")
- 
+
+@given(u'values from -1000 to -1')
+def step_impl(context):
+  context.x = numpy.linspace(-1000, -1, 100)
+
+@given(u'log 10 axes on x and y')
+def step_impl(context):
+  context.canvas = toyplot.Canvas()
+  context.axes = context.canvas.axes(xscale="log10", yscale="log10")
+
+@given(u'plotting x, x with markers')
+def step_impl(context):
+  context.axes.plot(context.x, context.x, marker="o")
+
+@then(u'the result should be a log-log plot from -1000 to -1')
+def step_impl(context):
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-log-scale-negative-1000-negative-1")
+
+@given(u'values from -1000 to -0.01')
+def step_impl(context):
+  context.x = numpy.linspace(-1000, -0.01, 100)
+
+@then(u'the result should be a log-log plot from -1000 to -0.01')
+def step_impl(context):
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-log-scale-negative-1000-negative-0.01")
+
+@given(u'values from -1000 to 0')
+def step_impl(context):
+  context.x = numpy.linspace(-1000, 0, 100)
+
+@then(u'the result should be a log-log plot from -1000 to 0')
+def step_impl(context):
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-log-scale-negative-1000-zero")
+
+@given(u'values from 0 to 1000')
+def step_impl(context):
+  context.x = numpy.linspace(0, 1000, 100)
+
+@then(u'the result should be a log-log plot from 0 to 1000')
+def step_impl(context):
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-log-scale-zero-1000")
+
+@given(u'values from 0.01 to 1000')
+def step_impl(context):
+  context.x = numpy.linspace(0.01, 1000, 100)
+
+@then(u'the result should be a log-log plot from 0.01 to 1000')
+def step_impl(context):
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-log-scale-0.01-1000")
+
+@given(u'values from 1 to 1000')
+def step_impl(context):
+  context.x = numpy.linspace(1, 1000, 100)
+
+@then(u'the result should be a log-log plot from 1 to 1000')
+def step_impl(context):
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-log-scale-1-1000")
+
+@given(u'values from -1000 to 0.5')
+def step_impl(context):
+  context.x = numpy.linspace(-1000, 0.5, 100)
+
+@then(u'the result should be a log-log plot from -1000 to 0.5')
+def step_impl(context):
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-log-scale-negative-1000-0.5")
+
+@given(u'values from -0.5 to 1000')
+def step_impl(context):
+  context.x = numpy.linspace(-0.5, 1000, 100)
+
+@then(u'the result should be a log-log plot from -0.5 to 1000')
+def step_impl(context):
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-log-scale-negative-0.5-1000")
+
+@given(u'values from -1000 to 1000')
+def step_impl(context):
+  context.x = numpy.linspace(-1000, 1000, 100)
+
+@then(u'the result should be a log-log plot from -1000 to 1000')
+def step_impl(context):
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-log-scale-negative-1000-1000")
+
+@given(u'log 2 axes on x and y')
+def step_impl(context):
+  context.canvas = toyplot.Canvas()
+  context.axes = context.canvas.axes(xscale="log2", yscale="log2")
+
+@then(u'the result should be a base 2 log-log plot from -1000 to -1')
+def step_impl(context):
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-log-2-scale-negative-1000-negative-1")
+
+@then(u'the result should be a base 2 log-log plot from 1 to 1000')
+def step_impl(context):
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-log-2-scale-1-1000")
+
+@then(u'the result should be a base 2 log-log plot from -1000 to 1000')
+def step_impl(context):
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-log-2-scale-negative-1000-1000")
+

@@ -376,11 +376,7 @@ class Cartesian(object):
       else:
         scale, base = scale
         if scale == "log":
-          if domain_max < 0:
-            return toyplot.locator.NegativeLog(base=base)
-          elif 0 < domain_min:
-            return toyplot.locator.PositiveLog(base=base)
-          return toyplot.locator.SymmetricLog(base=base)
+          return toyplot.locator.Log(base=base)
 
     # Calculate tick locations and labels.
     xlocator = _get_locator(self.x.ticks._locator, self.x._scale, xmin, xmax)

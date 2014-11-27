@@ -141,194 +141,6 @@ class Basic(TickLocator):
     titles = numpy.repeat(None, len(labels))
     return locations, labels, titles
 
-class PositiveLog(TickLocator):
-  """Generate ticks that are evenly spaced on a logarithmic scale, when the entire domain is positive.
-
-  Parameters
-  ----------
-  base : number, optional
-    Logarithm base.
-  format : string, optional
-    Python format string, see
-    `Format String Syntax <https://docs.python.org/2/library/string.html#format-string-syntax>`_
-    for the syntax.  The format string will be called with a single positional
-    argument containing the locator value, and two keyword arguments `base`
-    and `exponent`.  If omitted, the locator will generate high-quality
-    labels using superscript notation.
-
-  Examples
-  --------
-
-  Generate locator labels using fixed decimal point notation and two significant digits:
-
-  >>> locator = toyplot.locator.PositiveLog(format="{:.2g}")
-
-  Generate locator labels using scientific notation and three significant digits:
-
-  >>> locator = toyplot.locator.PositiveLog(format="{:.3e}")
-
-  Generate locator labels using mixed scientific and decimal notation and four significant digits:
-
-  >>> locator = toyplot.locator.PositiveLog(format="{:.4g}")
-
-  Generate locator labels using "carat" notation:
-
-  >>> locator = toyplot.locator.PositiveLog(format="{base}^{exponent}")
-
-  """
-  def __init__(self, base=10, format=None):
-    self._base = base
-    self._format = format
-
-  def ticks(self, domain_min, domain_max):
-    """Return a set of ticks for the given domain.
-
-    Parameters
-    ----------
-    domain_min, domain_max: number
-
-    Returns
-    -------
-    locations : sequence of numbers
-      The axis locations where ticks should be positioned.
-    labels : sequence of strings
-      Labels for each tick location.
-    titles : sequence of strings
-      Titles for each tick location.  Typically, backends render titles as tooltips.
-    """
-    exponents = numpy.arange(numpy.floor(numpy.log10(domain_min) / numpy.log10(self._base)), numpy.ceil(numpy.log10(domain_max) / numpy.log10(self._base)) + 1)
-    locations = numpy.power(self._base, exponents)
-    labels = [_log_format(self._base, int(exponent), location, self._format) for exponent, location in zip(exponents, locations)]
-    titles = numpy.repeat(None, len(labels))
-    return locations, labels, titles
-
-class NegativeLog(TickLocator):
-  """Generate ticks that are evenly spaced on a logarithmic scale, when the entire domain is negative.
-
-  Parameters
-  ----------
-  base : number, optional
-    Logarithm base.
-  format : string, optional
-    Python format string, see
-    `Format String Syntax <https://docs.python.org/2/library/string.html#format-string-syntax>`_
-    for the syntax.  The format string will be called with a single positional
-    argument containing the locator value, and two keyword arguments `base`
-    and `exponent`.  If omitted, the locator will generate high-quality
-    labels using superscript notation.
-
-  Examples
-  --------
-
-  Generate locator labels using fixed decimal point notation and two significant digits:
-
-  >>> locator = toyplot.locator.NegativeLog(format="{:.2g}")
-
-  Generate locator labels using scientific notation and three significant digits:
-
-  >>> locator = toyplot.locator.NegativeLog(format="{:.3e}")
-
-  Generate locator labels using mixed scientific and decimal notation and four significant digits:
-
-  >>> locator = toyplot.locator.NegativeLog(format="{:.4g}")
-
-  Generate locator labels using "carat" notation:
-
-  >>> locator = toyplot.locator.NegativeLog(format="{base}^{exponent}")
-
-  """
-  def __init__(self, base=10, format=None):
-    self._base = base
-    self._format = format
-
-  def ticks(self, domain_min, domain_max):
-    """Return a set of ticks for the given domain.
-
-    Parameters
-    ----------
-    domain_min, domain_max: number
-
-    Returns
-    -------
-    locations : sequence of numbers
-      The axis locations where ticks should be positioned.
-    labels : sequence of strings
-      Labels for each tick location.
-    titles : sequence of strings
-      Titles for each tick location.  Typically, backends render titles as tooltips.
-    """
-    exponents = numpy.arange(numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)), numpy.floor(numpy.log10(numpy.abs(domain_max)) / numpy.log10(self._base)) -1, -1)
-    locations = -numpy.power(self._base, exponents)
-    labels = ["-" + _log_format(self._base, int(exponent), location, self._format) for exponent, location in zip(exponents, locations)]
-    titles = numpy.repeat(None, len(labels))
-    return locations, labels, titles
-
-class SymmetricLog(TickLocator):
-  """Generate ticks that are evenly spaced on a logarithmic scale, when the domain straddles zero.
-
-  Parameters
-  ----------
-  base : number, optional
-    Logarithm base.
-  format : string, optional
-    Python format string, see
-    `Format String Syntax <https://docs.python.org/2/library/string.html#format-string-syntax>`_
-    for the syntax.  The format string will be called with a single positional
-    argument containing the locator value, and two keyword arguments `base`
-    and `exponent`.  If omitted, the locator will generate high-quality
-    labels using superscript notation.
-
-  Examples
-  --------
-
-  Generate locator labels using fixed decimal point notation and two significant digits:
-
-  >>> locator = toyplot.locator.SymmetricLog(format="{:.2g}")
-
-  Generate locator labels using scientific notation and three significant digits:
-
-  >>> locator = toyplot.locator.SymmetricLog(format="{:.3e}")
-
-  Generate locator labels using mixed scientific and decimal notation and four significant digits:
-
-  >>> locator = toyplot.locator.SymmetricLog(format="{:.4g}")
-
-  Generate locator labels using "carat" notation:
-
-  >>> locator = toyplot.locator.SymmetricLog(format="{base}^{exponent}")
-
-  """
-  def __init__(self, base=10, format=None):
-    self._base = base
-    self._format = format
-
-  def ticks(self, domain_min, domain_max):
-    """Return a set of ticks for the given domain.
-
-    Parameters
-    ----------
-    domain_min, domain_max: number
-
-    Returns
-    -------
-    locations : sequence of numbers
-      The axis locations where ticks should be positioned.
-    labels : sequence of strings
-      Labels for each tick location.
-    titles : sequence of strings
-      Titles for each tick location.  Typically, backends render titles as tooltips.
-    """
-    negative_exponents = numpy.arange(numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)), -1, -1) if domain_min < 0 else []
-    negative_locations = -numpy.power(self._base, negative_exponents)
-    linear_locations = [0]
-    positive_exponents = numpy.arange(0, numpy.ceil(numpy.log10(domain_max) / numpy.log10(self._base)) + 1) if domain_max > 0 else []
-    positive_locations = numpy.power(self._base, positive_exponents)
-
-    locations = numpy.concatenate((negative_locations, linear_locations, positive_locations))
-    labels = ["-" + _log_format(self._base, int(exponent), location, self._format) for exponent, location in zip(negative_exponents, negative_locations)] + [str(location) for location in linear_locations] + [_log_format(self._base, int(exponent), location, self._format) for exponent, location in zip(positive_exponents, positive_locations)]
-    titles = numpy.repeat(None, len(labels))
-    return locations, labels, titles
-
 class Log(TickLocator):
   """Generate ticks that are evenly spaced on a logarithmic scale
 
@@ -349,19 +161,19 @@ class Log(TickLocator):
 
   Generate locator labels using fixed decimal point notation and two significant digits:
 
-  >>> locator = toyplot.locator.SymmetricLog(format="{:.2g}")
+  >>> locator = toyplot.locator.Log(format="{:.2g}")
 
   Generate locator labels using scientific notation and three significant digits:
 
-  >>> locator = toyplot.locator.SymmetricLog(format="{:.3e}")
+  >>> locator = toyplot.locator.Log(format="{:.3e}")
 
   Generate locator labels using mixed scientific and decimal notation and four significant digits:
 
-  >>> locator = toyplot.locator.SymmetricLog(format="{:.4g}")
+  >>> locator = toyplot.locator.Log(format="{:.4g}")
 
   Generate locator labels using "carat" notation:
 
-  >>> locator = toyplot.locator.SymmetricLog(format="{base}^{exponent}")
+  >>> locator = toyplot.locator.Log(format="{base}^{exponent}")
 
   """
   def __init__(self, base=10, format=None):

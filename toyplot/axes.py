@@ -686,10 +686,10 @@ class Cartesian(object):
     a, b, c: array-like sets of coordinates
       If `a`, `b`, and `c` are provided, they specify the X coordinates, bottom
       coordinates, and top coordinates of the region respectively.  If only `a`
-      and `b` are provided, they specify the top coordinates and bottom
-      coordinates, with the X coordinates ranging from [0, N).  If only `a` is
-      provided, it specifies the top of the region, with the bottom along the
-      origin and the X coordinates ranging from [0, N).
+      and `b` are provided, they specify the X coordinates and top
+      coordinates, with the bottom coordinates lying on the X axis.  If only `a` is
+      provided, it specifies the top coordinates, with the bottom coordinates lying
+      on the X axis and the X coordinates ranging from [0, N).
     title: string, optional
       Human-readable title for the mark.  The SVG / HTML backends render the
       title as a tooltip.
@@ -706,25 +706,24 @@ class Cartesian(object):
     if baseline is None:
       if a is not None and b is not None and c is not None:
         position = toyplot.require.scalar_vector(a)
-        b = toyplot.require.scalar_vector(b, len(position))
-        c = toyplot.require.scalar_vector(c, len(position))
-        series = numpy.ma.column_stack((b, c))
+        bottom = toyplot.require.scalar_vector(b, len(position))
+        top = toyplot.require.scalar_vector(c, len(position))
+        series = numpy.ma.column_stack((bottom, top))
       elif a is not None and b is not None:
-        a = toyplot.require.scalar_vector(a)
+        position = toyplot.require.scalar_vector(a)
         b = toyplot.require.scalar_array(b)
         if b.ndim == 1:
-          b = toyplot.require.scalar_vector(b, len(a))
-          series = numpy.ma.column_stack((a, b))
-          position = numpy.ma.array(numpy.arange(series.shape[0]))
+          bottom = numpy.ma.repeat(0, len(a))
+          top = toyplot.require.scalar_vector(b, len(a))
+          series = numpy.ma.column_stack((bottom, top))
         elif b.ndim == 2:
           series = toyplot.require.scalar_matrix(b)
-          position = toyplot.require.scalar_vector(a, series.shape[0]);
       else:
         a = toyplot.require.scalar_array(a)
         if a.ndim == 1:
-          a = toyplot.require.scalar_vector(a)
-          b = numpy.ma.repeat(0, len(a))
-          series = numpy.ma.column_stack((b, a))
+          bottom = numpy.ma.repeat(0, len(a))
+          top = toyplot.require.scalar_vector(a)
+          series = numpy.ma.column_stack((bottom, top))
           position = numpy.ma.arange(series.shape[0])
         elif a.ndim == 2:
           series = toyplot.require.scalar_matrix(a)

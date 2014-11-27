@@ -54,7 +54,7 @@ def _symmetric_log(x, base, threshold=1):
     return numpy.where(masked.mask, x, numpy.sign(x) * (threshold + (numpy.ma.log10(numpy.abs(masked)) / numpy.log10(base))))
   if numpy.abs(x) < threshold:
     return x
-  return numpy.sign(x) * (threshold + numpy.log10(numpy.abs(x)))
+  return numpy.sign(x) * (threshold + numpy.log10(numpy.abs(x)) / numpy.log10(base))
 
 ###############################################################################################
 # Cartesian

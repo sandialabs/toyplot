@@ -808,25 +808,63 @@ class Cartesian(object):
       self._children.append(toyplot.mark.FillMagnitudes(table=table, position=position_axis, position_axis=position_axis, baseline="baseline", magnitudes=magnitudes, magnitude_axis=magnitude_axis, fill=fill, opacity=opacity, title=title, style=style))
       return self._children[-1]
 
-  def plot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None):
-    """Add a bivariate plot to the axes.
+  def plot(self, a, b=None, along="x", color=None, colormap=None, palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None):
+    """Add bivariate line plots to the axes.
 
     Parameters
     ----------
     a, b: array-like sets of coordinates
-      If `a` and `b` are provided, they specify the X coordinates and Y
-      coordinates of each point in the plot.  If only `a` is provided, it
-      specifies the Y coordinates, and the X coordinates will range from [0, N).
-    title: string, optional
-      Human-readable title for the mark.  The SVG / HTML backends render the
-      title as a tooltip.
+      If `a` and `b` are provided, they specify the first and second
+      coordinates respectively of each point in the plot.  If only `a` is provided, it
+      provides second coordinates, and the first coordinates will range from [0, N).
+    along: string, optional
+      Controls the mapping from coordinates to axes.  When set to "x" (the default),
+      first and second coordinates map to the X and Y axes.  When set to "y", the
+      coordinates are reversed.
+    color: array-like, optional
+      Overrides the default per-series colors provided by the axis palette.  Specify
+      one color, or one-color-per-series.  Colors may be CSS colors, toyplot colors,
+      or scalar values that will be mapped to colors using `colormap` or `palette`.
+    colormap: color map object, optional
+      Colormap object to map scalar `color` values to colors.
+    palette: :class:`toyplot.color.Palette`, optional
+      Color palette used to map scalar `color` values to colors with a linear colormap.
+    stroke_width: array-like, optional
+      Overrides the default stroke width of the plots.  Specify one width in drawing
+      units, or one-width-per-series.
+    stroke_opacity: array-like, optional
+      Overrides the default opacity of the plots.  Specify one opacity, or one-opacity-per-series.
+    marker: array-like, optional
+      Allows markers to be rendered for each plot datum. Specify one marker,
+      one-marker-per-series, or one-marker-per-datum.  Markers can use the
+      string marker type as a shortcut, or a full marker specification.
+    size: array-like, optional
+      Controls marker sizes.  Specify one size, one-size-per-series, or one-size-per-datum.
+    fill: array-like, optional
+      Override the fill color for markers, which defaults to the per-series color specified
+      by `color`.  Specify one color, one-color-per-series, or one-color-per-datum.  Colors
+      may be CSS colors, toyplot colors, or scalar values that will be mapped to colors using
+      `fill_colormap` or `fill_palette`.
+    fill_colormap: color map object, optional
+      Colormap object used to map scalar `fill` values to colors.
+    fill_palette: :class:`toyplot.color.Palette`, optional
+      Color palette used to map scalar `fill` values to colors with a linear colormap.
+    opacity: array-like, optional
+      Overrides the default opacity of the markers.  Specify one opacity, one-opacity-per-series,
+      or one-opacity-per-datum.
+    title: array-like, optional
+      Human-readable title for the data series.  The SVG / HTML backends render the
+      title using tooltips.  Specify one title or one-title-per-series.
     style: dict, optional
-      Collection of CSS styles to apply across all datums.  See
-      :class:`toyplot.mark.Plot` for a list of useful styles.
+      Collection of CSS styles applied to all plots.
+    mstyle: dict, optional
+      Collection of CSS styles applied to all markers.
+    mlstyle: dict, optional
+      Collection of CSS styles applied to all marker labels.
 
     Returns
     -------
-    plot: :class:`toyplot.mark.Plot`
+    mark: :class:`toyplot.mark.Plot`
     """
     along = toyplot.require.value_in(along, ["x", "y"])
 
@@ -848,16 +886,17 @@ class Cartesian(object):
         position = numpy.ma.arange(series.shape[0])
 
     default_color = [next(self._plot_colors) for i in range(series.shape[1])]
-    stroke = toyplot.color.broadcast(default_color if stroke is None else stroke, series.shape[1], colormap=stroke_colormap, palette=stroke_palette)
+    color = toyplot.color.broadcast(default_color if color is None else color, series.shape[1], colormap=colormap, palette=palette)
     stroke_width = toyplot.broadcast.scalar(stroke_width, series.shape[1])
     stroke_opacity = toyplot.broadcast.scalar(stroke_opacity, series.shape[1])
     marker = toyplot.broadcast.object(marker, series.shape)
-    size = toyplot.broadcast.scalar(size, series.shape)
-    fill = toyplot.color.broadcast(default_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
-    opacity = toyplot.broadcast.scalar(opacity, series.shape)
+    msize = toyplot.broadcast.scalar(size, series.shape)
+    mfill = toyplot.color.broadcast(color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
+    mstroke = toyplot.color.broadcast(mfill, series.shape)
+    mopacity = toyplot.broadcast.scalar(opacity, series.shape)
     title = toyplot.broadcast.object(title, series.shape[1])
     style = toyplot.style.combine({"fill":"none"}, toyplot.require.style(style))
-    mstyle = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(mstyle))
+    mstyle = toyplot.style.combine({}, toyplot.require.style(mstyle))
     mlstyle = toyplot.style.combine(toyplot.require.style(mlstyle))
 
     if along == "x":
@@ -872,25 +911,28 @@ class Cartesian(object):
     table[coordinate_axes] = position
     series_keys = []
     marker_keys = []
-    size_keys = []
-    fill_keys = []
-    opacity_keys = []
-    for index, (series_column, marker_column, size_column, fill_column, opacity_column) in enumerate(zip(series.T, marker.T, size.T, fill.T, opacity.T)):
+    msize_keys = []
+    mfill_keys = []
+    mstroke_keys = []
+    mopacity_keys = []
+    for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column) in enumerate(zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T)):
       series_keys.append(series_axis + str(index))
       marker_keys.append("marker" + str(index))
-      size_keys.append("size" + str(index))
-      fill_keys.append("fill" + str(index))
-      opacity_keys.append("opacity" + str(index))
+      msize_keys.append("size" + str(index))
+      mfill_keys.append("fill" + str(index))
+      mstroke_keys.append("stroke" + str(index))
+      mopacity_keys.append("opacity" + str(index))
       table[series_keys[-1]] = series_column
       table[marker_keys[-1]] = marker_column
-      table[size_keys[-1]] = size_column
-      table[fill_keys[-1]] = fill_column
-      table[opacity_keys[-1]] = opacity_column
+      table[msize_keys[-1]] = msize_column
+      table[mfill_keys[-1]] = mfill_column
+      table[mstroke_keys[-1]] = mstroke_column
+      table[mopacity_keys[-1]] = mopacity_column
 
-    self._children.append(toyplot.mark.Plot(table=table, coordinates=coordinate_axes, coordinate_axes=coordinate_axes, series=series_keys, series_axis=series_axis, show_stroke=True, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker_keys, size=size_keys, fill=fill_keys, opacity=opacity_keys, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle))
+    self._children.append(toyplot.mark.Plot(table=table, coordinates=coordinate_axes, coordinate_axes=coordinate_axes, series=series_keys, series_axis=series_axis, show_stroke=True, stroke=color, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker_keys, msize=msize_keys, mfill=mfill_keys, mstroke=mstroke_keys, mopacity=mopacity_keys, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle))
     return self._children[-1]
 
-  def scatterplot(self, a, b=None, along="x", stroke=None, stroke_colormap=None, stroke_palette=None, stroke_width=2.0, stroke_opacity=1.0, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None):
+  def scatterplot(self, a, b=None, along="x", color=None, colormap=None, palette=None, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None):
     """Add a bivariate plot to the axes.
 
     Parameters
@@ -933,16 +975,17 @@ class Cartesian(object):
         position = numpy.ma.arange(series.shape[0])
 
     default_color = [next(self._scatterplot_colors) for i in range(series.shape[1])]
-    stroke = toyplot.color.broadcast(default_color if stroke is None else stroke, series.shape[1], colormap=stroke_colormap, palette=stroke_palette)
-    stroke_width = toyplot.broadcast.scalar(stroke_width, series.shape[1])
-    stroke_opacity = toyplot.broadcast.scalar(stroke_opacity, series.shape[1])
+    color = toyplot.color.broadcast(default_color if color is None else color, series.shape[1], colormap=colormap, palette=palette)
+    stroke_width = toyplot.broadcast.scalar(0.0, series.shape[1])
+    stroke_opacity = toyplot.broadcast.scalar(0.0, series.shape[1])
     marker = toyplot.broadcast.object(marker, series.shape)
-    size = toyplot.broadcast.scalar(size, series.shape)
-    fill = toyplot.color.broadcast(default_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
-    opacity = toyplot.broadcast.scalar(opacity, series.shape)
+    msize = toyplot.broadcast.scalar(size, series.shape)
+    mfill = toyplot.color.broadcast(color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
+    mstroke = toyplot.color.broadcast(mfill, series.shape)
+    mopacity = toyplot.broadcast.scalar(opacity, series.shape)
     title = toyplot.broadcast.object(title, series.shape[1])
     style = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(style))
-    mstyle = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(mstyle))
+    mstyle = toyplot.style.combine({}, toyplot.require.style(mstyle))
     mlstyle = toyplot.style.combine(toyplot.require.style(mlstyle))
 
     if along == "x":
@@ -957,22 +1000,25 @@ class Cartesian(object):
     table[coordinate_axes] = position
     series_keys = []
     marker_keys = []
-    size_keys = []
-    fill_keys = []
-    opacity_keys = []
-    for index, (series_column, marker_column, size_column, fill_column, opacity_column) in enumerate(zip(series.T, marker.T, size.T, fill.T, opacity.T)):
+    msize_keys = []
+    mfill_keys = []
+    mstroke_keys = []
+    mopacity_keys = []
+    for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column) in enumerate(zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T)):
       series_keys.append(series_axis + str(index))
       marker_keys.append("marker" + str(index))
-      size_keys.append("size" + str(index))
-      fill_keys.append("fill" + str(index))
-      opacity_keys.append("opacity" + str(index))
+      msize_keys.append("size" + str(index))
+      mfill_keys.append("fill" + str(index))
+      mstroke_keys.append("stroke" + str(index))
+      mopacity_keys.append("opacity" + str(index))
       table[series_keys[-1]] = series_column
       table[marker_keys[-1]] = marker_column
-      table[size_keys[-1]] = size_column
-      table[fill_keys[-1]] = fill_column
-      table[opacity_keys[-1]] = opacity_column
+      table[msize_keys[-1]] = msize_column
+      table[mfill_keys[-1]] = mfill_column
+      table[mstroke_keys[-1]] = mstroke_column
+      table[mopacity_keys[-1]] = mopacity_column
 
-    self._children.append(toyplot.mark.Plot(table=table, coordinates=coordinate_axes, coordinate_axes=coordinate_axes, series=series_keys, series_axis=series_axis, show_stroke=False, stroke=stroke, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker_keys, size=size_keys, fill=fill_keys, opacity=opacity_keys, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle))
+    self._children.append(toyplot.mark.Plot(table=table, coordinates=coordinate_axes, coordinate_axes=coordinate_axes, series=series_keys, series_axis=series_axis, show_stroke=False, stroke=color, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker_keys, msize=msize_keys, mfill=mfill_keys, mstroke=mstroke_keys, mopacity=mopacity_keys, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle))
     return self._children[-1]
 
   def rect(self, a, b, c, d, along="x", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={"stroke":"none"}):

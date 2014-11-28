@@ -164,7 +164,7 @@ class Plot(Mark):
   :meth:`toyplot.axes.Cartesian.plot` and
   :meth:`toyplot.axes.Cartesian.scatterplot` instead.
   """
-  def __init__(self, table, coordinates, coordinate_axes, series, series_axis, show_stroke, stroke, stroke_width, stroke_opacity, marker, size, fill, opacity, title, style, mstyle, mlstyle):
+  def __init__(self, table, coordinates, coordinate_axes, series, series_axis, show_stroke, stroke, stroke_width, stroke_opacity, marker, msize, mfill, mstroke, mopacity, title, style, mstyle, mlstyle):
     table = toyplot.require.instance(table, toyplot.data.Table)
     coordinates = toyplot.require.table_keys(table, coordinates, min_length=1)
     coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=len(coordinates))
@@ -175,9 +175,10 @@ class Plot(Mark):
     # stroke_width
     # stroke_opacity
     marker = toyplot.require.table_keys(table, marker, length=len(series))
-    size = toyplot.require.table_keys(table, size, length=len(series))
-    fill = toyplot.require.table_keys(table, fill, length=len(series))
-    opacity = toyplot.require.table_keys(table, opacity, length=len(series))
+    msize = toyplot.require.table_keys(table, msize, length=len(series))
+    mfill = toyplot.require.table_keys(table, mfill, length=len(series))
+    mstroke = toyplot.require.table_keys(table, mstroke, length=len(series))
+    mopacity = toyplot.require.table_keys(table, mopacity, length=len(series))
     # title
     style = toyplot.require.style(style)
     mstyle = toyplot.require.style(mstyle)
@@ -194,9 +195,10 @@ class Plot(Mark):
     self._stroke_width = stroke_width     # N stroke widths
     self._stroke_opacity = stroke_opacity # N stroke opacities
     self._marker = marker                 # N marker columns
-    self._size = size                     # N marker size columns
-    self._fill = fill                     # N marker fill color columns
-    self._opacity = opacity               # N marker opacity columns
+    self._msize = msize                   # N marker size columns
+    self._mfill = mfill                   # N marker fill color columns
+    self._mstroke = mstroke               # N marker stroke color columns
+    self._mopacity = mopacity             # N marker opacity columns
     self._title = title                   # N titles
     self._style = style                   # Line style
     self._mstyle = mstyle                 # Marker style

@@ -688,14 +688,6 @@ def test_axes_bars_n_boundaries_titles():
   axes.bars(series, title=["1st quartile", "2nd quartile", "3rd quartile", "4th quartile"], baseline=None)
   assert_canvas_matches(canvas, "axes-bars-n-boundaries-titles")
 
-def test_fill_one_boundary():
-  numpy.random.seed(1234)
-  observations = numpy.random.normal(loc=1, size=(25, 100))
-  y = numpy.mean(observations, axis=1)
-
-  canvas, axes, mark = toyplot.fill(y)
-  assert_canvas_matches(canvas, "fill-one-boundary")
-
 def test_axes_hlines_fail():
   with nose.tools.assert_raises(ValueError):
     canvas = toyplot.Canvas()

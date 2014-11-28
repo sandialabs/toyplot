@@ -94,3 +94,27 @@ class Table(object):
       index = slice(index, index + 1)
     return Table(collections.OrderedDict([(key, self._columns[key][index]) for key in self._columns.keys()]))
 
+def read_csv(fobj):
+  """Load a CSV (delimited text) file.
+
+  Parameters
+  ----------
+  fobj: file-like object or string, required
+    The file to read.  Use a string filepath, an open file, or a file-like object.
+
+  Returns
+  -------
+  table: :class:`toyplot.data.Table`
+
+  Notes
+  -----
+  read_csv() is a simple tool for use in demos and tutorials.  For more full-featured
+  delimited text parsing, you should consider the :mod:`csv` module included in the
+  Python standard library, or functionality provided by `numpy` or `Pandas`.
+  """
+  import csv
+  if isinstance(fobj, toyplot.compatibility.string_type):
+    fobj = open(fobj, "r")
+  rows = [row for row in csv.reader(fobj)]
+  columns = zip(*rows)
+  return Table(collections.OrderedDict([(column[0], column[1:]) for column in columns]))

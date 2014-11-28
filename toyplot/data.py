@@ -61,7 +61,7 @@ class Table(object):
     root_xml = xml.Element("table", style="border-collapse:collapse; border:none; color: %s" % toyplot.color.near_black)
     header_xml = xml.SubElement(root_xml, "tr", style="border:none;border-bottom:1px solid %s" % toyplot.color.near_black)
     for name in self._columns.keys():
-      xml.SubElement(header_xml, "th", style="text-align:left;border:none").text = toyplot.compatibility.unicode_type(name)
+      xml.SubElement(header_xml, "th", style="text-align:left;border:none;padding-right:1em;").text = toyplot.compatibility.unicode_type(name)
 
     iterators = [iter(column) for column in self._columns.values()]
     for row_index in numpy.arange(len(self)):
@@ -69,7 +69,7 @@ class Table(object):
         value = next(iterator)
         if index == 0:
           row_xml = xml.SubElement(root_xml, "tr", style="border:none")
-        xml.SubElement(row_xml, "td", style="border:none").text = toyplot.compatibility.unicode_type(value)
+        xml.SubElement(row_xml, "td", style="border:none;padding-right:1em;").text = toyplot.compatibility.unicode_type(value)
 
     return xml.tostring(root_xml, method="html", encoding="utf-8")
 

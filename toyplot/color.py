@@ -204,7 +204,9 @@ class CategoricalMap(object):
   in an IPython notebook.
   """
 
-  def __init__(self, palette):
+  def __init__(self, palette=None):
+    if palette is None:
+      palette = Palette()
     self._palette = palette
 
   def colors(self, values, domain_min=None, domain_max=None):

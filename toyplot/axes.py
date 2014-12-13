@@ -307,6 +307,13 @@ class Cartesian(object):
     self._parent = parent
     self._children = []
 
+    self._xtick_locations = []
+    self._xtick_labels = []
+    self._xtick_titles = []
+    self._ytick_locations = []
+    self._ytick_labels = []
+    self._ytick_titles = []
+
   @property
   def show(self):
     return self._show
@@ -379,11 +386,13 @@ class Cartesian(object):
           return toyplot.locator.Log(base=base)
 
     # Calculate tick locations and labels.
-    xlocator = _get_locator(self.x.ticks._locator, self.x._scale, xmin, xmax)
-    ylocator = _get_locator(self.y.ticks._locator, self.y._scale, ymin, ymax)
+    if self.show and self.x.show:
+      xlocator = _get_locator(self.x.ticks._locator, self.x._scale, xmin, xmax)
+      self._xtick_locations, self._xtick_labels, self._xtick_titles = xlocator.ticks(xmin, xmax)
 
-    self._xtick_locations, self._xtick_labels, self._xtick_titles = xlocator.ticks(xmin, xmax)
-    self._ytick_locations, self._ytick_labels, self._ytick_titles = ylocator.ticks(ymin, ymax)
+    if self.show and self.y.show:
+      ylocator = _get_locator(self.y.ticks._locator, self.y._scale, ymin, ymax)
+      self._ytick_locations, self._ytick_labels, self._ytick_titles = ylocator.ticks(ymin, ymax)
 
     # Allow tick locations to grow (never shrink) the domain.
     if len(self._xtick_locations):

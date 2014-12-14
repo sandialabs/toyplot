@@ -447,6 +447,11 @@ def step_impl(context):
   context.axes.column("baz").justify = "right"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-right-justification")
 
+@then(u'the table can be rendered with a title')
+def step_impl(context):
+  context.axes.title.text = "Quarterly Report"
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-title")
+
 @given(u'values from -1000 to -1')
 def step_impl(context):
   context.x = numpy.linspace(-1000, -1, 100)

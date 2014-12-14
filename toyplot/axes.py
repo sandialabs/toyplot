@@ -1358,7 +1358,24 @@ class Table(object):
     def style(self, value):
       self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
-  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, data, parent):
+  class TitleHelper(object):
+    def __init__(self, title, style):
+      self._text = title
+      self._style = toyplot.style.combine({"font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
+    @property
+    def text(self):
+      return self._text
+    @text.setter
+    def text(self, value):
+      self._text = value
+    @property
+    def style(self):
+      return self._style
+    @style.setter
+    def style(self, value):
+      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
+
+  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, data, title, parent):
     self._xmin_range = xmin_range
     self._xmax_range = xmax_range
     self._ymin_range = ymin_range
@@ -1373,6 +1390,7 @@ class Table(object):
     self._rows = numpy.array([toyplot.axes.Table.Row() for row in range(data.shape[0])])
     self._cells = numpy.array([[toyplot.axes.Table.Cell() for column in range(data.shape[1])] for row in range(data.shape[0])])
     self._grid = toyplot.axes.Table.Grid(data.shape[0], data.shape[1])
+    self._title = Table.TitleHelper(title, style={"font-size":"14px", "baseline-shift":"100%"})
 
     self._grid.hlines[1,...] = "single"
 
@@ -1399,6 +1417,10 @@ class Table(object):
     x_boundaries = self._xmin_range + numpy.concatenate(([0], numpy.cumsum(column_widths)))
     y_boundaries = numpy.linspace(self._ymin_range, self._ymax_range, len(self._rows) + 2, endpoint=True)
     return x_boundaries, y_boundaries
+
+  @property
+  def title(self):
+    return self._title
 
   @property
   def grid(self):

@@ -879,6 +879,12 @@ def _render(canvas, axes, context):
         xml.SubElement(axes_xml, "line", x1=repr(x - separation), y1=repr(y_boundaries[start]), x2=repr(x - separation), y2=repr(y_boundaries[end]), style=_css_style(axes._grid._style))
         xml.SubElement(axes_xml, "line", x1=repr(x + separation), y1=repr(y_boundaries[start]), x2=repr(x + separation), y2=repr(y_boundaries[end]), style=_css_style(axes._grid._style))
 
+  # Render title
+  if axes._title._text is not None:
+    x = (axes._xmin_range + axes._xmax_range) * 0.5
+    y = axes._ymin_range
+    xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(axes._title._style)).text = axes._title._text
+
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.BarBoundaries, _RenderContext)
 def _render(axes, mark, context):
   left = mark._table[mark._left[0]]

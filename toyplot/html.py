@@ -795,10 +795,11 @@ def _render(canvas, axes, context):
   x_boundaries, y_boundaries = axes._boundaries()
 
   # Render column headers.
-  for column_index, (key, column) in enumerate(zip(axes._keys, axes._columns)):
-    x = (x_boundaries[column_index] + x_boundaries[column_index + 1]) / 2
-    y = (y_boundaries[0] + y_boundaries[1]) / 2
-    xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._hstyle, column.header.style, {"text-anchor":"middle"}))).text = key if column.header.content is None else column.header.content
+  if axes._header._show:
+    for column_index, (key, column) in enumerate(zip(axes._keys, axes._columns)):
+      x = (x_boundaries[column_index] + x_boundaries[column_index + 1]) / 2
+      y = (y_boundaries[0] + y_boundaries[1]) / 2
+      xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._hstyle, column.header.style, {"text-anchor":"middle"}))).text = key if column.header.content is None else column.header.content
 
   # Render column contents.
   for column_index, column in enumerate(axes._columns):
@@ -861,7 +862,10 @@ def _render(canvas, axes, context):
       i += n
     return result
 
-  for row_index, row in enumerate(axes._grid._hlines):
+  hlines = numpy.copy(axes._grid._hlines)
+  if not axes._header._show:
+    hlines[0, ...] = False
+  for row_index, row in enumerate(hlines):
     y = y_boundaries[row_index]
     for start, end, line_type in contiguous(row):
       if line_type == "single":
@@ -870,7 +874,10 @@ def _render(canvas, axes, context):
         xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y - separation), x2=repr(x_boundaries[end]), y2=repr(y - separation), style=_css_style(axes._grid._style))
         xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y + separation), x2=repr(x_boundaries[end]), y2=repr(y + separation), style=_css_style(axes._grid._style))
 
-  for column_index, column in enumerate(axes._grid._vlines.T):
+  vlines = numpy.copy(axes._grid._vlines)
+  if not axes._header._show:
+    vlines[0, ...] = False
+  for column_index, column in enumerate(vlines.T):
     x = x_boundaries[column_index]
     for start, end, line_type in contiguous(column):
       if line_type == "single":

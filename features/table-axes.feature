@@ -29,4 +29,5 @@ Feature: Table axes
       | with center justification              |
       | with right justification               |
       | with a title                           |
+      | without a header                       |
 

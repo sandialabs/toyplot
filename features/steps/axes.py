@@ -452,6 +452,12 @@ def step_impl(context):
   context.axes.title.text = "Quarterly Report"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-title")
 
+@then(u'the table can be rendered without a header')
+def step_impl(context):
+  context.axes.header.show = False
+  context.axes.grid.hlines[1, ...] = False
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-without-header")
+
 @given(u'values from -1000 to -1')
 def step_impl(context):
   context.x = numpy.linspace(-1000, -1, 100)

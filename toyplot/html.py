@@ -790,60 +790,54 @@ def _render(canvas, axes, context):
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Table, _RenderContext)
 def _render(canvas, axes, context):
+  x_boundaries, y_boundaries = axes._finalize()
+
   axes_xml = xml.SubElement(context.root, "g", id=context.get_id(axes), attrib={"class":"toyplot-axes-Table"})
 
-  x_boundaries, y_boundaries = axes._boundaries()
+  # Render visible cells.
+  for cell in axes._visible_cells:
+#    xml.SubElement(axes_xml, "rect", x=repr(cell._left), y=repr(cell._top), width=repr(cell._right - cell._left), height=repr(cell._bottom - cell._top), style=_css_style({"stroke":"black", "fill":"white"}))
 
-  # Render column headers.
-  if axes._header._show:
-    for column_index, (key, column) in enumerate(zip(axes._keys, axes._columns)):
-      x = (x_boundaries[column_index] + x_boundaries[column_index + 1]) / 2
-      y = (y_boundaries[0] + y_boundaries[1]) / 2
-      xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._hstyle, column.header.style, {"text-anchor":"middle"}))).text = key if column.header.content is None else column.header.content
+    if cell._data is None:
+      continue
 
-  # Render column contents.
-  for column_index, column in enumerate(axes._columns):
-    column_style = toyplot.style.combine(axes._style, column.style)
-
-    column_left = x_boundaries[column_index]
-    column_right = x_boundaries[column_index + 1]
-    column_center = (column_left + column_right) / 2
+    prefix, separator, suffix = cell._format.format(cell._data)
 
     padding = 5
-    formatted_left = column_left + padding
-    formatted_right = column_right - padding
 
-    prefix, separator, suffix = column.formatted
+    column_left = cell._left + padding
+    column_right = cell._right - padding
+    column_center = (cell._left + cell._right) / 2
 
-    for row_index, row in enumerate(axes._rows):
-      row_style = toyplot.style.combine(column_style, row.style)
-      cell_style = toyplot.style.combine(row_style, axes._cells[row_index, column_index].style)
-      cell_content = axes._cells[row_index, column_index]._content
+    row_top = cell._top
+    row_bottom = cell._bottom
+    row_center = (cell._top + cell._bottom) / 2
 
-      cell_prefix = prefix[row_index]
-      cell_separator = separator[row_index]
-      cell_suffix = suffix[row_index]
+    y = row_center + cell._row_offset
 
-      y = (y_boundaries[row_index + 1] + y_boundaries[row_index + 2]) / 2
+    if cell._justify == "left":
+      x = column_left + cell._column_offset
+      xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell._style, {"text-anchor":"begin"}))).text = prefix + separator + suffix
+    elif cell._justify == "center":
+      x = column_center + cell._column_offset
+      xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell._style, {"text-anchor":"middle"}))).text = prefix + separator + suffix
+    elif cell._justify == "right":
+      x = column_right + cell._column_offset
+      xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell._style, {"text-anchor":"end"}))).text = prefix + separator + suffix
+    elif cell._justify is "separator":
+      x = column_center + cell._column_offset
 
-      if column.justify == "left":
-        x = formatted_left + column.offset
-        xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"begin"}))).text = cell_content if cell_content is not None else cell_prefix + cell_separator + cell_suffix
-      elif column.justify == "center":
-        x = column_center
-        xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"middle"}))).text = cell_content if cell_content is not None else cell_prefix + cell_separator + cell_suffix
-      elif column.justify == "right":
-        x = formatted_right + column.offset
-        xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"end"}))).text = cell_content if cell_content is not None else cell_prefix + cell_separator + cell_suffix
-      elif column.justify is "separator":
-        x = column_center + column.offset
+      xml.SubElement(axes_xml, "text", x=repr(x - 2), y=repr(y), style=_css_style(toyplot.style.combine(cell._style, {"text-anchor":"end"}))).text = prefix
+      xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell._style, {"text-anchor":"middle"}))).text = separator
+      xml.SubElement(axes_xml, "text", x=repr(x + 2), y=repr(y), style=_css_style(toyplot.style.combine(cell._style, {"text-anchor":"begin"}))).text = suffix
 
-        if cell_content:
-          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"middle"}))).text = cell_content
-        else:
-          xml.SubElement(axes_xml, "text", x=repr(x - 2), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"end"}))).text = cell_prefix
-          xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"middle"}))).text = cell_separator
-          xml.SubElement(axes_xml, "text", x=repr(x + 2), y=repr(y), style=_css_style(toyplot.style.combine(cell_style, {"text-anchor":"begin"}))).text = cell_suffix
+#  # Render column headers.
+#  if axes._header._show:
+#    for column_index, (key, column) in enumerate(zip(axes._keys, axes._columns)):
+#      x = (x_boundaries[column_index] + x_boundaries[column_index + 1]) / 2
+#      y = (y_boundaries[0] + y_boundaries[1]) / 2
+#      xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(axes._hstyle, column.header.style, {"text-anchor":"middle"}))).text = key if column.header.content is None else column.header.content
+
 
   # Render children.
   for child in axes._children:
@@ -863,8 +857,9 @@ def _render(canvas, axes, context):
     return result
 
   hlines = numpy.copy(axes._grid._hlines)
-  if not axes._header._show:
-    hlines[0, ...] = False
+  hlines[axes._grid._hmask] = False
+#  if not axes._header._show:
+#    hlines[0, ...] = False
   for row_index, row in enumerate(hlines):
     y = y_boundaries[row_index]
     for start, end, line_type in contiguous(row):
@@ -875,8 +870,9 @@ def _render(canvas, axes, context):
         xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y + separation), x2=repr(x_boundaries[end]), y2=repr(y + separation), style=_css_style(axes._grid._style))
 
   vlines = numpy.copy(axes._grid._vlines)
-  if not axes._header._show:
-    vlines[0, ...] = False
+  vlines[axes._grid._vmask] = False
+#  if not axes._header._show:
+#    vlines[0, ...] = False
   for column_index, column in enumerate(vlines.T):
     x = x_boundaries[column_index]
     for start, end, line_type in contiguous(column):

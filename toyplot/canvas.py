@@ -272,25 +272,44 @@ class Canvas(object):
     self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style))
     return self._children[-1]
 
-  def table(self, data, bounds=None, rect=None, corner=None, grid=None, gutter=50, title=None, headershow=True):
+  def table(self, a=None, b=None, bounds=None, rect=None, corner=None, grid=None, gutter=50, title=None, headershow=True):
     """Add a set of table axes to the canvas.
 
     Parameters
     ----------
-    rows: integer, required
-      Number of rows in the table
-    columns: integer, required
-      Number of columns in the table
 
     Returns
     -------
     axes: :class:`toyplot.axes.Table`
     """
-    data = toyplot.data.Table(data)
+    if a is None and b is None:
+      data = None
+      rows = 10
+      columns = 4
+    elif b is None:
+      data = toyplot.data.Table(a)
+      rows, columns = data.shape
+    else:
+      data = None
+      rows = a
+      columns = b
 
     xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-    self._children.append(toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, data=data, title=title, headershow=headershow, parent=self))
-    return self._children[-1]
+    table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, rows=rows, columns=columns, title=title, headershow=headershow, parent=self)
+
+    if data is not None:
+      for index, (key, column) in enumerate(data.items()):
+        table.column(index).data = column
+        if issubclass(column._data.dtype.type, numpy.floating):
+          table.column(index).format = toyplot.format.FloatFormatter()
+          table.column(index).justify = "separator"
+        elif issubclass(column._data.dtype.type, numpy.character):
+          table.column(index).justify = "left"
+        elif issubclass(column._data.dtype.type, numpy.integer):
+          table.column(index).justify = "right"
+
+    self._children.append(table)
+    return table
 
   def text(self, x, y, text, angle=0.0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None):
     """Add text to the canvas.

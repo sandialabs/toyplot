@@ -6,36 +6,39 @@ from __future__ import division
 
 import numpy
 
-class ColumnFormatter(object):
-  """Base class for column formatters - objects that compute text representations of column data."""
-  def format(self, column):
-    """Return a text representation of the given column.
+class Formatter(object):
+  """Base class for formatters - objects that compute text representations from data."""
+  def format(self, value):
+    """Return a text representation of the given value.
 
     Parameters
     ----------
-    column: numpy.ndarray
+    value: value to be formatted
 
     Returns
     -------
-    prefix : sequence of strings
+    prefix : string
       Formatted data to be displayed before the separator.
-    separator : sequence of strings
-      Optional separator between formatted data, or empty strings.
-    suffix : numpy.ndarray of strings, or None
-      Optional formatted data to be displayed after the separator, or empty strings.
+    separator : string
+      Separator between formatted data, or empty string.
+    suffix : string
+      Formatted data to be displayed after the separator, or empty string.
     """
     raise NotImplementedError()
 
-class DefaultFormatter(ColumnFormatter):
-  def format(self, column):
-    return (numpy.char.mod("%s", column), [""] * len(column), [""] * len(column))
+class DefaultFormatter(Formatter):
+  def format(self, value):
+    return "%s" % value, "", ""
 
-class FloatFormatter(ColumnFormatter):
+class FloatFormatter(Formatter):
   def __init__(self, format="{:.6g}"):
     self._format = format
 
-  def format(self, column):
-    formatted = [(self._format.format(value)).split(".") for value in column]
-    formatted = [group + ["", ""] if len(group) == 1 else group + ["."] for group in formatted]
-    prefix, suffix, separator = zip(*formatted)
-    return (prefix, separator, suffix)
+  def format(self, value):
+    try:
+      formatted = self._format.format(value).split(".")
+      if len(formatted) == 1:
+        return formatted, "", ""
+      return formatted[0], ".", formatted[1]
+    except:
+      return str(value), "", ""

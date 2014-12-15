@@ -1221,7 +1221,7 @@ class Cartesian(object):
 class Table(object):
   """Experimental table coordinate system.
   """
-  class TitleHelper(object):
+  class Title(object):
     def __init__(self, title, style):
       self._text = title
       self._style = toyplot.style.combine({"font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
@@ -1239,11 +1239,13 @@ class Table(object):
       self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
   class Cell(object):
-    def __init__(self, row, column, default_format, default_justify, default_style):
+    def __init__(self, row=None, column=None):
+      self._row = row
+      self._column = column
+      self._format = Table.Cell.default_format
+      self._justify = Table.Cell.default_justify
+      self._style = Table.Cell.default_style
       self._data = None
-      self._format = default_format
-      self._justify = default_justify
-      self._style = default_style
       self._width = None
       self._height = None
       self._left = None
@@ -1253,21 +1255,23 @@ class Table(object):
       self._column_offset = 0
       self._row_offset = 0
       self._parents = None
-      self._row = row
-      self._column = column
+    default_format = toyplot.format.DefaultFormatter()
+    default_justify = "left"
+    default_style = {"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle"}
 
   class CellReference(object):
-    def __init__(self, parent, cells):
-      self._parent = parent
+    def __init__(self, table, region, cells):
+      self._table = table
+      self._region = region
       self._cells = cells
 
     def _set_show(self, value):
       if value:
         for cell in self._cells.flat:
-          self._parent._visible_cells.add(cell)
+          self._region._visible_cells.add(cell)
       else:
         for cell in self._cells.flat:
-          self._parent._visible_cells.remove(cell)
+          self._region._visible_cells.remove(cell)
     show = property(fset=_set_show)
 
     def _set_data(self, value):
@@ -1312,61 +1316,34 @@ class Table(object):
     row_offset = property(fset=_set_row_offset)
 
     def axes(self, xmin=None, xmax=None, ymin=None, ymax=None, show=False, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=5, tick_length=5):
-      self._parent._finalize()
+      self._table._finalize()
       left = numpy.min([cell._left for cell in self._cells.flat])
       right = numpy.max([cell._right for cell in self._cells.flat])
       top = numpy.min([cell._top for cell in self._cells.flat])
       bottom = numpy.max([cell._bottom for cell in self._cells.flat])
 
-      axes = toyplot.axes.Cartesian(left, right, top, bottom, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self._parent)
+      axes = toyplot.axes.Cartesian(left, right, top, bottom, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self._table._parent)
       axes.coordinates.show = False
-      self._parent._children.append(axes)
+      self._table._children.append(axes)
       return axes
 
     def merge(self):
       source = self._cells.flat[0]
-      merged_cell = Table.Cell(None, None, source._format, source._justify, source._style)
+      merged_cell = Table.Cell()
       merged_cell._parents = self._cells
 
       rows = numpy.unique([cell._row for cell in self._cells.flat])
       columns = numpy.unique([cell._column for cell in self._cells.flat])
 
       if len(rows) > 1:
-        self._parent._grid._hmask[rows[1:], columns] = True
+        self._region._grid._hmask[rows[1:], columns] = True
       if len(columns) > 1:
-        self._parent._grid._vmask[rows, columns[1:]] = True
+        self._region._grid._vmask[rows, columns[1:]] = True
 
       for cell in self._cells.flat:
-        self._parent._visible_cells.remove(cell)
-      self._parent._visible_cells.add(merged_cell)
-      return Table.CellReference(self._parent, numpy.array(merged_cell))
-
-#  class HeaderCell(object):
-#    def __init__(self):
-#      self._content = None
-#      self._style = None
-#    @property
-#    def content(self):
-#      return self._content
-#    @content.setter
-#    def content(self, value):
-#      self._content = value
-#    @property
-#    def style(self):
-#      return self._style
-#    @style.setter
-#    def style(self, value):
-#      self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
-
-#  class HeaderHelper(object):
-#    def __init__(self, show):
-#      self._show = show
-#    @property
-#    def show(self):
-#      return self._show
-#    @show.setter
-#    def show(self, value):
-#      self._show = value
+        self._region._visible_cells.remove(cell)
+      self._region._visible_cells.add(merged_cell)
+      return Table.CellReference(self._table, self._region, numpy.array(merged_cell))
 
   class Grid(object):
     def __init__(self, rows, columns):
@@ -1395,6 +1372,29 @@ class Table(object):
     def style(self, value):
       self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
+  class Region(object):
+    def __init__(self, table, rows, columns):
+      self._table = table
+      self._grid = Table.Grid(rows, columns)
+      self._cells = numpy.empty((rows, columns), dtype="object")
+      for row in range(rows):
+        for column in range(columns):
+          self._cells[row,column] = Table.Cell(row, column)
+      self._visible_cells = set(numpy.ravel(self._cells))
+
+    @property
+    def grid(self):
+      return self._grid
+
+    def column(self, column):
+      return Table.CellReference(self._table, self, self._cells.T[column])
+
+    def row(self, row):
+      return Table.CellReference(self._table, self, self._cells[row])
+
+    def cell(self, row, column, rowspan=1, colspan=1):
+      return Table.CellReference(self._table, self, self._cells[row : row + rowspan, column : column + colspan])
+
   def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, rows, columns, title, headershow, parent):
     self._xmin_range = xmin_range
     self._xmax_range = xmax_range
@@ -1403,55 +1403,34 @@ class Table(object):
     self._parent = parent
     self._children = []
 
-    self._title = Table.TitleHelper(title, style={"font-size":"14px", "baseline-shift":"100%"})
-#    self._header = Table.HeaderHelper(headershow)
+    self._title = Table.Title(title, style={"font-size":"14px", "baseline-shift":"100%"})
 
-
-    default_format = toyplot.format.DefaultFormatter()
-    default_justify = "left"
-    default_style = {"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle"}
-    default_hstyle = {"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle", "font-weight":"bold"}
-
-#    self._header_cells = numpy.empty(columns, dtype="object")
-#    for cell in numpy.nditer(self._header_cells, flags=["refs_ok"], op_flags=["readwrite"]):
-#      cell[...] = Table.Cell(default_format, default_justify, default_hstyle)
-
-    self._body_cells = numpy.empty((rows, columns), dtype="object")
-    for row in range(rows):
-      for column in range(columns):
-        self._body_cells[row,column] = Table.Cell(row, column, default_format, default_justify, default_style)
-
-    self._visible_cells = set(numpy.ravel(self._body_cells).tolist())
-
-    self._grid = toyplot.axes.Table.Grid(rows, columns)
-#    self._grid._hlines[0,...] = "single"
+    self._body = Table.Region(self, rows, columns)
 
     self._finalized = False
-    self._x_boundaries = None
-    self._y_boundaries = None
 
   @property
   def title(self):
     return self._title
 
-  def column(self, column):
-    return Table.CellReference(self, self._body_cells.T[column])
-
-  def row(self, row):
-    return Table.CellReference(self, self._body_cells[row])
-
-  def cell(self, row, column, rowspan=1, colspan=1):
-    return Table.CellReference(self, self._body_cells[row : row + rowspan, column : column + colspan])
-
   @property
   def grid(self):
-    return self._grid
+    return self._body._grid
+
+  def column(self, column):
+    return self._body.column(column)
+
+  def row(self, row):
+    return self._body.row(row)
+
+  def cell(self, row, column, rowspan=1, colspan=1):
+    return self._body.cell(row, column, rowspan, colspan)
 
   def _finalize(self):
     if not self._finalized:
       self._finalized = True
-      column_widths = numpy.zeros(self._body_cells.shape[1])
-      for index, column in enumerate(self._body_cells.T):
+      column_widths = numpy.zeros(self._body._cells.shape[1])
+      for index, column in enumerate(self._body._cells.T):
         cell_widths = [cell._width for cell in column if cell._width is not None]
         if len(cell_widths):
           column_widths[index] = numpy.max(cell_widths)
@@ -1461,15 +1440,15 @@ class Table(object):
       default_width = available_width / numpy.count_nonzero(column_widths == 0)
       column_widths[column_widths == 0] = default_width
 
-      self._x_boundaries = self._xmin_range + numpy.concatenate(([0], numpy.cumsum(column_widths)))
+      self._body._x_boundaries = self._xmin_range + numpy.concatenate(([0], numpy.cumsum(column_widths)))
 
-      for index, column in enumerate(self._body_cells.T):
+      for index, column in enumerate(self._body._cells.T):
         for cell in column:
-          cell._left = self._x_boundaries[index]
-          cell._right = self._x_boundaries[index+1]
+          cell._left = self._body._x_boundaries[index]
+          cell._right = self._body._x_boundaries[index+1]
 
-      row_heights = numpy.zeros(self._body_cells.shape[0])
-      for index, row in enumerate(self._body_cells):
+      row_heights = numpy.zeros(self._body._cells.shape[0])
+      for index, row in enumerate(self._body._cells):
         cell_heights = [cell._height for cell in row if cell._height is not None]
         if len(cell_heights):
           row_heights[index] = numpy.max(cell_heights)
@@ -1479,24 +1458,17 @@ class Table(object):
       default_height = available_height / numpy.count_nonzero(row_heights == 0)
       row_heights[row_heights == 0] = default_height
 
-      self._y_boundaries = self._ymin_range + numpy.concatenate(([0], numpy.cumsum(row_heights)))
+      self._body._y_boundaries = self._ymin_range + numpy.concatenate(([0], numpy.cumsum(row_heights)))
 
-      for index, row in enumerate(self._body_cells):
+      for index, row in enumerate(self._body._cells):
         for cell in row:
-          cell._top = self._y_boundaries[index]
-          cell._bottom = self._y_boundaries[index+1]
+          cell._top = self._body._y_boundaries[index]
+          cell._bottom = self._body._y_boundaries[index+1]
 
-      for cell in self._visible_cells:
+      for cell in self._body._visible_cells:
         if cell._parents is not None:
           cell._left = numpy.min([parent._left for parent in cell._parents.flat])
           cell._right = numpy.max([parent._right for parent in cell._parents.flat])
           cell._top = numpy.min([parent._top for parent in cell._parents.flat])
           cell._bottom = numpy.max([parent._bottom for parent in cell._parents.flat])
-
-#    if self._header._show:
-#      y_boundaries = numpy.linspace(self._ymin_range, self._ymax_range, len(self._rows) + 2, endpoint=True)
-#    else:
-#      y_boundaries = numpy.concatenate(([self._ymin_range], numpy.linspace(self._ymin_range, self._ymax_range, len(self._rows) + 1, endpoint=True)))
-#
-    return self._x_boundaries, self._y_boundaries
 

@@ -1386,13 +1386,16 @@ class Table(object):
       self._x_boundaries = column_start + numpy.concatenate(([0], numpy.cumsum(column_widths)))
       self._y_boundaries = row_start + numpy.concatenate(([0], numpy.cumsum(row_heights)))
 
+      # Assign coordinates to grid cells.
+      for cell in self._cells.flat:
+        cell._left = self._x_boundaries[cell._column]
+        cell._right = self._x_boundaries[cell._column + 1]
+        cell._top = self._y_boundaries[cell._row]
+        cell._bottom = self._y_boundaries[cell._row + 1]
+
+      # Assign coordinates to merged cells.
       for cell in self._visible_cells:
-        if cell._parents is None:
-          cell._left = self._x_boundaries[cell._column]
-          cell._right = self._x_boundaries[cell._column + 1]
-          cell._top = self._y_boundaries[cell._row]
-          cell._bottom = self._y_boundaries[cell._row + 1]
-        else:
+        if cell._parents is not None:
           cell._left = numpy.min([parent._left for parent in cell._parents.flat])
           cell._right = numpy.max([parent._right for parent in cell._parents.flat])
           cell._top = numpy.min([parent._top for parent in cell._parents.flat])

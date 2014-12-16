@@ -1382,6 +1382,22 @@ class Table(object):
           self._cells[row,column] = Table.Cell(row, column)
       self._visible_cells = set(numpy.ravel(self._cells))
 
+    def _finalize(self, column_start, column_widths, row_start, row_heights):
+      self._x_boundaries = column_start + numpy.concatenate(([0], numpy.cumsum(column_widths)))
+      self._y_boundaries = row_start + numpy.concatenate(([0], numpy.cumsum(row_heights)))
+
+      for cell in self._visible_cells:
+        if cell._parents is None:
+          cell._left = self._x_boundaries[cell._column]
+          cell._right = self._x_boundaries[cell._column + 1]
+          cell._top = self._y_boundaries[cell._row]
+          cell._bottom = self._y_boundaries[cell._row + 1]
+        else:
+          cell._left = numpy.min([parent._left for parent in cell._parents.flat])
+          cell._right = numpy.max([parent._right for parent in cell._parents.flat])
+          cell._top = numpy.min([parent._top for parent in cell._parents.flat])
+          cell._bottom = numpy.max([parent._bottom for parent in cell._parents.flat])
+
     @property
     def grid(self):
       return self._grid
@@ -1405,6 +1421,7 @@ class Table(object):
 
     self._title = Table.Title(title, style={"font-size":"14px", "baseline-shift":"100%"})
 
+    self._header = None
     self._body = Table.Region(self, rows, columns)
 
     self._finalized = False
@@ -1426,49 +1443,41 @@ class Table(object):
   def cell(self, row, column, rowspan=1, colspan=1):
     return self._body.cell(row, column, rowspan, colspan)
 
+  def header(self, rows=None):
+    if self._header is not None and rows is not None:
+      raise Exception("Cannot change existing header shape.")
+    if self._header is None:
+      if rows is None:
+        rows = 1
+      self._header = Table.Region(self, rows, self._body._cells.shape[1])
+    return self._header
+
   def _finalize(self):
     if not self._finalized:
       self._finalized = True
-      column_widths = numpy.zeros(self._body._cells.shape[1])
-      for index, column in enumerate(self._body._cells.T):
-        cell_widths = [cell._width for cell in column if cell._width is not None]
-        if len(cell_widths):
-          column_widths[index] = numpy.max(cell_widths)
 
+      # Collect all explicit column widths and row heights for every region.
+      column_widths = numpy.zeros(self._body._cells.shape[1])
+      for cell in self._body._cells.flat:
+        if cell._width is not None:
+          column_widths[cell._column] = max(column_widths[cell._column], cell._width)
+
+      row_heights = numpy.zeros(self._body._cells.shape[0])
+      for cell in self._body._cells.flat:
+        if cell._height is not None:
+          row_heights[cell._row] = max(row_heights[cell._row], cell._height)
+
+      # Compute implicit column widths and row heights for the remaining cells.
       table_width = self._xmax_range - self._xmin_range
-      available_width = table_width - numpy.sum(column_widths[column_widths != 0])
+      available_width = table_width - numpy.sum(column_widths)
       default_width = available_width / numpy.count_nonzero(column_widths == 0)
       column_widths[column_widths == 0] = default_width
 
-      self._body._x_boundaries = self._xmin_range + numpy.concatenate(([0], numpy.cumsum(column_widths)))
-
-      for index, column in enumerate(self._body._cells.T):
-        for cell in column:
-          cell._left = self._body._x_boundaries[index]
-          cell._right = self._body._x_boundaries[index+1]
-
-      row_heights = numpy.zeros(self._body._cells.shape[0])
-      for index, row in enumerate(self._body._cells):
-        cell_heights = [cell._height for cell in row if cell._height is not None]
-        if len(cell_heights):
-          row_heights[index] = numpy.max(cell_heights)
-
       table_height = self._ymax_range - self._ymin_range
-      available_height = table_height - numpy.sum(row_heights[row_heights != 0])
+      available_height = table_height - numpy.sum(row_heights)
       default_height = available_height / numpy.count_nonzero(row_heights == 0)
       row_heights[row_heights == 0] = default_height
 
-      self._body._y_boundaries = self._ymin_range + numpy.concatenate(([0], numpy.cumsum(row_heights)))
-
-      for index, row in enumerate(self._body._cells):
-        for cell in row:
-          cell._top = self._body._y_boundaries[index]
-          cell._bottom = self._body._y_boundaries[index+1]
-
-      for cell in self._body._visible_cells:
-        if cell._parents is not None:
-          cell._left = numpy.min([parent._left for parent in cell._parents.flat])
-          cell._right = numpy.max([parent._right for parent in cell._parents.flat])
-          cell._top = numpy.min([parent._top for parent in cell._parents.flat])
-          cell._bottom = numpy.max([parent._bottom for parent in cell._parents.flat])
+      # Assign boundaries (cumulative sums of widths and heights) to each region.
+      self._body._finalize(self._xmin_range, column_widths, self._ymin_range, row_heights)
 

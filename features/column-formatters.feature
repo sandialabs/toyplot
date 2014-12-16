@@ -15,5 +15,4 @@ Feature: Column formatters
     Examples:
       | input                             |
       | floats                            |
-      | mixed floats and integers         |
       | integers                          |

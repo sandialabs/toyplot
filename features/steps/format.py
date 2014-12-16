@@ -10,19 +10,17 @@ def step_impl(context):
 
 @then(u'formatting strings with the toyplot.format.DefaultFormatter should produce valid output')
 def step_impl(context):
-  column = numpy.array(["0", "1", "2", "3"])
-  prefixes, separators, suffixes = context.formatter.format(column)
-  numpy.testing.assert_array_equal(prefixes, ["0", "1", "2", "3"])
-  numpy.testing.assert_array_equal(separators, [""] * 4)
-  numpy.testing.assert_array_equal(suffixes, [""] * 4)
+  prefix, separator, suffix = context.formatter.format("1")
+  nose.tools.assert_equal(prefix, "1")
+  nose.tools.assert_equal(separator, "")
+  nose.tools.assert_equal(suffix, "")
 
 @then(u'formatting integers with the toyplot.format.DefaultFormatter should produce valid output')
 def step_impl(context):
-  column = numpy.arange(4)
-  prefixes, separators, suffixes = context.formatter.format(column)
-  numpy.testing.assert_array_equal(prefixes, ["0", "1", "2", "3"])
-  numpy.testing.assert_array_equal(separators, [""] * 4)
-  numpy.testing.assert_array_equal(suffixes, [""] * 4)
+  prefix, separator, suffix = context.formatter.format(1)
+  nose.tools.assert_equal(prefix, "1")
+  nose.tools.assert_equal(separator, "")
+  nose.tools.assert_equal(suffix, "")
 
 @given(u'an instance of toyplot.format.FloatFormatter')
 def step_impl(context):
@@ -31,24 +29,15 @@ def step_impl(context):
 @then(u'formatting floats with the toyplot.format.FloatFormatter should produce valid output')
 def step_impl(context):
   column = numpy.arange(4) + 0.1
-  prefixes, separators, suffixes = context.formatter.format(column)
-  numpy.testing.assert_array_equal(prefixes, ["0", "1", "2", "3"])
-  numpy.testing.assert_array_equal(separators, ["."] * 4)
-  numpy.testing.assert_array_equal(suffixes, ["1"] * 4)
-
-@then(u'formatting mixed floats and integers with the toyplot.format.FloatFormatter should produce valid output')
-def step_impl(context):
-  column = numpy.array([0.1, 1.1, 2, 3.1])
-  prefixes, separators, suffixes = context.formatter.format(column)
-  numpy.testing.assert_array_equal(prefixes, ["0", "1", "2", "3"])
-  numpy.testing.assert_array_equal(separators, [".", ".", "", "."])
-  numpy.testing.assert_array_equal(suffixes, ["1", "1", "", "1"])
+  prefix, separator, suffix = context.formatter.format(4.1)
+  nose.tools.assert_equal(prefix, "4")
+  nose.tools.assert_equal(separator, ".")
+  nose.tools.assert_equal(suffix, "1")
 
 @then(u'formatting integers with the toyplot.format.FloatFormatter should produce valid output')
 def step_impl(context):
-  column = numpy.arange(4)
-  prefixes, separators, suffixes = context.formatter.format(column)
-  numpy.testing.assert_array_equal(prefixes, ["0", "1", "2", "3"])
-  numpy.testing.assert_array_equal(separators, [""] * 4)
-  numpy.testing.assert_array_equal(suffixes, [""] * 4)
+  prefix, separator, suffix = context.formatter.format(1)
+  nose.tools.assert_equal(prefix, "1")
+  nose.tools.assert_equal(separator, "")
+  nose.tools.assert_equal(suffix, "")
 

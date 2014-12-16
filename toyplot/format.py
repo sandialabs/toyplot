@@ -38,7 +38,7 @@ class FloatFormatter(Formatter):
     try:
       formatted = self._format.format(value).split(".")
       if len(formatted) == 1:
-        return formatted, "", ""
+        return formatted[0], "", ""
       return formatted[0], ".", formatted[1]
     except:
       return str(value), "", ""

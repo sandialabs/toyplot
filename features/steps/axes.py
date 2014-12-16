@@ -403,18 +403,18 @@ def step_impl(context):
 
 @then(u'the table can be rendered with column offsets')
 def step_impl(context):
-  context.axes.column("foo").offset = -50
-  context.axes.column("baz").offset = 50
+  context.axes.column(0).column_offset = -50
+  context.axes.column(2).column_offset = 50
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-column-offsets")
 
 @then(u'the table can be rendered with custom header content')
 def step_impl(context):
-  context.axes.column(1).header.content = "My Column"
+  context.axes.header().cell(0, 1).data = "My Column"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-header-content")
 
 @then(u'the table can be rendered with custom cell content')
 def step_impl(context):
-  context.axes.cell(1, 1).content = "My Cell"
+  context.axes.cell(1, 1).data = "My Cell"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-cell-content")
 
 @then(u'the table can be rendered with embedded plots')
@@ -428,23 +428,23 @@ def step_impl(context):
 
 @then(u'the table can be rendered with custom column widths')
 def step_impl(context):
-  context.axes.column("foo").width = 50
-  context.axes.column("baz").width = 250
+  context.axes.column(0).width = 50
+  context.axes.column(2).width = 250
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-custom-column-widths")
 
 @then(u'the table can be rendered with left justification')
 def step_impl(context):
-  context.axes.column("foo").justify = "left"
+  context.axes.column(0).align = "left"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-left-justification")
 
 @then(u'the table can be rendered with center justification')
 def step_impl(context):
-  context.axes.column("baz").justify = "center"
+  context.axes.column(2).align = "center"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-center-justification")
 
 @then(u'the table can be rendered with right justification')
 def step_impl(context):
-  context.axes.column("baz").justify = "right"
+  context.axes.column(2).align = "right"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-right-justification")
 
 @then(u'the table can be rendered with a title')

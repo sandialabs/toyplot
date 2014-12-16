@@ -1403,6 +1403,16 @@ class Table(object):
       return Table.CellReference(self._table, self._region, numpy.array(merged_cell))
 
   class Grid(object):
+    class ArrayReference(object):
+      def __init__(self, storage, sync):
+        self._storage = storage
+        self._sync = sync
+
+      def __setitem__(self, *arguments):
+        self._storage[arguments[0]] = arguments[1]
+        for source, target in self._sync:
+          target[...] = source
+
     def __init__(self, rows, columns):
       self._hlines = numpy.empty((rows + 1, columns + 0), dtype=object)
       self._vlines = numpy.empty((rows + 0, columns + 1), dtype=object)
@@ -1410,12 +1420,13 @@ class Table(object):
       self._vmask = numpy.zeros((rows + 0, columns + 1), dtype=bool)
       self._separation = 2
       self._style = {"stroke":toyplot.color.near_black, "stroke-width":0.5}
+      self._sync = []
     @property
     def hlines(self):
-      return self._hlines
+      return Table.Grid.ArrayReference(self._hlines, self._sync)
     @property
     def vlines(self):
-      return self._vlines
+      return Table.Grid.ArrayReference(self._vlines, self._sync)
     @property
     def separation(self):
       return self._separation
@@ -1525,7 +1536,15 @@ class Table(object):
       if rows is None:
         rows = 1
       self._header = Table.Region(self, rows=rows, columns=self._body._cells.shape[1], align="center", style={"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle", "font-weight":"bold"})
+
+      # Configure synchronization between the header and body grid.
+      self._header._grid._sync.append((self._header._grid._hlines[-1], self._body._grid._hlines[0]))
+      self._body._grid._sync.append((self._body._grid._hlines[0], self._header._grid._hlines[-1]))
+      self._body._grid._hmask[0,...] = True
+
+      # Enable a single horizontal line between header and body.
       self._header.grid.hlines[-1,...] = "single"
+
     return self._header
 
   def _finalize(self):

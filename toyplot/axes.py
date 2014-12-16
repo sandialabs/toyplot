@@ -1327,7 +1327,7 @@ class Table(object):
 
     def merge(self):
       source = self._cells.flat[0]
-      merged_cell = Table.Cell()
+      merged_cell = Table.Cell(align=source._align, style=source._style)
       merged_cell._parents = self._cells
 
       rows = numpy.unique([cell._row for cell in self._cells.flat])

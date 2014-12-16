@@ -827,16 +827,16 @@ def _render(canvas, axes, context):
 
       y = row_center + cell._row_offset
 
-      if cell._justify == "left":
+      if cell._align == "left":
         x = column_left + cell._column_offset
         xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell._style, {"text-anchor":"begin"}))).text = prefix + separator + suffix
-      elif cell._justify == "center":
+      elif cell._align == "center":
         x = column_center + cell._column_offset
         xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell._style, {"text-anchor":"middle"}))).text = prefix + separator + suffix
-      elif cell._justify == "right":
+      elif cell._align == "right":
         x = column_right + cell._column_offset
         xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(toyplot.style.combine(cell._style, {"text-anchor":"end"}))).text = prefix + separator + suffix
-      elif cell._justify is "separator":
+      elif cell._align is "separator":
         x = column_center + cell._column_offset
 
         xml.SubElement(axes_xml, "text", x=repr(x - 2), y=repr(y), style=_css_style(toyplot.style.combine(cell._style, {"text-anchor":"end"}))).text = prefix
@@ -844,8 +844,8 @@ def _render(canvas, axes, context):
         xml.SubElement(axes_xml, "text", x=repr(x + 2), y=repr(y), style=_css_style(toyplot.style.combine(cell._style, {"text-anchor":"begin"}))).text = suffix
 
     # Render grid lines.
-    x_boundaries = region._x_boundaries
-    y_boundaries = region._y_boundaries
+    column_boundaries = region._column_boundaries
+    row_boundaries = region._row_boundaries
     separation = region.grid.separation / 2
 
     def contiguous(a):
@@ -861,25 +861,27 @@ def _render(canvas, axes, context):
     hlines = numpy.copy(region._grid._hlines)
     hlines[region._grid._hmask] = False
     for row_index, row in enumerate(hlines):
-      y = y_boundaries[row_index]
+      y = row_boundaries[row_index]
       for start, end, line_type in contiguous(row):
         if line_type == "single":
-          xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y), x2=repr(x_boundaries[end]), y2=repr(y), style=_css_style(region._grid._style))
+          xml.SubElement(axes_xml, "line", x1=repr(column_boundaries[start]), y1=repr(y), x2=repr(column_boundaries[end]), y2=repr(y), style=_css_style(region._grid._style))
         elif line_type == "double":
-          xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y - separation), x2=repr(x_boundaries[end]), y2=repr(y - separation), style=_css_style(region._grid._style))
-          xml.SubElement(axes_xml, "line", x1=repr(x_boundaries[start]), y1=repr(y + separation), x2=repr(x_boundaries[end]), y2=repr(y + separation), style=_css_style(region._grid._style))
+          xml.SubElement(axes_xml, "line", x1=repr(column_boundaries[start]), y1=repr(y - separation), x2=repr(column_boundaries[end]), y2=repr(y - separation), style=_css_style(region._grid._style))
+          xml.SubElement(axes_xml, "line", x1=repr(column_boundaries[start]), y1=repr(y + separation), x2=repr(column_boundaries[end]), y2=repr(y + separation), style=_css_style(region._grid._style))
 
     vlines = numpy.copy(region._grid._vlines)
     vlines[region._grid._vmask] = False
     for column_index, column in enumerate(vlines.T):
-      x = x_boundaries[column_index]
+      x = column_boundaries[column_index]
       for start, end, line_type in contiguous(column):
         if line_type == "single":
-          xml.SubElement(axes_xml, "line", x1=repr(x), y1=repr(y_boundaries[start]), x2=repr(x), y2=repr(y_boundaries[end]), style=_css_style(region._grid._style))
+          xml.SubElement(axes_xml, "line", x1=repr(x), y1=repr(row_boundaries[start]), x2=repr(x), y2=repr(row_boundaries[end]), style=_css_style(region._grid._style))
         elif line_type == "double":
-          xml.SubElement(axes_xml, "line", x1=repr(x - separation), y1=repr(y_boundaries[start]), x2=repr(x - separation), y2=repr(y_boundaries[end]), style=_css_style(region._grid._style))
-          xml.SubElement(axes_xml, "line", x1=repr(x + separation), y1=repr(y_boundaries[start]), x2=repr(x + separation), y2=repr(y_boundaries[end]), style=_css_style(region._grid._style))
+          xml.SubElement(axes_xml, "line", x1=repr(x - separation), y1=repr(row_boundaries[start]), x2=repr(x - separation), y2=repr(row_boundaries[end]), style=_css_style(region._grid._style))
+          xml.SubElement(axes_xml, "line", x1=repr(x + separation), y1=repr(row_boundaries[start]), x2=repr(x + separation), y2=repr(row_boundaries[end]), style=_css_style(region._grid._style))
 
+  if axes._header:
+    render_region(axes_xml, axes._header)
   render_region(axes_xml, axes._body)
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.BarBoundaries, _RenderContext)

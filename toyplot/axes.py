@@ -1239,12 +1239,12 @@ class Table(object):
       self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
   class Cell(object):
-    def __init__(self, row=None, column=None):
+    def __init__(self, row=None, column=None, align=None, style=None):
       self._row = row
       self._column = column
       self._format = Table.Cell.default_format
-      self._justify = Table.Cell.default_justify
-      self._style = Table.Cell.default_style
+      self._align = align
+      self._style = style
       self._data = None
       self._width = None
       self._height = None
@@ -1256,8 +1256,6 @@ class Table(object):
       self._row_offset = 0
       self._parents = None
     default_format = toyplot.format.DefaultFormatter()
-    default_justify = "left"
-    default_style = {"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle"}
 
   class CellReference(object):
     def __init__(self, table, region, cells):
@@ -1284,10 +1282,10 @@ class Table(object):
         cell._format = value
     format = property(fset=_set_format)
 
-    def _set_justify(self, value):
+    def _set_align(self, value):
       for cell in self._cells.flat:
-        cell._justify = value
-    justify = property(fset=_set_justify)
+        cell._align = value
+    align = property(fset=_set_align)
 
     def _set_style(self, value):
       value = toyplot.require.style(value)
@@ -1373,25 +1371,36 @@ class Table(object):
       self._style = toyplot.style.combine(self._style, toyplot.require.style(value))
 
   class Region(object):
-    def __init__(self, table, rows, columns):
+    def __init__(self, table, rows, columns, align, style):
       self._table = table
       self._grid = Table.Grid(rows, columns)
       self._cells = numpy.empty((rows, columns), dtype="object")
       for row in range(rows):
         for column in range(columns):
-          self._cells[row,column] = Table.Cell(row, column)
+          self._cells[row,column] = Table.Cell(row, column, align, style)
       self._visible_cells = set(numpy.ravel(self._cells))
 
-    def _finalize(self, column_start, column_widths, row_start, row_heights):
-      self._x_boundaries = column_start + numpy.concatenate(([0], numpy.cumsum(column_widths)))
-      self._y_boundaries = row_start + numpy.concatenate(([0], numpy.cumsum(row_heights)))
+    def _column_widths(self):
+      column_widths = numpy.zeros(self._cells.shape[1])
+      for cell in self._cells.flat:
+        if cell._width is not None:
+          column_widths[cell._column] = max(column_widths[cell._column], cell._width)
+      return column_widths
 
+    def _row_heights(self):
+      row_heights = numpy.zeros(self._cells.shape[0])
+      for cell in self._cells.flat:
+        if cell._height is not None:
+          row_heights[cell._row] = max(row_heights[cell._row], cell._height)
+      return row_heights
+
+    def _finalize(self, column_boundaries, row_boundaries):
       # Assign coordinates to grid cells.
       for cell in self._cells.flat:
-        cell._left = self._x_boundaries[cell._column]
-        cell._right = self._x_boundaries[cell._column + 1]
-        cell._top = self._y_boundaries[cell._row]
-        cell._bottom = self._y_boundaries[cell._row + 1]
+        cell._left = column_boundaries[cell._column]
+        cell._right = column_boundaries[cell._column + 1]
+        cell._top = row_boundaries[cell._row]
+        cell._bottom = row_boundaries[cell._row + 1]
 
       # Assign coordinates to merged cells.
       for cell in self._visible_cells:
@@ -1400,6 +1409,10 @@ class Table(object):
           cell._right = numpy.max([parent._right for parent in cell._parents.flat])
           cell._top = numpy.min([parent._top for parent in cell._parents.flat])
           cell._bottom = numpy.max([parent._bottom for parent in cell._parents.flat])
+
+      # Store boundaries for use by grid lines.
+      self._column_boundaries = column_boundaries
+      self._row_boundaries = row_boundaries
 
     @property
     def grid(self):
@@ -1425,7 +1438,7 @@ class Table(object):
     self._title = Table.Title(title, style={"font-size":"14px", "baseline-shift":"100%"})
 
     self._header = None
-    self._body = Table.Region(self, rows, columns)
+    self._body = Table.Region(self, rows=rows, columns=columns, align="left", style={"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle"})
 
     self._finalized = False
 
@@ -1452,7 +1465,7 @@ class Table(object):
     if self._header is None:
       if rows is None:
         rows = 1
-      self._header = Table.Region(self, rows, self._body._cells.shape[1])
+      self._header = Table.Region(self, rows=rows, columns=self._body._cells.shape[1], align="center", style={"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle", "font-weight":"bold"})
     return self._header
 
   def _finalize(self):
@@ -1460,15 +1473,12 @@ class Table(object):
       self._finalized = True
 
       # Collect all explicit column widths and row heights for every region.
-      column_widths = numpy.zeros(self._body._cells.shape[1])
-      for cell in self._body._cells.flat:
-        if cell._width is not None:
-          column_widths[cell._column] = max(column_widths[cell._column], cell._width)
+      column_widths = self._body._column_widths()
+      row_heights = self._body._row_heights()
 
-      row_heights = numpy.zeros(self._body._cells.shape[0])
-      for cell in self._body._cells.flat:
-        if cell._height is not None:
-          row_heights[cell._row] = max(row_heights[cell._row], cell._height)
+      if self._header is not None:
+        column_widths = numpy.max((self._header._column_widths(), column_widths), axis=0)
+        row_heights = numpy.concatenate((self._header._row_heights(), row_heights))
 
       # Compute implicit column widths and row heights for the remaining cells.
       table_width = self._xmax_range - self._xmin_range
@@ -1482,5 +1492,12 @@ class Table(object):
       row_heights[row_heights == 0] = default_height
 
       # Assign boundaries (cumulative sums of widths and heights) to each region.
-      self._body._finalize(self._xmin_range, column_widths, self._ymin_range, row_heights)
+      column_boundaries = numpy.cumsum(numpy.concatenate(([self._xmin_range], column_widths)))
+      row_boundaries = numpy.cumsum(numpy.concatenate(([self._ymin_range], row_heights)))
+
+      if self._header is not None:
+        self._header._finalize(column_boundaries, row_boundaries[0 : self._header._cells.shape[0] + 1])
+        self._body._finalize(column_boundaries, row_boundaries[self._header._cells.shape[0] : ])
+      else:
+        self._body._finalize(column_boundaries, row_boundaries)
 

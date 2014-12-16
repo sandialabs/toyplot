@@ -299,14 +299,18 @@ class Canvas(object):
 
     if data is not None:
       for index, (key, column) in enumerate(data.items()):
+        table.header().cell(0, index).data = key
         table.column(index).data = column
         if issubclass(column._data.dtype.type, numpy.floating):
           table.column(index).format = toyplot.format.FloatFormatter()
-          table.column(index).justify = "separator"
+          table.column(index).align = "separator"
+          table.header().cell(0, index).align = "center"
         elif issubclass(column._data.dtype.type, numpy.character):
-          table.column(index).justify = "left"
+          table.column(index).align = "left"
+          table.header().cell(0, index).align = "left"
         elif issubclass(column._data.dtype.type, numpy.integer):
-          table.column(index).justify = "right"
+          table.column(index).align = "right"
+          table.header().cell(0, index).align = "right"
 
     self._children.append(table)
     return table

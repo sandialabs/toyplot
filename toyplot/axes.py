@@ -1525,6 +1525,7 @@ class Table(object):
       if rows is None:
         rows = 1
       self._header = Table.Region(self, rows=rows, columns=self._body._cells.shape[1], align="center", style={"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle", "font-weight":"bold"})
+      self._header.grid.hlines[-1,...] = "single"
     return self._header
 
   def _finalize(self):

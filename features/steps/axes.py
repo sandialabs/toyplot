@@ -329,7 +329,7 @@ def step_impl(context):
 
 @then(u'the table can be rendered with header styles')
 def step_impl(context):
-  context.axes.column(1).header.style = {"fill":"red"}
+  context.axes.header.column(1).style = {"fill":"red"}
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-header-style")
 
 @then(u'the table can be rendered with column styles')
@@ -390,13 +390,13 @@ def step_impl(context):
 
 @then(u'the table can be rendered with doubled lines')
 def step_impl(context):
-  context.axes.grid.hlines[0,...] = "double"
+  context.axes.grid.hlines[1,...] = "double"
   context.axes.grid.vlines[...,1] = "double"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-doubled-lines")
 
 @then(u'the table can be rendered with custom doubled line separation')
 def step_impl(context):
-  context.axes.grid.hlines[0,...] = "double"
+  context.axes.grid.hlines[1,...] = "double"
   context.axes.grid.vlines[...,1] = "double"
   context.axes.grid.separation = 4
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-doubled-line-separation")
@@ -409,7 +409,7 @@ def step_impl(context):
 
 @then(u'the table can be rendered with custom header content')
 def step_impl(context):
-  context.axes.header().cell(0, 1).data = "My Column"
+  context.axes.header.cell(0, 1).data = "My Column"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-header-content")
 
 @then(u'the table can be rendered with custom cell content')
@@ -420,10 +420,10 @@ def step_impl(context):
 @then(u'the table can be rendered with embedded plots')
 def step_impl(context):
   numpy.random.seed(1234)
-  context.axes.cell(0, 3).axes().plot(numpy.sin(numpy.linspace(0, 10)))
-  context.axes.cell(1, 3).axes().bars(numpy.random.uniform(0.1, 1, size=10))
-  context.axes.cell(2, 3).axes().bars(numpy.random.choice([-1, 1], size=30), fill=numpy.random.choice(["red", "blue"], size=30))
-  context.axes.cell(3, 3, rowspan=2).axes().fill(3 + numpy.cos(numpy.linspace(0, 5)) + numpy.sin(numpy.linspace(0, 20)))
+  context.axes.body.cell(0, 3).axes().plot(numpy.sin(numpy.linspace(0, 10)))
+  context.axes.body.cell(1, 3).axes().bars(numpy.random.uniform(0.1, 1, size=10))
+  context.axes.body.cell(2, 3).axes().bars(numpy.random.choice([-1, 1], size=30), fill=numpy.random.choice(["red", "blue"], size=30))
+  context.axes.body.cell(3, 3, rowspan=2).axes().fill(3 + numpy.cos(numpy.linspace(0, 5)) + numpy.sin(numpy.linspace(0, 20)))
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-embedded-plots")
 
 @then(u'the table can be rendered with custom column widths')
@@ -452,10 +452,10 @@ def step_impl(context):
   context.axes.title.text = "Quarterly Report"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-title")
 
-@then(u'the table can be rendered without a header')
+@then(u'an instance of toyplot.axes.Table can be rendered without a header')
 def step_impl(context):
-  context.axes.header.show = False
-  context.axes.grid.hlines[1, ...] = False
+  context.canvas = toyplot.Canvas()
+  context.axes = context.canvas.table(context.data, hrows=0)
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-without-header")
 
 @given(u'values from -1000 to -1')

@@ -295,24 +295,26 @@ class Canvas(object):
       data = None
       rows = a
       columns = b
+    if hrows is None:
+      hrows = 0
 
     xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
     table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, rows=rows, columns=columns, title=title, hrows=hrows, parent=self)
 
     if data is not None:
       for index, (key, column) in enumerate(data.items()):
-        table.header.cell(0, index).data = key
-        table.column(index).data = column
+        if hrows:
+          table.header.cell(0, index).data = key
+        table.body.column(index).data = column
         if issubclass(column._data.dtype.type, numpy.floating):
-          table.column(index).format = toyplot.format.FloatFormatter()
-          table.column(index).align = "separator"
-          table.header.cell(0, index).align = "center"
+          if hrows:
+            table.header.cell(0, index).align = "center"
+          table.body.column(index).format = toyplot.format.FloatFormatter()
+          table.body.column(index).align = "separator"
         elif issubclass(column._data.dtype.type, numpy.character):
           table.column(index).align = "left"
-          table.header.cell(0, index).align = "left"
         elif issubclass(column._data.dtype.type, numpy.integer):
           table.column(index).align = "right"
-          table.header.cell(0, index).align = "right"
 
     self._children.append(table)
     return table

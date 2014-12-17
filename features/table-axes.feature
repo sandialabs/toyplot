@@ -29,5 +29,7 @@ Feature: Table axes
       | with center justification              |
       | with right justification               |
       | with a title                           |
-      | without a header                       |
 
+  Scenario: Table without header
+    Given a sample toyplot.data.Table
+    Then an instance of toyplot.axes.Table can be rendered without a header

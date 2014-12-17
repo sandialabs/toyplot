@@ -390,13 +390,13 @@ def step_impl(context):
 
 @then(u'the table can be rendered with doubled lines')
 def step_impl(context):
-  context.axes.grid.hlines[1,...] = "double"
+  context.axes.grid.hlines[0,...] = "double"
   context.axes.grid.vlines[...,1] = "double"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-doubled-lines")
 
 @then(u'the table can be rendered with custom doubled line separation')
 def step_impl(context):
-  context.axes.grid.hlines[1,...] = "double"
+  context.axes.grid.hlines[0,...] = "double"
   context.axes.grid.vlines[...,1] = "double"
   context.axes.grid.separation = 4
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-doubled-line-separation")

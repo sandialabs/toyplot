@@ -1497,7 +1497,7 @@ class Table(object):
     def cell(self, row, column, rowspan=1, colspan=1):
       return Table.CellReference(self._table, self, self._cells[row : row + rowspan, column : column + colspan])
 
-  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, rows, columns, title, headershow, parent):
+  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, rows, columns, title, hrows, parent):
     self._xmin_range = xmin_range
     self._xmax_range = xmax_range
     self._ymin_range = ymin_range
@@ -1511,6 +1511,17 @@ class Table(object):
     self._body = Table.Region(self, rows=rows, columns=columns, align="left", style={"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle"})
 
     self._finalized = False
+
+    if hrows is not None:
+      self._header = Table.Region(self, rows=hrows, columns=self._body._cells.shape[1], align="center", style={"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle", "font-weight":"bold"})
+
+      # Configure synchronization between the header and body grid.
+      self._header._grid._sync.append((self._header._grid._hlines[-1], self._body._grid._hlines[0]))
+      self._body._grid._sync.append((self._body._grid._hlines[0], self._header._grid._hlines[-1]))
+      self._body._grid._hmask[0,...] = True
+
+      # Enable a single horizontal line between header and body.
+      self._header.grid.hlines[-1,...] = "single"
 
   @property
   def title(self):
@@ -1529,22 +1540,8 @@ class Table(object):
   def cell(self, row, column, rowspan=1, colspan=1):
     return self._body.cell(row, column, rowspan, colspan)
 
-  def header(self, rows=None):
-    if self._header is not None and rows is not None:
-      raise Exception("Cannot change existing header shape.")
-    if self._header is None:
-      if rows is None:
-        rows = 1
-      self._header = Table.Region(self, rows=rows, columns=self._body._cells.shape[1], align="center", style={"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle", "font-weight":"bold"})
-
-      # Configure synchronization between the header and body grid.
-      self._header._grid._sync.append((self._header._grid._hlines[-1], self._body._grid._hlines[0]))
-      self._body._grid._sync.append((self._body._grid._hlines[0], self._header._grid._hlines[-1]))
-      self._body._grid._hmask[0,...] = True
-
-      # Enable a single horizontal line between header and body.
-      self._header.grid.hlines[-1,...] = "single"
-
+  @property
+  def header(self):
     return self._header
 
   def _finalize(self):

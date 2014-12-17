@@ -272,7 +272,7 @@ class Canvas(object):
     self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style))
     return self._children[-1]
 
-  def table(self, a=None, b=None, bounds=None, rect=None, corner=None, grid=None, gutter=50, title=None, headershow=True):
+  def table(self, a=None, b=None, bounds=None, rect=None, corner=None, grid=None, gutter=50, title=None, hrows=None):
     """Add a set of table axes to the canvas.
 
     Parameters
@@ -289,28 +289,30 @@ class Canvas(object):
     elif b is None:
       data = toyplot.data.Table(a)
       rows, columns = data.shape
+      if hrows is None:
+        hrows = 1
     else:
       data = None
       rows = a
       columns = b
 
     xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-    table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, rows=rows, columns=columns, title=title, headershow=headershow, parent=self)
+    table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, rows=rows, columns=columns, title=title, hrows=hrows, parent=self)
 
     if data is not None:
       for index, (key, column) in enumerate(data.items()):
-        table.header().cell(0, index).data = key
+        table.header.cell(0, index).data = key
         table.column(index).data = column
         if issubclass(column._data.dtype.type, numpy.floating):
           table.column(index).format = toyplot.format.FloatFormatter()
           table.column(index).align = "separator"
-          table.header().cell(0, index).align = "center"
+          table.header.cell(0, index).align = "center"
         elif issubclass(column._data.dtype.type, numpy.character):
           table.column(index).align = "left"
-          table.header().cell(0, index).align = "left"
+          table.header.cell(0, index).align = "left"
         elif issubclass(column._data.dtype.type, numpy.integer):
           table.column(index).align = "right"
-          table.header().cell(0, index).align = "right"
+          table.header.cell(0, index).align = "right"
 
     self._children.append(table)
     return table

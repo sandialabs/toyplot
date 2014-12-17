@@ -272,7 +272,7 @@ class Canvas(object):
     self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style))
     return self._children[-1]
 
-  def table(self, a=None, b=None, bounds=None, rect=None, corner=None, grid=None, gutter=50, title=None, hrows=None):
+  def table(self, data=None, rows=None, columns=None, hrows=None, title=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
     """Add a set of table axes to the canvas.
 
     Parameters
@@ -282,19 +282,13 @@ class Canvas(object):
     -------
     axes: :class:`toyplot.axes.Table`
     """
-    if a is None and b is None:
-      data = None
-      rows = 10
-      columns = 4
-    elif b is None:
-      data = toyplot.data.Table(a)
+    if data is not None:
+      data = toyplot.data.Table(data)
       rows, columns = data.shape
       if hrows is None:
         hrows = 1
-    else:
-      data = None
-      rows = a
-      columns = b
+    if rows is None or columns is None:
+      raise ValueError("You must specify data, or rows and columns.")
     if hrows is None:
       hrows = 0
 

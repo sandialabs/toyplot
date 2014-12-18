@@ -872,9 +872,9 @@ def _render(canvas, axes, context):
   for column_index, column in enumerate(vlines.T):
     x = column_boundaries[column_index]
     for start, end, line_type in contiguous(column):
-      if line_type == "single":
+      if line_type == "single" or line_type == 1 or line_type == True:
         xml.SubElement(axes_xml, "line", x1=repr(x), y1=repr(row_boundaries[start]), x2=repr(x), y2=repr(row_boundaries[end]), style=_css_style(axes._gstyle))
-      elif line_type == "double":
+      elif line_type == "double" or line_type == 2:
         xml.SubElement(axes_xml, "line", x1=repr(x - separation), y1=repr(row_boundaries[start]), x2=repr(x - separation), y2=repr(row_boundaries[end]), style=_css_style(axes._gstyle))
         xml.SubElement(axes_xml, "line", x1=repr(x + separation), y1=repr(row_boundaries[start]), x2=repr(x + separation), y2=repr(row_boundaries[end]), style=_css_style(axes._gstyle))
 

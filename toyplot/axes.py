@@ -1401,17 +1401,6 @@ class Table(object):
       self._table._visible_cells.add(merged_cell)
       return Table.CellReference(self._table, numpy.array(merged_cell))
 
-  class GapReference(object):
-    def __init__(self, hgaps, vgaps):
-      self._hgaps = hgaps
-      self._vgaps = vgaps
-    @property
-    def hgaps(self):
-      return self._hgaps
-    @property
-    def vgaps(self):
-      return self._vgaps
-
   class GridReference(object):
     def __init__(self, table, hlines, vlines):
       self._table = table
@@ -1446,8 +1435,12 @@ class Table(object):
       self._vgaps = vgaps
 
     @property
-    def gaps(self):
-      return Table.GapReference(self._hgaps, self._vgaps)
+    def hgaps(self):
+      return self._hgaps
+
+    @property
+    def vgaps(self):
+      return self._vgaps
 
     @property
     def grid(self):
@@ -1532,8 +1525,12 @@ class Table(object):
       )
 
   @property
-  def gaps(self):
-    return Table.GapReference(self._hgaps, self._vgaps)
+  def hgaps(self):
+    return self._hgaps
+
+  @property
+  def vgaps(self):
+    return self._vgaps
 
   @property
   def grid(self):

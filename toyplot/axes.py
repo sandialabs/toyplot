@@ -1402,15 +1402,15 @@ class Table(object):
       return Table.CellReference(self._table, numpy.array(merged_cell))
 
   class GapReference(object):
-    def __init__(self, hgaps, vgaps):
-      self._hgaps = hgaps
-      self._vgaps = vgaps
+    def __init__(self, rgaps, cgaps):
+      self._rgaps = rgaps
+      self._cgaps = cgaps
     @property
-    def hgaps(self):
-      return self._hgaps
+    def rows(self):
+      return self._rgaps
     @property
-    def vgaps(self):
-      return self._vgaps
+    def columns(self):
+      return self._cgaps
 
   class GridReference(object):
     def __init__(self, table, hlines, vlines):
@@ -1437,17 +1437,17 @@ class Table(object):
       self._table._gstyle = toyplot.style.combine(self._table._gstyle, toyplot.require.style(value))
 
   class Region(object):
-    def __init__(self, table, cells, hlines, vlines, hgaps, vgaps):
+    def __init__(self, table, cells, hlines, vlines, rgaps, cgaps):
       self._table = table
       self._cells = cells
       self._hlines = hlines
       self._vlines = vlines
-      self._hgaps = hgaps
-      self._vgaps = vgaps
+      self._rgaps = rgaps
+      self._cgaps = cgaps
 
     @property
     def gaps(self):
-      return Table.GapReference(self._hgaps, self._vgaps)
+      return Table.GapReference(self._rgaps, self._cgaps)
 
     @property
     def grid(self):
@@ -1482,8 +1482,8 @@ class Table(object):
     self._separation = 2
     self._gstyle = {"stroke":toyplot.color.near_black, "stroke-width":0.5}
 
-    self._hgaps = numpy.zeros(hrows + rows + 1)
-    self._vgaps = numpy.zeros(columns + 1)
+    self._rgaps = numpy.zeros(hrows + rows + 1)
+    self._cgaps = numpy.zeros(columns + 1)
 
     hstyle={"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle", "font-weight":"bold"}
     style={"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle"}
@@ -1516,8 +1516,8 @@ class Table(object):
       self._cells[0 : self._hrows],
       self._hlines[0 : self._hrows + 1],
       self._vlines[0 : self._hrows + 1],
-      self._hgaps[0 : self._hrows + 1],
-      self._vgaps[...],
+      self._rgaps[0 : self._hrows + 1],
+      self._cgaps[...],
       )
 
   @property
@@ -1527,13 +1527,13 @@ class Table(object):
       self._cells[self._hrows : ],
       self._hlines[self._hrows : ],
       self._vlines[self._hrows : ],
-      self._hgaps[self._hrows : ],
-      self._vgaps[...],
+      self._rgaps[self._hrows : ],
+      self._cgaps[...],
       )
 
   @property
   def gaps(self):
-    return Table.GapReference(self._hgaps, self._vgaps)
+    return Table.GapReference(self._rgaps, self._cgaps)
 
   @property
   def grid(self):
@@ -1566,25 +1566,25 @@ class Table(object):
 
     # Compute implicit column widths and row heights for the remaining cells.
     table_width = self._xmax_range - self._xmin_range
-    available_width = table_width - numpy.sum(column_widths) - numpy.sum(self._vgaps)
+    available_width = table_width - numpy.sum(column_widths) - numpy.sum(self._cgaps)
     default_width = available_width / numpy.count_nonzero(column_widths == 0)
     column_widths[column_widths == 0] = default_width
 
     table_height = self._ymax_range - self._ymin_range
-    available_height = table_height - numpy.sum(row_heights) - numpy.sum(self._hgaps)
+    available_height = table_height - numpy.sum(row_heights) - numpy.sum(self._rgaps)
     default_height = available_height / numpy.count_nonzero(row_heights == 0)
     row_heights[row_heights == 0] = default_height
 
     # Compute cell-gap boundaries (cumulative sums of gaps and cells).
-    gap_cell_widths = numpy.empty(2 * len(self._vgaps))
+    gap_cell_widths = numpy.empty(2 * len(self._cgaps))
     gap_cell_widths[0] = self._xmin_range
-    gap_cell_widths[1::2] = self._vgaps
+    gap_cell_widths[1::2] = self._cgaps
     gap_cell_widths[2::2] = column_widths
     gap_cell_column_boundaries = numpy.cumsum(gap_cell_widths)
 
-    gap_cell_heights = numpy.empty(2 * len(self._hgaps))
+    gap_cell_heights = numpy.empty(2 * len(self._rgaps))
     gap_cell_heights[0] = self._ymin_range
-    gap_cell_heights[1::2] = self._hgaps
+    gap_cell_heights[1::2] = self._rgaps
     gap_cell_heights[2::2] = row_heights
     gap_cell_row_boundaries = numpy.cumsum(gap_cell_heights)
 

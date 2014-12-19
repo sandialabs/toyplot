@@ -1304,6 +1304,7 @@ class Table(object):
       self._format = Table.Cell.default_format
       self._align = align
       self._style = style
+      self._bstyle = None
       self._data = None
       self._width = None
       self._height = None
@@ -1350,6 +1351,12 @@ class Table(object):
       for cell in self._cells.flat:
         cell._style = toyplot.style.combine(cell._style, value)
     style = property(fset=_set_style)
+
+    def _set_bstyle(self, value):
+      value = toyplot.require.style(value)
+      for cell in self._cells.flat:
+        cell._bstyle = toyplot.style.combine(cell._bstyle, value)
+    bstyle = property(fset=_set_bstyle)
 
     def _set_width(self, value):
       for cell in self._cells.flat:

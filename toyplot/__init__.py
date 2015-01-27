@@ -4,7 +4,7 @@
 
 from __future__ import division
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 from toyplot.canvas import Canvas
 

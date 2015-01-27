@@ -50,11 +50,11 @@ def _signed_log(x, base):
 
 def _symmetric_log(x, base, threshold=1):
   if isinstance(x, numpy.ndarray):
-    masked = numpy.ma.masked_inside(x, -threshold, threshold, copy=False)
-    return numpy.where(masked.mask, x, numpy.sign(x) * (threshold + (numpy.ma.log10(numpy.abs(masked)) / numpy.log10(base))))
-  if numpy.abs(x) < threshold:
+    x = numpy.ma.array(x, copy=True, dtype="float64")
+    i = numpy.logical_and(~numpy.ma.getmaskarray(x), numpy.logical_or(x.data < -threshold, x.data > threshold))
+    x[i] = numpy.sign(x[i]) * (threshold + numpy.log10(numpy.abs(x[i])) / numpy.log10(base))
     return x
-  return numpy.sign(x) * (threshold + numpy.log10(numpy.abs(x)) / numpy.log10(base))
+  return x if numpy.abs(x) < threshold else numpy.sign(x) * (threshold + numpy.log10(numpy.abs(x)) / numpy.log10(base))
 
 class OrderedSet(collections.MutableSet):
   """Python recipe from http://code.activestate.com/recipes/576694-orderedset
@@ -434,7 +434,7 @@ class Cartesian(object):
       ymin -= 0.5
       ymax += 0.5
 
-    def _get_locator(locator, scale, domain_min, domain_max):
+    def _get_locator(locator, scale):
       if locator is not None:
         return locator
       if scale == "linear":
@@ -446,11 +446,11 @@ class Cartesian(object):
 
     # Calculate tick locations and labels.
     if self.show and self.x.show:
-      xlocator = _get_locator(self.x.ticks._locator, self.x._scale, xmin, xmax)
+      xlocator = _get_locator(self.x.ticks._locator, self.x._scale)
       self._xtick_locations, self._xtick_labels, self._xtick_titles = xlocator.ticks(xmin, xmax)
 
     if self.show and self.y.show:
-      ylocator = _get_locator(self.y.ticks._locator, self.y._scale, ymin, ymax)
+      ylocator = _get_locator(self.y.ticks._locator, self.y._scale)
       self._ytick_locations, self._ytick_labels, self._ytick_titles = ylocator.ticks(ymin, ymax)
 
     # Allow tick locations to grow (never shrink) the domain.

@@ -13,3 +13,4 @@ Contents:
    axes.rst
    markers.rst
    rendering.rst
+   text.rst

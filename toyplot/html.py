@@ -1162,6 +1162,8 @@ def _render(parent, mark, context):
   for dx, dy, dtext, dangle, dfill, dopacity, dtitle in zip(x, y, mark._table[mark._text[0]], mark._table[mark._angle[0]], mark._table[mark._fill[0]], mark._table[mark._opacity[0]], mark._table[mark._title[0]]):
     dstyle = toyplot.style.combine({"fill":toyplot.color.to_css(dfill), "opacity":dopacity}, mark._style)
     datum_xml = xml.SubElement(series_xml, "text", attrib={"class":"toyplot-Datum"}, x=repr(dx), y=repr(dy), transform="rotate(%r, %r, %r)" % (dangle, dx, dy), style=_css_style(dstyle))
+    if "-toyplot-anchor-shift" in dstyle:
+      datum_xml.set("dx", str(dstyle["-toyplot-anchor-shift"]))
     if dtext is not None:
       datum_xml.text = str(dtext)
     if dtitle is not None:

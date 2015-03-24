@@ -26,6 +26,18 @@ def step_impl(context):
   context.axes.scatterplot(0, 0, color="black", size=7);
   toyplot.testing.assert_canvas_equal(context.canvas, "text-anchor-end")
 
+@then(u'text can be aligned with positive anchor shift')
+def step_impl(context):
+  context.axes.text(0, 0, "Text!", style={"font-size":"24px", "text-anchor":"middle", "-toyplot-anchor-shift":"10px"})
+  context.axes.scatterplot(0, 0, color="black", size=7);
+  toyplot.testing.assert_canvas_equal(context.canvas, "text-anchor-shift-positive")
+
+@then(u'text can be aligned with negative anchor shift')
+def step_impl(context):
+  context.axes.text(0, 0, "Text!", style={"font-size":"24px", "text-anchor":"middle", "-toyplot-anchor-shift":"-10px"})
+  context.axes.scatterplot(0, 0, color="black", size=7);
+  toyplot.testing.assert_canvas_equal(context.canvas, "text-anchor-shift-negative")
+
 @then(u'text can be aligned with hanging alignment')
 def step_impl(context):
   context.axes.text(0, 0, "Text!", style={"font-size":"24px", "alignment-baseline":"hanging"})

@@ -9,6 +9,8 @@ Feature: Text alignment
       | with left alignment                                   |
       | with center alignment                                 |
       | with right alignment                                  |
+      | with positive anchor shift                            |
+      | with negative anchor shift                            |
 
     Examples: Vertical Alignment
       | phrase                                                |

@@ -1,3 +1,5 @@
+.. _user-guide:
+
 .. image:: ../artwork/toyplot.png
   :width: 200px
   :align: right
@@ -14,4 +16,5 @@ Contents:
    data-tables.rst
    markers.rst
    rendering.rst
+   table-axes.rst
    text.rst

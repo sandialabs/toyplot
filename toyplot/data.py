@@ -59,6 +59,7 @@ class Table(object):
 
   def _repr_html_(self):
     root_xml = xml.Element("table", style="border-collapse:collapse; border:none; color: %s" % toyplot.color.near_black)
+    root_xml.set("class", "toyplot-data-Table")
     header_xml = xml.SubElement(root_xml, "tr", style="border:none;border-bottom:1px solid %s" % toyplot.color.near_black)
     for name in self._columns.keys():
       xml.SubElement(header_xml, "th", style="text-align:left;border:none;padding-right:1em;").text = toyplot.compatibility.unicode_type(name)
@@ -75,21 +76,65 @@ class Table(object):
 
   @property
   def shape(self):
+    """Return the shape (number of rows and columns) of the table.
+
+    Returns
+    -------
+    shape: (number of rows, number of columns) tuple.
+    """
     return (list(self._columns.values())[0].shape[0] if len(self._columns) else 0, len(self._columns))
 
   def items(self):
+    """Return the table names and columns, in column order.
+
+    Returns
+    -------
+    items: sequence of (name, column) tuples.
+    """
     return self._columns.items()
 
   def keys(self):
+    """Return the table column names, in column order.
+
+    Returns
+    -------
+    keys: sequence of string column names.
+    """
     return self._columns.keys()
 
   def values(self):
+    """Return the table columns, in column order.
+
+    Returns
+    -------
+    values: sequence of numpy.ndarray columns.
+    """
     return self._columns.values()
 
   def columns(self, keys):
+    """Return a subset of the table's columns.
+
+    Parameters
+    ----------
+    keys: sequence of string column names.
+
+    Returns
+    -------
+    table: :class:`toyplot.data.Table` containing the requested columns.
+    """
     return Table(collections.OrderedDict([(key, self._columns[key]) for key in keys]))
 
   def rows(self, index):
+    """Return a subset of the table's rows.
+
+    Parameters
+    ----------
+    index: integer row index, or a slice.
+
+    Returns
+    -------
+    table: :class:`toyplot.data.Table` containing the requested rows.
+    """
     if isinstance(index, numbers.Integral):
       index = slice(index, index + 1)
     return Table(collections.OrderedDict([(key, self._columns[key][index]) for key in self._columns.keys()]))

@@ -298,7 +298,7 @@ class Canvas(object):
     if data is not None:
       for index, (key, column) in enumerate(data.items()):
         if hrows:
-          table.header.cell(0, index).data = key
+          table.header.cell(hrows-1, index).data = key
         table.body.column(index).data = column
         if issubclass(column._data.dtype.type, numpy.floating):
           if hrows:

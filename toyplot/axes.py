@@ -1522,7 +1522,7 @@ class Table(object):
       self,
       self._cells[0 : self._hrows],
       self._hlines[0 : self._hrows + 1],
-      self._vlines[0 : self._hrows + 1],
+      self._vlines[0 : self._hrows],
       self._rgaps[0 : self._hrows + 1],
       self._cgaps[...],
       )

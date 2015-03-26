@@ -284,7 +284,8 @@ class Canvas(object):
     """
     if data is not None:
       data = toyplot.data.Table(data)
-      rows, columns = data.shape
+      rows = data.shape[0] if rows is None else max(rows, data.shape[0])
+      columns = data.shape[1] if columns is None else max(columns, data.shape[1])
       if hrows is None:
         hrows = 1
     if rows is None or columns is None:

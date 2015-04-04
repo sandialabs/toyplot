@@ -719,9 +719,9 @@ def _render(canvas, axes, context):
       if axes.x.spine._show:
         x1 = axes._xmin_range
         x2 = axes._xmax_range
-        if axes._xmin_implicit is not None:
-          x1 = max(x1, axes._project_x(axes._xmin_implicit))
-          x2 = min(x2, axes._project_x(axes._xmax_implicit))
+        if axes._xmin_data_domain_implicit is not None:
+          x1 = max(x1, axes._project_x(axes._xmin_data_domain_implicit))
+          x2 = min(x2, axes._project_x(axes._xmax_data_domain_implicit))
         xml.SubElement(axes_xml, "line", x1=repr(x1), y1=repr(spine_y), x2=repr(x2), y2=repr(spine_y), style=_css_style(axes.x.spine._style))
 
       if axes.x.ticks._show:
@@ -753,9 +753,9 @@ def _render(canvas, axes, context):
       if axes.y.spine._show:
         y1 = axes._ymin_range
         y2 = axes._ymax_range
-        if axes._ymin_implicit is not None:
-          y1 = max(y1, axes._project_y(axes._ymax_implicit))
-          y2 = min(y2, axes._project_y(axes._ymin_implicit))
+        if axes._ymin_data_domain_implicit is not None:
+          y1 = max(y1, axes._project_y(axes._ymax_data_domain_implicit))
+          y2 = min(y2, axes._project_y(axes._ymin_data_domain_implicit))
         xml.SubElement(axes_xml, "line", x1=repr(spine_x), y1=repr(y1), x2=repr(spine_x), y2=repr(y2), style=_css_style(axes.y.spine._style))
 
       if axes.y.ticks._show:

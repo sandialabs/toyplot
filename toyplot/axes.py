@@ -341,10 +341,14 @@ class Cartesian(object):
     self._xmax_range = xmax_range
     self._ymin_range = ymin_range
     self._ymax_range = ymax_range
-    self._xmin_implicit = None
-    self._xmax_implicit = None
-    self._ymin_implicit = None
-    self._ymax_implicit = None
+    self._xmin_data_domain_implicit = None
+    self._xmax_data_domain_implicit = None
+    self._ymin_data_domain_implicit = None
+    self._ymax_data_domain_implicit = None
+    self._xmin_domain_implicit = None
+    self._xmax_domain_implicit = None
+    self._ymin_domain_implicit = None
+    self._ymax_domain_implicit = None
     self._padding = padding
 
     if palette is None:
@@ -358,6 +362,7 @@ class Cartesian(object):
     self._text_colors = itertools.cycle(palette)
 
     self._show = show
+
     self.coordinates = Cartesian.CoordinatesHelper(show=True, xmin_range=xmax_range - 100, xmax_range=xmax_range - 10, ymin_range = ymin_range + 10, ymax_range = ymin_range + 24, style={})
     self.label = Cartesian.LabelHelper(label=label, style={"font-size":"14px", "baseline-shift":"100%"})
     self.x = Cartesian.AxisHelper(show=xshow, label=xlabel, label_style={"baseline-shift":"-200%"}, min=xmin, max=xmax, tick_length=tick_length, tick_locator=xticklocator, tick_angle=0, scale=xscale)
@@ -386,24 +391,32 @@ class Cartesian(object):
   def padding(self, value):
     self._padding = value
 
-  def _update_domain(self, x, y):
+  def _update_domain(self, x, y, data=True):
     x = _flat_non_null(x)
     y = _flat_non_null(y)
 
     if len(x):
-      self._xmin_implicit = _null_min(x.min(), self._xmin_implicit)
-      self._xmax_implicit = _null_max(x.max(), self._xmax_implicit)
+      self._xmin_domain_implicit = _null_min(x.min(), self._xmin_domain_implicit)
+      self._xmax_domain_implicit = _null_max(x.max(), self._xmax_domain_implicit)
 
     if len(y):
-      self._ymin_implicit = _null_min(y.min(), self._ymin_implicit)
-      self._ymax_implicit = _null_max(y.max(), self._ymax_implicit)
+      self._ymin_domain_implicit = _null_min(y.min(), self._ymin_domain_implicit)
+      self._ymax_domain_implicit = _null_max(y.max(), self._ymax_domain_implicit)
+
+    if len(x) and data:
+      self._xmin_data_domain_implicit = _null_min(x.min(), self._xmin_data_domain_implicit)
+      self._xmax_data_domain_implicit = _null_max(x.max(), self._xmax_data_domain_implicit)
+
+    if len(y) and data:
+      self._ymin_data_domain_implicit = _null_min(y.min(), self._ymin_data_domain_implicit)
+      self._ymax_data_domain_implicit = _null_max(y.max(), self._ymax_data_domain_implicit)
 
   def _finalize_domain(self):
     # Begin with the implicit domain defined by our children.
-    xmin = self._xmin_implicit
-    xmax = self._xmax_implicit
-    ymin = self._ymin_implicit
-    ymax = self._ymax_implicit
+    xmin = self._xmin_domain_implicit
+    xmax = self._xmax_domain_implicit
+    ymin = self._ymin_domain_implicit
+    ymax = self._ymax_domain_implicit
 
     # If there is no implicit domain (we don't have any children), default to the origin.
     if xmin is None:

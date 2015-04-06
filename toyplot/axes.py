@@ -345,10 +345,10 @@ class Cartesian(object):
     self._xmax_data_domain_implicit = None
     self._ymin_data_domain_implicit = None
     self._ymax_data_domain_implicit = None
-    self._xmin_domain_implicit = None
-    self._xmax_domain_implicit = None
-    self._ymin_domain_implicit = None
-    self._ymax_domain_implicit = None
+    self._xmin_display_domain_implicit = None
+    self._xmax_display_domain_implicit = None
+    self._ymin_display_domain_implicit = None
+    self._ymax_display_domain_implicit = None
     self._padding = padding
 
     if palette is None:
@@ -391,17 +391,17 @@ class Cartesian(object):
   def padding(self, value):
     self._padding = value
 
-  def _update_domain(self, x, y, data=True):
+  def _update_domain(self, x, y, display=True, data=True):
     x = _flat_non_null(x)
     y = _flat_non_null(y)
 
-    if len(x):
-      self._xmin_domain_implicit = _null_min(x.min(), self._xmin_domain_implicit)
-      self._xmax_domain_implicit = _null_max(x.max(), self._xmax_domain_implicit)
+    if len(x) and display:
+      self._xmin_display_domain_implicit = _null_min(x.min(), self._xmin_display_domain_implicit)
+      self._xmax_display_domain_implicit = _null_max(x.max(), self._xmax_display_domain_implicit)
 
-    if len(y):
-      self._ymin_domain_implicit = _null_min(y.min(), self._ymin_domain_implicit)
-      self._ymax_domain_implicit = _null_max(y.max(), self._ymax_domain_implicit)
+    if len(y) and display:
+      self._ymin_display_domain_implicit = _null_min(y.min(), self._ymin_display_domain_implicit)
+      self._ymax_display_domain_implicit = _null_max(y.max(), self._ymax_display_domain_implicit)
 
     if len(x) and data:
       self._xmin_data_domain_implicit = _null_min(x.min(), self._xmin_data_domain_implicit)
@@ -413,10 +413,10 @@ class Cartesian(object):
 
   def _finalize_domain(self):
     # Begin with the implicit domain defined by our children.
-    xmin = self._xmin_domain_implicit
-    xmax = self._xmax_domain_implicit
-    ymin = self._ymin_domain_implicit
-    ymax = self._ymax_domain_implicit
+    xmin = self._xmin_display_domain_implicit
+    xmax = self._xmax_display_domain_implicit
+    ymin = self._ymin_display_domain_implicit
+    ymax = self._ymax_display_domain_implicit
 
     # If there is no implicit domain (we don't have any children), default to the origin.
     if xmin is None:

@@ -18,8 +18,9 @@ except: # pragma: no cover
 def render(canvas, fobj=None, width=None, height=None, scale=None):
   """Render the PNG bitmap representation of a canvas.
 
-  By default, canvas drawing units are mapped directly to pixels in the output
-  PNG image.  Use one of `width`, `height`, or `scale` to override this behavior.
+  By default, canvas dimensions in CSS pixels are mapped directly to pixels in
+  the output PNG image.  Use one of `width`, `height`, or `scale` to override
+  this behavior.
 
   Parameters
   ----------
@@ -34,7 +35,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
   height: number, optional
     Specify the height of the output image in pixels.
   scale: number, optional
-    Ratio of output image pixels to `canvas` drawing units.
+    Ratio of output image pixels to `canvas` pixels.
 
   Returns
   -------
@@ -63,8 +64,9 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 def render_frames(canvas, width=None, height=None, scale=None):
   """Render a canvas as a sequence of PNG images.
 
-  By default, canvas drawing units are mapped directly to pixels in the output
-  PNG images.  Use one of `width`, `height`, or `scale` to override this behavior.
+  By default, canvas dimensions in CSS pixels are mapped directly to pixels in
+  the output PNG images.  Use one of `width`, `height`, or `scale` to override
+  this behavior.
 
   Parameters
   ----------
@@ -75,7 +77,7 @@ def render_frames(canvas, width=None, height=None, scale=None):
   height: number, optional
     Specify the height of the output image in pixels.
   scale: number, optional
-    Ratio of output image pixels to `canvas` drawing units.
+    Ratio of output image pixels to `canvas` pixels.
 
   Returns
   -------

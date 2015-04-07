@@ -96,9 +96,9 @@ class Canvas(object):
   Parameters
   ----------
   width: integer, optional
-    Width of the canvas in drawing units.  Defaults to 600 if unspecified.
+    Width of the canvas in CSS pixels.  Defaults to 600 if unspecified.
   height: integer, optional
-    Height of the canvas in drawing units.  Defaults to the canvas width if unspecified.
+    Height of the canvas in CSS pixels.  Defaults to the canvas width if unspecified.
   style: dict, optional
     Collection of CSS styles to apply to the canvas.
   autorender: boolean, optional

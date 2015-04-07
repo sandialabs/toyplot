@@ -14,8 +14,9 @@ import toyplot.cairo
 def render(canvas, fobj, width=None, height=None, scale=None):
   """Render the PDF representation of a canvas.
 
-  By default, canvas drawing units are mapped directly to points in the output
-  PNG image.  Use one of `width`, `height`, or `scale` to override this behavior.
+  By default, the canvas dimensions in CSS pixels (1/96 of an inch) are mapped
+  directly to real-world units in the output PDF image.  Use one of `width`,
+  `height`, or `scale` to override this behavior.
 
   Parameters
   ----------
@@ -30,7 +31,7 @@ def render(canvas, fobj, width=None, height=None, scale=None):
     Specify the height of the output image with optional units.  If the units
     aren't specified, defaults to points.
   scale: number, optional
-    Ratio of output image points to `canvas` drawing units.
+    Scales the output `canvas` by the given ratio.
 
   Examples
   --------

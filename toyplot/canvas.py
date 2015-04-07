@@ -389,11 +389,13 @@ class Canvas(object):
       raise ValueError("Specify only one of width, height, or scale.")
 
     if width is not None:
-      scale = toyplot.units.points(width) / self._width
+      scale = toyplot.units.points(width) / toyplot.units.points((self._width, "px"))
     elif height is not None:
-      scale = toyplot.units.points(height) / self._height
+      scale = toyplot.units.points(height) / toyplot.units.points((self._height, "px"))
     elif scale is None:
-      scale = 1.0
+      scale = toyplot.units.points((1, "px")) / toyplot.units.points((1, "pt"))
+      print "px - pt", toyplot.units.points((1, "px")), toyplot.units.points((1, "pt"))
+      print "scale: %s" % scale
     return scale
 
   @staticmethod

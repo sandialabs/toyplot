@@ -393,9 +393,8 @@ class Canvas(object):
     elif height is not None:
       scale = toyplot.units.points(height) / toyplot.units.points((self._height, "px"))
     elif scale is None:
-      scale = toyplot.units.points((1, "px")) / toyplot.units.points((1, "pt"))
-      print "px - pt", toyplot.units.points((1, "px")), toyplot.units.points((1, "pt"))
-      print "scale: %s" % scale
+      scale = 1.0
+    scale *= 72.0 / 96.0
     return scale
 
   @staticmethod

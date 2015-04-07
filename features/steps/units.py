@@ -15,6 +15,10 @@ def step_impl(context):
 def step_impl(context):
   context.value = (0.5, "inch")
 
+@when(u'toyplot.units.points receives 96 px')
+def step_impl(context):
+  context.value = (96, "px")
+
 @then(u'toyplot.units.points should return 36')
 def step_impl(context):
   nose.tools.assert_equal(toyplot.units.points(context.value), 36)

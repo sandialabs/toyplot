@@ -16,7 +16,7 @@ def points(value):
     Value to be converted.  Pass a (value, units) tuple, or the units will be
     assumed to be "points".  Supported units include: centimeter, centimeters,
     cm, decimeter, decimeters, dm, in, inch, inches, m, meter, meters, pica,
-    picas, point, points, and pt.
+    picas, point, points, pt, pixel, pixels, and px.
   """
   if isinstance(value, numbers.Number):
     value = (value, "points")
@@ -27,21 +27,24 @@ def points(value):
     raise ValueError("Unknown unit of measure: %s" % units)
   return value * points._conversions[units.lower()]
 points._conversions = {
-  "centimeter":28.3464567,
-  "centimeters":28.3464567,
-  "cm":28.3464567,
-  "decimeter":283.464567,
-  "decimeters":283.464567,
-  "dm":283.464567,
-  "in":72.0,
-  "inch":72.0,
-  "inches":72.0,
-  "m":2834.64567,
-  "meter":2834.64567,
-  "meters":2834.64567,
-  "pica":12.0,
-  "picas":12.0,
-  "point":1.0,
-  "points":1.0,
-  "pt":1.0,
+  "centimeter": 28.3464567,
+  "centimeters": 28.3464567,
+  "cm": 28.3464567,
+  "decimeter": 283.464567,
+  "decimeters": 283.464567,
+  "dm": 283.464567,
+  "in": 72.0,
+  "inch": 72.0,
+  "inches": 72.0,
+  "m": 2834.64567,
+  "meter": 2834.64567,
+  "meters": 2834.64567,
+  "pica": 12.0,
+  "picas": 12.0,
+  "point": 1.0,
+  "points": 1.0,
+  "pt": 1.0,
+  "px": 72.0 / 96.0,
+  "pixel": 72.0 / 96.0,
+  "pixels": 72.0 / 96.0,
   }

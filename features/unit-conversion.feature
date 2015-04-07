@@ -7,6 +7,7 @@ Feature: Unit conversion
       | input     | response         |
       | 72        | return 72        |
       | .5 inch   | return 36        |
+      | 96 px     | return 72        |
       | string    | raise ValueError |
       | 1 furlong | raise ValueError |
 

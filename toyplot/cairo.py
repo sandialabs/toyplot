@@ -208,7 +208,7 @@ def render(svg, context):
           if "font-size" in current_style:
             size = current_style["font-size"].strip()
             if size[-2:] == "px":
-              size = int(pango.SCALE * float(size[:-2]) * 0.8) # 0.8 is a "fudge factor" because Cairo otherwise renders text larger than SVG
+              size = int(pango.SCALE * float(size[:-2]) * 72.0 / 96.0) # Convert CSS pixels to points
             else:
               raise ValueError("font-size must use pixel units")
             font_description.set_size(size)

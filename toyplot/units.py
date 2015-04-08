@@ -12,8 +12,8 @@ def convert(value, target, default=None):
   """Convert quantities using real-world units.
 
     Supported units include: centimeter, centimeters, cm, decimeter,
-    decimeters, dm, in, inch, inches, m, meter, meters, pica, picas, point,
-    points, pt, pixel, pixels, and px.
+    decimeters, dm, in, inch, inches, m, meter, meters, mm, millimeter,
+    millimeters, pc, pica, picas, point, points, pt, pixel, pixels, and px.
 
   Parameters
   ----------
@@ -61,13 +61,17 @@ convert._conversions = {
   "m": 2834.64567,
   "meter": 2834.64567,
   "meters": 2834.64567,
+  "millimeter": 2.83464567,
+  "millimeters": 2.83464567,
+  "mm": 2.83464567,
+  "pc": 12.0,
   "pica": 12.0,
   "picas": 12.0,
+  "pixel": 72.0 / 96.0,
+  "pixels": 72.0 / 96.0,
   "point": 1.0,
   "points": 1.0,
   "pt": 1.0,
   "px": 72.0 / 96.0,
-  "pixel": 72.0 / 96.0,
-  "pixels": 72.0 / 96.0,
   }
 

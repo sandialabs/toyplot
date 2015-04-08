@@ -24,7 +24,6 @@ import toyplot.data
 import toyplot.html
 import toyplot.locator
 import toyplot.svg
-import toyplot.units
 
 try:
   import toyplot.eps

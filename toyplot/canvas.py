@@ -389,9 +389,9 @@ class Canvas(object):
       raise ValueError("Specify only one of width, height, or scale.")
 
     if width is not None:
-      scale = toyplot.units.points(width) / toyplot.units.points((self._width, "px"))
+      scale = toyplot.units.convert(width, "pt") / toyplot.units.convert((self._width, "px"), "pt")
     elif height is not None:
-      scale = toyplot.units.points(height) / toyplot.units.points((self._height, "px"))
+      scale = toyplot.units.convert(height, "pt") / toyplot.units.convert((self._height, "px"), "pt")
     elif scale is None:
       scale = 1.0
     scale *= 72.0 / 96.0

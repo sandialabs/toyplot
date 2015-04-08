@@ -5,28 +5,50 @@
 from __future__ import division
 
 import numbers
+import re
 import toyplot.compatibility
 
-def points(value):
-  """Convert a quantity with real-world units to points (72nds of an inch).
+def convert(value, target, default=None):
+  """Convert quantities using real-world units.
+
+    Supported units include: centimeter, centimeters, cm, decimeter,
+    decimeters, dm, in, inch, inches, m, meter, meters, pica, picas, point,
+    points, pt, pixel, pixels, and px.
 
   Parameters
   ----------
-  value: number or (number, string) tuple
-    Value to be converted.  Pass a (value, units) tuple, or the units will be
-    assumed to be "points".  Supported units include: centimeter, centimeters,
-    cm, decimeter, decimeters, dm, in, inch, inches, m, meter, meters, pica,
-    picas, point, points, pt, pixel, pixels, and px.
+  value: number, string or (number, string) tuple
+    Value to be converted.  The value may be a number (in which case the
+    `default` parameter must specify the default unit of measure), a string
+    containing a number and unit suffix (such as a CSS length), or a (value,
+    units) tuple.
+  target: string
+    Unit of measure to convert to.
+  default: optional string
+    Default unit of measure to use when `value` is a plain number.
+
+  Returns
+  -------
+  Returns `value` converted to the `target` units, as a floating point number.
   """
   if isinstance(value, numbers.Number):
-    value = (value, "points")
+    if default is None:
+      raise ValueError("Value doesn't contain units, and no default units specified.")
+    value = (value, default)
+  elif isinstance(value, toyplot.compatibility.string_type):
+    value, units = re.match(r"([^a-zA-Z]+)([a-zA-Z]+)\Z", value).groups()
+    value = (float(value), units)
   if not (isinstance(value, tuple) and len(value) == 2 and isinstance(value[0], numbers.Number) and isinstance(value[1], toyplot.compatibility.string_type)):
-    raise ValueError("Value must be a number or a (number, string) tuple.")
+    raise ValueError("Value must be a number, string or (number, string) tuple.")
   value, units = value
-  if units.lower() not in points._conversions:
+  units = units.lower()
+  if units not in convert._conversions:
     raise ValueError("Unknown unit of measure: %s" % units)
-  return value * points._conversions[units.lower()]
-points._conversions = {
+  target = target.lower()
+  if target not in convert._conversions:
+    raise ValueError("Unknown unit of measure: %s" % target)
+  return value * convert._conversions[units] / convert._conversions[target]
+convert._conversions = {
   "centimeter": 28.3464567,
   "centimeters": 28.3464567,
   "cm": 28.3464567,
@@ -48,3 +70,4 @@ points._conversions = {
   "pixel": 72.0 / 96.0,
   "pixels": 72.0 / 96.0,
   }
+

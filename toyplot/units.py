@@ -8,40 +8,54 @@ import numbers
 import re
 import toyplot.compatibility
 
-def convert(value, target, default=None):
+def convert(value, target, default=None, reference=None):
   """Convert quantities using real-world units.
 
-    Supported units include: centimeter, centimeters, cm, decimeter,
-    decimeters, dm, in, inch, inches, m, meter, meters, mm, millimeter,
-    millimeters, pc, pica, picas, point, points, pt, pixel, pixels, and px.
+    Supported unit abbreviations include: centimeter, centimeters, cm,
+    decimeter, decimeters, dm, in, inch, inches, m, meter, meters, mm,
+    millimeter, millimeters, pc, pica, picas, point, points, pt, pixel, pixels,
+    and px.
+
+    Relative quantities can be specified using %.
 
   Parameters
   ----------
   value: number, string or (number, string) tuple
     Value to be converted.  The value may be a number (in which case the
     `default` parameter must specify the default unit of measure), a string
-    containing a number and unit suffix (such as a CSS length), or a (value,
-    units) tuple.
+    containing a number and unit abbreviation, or a (value, units) tuple.
   target: string
     Unit of measure to convert to.
   default: optional string
-    Default unit of measure to use when `value` is a plain number.
+    Default unit of measure to use when `value` is a plain number, or when
+    `relative` has been specified.
+  reference: optional number
+    When the caller specifies a relative measure using % as the unit abbreviation,
+    the returned value will equal `value` * 0.01 * `reference`.
 
   Returns
   -------
   Returns `value` converted to the `target` units, as a floating point number.
   """
   if isinstance(value, numbers.Number):
+    if value == 0:
+      return 0
     if default is None:
       raise ValueError("Value doesn't contain units, and no default units specified.")
     value = (value, default)
   elif isinstance(value, toyplot.compatibility.string_type):
-    value, units = re.match(r"([^a-zA-Z]+)([a-zA-Z]+)\Z", value).groups()
+    if value == "0":
+      return 0
+    value, units = re.match(r"([^a-zA-Z%]+)([a-zA-Z%]+)\Z", value).groups()
     value = (float(value), units)
   if not (isinstance(value, tuple) and len(value) == 2 and isinstance(value[0], numbers.Number) and isinstance(value[1], toyplot.compatibility.string_type)):
     raise ValueError("Value must be a number, string or (number, string) tuple.")
   value, units = value
   units = units.lower()
+  if units == "%":
+    if reference is None:
+      raise ValueError("Relative values require a reference.")
+    return value * 0.01 * reference
   if units not in convert._conversions:
     raise ValueError("Unknown unit of measure: %s" % units)
   target = target.lower()

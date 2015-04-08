@@ -4,25 +4,32 @@
 
 from __future__ import division
 
+import numpy
+import toyplot.broadcast
+import toyplot.require
+import toyplot.units
+
 def extents(x, y, text, style):
   """Compute (inexact) extents for a text string, based on the given coordinates and style.
   """
-  font_size = style["font-size"].strip()
-  if font_size[-2:] == "px":
-    font_size = float(font_size[:-2])
-  else:
-    raise ValueError("font-size must use pixel units")
+  x = toyplot.require.scalar_vector(x)
+  y = toyplot.require.scalar_vector(y, x.shape[0])
+  text = toyplot.broadcast.object(text, x.shape[0])
+  lengths = numpy.array([len(string) for string in text])
 
-  anchor_shift = float(style["-toyplot-anchor-shift"])
+  font_size = toyplot.units.convert(style["font-size"], target="px")
+  anchor_shift = toyplot.units.convert(style.get("-toyplot-anchor-shift", "0px"), target="px", reference=font_size)
+  text_anchor = style["text-anchor"]
+  baseline_shift = toyplot.units.convert(style.get("baseline-shift", "0px"), target="px", reference=font_size)
+  alignment_baseline = style["alignment-baseline"]
 
   # Because we don't have any metrics for the font, assume that the average
   # character width and height match the font size.
-  width = float(font_size * len(text))
-  height = float(font_size)
+  width = font_size * lengths
+  height = font_size
 
   x += float(anchor_shift)
 
-  text_anchor = style["text-anchor"]
   if text_anchor == "start":
     left = x
     right = x + width
@@ -35,16 +42,17 @@ def extents(x, y, text, style):
   else:
     raise ValueError("Unknown text-anchor value: %s" % text_anchor)
 
-  baseline_shift = style["baseline-shift"]
-  if baseline_shift[-1] == "%":
-    y -= float(baseline_shift[:-1]) * 0.01 * font_size
-  else:
-    y -= float(baseline_shift)
+  y -= baseline_shift
 
-  alignment_baseline = style["alignment-baseline"]
-  if alignment_baseline == "middle":
+  if alignment_baseline == "hanging":
+    top = y
+    bottom = y + height
+  elif alignment_baseline == "middle" or alignment_baseline == "central":
     top = y - height / 2
     bottom = y + height / 2
+  elif alignment_baseline == "alpha":
+    top = y - height
+    bottom = y
   else:
     raise ValueError("Unknown alignment-baseline value: %s" % alignment_baseline)
 

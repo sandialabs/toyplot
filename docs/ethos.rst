@@ -8,7 +8,7 @@ The Toyplot Ethos
 =================
 
 What began as a quick workaround to reduce the size of animated figures in
-IPython quickly grew into Toyplot, "the kid-sized plotting toolkit with
+Jupyter notebooks quickly grew into Toyplot, "the kid-sized plotting toolkit with
 grownup-sized goals".  In a nutshell, we think that scientists and engineers
 should expect more from their plots, from explicit support for
 reproducibility and open science to greater clarity and better aesthetics.
@@ -21,7 +21,7 @@ interactions part of the everyday experiences of data graphic users.  Because
 we're passionate about publishing and sharing results, Toyplot graphics are
 completely self-contained and embeddable, without the need for a server.  All
 of the Toyplot graphics you will see in this documentation are live and
-interactive, despite the fact that they were created offline in an IPython
+interactive, despite the fact that they were created offline in a Jupyter
 notebook and passed through several publishing steps on the way to becoming our
 documentation.  Of course, we provide backends to publish Toyplot figures to
 legacy formats including PNG, PDF, Encapsulated Postscript, and MP4.
@@ -29,7 +29,7 @@ legacy formats including PNG, PDF, Encapsulated Postscript, and MP4.
 With most toolkits, interactivity means throwaway features like pan-and-zoom.  For
 Toyplot, we're exploring simple-but-effective ideas to address the questions a
 colleague might ask when viewing a graphic in the real world: "What's the value
-at this weird peak?" "Where do those two series cross?" "Can I get a copy of the data?" 
+at this weird peak?" "Where do those two series cross?" "Can I get a copy of the data?"
 We're working on efficient animation that doesn't compromise the quality of your graphic
 with compression artifacts; and interactive data cursors that display quantities
 of interest and descriptive statistics just by hovering the mouse.  And since

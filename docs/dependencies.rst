@@ -43,5 +43,5 @@ And you'll need to following to generate this documentation:
 * Sphinx - documentation builder - http://sphinx-doc.org
 * Sphinx readthedocs theme - https://github.com/snide/sphinx_rtd_theme
 * napoleon - http://sphinxcontrib-napoleon.readthedocs.org/en/latest/
-* IPython - http://ipython.org
+* Jupyter - http://ipython.org
 * Pandoc - http://johnmacfarlane.net/pandoc

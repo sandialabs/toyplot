@@ -99,8 +99,8 @@ To build the documentation, run::
     $ cd toyplot
     $ python docs/setup.py
 
-Note that significant subsets of the documentation are written using IPython
-notebooks, so the docs/setup.py script requires IPython to convert the
+Note that significant subsets of the documentation are written using Jupyter
+notebooks, so the docs/setup.py script requires Jupyter to convert the
 notebooks into restructured text files for inclusion with the rest of the
 documentation.
 

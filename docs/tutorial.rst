@@ -12,8 +12,8 @@ Getting Started
 Welcome! This tutorial will introduce you to the basics of working with
 Toyplot.
 
-Note: this tutorial was created in an
-`IPython <http://www.ipython.org>`__ notebook and assumes that you're
+Note: this tutorial was created in a
+`Jupyter <http://www.ipython.org>`__ notebook and assumes that you're
 following-along in a notebook of your own. If you aren't using a
 notebook, you should read the user guide section on :ref:`rendering`
 for some important information on how to display your figures.
@@ -1261,7 +1261,7 @@ palette:
 
 
 
-Note: Like canvases, palettes are automatically rendered in IPython
+Note: Like canvases, palettes are automatically rendered in Jupyter
 notebooks, in this case as a collection of color swatches.
 
 You should observe that the order of colors in the palette match the

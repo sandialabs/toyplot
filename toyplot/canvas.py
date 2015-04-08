@@ -95,10 +95,14 @@ class Canvas(object):
 
   Parameters
   ----------
-  width: integer, optional
-    Width of the canvas in CSS pixels.  Defaults to 600 if unspecified.
-  height: integer, optional
-    Height of the canvas in CSS pixels.  Defaults to the canvas width if unspecified.
+  width: number, string, or (number, string) tuple, optional
+    Width of the canvas.  Assumes CSS pixels if units aren't provided.
+    Defaults to 600px (6.25") if unspecified.  See :ref:`units` for details on
+    how Toyplot handles real world units.
+  height: number, string, or (number, string) tuple, optional
+    Height of the canvas.  Assumes CSS pixels if units aren't provided.
+    Defaults to the canvas width if unspecified.  See :ref:`units` for details
+    on how Toyplot handles real world units.
   style: dict, optional
     Collection of CSS styles to apply to the canvas.
   autorender: boolean, optional
@@ -108,13 +112,13 @@ class Canvas(object):
   Examples
   --------
 
-  The following would create a Canvas 800 units wide, 600 units tall, with a yellow background:
+  The following would create a Canvas 8 inches wide and 6 inches tall, with a yellow background:
 
-  >>> canvas = toyplot.Canvas(800, 600, style={"background-color":"yellow"})
+  >>> canvas = toyplot.Canvas("8in", "6in", style={"background-color":"yellow"})
   """
   def __init__(self, width=None, height=None, style=None, autorender=None):
-    self._width = width if width is not None else 600
-    self._height = height if height is not None else self._width
+    self._width = toyplot.units.convert(width, "px", default="px") if width is not None else 600
+    self._height = toyplot.units.convert(height, "px", default="px") if height is not None else self._width
     self._style = toyplot.style.combine({"background-color": "transparent", "fill": toyplot.color.near_black, "fill-opacity": 1.0, "font-family":"helvetica", "font-size": "12px", "opacity": 1.0, "stroke": toyplot.color.near_black, "stroke-opacity": 1.0, "stroke-width": 1.0}, style)
     self._animation = collections.defaultdict(lambda: collections.defaultdict(list))
     self._children = []

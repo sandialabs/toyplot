@@ -18,3 +18,4 @@ Contents:
    rendering.rst
    table-axes.rst
    text.rst
+   units.rst

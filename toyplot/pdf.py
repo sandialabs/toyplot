@@ -14,9 +14,9 @@ import toyplot.cairo
 def render(canvas, fobj, width=None, height=None, scale=None):
   """Render the PDF representation of a canvas.
 
-  By default, the canvas dimensions in CSS pixels (1/96 of an inch) are mapped
-  directly to real-world units in the output PDF image.  Use one of `width`,
-  `height`, or `scale` to override this behavior.
+  Because the canvas dimensions are specified explicitly at creation time, they
+  map directly to real-world units in the output PDF image.  Use one of
+  `width`, `height`, or `scale` to override this behavior.
 
   Parameters
   ----------
@@ -24,12 +24,14 @@ def render(canvas, fobj, width=None, height=None, scale=None):
     Canvas to be rendered.
   fobj: file-like object or string
     The file to write.  Use a string filepath to write data directly to disk.
-  width: number or (number, string) tuple, optional
+  width: number, string, or (number, string) tuple, optional
     Specify the width of the output image with optional units.  If the units
-    aren't specified, defaults to points.
+    aren't specified, defaults to points.  See :ref:`units` for details on
+    unit conversion in Toyplot.
   height: number or (number, string) tuple, optional
     Specify the height of the output image with optional units.  If the units
-    aren't specified, defaults to points.
+    aren't specified, defaults to points.  See :ref:`units` for details on
+    unit conversion in Toyplot.
   scale: number, optional
     Scales the output `canvas` by the given ratio.
 

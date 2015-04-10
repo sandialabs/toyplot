@@ -856,17 +856,19 @@ class Cartesian(object):
       title = toyplot.broadcast.object(title, series.shape[1])
       style = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(style))
 
-      if baseline == "stacked":
-        baseline = numpy.ma.zeros(series.shape[0])
-      elif baseline == "symmetric":
-        baseline = -0.5 * numpy.ma.sum(series, axis=1)
-      elif baseline == "wiggle":
-        n = series.shape[1]
-        baseline = numpy.ma.zeros(series.shape[0])
-        for i in range(n):
-          for j in range(i):
-            baseline += series.T[j]
-        baseline *= -(1.0 / (n + 1))
+      if isinstance(baseline, toyplot.compatibility.string_type):
+        baseline = toyplot.require.value_in(baseline, ["stacked", "symmetric", "wiggle"])
+        if baseline == "stacked":
+          baseline = numpy.ma.zeros(series.shape[0])
+        elif baseline == "symmetric":
+          baseline = -0.5 * numpy.ma.sum(series, axis=1)
+        elif baseline == "wiggle":
+          n = series.shape[1]
+          baseline = numpy.ma.zeros(series.shape[0])
+          for i in range(n):
+            for j in range(i):
+              baseline += series.T[j]
+          baseline *= -(1.0 / (n + 1))
 
       boundaries = numpy.ma.cumsum(numpy.ma.column_stack((baseline, series)), axis=1)
       if along == "x":

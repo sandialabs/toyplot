@@ -22,7 +22,7 @@ def instance(value, types):
 
 def value_in(value, choices):
   if value not in choices:
-    raise ValueError("Expected one of %s, received %s." % (",".join([str(choice) for choice in choices]), value))
+    raise ValueError("Expected one of %s, received %r." % (", ".join([repr(choice) for choice in choices]), value))
   return value
 
 def table_keys(table, keys, length=None, min_length=None):

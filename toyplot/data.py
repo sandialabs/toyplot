@@ -139,6 +139,20 @@ class Table(object):
       index = slice(index, index + 1)
     return Table(collections.OrderedDict([(key, self._columns[key][index]) for key in self._columns.keys()]))
 
+  def matrix(self):
+    """Convert the table to a matrix (2D numpy array).
+
+    The data type of the returned array is chosen based on the types of the
+    columns within the table.  Tables containing a homogeneous set of column
+    types will return an array of the the same type.  If the table contains one
+    or more string columns, the results will be an array of strings.
+
+    Returns
+    -------
+    matrix: :class:`numpy.ma.array` with two dimensions.
+    """
+    return numpy.ma.column_stack(self._columns.values())
+
   def to_csv(self, fobj):
     import csv
     if isinstance(fobj, toyplot.compatibility.string_type):

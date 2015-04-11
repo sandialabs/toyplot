@@ -20,10 +20,12 @@ you could specify its width and height in inches:
     import numpy
     x = numpy.linspace(0, 1)
     y = x ** 2
+
 .. code:: python
 
     import toyplot
     toyplot.plot(x, y, width="3in", height="2in");
+
 
 
 .. raw:: html
@@ -250,6 +252,7 @@ You can also specify the quantity and units separately:
 .. code:: python
 
     toyplot.plot(x, y, width=(3, "in"), height=(2, "in"));
+
 
 
 .. raw:: html
@@ -480,6 +483,7 @@ If you don't specify any units, the canvas assumes a default unit of
 .. code:: python
 
     toyplot.plot(x, y, width=600, height=400);
+
 
 
 .. raw:: html

@@ -20,11 +20,13 @@ following automatically inserts a figure into your notebook:
     import numpy
     x = numpy.linspace(0, 1)
     y = x ** 2
+
 .. code:: python
 
     import toyplot
     canvas = toyplot.Canvas(width=300)
     canvas.axes().plot(x, y);
+
 
 
 .. raw:: html
@@ -260,6 +262,7 @@ override the default when creating your canvas:
 
     canvas = toyplot.Canvas(width=300, autorender=False)
     canvas.axes().plot(x, y);
+
 If you've disabled autorendering, or you're working in a noninteractive
 environment where autorendering does nothing (such as a "vanilla" Python
 shell) you'll need to explicitly tell Toyplot how and when to render

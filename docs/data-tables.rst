@@ -22,6 +22,7 @@ scratch:
 
     import toyplot.data
     import numpy
+
 .. code:: python
 
     table = toyplot.data.Table()
@@ -29,6 +30,7 @@ scratch:
     table["x*2"] = table["x"] * 2
     table["x^2"] = table["x"] ** 2
     table
+
 
 
 
@@ -53,6 +55,7 @@ the table, and always returns them in the same order:
     for name in table.keys():
         print name
 
+
 .. parsed-literal::
 
     x
@@ -65,6 +68,7 @@ the table, and always returns them in the same order:
     for column in table.values():
         print column
 
+
 .. parsed-literal::
 
     [0 1 2 3 4 5 6 7 8 9]
@@ -76,6 +80,7 @@ the table, and always returns them in the same order:
 
     for name, column in table.items():
         print name, column
+
 
 .. parsed-literal::
 
@@ -93,6 +98,7 @@ and slicing operations for row-oriented access to their contents:
 
 
 
+
 .. parsed-literal::
 
     10
@@ -102,6 +108,7 @@ and slicing operations for row-oriented access to their contents:
 .. code:: python
 
     table[2:5]
+
 
 
 
@@ -118,6 +125,7 @@ table using a subset of an existing table's columns:
 .. code:: python
 
     table.columns(["x*2", "x"])
+
 
 
 
@@ -145,6 +153,7 @@ In the following example, we load a set of temperature readings:
 
 
 
+
 .. raw:: html
 
     <table class="toyplot-data-Table" style="border-collapse:collapse; border:none; color: #292724"><tr style="border:none;border-bottom:1px solid #292724"><th style="text-align:left;border:none;padding-right:1em;">STATION</th><th style="text-align:left;border:none;padding-right:1em;">STATION_NAME</th><th style="text-align:left;border:none;padding-right:1em;">DATE</th><th style="text-align:left;border:none;padding-right:1em;">TMAX</th><th style="text-align:left;border:none;padding-right:1em;">TMIN</th><th style="text-align:left;border:none;padding-right:1em;">TOBS</th></tr><tr style="border:none"><td style="border:none;padding-right:1em;">GHCND:USC00294366</td><td style="border:none;padding-right:1em;">JEMEZ DAM NM US</td><td style="border:none;padding-right:1em;">20130101</td><td style="border:none;padding-right:1em;">39</td><td style="border:none;padding-right:1em;">-72</td><td style="border:none;padding-right:1em;">-67</td></tr><tr style="border:none"><td style="border:none;padding-right:1em;">GHCND:USC00294366</td><td style="border:none;padding-right:1em;">JEMEZ DAM NM US</td><td style="border:none;padding-right:1em;">20130102</td><td style="border:none;padding-right:1em;">0</td><td style="border:none;padding-right:1em;">-133</td><td style="border:none;padding-right:1em;">-133</td></tr><tr style="border:none"><td style="border:none;padding-right:1em;">GHCND:USC00294366</td><td style="border:none;padding-right:1em;">JEMEZ DAM NM US</td><td style="border:none;padding-right:1em;">20130103</td><td style="border:none;padding-right:1em;">11</td><td style="border:none;padding-right:1em;">-139</td><td style="border:none;padding-right:1em;">-89</td></tr><tr style="border:none"><td style="border:none;padding-right:1em;">GHCND:USC00294366</td><td style="border:none;padding-right:1em;">JEMEZ DAM NM US</td><td style="border:none;padding-right:1em;">20130104</td><td style="border:none;padding-right:1em;">11</td><td style="border:none;padding-right:1em;">-139</td><td style="border:none;padding-right:1em;">-89</td></tr><tr style="border:none"><td style="border:none;padding-right:1em;">GHCND:USC00294366</td><td style="border:none;padding-right:1em;">JEMEZ DAM NM US</td><td style="border:none;padding-right:1em;">20130105</td><td style="border:none;padding-right:1em;">22</td><td style="border:none;padding-right:1em;">-144</td><td style="border:none;padding-right:1em;">-111</td></tr><tr style="border:none"><td style="border:none;padding-right:1em;">GHCND:USC00294366</td><td style="border:none;padding-right:1em;">JEMEZ DAM NM US</td><td style="border:none;padding-right:1em;">20130106</td><td style="border:none;padding-right:1em;">44</td><td style="border:none;padding-right:1em;">-122</td><td style="border:none;padding-right:1em;">-100</td></tr><tr style="border:none"><td style="border:none;padding-right:1em;">GHCND:USC00294366</td><td style="border:none;padding-right:1em;">JEMEZ DAM NM US</td><td style="border:none;padding-right:1em;">20130107</td><td style="border:none;padding-right:1em;">56</td><td style="border:none;padding-right:1em;">-122</td><td style="border:none;padding-right:1em;">-11</td></tr><tr style="border:none"><td style="border:none;padding-right:1em;">GHCND:USC00294366</td><td style="border:none;padding-right:1em;">JEMEZ DAM NM US</td><td style="border:none;padding-right:1em;">20130108</td><td style="border:none;padding-right:1em;">100</td><td style="border:none;padding-right:1em;">-83</td><td style="border:none;padding-right:1em;">-78</td></tr><tr style="border:none"><td style="border:none;padding-right:1em;">GHCND:USC00294366</td><td style="border:none;padding-right:1em;">JEMEZ DAM NM US</td><td style="border:none;padding-right:1em;">20130109</td><td style="border:none;padding-right:1em;">72</td><td style="border:none;padding-right:1em;">-83</td><td style="border:none;padding-right:1em;">-33</td></tr><tr style="border:none"><td style="border:none;padding-right:1em;">GHCND:USC00294366</td><td style="border:none;padding-right:1em;">JEMEZ DAM NM US</td><td style="border:none;padding-right:1em;">20130111</td><td style="border:none;padding-right:1em;">89</td><td style="border:none;padding-right:1em;">-50</td><td style="border:none;padding-right:1em;">22</td></tr></table>
@@ -158,12 +167,14 @@ over time:
 
     table["TMAX_F"] = ((table["TMAX"].astype("float64") * 0.1) * 1.8) + 32
     table["TMIN_F"] = ((table["TMIN"].astype("float64") * 0.1) * 1.8) + 32
+
 .. code:: python
 
     canvas = toyplot.Canvas(width=600, height=300)
     axes = canvas.axes(xlabel="Day", ylabel=u"Temperature \u00b0F")
     axes.plot(table["TMAX_F"], color="red", stroke_width=1)
     axes.plot(table["TMIN_F"], color="blue", stroke_width=1);
+
 
 
 .. raw:: html

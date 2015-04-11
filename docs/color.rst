@@ -27,6 +27,7 @@ palette:
 
 
 
+
 .. raw:: html
 
     <div class="toyplot-color-Palette" style="overflow:hidden; height:auto"><div style="float:left;width:20px;height:20px;background-color:rgba(40%,76.1%,64.7%,1)"></div><div style="float:left;width:20px;height:20px;background-color:rgba(98.8%,55.3%,38.4%,1)"></div><div style="float:left;width:20px;height:20px;background-color:rgba(55.3%,62.7%,79.6%,1)"></div><div style="float:left;width:20px;height:20px;background-color:rgba(90.6%,54.1%,76.5%,1)"></div><div style="float:left;width:20px;height:20px;background-color:rgba(65.1%,84.7%,32.9%,1)"></div><div style="float:left;width:20px;height:20px;background-color:rgba(100%,85.1%,18.4%,1)"></div><div style="float:left;width:20px;height:20px;background-color:rgba(89.8%,76.9%,58%,1)"></div><div style="float:left;width:20px;height:20px;background-color:rgba(70.2%,70.2%,70.2%,1)"></div></div>
@@ -56,6 +57,7 @@ section on linear color maps) and accessed by name:
 
     print toyplot.color.brewer.names()
 
+
 .. parsed-literal::
 
     ['Accent', 'BlueGreen', 'BlueGreenBrown', 'BlueGreenYellow', 'BluePurple', 'BlueRed', 'BlueYellowRed', 'Blues', 'BrownOrangeYellow', 'Dark2', 'GrayRed', 'GreenBlue', 'GreenBluePurple', 'GreenYellow', 'GreenYellowRed', 'Greens', 'Greys', 'Oranges', 'Paired', 'Pastel1', 'Pastel2', 'PinkGreen', 'PurpleBlue', 'PurpleGreen', 'PurpleOrange', 'PurpleRed', 'Purples', 'RedOrange', 'RedOrangeYellow', 'RedPurple', 'Reds', 'Set1', 'Set2', 'Set3', 'Spectral']
@@ -64,6 +66,7 @@ section on linear color maps) and accessed by name:
 .. code:: python
 
     toyplot.color.brewer("BlueYellowRed")
+
 
 
 
@@ -79,6 +82,7 @@ never be necessary, as we will see shortly):
 .. code:: python
 
     toyplot.color.brewer("BlueYellowRed", reverse=True)
+
 
 
 
@@ -100,6 +104,7 @@ fewer colors if necessary:
 
 
 
+
 .. parsed-literal::
 
     [3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -109,6 +114,7 @@ fewer colors if necessary:
 .. code:: python
 
     toyplot.color.brewer("BlueYellowRed", 5)
+
 
 
 
@@ -125,6 +131,7 @@ name:
 .. code:: python
 
     toyplot.color.brewer.category("BlueYellowRed")
+
 
 
 
@@ -155,6 +162,7 @@ abbreviations:
         if toyplot.color.brewer.category(name) == "sequential":
             IPython.display.display_html(IPython.display.HTML("<b>%s</b>" % name))
             IPython.display.display(toyplot.color.brewer(name))
+
 
 
 .. raw:: html
@@ -391,6 +399,7 @@ high/positive values map to warm colors, and renamed for consistency:
             IPython.display.display(toyplot.color.brewer(name))
 
 
+
 .. raw:: html
 
     <b>BlueGreenBrown</b>
@@ -515,6 +524,7 @@ modification:
             IPython.display.display(toyplot.color.brewer(name))
 
 
+
 .. raw:: html
 
     <b>Accent</b>
@@ -628,6 +638,7 @@ provided by a palette:
 
 
 
+
 .. raw:: html
 
     <div class="toyplot-color-LinearMap" style="overflow:hidden; height:auto"><div style="float:left;width:2.2px;height:20px;background-color:rgba(19.2%,21.2%,58.4%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(20%,23.7%,59.7%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(20.8%,26.2%,60.9%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(21.6%,28.7%,62.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(22.4%,31.2%,63.3%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(23.2%,33.7%,64.6%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(24%,36.1%,65.8%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(24.8%,38.6%,67%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(25.6%,41.1%,68.3%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(26.3%,43.6%,69.5%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(27.2%,46.1%,70.7%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(29.1%,48.3%,71.9%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(31%,50.5%,73%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(32.8%,52.8%,74.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(34.7%,55%,75.3%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(36.6%,57.2%,76.4%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(38.4%,59.4%,77.6%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(40.3%,61.6%,78.7%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(42.1%,63.9%,79.9%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(44%,66.1%,81%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(45.9%,68.2%,82.2%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(48.1%,69.9%,83.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(50.3%,71.7%,84.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(52.5%,73.4%,85%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(54.6%,75.2%,86%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(56.8%,76.9%,86.9%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(59%,78.6%,87.9%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(61.2%,80.4%,88.8%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(63.4%,82.1%,89.8%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(65.5%,83.9%,90.7%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(67.7%,85.4%,91.6%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(69.8%,86.4%,92.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(71.9%,87.5%,92.7%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(74%,88.5%,93.3%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(76.1%,89.5%,93.9%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(78.2%,90.6%,94.5%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(80.3%,91.6%,95.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(82.4%,92.6%,95.7%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(84.5%,93.6%,96.3%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(86.6%,94.7%,96.9%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(88.3%,95.5%,96.4%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(89.6%,96%,94.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(90.8%,96.4%,91.8%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(92%,96.9%,89.6%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(93.2%,97.4%,87.3%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(94.5%,97.9%,85.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(95.7%,98.3%,82.8%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(96.9%,98.8%,80.5%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(98.2%,99.3%,78.3%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.4%,99.8%,76%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(100%,99.4%,74%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.9%,98.2%,72.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.9%,96.9%,70.2%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.9%,95.7%,68.4%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.8%,94.5%,66.5%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.8%,93.2%,64.7%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.7%,92%,62.8%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.7%,90.8%,60.9%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.7%,89.6%,59.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.6%,88.3%,57.2%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.6%,86.7%,55.4%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.5%,84.7%,53.5%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.5%,82.7%,51.6%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.5%,80.7%,49.8%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.4%,78.7%,47.9%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.4%,76.8%,46%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.3%,74.8%,44.2%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.3%,72.8%,42.3%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.3%,70.8%,40.5%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99.2%,68.8%,38.6%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(99%,66.4%,37.2%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(98.6%,63.9%,36%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(98.3%,61.3%,34.8%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(97.9%,58.7%,33.6%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(97.5%,56.1%,32.5%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(97.2%,53.6%,31.3%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(96.8%,51%,30.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(96.5%,48.4%,28.9%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(96.1%,45.8%,27.7%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(95.8%,43.3%,26.5%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(94.8%,40.8%,25.4%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(93.6%,38.4%,24.3%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(92.5%,36%,23.2%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(91.3%,33.6%,22.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(90.2%,31.1%,21%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(89%,28.7%,19.8%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(87.9%,26.3%,18.7%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(86.7%,23.9%,17.6%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(85.6%,21.5%,16.5%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(84.4%,19.1%,15.4%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(82.5%,17.1%,15.3%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(80.6%,15.2%,15.2%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(78.6%,13.3%,15.2%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(76.6%,11.4%,15.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(74.6%,9.51%,15.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(72.6%,7.61%,15.1%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(70.6%,5.7%,15%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(68.7%,3.8%,15%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(66.7%,1.9%,14.9%,1)"></div><div style="float:left;width:2.2px;height:20px;background-color:rgba(64.7%,0%,14.9%,1)"></div></div>
@@ -654,9 +665,11 @@ each of the Color Brewer sequential palettes:
     
             axes = canvas.axes(grid=(grid_m, grid_n, index), ymin=0, ymax=100, gutter=20, xshow=True, yshow=True, label=name)
             axes.scatterplot(x, y, size=10**2, fill=x, fill_colormap=colormap)
+
 .. code:: python
 
     luma_plot([(name, toyplot.color.LinearMap(toyplot.color.brewer(name), 0, 1)) for name in toyplot.color.brewer.names() if toyplot.color.brewer.category(name) == "sequential"])
+
 
 
 .. raw:: html
@@ -883,6 +896,7 @@ And here are the diverging palettes, viewed in the same fashion:
 .. code:: python
 
     luma_plot([(name, toyplot.color.LinearMap(toyplot.color.brewer(name), 0, 1)) for name in toyplot.color.brewer.names() if toyplot.color.brewer.category(name) == "diverging"])
+
 
 
 .. raw:: html
@@ -1118,6 +1132,7 @@ colormap (mis)used by many mainstream visualization libraries:
 .. code:: python
 
     luma_plot([("jet", toyplot.color.LinearMap(toyplot.color.Palette(numpy.load("jet.npy")), 0, 1))])
+
 
 
 .. raw:: html
@@ -1358,6 +1373,7 @@ effects:
 .. code:: python
 
     luma_plot([(name, toyplot.color.diverging(name, 0, 1)) for name in toyplot.color.diverging.names()])
+
 
 
 .. raw:: html

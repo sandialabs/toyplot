@@ -9,12 +9,10 @@ import toyplot.broadcast
 import toyplot.require
 import toyplot.units
 
-def extents(x, y, text, style):
+def extents(text, style):
   """Compute (inexact) extents for a text string, based on the given coordinates and style.
   """
-  x = toyplot.require.scalar_vector(x)
-  y = toyplot.require.scalar_vector(y, x.shape[0])
-  text = toyplot.broadcast.object(text, x.shape[0])
+  text = toyplot.require.string_vector(text)
   lengths = numpy.array([len(string) for string in text])
 
   font_size = toyplot.units.convert(style["font-size"], target="px")
@@ -23,12 +21,13 @@ def extents(x, y, text, style):
   baseline_shift = toyplot.units.convert(style.get("baseline-shift", "0px"), target="px", reference=font_size)
   alignment_baseline = style["alignment-baseline"]
 
+  x = toyplot.broadcast.scalar(anchor_shift, text.shape)
+  y = toyplot.broadcast.scalar(-baseline_shift, text.shape)
+
   # Because we don't have any metrics for the font, assume that the average
   # character width and height match the font size.
   width = font_size * lengths
   height = font_size
-
-  x += float(anchor_shift)
 
   if text_anchor == "start":
     left = x
@@ -41,8 +40,6 @@ def extents(x, y, text, style):
     right = x
   else:
     raise ValueError("Unknown text-anchor value: %s" % text_anchor)
-
-  y -= baseline_shift
 
   if alignment_baseline == "hanging":
     top = y

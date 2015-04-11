@@ -737,10 +737,13 @@ def _render(canvas, axes, context):
         for location, label, title, label_style in zip(axes._xtick_locations, axes._xtick_labels, axes._xtick_titles, axes.x.ticks.labels.label.styles(axes._xtick_locations)):
           x = axes._project_x(location)
           y = axes._ymax_range
-          label_xml = xml.SubElement(ticks_group, "text", x=repr(x), y=repr(y), style=_css_style({"text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"-80%"}, axes.x.ticks.labels._style, label_style))
+          dstyle = toyplot.style.combine({"text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"-80%"}, axes.x.ticks.labels._style, label_style)
+          label_xml = xml.SubElement(ticks_group, "text", x=repr(x), y=repr(y), style=_css_style(dstyle))
           label_xml.text = label
           if axes.x.ticks.labels._angle:
             label_xml.set("transform", "rotate(%r, %r, %r)" % (axes.x.ticks.labels._angle, x, y))
+          if "-toyplot-anchor-shift" in dstyle:
+            label_xml.set("dx", str(dstyle["-toyplot-anchor-shift"]))
           if title is not None:
             xml.SubElement(label_xml, "title").text = str(title)
 
@@ -771,10 +774,13 @@ def _render(canvas, axes, context):
         for location, label, title, label_style in zip(axes._ytick_locations, axes._ytick_labels, axes._ytick_titles, axes.y.ticks.labels.label.styles(axes._ytick_locations)):
           x = axes._xmin_range
           y = axes._project_y(location)
-          label_xml = xml.SubElement(ticks_group, "text", x=repr(x), y=repr(y), style=_css_style({"text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"80%"}, axes.y.ticks.labels._style, label_style))
+          dstyle = toyplot.style.combine({"text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"80%"}, axes.y.ticks.labels._style, label_style)
+          label_xml = xml.SubElement(ticks_group, "text", x=repr(x), y=repr(y), style=_css_style(dstyle))
           label_xml.text = label
           if axes.y.ticks.labels._angle:
             label_xml.set("transform", "rotate(%r, %r, %r)" % (axes.y.ticks.labels._angle, x, y))
+          if "-toyplot-anchor-shift" in dstyle:
+            label_xml.set("dx", str(dstyle["-toyplot-anchor-shift"]))
           if title is not None:
             xml.SubElement(label_xml, "title").text = str(title)
 

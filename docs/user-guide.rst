@@ -13,6 +13,7 @@ Contents:
    :maxdepth: 2
 
    axes.rst
+   color.rst
    data-tables.rst
    markers.rst
    rendering.rst

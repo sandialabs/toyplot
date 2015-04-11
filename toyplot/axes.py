@@ -314,6 +314,7 @@ class Cartesian(object):
   class TickLabelsHelper(object):
     def __init__(self, angle):
       self._show = True
+      self._offset = 0
       self._angle = angle
       self._style = {"font-size":"10px", "font-weight":"normal", "stroke":"none"}
       self.label = Cartesian.PerTickHelper()
@@ -323,6 +324,12 @@ class Cartesian(object):
     @show.setter
     def show(self, value):
       self._show = value
+    @property
+    def offset(self):
+      return self._offset
+    @offset.setter
+    def offset(self, value):
+      self._offset = value
     @property
     def angle(self):
       return self._angle

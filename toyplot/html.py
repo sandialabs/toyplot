@@ -736,7 +736,7 @@ def _render(canvas, axes, context):
         ticks_group = xml.SubElement(axes_xml, "g")
         for location, label, title, label_style in zip(axes._xtick_locations, axes._xtick_labels, axes._xtick_titles, axes.x.ticks.labels.label.styles(axes._xtick_locations)):
           x = axes._project_x(location)
-          y = axes._ymax_range
+          y = axes._ymax_range + axes.x.ticks.labels._offset
           dstyle = toyplot.style.combine({"text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"-80%"}, axes.x.ticks.labels._style, label_style)
           label_xml = xml.SubElement(ticks_group, "text", x=repr(x), y=repr(y), style=_css_style(dstyle))
           label_xml.text = label
@@ -772,7 +772,7 @@ def _render(canvas, axes, context):
       if axes.y.ticks.labels._show:
         ticks_group = xml.SubElement(axes_xml, "g")
         for location, label, title, label_style in zip(axes._ytick_locations, axes._ytick_labels, axes._ytick_titles, axes.y.ticks.labels.label.styles(axes._ytick_locations)):
-          x = axes._xmin_range
+          x = axes._xmin_range - axes.y.ticks.labels._offset
           y = axes._project_y(location)
           dstyle = toyplot.style.combine({"text-anchor":"middle", "alignment-baseline":"middle", "baseline-shift":"80%"}, axes.y.ticks.labels._style, label_style)
           label_xml = xml.SubElement(ticks_group, "text", x=repr(x), y=repr(y), style=_css_style(dstyle))

@@ -466,8 +466,10 @@ class LinearMap(object):
     domain_min = self._domain_min if self._domain_min is not None else 0
     domain_max = self._domain_max if self._domain_max is not None else 1
     root_xml = xml.Element("div", style="overflow:hidden; height:auto", attrib={"class":"toyplot-color-LinearMap"})
-    for color in self.colors(numpy.linspace(domain_min, domain_max, 100, endpoint=True)):
-      xml.SubElement(root_xml, "div", style="float:left;width:1px;height:20px;background-color:%s" % to_css(color))
+    sample_count = 100
+    sample_width = len(self._palette) * 20.0 / sample_count
+    for color in self.colors(numpy.linspace(domain_min, domain_max, sample_count, endpoint=True)):
+      xml.SubElement(root_xml, "div", style="float:left;width:%spx;height:20px;background-color:%s" % (sample_width, to_css(color)))
     return xml.tostring(root_xml, method="html")
 
 def brewer(name, count=None, reverse=False):

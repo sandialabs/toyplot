@@ -169,7 +169,7 @@ class Canvas(object):
 
     Autorendering - which is enabled by default when a canvas is created -
     controls how the canvas should be displayed automatically without
-    caller intervention in certain interactive environments, such as IPython
+    caller intervention in certain interactive environments, such as Jupyter
     notebooks.
 
     Note that autorendering is disabled when a canvas is explicitly

@@ -109,8 +109,8 @@ class Palette(object):
   -----
   You can iterate over the colors in a Palette using normal Python iteration.
 
-  Palettes are displayed as a collection of color swatches when viewed in an
-  IPython notebook.
+  Palettes are displayed as a collection of color swatches when viewed in a
+  Jupyter notebook.
   """
   def __init__(self, colors=None, reverse=False):
     if colors is None:
@@ -201,7 +201,7 @@ class CategoricalMap(object):
   Notes
   -----
   Categorical maps are displayed as a collection of color swatches when viewed
-  in an IPython notebook.
+  in a Jupyter notebook.
   """
 
   def __init__(self, palette=None):
@@ -293,7 +293,7 @@ class DivergingMap(object):
 
   Notes
   -----
-  Diverging maps generate a color preview when viewed in an IPython notebook.
+  Diverging maps generate a color preview when viewed in a Jupyter notebook.
   """
 
   def __init__(self, low=None, high=None, domain_min=None, domain_max=None):
@@ -404,7 +404,7 @@ class LinearMap(object):
   Notes
   -----
   Linear maps are displayed as a color preview of their domain when viewed in
-  an IPython notebook.
+  a Jupyter notebook.
   """
 
   def __init__(self, palette=None, domain_min=None, domain_max=None):

@@ -16,6 +16,7 @@ import toyplot.layout
 import toyplot.locator
 import toyplot.mark
 import toyplot.require
+import toyplot.text
 
 ###############################################################################################
 # Helpers
@@ -356,6 +357,12 @@ class Cartesian(object):
     self._xmax_display_domain_implicit = None
     self._ymin_display_domain_implicit = None
     self._ymax_display_domain_implicit = None
+    self._expand_domain_range_x = None
+    self._expand_domain_range_y = None
+    self._expand_domain_range_left = None
+    self._expand_domain_range_right = None
+    self._expand_domain_range_top = None
+    self._expand_domain_range_bottom = None
     self._padding = padding
 
     if palette is None:
@@ -418,6 +425,69 @@ class Cartesian(object):
       self._ymin_data_domain_implicit = _null_min(y.min(), self._ymin_data_domain_implicit)
       self._ymax_data_domain_implicit = _null_max(y.max(), self._ymax_data_domain_implicit)
 
+  def _expand_domain_range(self, x, y, extents):
+    left, right, top, bottom = extents
+
+    self._expand_domain_range_x = x if self._expand_domain_range_x is None else numpy.concatenate((self._expand_domain_range_x, x))
+    self._expand_domain_range_y = y if self._expand_domain_range_y is None else numpy.concatenate((self._expand_domain_range_y, y))
+    self._expand_domain_range_left = left if self._expand_domain_range_left is None else numpy.concatenate((self._expand_domain_range_left, left))
+    self._expand_domain_range_right = right if self._expand_domain_range_right is None else numpy.concatenate((self._expand_domain_range_right, right))
+    self._expand_domain_range_top = top if self._expand_domain_range_top is None else numpy.concatenate((self._expand_domain_range_top, top))
+    self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate((self._expand_domain_range_bottom, bottom))
+
+  def _get_projections(self, xmin, xmax, ymin, ymax):
+    def x_linear_projection(domain_min, domain_max, range_min, range_max):
+      def implementation(x):
+        return (x - domain_min) / (domain_max - domain_min) * (range_max - range_min) + range_min
+      return implementation
+
+    def x_log_projection(domain_min, domain_max, range_min, range_max, base):
+      def implementation(x):
+        return (_signed_log(x, base) - _signed_log(domain_min, base)) / (_signed_log(domain_max, base) - _signed_log(domain_min, base)) * (range_max - range_min) + range_min
+      return implementation
+
+    def x_symlog_projection(domain_min, domain_max, range_min, range_max, base):
+      def implementation(x):
+        return (_symmetric_log(x, base) - _symmetric_log(domain_min, base)) / (_symmetric_log(domain_max, base) - _symmetric_log(domain_min, base)) * (range_max - range_min) + range_min
+      return implementation
+
+    def y_linear_projection(domain_min, domain_max, range_min, range_max):
+      def implementation(x):
+        return (1 - ((x - domain_min) / (domain_max - domain_min))) * (range_max - range_min) + range_min
+      return implementation
+
+    def y_log_projection(domain_min, domain_max, range_min, range_max, base):
+      def implementation(x):
+        return (1 - ((_signed_log(x, base) - _signed_log(domain_min, base)) / (_signed_log(domain_max, base) - _signed_log(domain_min, base)))) * (range_max - range_min) + range_min
+      return implementation
+
+    def y_symlog_projection(domain_min, domain_max, range_min, range_max, base):
+      def implementation(x):
+        return (1 - ((_symmetric_log(x, base) - _symmetric_log(domain_min, base)) / (_symmetric_log(domain_max, base) - _symmetric_log(domain_min, base)))) * (range_max - range_min) + range_min
+      return implementation
+
+    if self.x._scale == "linear":
+      xprojection = x_linear_projection(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding)
+    else:
+      scale, base = self.x._scale
+      if scale == "log":
+        if xmax < 0 or 0 < xmin:
+          xprojection = x_log_projection(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
+        else:
+          xprojection = x_symlog_projection(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
+
+    if self.y._scale == "linear":
+      yprojection = y_linear_projection(ymin, ymax, self._ymin_range + self._padding, self._ymax_range - self._padding)
+    else:
+      scale, base = self.y._scale
+      if scale == "log":
+        if ymax < 0 or 0 < ymin:
+          yprojection = y_log_projection(ymin, ymax, self._ymin_range + self._padding, self._ymax_range - self._padding, base)
+        else:
+          yprojection = y_symlog_projection(ymin, ymax, self._ymin_range + self._padding, self._ymax_range - self._padding, base)
+
+    return xprojection, yprojection
+
   def _finalize_domain(self):
     # Begin with the implicit domain defined by our children.
     xmin = self._xmin_display_domain_implicit
@@ -434,6 +504,18 @@ class Cartesian(object):
       ymin = 0
     if ymax is None:
       ymax = 0
+
+    # Ensure that the domain is never empty.
+    if xmin == xmax:
+      xmin -= 0.5
+      xmax += 0.5
+
+    if ymin == ymax:
+      ymin -= 0.5
+      ymax += 0.5
+
+    # Get temporary projections so we can expand the domain.
+    xprojection, yprojection = self._get_projections(xmin, xmax, ymin, ymax)
 
     # Allow users to override the domain.
     if self.x.domain._min is not None:
@@ -486,55 +568,8 @@ class Cartesian(object):
     self._ymin_computed = ymin
     self._ymax_computed = ymax
 
-    def x_linear_projection(domain_min, domain_max, range_min, range_max):
-      def implementation(x):
-        return (x - domain_min) / (domain_max - domain_min) * (range_max - range_min) + range_min
-      return implementation
-
-    def x_log_projection(domain_min, domain_max, range_min, range_max, base):
-      def implementation(x):
-        return (_signed_log(x, base) - _signed_log(domain_min, base)) / (_signed_log(domain_max, base) - _signed_log(domain_min, base)) * (range_max - range_min) + range_min
-      return implementation
-
-    def x_symlog_projection(domain_min, domain_max, range_min, range_max, base):
-      def implementation(x):
-        return (_symmetric_log(x, base) - _symmetric_log(domain_min, base)) / (_symmetric_log(domain_max, base) - _symmetric_log(domain_min, base)) * (range_max - range_min) + range_min
-      return implementation
-
-    def y_linear_projection(domain_min, domain_max, range_min, range_max):
-      def implementation(x):
-        return (1 - ((x - domain_min) / (domain_max - domain_min))) * (range_max - range_min) + range_min
-      return implementation
-
-    def y_log_projection(domain_min, domain_max, range_min, range_max, base):
-      def implementation(x):
-        return (1 - ((_signed_log(x, base) - _signed_log(domain_min, base)) / (_signed_log(domain_max, base) - _signed_log(domain_min, base)))) * (range_max - range_min) + range_min
-      return implementation
-
-    def y_symlog_projection(domain_min, domain_max, range_min, range_max, base):
-      def implementation(x):
-        return (1 - ((_symmetric_log(x, base) - _symmetric_log(domain_min, base)) / (_symmetric_log(domain_max, base) - _symmetric_log(domain_min, base)))) * (range_max - range_min) + range_min
-      return implementation
-
-    if self.x._scale == "linear":
-      self._xprojection = x_linear_projection(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding)
-    else:
-      scale, base = self.x._scale
-      if scale == "log":
-        if xmax < 0 or 0 < xmin:
-          self._xprojection = x_log_projection(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
-        else:
-          self._xprojection = x_symlog_projection(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
-
-    if self.y._scale == "linear":
-      self._yprojection = y_linear_projection(ymin, ymax, self._ymin_range + self._padding, self._ymax_range - self._padding)
-    else:
-      scale, base = self.y._scale
-      if scale == "log":
-        if ymax < 0 or 0 < ymin:
-          self._yprojection = y_log_projection(ymin, ymax, self._ymin_range + self._padding, self._ymax_range - self._padding, base)
-        else:
-          self._yprojection = y_symlog_projection(ymin, ymax, self._ymin_range + self._padding, self._ymax_range - self._padding, base)
+    # Get the final projections for rendering.
+    self._xprojection, self._yprojection = self._get_projections(xmin, xmax, ymin, ymax)
 
   def _project_x(self, x):
     return self._xprojection(x)
@@ -1165,12 +1200,13 @@ class Cartesian(object):
     table["fill"] = toyplot.broadcast.object(fill, table.shape[0])
     table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
     table["title"] = toyplot.broadcast.object(title, table.shape[0])
-    style = toyplot.style.combine({"font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
+    style = toyplot.style.combine({"font-size":"12px", "font-weight":"normal", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
 
     default_color = next(self._text_colors)
     table["toyplot:fill"] = toyplot.color.broadcast(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
 
     self._update_domain(table["x"], table["y"])
+    self._expand_domain_range(table["x"], table["y"], toyplot.text.extents(table["text"], style))
 
     self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style))
     return self._children[-1]

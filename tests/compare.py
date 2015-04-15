@@ -17,7 +17,7 @@ if len(arguments.files) == 1:
 else:
   paths = arguments.files
 
-subprocess.check_call(["qlmanage", "-p"] + paths)
+#subprocess.check_call(["qlmanage", "-p"] + paths)
 
 directory = tempfile.mkdtemp()
 comparison_paths = []

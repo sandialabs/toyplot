@@ -10,9 +10,9 @@ def step_impl(context):
 
 @then(u'text can be aligned with left alignment')
 def step_impl(context):
-  context.axes.text(0, 0, "Text!", style={"font-size":"24px", "text-anchor":"begin"})
+  context.axes.text(0, 0, "Text!", style={"font-size":"24px", "text-anchor":"start"})
   context.axes.scatterplot(0, 0, color="black", size=7);
-  toyplot.testing.assert_canvas_equal(context.canvas, "text-anchor-begin")
+  toyplot.testing.assert_canvas_equal(context.canvas, "text-anchor-start")
 
 @then(u'text can be aligned with center alignment')
 def step_impl(context):

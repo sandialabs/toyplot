@@ -998,7 +998,7 @@ def test_axes_text_angle_fill():
 
   canvas = toyplot.Canvas(400, 400)
   axes = canvas.axes(xmin=-0.25, xmax=0.5, ymin=-0.5, ymax=0.25)
-  axes.text(x, y, text="Toyplot!", angle=angle, fill=fill, style={"font-size":"36px", "font-weight":"bold", "stroke":"white", "text-anchor":"begin"})
+  axes.text(x, y, text="Toyplot!", angle=angle, fill=fill, style={"font-size":"36px", "font-weight":"bold", "stroke":"white", "text-anchor":"start"})
 
   assert_canvas_matches(canvas, "axes-text-angle-fill")
 

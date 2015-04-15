@@ -303,7 +303,7 @@ class Cartesian(object):
       return self._length
     @length.setter
     def length(self, value):
-      self._length = value
+      self._length = toyplot.units.convert(value, target="px", default="px")
     @property
     def style(self):
       return self._style
@@ -329,7 +329,7 @@ class Cartesian(object):
       return self._offset
     @offset.setter
     def offset(self, value):
-      self._offset = value
+      self._offset = toyplot.units.convert(value, target="px", default="px")
     @property
     def angle(self):
       return self._angle
@@ -356,7 +356,9 @@ class Cartesian(object):
     self._xmax_display_domain_implicit = None
     self._ymin_display_domain_implicit = None
     self._ymax_display_domain_implicit = None
-    self._padding = padding
+    self._padding = toyplot.units.convert(padding, target="px", default="px")
+
+    tick_length = toyplot.units.convert(tick_length, target="px", default="px")
 
     if palette is None:
       palette = toyplot.color.Palette()
@@ -396,7 +398,7 @@ class Cartesian(object):
     return self._padding
   @padding.setter
   def padding(self, value):
-    self._padding = value
+    self._padding = toyplot.units.convert(value, target="px", default="px")
 
   def _update_domain(self, x, y, display=True, data=True):
     x = _flat_non_null(x)

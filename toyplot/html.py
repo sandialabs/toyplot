@@ -611,18 +611,18 @@ def _render_marker(root, cx, cy, size, marker, marker_style=None, label_style=No
     attrib["class"] = extra_class
   marker_xml = xml.SubElement(root, "g", attrib=attrib)
   if shape == "|":
-    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (-shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
   elif shape == "+":
-    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
-    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx - (size / 2)), x2=repr(cx + (size / 2)), y1=repr(cy), y2=repr(cy))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (-shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (-shape_angle, cx, cy), x1=repr(cx - (size / 2)), x2=repr(cx + (size / 2)), y1=repr(cy), y2=repr(cy))
   elif shape == "*":
-    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
-    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle - 60, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
-    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle + 60, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (-shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (-shape_angle + 60, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (-shape_angle - 60, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
   elif shape == "^":
-    xml.SubElement(marker_xml, "polygon", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), points=" ".join(["%r,%r" % (xp, yp) for xp, yp in [(cx - (size / 2), cy + (size / 2)), (cx, cy - (size / 2)), (cx + (size / 2), cy + (size / 2))]]))
+    xml.SubElement(marker_xml, "polygon", transform="rotate(%r, %r, %r)" % (-shape_angle, cx, cy), points=" ".join(["%r,%r" % (xp, yp) for xp, yp in [(cx - (size / 2), cy + (size / 2)), (cx, cy - (size / 2)), (cx + (size / 2), cy + (size / 2))]]))
   elif shape == "s":
-    xml.SubElement(marker_xml, "rect", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x=repr(cx-(size / 2)), y=repr(cy-(size / 2)), width=repr(size), height=repr(size))
+    xml.SubElement(marker_xml, "rect", transform="rotate(%r, %r, %r)" % (-shape_angle, cx, cy), x=repr(cx-(size / 2)), y=repr(cy-(size / 2)), width=repr(size), height=repr(size))
   elif shape == "o":
     xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
   elif shape == "oo":
@@ -630,16 +630,16 @@ def _render_marker(root, cx, cy, size, marker, marker_style=None, label_style=No
     xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 4))
   elif shape == "o|":
     xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
-    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (-shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
   elif shape == "o+":
     xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
-    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
-    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx - (size / 2)), x2=repr(cx + (size / 2)), y1=repr(cy), y2=repr(cy))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (-shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (-shape_angle, cx, cy), x1=repr(cx - (size / 2)), x2=repr(cx + (size / 2)), y1=repr(cy), y2=repr(cy))
   elif shape == "o*":
     xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
-    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
-    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle - 60, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
-    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (shape_angle + 60, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (-shape_angle, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (-shape_angle + 60, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
+    xml.SubElement(marker_xml, "line", transform="rotate(%r, %r, %r)" % (-shape_angle - 60, cx, cy), x1=repr(cx), x2=repr(cx), y1=repr(cy - (size / 2)), y2=repr(cy + (size / 2)))
   elif shape == "path":
     shape_path = marker.get("path")
     xml.SubElement(marker_xml, "path", transform="translate(%r, %r) scale(%r) translate(%r, %r)" % (cx, cy, size, -cx, -cy), d="M " + repr(cx) + " " + repr(cy) + shape_path)
@@ -741,7 +741,7 @@ def _render(canvas, axes, context):
           label_xml = xml.SubElement(ticks_group, "text", x=repr(x), y=repr(y), style=_css_style(dstyle))
           label_xml.text = label
           if axes.x.ticks.labels._angle:
-            label_xml.set("transform", "rotate(%r, %r, %r)" % (axes.x.ticks.labels._angle, x, y))
+            label_xml.set("transform", "rotate(%r, %r, %r)" % (-axes.x.ticks.labels._angle, x, y))
           if "-toyplot-anchor-shift" in dstyle:
             label_xml.set("dx", str(dstyle["-toyplot-anchor-shift"]))
           if title is not None:
@@ -778,7 +778,7 @@ def _render(canvas, axes, context):
           label_xml = xml.SubElement(ticks_group, "text", x=repr(x), y=repr(y), style=_css_style(dstyle))
           label_xml.text = label
           if axes.y.ticks.labels._angle:
-            label_xml.set("transform", "rotate(%r, %r, %r)" % (axes.y.ticks.labels._angle, x, y))
+            label_xml.set("transform", "rotate(%r, %r, %r)" % (-axes.y.ticks.labels._angle, x, y))
           if "-toyplot-anchor-shift" in dstyle:
             label_xml.set("dx", str(dstyle["-toyplot-anchor-shift"]))
           if title is not None:
@@ -1167,7 +1167,7 @@ def _render(parent, mark, context):
   series_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Series"})
   for dx, dy, dtext, dangle, dfill, dopacity, dtitle in zip(x, y, mark._table[mark._text[0]], mark._table[mark._angle[0]], mark._table[mark._fill[0]], mark._table[mark._opacity[0]], mark._table[mark._title[0]]):
     dstyle = toyplot.style.combine({"fill":toyplot.color.to_css(dfill), "opacity":dopacity}, mark._style)
-    datum_xml = xml.SubElement(series_xml, "text", attrib={"class":"toyplot-Datum"}, x=repr(dx), y=repr(dy), transform="rotate(%r, %r, %r)" % (dangle, dx, dy), style=_css_style(dstyle))
+    datum_xml = xml.SubElement(series_xml, "text", attrib={"class":"toyplot-Datum"}, x=repr(dx), y=repr(dy), transform="rotate(%r, %r, %r)" % (-dangle, dx, dy), style=_css_style(dstyle))
     if "-toyplot-anchor-shift" in dstyle:
       datum_xml.set("dx", str(dstyle["-toyplot-anchor-shift"]))
     if dtext is not None:

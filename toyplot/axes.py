@@ -369,7 +369,7 @@ class Cartesian(object):
     self.coordinates = Cartesian.CoordinatesHelper(show=True, xmin_range=xmax_range - 100, xmax_range=xmax_range - 10, ymin_range = ymin_range + 10, ymax_range = ymin_range + 24, style={})
     self.label = Cartesian.LabelHelper(label=label, style={"font-size":"14px", "baseline-shift":"100%"})
     self.x = Cartesian.AxisHelper(show=xshow, label=xlabel, label_style={"baseline-shift":"-200%"}, min=xmin, max=xmax, tick_length=tick_length, tick_locator=xticklocator, tick_angle=0, scale=xscale)
-    self.y = Cartesian.AxisHelper(show=yshow, label=ylabel, label_style={"baseline-shift":"200%"}, min=ymin, max=ymax, tick_length=tick_length, tick_locator=yticklocator, tick_angle=-90, scale=yscale)
+    self.y = Cartesian.AxisHelper(show=yshow, label=ylabel, label_style={"baseline-shift":"200%"}, min=ymin, max=ymax, tick_length=tick_length, tick_locator=yticklocator, tick_angle=90, scale=yscale)
 
     self._parent = parent
     self._children = []

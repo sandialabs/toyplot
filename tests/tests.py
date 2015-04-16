@@ -925,11 +925,11 @@ def test_axes_scatterplot_markers():
     "",
     "|",
     "-",
-    {"shape":"|", "angle":45},
     {"shape":"|", "angle":-45},
+    {"shape":"|", "angle":45},
     "+",
     "x",
-    {"shape":"x", "angle":22.5},
+    {"shape":"x", "angle":-22.5},
     "*",
     "^",
     {"shape":">", "mstyle":{"stroke":"red"}},
@@ -993,7 +993,7 @@ def test_axes_text():
 def test_axes_text_angle_fill():
   x = numpy.zeros(10)
   y = x
-  angle = numpy.linspace(90, 0, len(x), endpoint=True)
+  angle = numpy.linspace(-90, 0, len(x), endpoint=True)
   fill = numpy.linspace(1, 0, len(x))
 
   canvas = toyplot.Canvas(400, 400)

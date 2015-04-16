@@ -425,16 +425,6 @@ class Cartesian(object):
     self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate((self._expand_domain_range_bottom, bottom))
 
   def _get_projections(self, xmin, xmax, ymin, ymax):
-#    def x_symlog_projection(domain_min, domain_max, range_min, range_max, base):
-#      def implementation(x):
-#        return (_symmetric_log(x, base) - _symmetric_log(domain_min, base)) / (_symmetric_log(domain_max, base) - _symmetric_log(domain_min, base)) * (range_max - range_min) + range_min
-#      return implementation
-
-#    def y_symlog_projection(domain_min, domain_max, range_min, range_max, base):
-#      def implementation(x):
-#        return (1 - ((_symmetric_log(x, base) - _symmetric_log(domain_min, base)) / (_symmetric_log(domain_max, base) - _symmetric_log(domain_min, base)))) * (range_max - range_min) + range_min
-#      return implementation
-
     if self.x._scale == "linear":
       xprojection = toyplot.projection.Linear(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding)
     else:
@@ -443,7 +433,6 @@ class Cartesian(object):
         if xmax < 0 or 0 < xmin:
           xprojection = toyplot.projection.Log(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
         else:
-          #xprojection = x_symlog_projection(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
           xprojection = toyplot.projection.SymmetricLog(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
 
     if self.y._scale == "linear":
@@ -454,7 +443,6 @@ class Cartesian(object):
         if ymax < 0 or 0 < ymin:
           yprojection = toyplot.projection.Log(ymin, ymax, self._ymax_range - self._padding, self._ymin_range + self._padding, base)
         else:
-          #yprojection = y_symlog_projection(ymin, ymax, self._ymin_range + self._padding, self._ymax_range - self._padding, base)
           yprojection = toyplot.projection.SymmetricLog(ymin, ymax, self._ymax_range - self._padding, self._ymin_range + self._padding, base)
 
     return xprojection, yprojection
@@ -485,8 +473,26 @@ class Cartesian(object):
       ymin -= 0.5
       ymax += 0.5
 
-    # Get temporary projections so we can expand the domain.
-    xprojection, yprojection = self._get_projections(xmin, xmax, ymin, ymax)
+    # Optionally expand the domain in range-space (used to make room for text).
+    if self._expand_domain_range_x is not None:
+      x_projection, y_projection = self._get_projections(xmin, xmax, ymin, ymax)
+
+      range_x = x_projection(self._expand_domain_range_x)
+      range_y = y_projection(self._expand_domain_range_y)
+      range_left = range_x + self._expand_domain_range_left
+      range_right = range_x + self._expand_domain_range_right
+      range_top = range_y + self._expand_domain_range_top
+      range_bottom = range_y + self._expand_domain_range_bottom
+
+      domain_left = x_projection.inverse(range_left)
+      domain_right = x_projection.inverse(range_right)
+      domain_top = y_projection.inverse(range_top)
+      domain_bottom = y_projection.inverse(range_bottom)
+
+      xmin = _null_min(domain_left.min(), xmin)
+      xmax = _null_max(domain_right.max(), xmax)
+      ymin = _null_min(domain_bottom.min(), ymin)
+      ymax = _null_max(domain_top.max(), ymax)
 
     # Allow users to override the domain.
     if self.x.domain._min is not None:

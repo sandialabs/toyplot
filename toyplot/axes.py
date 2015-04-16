@@ -15,6 +15,7 @@ import toyplot.format
 import toyplot.layout
 import toyplot.locator
 import toyplot.mark
+import toyplot.projection
 import toyplot.require
 import toyplot.text
 
@@ -44,18 +45,6 @@ def _flat_non_null(array):
     array = array.ravel()
   array = array[numpy.invert(numpy.isnan(array))]
   return array
-
-def _signed_log(x, base):
-  """Return the log of a number, retaining its sign (e.g. return -3 for log-base-10 of -1000)."""
-  return numpy.sign(x) * numpy.log10(numpy.abs(x)) / numpy.log10(base)
-
-def _symmetric_log(x, base, threshold=1):
-  if isinstance(x, numpy.ndarray):
-    x = numpy.ma.array(x, copy=True, dtype="float64")
-    i = numpy.logical_and(~numpy.ma.getmaskarray(x), numpy.logical_or(x.data < -threshold, x.data > threshold))
-    x[i] = numpy.sign(x[i]) * (threshold + numpy.log10(numpy.abs(x[i])) / numpy.log10(base))
-    return x
-  return x if numpy.abs(x) < threshold else numpy.sign(x) * (threshold + numpy.log10(numpy.abs(x)) / numpy.log10(base))
 
 class OrderedSet(collections.MutableSet):
   """Python recipe from http://code.activestate.com/recipes/576694-orderedset
@@ -436,55 +425,37 @@ class Cartesian(object):
     self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate((self._expand_domain_range_bottom, bottom))
 
   def _get_projections(self, xmin, xmax, ymin, ymax):
-    def x_linear_projection(domain_min, domain_max, range_min, range_max):
-      def implementation(x):
-        return (x - domain_min) / (domain_max - domain_min) * (range_max - range_min) + range_min
-      return implementation
+#    def x_symlog_projection(domain_min, domain_max, range_min, range_max, base):
+#      def implementation(x):
+#        return (_symmetric_log(x, base) - _symmetric_log(domain_min, base)) / (_symmetric_log(domain_max, base) - _symmetric_log(domain_min, base)) * (range_max - range_min) + range_min
+#      return implementation
 
-    def x_log_projection(domain_min, domain_max, range_min, range_max, base):
-      def implementation(x):
-        return (_signed_log(x, base) - _signed_log(domain_min, base)) / (_signed_log(domain_max, base) - _signed_log(domain_min, base)) * (range_max - range_min) + range_min
-      return implementation
-
-    def x_symlog_projection(domain_min, domain_max, range_min, range_max, base):
-      def implementation(x):
-        return (_symmetric_log(x, base) - _symmetric_log(domain_min, base)) / (_symmetric_log(domain_max, base) - _symmetric_log(domain_min, base)) * (range_max - range_min) + range_min
-      return implementation
-
-    def y_linear_projection(domain_min, domain_max, range_min, range_max):
-      def implementation(x):
-        return (1 - ((x - domain_min) / (domain_max - domain_min))) * (range_max - range_min) + range_min
-      return implementation
-
-    def y_log_projection(domain_min, domain_max, range_min, range_max, base):
-      def implementation(x):
-        return (1 - ((_signed_log(x, base) - _signed_log(domain_min, base)) / (_signed_log(domain_max, base) - _signed_log(domain_min, base)))) * (range_max - range_min) + range_min
-      return implementation
-
-    def y_symlog_projection(domain_min, domain_max, range_min, range_max, base):
-      def implementation(x):
-        return (1 - ((_symmetric_log(x, base) - _symmetric_log(domain_min, base)) / (_symmetric_log(domain_max, base) - _symmetric_log(domain_min, base)))) * (range_max - range_min) + range_min
-      return implementation
+#    def y_symlog_projection(domain_min, domain_max, range_min, range_max, base):
+#      def implementation(x):
+#        return (1 - ((_symmetric_log(x, base) - _symmetric_log(domain_min, base)) / (_symmetric_log(domain_max, base) - _symmetric_log(domain_min, base)))) * (range_max - range_min) + range_min
+#      return implementation
 
     if self.x._scale == "linear":
-      xprojection = x_linear_projection(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding)
+      xprojection = toyplot.projection.Linear(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding)
     else:
       scale, base = self.x._scale
       if scale == "log":
         if xmax < 0 or 0 < xmin:
-          xprojection = x_log_projection(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
+          xprojection = toyplot.projection.Log(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
         else:
-          xprojection = x_symlog_projection(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
+          #xprojection = x_symlog_projection(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
+          xprojection = toyplot.projection.SymmetricLog(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
 
     if self.y._scale == "linear":
-      yprojection = y_linear_projection(ymin, ymax, self._ymin_range + self._padding, self._ymax_range - self._padding)
+      yprojection = toyplot.projection.Linear(ymin, ymax, self._ymax_range - self._padding, self._ymin_range + self._padding)
     else:
       scale, base = self.y._scale
       if scale == "log":
         if ymax < 0 or 0 < ymin:
-          yprojection = y_log_projection(ymin, ymax, self._ymin_range + self._padding, self._ymax_range - self._padding, base)
+          yprojection = toyplot.projection.Log(ymin, ymax, self._ymax_range - self._padding, self._ymin_range + self._padding, base)
         else:
-          yprojection = y_symlog_projection(ymin, ymax, self._ymin_range + self._padding, self._ymax_range - self._padding, base)
+          #yprojection = y_symlog_projection(ymin, ymax, self._ymin_range + self._padding, self._ymax_range - self._padding, base)
+          yprojection = toyplot.projection.SymmetricLog(ymin, ymax, self._ymax_range - self._padding, self._ymin_range + self._padding, base)
 
     return xprojection, yprojection
 

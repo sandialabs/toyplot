@@ -2,5 +2,5 @@ language: python
 python:
   - "3.3"
   - "2.7"
-install: pip install -r requirements.txt --use-mirrors
+install: pip install colormath multipledispatch numpy>=1.7 behave
 script: python regression.py

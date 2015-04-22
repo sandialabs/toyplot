@@ -7,6 +7,8 @@ before_install:
   - sudo apt-get install -y ffmpeg python-gtk2
 install:
   - pip install behave "colormath>=2.1.0" coverage coveralls mock multipledispatch networkx "numpy>=1.7"
+before_script:
+  - python -c "import cairo; print cairo.version, cairo.cairo_version_string()"
 script:
   - coverage run --source toyplot --omit toyplot/testing.py -m nose
   - coverage run --append --source toyplot --omit toyplot/testing.py -m behave

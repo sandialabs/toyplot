@@ -2,5 +2,5 @@ language: python
 python:
   - "3.3"
   - "2.7"
-install: pip install colormath multipledispatch numpy>=1.7 behave
+install: pip install behave colormath coverage multipledispatch numpy>=1.7
 script: python regression.py

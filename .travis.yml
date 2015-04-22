@@ -3,8 +3,10 @@ python:
   - "2.7"
   - "3.3"
 install:
-  - pip install behave colormath coverage multipledispatch networkx numpy>=1.7
+  - pip install behave colormath coverage coveralls multipledispatch networkx numpy>=1.7
 script:
   - coverage run --source toyplot -m nose
   - coverage run --source toyplot --append -m behave
   - coverage report
+after_success:
+  - coveralls

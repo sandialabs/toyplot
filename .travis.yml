@@ -8,8 +8,8 @@ before_install:
 install:
   - pip install behave colormath coverage coveralls multipledispatch networkx numpy>=1.7
 script:
-  - coverage run --source toyplot -m nose
-  - coverage run --source toyplot --append -m behave
+  - coverage run --source toyplot --omit toyplot/testing.py -m nose
+  - coverage run --source toyplot --omit toyplot/testing.py -m behave --append
   - coverage report
 after_script:
   - coveralls

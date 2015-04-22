@@ -8,6 +8,9 @@ before_install:
 install:
   - pip install behave "colormath>=2.1.0" coverage coveralls mock multipledispatch networkx "numpy>=1.7"
 before_script:
+  - dpkg-query -L python-gtk2
+  - dpkg-query -L cairo 
+  - python -c "import pprint,sys;pprint.pprint(sys.path)"
   - python -c "import cairo; print cairo.version, cairo.cairo_version_string()"
 script:
   - coverage run --source toyplot --omit toyplot/testing.py -m nose

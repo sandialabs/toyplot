@@ -6,8 +6,14 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y ffmpeg python-gtk2
 install:
-  - pip install behave "colormath>=2.1.0" coverage coveralls mock multipledispatch networkx "numpy>=1.7" ruamel.venvgtk
+  - pip install behave "colormath>=2.1.0" coverage coveralls mock multipledispatch networkx "numpy>=1.7"
 before_script:
+  - mkdir -p lib/python2.7/dist-packages/
+  - ln -s /usr/lib/python2.7/dist-packages/glib/ lib/python2.7/dist-packages/
+  - ln -s /usr/lib/python2.7/dist-packages/gobject/ lib/python2.7/dist-packages/
+  - ln -s /usr/lib/python2.7/dist-packages/gtk-2.0* lib/python2.7/dist-packages/
+  - ln -s /usr/lib/python2.7/dist-packages/pygtk.pth lib/python2.7/dist-packages/
+  - ln -s /usr/lib/python2.7/dist-packages/cairo lib/python2.7/dist-packages/
   - dpkg-query -L python-gtk2
   - dpkg-query -L python-cairo
   - python -c "import pprint,sys;pprint.pprint(sys.path)"

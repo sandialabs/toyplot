@@ -31,7 +31,8 @@ def convert(value, target, default=None, reference=None):
     `relative` has been specified.
   reference: optional number
     When the caller specifies a relative measure using % as the unit abbreviation,
-    the returned value will equal `value` * 0.01 * `reference`.
+    the returned value will equal `value` * 0.01 * `reference`.  Note that the
+    reference *must* be specified in `target` units.
 
   Returns
   -------

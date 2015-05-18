@@ -1183,7 +1183,7 @@ class Cartesian(object):
     table["toyplot:fill"] = toyplot.color.broadcast(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
 
     self._update_domain(table["x"], table["y"])
-    self._expand_domain_range(table["x"], table["y"], toyplot.text.extents(table["text"], style))
+    self._expand_domain_range(table["x"], table["y"], toyplot.text.extents(table["text"], table["angle"], style))
 
     self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style))
     return self._children[-1]

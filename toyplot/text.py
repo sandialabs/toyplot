@@ -7,9 +7,10 @@ from __future__ import division
 import numpy
 import toyplot.broadcast
 import toyplot.require
+import toyplot.transform
 import toyplot.units
 
-def extents(text, style):
+def extents(text, angle, style):
   """Compute (inexact) extents for a text string, based on the given coordinates and style.
   """
   text = toyplot.require.string_vector(text)
@@ -29,6 +30,7 @@ def extents(text, style):
   width = font_size * lengths
   height = font_size
 
+  # Compute left/right extents relative to the text anchor.
   if text_anchor == "start":
     left = x
     right = x + width
@@ -41,6 +43,7 @@ def extents(text, style):
   else:
     raise ValueError("Unknown text-anchor value: %s" % text_anchor)
 
+  # Compute top/bottom extents relative to the text baseline.
   if alignment_baseline == "hanging":
     top = y
     bottom = y + height
@@ -52,6 +55,24 @@ def extents(text, style):
     bottom = y
   else:
     raise ValueError("Unknown alignment-baseline value: %s" % alignment_baseline)
+
+  # Compute axis-aligned extents regardless of the text rotation angle.
+  corner1 = numpy.column_stack((left, -top))
+  corner2 = numpy.column_stack((right, -top))
+  corner3 = numpy.column_stack((right, -bottom))
+  corner4 = numpy.column_stack((left, -bottom))
+
+  for index, theta in enumerate(angle):
+    transformation = toyplot.transform.rotation(theta)
+    corner1[index] = corner1[index] * transformation
+    corner2[index] = corner2[index] * transformation
+    corner3[index] = corner3[index] * transformation
+    corner4[index] = corner4[index] * transformation
+
+  left = numpy.minimum(corner1.T[0], numpy.minimum(corner2.T[0], numpy.minimum(corner3.T[0], corner4.T[0])))
+  right = numpy.maximum(corner1.T[0], numpy.maximum(corner2.T[0], numpy.maximum(corner3.T[0], corner4.T[0])))
+  top = -numpy.maximum(corner1.T[1], numpy.maximum(corner2.T[1], numpy.maximum(corner3.T[1], corner4.T[1])))
+  bottom = -numpy.minimum(corner1.T[1], numpy.minimum(corner2.T[1], numpy.minimum(corner3.T[1], corner4.T[1])))
 
   return (left, right, top, bottom)
 

@@ -22,13 +22,14 @@ def _assert_content_equal(content, test_file, reference_file):
   if os.path.exists(test_file):
     os.remove(test_file)
   if os.path.exists(reference_file):
-    reference_html = open(reference_file, "rb").read()
-    if content != reference_html:
+    reference = open(reference_file, "rb").read()
+    if content != reference:
       if not os.path.exists(failed_dir):
         os.mkdir(failed_dir)
       with open(test_file, "wb") as file:
         file.write(content)
-      raise AssertionError("Test output %s doesn't match %s." % (test_file, reference_file))
+      #raise AssertionError("Test output %s doesn't match %s." % (test_file, reference_file))
+      raise AssertionError("\n".join(list(difflib.context_diff(content.split("\n"), reference.split("\n"), lineterm="", fromfile="test", tofile="reference"))))
   else:
     with open(reference_file, "wb") as file:
       file.write(content)

@@ -698,8 +698,8 @@ following:
 
 -  axes.show - set to *False* to hide the axes completely (the plotted
    data will still be visible).
--  axes.padding - controls a small gap, measured in CSS pixels, between
-   the axes and their contents.
+-  axes.padding - a small gap between the axes and their contents.
+   Defaults to CSS pixels, supports all :ref:`units`.
 -  axes.label.text - optional label at the top of the axes.
 -  axes.label.style - styles the axes label text.
 -  axes.coordinates.show - set to *False* to disable interactive mouse
@@ -727,14 +727,14 @@ following:
    :py:class:`toyplot.locator.SymmetricLog` to control the positioning
    and formatting of ticks and tick labels. By default, an appropriate
    locator is automatically chosen based on the axis scale and domain.
--  axes.x.ticks.length - controls the length of X axis ticks in CSS
-   pixels.
+-  axes.x.ticks.length - length of X axis ticks. Defaults to CSS pixels,
+   supports all :ref:`units`.
 -  axes.x.ticks.style - styles the X axis ticks.
 -  axes.x.ticks.labels.show - set to *False* to hide X axis tick labels.
 -  axes.x.ticks.labels.angle - set the angle of X axis tick labels in
    degrees.
--  axes.x.ticks.labels.offset - offsets labels from the axis by the
-   given amount.
+-  axes.x.ticks.labels.offset - offsets labels from the axis. Defaults
+   to CSS pixels, supports all :ref:`units`.
 -  axes.x.ticks.labels.style - style X axis tick label text.
 -  ... and equivalent properties for the Y axis.
 

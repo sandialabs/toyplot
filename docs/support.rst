@@ -5,9 +5,9 @@
 Support
 =======
 
-For Toyplot questions, comments, or suggestions, get in touch with the team at:
+The Toyplot documentation:
 
-* https://gitter.im/sandialabs/toyplot
+* http://toyplot.readthedocs.org
 
 Visit our GitHub repository for access to source code, issue tracker, and the wiki:
 
@@ -16,7 +16,15 @@ Visit our GitHub repository for access to source code, issue tracker, and the wi
 We also have a continuous integration server that runs the Toyplot regression test
 suite anytime changes are committed to GitHub:
 
-* http://54.68.38.160/waterfall
+* https://travis-ci.org/sandialabs/toyplot
+
+And here are our test coverage stats, also updated automatically when modifications are committed:
+
+* https://coveralls.io/r/sandialabs/toyplot
+
+For Toyplot questions, comments, or suggestions, get in touch with the team at:
+
+* https://gitter.im/sandialabs/toyplot
 
 Or, you can contact Tim directly:
 

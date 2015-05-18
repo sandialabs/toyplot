@@ -52,5 +52,4 @@ class SymmetricLog(object):
 
   def __call__(self, domain_values):
     return (_symmetric_log(domain_values, self._base) - _symmetric_log(self._domain_min, self._base)) / (_symmetric_log(self._domain_max, self._base) - _symmetric_log(self._domain_min, self._base)) * (self._range_max - self._range_min) + self._range_min
-    
 

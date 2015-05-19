@@ -38,3 +38,16 @@ def step_impl(context):
 def step_impl(context):
   nose.tools.assert_equal(context.projection(100), 100)
 
+@given(u'A symlog10 projection with -100, 100 and 0, 100')
+def step_impl(context):
+  context.projection = toyplot.projection.SymmetricLog(-100, 100, 0, 100, 10)
+
+@then(u'-100 should project to 0')
+def step_impl(context):
+  nose.tools.assert_equal(context.projection(-100), 0)
+
+@then(u'0 should project to 50')
+def step_impl(context):
+  nose.tools.assert_equal(context.projection(0), 50)
+
+

@@ -19,6 +19,7 @@ def _symmetric_log(x, base, threshold=1):
   return x if numpy.abs(x) < threshold else numpy.sign(x) * (threshold + numpy.log10(numpy.abs(x)) / numpy.log10(base))
 
 class Linear(object):
+  """Compute linear projections between a domain and a range."""
   def __init__(self, domain_min, domain_max, range_min, range_max):
     self._domain_min = domain_min
     self._domain_max = domain_max
@@ -26,9 +27,11 @@ class Linear(object):
     self._range_max = range_max
 
   def __call__(self, domain_values):
+    """Transform values from the domain to the range."""
     return (domain_values - self._domain_min) / (self._domain_max - self._domain_min) * (self._range_max - self._range_min) + self._range_min
 
   def inverse(self, range_values):
+    """Transform values from the range to the domain."""
     return (range_values - self._range_min) / (self._range_max - self._range_min) * (self._domain_max - self._domain_min) + self._domain_min
 
 class Log(object):

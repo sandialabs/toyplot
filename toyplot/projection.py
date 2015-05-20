@@ -6,6 +6,12 @@ from __future__ import division
 
 import numpy
 
+def _mix(a, b, amount):
+  return ((1.0 - amount) * a) + (amount * b)
+
+def _log(x, base):
+  return numpy.log10(numpy.abs(x)) / numpy.log10(base)
+
 def _signed_log(x, base):
   """Return the log of a number, retaining its sign (e.g. return -3 for log-base-10 of -1000)."""
   return numpy.sign(x) * numpy.log10(numpy.abs(x)) / numpy.log10(base)
@@ -17,6 +23,81 @@ def _symmetric_log(x, base, threshold=1):
     x[i] = numpy.sign(x[i]) * (threshold + numpy.log10(numpy.abs(x[i])) / numpy.log10(base))
     return x
   return x if numpy.abs(x) < threshold else numpy.sign(x) * (threshold + numpy.log10(numpy.abs(x)) / numpy.log10(base))
+
+class Piecewise(object):
+  """Compute a projection from an arbitrary collection of linear and log segments."""
+  def __init__(self, segments):
+    self._segments = [(scale, float(domain_min), float(domain_max), float(range_min), float(range_max)) for scale, domain_min, domain_max, range_min, range_max in segments]
+
+  def __call__(self, domain_values):
+    """Transform values from the domain to the range."""
+    domain_values = numpy.array(domain_values, dtype="float64")
+    range_values = numpy.empty_like(domain_values)
+    for scale, domain_min, domain_max, range_min, range_max in self._segments:
+      segment = numpy.logical_and(domain_min <= domain_values, domain_values <= domain_max)
+      if scale == "linear":
+        range_values[segment] = _mix(range_min, range_max, (domain_values[segment] - domain_min) / (domain_max - domain_min))
+      else:
+        scale, base = scale
+        if scale == "log":
+          range_values[segment] = _mix(range_min, range_max, (_log(domain_values, base) - _log(domain_min, base)) / (_log(domain_max, base) - _log(domain_min, base)))
+        else:
+          raise Exception("Unknown scale: %s" % (scale,))
+    return range_values
+
+  def inverse(self, range_values):
+    """Transform values from the range to the domain."""
+    range_values = numpy.array(range_values, dtype="float64")
+    domain_values = numpy.empty_like(range_values)
+    for scale, domain_min, domain_max, range_min, range_max in self._segments:
+      segment = numpy.logical_and(range_min <= range_values, range_values <= range_max)
+      if scale == "linear":
+        domain_values[segment] = _mix(domain_min, domain_max, (range_values[segment] - range_min) / (range_max - range_min))
+      else:
+        scale, base = scale
+        if scale == "log":
+          pass
+        else:
+          raise Exception("Unknown scale: %s" % (scale,))
+    return domain_values
+
+def linear(domain_min, domain_max, range_min, range_max):
+  return Piecewise([("linear", domain_min, domain_max, range_min, range_max)])
+
+def log(base, domain_min, domain_max, range_min, range_max, linear_domain_min=-1, linear_domain_max=1):
+  # Negative domain
+  if domain_max < 0:
+    return Piecewise([(("log", base), domain_min, domain_max, range_min, range_max)])
+
+  # Positive domain
+  if 0 < domain_min:
+    return Piecewise([(("log", base), domain_min, domain_max, range_min, range_max)])
+
+  # Mixed negative / positive domain
+  if domain_min < linear_domain_min and linear_domain_max < domain_max:
+    linear_range_min = _mix(range_min, range_max, 0.4)
+    linear_range_max = _mix(range_min, range_max, 0.6)
+    return Piecewise([
+      (("log", base), domain_min, linear_domain_min, range_min, linear_range_min),
+      ("linear", linear_domain_min, linear_domain_max, linear_range_min, linear_range_max),
+      (("log", base), linear_domain_max, domain_max, linear_range_max, range_max),
+      ])
+
+  if domain_min < linear_domain_min:
+    linear_range_min = _mix(range_min, range_max, 0.8)
+    return Piecewise([
+      (("log", base), domain_min, linear_domain_min, range_min, linear_range_min),
+      ("linear", linear_domain_min, linear_domain_max, linear_range_min, range_max),
+      ])
+
+  if linear_domain_max < domain_max:
+    linear_range_max = _mix(range_min, range_max, 0.2)
+    return Piecewise([
+      ("linear", domain_min, linear_domain_max, range_min, linear_range_max),
+      (("log", base), linear_domain_max, domain_max, linear_range_max, range_max),
+      ])
+
+  return Piecewise([("linear", domain_min, domain_max, range_min, range_max)])
 
 class Linear(object):
   """Compute linear projections between a domain and a range."""

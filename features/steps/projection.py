@@ -30,14 +30,17 @@ def step_impl(context):
 @then(u'1 should project to 0')
 def step_impl(context):
   nose.tools.assert_equal(context.projection(1), 0)
+  nose.tools.assert_equal(context.projection.inverse(0), 1)
 
 @then(u'10 should project to 50')
 def step_impl(context):
   nose.tools.assert_equal(context.projection(10), 50)
+  nose.tools.assert_equal(context.projection.inverse(50), 10)
 
 @then(u'100 should project to 100')
 def step_impl(context):
   nose.tools.assert_equal(context.projection(100), 100)
+  nose.tools.assert_equal(context.projection.inverse(100), 100)
 
 @given(u'A log10 projection with -100, 100 and 0, 100')
 def step_impl(context):
@@ -46,9 +49,11 @@ def step_impl(context):
 @then(u'-100 should project to 0')
 def step_impl(context):
   nose.tools.assert_equal(context.projection(-100), 0)
+  nose.tools.assert_equal(context.projection.inverse(0), -100)
 
 @then(u'0 should project to 50')
 def step_impl(context):
   nose.tools.assert_equal(context.projection(0), 50)
+  nose.tools.assert_equal(context.projection.inverse(50), 0)
 
 

@@ -36,11 +36,13 @@ class Piecewise(object):
     for scale, domain_min, domain_max, range_min, range_max in self._segments:
       segment = numpy.logical_and(domain_min <= domain_values, domain_values <= domain_max)
       if scale == "linear":
-        range_values[segment] = _mix(range_min, range_max, (domain_values[segment] - domain_min) / (domain_max - domain_min))
+        amount = (domain_values[segment] - domain_min) / (domain_max - domain_min)
+        range_values[segment] = _mix(range_min, range_max, amount)
       else:
         scale, base = scale
         if scale == "log":
-          range_values[segment] = _mix(range_min, range_max, (_log(domain_values, base) - _log(domain_min, base)) / (_log(domain_max, base) - _log(domain_min, base)))
+          amount = (_log(domain_values, base) - _log(domain_min, base)) / (_log(domain_max, base) - _log(domain_min, base))
+          range_values[segment] = _mix(range_min, range_max, amount)
         else:
           raise Exception("Unknown scale: %s" % (scale,))
     return range_values
@@ -52,11 +54,13 @@ class Piecewise(object):
     for scale, domain_min, domain_max, range_min, range_max in self._segments:
       segment = numpy.logical_and(range_min <= range_values, range_values <= range_max)
       if scale == "linear":
-        domain_values[segment] = _mix(domain_min, domain_max, (range_values[segment] - range_min) / (range_max - range_min))
+        amount = (range_values[segment] - range_min) / (range_max - range_min)
+        domain_values[segment] = _mix(domain_min, domain_max, amount)
       else:
         scale, base = scale
         if scale == "log":
-          pass
+          amount = (range_values[segment] - range_min) / (range_max - range_min)
+          domain_values[segment] = numpy.sign(domain_min) * numpy.power(base, _mix(_log(domain_min, base), _log(domain_max, base), amount))
         else:
           raise Exception("Unknown scale: %s" % (scale,))
     return domain_values

@@ -428,24 +428,18 @@ class Cartesian(object):
 
   def _get_projections(self, xmin, xmax, ymin, ymax):
     if self.x._scale == "linear":
-      xprojection = toyplot.projection.Linear(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding)
+      xprojection = toyplot.projection.linear(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding)
     else:
       scale, base = self.x._scale
       if scale == "log":
-        if xmax < 0 or 0 < xmin:
-          xprojection = toyplot.projection.Log(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
-        else:
-          xprojection = toyplot.projection.SymmetricLog(xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding, base)
+        xprojection = toyplot.projection.log(base, xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding)
 
     if self.y._scale == "linear":
-      yprojection = toyplot.projection.Linear(ymin, ymax, self._ymax_range - self._padding, self._ymin_range + self._padding)
+      yprojection = toyplot.projection.linear(ymin, ymax, self._ymax_range - self._padding, self._ymin_range + self._padding)
     else:
       scale, base = self.y._scale
       if scale == "log":
-        if ymax < 0 or 0 < ymin:
-          yprojection = toyplot.projection.Log(ymin, ymax, self._ymax_range - self._padding, self._ymin_range + self._padding, base)
-        else:
-          yprojection = toyplot.projection.SymmetricLog(ymin, ymax, self._ymax_range - self._padding, self._ymin_range + self._padding, base)
+        yprojection = toyplot.projection.log(base, ymin, ymax, self._ymax_range - self._padding, self._ymin_range + self._padding)
 
     return xprojection, yprojection
 

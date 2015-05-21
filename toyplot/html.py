@@ -268,16 +268,16 @@ def render(canvas, fobj=None, animation=False):
         for(var i = 0; i != data["x"].length; ++i)
         {
           var segment = data["x"][i];
-          if(segment.range.min <= point[0] && point[0] < segment.range.max)
+          if(Math.min(segment.range.min, segment.range.max) <= point[0] && point[0] < Math.max(segment.range.min, segment.range.max))
           {
-            var normalized = (point[0] - segment.range.min) / (segment.range.max - segment.range.min);
+            var amount = (point[0] - segment.range.min) / (segment.range.max - segment.range.min);
             if(segment.scale == "linear")
             {
-              x = Number(mix(segment.domain.min, segment.domain.max, normalized)).toFixed(2);
+              x = Number(mix(segment.domain.min, segment.domain.max, amount)).toFixed(2);
             }
             else if(segment.scale == "log")
             {
-              x = Number(sign(segment.domain.min) * Math.pow(segment.base, mix(log_n(Math.abs(segment.domain.min), segment.base), log_n(Math.abs(segment.domain.max), segment.base), normalized))).toFixed(2);
+              x = Number(sign(segment.domain.min) * Math.pow(segment.base, mix(log_n(Math.abs(segment.domain.min), segment.base), log_n(Math.abs(segment.domain.max), segment.base), amount))).toFixed(2);
             }
           }
         }
@@ -285,16 +285,16 @@ def render(canvas, fobj=None, animation=False):
         for(var i = 0; i != data["y"].length; ++i)
         {
           var segment = data["y"][i];
-          if(segment.range.min <= point[1] && point[1] < segment.range.max)
+          if(Math.min(segment.range.min, segment.range.max) <= point[1] && point[1] < Math.max(segment.range.min, segment.range.max))
           {
-            var normalized = (segment.range.max - point[1]) / (segment.range.max - segment.range.min);
+            var amount = (point[1] - segment.range.min) / (segment.range.max - segment.range.min);
             if(segment.scale == "linear")
             {
-              y = Number(mix(segment.domain.min, segment.domain.max, normalized)).toFixed(2);
+              y = Number(mix(segment.domain.min, segment.domain.max, amount)).toFixed(2);
             }
             else if(segment.scale == "log")
             {
-              y = Number(sign(segment.domain.min) * Math.pow(segment.base, mix(log_n(Math.abs(segment.domain.min), segment.base), log_n(Math.abs(segment.domain.max), segment.base), normalized))).toFixed(2);
+              y = Number(sign(segment.domain.min) * Math.pow(segment.base, mix(log_n(Math.abs(segment.domain.min), segment.base), log_n(Math.abs(segment.domain.max), segment.base), amount))).toFixed(2);
             }
           }
         }
@@ -652,30 +652,50 @@ _render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<
 def _render(canvas, axes, context):
   axes._finalize_domain()
 
-  axes_data = {"x":[], "y":[]}
-  if axes.x._scale == "linear":
-    axes_data["x"].append({"scale":"linear", "range":{"min":axes._xmin_range + axes._padding, "max":axes._xmax_range - axes._padding}, "domain":{"min":axes._xmin_computed, "max":axes._xmax_computed}})
-  else:
-    scale, base = axes.x._scale
-    if scale == "log":
-      if axes._xmax_computed < 0 or axes._xmin_computed > 0:
-        axes_data["x"].append({"scale":"log", "base":base, "range":{"min":axes._xmin_range + axes._padding, "max":axes._xmax_range - axes._padding}, "domain":{"min":axes._xmin_computed, "max":axes._xmax_computed}})
-      else:
-        axes_data["x"].append({"scale":"log", "base":base, "range":{"min":axes._xmin_range + axes._padding, "max":axes._project_x(-1.0)}, "domain":{"min":axes._xmin_computed, "max":-1.0}})
-        axes_data["x"].append({"scale":"linear", "range":{"min":axes._project_x(-1.0), "max":axes._project_x(1.0)}, "domain":{"min":-1.0, "max":1.0}})
-        axes_data["x"].append({"scale":"log", "base":base, "range":{"min":axes._project_x(1.0), "max":axes._xmax_range - axes._padding}, "domain":{"min":1.0, "max":axes._xmax_computed}})
+  if not isinstance(axes._xprojection, toyplot.projection.Piecewise):
+    raise Exception("Unknown projection type: %s" % axes._xprojection)
+  if not isinstance(axes._yprojection, toyplot.projection.Piecewise):
+    raise Exception("Unknown projection type: %s" % axes._yprojection)
 
-  if axes.y._scale == "linear":
-    axes_data["y"].append({"scale":"linear", "range":{"min":axes._ymin_range + axes._padding, "max":axes._ymax_range - axes._padding}, "domain":{"min":axes._ymin_computed, "max":axes._ymax_computed}})
-  else:
-    scale, base = axes.y._scale
-    if scale == "log":
-      if axes._ymax_computed < 0 or axes._ymin_computed > 0:
-        axes_data["y"].append({"scale":"log", "base":base, "range":{"min":axes._ymin_range + axes._padding, "max":axes._ymax_range - axes._padding}, "domain":{"min":axes._ymin_computed, "max":axes._ymax_computed}})
-      else:
-        axes_data["y"].append({"scale":"log", "base":base, "range":{"min":axes._project_y(-1.0), "max":axes._ymax_range - axes._padding}, "domain":{"min":axes._ymin_computed, "max":-1.0}})
-        axes_data["y"].append({"scale":"linear", "range":{"min":axes._project_y(1.0), "max":axes._project_y(-1.0)}, "domain":{"min":-1.0, "max":1.0}})
-        axes_data["y"].append({"scale":"log", "base":base, "range":{"min":axes._ymin_range + axes._padding, "max":axes._project_y(1.0)}, "domain":{"min":1.0, "max":axes._ymax_computed}})
+  axes_data = {"x":[], "y":[]}
+  for scale, domain_min, domain_max, range_min, range_max in axes._xprojection._segments:
+    if scale == "linear":
+      axes_data["x"].append({"scale":scale, "domain":{"min":domain_min, "max":domain_max}, "range":{"min":range_min, "max":range_max}})
+    else:
+      scale, base = scale
+      axes_data["x"].append({"scale":scale, "base":base, "domain":{"min":domain_min, "max":domain_max}, "range":{"min":range_min, "max":range_max}})
+
+  for scale, domain_min, domain_max, range_min, range_max in axes._yprojection._segments:
+    if scale == "linear":
+      axes_data["y"].append({"scale":scale, "domain":{"min":domain_min, "max":domain_max}, "range":{"min":range_min, "max":range_max}})
+    else:
+      scale, base = scale
+      axes_data["y"].append({"scale":scale, "base":base, "domain":{"min":domain_min, "max":domain_max}, "range":{"min":range_min, "max":range_max}})
+
+
+#  if axes.x._scale == "linear":
+#    axes_data["x"].append({"scale":"linear", "range":{"min":axes._xmin_range + axes._padding, "max":axes._xmax_range - axes._padding}, "domain":{"min":axes._xmin_computed, "max":axes._xmax_computed}})
+#  else:
+#    scale, base = axes.x._scale
+#    if scale == "log":
+#      if axes._xmax_computed < 0 or axes._xmin_computed > 0:
+#        axes_data["x"].append({"scale":"log", "base":base, "range":{"min":axes._xmin_range + axes._padding, "max":axes._xmax_range - axes._padding}, "domain":{"min":axes._xmin_computed, "max":axes._xmax_computed}})
+#      else:
+#        axes_data["x"].append({"scale":"log", "base":base, "range":{"min":axes._xmin_range + axes._padding, "max":axes._project_x(-1.0)}, "domain":{"min":axes._xmin_computed, "max":-1.0}})
+#        axes_data["x"].append({"scale":"linear", "range":{"min":axes._project_x(-1.0), "max":axes._project_x(1.0)}, "domain":{"min":-1.0, "max":1.0}})
+#        axes_data["x"].append({"scale":"log", "base":base, "range":{"min":axes._project_x(1.0), "max":axes._xmax_range - axes._padding}, "domain":{"min":1.0, "max":axes._xmax_computed}})
+#
+#  if axes.y._scale == "linear":
+#    axes_data["y"].append({"scale":"linear", "range":{"min":axes._ymin_range + axes._padding, "max":axes._ymax_range - axes._padding}, "domain":{"min":axes._ymin_computed, "max":axes._ymax_computed}})
+#  else:
+#    scale, base = axes.y._scale
+#    if scale == "log":
+#      if axes._ymax_computed < 0 or axes._ymin_computed > 0:
+#        axes_data["y"].append({"scale":"log", "base":base, "range":{"min":axes._ymin_range + axes._padding, "max":axes._ymax_range - axes._padding}, "domain":{"min":axes._ymin_computed, "max":axes._ymax_computed}})
+#      else:
+#        axes_data["y"].append({"scale":"log", "base":base, "range":{"min":axes._project_y(-1.0), "max":axes._ymax_range - axes._padding}, "domain":{"min":axes._ymin_computed, "max":-1.0}})
+#        axes_data["y"].append({"scale":"linear", "range":{"min":axes._project_y(1.0), "max":axes._project_y(-1.0)}, "domain":{"min":-1.0, "max":1.0}})
+#        axes_data["y"].append({"scale":"log", "base":base, "range":{"min":axes._ymin_range + axes._padding, "max":axes._project_y(1.0)}, "domain":{"min":1.0, "max":axes._ymax_computed}})
 
   class custom_encoder(json.JSONEncoder):
     def default(self, obj):

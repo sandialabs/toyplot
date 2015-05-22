@@ -123,21 +123,38 @@ _show_mouse_coordinates = string.Template("""
 {
   function sign(x)
   {
-    if(x < 0)
-      return -1;
-    if(x > 0)
-      return 1;
-    return 0;
+    return x < 0 ? -1 : x > 0 ? 1 : 0;
   }
 
   function log_n(x, base)
   {
-    return Math.log(x) / Math.log(base);
+    return Math.log(Math.abs(x)) / Math.log(base);
   }
 
   function mix(a, b, amount)
   {
     return ((1.0 - amount) * a) + (amount * b);
+  }
+
+  function to_domain(projection, range)
+  {
+    for(var i = 0; i != projection.length; ++i)
+    {
+      var segment = projection[i];
+      if(Math.min(segment.range.bounds.min, segment.range.bounds.max) <= point[0] && point[0] < Math.max(segment.range.bounds.min, segment.range.bounds.max))
+      {
+        var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
+        if(segment.scale == "linear")
+        {
+          return mix(segment.domain.min, segment.domain.max, amount)
+        }
+        else if(segment.scale[0] == "log")
+        {
+          var base = segment.scale[1];
+          return sign(segment.domain.min) * Math.pow(base, mix(log_n(Math.abs(segment.domain.min), base), log_n(Math.abs(segment.domain.max), base), amount));
+        }
+      }
+    }
   }
 
   // Compute mouse coordinates relative to a DOM object, with thanks to d3js.org, where this code originated.
@@ -157,65 +174,18 @@ _show_mouse_coordinates = string.Template("""
 
   function display_coordinates(e)
   {
-    var x = null;
-    var y = null;
-
     var axes = e.currentTarget.parentElement;
     var data = JSON.parse(axes.querySelector("toyplot\\\\:axes").textContent);
 
     point = d3_mousePoint(e.target, e);
+    var x = Number(to_domain(data["x"], point[0])).toFixed(2);
+    var y = Number(to_domain(data["y"], point[1])).toFixed(2);
 
-    for(var i = 0; i != data["x"].length; ++i)
+    var coordinates = axes.querySelectorAll(".toyplot-coordinates");
+    for(var i = 0; i != coordinates.length; ++i)
     {
-      var segment = data["x"][i];
-      if(Math.min(segment.range.min, segment.range.max) <= point[0] && point[0] < Math.max(segment.range.min, segment.range.max))
-      {
-        var amount = (point[0] - segment.range.min) / (segment.range.max - segment.range.min);
-        if(segment.scale == "linear")
-        {
-          x = Number(mix(segment.domain.min, segment.domain.max, amount)).toFixed(2);
-        }
-        else if(segment.scale == "log")
-        {
-          x = Number(sign(segment.domain.min) * Math.pow(segment.base, mix(log_n(Math.abs(segment.domain.min), segment.base), log_n(Math.abs(segment.domain.max), segment.base), amount))).toFixed(2);
-        }
-      }
-    }
-
-    for(var i = 0; i != data["y"].length; ++i)
-    {
-      var segment = data["y"][i];
-      if(Math.min(segment.range.min, segment.range.max) <= point[1] && point[1] < Math.max(segment.range.min, segment.range.max))
-      {
-        var amount = (point[1] - segment.range.min) / (segment.range.max - segment.range.min);
-        if(segment.scale == "linear")
-        {
-          y = Number(mix(segment.domain.min, segment.domain.max, amount)).toFixed(2);
-        }
-        else if(segment.scale == "log")
-        {
-          y = Number(sign(segment.domain.min) * Math.pow(segment.base, mix(log_n(Math.abs(segment.domain.min), segment.base), log_n(Math.abs(segment.domain.max), segment.base), amount))).toFixed(2);
-        }
-      }
-    }
-
-    if(x !== null && y !== null)
-      text = "x=" + x + " y=" + y;
-    else if(x !== null)
-      text = "x=" + x;
-    else if(y !== null)
-      text = "y=" + y;
-    else
-      text = null;
-
-    if(text !== null)
-    {
-      var coordinates = axes.querySelectorAll(".toyplot-coordinates");
-      for(var i = 0; i != coordinates.length; ++i)
-      {
-        coordinates[i].style.visibility = "visible";
-        coordinates[i].querySelector("text").textContent = text;
-      }
+      coordinates[i].style.visibility = "visible";
+      coordinates[i].querySelector("text").textContent = "x=" + x + " y=" + y;
     }
   }
 
@@ -659,20 +629,19 @@ def _render(canvas, axes, context):
   if not isinstance(axes._yprojection, toyplot.projection.Piecewise):
     raise Exception("Unknown projection type: %s" % axes._yprojection)
 
+  def encode(value):
+    if value == numpy.inf:
+      return 1.7976931348623157e+308
+    elif value == -numpy.inf:
+      return -1.7976931348623157e+308
+    return value
+
   axes_data = {"x":[], "y":[]}
   for segment in axes._xprojection._segments:
-    if segment.scale == "linear":
-      axes_data["x"].append({"scale":segment.scale, "domain":{"min":segment.domain.min, "max":segment.domain.max}, "range":{"min":segment.range.min, "max":segment.range.max}})
-    else:
-      scale, base = segment.scale
-      axes_data["x"].append({"scale":scale, "base":base, "domain":{"min":segment.domain.min, "max":segment.domain.max}, "range":{"min":segment.range.min, "max":segment.range.max}})
+    axes_data["x"].append({"scale":segment.scale, "domain":{"min":segment.domain.min, "max":segment.domain.max, "bounds":{"min":encode(segment.domain.bounds.min), "max":encode(segment.domain.bounds.max)}}, "range":{"min":segment.range.min, "max":segment.range.max, "bounds":{"min":encode(segment.range.bounds.min), "max":encode(segment.range.bounds.max)}}})
 
   for segment in axes._yprojection._segments:
-    if segment.scale == "linear":
-      axes_data["y"].append({"scale":segment.scale, "domain":{"min":segment.domain.min, "max":segment.domain.max}, "range":{"min":segment.range.min, "max":segment.range.max}})
-    else:
-      scale, base = segment.scale
-      axes_data["y"].append({"scale":scale, "base":base, "domain":{"min":segment.domain.min, "max":segment.domain.max}, "range":{"min":segment.range.min, "max":segment.range.max}})
+    axes_data["y"].append({"scale":segment.scale, "domain":{"min":segment.domain.min, "max":segment.domain.max, "bounds":{"min":encode(segment.domain.bounds.min), "max":encode(segment.domain.bounds.max)}}, "range":{"min":segment.range.min, "max":segment.range.max, "bounds":{"min":encode(segment.range.bounds.min), "max":encode(segment.range.bounds.max)}}})
 
   class custom_encoder(json.JSONEncoder):
     def default(self, obj):

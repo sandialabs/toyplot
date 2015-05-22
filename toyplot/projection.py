@@ -48,7 +48,7 @@ class Piecewise(object):
 
   def __call__(self, domain_values):
     """Transform values from the domain to the range."""
-    domain_values = numpy.array(domain_values, dtype="float64")
+    domain_values = numpy.ma.array(domain_values, dtype="float64")
     range_values = numpy.empty_like(domain_values)
     for segment in self._segments:
       indices = _in_range(segment.domain.bounds.min, domain_values, segment.domain.bounds.max)
@@ -69,7 +69,7 @@ class Piecewise(object):
 
   def inverse(self, range_values):
     """Transform values from the range to the domain."""
-    range_values = numpy.array(range_values, dtype="float64")
+    range_values = numpy.ma.array(range_values, dtype="float64")
     domain_values = numpy.empty_like(range_values)
     for segment in self._segments:
       indices = _in_range(segment.range.bounds.min, range_values, segment.range.bounds.max)

@@ -12,7 +12,7 @@ docs_dir = os.path.join(root_dir, "docs")
 
 def convert_notebook(name):
   # Convert the notebook into restructured text suitable for the documentation.
-  subprocess.check_call(["ipython", "nbconvert", "--to", "rst", os.path.join(docs_dir, "%s.ipynb" % name), "--output", os.path.join(docs_dir, name)])
+  subprocess.check_call(["ipython", "nbconvert", "--execute", "--to", "rst", os.path.join(docs_dir, "%s.ipynb" % name), "--output", os.path.join(docs_dir, name)])
 
   # Unmangle Sphinx cross-references in the tutorial that get mangled by markdown.
   with open(os.path.join(docs_dir, "%s.rst" % name), "r") as file:

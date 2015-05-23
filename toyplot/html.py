@@ -19,6 +19,12 @@ import toyplot.mark
 import uuid
 import xml.etree.ElementTree as xml
 
+class _NumpyJSONEncoder(json.JSONEncoder):
+  def default(self, obj):
+    if isinstance(obj, numpy.generic):
+      return numpy.asscalar(obj)
+    return json.JSONEncoder.default(self, obj)
+
 _alignment_baseline_workaround = string.Template("""
 // Workaround for browsers that don't support alignment-baseline.
 (function()
@@ -471,7 +477,7 @@ def render(canvas, fobj=None, animation=False):
          cartesian_axes[key][axis].append({"scale":segment.scale, "domain":{"min":segment.domain.min, "max":segment.domain.max, "bounds":{"min":segment.domain.bounds.min, "max":segment.domain.bounds.max}}, "range":{"min":segment.range.min, "max":segment.range.max, "bounds":{"min":segment.range.bounds.min, "max":segment.range.bounds.max}}})
 
   if cartesian_axes:
-    xml.SubElement(controls, "script").text = _embed_cartesian_axes.substitute(root_id=root.get("id"), axes=json.dumps(cartesian_axes))
+    xml.SubElement(controls, "script").text = _embed_cartesian_axes.substitute(root_id=root.get("id"), axes=json.dumps(cartesian_axes, cls=_NumpyJSONEncoder, sort_keys=True))
 
   if len(svg_animation) > 1:
     times = numpy.array(sorted(svg_animation.keys()))

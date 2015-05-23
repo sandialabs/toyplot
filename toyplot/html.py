@@ -117,10 +117,12 @@ _show_popup = string.Template("""
 })();
 """)
 
-_show_mouse_coordinates = string.Template("""
+_embed_cartesian_axes = string.Template("""
 // Display mouse coordinates.
 (function()
 {
+  var axes = $axes;
+
   function sign(x)
   {
     return x < 0 ? -1 : x > 0 ? 1 : 0;
@@ -174,14 +176,14 @@ _show_mouse_coordinates = string.Template("""
 
   function display_coordinates(e)
   {
-    var axes = e.currentTarget.parentElement;
-    var data = JSON.parse(axes.querySelector("toyplot\\\\:axes").textContent);
+    var dom_axes = e.currentTarget.parentElement;
+    var data = axes[dom_axes.id];
 
     point = d3_mousePoint(e.target, e);
     var x = Number(to_domain(data["x"], point[0])).toFixed(2);
     var y = Number(to_domain(data["y"], point[1])).toFixed(2);
 
-    var coordinates = axes.querySelectorAll(".toyplot-coordinates");
+    var coordinates = dom_axes.querySelectorAll(".toyplot-coordinates");
     for(var i = 0; i != coordinates.length; ++i)
     {
       coordinates[i].style.visibility = "visible";
@@ -191,17 +193,17 @@ _show_mouse_coordinates = string.Template("""
 
   function clear_coordinates(e)
   {
-    var axes = e.currentTarget.parentElement;
-    var coordinates = axes.querySelectorAll(".toyplot-coordinates");
+    var dom_axes = e.currentTarget.parentElement;
+    var coordinates = dom_axes.querySelectorAll(".toyplot-coordinates");
     for(var i = 0; i != coordinates.length; ++i)
       coordinates[i].style.visibility = "hidden";
   }
 
-  var axes = document.querySelectorAll("#$root_id .toyplot-axes-Cartesian .toyplot-coordinate-events");
-  for(var i = 0; i != axes.length; ++i)
+  for(var axes_id in axes)
   {
-    axes[i].onmousemove = display_coordinates;
-    axes[i].onmouseout = clear_coordinates;
+    var event_target = document.querySelector("#" + axes_id + " .toyplot-coordinate-events");
+    event_target.onmousemove = display_coordinates;
+    event_target.onmouseout = clear_coordinates;
   }
 })();
 """)
@@ -460,8 +462,16 @@ def render(canvas, fobj=None, animation=False):
   if list(svg.iter("toyplot:data-table")):
     xml.SubElement(controls, "script").text = _show_popup.substitute(root_id=root.get("id"))
 
-  if svg.find(".//*[@class='toyplot-coordinates']") is not None:
-    xml.SubElement(controls, "script").text = _show_mouse_coordinates.substitute(root_id=root.get("id"))
+  cartesian_axes = dict()
+  for key, axes in context._cartesian_axes.items():
+    cartesian_axes[key] = dict()
+    for axis, projection in [("x", axes._xprojection), ("y", axes._yprojection)]:
+      cartesian_axes[key][axis] = list()
+      for segment in projection._segments:
+         cartesian_axes[key][axis].append({"scale":segment.scale, "domain":{"min":segment.domain.min, "max":segment.domain.max, "bounds":{"min":segment.domain.bounds.min, "max":segment.domain.bounds.max}}, "range":{"min":segment.range.min, "max":segment.range.max, "bounds":{"min":segment.range.bounds.min, "max":segment.range.bounds.max}}})
+
+  if cartesian_axes:
+    xml.SubElement(controls, "script").text = _embed_cartesian_axes.substitute(root_id=root.get("id"), axes=json.dumps(cartesian_axes))
 
   if len(svg_animation) > 1:
     times = numpy.array(sorted(svg_animation.keys()))
@@ -519,12 +529,16 @@ def _css_attrib(*styles):
   return attrib
 
 class _RenderContext(object):
-  def __init__(self, root=None, id_cache={}):
+  def __init__(self, root=None, id_cache=None, cartesian_axes=None):
     self._root = root
-    self._id_cache = id_cache
+    self._id_cache = dict() if id_cache is None else id_cache
+    self._cartesian_axes = dict() if cartesian_axes is None else cartesian_axes
+
+  def add_cartesian_axes(self, axes):
+    self._cartesian_axes[self.get_id(axes)] = axes
 
   def push(self, root):
-    return _RenderContext(root, self._id_cache)
+    return _RenderContext(root, self._id_cache, self._cartesian_axes)
 
   @property
   def root(self):
@@ -624,34 +638,7 @@ _render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<
 def _render(canvas, axes, context):
   axes._finalize_domain()
 
-  if not isinstance(axes._xprojection, toyplot.projection.Piecewise):
-    raise Exception("Unknown projection type: %s" % axes._xprojection)
-  if not isinstance(axes._yprojection, toyplot.projection.Piecewise):
-    raise Exception("Unknown projection type: %s" % axes._yprojection)
-
-  def encode(value):
-    if value == numpy.inf:
-      return 1.7976931348623157e+308
-    elif value == -numpy.inf:
-      return -1.7976931348623157e+308
-    return value
-
-  axes_data = {"x":[], "y":[]}
-  for segment in axes._xprojection._segments:
-    axes_data["x"].append({"scale":segment.scale, "domain":{"min":segment.domain.min, "max":segment.domain.max, "bounds":{"min":encode(segment.domain.bounds.min), "max":encode(segment.domain.bounds.max)}}, "range":{"min":segment.range.min, "max":segment.range.max, "bounds":{"min":encode(segment.range.bounds.min), "max":encode(segment.range.bounds.max)}}})
-
-  for segment in axes._yprojection._segments:
-    axes_data["y"].append({"scale":segment.scale, "domain":{"min":segment.domain.min, "max":segment.domain.max, "bounds":{"min":encode(segment.domain.bounds.min), "max":encode(segment.domain.bounds.max)}}, "range":{"min":segment.range.min, "max":segment.range.max, "bounds":{"min":encode(segment.range.bounds.min), "max":encode(segment.range.bounds.max)}}})
-
-  class custom_encoder(json.JSONEncoder):
-    def default(self, obj):
-      if isinstance(obj, numpy.generic):
-        return numpy.asscalar(obj)
-      print(type(obj))
-      return json.JSONEncoder.default(self, obj)
-
   axes_xml = xml.SubElement(context.root, "g", id=context.get_id(axes), attrib={"class":"toyplot-axes-Cartesian"})
-  xml.SubElement(axes_xml, "toyplot:axes").text = json.dumps(axes_data, cls=custom_encoder, sort_keys=True)
 
   clip_xml = xml.SubElement(axes_xml, "clipPath", id="t" + uuid.uuid4().hex)
   xml.SubElement(clip_xml, "rect", x=repr(axes._xmin_range), y=repr(axes._ymin_range), width=repr(axes._xmax_range - axes._xmin_range), height=repr(axes._ymax_range - axes._ymin_range))
@@ -662,6 +649,7 @@ def _render(canvas, axes, context):
     _render(axes, child, context.push(children_xml))
 
   if axes.coordinates._show:
+    context.add_cartesian_axes(axes)
     coordinates_xml = xml.SubElement(axes_xml, "g", style=_css_style({"visibility":"hidden"}), attrib={"class":"toyplot-coordinates"})
     xml.SubElement(coordinates_xml, "rect", x=repr(axes.coordinates._xmin_range), y=repr(axes.coordinates._ymin_range), width=repr(axes.coordinates._xmax_range - axes.coordinates._xmin_range), height=repr(axes.coordinates._ymax_range - axes.coordinates._ymin_range), style=_css_style(axes.coordinates._style))
     xml.SubElement(coordinates_xml, "text", x=repr((axes.coordinates._xmin_range + axes.coordinates._xmax_range) * 0.5), y=repr((axes.coordinates._ymin_range + axes.coordinates._ymax_range) * 0.5), style=_css_style(axes.coordinates.label._style))

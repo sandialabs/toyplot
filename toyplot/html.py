@@ -26,7 +26,6 @@ class _NumpyJSONEncoder(json.JSONEncoder):
     return json.JSONEncoder.default(self, obj)
 
 _alignment_baseline_workaround = string.Template("""
-// Workaround for browsers that don't support alignment-baseline.
 (function()
 {
   if(window.CSS !== undefined && window.CSS.supports !== undefined)
@@ -73,22 +72,22 @@ _alignment_baseline_workaround = string.Template("""
 })();
 """)
 
-_show_popup = string.Template("""
-// Allow users to extract embedded raw data.
+_export_data_tables = string.Template("""
 (function()
 {
-  function save_csv(dataset)
+  var data_tables = $data_tables;
+
+  function save_csv(data_table)
   {
     uri = "data:text/csv;charset=utf-8,";
-    data = JSON.parse(dataset.textContent);
-    uri += data.names.join(",") + "\\n";
-    for(var i = 0; i != data.data[0].length; ++i)
+    uri += data_table.names.join(",") + "\\n";
+    for(var i = 0; i != data_table.data[0].length; ++i)
     {
-      for(var j = 0; j != data.data.length; ++j)
+      for(var j = 0; j != data_table.data.length; ++j)
       {
         if(j)
           uri += ",";
-        uri += data.data[j][i];
+        uri += data_table.data[j][i];
       }
       uri += "\\n";
     }
@@ -97,13 +96,13 @@ _show_popup = string.Template("""
     window.open(uri);
   }
 
-  function open_popup(dataset)
+  function open_popup(data_table)
   {
     return function(e)
     {
       var popup = document.querySelector("#$root_id .toyplot-mark-popup");
-      popup.querySelector(".toyplot-mark-popup-title").innerHTML = dataset.getAttribute("title");
-      popup.querySelector(".toyplot-mark-popup-save-csv").onclick = function() { popup.style.visibility = "hidden"; save_csv(dataset); }
+      popup.querySelector(".toyplot-mark-popup-title").innerHTML = data_table.title;
+      popup.querySelector(".toyplot-mark-popup-save-csv").onclick = function() { popup.style.visibility = "hidden"; save_csv(data_table); }
       popup.style.left = (e.clientX - 50) + "px";
       popup.style.top = (e.clientY - 20) + "px";
       popup.style.visibility = "visible";
@@ -113,21 +112,19 @@ _show_popup = string.Template("""
 
   }
 
-  var datasets = document.querySelectorAll("#$root_id toyplot\\\\:data-table");
-  for(var i = 0; i != datasets.length; ++i)
+  for(var i = 0; i != data_tables.length; ++i)
   {
-    var dataset = datasets[i];
-    var mark = dataset.parentElement;
-    mark.oncontextmenu = open_popup(dataset);
+    var data_table = data_tables[i];
+    var event_target = document.querySelector("#" + data_table.id);
+    event_target.oncontextmenu = open_popup(data_table);
   }
 })();
 """)
 
-_embed_cartesian_axes = string.Template("""
-// Display mouse coordinates.
+_show_mouse_coordinates = string.Template("""
 (function()
 {
-  var axes = $axes;
+  var axes = $cartesian_axes;
 
   function sign(x)
   {
@@ -431,11 +428,13 @@ def render(canvas, fobj=None, animation=False):
   """
   canvas.autorender(False)
 
+  # Create the SVG representation.
   context = _RenderContext()
   svg = xml.Element("svg", xmlns="http://www.w3.org/2000/svg", attrib={"xmlns:toyplot":"http://www.sandia.gov/toyplot"}, width="%rpx" % canvas._width, height="%rpx" % canvas._height, style=_css_style(canvas._style), id=context.get_id(canvas))
   for child in canvas._children:
     _render(canvas, child, context.push(svg))
 
+  # Collect animation data.
   svg_animation = collections.defaultdict(lambda: collections.defaultdict(list))
   for time, time_changes in list(canvas._animation.items())[:-1]:
     svg_animation[time] # Ensure we have an entry for every time, even if there aren't any changes.
@@ -443,9 +442,11 @@ def render(canvas, fobj=None, animation=False):
       for change in type_changes:
         svg_animation[time][type].append([context.get_id(change[0])] + list(change[1:]))
 
+  # Create the top-level HTML element.
   root = xml.Element("div", align="center", attrib={"class":"toyplot"}, id="t" + uuid.uuid4().hex)
   root.append(svg)
 
+  # Add HTML controls.
   controls = xml.SubElement(root, "div", attrib={"class":"toyplot-controls"})
   mark_popup = xml.SubElement(controls, "ul", attrib={"class":"toyplot-mark-popup"}, onmouseleave="this.style.visibility='hidden'", style=_css_style({
     "background":"rgba(0%,0%,0%,0.75)",
@@ -462,23 +463,41 @@ def render(canvas, fobj=None, animation=False):
   xml.SubElement(mark_popup, "li", attrib={"class":"toyplot-mark-popup-title"}, style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;")
   xml.SubElement(mark_popup, "li", attrib={"class":"toyplot-mark-popup-save-csv"}, style="border-radius:3px;padding:5px;list-style:none;margin:0;", onmouseover="this.style.color='steelblue';this.style.background='white'", onmouseout="this.style.color='white';this.style.background='steelblue'").text = "Save as .csv"
 
+  # Add a workaround for browsers that don't support CSS alignment-baseline.
   if svg.find(".//text") is not None:
     xml.SubElement(controls, "script").text = _alignment_baseline_workaround.substitute(root_id=root.get("id"))
 
-  if list(svg.iter("toyplot:data-table")):
-    xml.SubElement(controls, "script").text = _show_popup.substitute(root_id=root.get("id"))
+  # Allow users to export embedded table data.
+  if context._data_tables:
+    data_tables = list();
+    for data_table in context._data_tables:
+      names = []
+      data = []
+      for name, column in data_table["table"].items():
+        if column.dtype == toyplot.color.dtype:
+          for suffix, channel in zip([":red", ":green", ":blue", ":alpha"], ["r", "g", "b", "a"]):
+            names.append(name + suffix)
+            data.append(column[channel].tolist())
+        else:
+          names.append(name)
+          data.append(column.tolist())
+      data_tables.append({"id":context.get_id(data_table["mark"]), "title":data_table["title"], "names":names, "data":data}) 
 
-  cartesian_axes = dict()
-  for key, axes in context._cartesian_axes.items():
-    cartesian_axes[key] = dict()
-    for axis, projection in [("x", axes._xprojection), ("y", axes._yprojection)]:
-      cartesian_axes[key][axis] = list()
-      for segment in projection._segments:
-         cartesian_axes[key][axis].append({"scale":segment.scale, "domain":{"min":segment.domain.min, "max":segment.domain.max, "bounds":{"min":segment.domain.bounds.min, "max":segment.domain.bounds.max}}, "range":{"min":segment.range.min, "max":segment.range.max, "bounds":{"min":segment.range.bounds.min, "max":segment.range.bounds.max}}})
+    xml.SubElement(controls, "script").text = _export_data_tables.substitute(root_id=root.get("id"), data_tables=json.dumps(data_tables))
 
-  if cartesian_axes:
-    xml.SubElement(controls, "script").text = _embed_cartesian_axes.substitute(root_id=root.get("id"), axes=json.dumps(cartesian_axes, cls=_NumpyJSONEncoder, sort_keys=True))
+  # Provide interactive mouse coordinates.
+  if context._cartesian_axes:
+    cartesian_axes = dict()
+    for key, axes in context._cartesian_axes.items():
+      cartesian_axes[key] = dict()
+      for axis, projection in [("x", axes._xprojection), ("y", axes._yprojection)]:
+        cartesian_axes[key][axis] = list()
+        for segment in projection._segments:
+           cartesian_axes[key][axis].append({"scale":segment.scale, "domain":{"min":segment.domain.min, "max":segment.domain.max, "bounds":{"min":segment.domain.bounds.min, "max":segment.domain.bounds.max}}, "range":{"min":segment.range.min, "max":segment.range.max, "bounds":{"min":segment.range.bounds.min, "max":segment.range.bounds.max}}})
 
+    xml.SubElement(controls, "script").text = _show_mouse_coordinates.substitute(root_id=root.get("id"), cartesian_axes=json.dumps(cartesian_axes, cls=_NumpyJSONEncoder, sort_keys=True))
+
+  # Provide VCR controls.
   if len(svg_animation) > 1:
     times = numpy.array(sorted(svg_animation.keys()))
     durations = times[1:] - times[:-1]
@@ -535,16 +554,20 @@ def _css_attrib(*styles):
   return attrib
 
 class _RenderContext(object):
-  def __init__(self, root=None, id_cache=None, cartesian_axes=None):
+  def __init__(self, root=None, id_cache=None, data_tables=None, cartesian_axes=None):
     self._root = root
     self._id_cache = dict() if id_cache is None else id_cache
+    self._data_tables = list() if data_tables is None else data_tables
     self._cartesian_axes = dict() if cartesian_axes is None else cartesian_axes
+
+  def add_data_table(self, mark, table, title):
+    self._data_tables.append({"mark":mark, "title":title, "table":table})
 
   def add_cartesian_axes(self, axes):
     self._cartesian_axes[self.get_id(axes)] = axes
 
   def push(self, root):
-    return _RenderContext(root, self._id_cache, self._cartesian_axes)
+    return _RenderContext(root, self._id_cache, self._data_tables, self._cartesian_axes)
 
   @property
   def root(self):
@@ -565,22 +588,6 @@ def _flat_contiguous(a):
           result.append(slice(i, i + n))
       i += n
   return result
-
-def _render_data_table(root_xml, table, title):
-  names = []
-  data = []
-  for name, column in table.items():
-    if column.dtype == toyplot.color.dtype:
-      for suffix, channel in zip([":red", ":green", ":blue", ":alpha"], ["r", "g", "b", "a"]):
-        names.append(name + suffix)
-        data.append(column[channel].tolist())
-    else:
-      names.append(name)
-      data.append(column.tolist())
-
-  xml_data_table = xml.SubElement(root_xml, "toyplot:data-table", title=title)
-  xml_data_table.text = json.dumps({"names":names, "data":data}, sort_keys=True)
-  return xml_data_table
 
 def _render_marker(root, cx, cy, size, marker, marker_style=None, label_style=None, extra_class=None):
   if marker is None:
@@ -869,7 +876,7 @@ def _render(axes, mark, context):
     boundaries = axes._project_x(boundaries)
 
   mark_xml = xml.SubElement(context.root, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class":"toyplot-mark-BarBoundaries"})
-  _render_data_table(mark_xml, mark._table, title="Bar Data")
+  context.add_data_table(mark, mark._table, title="Bar Data")
 
   for boundary1, boundary2, fill, opacity, title in zip(boundaries.T[:-1], boundaries.T[1:], [mark._table[key] for key in mark._fill], [mark._table[key] for key in mark._opacity], [mark._table[key] for key in mark._title]):
     not_null = numpy.invert(numpy.logical_or(numpy.ma.getmaskarray(boundary1), numpy.ma.getmaskarray(boundary2)))
@@ -906,7 +913,7 @@ def _render(axes, mark, context):
     boundaries = axes._project_x(boundaries)
 
   mark_xml = xml.SubElement(context.root, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class":"toyplot-mark-BarMagnitudes"})
-  _render_data_table(mark_xml, mark._table, title="Bar Data")
+  context.add_data_table(mark, mark._table, title="Bar Data")
 
   for boundary1, boundary2, fill, opacity, title in zip(boundaries.T[:-1], boundaries.T[1:], [mark._table[key] for key in mark._fill], [mark._table[key] for key in mark._opacity], [mark._table[key] for key in mark._title]):
     series_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Series"})
@@ -931,7 +938,7 @@ def _render(axes, mark, context):
     boundaries = axes._project_y(boundaries)
 
   mark_xml = xml.SubElement(context.root, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class":"toyplot-mark-FillBoundaries"})
-  _render_data_table(mark_xml, mark._table, title="Fill Data")
+  context.add_data_table(mark, mark._table, title="Fill Data")
 
   for boundary1, boundary2, fill, opacity, title in zip(boundaries.T[:-1], boundaries.T[1:], mark._fill, mark._opacity, mark._title):
     not_null = numpy.invert(numpy.logical_or(numpy.ma.getmaskarray(boundary1), numpy.ma.getmaskarray(boundary2)))
@@ -966,7 +973,7 @@ def _render(axes, mark, context):
     boundaries = axes._project_y(boundaries)
 
   mark_xml = xml.SubElement(context.root, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class":"toyplot-mark-FillMagnitudes"})
-  _render_data_table(mark_xml, mark._table, title="Fill Data")
+  context.add_data_table(mark, mark._table, title="Fill Data")
 
   for boundary1, boundary2, fill, opacity, title in zip(boundaries.T[:-1], boundaries.T[1:], mark._fill, mark._opacity, mark._title):
     series_style = toyplot.style.combine({"fill":toyplot.color.to_css(fill), "opacity":opacity}, mark._style)
@@ -1060,7 +1067,7 @@ def _render(axes, mark, context):
     series = axes._project_x(series)
 
   mark_xml = xml.SubElement(context.root, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class":"toyplot-mark-Plot"})
-  _render_data_table(mark_xml, mark._table, title="Plot Data")
+  context.add_data_table(mark, mark._table, title="Plot Data")
 
   for series, stroke, stroke_width, stroke_opacity, title, marker, msize, mfill, mstroke, mopacity  in zip(series.T, mark._stroke.T, mark._stroke_width.T, mark._stroke_opacity.T, mark._title.T, [mark._table[key] for key in mark._marker], [mark._table[key] for key in mark._msize], [mark._table[key] for key in mark._mfill], [mark._table[key] for key in mark._mstroke], [mark._table[key] for key in mark._mopacity]):
     not_null = numpy.invert(numpy.logical_or(numpy.ma.getmaskarray(position), numpy.ma.getmaskarray(series)))
@@ -1104,7 +1111,7 @@ def _render(axes, mark, context):
     y1 = axes._project_y(mark._table[mark._left[0]])
     y2 = axes._project_y(mark._table[mark._right[0]])
   mark_xml = xml.SubElement(context.root, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class":"toyplot-mark-Rect"})
-  _render_data_table(mark_xml, mark._table, title="Rect Data")
+  context.add_data_table(mark, mark._table, title="Rect Data")
 
   series_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Series"})
   for dx1, dx2, dy1, dy2, dfill, dopacity, dtitle in zip(x1, x2, y1, y2, mark._table[mark._fill[0]], mark._table[mark._opacity[0]], mark._table[mark._title[0]]):
@@ -1123,7 +1130,7 @@ def _render(parent, mark, context):
     y = parent._project_y(y)
 
   mark_xml = xml.SubElement(context.root, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class":"toyplot-mark-Text"})
-  _render_data_table(mark_xml, mark._table, title="Text Data")
+  context.add_data_table(mark, mark._table, title="Text Data")
   series_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Series"})
   for dx, dy, dtext, dangle, dfill, dopacity, dtitle in zip(x, y, mark._table[mark._text[0]], mark._table[mark._angle[0]], mark._table[mark._fill[0]], mark._table[mark._opacity[0]], mark._table[mark._title[0]]):
     dstyle = toyplot.style.combine({"fill":toyplot.color.to_css(dfill), "opacity":dopacity}, mark._style)

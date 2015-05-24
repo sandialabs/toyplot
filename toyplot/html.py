@@ -471,17 +471,23 @@ def render(canvas, fobj=None, animation=False):
   if context._data_tables:
     data_tables = list();
     for data_table in context._data_tables:
+      mark = data_table["mark"]
+      title = data_table["title"]
+      table = data_table["table"]
+
       names = []
       data = []
-      for name, column in data_table["table"].items():
-        if column.dtype == toyplot.color.dtype:
-          for suffix, channel in zip([":red", ":green", ":blue", ":alpha"], ["r", "g", "b", "a"]):
-            names.append(name + suffix)
-            data.append(column[channel].tolist())
-        else:
-          names.append(name)
-          data.append(column.tolist())
-      data_tables.append({"id":context.get_id(data_table["mark"]), "title":data_table["title"], "names":names, "data":data}) 
+      for name, column in table.items():
+        if "toyplot:exportable" in table.metadata(name) and table.metadata(name)["toyplot:exportable"]:
+          if column.dtype == toyplot.color.dtype:
+            for suffix, channel in zip([":red", ":green", ":blue", ":alpha"], ["r", "g", "b", "a"]):
+              names.append(name + suffix)
+              data.append(column[channel].tolist())
+          else:
+            names.append(name)
+            data.append(column.tolist())
+      if names:
+        data_tables.append({"id":context.get_id(mark), "title":title, "names":names, "data":data}) 
 
     xml.SubElement(controls, "script").text = _export_data_tables.substitute(root_id=root.get("id"), data_tables=json.dumps(data_tables))
 

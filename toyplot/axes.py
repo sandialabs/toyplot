@@ -658,7 +658,9 @@ class Cartesian(object):
 
       table = toyplot.data.Table()
       table["left"] = position.T[0]
+      table.metadata("left")["toyplot:exportable"] = True
       table["right"] = position.T[1]
+      table.metadata("right")["toyplot:exportable"] = True
       boundary_keys = []
       fill_keys = []
       opacity_keys = []
@@ -673,6 +675,7 @@ class Cartesian(object):
         opacity_keys.append("opacity" + str(index))
         title_keys.append("title" + str(index))
         table[boundary_keys[-1]] = boundary_column
+        table.metadata(boundary_keys[-1])["toyplot:exportable"] = True
         table[fill_keys[-1]] = fill_column
         table[opacity_keys[-1]] = opacity_column
         table[title_keys[-1]] = title_column
@@ -742,8 +745,11 @@ class Cartesian(object):
 
       table = toyplot.data.Table()
       table["left"] = position.T[0]
+      table.metadata("left")["toyplot:exportable"] = True
       table["right"] = position.T[1]
+      table.metadata("right")["toyplot:exportable"] = True
       table["baseline"] = baseline
+      table.metadata("baseline")["toyplot:exportable"] = True
       magnitude_keys = []
       fill_keys = []
       opacity_keys = []
@@ -754,6 +760,7 @@ class Cartesian(object):
         opacity_keys.append("opacity" + str(index))
         title_keys.append("title" + str(index))
         table[magnitude_keys[-1]] = magnitude_column
+        table.metadata(magnitude_keys[-1])["toyplot:exportable"] = True
         table[fill_keys[-1]] = fill_column
         table[opacity_keys[-1]] = opacity_column
         table[title_keys[-1]] = title_column
@@ -841,10 +848,12 @@ class Cartesian(object):
 
       table = toyplot.data.Table()
       table[position_axis] = position
+      table.metadata(position_axis)["toyplot:exportable"] = True
       boundaries = []
       for index, column in enumerate(series.T):
         key = boundary_axis + str(index)
         table[key] = column
+        table.metadata(key)["toyplot:exportable"] = True
         boundaries.append(key)
 
       self._children.append(toyplot.mark.FillBoundaries(table=table, position=position_axis, position_axis=position_axis, boundaries=boundaries, boundary_axis=boundary_axis, fill=fill, opacity=opacity, title=title, style=style))
@@ -896,11 +905,13 @@ class Cartesian(object):
 
       table = toyplot.data.Table()
       table[position_axis] = position
+      table.metadata(position_axis)["toyplot:exportable"] = True
       table["baseline"] = baseline
       magnitudes = []
       for index, column in enumerate(series.T):
         key = magnitude_axis + str(index)
         table[key] = column
+        table.metadata(key)["toyplot:exportable"] = True
         magnitudes.append(key)
 
       self._children.append(toyplot.mark.FillMagnitudes(table=table, position=position_axis, position_axis=position_axis, baseline="baseline", magnitudes=magnitudes, magnitude_axis=magnitude_axis, fill=fill, opacity=opacity, title=title, style=style))

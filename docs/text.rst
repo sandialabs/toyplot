@@ -28,7 +28,7 @@ rendered some text, then plotted its coordinates using a black dot:
 
 .. raw:: html
 
-    <div align="center" class="toyplot" id="t40f5bee31c6a48d58aa79adac2429eb6"><svg height="150.0px" id="tf9ad9dbcd2134f3e821ae30980b14882" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="500.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="te9a1764a5b8f412ab3ffa164aa3a2af2"><clipPath id="tb993f711bb0045b9bd4d3ce4b8f6d0d9"><rect height="50.0" width="400.0" x="50" y="50"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#tb993f711bb0045b9bd4d3ce4b8f6d0d9)" style="cursor:crosshair"><rect height="50.0" style="pointer-events:all;visibility:hidden" width="400.0" x="50" y="50"></rect><g class="toyplot-mark-Text" id="t66e37fdcfc074ec0be89fd5049a4c65f" style="alignment-baseline:middle;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;fill:rgba(40%,76.1%,64.7%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 250.0, 75.0)" x="250.0" y="75.0">Text!</text></g></g><g class="toyplot-mark-Plot" id="t4b9e75893b6e4287a581d633bfb9689d" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="250.0" cy="75.0" r="1.3228756555322954"></circle></g></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="350.0" y="60"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="395.0" y="67.0"></text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
+    <div align="center" class="toyplot" id="tc206613ca7034a6882baa1fd2356be34"><svg height="150.0px" id="t5efc414bb1b74a8b9145b3a1c809d474" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="500.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="t5bcecd31281e4092a399e2a7106f8cc0"><clipPath id="tc16d83766f1d40ef8d1d83007a3a6e4a"><rect height="50.0" width="400.0" x="50" y="50"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#tc16d83766f1d40ef8d1d83007a3a6e4a)" style="cursor:crosshair"><rect height="50.0" style="pointer-events:all;visibility:hidden" width="400.0" x="50" y="50"></rect><g class="toyplot-mark-Text" id="t3d6239ff44e94c199b68c87626ce203c" style="alignment-baseline:middle;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;fill:rgba(40%,76.1%,64.7%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 250.0, 75.0)" x="250.0" y="75.0">Text!</text></g></g><g class="toyplot-mark-Plot" id="ta50ec8c1a5b849cbb8e7a3bbcb9debcc" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="250.0" cy="75.0" r="1.3228756555322954"></circle></g></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="350.0" y="60"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="395.0" y="67.0"></text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
     (function()
     {
       if(window.CSS !== undefined && window.CSS.supports !== undefined)
@@ -36,7 +36,7 @@ rendered some text, then plotted its coordinates using a black dot:
         if(!window.CSS.supports("alignment-baseline", "middle"))
         {
           var re = /\s*alignment-baseline\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#t40f5bee31c6a48d58aa79adac2429eb6 text");
+          var text = document.querySelectorAll("#tc206613ca7034a6882baa1fd2356be34 text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -56,7 +56,7 @@ rendered some text, then plotted its coordinates using a black dot:
         if(!window.CSS.supports("baseline-shift", "0"))
         {
           var re = /\s*baseline-shift\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#t40f5bee31c6a48d58aa79adac2429eb6 text");
+          var text = document.querySelectorAll("#tc206613ca7034a6882baa1fd2356be34 text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -76,7 +76,7 @@ rendered some text, then plotted its coordinates using a black dot:
     </script><script>
     (function()
     {
-      var data_tables = [{"data": [[0.0], [0.0], ["Text!"], [0.0], [null], [1.0], [null], [0.4], [0.7607843137254902], [0.6470588235294118], [1.0]], "names": ["x", "y", "text", "angle", "fill", "opacity", "title", "toyplot:fill:red", "toyplot:fill:green", "toyplot:fill:blue", "toyplot:fill:alpha"], "id": "t66e37fdcfc074ec0be89fd5049a4c65f", "title": "Text Data"}, {"data": [[0.0], [0.0], ["o"], [7.0], [0.0], [0.0], [0.0], [1.0], [0.0], [0.0], [0.0], [1.0], [1.0]], "names": ["x", "y0", "marker0", "size0", "fill0:red", "fill0:green", "fill0:blue", "fill0:alpha", "stroke0:red", "stroke0:green", "stroke0:blue", "stroke0:alpha", "opacity0"], "id": "t4b9e75893b6e4287a581d633bfb9689d", "title": "Plot Data"}];
+      var data_tables = [{"data": [[0.0], [0.0]], "names": ["x", "y0"], "id": "ta50ec8c1a5b849cbb8e7a3bbcb9debcc", "title": "Plot Data"}];
     
       function save_csv(data_table)
       {
@@ -101,7 +101,7 @@ rendered some text, then plotted its coordinates using a black dot:
       {
         return function(e)
         {
-          var popup = document.querySelector("#t40f5bee31c6a48d58aa79adac2429eb6 .toyplot-mark-popup");
+          var popup = document.querySelector("#tc206613ca7034a6882baa1fd2356be34 .toyplot-mark-popup");
           popup.querySelector(".toyplot-mark-popup-title").innerHTML = data_table.title;
           popup.querySelector(".toyplot-mark-popup-save-csv").onclick = function() { popup.style.visibility = "hidden"; save_csv(data_table); }
           popup.style.left = (e.clientX - 50) + "px";
@@ -123,7 +123,7 @@ rendered some text, then plotted its coordinates using a black dot:
     </script><script>
     (function()
     {
-      var axes = {"te9a1764a5b8f412ab3ffa164aa3a2af2": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 0.5, "min": -0.5}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 440.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 0.5, "min": -0.5}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 60.0, "min": 90.0}, "scale": "linear"}]}};
+      var axes = {"t5bcecd31281e4092a399e2a7106f8cc0": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 0.5, "min": -0.5}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 440.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 0.5, "min": -0.5}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 60.0, "min": 90.0}, "scale": "linear"}]}};
     
       function sign(x)
       {
@@ -247,11 +247,11 @@ attribute to change the text justification relative to its X coordinate:
 
 
     /Users/tshead/src/toyplot/toyplot/axes.pyc in text(self, a, b, text, angle, fill, colormap, palette, opacity, title, style)
-       1180 
-       1181     self._update_domain(table["x"], table["y"])
-    -> 1182     self._expand_domain_range(table["x"], table["y"], toyplot.text.extents(table["text"], table["angle"], style))
-       1183 
-       1184     self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style))
+       1198 
+       1199     self._update_domain(table["x"], table["y"])
+    -> 1200     self._expand_domain_range(table["x"], table["y"], toyplot.text.extents(table["text"], table["angle"], style))
+       1201 
+       1202     self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style))
 
 
     /Users/tshead/src/toyplot/toyplot/text.pyc in extents(text, angle, style)
@@ -268,7 +268,7 @@ attribute to change the text justification relative to its X coordinate:
 
 .. raw:: html
 
-    <div align="center" class="toyplot" id="t94f821a647154c2cb7b00f5b6afbe232"><svg height="300.0px" id="t27181b5e8ab84e57b4086bb49cbb9a64" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="500.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="t3e8a6711afaf4bdf84b1c30b08325311"><clipPath id="tc62893be32ef43ce8d08ed815958ed7a"><rect height="200.0" width="400.0" x="50" y="50"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#tc62893be32ef43ce8d08ed815958ed7a)" style="cursor:crosshair"><rect height="200.0" style="pointer-events:all;visibility:hidden" width="400.0" x="50" y="50"></rect><g class="toyplot-mark-Plot" id="tc491762a3a234391803adedaad58417b" style="fill:none;stroke-width:1"><g class="toyplot-Series"><path d="M 250.0 240.0 L 250.0 60.0" style="fill:none;stroke:rgba(50.2%,50.2%,50.2%,1);stroke-opacity:1.0;stroke-width:1"></path></g></g><g class="toyplot-mark-Text" id="t1401ae9c46344e6286c87b5e4cf84bef" style="alignment-baseline:middle;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;fill:rgba(40%,76.1%,64.7%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 250.0, 105.0)" x="250.0" y="105.0">Centered</text></g></g><g class="toyplot-mark-Plot" id="tbe10c8895d2646e280c3004c4f7c8264" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="250.0" cy="105.0" r="1.3228756555322954"></circle></g></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="350.0" y="60"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="395.0" y="67.0"></text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
+    <div align="center" class="toyplot" id="t68b391a0c23040b5a4a21f4cd0fb7f96"><svg height="300.0px" id="t1f51d1b4660b453aaa9421e25e7c25bc" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="500.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="t7a58409cf3ab4869a72e30a1759967c5"><clipPath id="t4173aebc19f44667b92e42f568f8b625"><rect height="200.0" width="400.0" x="50" y="50"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#t4173aebc19f44667b92e42f568f8b625)" style="cursor:crosshair"><rect height="200.0" style="pointer-events:all;visibility:hidden" width="400.0" x="50" y="50"></rect><g class="toyplot-mark-Plot" id="te4c8645180d7475bab79ab0d6fdf20fe" style="fill:none;stroke-width:1"><g class="toyplot-Series"><path d="M 250.0 240.0 L 250.0 60.0" style="fill:none;stroke:rgba(50.2%,50.2%,50.2%,1);stroke-opacity:1.0;stroke-width:1"></path></g></g><g class="toyplot-mark-Text" id="t84618d12e4fd46ac85788c39242925c6" style="alignment-baseline:middle;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;fill:rgba(40%,76.1%,64.7%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 250.0, 105.0)" x="250.0" y="105.0">Centered</text></g></g><g class="toyplot-mark-Plot" id="ta261b92936c341628e08479741103cd5" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="250.0" cy="105.0" r="1.3228756555322954"></circle></g></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="350.0" y="60"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="395.0" y="67.0"></text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
     (function()
     {
       if(window.CSS !== undefined && window.CSS.supports !== undefined)
@@ -276,7 +276,7 @@ attribute to change the text justification relative to its X coordinate:
         if(!window.CSS.supports("alignment-baseline", "middle"))
         {
           var re = /\s*alignment-baseline\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#t94f821a647154c2cb7b00f5b6afbe232 text");
+          var text = document.querySelectorAll("#t68b391a0c23040b5a4a21f4cd0fb7f96 text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -296,7 +296,7 @@ attribute to change the text justification relative to its X coordinate:
         if(!window.CSS.supports("baseline-shift", "0"))
         {
           var re = /\s*baseline-shift\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#t94f821a647154c2cb7b00f5b6afbe232 text");
+          var text = document.querySelectorAll("#t68b391a0c23040b5a4a21f4cd0fb7f96 text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -316,7 +316,7 @@ attribute to change the text justification relative to its X coordinate:
     </script><script>
     (function()
     {
-      var data_tables = [{"data": [[0.0, 0.0], [-2.0, 2.0], [null, null], [20.0, 20.0], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [1.0, 1.0], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [1.0, 1.0], [1.0, 1.0]], "names": ["x", "y0", "marker0", "size0", "fill0:red", "fill0:green", "fill0:blue", "fill0:alpha", "stroke0:red", "stroke0:green", "stroke0:blue", "stroke0:alpha", "opacity0"], "id": "tc491762a3a234391803adedaad58417b", "title": "Plot Data"}, {"data": [[0.0], [1.0], ["Centered"], [0.0], [null], [1.0], [null], [0.4], [0.7607843137254902], [0.6470588235294118], [1.0]], "names": ["x", "y", "text", "angle", "fill", "opacity", "title", "toyplot:fill:red", "toyplot:fill:green", "toyplot:fill:blue", "toyplot:fill:alpha"], "id": "t1401ae9c46344e6286c87b5e4cf84bef", "title": "Text Data"}, {"data": [[0.0], [1.0], ["o"], [7.0], [0.0], [0.0], [0.0], [1.0], [0.0], [0.0], [0.0], [1.0], [1.0]], "names": ["x", "y0", "marker0", "size0", "fill0:red", "fill0:green", "fill0:blue", "fill0:alpha", "stroke0:red", "stroke0:green", "stroke0:blue", "stroke0:alpha", "opacity0"], "id": "tbe10c8895d2646e280c3004c4f7c8264", "title": "Plot Data"}];
+      var data_tables = [{"data": [[0.0, 0.0], [-2.0, 2.0]], "names": ["x", "y0"], "id": "te4c8645180d7475bab79ab0d6fdf20fe", "title": "Plot Data"}, {"data": [[0.0], [1.0]], "names": ["x", "y0"], "id": "ta261b92936c341628e08479741103cd5", "title": "Plot Data"}];
     
       function save_csv(data_table)
       {
@@ -341,7 +341,7 @@ attribute to change the text justification relative to its X coordinate:
       {
         return function(e)
         {
-          var popup = document.querySelector("#t94f821a647154c2cb7b00f5b6afbe232 .toyplot-mark-popup");
+          var popup = document.querySelector("#t68b391a0c23040b5a4a21f4cd0fb7f96 .toyplot-mark-popup");
           popup.querySelector(".toyplot-mark-popup-title").innerHTML = data_table.title;
           popup.querySelector(".toyplot-mark-popup-save-csv").onclick = function() { popup.style.visibility = "hidden"; save_csv(data_table); }
           popup.style.left = (e.clientX - 50) + "px";
@@ -363,7 +363,7 @@ attribute to change the text justification relative to its X coordinate:
     </script><script>
     (function()
     {
-      var axes = {"t3e8a6711afaf4bdf84b1c30b08325311": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 0.5, "min": -0.5}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 440.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 2.0, "min": -2.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 60.0, "min": 240.0}, "scale": "linear"}]}};
+      var axes = {"t7a58409cf3ab4869a72e30a1759967c5": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 0.5, "min": -0.5}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 440.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 2.0, "min": -2.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 60.0, "min": 240.0}, "scale": "linear"}]}};
     
       function sign(x)
       {
@@ -493,11 +493,11 @@ standard ``baseline-shift`` attribute, below:
 
 
     /Users/tshead/src/toyplot/toyplot/axes.pyc in text(self, a, b, text, angle, fill, colormap, palette, opacity, title, style)
-       1180 
-       1181     self._update_domain(table["x"], table["y"])
-    -> 1182     self._expand_domain_range(table["x"], table["y"], toyplot.text.extents(table["text"], table["angle"], style))
-       1183 
-       1184     self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style))
+       1198 
+       1199     self._update_domain(table["x"], table["y"])
+    -> 1200     self._expand_domain_range(table["x"], table["y"], toyplot.text.extents(table["text"], table["angle"], style))
+       1201 
+       1202     self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style))
 
 
     /Users/tshead/src/toyplot/toyplot/text.pyc in extents(text, angle, style)
@@ -514,7 +514,7 @@ standard ``baseline-shift`` attribute, below:
 
 .. raw:: html
 
-    <div align="center" class="toyplot" id="ta64b37a5341b4d8b978355e436302c20"><svg height="300.0px" id="t509db16f3df740069e03e837ab6c05de" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="500.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="tc13011357b084a4c980e55478601e13e"><clipPath id="t9faa272834514591a50fb149dcc4e0fe"><rect height="200.0" width="400.0" x="50" y="50"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#t9faa272834514591a50fb149dcc4e0fe)" style="cursor:crosshair"><rect height="200.0" style="pointer-events:all;visibility:hidden" width="400.0" x="50" y="50"></rect><g class="toyplot-mark-Plot" id="t05caa91938e04c0483abbb1833a2716e" style="fill:none;stroke-width:1"><g class="toyplot-Series"><path d="M 250.0 240.0 L 250.0 60.0" style="fill:none;stroke:rgba(50.2%,50.2%,50.2%,1);stroke-opacity:1.0;stroke-width:1"></path></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="350.0" y="60"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="395.0" y="67.0"></text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
+    <div align="center" class="toyplot" id="t8ee35d2845534cd4a2b8785328752691"><svg height="300.0px" id="t913eec751aa941dab0b8da77f78900b6" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="500.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="t34c02bb0630d4e65900052cc25a085cd"><clipPath id="tda9d25e25de14abfb6f25418000b242f"><rect height="200.0" width="400.0" x="50" y="50"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#tda9d25e25de14abfb6f25418000b242f)" style="cursor:crosshair"><rect height="200.0" style="pointer-events:all;visibility:hidden" width="400.0" x="50" y="50"></rect><g class="toyplot-mark-Plot" id="t6a4418aa882e4091979625afbf209fad" style="fill:none;stroke-width:1"><g class="toyplot-Series"><path d="M 250.0 240.0 L 250.0 60.0" style="fill:none;stroke:rgba(50.2%,50.2%,50.2%,1);stroke-opacity:1.0;stroke-width:1"></path></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="350.0" y="60"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="395.0" y="67.0"></text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
     (function()
     {
       if(window.CSS !== undefined && window.CSS.supports !== undefined)
@@ -522,7 +522,7 @@ standard ``baseline-shift`` attribute, below:
         if(!window.CSS.supports("alignment-baseline", "middle"))
         {
           var re = /\s*alignment-baseline\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#ta64b37a5341b4d8b978355e436302c20 text");
+          var text = document.querySelectorAll("#t8ee35d2845534cd4a2b8785328752691 text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -542,7 +542,7 @@ standard ``baseline-shift`` attribute, below:
         if(!window.CSS.supports("baseline-shift", "0"))
         {
           var re = /\s*baseline-shift\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#ta64b37a5341b4d8b978355e436302c20 text");
+          var text = document.querySelectorAll("#t8ee35d2845534cd4a2b8785328752691 text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -562,7 +562,7 @@ standard ``baseline-shift`` attribute, below:
     </script><script>
     (function()
     {
-      var data_tables = [{"data": [[0.0, 0.0], [-3.0, 2.0], [null, null], [20.0, 20.0], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [1.0, 1.0], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [1.0, 1.0], [1.0, 1.0]], "names": ["x", "y0", "marker0", "size0", "fill0:red", "fill0:green", "fill0:blue", "fill0:alpha", "stroke0:red", "stroke0:green", "stroke0:blue", "stroke0:alpha", "opacity0"], "id": "t05caa91938e04c0483abbb1833a2716e", "title": "Plot Data"}];
+      var data_tables = [{"data": [[0.0, 0.0], [-3.0, 2.0]], "names": ["x", "y0"], "id": "t6a4418aa882e4091979625afbf209fad", "title": "Plot Data"}];
     
       function save_csv(data_table)
       {
@@ -587,7 +587,7 @@ standard ``baseline-shift`` attribute, below:
       {
         return function(e)
         {
-          var popup = document.querySelector("#ta64b37a5341b4d8b978355e436302c20 .toyplot-mark-popup");
+          var popup = document.querySelector("#t8ee35d2845534cd4a2b8785328752691 .toyplot-mark-popup");
           popup.querySelector(".toyplot-mark-popup-title").innerHTML = data_table.title;
           popup.querySelector(".toyplot-mark-popup-save-csv").onclick = function() { popup.style.visibility = "hidden"; save_csv(data_table); }
           popup.style.left = (e.clientX - 50) + "px";
@@ -609,7 +609,7 @@ standard ``baseline-shift`` attribute, below:
     </script><script>
     (function()
     {
-      var axes = {"tc13011357b084a4c980e55478601e13e": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 0.5, "min": -0.5}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 440.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 2.0, "min": -3.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 60.0, "min": 240.0}, "scale": "linear"}]}};
+      var axes = {"t34c02bb0630d4e65900052cc25a085cd": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 0.5, "min": -0.5}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 440.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 2.0, "min": -3.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 60.0, "min": 240.0}, "scale": "linear"}]}};
     
       function sign(x)
       {
@@ -743,11 +743,11 @@ Toyplot default:
 
 
     /Users/tshead/src/toyplot/toyplot/axes.pyc in text(self, a, b, text, angle, fill, colormap, palette, opacity, title, style)
-       1180 
-       1181     self._update_domain(table["x"], table["y"])
-    -> 1182     self._expand_domain_range(table["x"], table["y"], toyplot.text.extents(table["text"], table["angle"], style))
-       1183 
-       1184     self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style))
+       1198 
+       1199     self._update_domain(table["x"], table["y"])
+    -> 1200     self._expand_domain_range(table["x"], table["y"], toyplot.text.extents(table["text"], table["angle"], style))
+       1201 
+       1202     self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style))
 
 
     /Users/tshead/src/toyplot/toyplot/text.pyc in extents(text, angle, style)
@@ -764,7 +764,7 @@ Toyplot default:
 
 .. raw:: html
 
-    <div align="center" class="toyplot" id="tea2c9f05000943c9940a00812f1dd04c"><svg height="300.0px" id="tda2680f2aaea4e289177a19d4d089b7c" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="600.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="tb2cf7a48755c449e915962ac4386b765"><clipPath id="t879fdce7cc6e49fa89f3ef1308e466d8"><rect height="200.0" width="500.0" x="50" y="50"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#t879fdce7cc6e49fa89f3ef1308e466d8)" style="cursor:crosshair"><rect height="200.0" style="pointer-events:all;visibility:hidden" width="500.0" x="50" y="50"></rect><g class="toyplot-mark-Plot" id="te2e19d82a2ee446b9c5f85c674341397" style="fill:none;stroke-width:1"><g class="toyplot-Series"><path d="M 60.0 150.0 L 540.0 150.0" style="fill:none;stroke:rgba(50.2%,50.2%,50.2%,1);stroke-opacity:1.0;stroke-width:1"></path></g></g><g class="toyplot-mark-Text" id="t580ce50846384ab991378d7fd452d76c" style="alignment-baseline:hanging;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:hanging;fill:rgba(40%,76.1%,64.7%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 156.0, 150.0)" x="156.0" y="150.0">Hanging</text></g></g><g class="toyplot-mark-Plot" id="te822d47e0c1c43b299dc12d8f18c2626" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="156.0" cy="150.0" r="1.3228756555322954"></circle></g></g></g><g class="toyplot-mark-Text" id="t726c3d3fdb2a4e42b55dad3ba71b914f" style="alignment-baseline:central;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:central;fill:rgba(98.8%,55.3%,38.4%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 252.0, 150.0)" x="252.0" y="150.0">Central</text></g></g><g class="toyplot-mark-Plot" id="t5647f4effb0646b894b33b12f607d996" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="252.0" cy="150.0" r="1.3228756555322954"></circle></g></g></g><g class="toyplot-mark-Text" id="t8db7ac99b5834bfaa14863e490ddc3b9" style="alignment-baseline:middle;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;fill:rgba(55.3%,62.7%,79.6%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 348.0, 150.0)" x="348.0" y="150.0">Middle</text></g></g><g class="toyplot-mark-Plot" id="t68d6b80ebbb142c8a86c0f926cdeb1f9" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="348.0" cy="150.0" r="1.3228756555322954"></circle></g></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="450.0" y="60"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="495.0" y="67.0"></text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
+    <div align="center" class="toyplot" id="t0f7a0ab85cb14962a14dca83c3248464"><svg height="300.0px" id="td7f38ce6003d471892e2530ad3b9a3b9" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="600.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="t59da12e7dc504d359db4459b9b8683c4"><clipPath id="t7250eb9a605848eba4006843410f14f9"><rect height="200.0" width="500.0" x="50" y="50"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#t7250eb9a605848eba4006843410f14f9)" style="cursor:crosshair"><rect height="200.0" style="pointer-events:all;visibility:hidden" width="500.0" x="50" y="50"></rect><g class="toyplot-mark-Plot" id="t98fb19e90f2249e9a8d4dd4228bb612f" style="fill:none;stroke-width:1"><g class="toyplot-Series"><path d="M 60.0 150.0 L 540.0 150.0" style="fill:none;stroke:rgba(50.2%,50.2%,50.2%,1);stroke-opacity:1.0;stroke-width:1"></path></g></g><g class="toyplot-mark-Text" id="t7611a42c848b461e949fdbc832de86d5" style="alignment-baseline:hanging;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:hanging;fill:rgba(40%,76.1%,64.7%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 156.0, 150.0)" x="156.0" y="150.0">Hanging</text></g></g><g class="toyplot-mark-Plot" id="t713e79d8946f46359f7a3cb55ec0f3d8" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="156.0" cy="150.0" r="1.3228756555322954"></circle></g></g></g><g class="toyplot-mark-Text" id="t8791912d810342b5830ccbaf911c9e4e" style="alignment-baseline:central;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:central;fill:rgba(98.8%,55.3%,38.4%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 252.0, 150.0)" x="252.0" y="150.0">Central</text></g></g><g class="toyplot-mark-Plot" id="t93d66a1c433b41fa9a0ca9eb7aa9cb42" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="252.0" cy="150.0" r="1.3228756555322954"></circle></g></g></g><g class="toyplot-mark-Text" id="t9767ad59406c4d81bfb87e625d11983c" style="alignment-baseline:middle;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;fill:rgba(55.3%,62.7%,79.6%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 348.0, 150.0)" x="348.0" y="150.0">Middle</text></g></g><g class="toyplot-mark-Plot" id="tbd354c5bdfcc44afaf80fe7d284b0ef1" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="348.0" cy="150.0" r="1.3228756555322954"></circle></g></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="450.0" y="60"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="495.0" y="67.0"></text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
     (function()
     {
       if(window.CSS !== undefined && window.CSS.supports !== undefined)
@@ -772,7 +772,7 @@ Toyplot default:
         if(!window.CSS.supports("alignment-baseline", "middle"))
         {
           var re = /\s*alignment-baseline\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#tea2c9f05000943c9940a00812f1dd04c text");
+          var text = document.querySelectorAll("#t0f7a0ab85cb14962a14dca83c3248464 text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -792,7 +792,7 @@ Toyplot default:
         if(!window.CSS.supports("baseline-shift", "0"))
         {
           var re = /\s*baseline-shift\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#tea2c9f05000943c9940a00812f1dd04c text");
+          var text = document.querySelectorAll("#t0f7a0ab85cb14962a14dca83c3248464 text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -812,7 +812,7 @@ Toyplot default:
     </script><script>
     (function()
     {
-      var data_tables = [{"data": [[-2.0, 3.0], [0.0, 0.0], [null, null], [20.0, 20.0], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [1.0, 1.0], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [1.0, 1.0], [1.0, 1.0]], "names": ["x", "y0", "marker0", "size0", "fill0:red", "fill0:green", "fill0:blue", "fill0:alpha", "stroke0:red", "stroke0:green", "stroke0:blue", "stroke0:alpha", "opacity0"], "id": "te2e19d82a2ee446b9c5f85c674341397", "title": "Plot Data"}, {"data": [[-1.0], [0.0], ["Hanging"], [0.0], [null], [1.0], [null], [0.4], [0.7607843137254902], [0.6470588235294118], [1.0]], "names": ["x", "y", "text", "angle", "fill", "opacity", "title", "toyplot:fill:red", "toyplot:fill:green", "toyplot:fill:blue", "toyplot:fill:alpha"], "id": "t580ce50846384ab991378d7fd452d76c", "title": "Text Data"}, {"data": [[-1.0], [0.0], ["o"], [7.0], [0.0], [0.0], [0.0], [1.0], [0.0], [0.0], [0.0], [1.0], [1.0]], "names": ["x", "y0", "marker0", "size0", "fill0:red", "fill0:green", "fill0:blue", "fill0:alpha", "stroke0:red", "stroke0:green", "stroke0:blue", "stroke0:alpha", "opacity0"], "id": "te822d47e0c1c43b299dc12d8f18c2626", "title": "Plot Data"}, {"data": [[0.0], [0.0], ["Central"], [0.0], [null], [1.0], [null], [0.9882352941176471], [0.5529411764705883], [0.3843137254901961], [1.0]], "names": ["x", "y", "text", "angle", "fill", "opacity", "title", "toyplot:fill:red", "toyplot:fill:green", "toyplot:fill:blue", "toyplot:fill:alpha"], "id": "t726c3d3fdb2a4e42b55dad3ba71b914f", "title": "Text Data"}, {"data": [[0.0], [0.0], ["o"], [7.0], [0.0], [0.0], [0.0], [1.0], [0.0], [0.0], [0.0], [1.0], [1.0]], "names": ["x", "y0", "marker0", "size0", "fill0:red", "fill0:green", "fill0:blue", "fill0:alpha", "stroke0:red", "stroke0:green", "stroke0:blue", "stroke0:alpha", "opacity0"], "id": "t5647f4effb0646b894b33b12f607d996", "title": "Plot Data"}, {"data": [[1.0], [0.0], ["Middle"], [0.0], [null], [1.0], [null], [0.5529411764705883], [0.6274509803921569], [0.796078431372549], [1.0]], "names": ["x", "y", "text", "angle", "fill", "opacity", "title", "toyplot:fill:red", "toyplot:fill:green", "toyplot:fill:blue", "toyplot:fill:alpha"], "id": "t8db7ac99b5834bfaa14863e490ddc3b9", "title": "Text Data"}, {"data": [[1.0], [0.0], ["o"], [7.0], [0.0], [0.0], [0.0], [1.0], [0.0], [0.0], [0.0], [1.0], [1.0]], "names": ["x", "y0", "marker0", "size0", "fill0:red", "fill0:green", "fill0:blue", "fill0:alpha", "stroke0:red", "stroke0:green", "stroke0:blue", "stroke0:alpha", "opacity0"], "id": "t68d6b80ebbb142c8a86c0f926cdeb1f9", "title": "Plot Data"}];
+      var data_tables = [{"data": [[-2.0, 3.0], [0.0, 0.0]], "names": ["x", "y0"], "id": "t98fb19e90f2249e9a8d4dd4228bb612f", "title": "Plot Data"}, {"data": [[-1.0], [0.0]], "names": ["x", "y0"], "id": "t713e79d8946f46359f7a3cb55ec0f3d8", "title": "Plot Data"}, {"data": [[0.0], [0.0]], "names": ["x", "y0"], "id": "t93d66a1c433b41fa9a0ca9eb7aa9cb42", "title": "Plot Data"}, {"data": [[1.0], [0.0]], "names": ["x", "y0"], "id": "tbd354c5bdfcc44afaf80fe7d284b0ef1", "title": "Plot Data"}];
     
       function save_csv(data_table)
       {
@@ -837,7 +837,7 @@ Toyplot default:
       {
         return function(e)
         {
-          var popup = document.querySelector("#tea2c9f05000943c9940a00812f1dd04c .toyplot-mark-popup");
+          var popup = document.querySelector("#t0f7a0ab85cb14962a14dca83c3248464 .toyplot-mark-popup");
           popup.querySelector(".toyplot-mark-popup-title").innerHTML = data_table.title;
           popup.querySelector(".toyplot-mark-popup-save-csv").onclick = function() { popup.style.visibility = "hidden"; save_csv(data_table); }
           popup.style.left = (e.clientX - 50) + "px";
@@ -859,7 +859,7 @@ Toyplot default:
     </script><script>
     (function()
     {
-      var axes = {"tb2cf7a48755c449e915962ac4386b765": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 3.0, "min": -2.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 540.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 0.5, "min": -0.5}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 60.0, "min": 240.0}, "scale": "linear"}]}};
+      var axes = {"t59da12e7dc504d359db4459b9b8683c4": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 3.0, "min": -2.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 540.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 0.5, "min": -0.5}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 60.0, "min": 240.0}, "scale": "linear"}]}};
     
       function sign(x)
       {
@@ -976,7 +976,7 @@ they represent a distance relative to the font height:
 
 .. raw:: html
 
-    <div align="center" class="toyplot" id="tb10a77b0b75e45398621469ec3d11070"><svg height="300.0px" id="tb1f8adaac8f24ad6839c9f2cdec92f03" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="700.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="t625e37d8bc354d3ca5f61746b1004df7"><clipPath id="tf03be5bd2e1345a8aad67c8d157fda45"><rect height="200.0" width="600.0" x="50" y="50"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#tf03be5bd2e1345a8aad67c8d157fda45)" style="cursor:crosshair"><rect height="200.0" style="pointer-events:all;visibility:hidden" width="600.0" x="50" y="50"></rect><g class="toyplot-mark-Plot" id="t8e93582982544c738884e0231172b2c6" style="fill:none;stroke-width:1"><g class="toyplot-Series"><path d="M 75.466666666666697 150.0 L 636.13333333333333 150.0" style="fill:none;stroke:rgba(50.2%,50.2%,50.2%,1);stroke-opacity:1.0;stroke-width:1"></path></g></g><g class="toyplot-mark-Text" id="tab8faf69127241bb9853440a3baacafd" style="alignment-baseline:middle;baseline-shift:-100%;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;baseline-shift:-100%;fill:rgba(40%,76.1%,64.7%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 187.60000000000002, 150.0)" x="187.60000000000002" y="150.0">Shift -100%</text></g></g><g class="toyplot-mark-Plot" id="t14fb3c518daa47e98e1841031796252c" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="187.60000000000002" cy="150.0" r="1.3228756555322954"></circle></g></g></g><g class="toyplot-mark-Text" id="ta82a755e59bc4a2db95504581d22b1c8" style="alignment-baseline:middle;baseline-shift:0;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;baseline-shift:0;fill:rgba(98.8%,55.3%,38.4%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 299.73333333333335, 150.0)" x="299.73333333333335" y="150.0">Shift 0%</text></g></g><g class="toyplot-mark-Plot" id="t503f01ec940a450b8fb985b400a32884" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="299.73333333333335" cy="150.0" r="1.3228756555322954"></circle></g></g></g><g class="toyplot-mark-Text" id="te1aa4b2b043f4e81b5425e12f3797081" style="alignment-baseline:middle;baseline-shift:66%;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;baseline-shift:66%;fill:rgba(55.3%,62.7%,79.6%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 411.86666666666667, 150.0)" x="411.86666666666667" y="150.0">Shift 66%</text></g></g><g class="toyplot-mark-Plot" id="tb8cfd5b1a07f4ea29b70f076485c936a" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="411.86666666666667" cy="150.0" r="1.3228756555322954"></circle></g></g></g><g class="toyplot-mark-Text" id="ta97d0d3bef3c40dbabaf7e30a849f011" style="alignment-baseline:middle;baseline-shift:100%;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;baseline-shift:100%;fill:rgba(90.6%,54.1%,76.5%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 524.0, 150.0)" x="524.0" y="150.0">Shift 100%</text></g></g><g class="toyplot-mark-Plot" id="tfc3f5411b8b04f61a5e23732c5d13a2e" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="524.0" cy="150.0" r="1.3228756555322954"></circle></g></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="550.0" y="60"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="595.0" y="67.0"></text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
+    <div align="center" class="toyplot" id="t6fef12ddf0de4c89ab240138a1958b59"><svg height="300.0px" id="ted27463ab490427698e2fab2df1f377f" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="700.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="t769afa1b63244d7787c58d948fdd9ea1"><clipPath id="t4685783da3ef44809160539045740723"><rect height="200.0" width="600.0" x="50" y="50"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#t4685783da3ef44809160539045740723)" style="cursor:crosshair"><rect height="200.0" style="pointer-events:all;visibility:hidden" width="600.0" x="50" y="50"></rect><g class="toyplot-mark-Plot" id="tae7859992c944e7fb7f7ee28ae565130" style="fill:none;stroke-width:1"><g class="toyplot-Series"><path d="M 75.466666666666697 150.0 L 636.13333333333333 150.0" style="fill:none;stroke:rgba(50.2%,50.2%,50.2%,1);stroke-opacity:1.0;stroke-width:1"></path></g></g><g class="toyplot-mark-Text" id="t525a9d905d584281bfdf82b127b6ff2b" style="alignment-baseline:middle;baseline-shift:-100%;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;baseline-shift:-100%;fill:rgba(40%,76.1%,64.7%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 187.60000000000002, 150.0)" x="187.60000000000002" y="150.0">Shift -100%</text></g></g><g class="toyplot-mark-Plot" id="t16f95c9b665e45ab8ab93634b50f4d99" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="187.60000000000002" cy="150.0" r="1.3228756555322954"></circle></g></g></g><g class="toyplot-mark-Text" id="tb2444fc020c8456a86d5db374c44442a" style="alignment-baseline:middle;baseline-shift:0;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;baseline-shift:0;fill:rgba(98.8%,55.3%,38.4%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 299.73333333333335, 150.0)" x="299.73333333333335" y="150.0">Shift 0%</text></g></g><g class="toyplot-mark-Plot" id="tc8a15676b68847018342c7f82cf6de20" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="299.73333333333335" cy="150.0" r="1.3228756555322954"></circle></g></g></g><g class="toyplot-mark-Text" id="tc9e4a9e75cf54358a9e36914c3807b8f" style="alignment-baseline:middle;baseline-shift:66%;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;baseline-shift:66%;fill:rgba(55.3%,62.7%,79.6%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 411.86666666666667, 150.0)" x="411.86666666666667" y="150.0">Shift 66%</text></g></g><g class="toyplot-mark-Plot" id="t6274c054dff34fbdb9c32989e04a29b6" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="411.86666666666667" cy="150.0" r="1.3228756555322954"></circle></g></g></g><g class="toyplot-mark-Text" id="tce4a34226daf46b0a6511ab9927e7c18" style="alignment-baseline:middle;baseline-shift:100%;font-size:24px;font-weight:normal;stroke:none;text-anchor:middle"><g class="toyplot-Series"><text class="toyplot-Datum" style="alignment-baseline:middle;baseline-shift:100%;fill:rgba(90.6%,54.1%,76.5%,1);font-size:24px;font-weight:normal;opacity:1.0;stroke:none;text-anchor:middle" transform="rotate(-0.0, 524.0, 150.0)" x="524.0" y="150.0">Shift 100%</text></g></g><g class="toyplot-mark-Plot" id="t121318df2b9e40068f9ba6f38a7d6426" style="stroke:none"><g class="toyplot-Series"><g class="toyplot-Datum" style="fill:rgba(0%,0%,0%,1);opacity:1.0;stroke:rgba(0%,0%,0%,1)"><circle cx="524.0" cy="150.0" r="1.3228756555322954"></circle></g></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="550.0" y="60"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="595.0" y="67.0"></text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
     (function()
     {
       if(window.CSS !== undefined && window.CSS.supports !== undefined)
@@ -984,7 +984,7 @@ they represent a distance relative to the font height:
         if(!window.CSS.supports("alignment-baseline", "middle"))
         {
           var re = /\s*alignment-baseline\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#tb10a77b0b75e45398621469ec3d11070 text");
+          var text = document.querySelectorAll("#t6fef12ddf0de4c89ab240138a1958b59 text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -1004,7 +1004,7 @@ they represent a distance relative to the font height:
         if(!window.CSS.supports("baseline-shift", "0"))
         {
           var re = /\s*baseline-shift\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#tb10a77b0b75e45398621469ec3d11070 text");
+          var text = document.querySelectorAll("#t6fef12ddf0de4c89ab240138a1958b59 text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -1024,7 +1024,7 @@ they represent a distance relative to the font height:
     </script><script>
     (function()
     {
-      var data_tables = [{"data": [[-2.0, 3.0], [0.0, 0.0], [null, null], [20.0, 20.0], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [1.0, 1.0], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [0.5019607843137255, 0.5019607843137255], [1.0, 1.0], [1.0, 1.0]], "names": ["x", "y0", "marker0", "size0", "fill0:red", "fill0:green", "fill0:blue", "fill0:alpha", "stroke0:red", "stroke0:green", "stroke0:blue", "stroke0:alpha", "opacity0"], "id": "t8e93582982544c738884e0231172b2c6", "title": "Plot Data"}, {"data": [[-1.0], [0.0], ["Shift -100%"], [0.0], [null], [1.0], [null], [0.4], [0.7607843137254902], [0.6470588235294118], [1.0]], "names": ["x", "y", "text", "angle", "fill", "opacity", "title", "toyplot:fill:red", "toyplot:fill:green", "toyplot:fill:blue", "toyplot:fill:alpha"], "id": "tab8faf69127241bb9853440a3baacafd", "title": "Text Data"}, {"data": [[-1.0], [0.0], ["o"], [7.0], [0.0], [0.0], [0.0], [1.0], [0.0], [0.0], [0.0], [1.0], [1.0]], "names": ["x", "y0", "marker0", "size0", "fill0:red", "fill0:green", "fill0:blue", "fill0:alpha", "stroke0:red", "stroke0:green", "stroke0:blue", "stroke0:alpha", "opacity0"], "id": "t14fb3c518daa47e98e1841031796252c", "title": "Plot Data"}, {"data": [[0.0], [0.0], ["Shift 0%"], [0.0], [null], [1.0], [null], [0.9882352941176471], [0.5529411764705883], [0.3843137254901961], [1.0]], "names": ["x", "y", "text", "angle", "fill", "opacity", "title", "toyplot:fill:red", "toyplot:fill:green", "toyplot:fill:blue", "toyplot:fill:alpha"], "id": "ta82a755e59bc4a2db95504581d22b1c8", "title": "Text Data"}, {"data": [[0.0], [0.0], ["o"], [7.0], [0.0], [0.0], [0.0], [1.0], [0.0], [0.0], [0.0], [1.0], [1.0]], "names": ["x", "y0", "marker0", "size0", "fill0:red", "fill0:green", "fill0:blue", "fill0:alpha", "stroke0:red", "stroke0:green", "stroke0:blue", "stroke0:alpha", "opacity0"], "id": "t503f01ec940a450b8fb985b400a32884", "title": "Plot Data"}, {"data": [[1.0], [0.0], ["Shift 66%"], [0.0], [null], [1.0], [null], [0.5529411764705883], [0.6274509803921569], [0.796078431372549], [1.0]], "names": ["x", "y", "text", "angle", "fill", "opacity", "title", "toyplot:fill:red", "toyplot:fill:green", "toyplot:fill:blue", "toyplot:fill:alpha"], "id": "te1aa4b2b043f4e81b5425e12f3797081", "title": "Text Data"}, {"data": [[1.0], [0.0], ["o"], [7.0], [0.0], [0.0], [0.0], [1.0], [0.0], [0.0], [0.0], [1.0], [1.0]], "names": ["x", "y0", "marker0", "size0", "fill0:red", "fill0:green", "fill0:blue", "fill0:alpha", "stroke0:red", "stroke0:green", "stroke0:blue", "stroke0:alpha", "opacity0"], "id": "tb8cfd5b1a07f4ea29b70f076485c936a", "title": "Plot Data"}, {"data": [[2.0], [0.0], ["Shift 100%"], [0.0], [null], [1.0], [null], [0.9058823529411765], [0.5411764705882353], [0.7647058823529411], [1.0]], "names": ["x", "y", "text", "angle", "fill", "opacity", "title", "toyplot:fill:red", "toyplot:fill:green", "toyplot:fill:blue", "toyplot:fill:alpha"], "id": "ta97d0d3bef3c40dbabaf7e30a849f011", "title": "Text Data"}, {"data": [[2.0], [0.0], ["o"], [7.0], [0.0], [0.0], [0.0], [1.0], [0.0], [0.0], [0.0], [1.0], [1.0]], "names": ["x", "y0", "marker0", "size0", "fill0:red", "fill0:green", "fill0:blue", "fill0:alpha", "stroke0:red", "stroke0:green", "stroke0:blue", "stroke0:alpha", "opacity0"], "id": "tfc3f5411b8b04f61a5e23732c5d13a2e", "title": "Plot Data"}];
+      var data_tables = [{"data": [[-2.0, 3.0], [0.0, 0.0]], "names": ["x", "y0"], "id": "tae7859992c944e7fb7f7ee28ae565130", "title": "Plot Data"}, {"data": [[-1.0], [0.0]], "names": ["x", "y0"], "id": "t16f95c9b665e45ab8ab93634b50f4d99", "title": "Plot Data"}, {"data": [[0.0], [0.0]], "names": ["x", "y0"], "id": "tc8a15676b68847018342c7f82cf6de20", "title": "Plot Data"}, {"data": [[1.0], [0.0]], "names": ["x", "y0"], "id": "t6274c054dff34fbdb9c32989e04a29b6", "title": "Plot Data"}, {"data": [[2.0], [0.0]], "names": ["x", "y0"], "id": "t121318df2b9e40068f9ba6f38a7d6426", "title": "Plot Data"}];
     
       function save_csv(data_table)
       {
@@ -1049,7 +1049,7 @@ they represent a distance relative to the font height:
       {
         return function(e)
         {
-          var popup = document.querySelector("#tb10a77b0b75e45398621469ec3d11070 .toyplot-mark-popup");
+          var popup = document.querySelector("#t6fef12ddf0de4c89ab240138a1958b59 .toyplot-mark-popup");
           popup.querySelector(".toyplot-mark-popup-title").innerHTML = data_table.title;
           popup.querySelector(".toyplot-mark-popup-save-csv").onclick = function() { popup.style.visibility = "hidden"; save_csv(data_table); }
           popup.style.left = (e.clientX - 50) + "px";
@@ -1071,7 +1071,7 @@ they represent a distance relative to the font height:
     </script><script>
     (function()
     {
-      var axes = {"t625e37d8bc354d3ca5f61746b1004df7": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 3.0344827586206899, "min": -2.1379310344827589}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 640.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 0.5, "min": -0.5}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 60.0, "min": 240.0}, "scale": "linear"}]}};
+      var axes = {"t769afa1b63244d7787c58d948fdd9ea1": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 3.0344827586206899, "min": -2.1379310344827589}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 640.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 0.5, "min": -0.5}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 60.0, "min": 240.0}, "scale": "linear"}]}};
     
       function sign(x)
       {

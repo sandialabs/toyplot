@@ -96,6 +96,15 @@ def step_impl(context):
   with nose.tools.assert_raises(ValueError):
     context.data["c"] = numpy.random.random((10, 4))
 
+@then(u'per-column metadata can be specified')
+def step_impl(context):
+  nose.tools.assert_equal(context.data.metadata("b"), {})
+  context.data.metadata("b")["foo"] = True
+  nose.tools.assert_equal(context.data.metadata("b"), {"foo":True})
+
+  with nose.tools.assert_raises(ValueError):
+    context.data.metadata("c")
+
 @when(u'toyplot.data.Table is initialized with nothing')
 def step_impl(context):
   context.data = toyplot.data.Table()

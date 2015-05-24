@@ -16,6 +16,7 @@ class Table(object):
   """
   def __init__(self, data=None):
     self._columns = collections.OrderedDict()
+    self._metadata = collections.defaultdict(dict)
 
     if data is not None:
       if isinstance(data, collections.OrderedDict):
@@ -123,6 +124,22 @@ class Table(object):
     table: :class:`toyplot.data.Table` containing the requested columns.
     """
     return Table(collections.OrderedDict([(key, self._columns[key]) for key in keys]))
+
+  def metadata(self, column):
+    """Return metadata for one of the table's columns.
+
+    Parameters
+    ----------
+    column: string.
+      The name of an existing column.
+
+    Returns
+    -------
+    metadata: dict containing key-value pairs.
+    """
+    if column not in self._columns:
+      raise ValueError("Unknown column name '%s'" % column)
+    return self._metadata[column]
 
   def rows(self, index):
     """Return a subset of the table's rows.

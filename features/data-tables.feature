@@ -11,6 +11,7 @@ Feature: Data tables
     And new columns must have a string name
     And new columns must have the same number of rows as existing columns
     And new columns must be one-dimensional
+    And per-column metadata can be specified
 
   Scenario Outline: Data table creation
     When toyplot.data.Table is initialized with <input>

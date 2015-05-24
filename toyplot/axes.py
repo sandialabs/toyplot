@@ -46,6 +46,9 @@ def _flat_non_null(array):
   array = array[numpy.invert(numpy.isnan(array))]
   return array
 
+def _mark_exportable(table, column):
+  table.metadata(column)["toyplot:exportable"] = True
+
 class OrderedSet(collections.MutableSet):
   """Python recipe from http://code.activestate.com/recipes/576694-orderedset
   """
@@ -658,9 +661,9 @@ class Cartesian(object):
 
       table = toyplot.data.Table()
       table["left"] = position.T[0]
-      table.metadata("left")["toyplot:exportable"] = True
+      _mark_exportable(table, "left")
       table["right"] = position.T[1]
-      table.metadata("right")["toyplot:exportable"] = True
+      _mark_exportable(table, "right")
       boundary_keys = []
       fill_keys = []
       opacity_keys = []
@@ -675,7 +678,7 @@ class Cartesian(object):
         opacity_keys.append("opacity" + str(index))
         title_keys.append("title" + str(index))
         table[boundary_keys[-1]] = boundary_column
-        table.metadata(boundary_keys[-1])["toyplot:exportable"] = True
+        _mark_exportable(table, boundary_keys[-1])
         table[fill_keys[-1]] = fill_column
         table[opacity_keys[-1]] = opacity_column
         table[title_keys[-1]] = title_column
@@ -745,11 +748,11 @@ class Cartesian(object):
 
       table = toyplot.data.Table()
       table["left"] = position.T[0]
-      table.metadata("left")["toyplot:exportable"] = True
+      _mark_exportable(table, "left")
       table["right"] = position.T[1]
-      table.metadata("right")["toyplot:exportable"] = True
+      _mark_exportable(table, "right")
       table["baseline"] = baseline
-      table.metadata("baseline")["toyplot:exportable"] = True
+      _mark_exportable(table, "baseline")
       magnitude_keys = []
       fill_keys = []
       opacity_keys = []
@@ -760,7 +763,7 @@ class Cartesian(object):
         opacity_keys.append("opacity" + str(index))
         title_keys.append("title" + str(index))
         table[magnitude_keys[-1]] = magnitude_column
-        table.metadata(magnitude_keys[-1])["toyplot:exportable"] = True
+        _mark_exportable(table, magnitude_keys[-1])
         table[fill_keys[-1]] = fill_column
         table[opacity_keys[-1]] = opacity_column
         table[title_keys[-1]] = title_column
@@ -848,12 +851,12 @@ class Cartesian(object):
 
       table = toyplot.data.Table()
       table[position_axis] = position
-      table.metadata(position_axis)["toyplot:exportable"] = True
+      _mark_exportable(table, position_axis)
       boundaries = []
       for index, column in enumerate(series.T):
         key = boundary_axis + str(index)
         table[key] = column
-        table.metadata(key)["toyplot:exportable"] = True
+        _mark_exportable(table, key)
         boundaries.append(key)
 
       self._children.append(toyplot.mark.FillBoundaries(table=table, position=position_axis, position_axis=position_axis, boundaries=boundaries, boundary_axis=boundary_axis, fill=fill, opacity=opacity, title=title, style=style))
@@ -905,13 +908,13 @@ class Cartesian(object):
 
       table = toyplot.data.Table()
       table[position_axis] = position
-      table.metadata(position_axis)["toyplot:exportable"] = True
+      _mark_exportable(table, position_axis)
       table["baseline"] = baseline
       magnitudes = []
       for index, column in enumerate(series.T):
         key = magnitude_axis + str(index)
         table[key] = column
-        table.metadata(key)["toyplot:exportable"] = True
+        _mark_exportable(table, key)
         magnitudes.append(key)
 
       self._children.append(toyplot.mark.FillMagnitudes(table=table, position=position_axis, position_axis=position_axis, baseline="baseline", magnitudes=magnitudes, magnitude_axis=magnitude_axis, fill=fill, opacity=opacity, title=title, style=style))
@@ -1018,6 +1021,7 @@ class Cartesian(object):
 
     table = toyplot.data.Table()
     table[coordinate_axes] = position
+    _mark_exportable(table, coordinate_axes)
     series_keys = []
     marker_keys = []
     msize_keys = []
@@ -1032,6 +1036,7 @@ class Cartesian(object):
       mstroke_keys.append("stroke" + str(index))
       mopacity_keys.append("opacity" + str(index))
       table[series_keys[-1]] = series_column
+      _mark_exportable(table, series_keys[-1])
       table[marker_keys[-1]] = marker_column
       table[msize_keys[-1]] = msize_column
       table[mfill_keys[-1]] = mfill_column
@@ -1107,6 +1112,7 @@ class Cartesian(object):
 
     table = toyplot.data.Table()
     table[coordinate_axes] = position
+    _mark_exportable(table, coordinate_axes)
     series_keys = []
     marker_keys = []
     msize_keys = []
@@ -1121,6 +1127,7 @@ class Cartesian(object):
       mstroke_keys.append("stroke" + str(index))
       mopacity_keys.append("opacity" + str(index))
       table[series_keys[-1]] = series_column
+      _mark_exportable(table, series_keys[-1])
       table[marker_keys[-1]] = marker_column
       table[msize_keys[-1]] = msize_column
       table[mfill_keys[-1]] = mfill_column

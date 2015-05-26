@@ -46,8 +46,8 @@ def _flat_non_null(array):
   array = array[numpy.invert(numpy.isnan(array))]
   return array
 
-def _mark_exportable(table, column):
-  table.metadata(column)["toyplot:exportable"] = True
+def _mark_exportable(table, column, exportable=True):
+  table.metadata(column)["toyplot:exportable"] = exportable
 
 class OrderedSet(collections.MutableSet):
   """Python recipe from http://code.activestate.com/recipes/576694-orderedset
@@ -1187,8 +1187,11 @@ class Cartesian(object):
     """
     table = toyplot.data.Table()
     table["x"] = toyplot.require.scalar_vector(a)
+    _mark_exportable(table, "x", not annotation)
     table["y"] = toyplot.require.scalar_vector(b, table.shape[0])
+    _mark_exportable(table, "y", not annotation)
     table["text"] = toyplot.broadcast.object(text, table.shape[0])
+    _mark_exportable(table, "text", not annotation)
     table["angle"] = toyplot.broadcast.scalar(angle, table.shape[0])
     table["fill"] = toyplot.broadcast.object(fill, table.shape[0])
     table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
@@ -1198,11 +1201,7 @@ class Cartesian(object):
     default_color = next(self._text_colors)
     table["toyplot:fill"] = toyplot.color.broadcast(default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
 
-    if annotation:
-      self._update_domain(table["x"], table["y"], display=True, data=False)
-    else:
-      self._update_domain(table["x"], table["y"], display=True, data=True)
-
+    self._update_domain(table["x"], table["y"], display=True, data=not annotation)
     self._expand_domain_range(table["x"], table["y"], toyplot.text.extents(table["text"], table["angle"], style))
 
     self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=["x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style))

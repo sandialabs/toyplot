@@ -987,7 +987,7 @@ def test_axes_text():
   x = numpy.linspace(0, 1)
   y = numpy.sin(x * 10)
   text = ["s%s" % index for index in range(len(x))]
-  axes.text(x, y, text)
+  axes.text(x, y, text, annotation=False)
   assert_canvas_matches(canvas, "axes-text")
 
 def test_axes_text_angle_fill():

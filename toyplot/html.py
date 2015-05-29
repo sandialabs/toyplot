@@ -1144,7 +1144,7 @@ def _render(parent, mark, context):
     if "-toyplot-anchor-shift" in dstyle:
       datum_xml.set("dx", str(dstyle["-toyplot-anchor-shift"]))
     if dtext is not None:
-      datum_xml.text = str(dtext)
+      datum_xml.text = toyplot.compatibility.unicode_type(dtext)
     if dtitle is not None:
       xml.SubElement(datum_xml, "title").text = str(dtitle)
 

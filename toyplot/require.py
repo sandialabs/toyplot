@@ -74,7 +74,7 @@ def string(value):
 def string_vector(value, length=None, min_length=None):
   if isinstance(value, (toyplot.compatibility.string_type)):
     value = [value]
-  array = numpy.ma.array(value).astype("str")
+  array = numpy.ma.array(value).astype("unicode")
   if array.ndim != 1:
     raise ValueError("Expected a vector.")
   if length is not None:

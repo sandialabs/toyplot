@@ -786,7 +786,9 @@ def _render(canvas, axes, context):
   # Render visible cells.
   for cell in axes._visible_cells:
     if cell._bstyle is not None:
-      xml.SubElement(axes_xml, "rect", x=repr(cell._left), y=repr(cell._top), width=repr(cell._right - cell._left), height=repr(cell._bottom - cell._top), style=_css_style(cell._bstyle))
+      cell_xml = xml.SubElement(axes_xml, "rect", x=repr(cell._left), y=repr(cell._top), width=repr(cell._right - cell._left), height=repr(cell._bottom - cell._top), style=_css_style(cell._bstyle))
+      if cell._title is not None:
+        xml.SubElement(cell_xml, "title").text = str(cell._title)
 
     if cell._data is None:
       continue

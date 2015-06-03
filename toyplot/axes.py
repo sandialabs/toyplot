@@ -1360,6 +1360,7 @@ class Table(object):
       self._style = style
       self._bstyle = None
       self._data = None
+      self._title = None
       self._width = None
       self._height = None
       self._left = None
@@ -1389,6 +1390,11 @@ class Table(object):
       for left, right in numpy.nditer([self._cells, value], flags=["refs_ok"], op_flags=[["readwrite"], ["readonly"]]):
         left[()]._data = right[()]
     data = property(fset=_set_data)
+
+    def _set_title(self, value):
+      for left, right in numpy.nditer([self._cells, value], flags=["refs_ok"], op_flags=[["readwrite"], ["readonly"]]):
+        left[()]._title = right[()]
+    title = property(fset=_set_title)
 
     def _set_format(self, value):
       for cell in self._cells.flat:

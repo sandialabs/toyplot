@@ -298,7 +298,9 @@ class Canvas(object):
 
     for i, row in enumerate(matrix):
       for j, value in enumerate(row):
-        table.cell(i, j).bstyle = {"stroke":"none", "fill": colormap.css(value)}
+        cell = table.cell(i, j)
+        cell.bstyle = {"stroke":"none", "fill": colormap.css(value)}
+        cell.title = value
 
     self._children.append(table)
     return table

@@ -276,6 +276,33 @@ class Canvas(object):
     self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style))
     return self._children[-1]
 
+  def matrix(self, matrix, title=None, colormap=None, palette=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
+    """Add a matrix visualization to the canvas.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    axes: :class:`toyplot.axes.Table`
+    """
+    matrix = toyplot.require.scalar_matrix(matrix)
+
+    if colormap is None:
+      if palette is None:
+        palette = toyplot.color.brewer("BlueRed")
+      colormap = toyplot.color.LinearMap(palette, matrix.min(), matrix.max())
+
+    xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+    table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, hrows=0, rows=matrix.shape[0], columns=matrix.shape[1], title=title, parent=self)
+
+    for i, row in enumerate(matrix):
+      for j, value in enumerate(row):
+        table.cell(i, j).bstyle = {"stroke":"none", "fill": colormap.css(value)}
+
+    self._children.append(table)
+    return table
+
   def table(self, data=None, rows=None, columns=None, hrows=None, title=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
     """Add a set of table axes to the canvas.
 

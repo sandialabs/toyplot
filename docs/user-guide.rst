@@ -14,6 +14,7 @@ Contents:
 
    axes.rst
    color.rst
+   convenience.rst
    data-tables.rst
    markers.rst
    rendering.rst

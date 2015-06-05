@@ -50,6 +50,41 @@ class TickLocator(object):
     """
     raise NotImplementedError()
 
+class Basic(TickLocator):
+  """Generate N evenly spaced ticks that include the minimum and maximum values of a domain.
+
+  Parameters
+  ----------
+  count: number, optional
+    Number of ticks to generate.
+  format : string, optional
+    Format string used to generate labels from tick locations.
+  """
+  def __init__(self, count=5, format="{:g}"):
+    self._count = count
+    self._format = format
+
+  def ticks(self, domain_min, domain_max):
+    """Return a set of ticks for the given domain.
+
+    Parameters
+    ----------
+    domain_min, domain_max: number
+
+    Returns
+    -------
+    locations : sequence of numbers
+      The axis locations where ticks should be positioned.
+    labels : sequence of strings
+      Labels for each tick location.
+    titles : sequence of strings
+      Titles for each tick location.  Typically, backends render titles as tooltips.
+    """
+    locations = numpy.linspace(domain_min, domain_max, self._count, endpoint=True)
+    labels = [self._format.format(location) for location in locations]
+    titles = numpy.repeat(None, len(labels))
+    return locations, labels, titles
+
 class Explicit(TickLocator):
   """Explicitly specify a collection of tick locations and labels for an axis.
 
@@ -105,190 +140,6 @@ class Explicit(TickLocator):
       Titles for each tick location.  Typically, backends render titles as tooltips.
     """
     return self._locations, self._labels, self._titles
-
-class Basic(TickLocator):
-  """Generate N evenly spaced ticks that include the minimum and maximum values of a domain.
-
-  Parameters
-  ----------
-  count: number, optional
-    Number of ticks to generate.
-  format : string, optional
-    Format string used to generate labels from tick locations.
-  """
-  def __init__(self, count=5, format="{:g}"):
-    self._count = count
-    self._format = format
-
-  def ticks(self, domain_min, domain_max):
-    """Return a set of ticks for the given domain.
-
-    Parameters
-    ----------
-    domain_min, domain_max: number
-
-    Returns
-    -------
-    locations : sequence of numbers
-      The axis locations where ticks should be positioned.
-    labels : sequence of strings
-      Labels for each tick location.
-    titles : sequence of strings
-      Titles for each tick location.  Typically, backends render titles as tooltips.
-    """
-    locations = numpy.linspace(domain_min, domain_max, self._count, endpoint=True)
-    labels = [self._format.format(location) for location in locations]
-    titles = numpy.repeat(None, len(labels))
-    return locations, labels, titles
-
-class Log(TickLocator):
-  """Generate ticks that are evenly spaced on a logarithmic scale
-
-  Parameters
-  ----------
-  base : number, optional
-    Logarithm base.
-  format : string, optional
-    Python format string, see
-    `Format String Syntax <https://docs.python.org/2/library/string.html#format-string-syntax>`_
-    for the syntax.  The format string will be called with a single positional
-    argument containing the locator value, and two keyword arguments `base`
-    and `exponent`.  If omitted, the locator will generate high-quality
-    labels using superscript notation.
-
-  Examples
-  --------
-
-  Generate locator labels using fixed decimal point notation and two significant digits:
-
-  >>> locator = toyplot.locator.Log(format="{:.2g}")
-
-  Generate locator labels using scientific notation and three significant digits:
-
-  >>> locator = toyplot.locator.Log(format="{:.3e}")
-
-  Generate locator labels using mixed scientific and decimal notation and four significant digits:
-
-  >>> locator = toyplot.locator.Log(format="{:.4g}")
-
-  Generate locator labels using "carat" notation:
-
-  >>> locator = toyplot.locator.Log(format="{base}^{exponent}")
-
-  """
-  def __init__(self, base=10, format=None):
-    self._base = base
-    self._format = format
-
-  def ticks(self, domain_min, domain_max):
-    """Return a set of ticks for the given domain.
-
-    Parameters
-    ----------
-    domain_min, domain_max: number
-
-    Returns
-    -------
-    locations : sequence of numbers
-      The axis locations where ticks should be positioned.
-    labels : sequence of strings
-      Labels for each tick location.
-    titles : sequence of strings
-      Titles for each tick location.  Typically, backends render titles as tooltips.
-    """
-    if domain_min < 0 and domain_max < 0:
-      negative_exponents = numpy.arange(numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)), numpy.floor(numpy.log10(numpy.abs(domain_max)) / numpy.log10(self._base)) -1, -1)
-    elif domain_min < 0:
-      negative_exponents = numpy.arange(numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)), -1, -1)
-    else:
-      negative_exponents = []
-    negative_locations = -numpy.power(self._base, negative_exponents)
-
-    if domain_max == 0 or domain_min == 0 or domain_min < 0 and domain_max > 0:
-      linear_locations = [0]
-    else:
-      linear_locations = []
-
-    if domain_min > 0 and domain_max > 0:
-      positive_exponents = numpy.arange(numpy.floor(numpy.log10(domain_min) / numpy.log10(self._base)), numpy.ceil(numpy.log10(domain_max) / numpy.log10(self._base)) + 1)
-    elif domain_max > 0:
-      positive_exponents = numpy.arange(0, numpy.ceil(numpy.log10(domain_max) / numpy.log10(self._base)) + 1) if domain_max != 0 else []
-    else:
-      positive_exponents = []
-    positive_locations = numpy.power(self._base, positive_exponents)
-
-    #print domain_min, negative_exponents, linear_locations, positive_exponents, domain_max
-
-    negative_labels = ["-" + _log_format(self._base, int(exponent), location, self._format) for exponent, location in zip(negative_exponents, negative_locations)]
-    linear_labels = [str(location) for location in linear_locations]
-    positive_labels = [_log_format(self._base, int(exponent), location, self._format) for exponent, location in zip(positive_exponents, positive_locations)]
-
-    locations = numpy.concatenate((negative_locations, linear_locations, positive_locations))
-    labels = negative_labels + linear_labels + positive_labels
-    titles = numpy.repeat(None, len(labels))
-    return locations, labels, titles
-
-class Heckbert(TickLocator):
-  """Generate ticks using the "Nice numbers for graph labels" algorithm by Paul Heckbert.
-
-  Note that this locator can produce ticks outside the minimum / maximum axis
-  domain.
-
-  Parameters
-  ----------
-  count: number of ticks to generate
-  """
-  def __init__(self, count=5):
-    self._count = count
-
-  def ticks(self, domain_min, domain_max):
-    """Return a set of ticks for the given domain.
-
-    Parameters
-    ----------
-    domain_min, domain_max: number
-
-    Returns
-    -------
-    locations : sequence of numbers
-      The axis locations where ticks should be positioned.
-    labels : sequence of strings
-      Labels for each tick location.
-    titles : sequence of strings
-      Titles for each tick location.  Typically, backends render titles as tooltips.
-    """
-    def nicenum(x, rounding):
-      exponent = numpy.floor(numpy.log10(x))
-      fraction = x / numpy.power(10, exponent)
-      if rounding: # pragma: no cover
-        if fraction < 1.5:
-          nice_fraction = 1
-        elif fraction < 3:
-          nice_fraction = 2
-        elif fraction < 7:
-          nice_fraction = 5
-        else:
-          nice_fraction = 10
-      else: # pragma: no cover
-        if fraction <= 1:
-          nice_fraction = 1
-        elif fraction <= 2:
-          nice_fraction = 2
-        elif fraction <= 5:
-          nice_fraction = 5
-        else:
-          nice_fraction = 10
-      return nice_fraction * numpy.power(10, exponent);
-
-    tick_range = nicenum(domain_max - domain_min, rounding=False)
-    tick_spacing = nicenum(tick_range / (self._count - 1), rounding=True)
-    tick_min = numpy.floor(domain_min / tick_spacing) * tick_spacing
-    tick_max = numpy.ceil(domain_max / tick_spacing) * tick_spacing
-    locations = numpy.linspace(tick_min, tick_max, self._count)
-    digits = int(numpy.max(-numpy.floor(numpy.log10(tick_spacing)), 0))
-    labels = ["%.*f" % (digits, location) for location in locations]
-    titles = numpy.repeat(None, len(labels))
-    return locations, labels, titles
 
 # An alpha version of the Talbot, Lin, Hanrahan tick mark generator for matplotlib.
 # Described in "An Extension of Wilkinson's Algorithm for Positioning Tick Labels on Axes"
@@ -454,4 +305,153 @@ class Extended(TickLocator):
     titles = numpy.repeat(None, len(labels))
     return locations, labels, titles
 
+
+class Heckbert(TickLocator):
+  """Generate ticks using the "Nice numbers for graph labels" algorithm by Paul Heckbert.
+
+  Note that this locator can produce ticks outside the minimum / maximum axis
+  domain.
+
+  Parameters
+  ----------
+  count: number of ticks to generate
+  """
+  def __init__(self, count=5):
+    self._count = count
+
+  def ticks(self, domain_min, domain_max):
+    """Return a set of ticks for the given domain.
+
+    Parameters
+    ----------
+    domain_min, domain_max: number
+
+    Returns
+    -------
+    locations : sequence of numbers
+      The axis locations where ticks should be positioned.
+    labels : sequence of strings
+      Labels for each tick location.
+    titles : sequence of strings
+      Titles for each tick location.  Typically, backends render titles as tooltips.
+    """
+    def nicenum(x, rounding):
+      exponent = numpy.floor(numpy.log10(x))
+      fraction = x / numpy.power(10, exponent)
+      if rounding: # pragma: no cover
+        if fraction < 1.5:
+          nice_fraction = 1
+        elif fraction < 3:
+          nice_fraction = 2
+        elif fraction < 7:
+          nice_fraction = 5
+        else:
+          nice_fraction = 10
+      else: # pragma: no cover
+        if fraction <= 1:
+          nice_fraction = 1
+        elif fraction <= 2:
+          nice_fraction = 2
+        elif fraction <= 5:
+          nice_fraction = 5
+        else:
+          nice_fraction = 10
+      return nice_fraction * numpy.power(10, exponent);
+
+    tick_range = nicenum(domain_max - domain_min, rounding=False)
+    tick_spacing = nicenum(tick_range / (self._count - 1), rounding=True)
+    tick_min = numpy.floor(domain_min / tick_spacing) * tick_spacing
+    tick_max = numpy.ceil(domain_max / tick_spacing) * tick_spacing
+    locations = numpy.linspace(tick_min, tick_max, self._count)
+    digits = int(numpy.max(-numpy.floor(numpy.log10(tick_spacing)), 0))
+    labels = ["%.*f" % (digits, location) for location in locations]
+    titles = numpy.repeat(None, len(labels))
+    return locations, labels, titles
+
+class Log(TickLocator):
+  """Generate ticks that are evenly spaced on a logarithmic scale
+
+  Parameters
+  ----------
+  base : number, optional
+    Logarithm base.
+  format : string, optional
+    Python format string, see
+    `Format String Syntax <https://docs.python.org/2/library/string.html#format-string-syntax>`_
+    for the syntax.  The format string will be called with a single positional
+    argument containing the locator value, and two keyword arguments `base`
+    and `exponent`.  If omitted, the locator will generate high-quality
+    labels using superscript notation.
+
+  Examples
+  --------
+
+  Generate locator labels using fixed decimal point notation and two significant digits:
+
+  >>> locator = toyplot.locator.Log(format="{:.2g}")
+
+  Generate locator labels using scientific notation and three significant digits:
+
+  >>> locator = toyplot.locator.Log(format="{:.3e}")
+
+  Generate locator labels using mixed scientific and decimal notation and four significant digits:
+
+  >>> locator = toyplot.locator.Log(format="{:.4g}")
+
+  Generate locator labels using "carat" notation:
+
+  >>> locator = toyplot.locator.Log(format="{base}^{exponent}")
+
+  """
+  def __init__(self, base=10, format=None):
+    self._base = base
+    self._format = format
+
+  def ticks(self, domain_min, domain_max):
+    """Return a set of ticks for the given domain.
+
+    Parameters
+    ----------
+    domain_min, domain_max: number
+
+    Returns
+    -------
+    locations : sequence of numbers
+      The axis locations where ticks should be positioned.
+    labels : sequence of strings
+      Labels for each tick location.
+    titles : sequence of strings
+      Titles for each tick location.  Typically, backends render titles as tooltips.
+    """
+    if domain_min < 0 and domain_max < 0:
+      negative_exponents = numpy.arange(numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)), numpy.floor(numpy.log10(numpy.abs(domain_max)) / numpy.log10(self._base)) -1, -1)
+    elif domain_min < 0:
+      negative_exponents = numpy.arange(numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)), -1, -1)
+    else:
+      negative_exponents = []
+    negative_locations = -numpy.power(self._base, negative_exponents)
+
+    if domain_max == 0 or domain_min == 0 or domain_min < 0 and domain_max > 0:
+      linear_locations = [0]
+    else:
+      linear_locations = []
+
+    if domain_min > 0 and domain_max > 0:
+      positive_exponents = numpy.arange(numpy.floor(numpy.log10(domain_min) / numpy.log10(self._base)), numpy.ceil(numpy.log10(domain_max) / numpy.log10(self._base)) + 1)
+    elif domain_max > 0:
+      positive_exponents = numpy.arange(0, numpy.ceil(numpy.log10(domain_max) / numpy.log10(self._base)) + 1) if domain_max != 0 else []
+    else:
+      positive_exponents = []
+    positive_locations = numpy.power(self._base, positive_exponents)
+
+    #print domain_min, negative_exponents, linear_locations, positive_exponents, domain_max
+
+    negative_labels = ["-" + _log_format(self._base, int(exponent), location, self._format) for exponent, location in zip(negative_exponents, negative_locations)]
+    linear_labels = [str(location) for location in linear_locations]
+    positive_labels = [_log_format(self._base, int(exponent), location, self._format) for exponent, location in zip(positive_exponents, positive_locations)]
+
+    locations = numpy.concatenate((negative_locations, linear_locations, positive_locations))
+    labels = negative_labels + linear_labels + positive_labels
+    titles = numpy.repeat(None, len(labels))
+    return locations, labels, titles
 

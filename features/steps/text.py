@@ -58,9 +58,9 @@ def step_impl(context):
 
 @then(u'text can be aligned with alphabetic alignment')
 def step_impl(context):
-  context.axes.text(0, 0, "Text!", style={"font-size":"24px", "alignment-baseline":"alpha"})
+  context.axes.text(0, 0, "Text!", style={"font-size":"24px", "alignment-baseline":"alphabetic"})
   context.axes.scatterplot(0, 0, color="black", size=7);
-  toyplot.testing.assert_canvas_equal(context.canvas, "text-alignment-baseline-alpha")
+  toyplot.testing.assert_canvas_equal(context.canvas, "text-alignment-baseline-alphabetic")
 
 @then(u'text can be aligned with positive baseline shift')
 def step_impl(context):

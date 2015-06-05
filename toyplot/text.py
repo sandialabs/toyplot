@@ -50,7 +50,7 @@ def extents(text, angle, style):
   elif alignment_baseline == "middle" or alignment_baseline == "central":
     top = y - height / 2
     bottom = y + height / 2
-  elif alignment_baseline == "alpha":
+  elif alignment_baseline == "alphabetic":
     top = y - height
     bottom = y
   else:

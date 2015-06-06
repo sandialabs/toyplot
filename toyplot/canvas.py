@@ -209,8 +209,9 @@ class Canvas(object):
       Specifies the mapping from data to canvas coordinates along an axis.
     palette: :class:`toyplot.color.Palette`, optional
       Color palette used to automatically select per-series colors for plotted data.
-    padding: :ref:`units`, optional
-      Distance between the axes and plotted data.  Defaults to CSS pixel units.
+    padding: number, string, or (number, string) tuple,  optional
+      Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
+      See :ref:`units` for details on how Toyplot handles real-world units.
     tick_length: :ref:`units`, optional
       Length of axes ticks, defaults to CSS pixel units.
 

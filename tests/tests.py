@@ -1005,7 +1005,7 @@ def test_axes_text_angle_fill():
 def test_axes_legend():
   canvas = toyplot.Canvas()
   axes = canvas.axes(grid=(2, 2, 1, 1))
-  axes.legend((("foo", "s"), ("bar", "o")), corner=("bottom-left", 100, 50, 30))
+  axes.legend((("foo", "s"), ("bar", "o")), corner=("bottom-left", 30, 100, 50))
   assert_canvas_matches(canvas, "axes-legend")
 
 def test_animation_frame_sanity_checks():
@@ -1280,16 +1280,16 @@ def test_bounds_placement():
 def test_corner_placement():
   style = {"stroke":toyplot.color.near_black}
   canvas = toyplot.Canvas(800, 600, style={"border":"1px solid %s" % toyplot.color.near_black})
-  canvas.legend([("top", "^")], style=style, corner=("top", 100, 30, 10))
-  canvas.legend([("top-right", "^")], style=style, corner=("top-right", 100, 30, 10))
-  canvas.legend([("right", "^")], style=style, corner=("right", 100, 30, 10))
-  canvas.legend([("bottom-right", "^")], style=style, corner=("bottom-right", 150, 30, 10))
-  canvas.legend([("bottom", "^")], style=style, corner=("bottom", 100, 30, 10))
-  canvas.legend([("bottom-left", "^")], style=style, corner=("bottom-left", 100, 30, 10))
-  canvas.legend([("left", "^")], style=style, corner=("left", 100, 30, 10))
-  canvas.legend([("top-left", "^")], style=style, corner=("top-left", 100, 30, 10))
-  canvas.legend([("top-left", "^")], style=style, corner=("top-left", 100, 30, 50))
-  canvas.legend([("top-left", "^")], style=style, corner=("top-left", "20%", "10%", 100))
+  canvas.legend([("top", "^")], style=style, corner=("top", 10, 100, 30))
+  canvas.legend([("top-right", "^")], style=style, corner=("top-right", 10, 100, 30))
+  canvas.legend([("right", "^")], style=style, corner=("right", 10, 100, 30))
+  canvas.legend([("bottom-right", "^")], style=style, corner=("bottom-right", 10, 150, 30))
+  canvas.legend([("bottom", "^")], style=style, corner=("bottom", 10, 100, 30))
+  canvas.legend([("bottom-left", "^")], style=style, corner=("bottom-left", 10, 100, 30))
+  canvas.legend([("left", "^")], style=style, corner=("left", 10, 100, 30))
+  canvas.legend([("top-left", "^")], style=style, corner=("top-left", 10, 100, 30))
+  canvas.legend([("top-left", "^")], style=style, corner=("top-left", 50, 100, 30))
+  canvas.legend([("top-left", "^")], style=style, corner=("top-left", 100, "20%", "10%"))
   assert_canvas_matches(canvas, "corner-placement")
 
 def test_grid_placement():

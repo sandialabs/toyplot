@@ -9,40 +9,60 @@ from __future__ import division
 
 import numbers
 import toyplot.compatibility
+import toyplot.units
 
 def region(xmin, xmax, ymin, ymax, bounds=None, rect=None, corner=None, grid=None, gutter=40):
-  def length(min, max, value):
-    if isinstance(value, numbers.Number):
-      return value
-    if isinstance(value, toyplot.compatibility.string_type):
-      value = value.strip()
-      if value[-1] == "%":
-        value = float(value[:-1]) * 0.01
-        return ((1.0 - value) * min) + (value * max)
-      else:
-        return float(value)
+  """Specify a rectangular target region relative to a parent region.
+
+  Parameters
+  ----------
+  xmin: number, required
+    Minimum X boundary of the parent region, specified in CSS pixel units.
+  xmax: number, required
+    Maximum X boundary of the parent region, specified in CSS pixel units.
+  ymin: number, required
+    Minimum Y boundary of the parent region, specified in CSS pixel units.
+  ymax: number, required
+    Maximum Y boundary of the parent region, specified in CSS pixel units.
+  gutter: number, string, or (number, string) tuple, optional
+    Padding around the target region, specified in real-world units.  Defaults
+    to CSS pixel units.  See :ref:`units` for details.
+
+  Returns
+  -------
+  xmin, xmax, ymin, ymax: number
+    The boundaries of the target region, specified in CSS pixel units.
+  """
+
+  gutter = toyplot.units.convert(gutter, "px", default="px")
+
+  def convert(min, max, value):
+    value = toyplot.units.convert(value, "px", default="px", reference=max - min)
+    if value < 0:
+      return float(max + value)
+    return float(min + value)
 
   # Specify explicit bounds for the region
   if bounds is not None:
     if isinstance(bounds, tuple) and len(bounds) == 4:
-      return (length(xmin, xmax, bounds[0]), length(xmin, xmax, bounds[1]), length(ymin, ymax, bounds[2]), length(ymin, ymax, bounds[3]))
-    raise ValueError("Unrecognized bounds type")
+      return (convert(xmin, xmax, bounds[0]), convert(xmin, xmax, bounds[1]), convert(ymin, ymax, bounds[2]), convert(ymin, ymax, bounds[3]))
+    raise TypeError("bounds parameter must be an (xmin, xmax, ymin, ymax) tuple.")
   # Specify an explicit rectangle for the region
   if rect is not None:
     if isinstance(rect, tuple) and len(rect) == 4:
-      x = length(xmin, xmax, rect[0])
-      y = length(ymin, ymax, rect[1])
-      width = length(xmin, xmax, rect[2])
-      height = length(ymin, ymax, rect[3])
+      x = convert(xmin, xmax, rect[0])
+      y = convert(ymin, ymax, rect[1])
+      width = toyplot.units.convert(rect[2], "px", default="px", reference=xmax-xmin)
+      height = toyplot.units.convert(rect[3], "px", default="px", reference=ymax-ymin)
       return (x, x + width, y, y + height)
     raise ValueError("Unrecognized rect type")
   # Offset a rectangle from a corner
   if corner is not None:
     if isinstance(corner, tuple) and len(corner) == 4:
       position = corner[0]
-      width = length(xmin, xmax, corner[1])
-      height = length(ymin, ymax, corner[2])
-      inset = float(corner[3])
+      inset = toyplot.units.convert(corner[1], "px", default="px")
+      width = toyplot.units.convert(corner[2], "px", default="px", reference=xmax-xmin)
+      height = toyplot.units.convert(corner[3], "px", default="px", reference=ymax-ymin)
     else:
       raise ValueError("Unrecognized corner type")
     if position == "top":

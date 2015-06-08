@@ -19,13 +19,12 @@ class Table(object):
     self._metadata = collections.defaultdict(dict)
 
     if data is not None:
-      if isinstance(data, collections.OrderedDict):
-        for key, value in data.items():
-          self[key] = value
-      elif isinstance(data, toyplot.data.Table):
-        for key, value in data.items():
-          self[key] = value
-      elif isinstance(data, dict):
+      # Input data for which an explicit column ordering is known.
+      if isinstance(data, (collections.OrderedDict, toyplot.data.Table, numpy.lib.npyio.NpzFile)):
+        for key in data.keys():
+          self[key] = data[key]
+      # Input data for which an explicit column ordering is not known.
+      elif isinstance(data, (dict, collections.Mapping)):
         for key in sorted(data.keys()):
           self[key] = data[key]
       else:

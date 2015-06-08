@@ -295,18 +295,24 @@ class Canvas(object):
       colormap = toyplot.color.LinearMap(palette, matrix.min(), matrix.max())
 
     xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-    table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, hrows=0, rows=matrix.shape[0], columns=matrix.shape[1], title=title, parent=self)
+    table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, trows=1, brows=0, lcols=1, rcols=0, rows=matrix.shape[0], columns=matrix.shape[1], title=title, parent=self)
+
+    for i in range(matrix.shape[0]):
+      table.left.cell(i, 0).data = i
+
+    for j in range(matrix.shape[1]):
+      table.top.cell(0, j).data = j
 
     for i, row in enumerate(matrix):
       for j, value in enumerate(row):
-        cell = table.cell(i, j)
+        cell = table.body.cell(i, j)
         cell.bstyle = {"stroke":"none", "fill": colormap.css(value)}
         cell.title = value
 
     self._children.append(table)
     return table
 
-  def table(self, data=None, rows=None, columns=None, hrows=None, title=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
+  def table(self, data=None, rows=None, columns=None, hrows=None, brows=None, lcols=None, rcols=None, title=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
     """Add a set of table axes to the canvas.
 
     Parameters
@@ -326,9 +332,15 @@ class Canvas(object):
       raise ValueError("You must specify data, or rows and columns.")
     if hrows is None:
       hrows = 0
+    if brows is None:
+      brows = 0
+    if lcols is None:
+      lcols = 0
+    if rcols is None:
+      rcols = 0
 
     xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-    table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, rows=rows, columns=columns, title=title, hrows=hrows, parent=self)
+    table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, rows=rows, columns=columns, title=title, trows=hrows, brows=brows, lcols=lcols, rcols=rcols, parent=self)
 
     if data is not None:
       for index, (key, column) in enumerate(data.items()):
@@ -344,6 +356,10 @@ class Canvas(object):
           table.column(index).align = "left"
         elif issubclass(column._data.dtype.type, numpy.integer):
           table.column(index).align = "right"
+
+    # Enable a single horizontal line between header and body.
+    if hrows:
+      table.grid.hlines[hrows] = "single"
 
     self._children.append(table)
     return table

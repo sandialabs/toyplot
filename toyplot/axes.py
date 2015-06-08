@@ -1529,46 +1529,50 @@ class Table(object):
     def cell(self, row, column, rowspan=1, colspan=1):
       return Table.CellReference(self._table, self._cells[row : row + rowspan, column : column + colspan])
 
-  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, rows, columns, hrows, title, parent):
+    @property
+    def cells(self):
+      return Table.CellReference(self._table, self._cells)
+
+  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, rows, columns, trows, brows, lcols, rcols, title, parent):
     self._xmin_range = xmin_range
     self._xmax_range = xmax_range
     self._ymin_range = ymin_range
     self._ymax_range = ymax_range
     self._rows = rows
     self._columns = columns
-    self._hrows = hrows
+    self._trows = trows
+    self._brows = brows
+    self._lcols = lcols
+    self._rcols = rcols
     self._parent = parent
     self._children = []
 
     self._title = Table.Title(title, style={"font-size":"14px", "baseline-shift":"100%"})
 
-    self._hlines = numpy.empty((hrows + rows + 1, columns + 0), dtype=object)
-    self._vlines = numpy.empty((hrows + rows + 0, columns + 1), dtype=object)
-    self._hmask = numpy.zeros((hrows + rows + 1, columns + 0), dtype=bool)
-    self._vmask = numpy.zeros((hrows + rows + 0, columns + 1), dtype=bool)
+    self._hlines = numpy.empty((trows + rows + brows + 1, lcols + columns + rcols + 0), dtype=object)
+    self._vlines = numpy.empty((trows + rows + brows + 0, lcols + columns + rcols + 1), dtype=object)
+    self._hmask = numpy.zeros((trows + rows + brows + 1, lcols + columns + rcols + 0), dtype=bool)
+    self._vmask = numpy.zeros((trows + rows + brows + 0, lcols + columns + rcols + 1), dtype=bool)
     self._separation = 2
     self._gstyle = {"stroke":toyplot.color.near_black, "stroke-width":0.5}
 
-    self._rgaps = numpy.zeros(hrows + rows + 1)
-    self._cgaps = numpy.zeros(columns + 1)
+    self._rgaps = numpy.zeros(trows + rows + brows + 1)
+    self._cgaps = numpy.zeros(lcols + columns + rcols + 1)
 
     hstyle={"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle", "font-weight":"bold"}
     style={"font-size":"12px", "stroke":"none", "fill":toyplot.color.near_black, "alignment-baseline":"middle"}
 
-    self._cells = numpy.empty((hrows + rows, columns), dtype="object")
-    for row in range(hrows):
-      for column in range(columns):
-        self._cells[row,column] = Table.Cell(row, column, "center", hstyle)
-    for row in range(hrows, hrows + rows):
-      for column in range(columns):
-        self._cells[row,column] = Table.Cell(row, column, "left", style)
+    self._cells = numpy.empty((trows + rows + brows, lcols + columns + rcols), dtype="object")
+    for row in range(trows + rows + brows):
+      for column in range(lcols + columns + rcols):
+        if row < trows or row >= trows + rows or column < lcols or column >= lcols + columns:
+          self._cells[row,column] = Table.Cell(row, column, "center", hstyle)
+        else:
+          self._cells[row,column] = Table.Cell(row, column, "left", style)
+
     self._visible_cells = OrderedSet(numpy.ravel(self._cells))
 
     self._finalized = False
-
-    # Enable a single horizontal line between header and body.
-    if self._hrows:
-      self._hlines[self._hrows] = "single"
 
   @property
   def title(self):
@@ -1576,27 +1580,106 @@ class Table(object):
 
   @property
   def header(self):
-    if not self._hrows:
-      return None
+    return self.top
+
+  @property
+  def footer(self):
+    return self.bottom
+
+  @property
+  def top(self):
+    region = Table.Region(
+      self,
+      self._cells[0 : self._trows, self._lcols : self._lcols + self._columns],
+      self._hlines[0 : self._trows + 1, self._lcols : self._lcols + self._columns],
+      self._vlines[0 : self._trows, self._lcols : self._lcols + self._columns + 1],
+      self._rgaps[0 : self._trows + 1],
+      self._cgaps[self._lcols : self._lcols + self._columns],
+      )
+
+    region.left = Table.Region(
+      self,
+      self._cells[0 : self._trows, 0 : self._lcols],
+      self._hlines[0 : self._trows + 1, 0 : self._lcols],
+      self._vlines[0 : self._trows, 0 : self._lcols + 1],
+      self._rgaps[0 : self._trows + 1],
+      self._cgaps[0 : self._lcols],
+      )
+
+    region.right = Table.Region(
+      self,
+      self._cells[0 : self._trows, self._lcols + self._columns : ],
+      self._hlines[0 : self._trows + 1, self._lcols + self._columns : ],
+      self._vlines[0 : self._trows, self._lcols + self._columns : ],
+      self._rgaps[0 : self._trows + 1],
+      self._cgaps[self._lcols + self._columns : ],
+      )
+
+    return region
+
+  @property
+  def left(self):
     return Table.Region(
       self,
-      self._cells[0 : self._hrows],
-      self._hlines[0 : self._hrows + 1],
-      self._vlines[0 : self._hrows],
-      self._rgaps[0 : self._hrows + 1],
-      self._cgaps[...],
+      self._cells[self._trows : self._trows + self._rows, 0 : self._lcols],
+      self._hlines[self._trows : self._trows + self._rows + 1, 0 : self._lcols],
+      self._vlines[self._trows : self._trows + self._rows, 0 : self._lcols + 1],
+      self._rgaps[self._trows : self._trows + self._rows + 1],
+      self._cgaps[0 : self._lcols],
       )
 
   @property
   def body(self):
     return Table.Region(
       self,
-      self._cells[self._hrows : ],
-      self._hlines[self._hrows : ],
-      self._vlines[self._hrows : ],
-      self._rgaps[self._hrows : ],
-      self._cgaps[...],
+      self._cells[self._trows : self._trows + self._rows, self._lcols : self._lcols + self._columns],
+      self._hlines[self._trows : self._trows + self._rows + 1, self._lcols : self._lcols + self._columns],
+      self._vlines[self._trows : self._trows + self._rows, self._lcols : self._lcols + self._columns + 1],
+      self._rgaps[self._trows : self._trows + self._rows],
+      self._cgaps[self._lcols : self._lcols + self._columns],
       )
+
+  @property
+  def right(self):
+    return Table.Region(
+      self,
+      self._cells[self._trows : self._trows + self._rows, self._lcols + self._columns : ],
+      self._hlines[self._trows : self._trows + self._rows + 1, self._lcols + self._columns : ],
+      self._vlines[self._trows : self._trows + self._rows, self._lcols + self._columns : ],
+      self._rgaps[self._trows : self._trows + self._rows + 1],
+      self._cgaps[self._lcols + self._columns : ],
+      )
+
+  @property
+  def bottom(self):
+    region = Table.Region(
+      self,
+      self._cells[self._trows + self._rows : , self._lcols : self._lcols + self._columns],
+      self._hlines[self._trows + self._rows : , self._lcols : self._lcols + self._columns],
+      self._vlines[self._trows + self._rows : , self._lcols : self._lcols + self._columns + 1],
+      self._rgaps[self._trows + self._rows : ],
+      self._cgaps[self._lcols : self._lcols + self._columns],
+      )
+
+    region.left = Table.Region(
+      self,
+      self._cells[self._trows + self._rows : , 0 : self._lcols],
+      self._hlines[self._trows + self._rows : , 0 : self._lcols],
+      self._vlines[self._trows + self._rows : , 0 : self._lcols + 1],
+      self._rgaps[self._trows + self._rows : ],
+      self._cgaps[0 : self._lcols],
+      )
+
+    region.right = Table.Region(
+      self,
+      self._cells[self._trows + self._rows : , self._lcols + self._columns : ],
+      self._hlines[self._trows + self._rows : , self._lcols + self._columns : ],
+      self._vlines[self._trows + self._rows : , self._lcols + self._columns : ],
+      self._rgaps[self._trows + self._rows : ],
+      self._cgaps[self._lcols + self._columns : ],
+      )
+
+    return region
 
   @property
   def gaps(self):

@@ -1062,6 +1062,43 @@ def _render(canvas, legend, context):
       label_y = y + ((i + 1) * mark_gutter) + (i * mark_height) + (mark_height / 2)
       xml.SubElement(context.root, "text", x=repr(label_x), y=repr(label_y), style=_css_style({"alignment-baseline":"middle", "stroke":"none"}, legend._lstyle)).text = mark_label
 
+@dispatch(toyplot.axes.Cartesian, toyplot.mark.Graph, _RenderContext)
+def _render(axes, mark, context):
+  position = mark._table[mark._coordinates[0]]
+  series = numpy.ma.column_stack([mark._table[key] for key in mark._series])
+
+  if mark._coordinate_axes[0] == "x":
+    position = axes._project_x(position)
+    series = axes._project_y(series)
+  elif mark._coordinate_axes[0] == "y":
+    position = axes._project_y(position)
+    series = axes._project_x(series)
+
+  mark_xml = xml.SubElement(context.root, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class":"toyplot-mark-Graph"})
+  context.add_data_table(mark, mark._table, title="Graph Data")
+
+  for series, stroke, stroke_width, stroke_opacity, title, marker, msize, mfill, mstroke, mopacity  in zip(series.T, mark._stroke.T, mark._stroke_width.T, mark._stroke_opacity.T, mark._title.T, [mark._table[key] for key in mark._marker], [mark._table[key] for key in mark._msize], [mark._table[key] for key in mark._mfill], [mark._table[key] for key in mark._mstroke], [mark._table[key] for key in mark._mopacity]):
+    not_null = numpy.invert(numpy.logical_or(numpy.ma.getmaskarray(position), numpy.ma.getmaskarray(series)))
+
+    msize = numpy.sqrt(msize)
+    stroke_style = toyplot.style.combine({"stroke":toyplot.color.to_css(stroke), "stroke-width":stroke_width, "stroke-opacity":stroke_opacity}, mark._style)
+    if mark._coordinate_axes[0] == "x":
+      x = position
+      y = series
+    elif mark._coordinate_axes[0] == "y":
+      x = series
+      y = position
+    series_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Series"})
+    if mark._show_edges:
+      for source, target in zip(mark._etable[mark._esource[0]], mark._etable[mark._etarget[0]]):
+        xml.SubElement(series_xml, "line", x1=repr(x[source]), y1=repr(y[source]), x2=repr(x[target]), y2=repr(y[target]), style=_css_style({"stroke":"black", "stroke-width":1.0}))  
+    for dx, dy, dmarker, dsize, dfill, dstroke, dopacity in zip(x[not_null], y[not_null], marker[not_null], msize[not_null], mfill[not_null], mstroke[not_null], mopacity[not_null]):
+      dstyle = toyplot.style.combine({"fill":toyplot.color.to_css(dfill),"stroke":toyplot.color.to_css(dstroke), "opacity":dopacity}, mark._mstyle)
+      _render_marker(series_xml, dx, dy, dsize, dmarker, dstyle, mark._mlstyle, extra_class="toyplot-Datum")
+
+    if title is not None:
+      xml.SubElement(series_xml, "title").text = str(title)
+
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Plot, _RenderContext)
 def _render(axes, mark, context):
   position = mark._table[mark._coordinates[0]]

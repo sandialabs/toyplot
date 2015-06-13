@@ -54,6 +54,21 @@ def scalar_vector(value, length=None):
       raise ValueError("Expected %s values, received %s." % (length, len(array)))
   return array
 
+def integer_array(value):
+  array = numpy.ma.array(value).astype("int64")
+  return array
+
+def integer_vector(value, length=None):
+  array = integer_array(value)
+  if array.shape == ():
+    array = numpy.ma.repeat(array, 1)
+  if array.ndim != 1:
+    raise ValueError("Expected a vector.")
+  if length is not None:
+    if len(array) != length:
+      raise ValueError("Expected %s values, received %s." % (length, len(array)))
+  return array
+
 def scalar_matrix(value, rows=None, columns=None):
   array = scalar_array(value)
   if array.ndim != 2:

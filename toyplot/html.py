@@ -1064,40 +1064,44 @@ def _render(canvas, legend, context):
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Graph, _RenderContext)
 def _render(axes, mark, context):
-  position = mark._table[mark._coordinates[0]]
-  series = numpy.ma.column_stack([mark._table[key] for key in mark._series])
+  position = mark._vertex_table[mark._coordinates[0]]
+  series = mark._vertex_table[mark._series[0]]
 
-  if mark._coordinate_axes[0] == "x":
-    position = axes._project_x(position)
-    series = axes._project_y(series)
-  elif mark._coordinate_axes[0] == "y":
-    position = axes._project_y(position)
-    series = axes._project_x(series)
+  if mark._coordinate_axis[0] == "x":
+    x = axes._project_x(position)
+    y = axes._project_y(series)
+  elif mark._coordinate_axis[0] == "y":
+    y = axes._project_y(position)
+    x = axes._project_x(series)
 
-  mark_xml = xml.SubElement(context.root, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class":"toyplot-mark-Graph"})
-  context.add_data_table(mark, mark._table, title="Graph Data")
+  marker = mark._vertex_table[mark._marker[0]]
+  msize = mark._vertex_table[mark._msize[0]]
+  mfill = mark._vertex_table[mark._mfill[0]]
+  mstroke = mark._vertex_table[mark._mstroke[0]]
+  mopacity = mark._vertex_table[mark._mopacity[0]]
+  title = mark._title
 
-  for series, stroke, stroke_width, stroke_opacity, title, marker, msize, mfill, mstroke, mopacity  in zip(series.T, mark._stroke.T, mark._stroke_width.T, mark._stroke_opacity.T, mark._title.T, [mark._table[key] for key in mark._marker], [mark._table[key] for key in mark._msize], [mark._table[key] for key in mark._mfill], [mark._table[key] for key in mark._mstroke], [mark._table[key] for key in mark._mopacity]):
-    not_null = numpy.invert(numpy.logical_or(numpy.ma.getmaskarray(position), numpy.ma.getmaskarray(series)))
+  stroke = mark._stroke
+  stroke_width = mark._stroke_width
+  stroke_opacity = mark._stroke_opacity
 
-    msize = numpy.sqrt(msize)
-    stroke_style = toyplot.style.combine({"stroke":toyplot.color.to_css(stroke), "stroke-width":stroke_width, "stroke-opacity":stroke_opacity}, mark._style)
-    if mark._coordinate_axes[0] == "x":
-      x = position
-      y = series
-    elif mark._coordinate_axes[0] == "y":
-      x = series
-      y = position
-    series_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Series"})
-    if mark._show_edges:
-      for source, target in zip(mark._etable[mark._esource[0]], mark._etable[mark._etarget[0]]):
-        xml.SubElement(series_xml, "line", x1=repr(x[source]), y1=repr(y[source]), x2=repr(x[target]), y2=repr(y[target]), style=_css_style({"stroke":"black", "stroke-width":1.0}))  
-    for dx, dy, dmarker, dsize, dfill, dstroke, dopacity in zip(x[not_null], y[not_null], marker[not_null], msize[not_null], mfill[not_null], mstroke[not_null], mopacity[not_null]):
-      dstyle = toyplot.style.combine({"fill":toyplot.color.to_css(dfill),"stroke":toyplot.color.to_css(dstroke), "opacity":dopacity}, mark._mstyle)
-      _render_marker(series_xml, dx, dy, dsize, dmarker, dstyle, mark._mlstyle, extra_class="toyplot-Datum")
+  mark_xml = xml.SubElement(context.root, "g", id=context.get_id(mark), attrib={"class":"toyplot-mark-Graph"})
+  #context.add_data_table(mark, mark._vertex_table, title="Graph Vertex Data")
+  #context.add_data_table(mark, mark._edge_table, title="Graph Edge Data")
+  if mark._show_edges:
+    edge_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Edges"})
+    for source, target, dstroke, dstroke_width, dstroke_opacity in itertools.izip(mark._edge_table[mark._source[0]], mark._edge_table[mark._target[0]], mark._edge_table[mark._stroke[0]], mark._edge_table[mark._stroke_width[0]], mark._edge_table[mark._stroke_opacity[0]]):
+      edge_style = toyplot.style.combine({"stroke":toyplot.color.to_css(dstroke), "stroke-width":dstroke_width, "stroke-opacity":dstroke_opacity}, mark._edge_style)
+      xml.SubElement(edge_xml, "line", x1=repr(x[source]), y1=repr(y[source]), x2=repr(x[target]), y2=repr(y[target]), style=_css_style(edge_style))
 
-    if title is not None:
-      xml.SubElement(series_xml, "title").text = str(title)
+  vertex_xml = xml.SubElement(mark_xml, "g", attrib={"class":"toyplot-Vertices"})
+  msize = numpy.sqrt(msize)
+  for dx, dy, dmarker, dsize, dfill, dstroke, dopacity in itertools.izip(x, y, marker, msize, mfill, mstroke, mopacity):
+    dstyle = toyplot.style.combine({"fill":toyplot.color.to_css(dfill),"stroke":toyplot.color.to_css(dstroke), "opacity":dopacity}, mark._mstyle)
+    _render_marker(vertex_xml, dx, dy, dsize, dmarker, dstyle, mark._mlstyle, extra_class="toyplot-Datum")
+
+  if title is not None:
+    xml.SubElement(vertex_xml, "title").text = str(title)
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Plot, _RenderContext)
 def _render(axes, mark, context):

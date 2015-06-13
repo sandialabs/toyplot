@@ -162,53 +162,52 @@ class Graph(Mark):
   Do not create Graph instances directly.  Use factory methods such as
   :meth:`toyplot.axes.Cartesian.graph` instead.
   """
-  def __init__(self, table, coordinates, coordinate_axes, series, series_axis, show_edges, stroke, stroke_width, stroke_opacity, marker, msize, mfill, mstroke, mopacity, title, style, mstyle, mlstyle, etable, esource, etarget):
-    table = toyplot.require.instance(table, toyplot.data.Table)
-    coordinates = toyplot.require.table_keys(table, coordinates, min_length=1)
-    coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=len(coordinates))
-    series = toyplot.require.table_keys(table, series, min_length=1)
+  def __init__(self, vertex_table, coordinates, coordinate_axis, series, series_axis, marker, msize, mfill, mstroke, mopacity, title, mstyle, mlstyle, edge_table, source, target, show_edges, stroke, stroke_width, stroke_opacity, edge_style):
+    vertex_table = toyplot.require.instance(vertex_table, toyplot.data.Table)
+    coordinates = toyplot.require.table_keys(vertex_table, coordinates, length=1)
+    coordinate_axis = toyplot.require.string_vector(coordinate_axis, length=1)
+    series = toyplot.require.table_keys(vertex_table, series, length=1)
     series_axis = toyplot.require.string_vector(series_axis, length=1)
-    # show_edges
-    # stroke
-    # stroke_width
-    # stroke_opacity
-    marker = toyplot.require.table_keys(table, marker, length=len(series))
-    msize = toyplot.require.table_keys(table, msize, length=len(series))
-    mfill = toyplot.require.table_keys(table, mfill, length=len(series))
-    mstroke = toyplot.require.table_keys(table, mstroke, length=len(series))
-    mopacity = toyplot.require.table_keys(table, mopacity, length=len(series))
-    # title
-    style = toyplot.require.style(style)
+    marker = toyplot.require.table_keys(vertex_table, marker, length=len(series))
+    msize = toyplot.require.table_keys(vertex_table, msize, length=len(series))
+    mfill = toyplot.require.table_keys(vertex_table, mfill, length=len(series))
+    mstroke = toyplot.require.table_keys(vertex_table, mstroke, length=len(series))
+    mopacity = toyplot.require.table_keys(vertex_table, mopacity, length=len(series))
+    title = toyplot.require.table_keys(vertex_table, title, length=len(series))
     mstyle = toyplot.require.style(mstyle)
     mlstyle = toyplot.require.style(mlstyle)
 
-    etable = toyplot.require.instance(etable, toyplot.data.Table)
-    esource = toyplot.require.table_keys(etable, esource, length=1)
-    etarget = toyplot.require.table_keys(etable, etarget, length=1)
+    edge_table = toyplot.require.instance(edge_table, toyplot.data.Table)
+    source = toyplot.require.table_keys(edge_table, source, length=1)
+    target = toyplot.require.table_keys(edge_table, target, length=1)
+    stroke = toyplot.require.table_keys(edge_table, stroke, length=1)
+    stroke_width = toyplot.require.table_keys(edge_table, stroke_width, length=1)
+    stroke_opacity = toyplot.require.table_keys(edge_table, stroke_opacity, length=1)
+    edge_style = toyplot.require.style(edge_style)
 
     Mark.__init__(self)
-    self._table = table
-    self._coordinates = coordinates       # D-1 coordinate columns
-    self._coordinate_axes = coordinate_axes # D-1 axis identifiers
-    self._series = series                 # N coordinate columns
+    self._vertex_table = vertex_table
+    self._coordinates = coordinates       # 1 coordinate column
+    self._coordinate_axis = coordinate_axis # 1 axis identifier
+    self._series = series                 # 1 coordinate columns
     self._series_axis = series_axis       # 1 axis identifier
-    self._show_edges = show_edges         # Boolean
-    self._stroke = stroke                 # N stroke colors
-    self._stroke_width = stroke_width     # N stroke widths
-    self._stroke_opacity = stroke_opacity # N stroke opacities
-    self._marker = marker                 # N marker columns
-    self._msize = msize                   # N marker size columns
-    self._mfill = mfill                   # N marker fill color columns
-    self._mstroke = mstroke               # N marker stroke color columns
-    self._mopacity = mopacity             # N marker opacity columns
-    self._title = title                   # N titles
-    self._style = style                   # Line style
+    self._marker = marker                 # 1 marker columns
+    self._msize = msize                   # 1 marker size columns
+    self._mfill = mfill                   # 1 marker fill color columns
+    self._mstroke = mstroke               # 1 marker stroke color columns
+    self._mopacity = mopacity             # 1 marker opacity columns
+    self._title = title                   # 1 titles column
     self._mstyle = mstyle                 # Marker style
     self._mlstyle = mlstyle               # Marker label style
 
-    self._etable = etable
-    self._esource = esource               # 1 source column
-    self._etarget = etarget               # 1 target column
+    self._edge_table = edge_table
+    self._source = source                 # 1 source column
+    self._target = target                 # 1 target column
+    self._show_edges = show_edges         # Boolean
+    self._stroke = stroke                 # M stroke colors
+    self._stroke_width = stroke_width     # M stroke widths
+    self._stroke_opacity = stroke_opacity # M stroke opacities
+    self._edge_style = edge_style         # Edge style
 
 class Plot(Mark):
   """Plot multiple bivariate data series using lines and/or markers.

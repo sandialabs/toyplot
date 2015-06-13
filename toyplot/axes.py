@@ -364,6 +364,7 @@ class Cartesian(object):
     self._palette = palette
     self._bar_colors = itertools.cycle(palette)
     self._fill_colors = itertools.cycle(palette)
+    self._graph_colors = itertools.cycle(palette)
     self._plot_colors = itertools.cycle(palette)
     self._scatterplot_colors = itertools.cycle(palette)
     self._rect_colors = itertools.cycle(palette)
@@ -920,7 +921,7 @@ class Cartesian(object):
       self._children.append(toyplot.mark.FillMagnitudes(table=table, position=position_axis, position_axis=position_axis, baseline="baseline", magnitudes=magnitudes, magnitude_axis=magnitude_axis, fill=fill, opacity=opacity, title=title, style=style))
       return self._children[-1]
 
-  def graph(self, a, b=None, c=None, d=None, along="x", color=None, colormap=None, palette=None, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None):
+  def graph(self, a, b, c, d, along="x", vertex_color=None, vertex_colormap=None, vertex_palette=None, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, edge_color=None, edge_colormap=None, edge_palette=None, edge_width=1.0, edge_opacity=1.0, edge_style=None, mstyle=None, mlstyle=None):
     """Add a graph plot to the axes.
 
     Parameters
@@ -942,80 +943,58 @@ class Cartesian(object):
     """
     along = toyplot.require.value_in(along, ["x", "y"])
 
-    if a is not None and b is not None:
-      position = toyplot.require.scalar_vector(a)
-      b = numpy.ma.array(b).astype("float64")
-      if b.ndim == 0:
-        b = toyplot.require.scalar_vector(b, len(position))
-        series = numpy.ma.column_stack((b,))
-      elif b.ndim == 1:
-        b = toyplot.require.scalar_vector(b, len(position))
-        series = numpy.ma.column_stack((b,))
-      elif b.ndim == 2:
-        series = toyplot.require.scalar_matrix(b, rows=len(position))
-    else:
-      a = numpy.ma.array(a).astype("float64")
-      if a.ndim == 1:
-        series = numpy.ma.column_stack((a,))
-        position = numpy.ma.arange(series.shape[0])
-      elif a.ndim == 2:
-        series = a
-        position = numpy.ma.arange(series.shape[0])
+    position = toyplot.require.scalar_vector(a)
+    series = toyplot.require.scalar_vector(b, len(position))
+    source = toyplot.require.integer_vector(c)
+    target = toyplot.require.integer_vector(d, len(source))
 
-    source = numpy.array(c)
-    target = numpy.array(d)
+    default_color = [next(self._graph_colors)]
+    vertex_color = toyplot.color.broadcast(default_color if vertex_color is None else vertex_color, series.shape, colormap=vertex_colormap, palette=vertex_palette)
 
-    default_color = [next(self._scatterplot_colors) for i in range(series.shape[1])]
-    color = toyplot.color.broadcast(default_color if color is None else color, series.shape[1], colormap=colormap, palette=palette)
-    stroke_width = toyplot.broadcast.scalar(0.0, series.shape[1])
-    stroke_opacity = toyplot.broadcast.scalar(0.0, series.shape[1])
     marker = toyplot.broadcast.object(marker, series.shape)
     msize = toyplot.broadcast.scalar(size, series.shape)
-    mfill = toyplot.color.broadcast(color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
+    mfill = toyplot.color.broadcast(vertex_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
     mstroke = toyplot.color.broadcast(mfill, series.shape)
     mopacity = toyplot.broadcast.scalar(opacity, series.shape)
-    title = toyplot.broadcast.object(title, series.shape[1])
-    style = toyplot.style.combine({"stroke":"none"}, toyplot.require.style(style))
+    title = toyplot.broadcast.object(title, series.shape)
     mstyle = toyplot.style.combine({}, toyplot.require.style(mstyle))
     mlstyle = toyplot.style.combine(toyplot.require.style(mlstyle))
+
+    edge_color = toyplot.color.broadcast(default_color if edge_color is None else edge_color, source.shape, colormap=edge_colormap, palette=edge_palette)
+    edge_width = toyplot.broadcast.scalar(edge_width, source.shape)
+    edge_opacity = toyplot.broadcast.scalar(edge_opacity, source.shape)
+    edge_style = toyplot.style.combine({}, toyplot.require.style(edge_style))
 
     if along == "x":
       self._update_domain(position, series)
     elif along == "y":
       self._update_domain(series, position)
 
-    coordinate_axes = along
+    coordinate_axis = along
     series_axis = "y" if along == "x" else "x"
 
-    table = toyplot.data.Table()
-    table[coordinate_axes] = position
-    _mark_exportable(table, coordinate_axes)
-    series_keys = []
-    marker_keys = []
-    msize_keys = []
-    mfill_keys = []
-    mstroke_keys = []
-    mopacity_keys = []
-    for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column) in enumerate(zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T)):
-      series_keys.append(series_axis + str(index))
-      marker_keys.append("marker" + str(index))
-      msize_keys.append("size" + str(index))
-      mfill_keys.append("fill" + str(index))
-      mstroke_keys.append("stroke" + str(index))
-      mopacity_keys.append("opacity" + str(index))
-      table[series_keys[-1]] = series_column
-      _mark_exportable(table, series_keys[-1])
-      table[marker_keys[-1]] = marker_column
-      table[msize_keys[-1]] = msize_column
-      table[mfill_keys[-1]] = mfill_column
-      table[mstroke_keys[-1]] = mstroke_column
-      table[mopacity_keys[-1]] = mopacity_column
+    vertex_table = toyplot.data.Table()
+    vertex_table[coordinate_axis] = position
+    _mark_exportable(vertex_table, coordinate_axis)
+    vertex_table[series_axis] = series
+    _mark_exportable(vertex_table, series_axis)
+    vertex_table["marker"] = marker
+    vertex_table["size"] = msize
+    vertex_table["fill"] = mfill
+    vertex_table["stroke"] = mstroke
+    vertex_table["opacity"] = mopacity
+    vertex_table["title"] = title
 
-    etable = toyplot.data.Table()
-    etable["source"] = source
-    etable["target"] = target
+    edge_table = toyplot.data.Table()
+    edge_table["source"] = source
+    _mark_exportable(edge_table, "source")
+    edge_table["target"] = target
+    _mark_exportable(edge_table, "target")
+    edge_table["stroke"] = edge_color
+    edge_table["stroke-width"] = edge_width
+    edge_table["stroke-opacity"]= edge_opacity
 
-    self._children.append(toyplot.mark.Graph(table=table, coordinates=coordinate_axes, coordinate_axes=coordinate_axes, series=series_keys, series_axis=series_axis, show_edges=True, stroke=color, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker_keys, msize=msize_keys, mfill=mfill_keys, mstroke=mstroke_keys, mopacity=mopacity_keys, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle, etable=etable, esource="source", etarget="target"))
+    self._children.append(toyplot.mark.Graph(vertex_table=vertex_table, coordinates=coordinate_axis, coordinate_axis=coordinate_axis, series=series_axis, series_axis=series_axis, marker=["marker"], msize=["size"], mfill=["fill"], mstroke=["stroke"], mopacity=["opacity"], title=["title"], mstyle=mstyle, mlstyle=mlstyle, edge_table=edge_table, source=["source"], target=["target"], show_edges=True, stroke=["stroke"], stroke_width=["stroke-width"], stroke_opacity=["stroke-opacity"], edge_style=edge_style))
     return self._children[-1]
 
   def plot(self, a, b=None, along="x", color=None, colormap=None, palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None):

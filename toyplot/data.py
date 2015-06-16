@@ -27,6 +27,10 @@ class Table(object):
       elif isinstance(data, (dict, collections.Mapping)):
         for key in sorted(data.keys()):
           self[key] = data[key]
+      # Input data based on sequences.
+      elif isinstance(data, (list, collections.Sequence)):
+        for key, values in data:
+          self[key] = values
       else:
         raise ValueError("Unsupported data type: %s" % type(data))
 

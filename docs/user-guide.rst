@@ -17,6 +17,7 @@ Contents:
    convenience.rst
    data-tables.rst
    markers.rst
+   matrix-visualization.rst
    rendering.rst
    table-axes.rst
    text.rst

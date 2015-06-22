@@ -231,9 +231,18 @@ def render(svg, context):
           dx = toyplot.units.convert(element.get("dx", 0), "px", default="px")
           x += dx
 
-          alignment_baseline = current_style.get("alignment-baseline", "baseline")
-          if alignment_baseline == "middle":
+          alignment_baseline = current_style.get("alignment-baseline", "middle")
+          if alignment_baseline == "hanging":
+            y -= ink_extents[1]
+          elif alignment_baseline == "central":
+            y -= ink_extents[3] * 0.5
+          elif alignment_baseline == "middle":
             y -= logical_extents[3] * 0.5
+          elif alignment_baseline == "alphabetic":
+            layout_iter = layout.get_iter()
+            y -= layout_iter.get_baseline() / pango.SCALE
+          else:
+            raise ValueError("Unsupported alignment-baseline: %s" % alignment_baseline)
 
           baseline_shift = current_style.get("baseline-shift", "0").strip()
           if baseline_shift[-1] == "%":

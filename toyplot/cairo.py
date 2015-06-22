@@ -11,6 +11,7 @@ import numpy
 import pango
 import pangocairo
 import toyplot.color
+import toyplot.units
 
 def render(svg, context):
   """Render the SVG representation of a canvas to a Cairo context.
@@ -204,7 +205,7 @@ def render(svg, context):
           if "font-family" in current_style:
             font_description.set_family(current_style["font-family"])
           if "font-weight" in current_style:
-            font_description.set_weight(pango.WEIGHT_BOLD if current_style["font-weight"] == "bold" else pango.WEIGHT_NORMAL) 
+            font_description.set_weight(pango.WEIGHT_BOLD if current_style["font-weight"] == "bold" else pango.WEIGHT_NORMAL)
           if "font-size" in current_style:
             size = current_style["font-size"].strip()
             if size[-2:] == "px":
@@ -226,6 +227,9 @@ def render(svg, context):
             x -= logical_extents[2] * 0.5
           elif text_anchor == "end":
             x -= logical_extents[2]
+
+          dx = toyplot.units.convert(element.get("dx", 0), "px", default="px")
+          x += dx
 
           alignment_baseline = current_style.get("alignment-baseline", "baseline")
           if alignment_baseline == "middle":
@@ -251,7 +255,7 @@ def render(svg, context):
             context.set_source_rgba(*stroke)
             context.stroke()
           context.new_path()
-      elif element.tag in ["title", "toyplot:axes", "toyplot:data-table"]:
+      elif element.tag in ["title"]:
         pass
       else:
         raise Exception("unhandled tag: %s" % element.tag)

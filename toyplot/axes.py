@@ -1607,6 +1607,18 @@ class Table(object):
       return Table.CellReference(self._table, self._cells[row : row + rowspan, column : column + colspan])
 
     @property
+    def shape(self):
+      return self._cells.shape
+
+    @property
+    def rows(self):
+      return self._cells.shape[0]
+
+    @property
+    def columns(self):
+      return self._cells.shape[1]
+
+    @property
     def cells(self):
       return Table.CellReference(self._table, self._cells)
 
@@ -1654,6 +1666,18 @@ class Table(object):
   @property
   def title(self):
     return self._title
+
+  @property
+  def shape(self):
+    return self._cells.shape
+
+  @property
+  def rows(self):
+    return self._cells.shape[0]
+
+  @property
+  def columns(self):
+    return self._cells.shape[1]
 
   @property
   def header(self):

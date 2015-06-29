@@ -368,6 +368,38 @@ class Heckbert(TickLocator):
     titles = numpy.repeat(None, len(labels))
     return locations, labels, titles
 
+class Integer(TickLocator):
+  """Generate evenly-spaced integer ticks
+
+  Parameters
+  ----------
+  step: integer, optional
+    Number of integer values to skip between labels.
+  """
+  def __init__(self, step=1):
+    self._step = step
+
+  def ticks(self, domain_min, domain_max):
+    """Return a set of ticks for the given domain.
+
+    Parameters
+    ----------
+    domain_min, domain_max: number
+
+    Returns
+    -------
+    locations : sequence of integers
+      The axis locations where ticks should be positioned.
+    labels : sequence of strings
+      Labels for each tick location.
+    titles : sequence of strings
+      Titles for each tick location.  Typically, backends render titles as tooltips.
+    """
+    locations = numpy.arange(domain_min, domain_max + 1, self._step, dtype="int64")
+    labels = [repr(location) for location in locations]
+    titles = numpy.repeat(None, len(locations))
+    return locations, labels, titles
+
 class Log(TickLocator):
   """Generate ticks that are evenly spaced on a logarithmic scale
 

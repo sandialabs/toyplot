@@ -277,7 +277,7 @@ class Canvas(object):
     self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style))
     return self._children[-1]
 
-  def matrix(self, matrix, title=None, colormap=None, palette=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
+  def matrix(self, matrix, title=None, step=1, colormap=None, palette=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
     """Add a matrix visualization to the canvas.
 
     Parameters
@@ -297,11 +297,17 @@ class Canvas(object):
     xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
     table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, trows=1, brows=0, lcols=1, rcols=0, rows=matrix.shape[0], columns=matrix.shape[1], title=title, parent=self)
 
-    for i in range(matrix.shape[0]):
-      table.left.cell(i, 0).data = i
+    table.top.row(0).height = 20
+    table.left.column(0).width = 20
 
-    for j in range(matrix.shape[1]):
-      table.top.cell(0, j).data = j
+    table.left.column(0).align = "right"
+    for i, label, title in zip(*toyplot.locator.Integer(step=step).ticks(0, matrix.shape[0]-1)):
+      table.left.cell(i, 0).data = label
+      #table.left.cell(i, 0).title = title
+
+    for j, label, title in zip(*toyplot.locator.Integer(step=step).ticks(0, matrix.shape[1]-1)):
+      table.top.cell(0, j).data = label
+      #table.top.cell(0, j).title = title
 
     for i, row in enumerate(matrix):
       for j, value in enumerate(row):

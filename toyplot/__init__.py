@@ -84,7 +84,7 @@ def scatterplot(a, b=None, along="x", color=None, colormap=None, palette=None, m
   mark = axes.scatterplot(a=a, b=b, along=along, color=color, colormap=colormap, palette=palette, marker=marker, size=size, fill=fill, fill_colormap=fill_colormap, fill_palette=fill_palette, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle)
   return canvas, axes, mark
 
-def matrix(matrix, title=None, colormap=None, palette=None, width=None, height=None, canvas_style=None):
+def matrix(matrix, title=None, step=1, colormap=None, palette=None, width=None, height=None, canvas_style=None):
   """Convenience function to create a matrix visualization in a single call.
 
   See :meth:`toyplot.canvas.Canvas.matrix`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
@@ -97,7 +97,7 @@ def matrix(matrix, title=None, colormap=None, palette=None, width=None, height=N
     A new set of table axes that fill the canvas.
   """
   canvas = Canvas(width=width, height=height, style=canvas_style)
-  table = canvas.matrix(matrix=matrix, title=title, colormap=colormap, palette=palette)
+  table = canvas.matrix(matrix=matrix, title=title, step=step, colormap=colormap, palette=palette)
   return canvas, table
 
 def table(data=None, rows=None, columns=None, hrows=None, brows=None, lcols=None, rcols=None, title=None, width=None, height=None, canvas_style=None):

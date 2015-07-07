@@ -79,7 +79,7 @@ _export_data_tables = string.Template("""
 
   function save_csv(data_table)
   {
-    uri = "data:text/csv;charset=utf-8,";
+    var uri = "data:text/csv;charset=utf-8,";
     uri += data_table.names.join(",") + "\\n";
     for(var i = 0; i != data_table.data[0].length; ++i)
     {
@@ -91,9 +91,23 @@ _export_data_tables = string.Template("""
       }
       uri += "\\n";
     }
-
     uri = encodeURI(uri);
-    window.open(uri);
+
+    var link = document.createElement("a");
+    if(typeof link.download != "undefined")
+    {
+      link.href = uri;
+      link.style = "visibility:hidden";
+      link.download = "toyplot.csv";
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    else
+    {
+      window.open(uri);
+    }
   }
 
   function open_popup(data_table)

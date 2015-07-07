@@ -10,6 +10,7 @@ import numpy
 import toyplot.axes
 import toyplot.broadcast
 import toyplot.color
+import toyplot.compatibility
 import toyplot.config
 import toyplot.layout
 import toyplot.style
@@ -128,7 +129,7 @@ class Canvas(object):
   def _repr_html_(self):
     import toyplot.html
     import xml.etree.ElementTree as xml
-    return xml.tostring(toyplot.html.render(self), method="html")
+    return toyplot.compatibility.unicode_type(xml.tostring(toyplot.html.render(self), encoding="utf-8", method="html"), encoding="utf-8")
 
   def animate(self, frames, callback=None):
     """Generate a collection of animation frames, calling a callback to store an explicit representation of what changes at each frame.

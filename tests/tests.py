@@ -1039,7 +1039,7 @@ def test_canvas_time():
 def test_canvas_repr_html():
   canvas = toyplot.Canvas(autorender="html")
   html = canvas._repr_html_()
-  nose.tools.assert_is_instance(html, toyplot.compatibility.bytes_type)
+  nose.tools.assert_is_instance(html, toyplot.compatibility.unicode_type)
 
 def test_explicit_tick_locator_failure():
   with nose.tools.assert_raises(ValueError):

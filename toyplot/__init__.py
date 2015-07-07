@@ -7,6 +7,7 @@ from __future__ import division
 __version__ = "0.6.0"
 
 from toyplot.canvas import Canvas
+import toyplot.compatibility
 
 def bars(a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, xmin=None, xmax=None, ymin=None, ymax=None, show=True, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style=None):
   """Convenience function for creating a bar plot in a single call.

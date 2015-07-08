@@ -8,15 +8,6 @@ from __future__ import division
 without the use of code-modification tools like `2to3`.  The
 `toyplot.compatibility` module contains code to facilitate this.
 """
-
-import distutils.version
-import numpy
-
-_numpy_version = distutils.version.StrictVersion(numpy.__version__)
-_minimum_numpy_version = distutils.version.StrictVersion("1.7")
-if _numpy_version < _minimum_numpy_version:
-  raise Exception("numpy >= %s is required, found version %s" % (_minimum_numpy_version, _numpy_version))
-
 try:
   string_type = basestring
 except: # pragma: no cover

@@ -1,0 +1,28 @@
+package:
+  name: toyplot
+  version: {{ environ['GIT_DESCRIBE_TAG'] }}
+
+source:
+  git_url: ../
+
+build:
+  script: python setup.py install
+  number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
+
+requirements:
+  build:
+    - setuptools
+    - colormath
+    - multipledispatch
+    - numpy >=1.7
+  run:
+    - colormath
+    - multipledispatch
+    - numpy >=1.7
+
+
+about:
+  home: http://github.com/sandialabs/toyplot
+  license: BSD
+  summary: A modern plotting toolkit supporting electronic publishing and reproducibility.
+

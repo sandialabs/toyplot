@@ -22,6 +22,10 @@ And here are our test coverage stats, also updated automatically when modificati
 
 * https://coveralls.io/r/sandialabs/toyplot
 
-For Toyplot questions, comments, or suggestions, get in touch with Tim directly:
+For Toyplot questions, comments, or suggestions, get in touch with the team at:
+
+* https://gitter.im/sandialabs/toyplot
+
+Otherwise, you can contact Tim directly:
 
 * Timothy M. Shead - `tshead@sandia.gov <mailto:tshead@sandia.gov?subject=Toyplot>`_

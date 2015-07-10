@@ -17,6 +17,7 @@ Contents:
   color.rst
   convenience.rst
   data-tables.rst
+  labels-and-legends.rst
   markers.rst
   matrix-visualization.rst
   rendering.rst

@@ -788,10 +788,10 @@ def _render(canvas, axes, context):
   axes_xml = xml.SubElement(context.root, "g", id=context.get_id(axes), attrib={"class":"toyplot-axes-Table"})
 
   # Render title
-  if axes._title._text is not None:
+  if axes._label._text is not None:
     x = (axes._xmin_range + axes._xmax_range) * 0.5
     y = axes._ymin_range
-    xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(axes._title._style)).text = axes._title._text
+    xml.SubElement(axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(axes._label._style)).text = axes._label._text
 
   # Render children.
   for child in axes._children:

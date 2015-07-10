@@ -1411,9 +1411,9 @@ class Cartesian(object):
 class Table(object):
   """Experimental table coordinate system.
   """
-  class Title(object):
-    def __init__(self, title, style):
-      self._text = title
+  class Label(object):
+    def __init__(self, label, style):
+      self._text = label
       self._style = toyplot.style.combine({"font-weight":"bold", "stroke":"none", "text-anchor":"middle", "alignment-baseline":"middle"}, toyplot.require.style(style))
     @property
     def text(self):
@@ -1622,7 +1622,7 @@ class Table(object):
     def cells(self):
       return Table.CellReference(self._table, self._cells)
 
-  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, rows, columns, trows, brows, lcols, rcols, title, parent):
+  def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, rows, columns, trows, brows, lcols, rcols, label, parent):
     self._xmin_range = xmin_range
     self._xmax_range = xmax_range
     self._ymin_range = ymin_range
@@ -1636,7 +1636,7 @@ class Table(object):
     self._parent = parent
     self._children = []
 
-    self._title = Table.Title(title, style={"font-size":"14px", "baseline-shift":"100%"})
+    self._label = Table.Label(label, style={"font-size":"14px", "baseline-shift":"100%"})
 
     self._hlines = numpy.empty((trows + rows + brows + 1, lcols + columns + rcols + 0), dtype=object)
     self._vlines = numpy.empty((trows + rows + brows + 0, lcols + columns + rcols + 1), dtype=object)
@@ -1664,8 +1664,8 @@ class Table(object):
     self._finalized = False
 
   @property
-  def title(self):
-    return self._title
+  def label(self):
+    return self._label
 
   @property
   def shape(self):

@@ -23,4 +23,5 @@ Contents:
   rendering.rst
   table-axes.rst
   text.rst
+  tick-locators.rst
   units.rst

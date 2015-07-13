@@ -28,7 +28,7 @@ Feature: Table axes
       | with left justification                |
       | with center justification              |
       | with right justification               |
-      | with a title                           |
+      | with a label                           |
 
   Scenario: Table without header
     Given a sample toyplot.data.Table

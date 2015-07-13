@@ -35,18 +35,6 @@ Coding Style
 The Toyplot source code follows the `PEP-8 Style Guide for Python Code <http://legacy.python.org/dev/peps/pep-0008>`_,
 except that we use two spaces for indentation instead of four.
 
-Code Walkthrough
-----------------
-
-Most of Toyplot's public API is located in `toyplot/__init__.py` ... for most
-contributations, that's where you'll start.  If you're adding a new type of
-visualization, you'll need to create a new :class:`toyplot.Mark` derivative
-there.  Then, you'll create factory methods for creating instances of your
-new mark in :class:`toyplot.axes.Cartesian` and/or :class:`toyplot.canvas.Canvas`.  Once
-you've done that, you'll need to write code to render your new mark
-in `toyplot/svg.py`.  That's it ... all of the other backends are rendered
-from the SVG representation.
-
 Running Regression Tests
 ------------------------
 
@@ -66,7 +54,7 @@ Writing Regression Tests
   Toyplot is in the midst of a transition from `nose <https://nose.readthedocs.org/en/latest/>`_
   to `behave <http://pythonhosted.org/behave>`_ for running regression tests.  New tests should
   be added to the `features` directory using behave.  The following outlines how the old tests
-  were written, and wll remain as a reference until they are all replaced.
+  were written, and will remain as a reference until they are all replaced.
 
 Existing tests are located in `tests/tests.py`.
 

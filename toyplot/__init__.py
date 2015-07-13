@@ -7,7 +7,6 @@ from __future__ import division
 __version__ = "0.6.0"
 
 from toyplot.canvas import Canvas
-import toyplot.compatibility
 
 def bars(a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, xmin=None, xmax=None, ymin=None, ymax=None, show=True, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style=None):
   """Convenience function for creating a bar plot in a single call.
@@ -85,7 +84,7 @@ def scatterplot(a, b=None, along="x", color=None, colormap=None, palette=None, m
   mark = axes.scatterplot(a=a, b=b, along=along, color=color, colormap=colormap, palette=palette, marker=marker, size=size, fill=fill, fill_colormap=fill_colormap, fill_palette=fill_palette, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle)
   return canvas, axes, mark
 
-def matrix(matrix, title=None, step=1, colormap=None, palette=None, width=None, height=None, canvas_style=None):
+def matrix(matrix, label=None, step=1, colormap=None, palette=None, width=None, height=None, canvas_style=None):
   """Convenience function to create a matrix visualization in a single call.
 
   See :meth:`toyplot.canvas.Canvas.matrix`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
@@ -98,10 +97,10 @@ def matrix(matrix, title=None, step=1, colormap=None, palette=None, width=None, 
     A new set of table axes that fill the canvas.
   """
   canvas = Canvas(width=width, height=height, style=canvas_style)
-  table = canvas.matrix(matrix=matrix, title=title, step=step, colormap=colormap, palette=palette)
+  table = canvas.matrix(matrix=matrix, label=label, step=step, colormap=colormap, palette=palette)
   return canvas, table
 
-def table(data=None, rows=None, columns=None, hrows=None, brows=None, lcols=None, rcols=None, title=None, width=None, height=None, canvas_style=None):
+def table(data=None, rows=None, columns=None, hrows=None, brows=None, lcols=None, rcols=None, label=None, width=None, height=None, canvas_style=None):
   """Convenience function to create a table visualization in a single call.
 
   See :meth:`toyplot.canvas.Canvas.table`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
@@ -114,6 +113,6 @@ def table(data=None, rows=None, columns=None, hrows=None, brows=None, lcols=None
     A new set of table axes that fill the canvas.
   """
   canvas = Canvas(width=width, height=height, style=canvas_style)
-  table = canvas.table(data=data, rows=rows, columns=columns, hrows=hrows, brows=brows, lcols=lcols, rcols=rcols, title=title)
+  table = canvas.table(data=data, rows=rows, columns=columns, hrows=hrows, brows=brows, lcols=lcols, rcols=rcols, label=label)
   return canvas, table
 

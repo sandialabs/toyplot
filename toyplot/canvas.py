@@ -278,7 +278,7 @@ class Canvas(object):
     self._children.append(toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style))
     return self._children[-1]
 
-  def matrix(self, matrix, title=None, step=1, colormap=None, palette=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
+  def matrix(self, matrix, label=None, step=1, colormap=None, palette=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
     """Add a matrix visualization to the canvas.
 
     Parameters
@@ -296,7 +296,7 @@ class Canvas(object):
       colormap = toyplot.color.LinearMap(palette, matrix.min(), matrix.max())
 
     xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-    table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, trows=1, brows=0, lcols=1, rcols=0, rows=matrix.shape[0], columns=matrix.shape[1], title=title, parent=self)
+    table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, trows=1, brows=0, lcols=1, rcols=0, rows=matrix.shape[0], columns=matrix.shape[1], label=label, parent=self)
 
     table.top.row(0).height = 20
     table.left.column(0).width = 20
@@ -319,7 +319,7 @@ class Canvas(object):
     self._children.append(table)
     return table
 
-  def table(self, data=None, rows=None, columns=None, hrows=None, brows=None, lcols=None, rcols=None, title=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
+  def table(self, data=None, rows=None, columns=None, hrows=None, brows=None, lcols=None, rcols=None, label=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
     """Add a set of table axes to the canvas.
 
     Parameters
@@ -347,7 +347,7 @@ class Canvas(object):
       rcols = 0
 
     xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-    table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, rows=rows, columns=columns, title=title, trows=hrows, brows=brows, lcols=lcols, rcols=rcols, parent=self)
+    table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, rows=rows, columns=columns, label=label, trows=hrows, brows=brows, lcols=lcols, rcols=rcols, parent=self)
 
     if data is not None:
       for index, (key, column) in enumerate(data.items()):

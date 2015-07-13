@@ -46,6 +46,13 @@ class Table(object):
       elif isinstance(data, (list, collections.Sequence)):
         for key, values in data:
           self[key] = values
+      # Input data based on numpy arrays.
+      elif isinstance(data, numpy.ndarray):
+        if data.ndim == 2:
+          for column_index in numpy.arange(data.shape[1]):
+            self["C%s" % column_index] = data[:,column_index]
+        else:
+          raise ValueError("Only two-dimensional arrays are allowed.")
       else:
         raise ValueError("Unsupported data type: %s" % type(data))
 

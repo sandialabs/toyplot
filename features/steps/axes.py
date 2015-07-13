@@ -451,10 +451,10 @@ def step_impl(context):
   context.axes.column(2).align = "right"
   toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-right-justification")
 
-@then(u'the table can be rendered with a title')
+@then(u'the table can be rendered with a label')
 def step_impl(context):
-  context.axes.title.text = "Quarterly Report"
-  toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-title")
+  context.axes.label.text = "Quarterly Report"
+  toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-label")
 
 @then(u'an instance of toyplot.axes.Table can be rendered without a header')
 def step_impl(context):

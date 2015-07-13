@@ -5,11 +5,26 @@
 from __future__ import division
 
 import collections
+import itertools
 import numbers
 import numpy
 import toyplot.color
 import toyplot.compatibility
 import xml.etree.ElementTree as xml
+
+def contiguous(a):
+  """Split an array into a collection of contiguous ranges.
+  """
+  i = 0
+  begin = []
+  end = []
+  values = []
+  for (value, group) in itertools.groupby(numpy.array(a).ravel()):
+    begin.append(i)
+    end.append(i + len(list(group)))
+    values.append(value)
+    i = end[-1]
+  return numpy.array(begin), numpy.array(end), numpy.array(values)
 
 class Table(object):
   """Encapsulates an ordered, heterogeneous collection of labelled data series.

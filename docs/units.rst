@@ -31,7 +31,7 @@ inches:
 
 .. raw:: html
 
-    <div align="center" class="toyplot" id="t0413c3155da945e585f2d1c3b13ac329"><svg height="192.0px" id="t0bc79ff8a192439da0f5832ed5ce6bb9" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="288.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="t929c898fd2724e8298b15c177d5f268d"><clipPath id="t3f84ea6d5c504a4cb53dc2c27ed849a0"><rect height="92.0" width="188.0" x="50.0" y="50.0"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#t3f84ea6d5c504a4cb53dc2c27ed849a0)" style="cursor:crosshair"><rect height="92.0" style="pointer-events:all;visibility:hidden" width="188.0" x="50.0" y="50.0"></rect><g class="toyplot-mark-Plot" id="tee7591b2098741c6a1e09042b8124efb" style="fill:none"><g class="toyplot-Series"><path d="M 60.0 132.0 L 63.428571428571431 131.97001249479382 L 66.857142857142847 131.88004997917537 L 70.285714285714292 131.73011245314453 L 73.714285714285708 131.52019991670139 L 77.142857142857139 131.25031236984591 L 80.571428571428569 130.92044981257811 L 84.0 130.53061224489795 L 87.428571428571431 130.08079966680549 L 90.857142857142861 129.5710120783007 L 94.285714285714278 129.0012494793836 L 97.714285714285708 128.37151187005415 L 101.14285714285714 127.68179925031237 L 104.57142857142856 126.93211162015827 L 108.0 126.12244897959184 L 111.42857142857142 125.25281132861308 L 114.85714285714286 124.323198667222 L 118.28571428571429 123.33361099541858 L 121.71428571428572 122.28404831320283 L 125.14285714285714 121.17451062057476 L 128.57142857142856 120.00499791753437 L 132.0 118.77551020408163 L 135.42857142857142 117.48604748021658 L 138.85714285714286 116.1366097459392 L 142.28571428571428 114.72719700124948 L 145.71428571428572 113.25780924614745 L 149.14285714285711 111.72844648063307 L 152.57142857142856 110.13910870470637 L 156.0 108.48979591836735 L 159.42857142857142 106.78050812161598 L 162.85714285714283 105.01124531445232 L 166.28571428571428 103.1820074968763 L 169.71428571428572 101.29279466888796 L 173.14285714285714 99.343606830487303 L 176.57142857142858 97.334443981674298 L 179.99999999999997 95.265306122448976 L 183.42857142857144 93.136193252811324 L 186.85714285714286 90.947105372761357 L 190.28571428571428 88.69804248229903 L 193.71428571428569 86.389004581424416 L 197.14285714285711 84.019991670137458 L 200.57142857142856 81.591003748438155 L 204.0 79.102040816326536 L 207.42857142857142 76.553102873802587 L 210.85714285714283 73.944189920866322 L 214.28571428571425 71.275301957517712 L 217.71428571428572 68.546438983756772 L 221.14285714285714 65.757600999583502 L 224.57142857142858 62.908788004997916 L 228.0 60.0" style="fill:none;stroke:rgba(40%,76.1%,64.7%,1);stroke-opacity:1.0;stroke-width:2.0"></path></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14.0" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="138.0" y="60.0"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="183.0" y="67.0"></text></g><line style="" x1="60.0" x2="228.0" y1="142.0" y2="142.0"></line><g><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="60.0" y="142.0">0.0</text><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="144.0" y="142.0">0.5</text><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="228.0" y="142.0">1.0</text></g><line style="" x1="50.0" x2="50.0" y1="60.0" y2="132.0"></line><g><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 132.0)" x="50.0" y="132.0">0.0</text><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 96.0)" x="50.0" y="96.0">0.5</text><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 60.0)" x="50.0" y="60.0">1.0</text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
+    <div align="center" class="toyplot" id="t4aa72c65dcce492c93d0ad3a12a4becd"><svg height="192.0px" id="te53677a821654e0cb33af061556d1b98" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="288.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="t276f74b9cec64c7291806509a76a49ca"><clipPath id="ta5562f2a9e72452ca0fa1f8b4eb7386b"><rect height="92.0" width="188.0" x="50.0" y="50.0"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#ta5562f2a9e72452ca0fa1f8b4eb7386b)" style="cursor:crosshair"><rect height="92.0" style="pointer-events:all;visibility:hidden" width="188.0" x="50.0" y="50.0"></rect><g class="toyplot-mark-Plot" id="t9088a57e334e4b018edcecc5f8c27bbd" style="fill:none"><g class="toyplot-Series"><path d="M 60.0 132.0 L 63.428571428571431 131.97001249479382 L 66.857142857142847 131.88004997917537 L 70.285714285714292 131.73011245314453 L 73.714285714285708 131.52019991670139 L 77.142857142857139 131.25031236984591 L 80.571428571428569 130.92044981257811 L 84.0 130.53061224489795 L 87.428571428571431 130.08079966680549 L 90.857142857142861 129.5710120783007 L 94.285714285714278 129.0012494793836 L 97.714285714285708 128.37151187005415 L 101.14285714285714 127.68179925031237 L 104.57142857142856 126.93211162015827 L 108.0 126.12244897959184 L 111.42857142857142 125.25281132861308 L 114.85714285714286 124.323198667222 L 118.28571428571429 123.33361099541858 L 121.71428571428572 122.28404831320283 L 125.14285714285714 121.17451062057476 L 128.57142857142856 120.00499791753437 L 132.0 118.77551020408163 L 135.42857142857142 117.48604748021658 L 138.85714285714286 116.1366097459392 L 142.28571428571428 114.72719700124948 L 145.71428571428572 113.25780924614745 L 149.14285714285711 111.72844648063307 L 152.57142857142856 110.13910870470637 L 156.0 108.48979591836735 L 159.42857142857142 106.78050812161598 L 162.85714285714283 105.01124531445232 L 166.28571428571428 103.1820074968763 L 169.71428571428572 101.29279466888796 L 173.14285714285714 99.343606830487303 L 176.57142857142858 97.334443981674298 L 179.99999999999997 95.265306122448976 L 183.42857142857144 93.136193252811324 L 186.85714285714286 90.947105372761357 L 190.28571428571428 88.69804248229903 L 193.71428571428569 86.389004581424416 L 197.14285714285711 84.019991670137458 L 200.57142857142856 81.591003748438155 L 204.0 79.102040816326536 L 207.42857142857142 76.553102873802587 L 210.85714285714283 73.944189920866322 L 214.28571428571425 71.275301957517712 L 217.71428571428572 68.546438983756772 L 221.14285714285714 65.757600999583502 L 224.57142857142858 62.908788004997916 L 228.0 60.0" style="fill:none;stroke:rgba(40%,76.1%,64.7%,1);stroke-opacity:1.0;stroke-width:2.0"></path></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14.0" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="138.0" y="60.0"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="183.0" y="67.0"></text></g><line style="" x1="60.0" x2="228.0" y1="142.0" y2="142.0"></line><g><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="60.0" y="142.0">0.0</text><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="144.0" y="142.0">0.5</text><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="228.0" y="142.0">1.0</text></g><line style="" x1="50.0" x2="50.0" y1="60.0" y2="132.0"></line><g><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 132.0)" x="50.0" y="132.0">0.0</text><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 96.0)" x="50.0" y="96.0">0.5</text><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 60.0)" x="50.0" y="60.0">1.0</text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
     (function()
     {
       if(window.CSS !== undefined && window.CSS.supports !== undefined)
@@ -39,7 +39,7 @@ inches:
         if(!window.CSS.supports("alignment-baseline", "middle"))
         {
           var re = /\s*alignment-baseline\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#t0413c3155da945e585f2d1c3b13ac329 text");
+          var text = document.querySelectorAll("#t4aa72c65dcce492c93d0ad3a12a4becd text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -59,7 +59,7 @@ inches:
         if(!window.CSS.supports("baseline-shift", "0"))
         {
           var re = /\s*baseline-shift\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#t0413c3155da945e585f2d1c3b13ac329 text");
+          var text = document.querySelectorAll("#t4aa72c65dcce492c93d0ad3a12a4becd text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -79,7 +79,7 @@ inches:
     </script><script>
     (function()
     {
-      var data_tables = [{"data": [[0.0, 0.02040816326530612, 0.04081632653061224, 0.061224489795918366, 0.08163265306122448, 0.1020408163265306, 0.12244897959183673, 0.14285714285714285, 0.16326530612244897, 0.18367346938775508, 0.2040816326530612, 0.22448979591836732, 0.24489795918367346, 0.26530612244897955, 0.2857142857142857, 0.3061224489795918, 0.32653061224489793, 0.3469387755102041, 0.36734693877551017, 0.3877551020408163, 0.4081632653061224, 0.42857142857142855, 0.44897959183673464, 0.4693877551020408, 0.4897959183673469, 0.5102040816326531, 0.5306122448979591, 0.5510204081632653, 0.5714285714285714, 0.5918367346938775, 0.6122448979591836, 0.6326530612244897, 0.6530612244897959, 0.673469387755102, 0.6938775510204082, 0.7142857142857142, 0.7346938775510203, 0.7551020408163265, 0.7755102040816326, 0.7959183673469387, 0.8163265306122448, 0.836734693877551, 0.8571428571428571, 0.8775510204081632, 0.8979591836734693, 0.9183673469387754, 0.9387755102040816, 0.9591836734693877, 0.9795918367346939, 1.0], [0.0, 0.00041649312786339016, 0.0016659725114535606, 0.003748438150770512, 0.006663890045814243, 0.010412328196584754, 0.014993752603082049, 0.02040816326530612, 0.02665556018325697, 0.033735943356934604, 0.041649312786339016, 0.05039566847147021, 0.059975010412328195, 0.07038733860891293, 0.08163265306122448, 0.09371095376926278, 0.10662224073302788, 0.12036651395251978, 0.13494377342773842, 0.15035401915868388, 0.16659725114535606, 0.18367346938775508, 0.20158267388588083, 0.22032486463973341, 0.23990004164931278, 0.2603082049146189, 0.2815493544356517, 0.3036234902124114, 0.32653061224489793, 0.3502707205331112, 0.3748438150770511, 0.40024989587671794, 0.4264889629321115, 0.453561016243232, 0.4814660558100791, 0.510204081632653, 0.5397750937109537, 0.5701790920449812, 0.6014160766347355, 0.6334860474802164, 0.6663890045814242, 0.7001249479383589, 0.7346938775510203, 0.7700957934194085, 0.8063306955435233, 0.8433985839233651, 0.8812994585589337, 0.920033319450229, 0.9596001665972511, 1.0]], "names": ["x", "y0"], "id": "tee7591b2098741c6a1e09042b8124efb", "title": "Plot Data"}];
+      var data_tables = [{"data": [[0.0, 0.02040816326530612, 0.04081632653061224, 0.061224489795918366, 0.08163265306122448, 0.1020408163265306, 0.12244897959183673, 0.14285714285714285, 0.16326530612244897, 0.18367346938775508, 0.2040816326530612, 0.22448979591836732, 0.24489795918367346, 0.26530612244897955, 0.2857142857142857, 0.3061224489795918, 0.32653061224489793, 0.3469387755102041, 0.36734693877551017, 0.3877551020408163, 0.4081632653061224, 0.42857142857142855, 0.44897959183673464, 0.4693877551020408, 0.4897959183673469, 0.5102040816326531, 0.5306122448979591, 0.5510204081632653, 0.5714285714285714, 0.5918367346938775, 0.6122448979591836, 0.6326530612244897, 0.6530612244897959, 0.673469387755102, 0.6938775510204082, 0.7142857142857142, 0.7346938775510203, 0.7551020408163265, 0.7755102040816326, 0.7959183673469387, 0.8163265306122448, 0.836734693877551, 0.8571428571428571, 0.8775510204081632, 0.8979591836734693, 0.9183673469387754, 0.9387755102040816, 0.9591836734693877, 0.9795918367346939, 1.0], [0.0, 0.00041649312786339016, 0.0016659725114535606, 0.003748438150770512, 0.006663890045814243, 0.010412328196584754, 0.014993752603082049, 0.02040816326530612, 0.02665556018325697, 0.033735943356934604, 0.041649312786339016, 0.05039566847147021, 0.059975010412328195, 0.07038733860891293, 0.08163265306122448, 0.09371095376926278, 0.10662224073302788, 0.12036651395251978, 0.13494377342773842, 0.15035401915868388, 0.16659725114535606, 0.18367346938775508, 0.20158267388588083, 0.22032486463973341, 0.23990004164931278, 0.2603082049146189, 0.2815493544356517, 0.3036234902124114, 0.32653061224489793, 0.3502707205331112, 0.3748438150770511, 0.40024989587671794, 0.4264889629321115, 0.453561016243232, 0.4814660558100791, 0.510204081632653, 0.5397750937109537, 0.5701790920449812, 0.6014160766347355, 0.6334860474802164, 0.6663890045814242, 0.7001249479383589, 0.7346938775510203, 0.7700957934194085, 0.8063306955435233, 0.8433985839233651, 0.8812994585589337, 0.920033319450229, 0.9596001665972511, 1.0]], "names": ["x", "y0"], "id": "t9088a57e334e4b018edcecc5f8c27bbd", "title": "Plot Data"}];
     
       function save_csv(data_table)
       {
@@ -118,7 +118,7 @@ inches:
       {
         return function(e)
         {
-          var popup = document.querySelector("#t0413c3155da945e585f2d1c3b13ac329 .toyplot-mark-popup");
+          var popup = document.querySelector("#t4aa72c65dcce492c93d0ad3a12a4becd .toyplot-mark-popup");
           popup.querySelector(".toyplot-mark-popup-title").innerHTML = data_table.title;
           popup.querySelector(".toyplot-mark-popup-save-csv").onclick = function() { popup.style.visibility = "hidden"; save_csv(data_table); }
           popup.style.left = (e.clientX - 50) + "px";
@@ -140,21 +140,28 @@ inches:
     </script><script>
     (function()
     {
-      var axes = {"t929c898fd2724e8298b15c177d5f268d": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 1.0, "min": 0.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 228.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 1.0, "min": 0.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 60.0, "min": 132.0}, "scale": "linear"}]}};
+      var axes = {"t276f74b9cec64c7291806509a76a49ca": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 1.0, "min": 0.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 228.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 1.0, "min": 0.0}, "range": {"bounds": {"max": -Infinity, "min": Infinity}, "max": 60.0, "min": 132.0}, "scale": "linear"}]}};
     
       function sign(x)
       {
         return x < 0 ? -1 : x > 0 ? 1 : 0;
       }
     
-      function log_n(x, base)
+      function _mix(a, b, amount)
+      {
+        return ((1.0 - amount) * a) + (amount * b);
+      }
+    
+      function _log(x, base)
       {
         return Math.log(Math.abs(x)) / Math.log(base);
       }
     
-      function mix(a, b, amount)
+      function _in_range(a, x, b)
       {
-        return ((1.0 - amount) * a) + (amount * b);
+        var left = Math.min(a, b);
+        var right = Math.max(a, b);
+        return left <= x && x <= right;
       }
     
       function to_domain(projection, range)
@@ -162,17 +169,18 @@ inches:
         for(var i = 0; i != projection.length; ++i)
         {
           var segment = projection[i];
-          if(Math.min(segment.range.bounds.min, segment.range.bounds.max) <= point[0] && point[0] < Math.max(segment.range.bounds.min, segment.range.bounds.max))
+          if(_in_range(segment.range.bounds.min, range, segment.range.bounds.max))
           {
-            var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
             if(segment.scale == "linear")
             {
-              return mix(segment.domain.min, segment.domain.max, amount)
+              var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
+              return _mix(segment.domain.min, segment.domain.max, amount)
             }
             else if(segment.scale[0] == "log")
             {
+              var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
               var base = segment.scale[1];
-              return sign(segment.domain.min) * Math.pow(base, mix(log_n(Math.abs(segment.domain.min), base), log_n(Math.abs(segment.domain.max), base), amount));
+              return sign(segment.domain.min) * Math.pow(base, _mix(_log(segment.domain.min, base), _log(segment.domain.max, base), amount));
             }
           }
         }
@@ -238,7 +246,7 @@ You can also specify the quantity and units separately:
 
 .. raw:: html
 
-    <div align="center" class="toyplot" id="t2f8bfa7d87694361b316144490ed30a0"><svg height="192.0px" id="tbf8acfd9bbb24739915cda2c40a2216f" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="288.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="tbf33354f2ee5423b96ba8375b162a081"><clipPath id="t2318640e8242430586258ae896a640f5"><rect height="92.0" width="188.0" x="50.0" y="50.0"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#t2318640e8242430586258ae896a640f5)" style="cursor:crosshair"><rect height="92.0" style="pointer-events:all;visibility:hidden" width="188.0" x="50.0" y="50.0"></rect><g class="toyplot-mark-Plot" id="t000c5b0de1e64ef492bda40a2b09c75f" style="fill:none"><g class="toyplot-Series"><path d="M 60.0 132.0 L 63.428571428571431 131.97001249479382 L 66.857142857142847 131.88004997917537 L 70.285714285714292 131.73011245314453 L 73.714285714285708 131.52019991670139 L 77.142857142857139 131.25031236984591 L 80.571428571428569 130.92044981257811 L 84.0 130.53061224489795 L 87.428571428571431 130.08079966680549 L 90.857142857142861 129.5710120783007 L 94.285714285714278 129.0012494793836 L 97.714285714285708 128.37151187005415 L 101.14285714285714 127.68179925031237 L 104.57142857142856 126.93211162015827 L 108.0 126.12244897959184 L 111.42857142857142 125.25281132861308 L 114.85714285714286 124.323198667222 L 118.28571428571429 123.33361099541858 L 121.71428571428572 122.28404831320283 L 125.14285714285714 121.17451062057476 L 128.57142857142856 120.00499791753437 L 132.0 118.77551020408163 L 135.42857142857142 117.48604748021658 L 138.85714285714286 116.1366097459392 L 142.28571428571428 114.72719700124948 L 145.71428571428572 113.25780924614745 L 149.14285714285711 111.72844648063307 L 152.57142857142856 110.13910870470637 L 156.0 108.48979591836735 L 159.42857142857142 106.78050812161598 L 162.85714285714283 105.01124531445232 L 166.28571428571428 103.1820074968763 L 169.71428571428572 101.29279466888796 L 173.14285714285714 99.343606830487303 L 176.57142857142858 97.334443981674298 L 179.99999999999997 95.265306122448976 L 183.42857142857144 93.136193252811324 L 186.85714285714286 90.947105372761357 L 190.28571428571428 88.69804248229903 L 193.71428571428569 86.389004581424416 L 197.14285714285711 84.019991670137458 L 200.57142857142856 81.591003748438155 L 204.0 79.102040816326536 L 207.42857142857142 76.553102873802587 L 210.85714285714283 73.944189920866322 L 214.28571428571425 71.275301957517712 L 217.71428571428572 68.546438983756772 L 221.14285714285714 65.757600999583502 L 224.57142857142858 62.908788004997916 L 228.0 60.0" style="fill:none;stroke:rgba(40%,76.1%,64.7%,1);stroke-opacity:1.0;stroke-width:2.0"></path></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14.0" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="138.0" y="60.0"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="183.0" y="67.0"></text></g><line style="" x1="60.0" x2="228.0" y1="142.0" y2="142.0"></line><g><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="60.0" y="142.0">0.0</text><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="144.0" y="142.0">0.5</text><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="228.0" y="142.0">1.0</text></g><line style="" x1="50.0" x2="50.0" y1="60.0" y2="132.0"></line><g><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 132.0)" x="50.0" y="132.0">0.0</text><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 96.0)" x="50.0" y="96.0">0.5</text><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 60.0)" x="50.0" y="60.0">1.0</text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
+    <div align="center" class="toyplot" id="t88c6e9f16d4c45fe940f534d033692f7"><svg height="192.0px" id="tdc3331b4a1b44c1294034a05da1aa035" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="288.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="t333bcf43363c46988bfac538f21a8ef2"><clipPath id="ta1bb0f6307f446a49002184907c62d11"><rect height="92.0" width="188.0" x="50.0" y="50.0"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#ta1bb0f6307f446a49002184907c62d11)" style="cursor:crosshair"><rect height="92.0" style="pointer-events:all;visibility:hidden" width="188.0" x="50.0" y="50.0"></rect><g class="toyplot-mark-Plot" id="t39cb8e4da7164f33af34c09e3c40452b" style="fill:none"><g class="toyplot-Series"><path d="M 60.0 132.0 L 63.428571428571431 131.97001249479382 L 66.857142857142847 131.88004997917537 L 70.285714285714292 131.73011245314453 L 73.714285714285708 131.52019991670139 L 77.142857142857139 131.25031236984591 L 80.571428571428569 130.92044981257811 L 84.0 130.53061224489795 L 87.428571428571431 130.08079966680549 L 90.857142857142861 129.5710120783007 L 94.285714285714278 129.0012494793836 L 97.714285714285708 128.37151187005415 L 101.14285714285714 127.68179925031237 L 104.57142857142856 126.93211162015827 L 108.0 126.12244897959184 L 111.42857142857142 125.25281132861308 L 114.85714285714286 124.323198667222 L 118.28571428571429 123.33361099541858 L 121.71428571428572 122.28404831320283 L 125.14285714285714 121.17451062057476 L 128.57142857142856 120.00499791753437 L 132.0 118.77551020408163 L 135.42857142857142 117.48604748021658 L 138.85714285714286 116.1366097459392 L 142.28571428571428 114.72719700124948 L 145.71428571428572 113.25780924614745 L 149.14285714285711 111.72844648063307 L 152.57142857142856 110.13910870470637 L 156.0 108.48979591836735 L 159.42857142857142 106.78050812161598 L 162.85714285714283 105.01124531445232 L 166.28571428571428 103.1820074968763 L 169.71428571428572 101.29279466888796 L 173.14285714285714 99.343606830487303 L 176.57142857142858 97.334443981674298 L 179.99999999999997 95.265306122448976 L 183.42857142857144 93.136193252811324 L 186.85714285714286 90.947105372761357 L 190.28571428571428 88.69804248229903 L 193.71428571428569 86.389004581424416 L 197.14285714285711 84.019991670137458 L 200.57142857142856 81.591003748438155 L 204.0 79.102040816326536 L 207.42857142857142 76.553102873802587 L 210.85714285714283 73.944189920866322 L 214.28571428571425 71.275301957517712 L 217.71428571428572 68.546438983756772 L 221.14285714285714 65.757600999583502 L 224.57142857142858 62.908788004997916 L 228.0 60.0" style="fill:none;stroke:rgba(40%,76.1%,64.7%,1);stroke-opacity:1.0;stroke-width:2.0"></path></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14.0" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="138.0" y="60.0"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="183.0" y="67.0"></text></g><line style="" x1="60.0" x2="228.0" y1="142.0" y2="142.0"></line><g><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="60.0" y="142.0">0.0</text><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="144.0" y="142.0">0.5</text><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="228.0" y="142.0">1.0</text></g><line style="" x1="50.0" x2="50.0" y1="60.0" y2="132.0"></line><g><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 132.0)" x="50.0" y="132.0">0.0</text><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 96.0)" x="50.0" y="96.0">0.5</text><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 60.0)" x="50.0" y="60.0">1.0</text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
     (function()
     {
       if(window.CSS !== undefined && window.CSS.supports !== undefined)
@@ -246,7 +254,7 @@ You can also specify the quantity and units separately:
         if(!window.CSS.supports("alignment-baseline", "middle"))
         {
           var re = /\s*alignment-baseline\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#t2f8bfa7d87694361b316144490ed30a0 text");
+          var text = document.querySelectorAll("#t88c6e9f16d4c45fe940f534d033692f7 text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -266,7 +274,7 @@ You can also specify the quantity and units separately:
         if(!window.CSS.supports("baseline-shift", "0"))
         {
           var re = /\s*baseline-shift\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#t2f8bfa7d87694361b316144490ed30a0 text");
+          var text = document.querySelectorAll("#t88c6e9f16d4c45fe940f534d033692f7 text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -286,7 +294,7 @@ You can also specify the quantity and units separately:
     </script><script>
     (function()
     {
-      var data_tables = [{"data": [[0.0, 0.02040816326530612, 0.04081632653061224, 0.061224489795918366, 0.08163265306122448, 0.1020408163265306, 0.12244897959183673, 0.14285714285714285, 0.16326530612244897, 0.18367346938775508, 0.2040816326530612, 0.22448979591836732, 0.24489795918367346, 0.26530612244897955, 0.2857142857142857, 0.3061224489795918, 0.32653061224489793, 0.3469387755102041, 0.36734693877551017, 0.3877551020408163, 0.4081632653061224, 0.42857142857142855, 0.44897959183673464, 0.4693877551020408, 0.4897959183673469, 0.5102040816326531, 0.5306122448979591, 0.5510204081632653, 0.5714285714285714, 0.5918367346938775, 0.6122448979591836, 0.6326530612244897, 0.6530612244897959, 0.673469387755102, 0.6938775510204082, 0.7142857142857142, 0.7346938775510203, 0.7551020408163265, 0.7755102040816326, 0.7959183673469387, 0.8163265306122448, 0.836734693877551, 0.8571428571428571, 0.8775510204081632, 0.8979591836734693, 0.9183673469387754, 0.9387755102040816, 0.9591836734693877, 0.9795918367346939, 1.0], [0.0, 0.00041649312786339016, 0.0016659725114535606, 0.003748438150770512, 0.006663890045814243, 0.010412328196584754, 0.014993752603082049, 0.02040816326530612, 0.02665556018325697, 0.033735943356934604, 0.041649312786339016, 0.05039566847147021, 0.059975010412328195, 0.07038733860891293, 0.08163265306122448, 0.09371095376926278, 0.10662224073302788, 0.12036651395251978, 0.13494377342773842, 0.15035401915868388, 0.16659725114535606, 0.18367346938775508, 0.20158267388588083, 0.22032486463973341, 0.23990004164931278, 0.2603082049146189, 0.2815493544356517, 0.3036234902124114, 0.32653061224489793, 0.3502707205331112, 0.3748438150770511, 0.40024989587671794, 0.4264889629321115, 0.453561016243232, 0.4814660558100791, 0.510204081632653, 0.5397750937109537, 0.5701790920449812, 0.6014160766347355, 0.6334860474802164, 0.6663890045814242, 0.7001249479383589, 0.7346938775510203, 0.7700957934194085, 0.8063306955435233, 0.8433985839233651, 0.8812994585589337, 0.920033319450229, 0.9596001665972511, 1.0]], "names": ["x", "y0"], "id": "t000c5b0de1e64ef492bda40a2b09c75f", "title": "Plot Data"}];
+      var data_tables = [{"data": [[0.0, 0.02040816326530612, 0.04081632653061224, 0.061224489795918366, 0.08163265306122448, 0.1020408163265306, 0.12244897959183673, 0.14285714285714285, 0.16326530612244897, 0.18367346938775508, 0.2040816326530612, 0.22448979591836732, 0.24489795918367346, 0.26530612244897955, 0.2857142857142857, 0.3061224489795918, 0.32653061224489793, 0.3469387755102041, 0.36734693877551017, 0.3877551020408163, 0.4081632653061224, 0.42857142857142855, 0.44897959183673464, 0.4693877551020408, 0.4897959183673469, 0.5102040816326531, 0.5306122448979591, 0.5510204081632653, 0.5714285714285714, 0.5918367346938775, 0.6122448979591836, 0.6326530612244897, 0.6530612244897959, 0.673469387755102, 0.6938775510204082, 0.7142857142857142, 0.7346938775510203, 0.7551020408163265, 0.7755102040816326, 0.7959183673469387, 0.8163265306122448, 0.836734693877551, 0.8571428571428571, 0.8775510204081632, 0.8979591836734693, 0.9183673469387754, 0.9387755102040816, 0.9591836734693877, 0.9795918367346939, 1.0], [0.0, 0.00041649312786339016, 0.0016659725114535606, 0.003748438150770512, 0.006663890045814243, 0.010412328196584754, 0.014993752603082049, 0.02040816326530612, 0.02665556018325697, 0.033735943356934604, 0.041649312786339016, 0.05039566847147021, 0.059975010412328195, 0.07038733860891293, 0.08163265306122448, 0.09371095376926278, 0.10662224073302788, 0.12036651395251978, 0.13494377342773842, 0.15035401915868388, 0.16659725114535606, 0.18367346938775508, 0.20158267388588083, 0.22032486463973341, 0.23990004164931278, 0.2603082049146189, 0.2815493544356517, 0.3036234902124114, 0.32653061224489793, 0.3502707205331112, 0.3748438150770511, 0.40024989587671794, 0.4264889629321115, 0.453561016243232, 0.4814660558100791, 0.510204081632653, 0.5397750937109537, 0.5701790920449812, 0.6014160766347355, 0.6334860474802164, 0.6663890045814242, 0.7001249479383589, 0.7346938775510203, 0.7700957934194085, 0.8063306955435233, 0.8433985839233651, 0.8812994585589337, 0.920033319450229, 0.9596001665972511, 1.0]], "names": ["x", "y0"], "id": "t39cb8e4da7164f33af34c09e3c40452b", "title": "Plot Data"}];
     
       function save_csv(data_table)
       {
@@ -325,7 +333,7 @@ You can also specify the quantity and units separately:
       {
         return function(e)
         {
-          var popup = document.querySelector("#t2f8bfa7d87694361b316144490ed30a0 .toyplot-mark-popup");
+          var popup = document.querySelector("#t88c6e9f16d4c45fe940f534d033692f7 .toyplot-mark-popup");
           popup.querySelector(".toyplot-mark-popup-title").innerHTML = data_table.title;
           popup.querySelector(".toyplot-mark-popup-save-csv").onclick = function() { popup.style.visibility = "hidden"; save_csv(data_table); }
           popup.style.left = (e.clientX - 50) + "px";
@@ -347,21 +355,28 @@ You can also specify the quantity and units separately:
     </script><script>
     (function()
     {
-      var axes = {"tbf33354f2ee5423b96ba8375b162a081": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 1.0, "min": 0.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 228.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 1.0, "min": 0.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 60.0, "min": 132.0}, "scale": "linear"}]}};
+      var axes = {"t333bcf43363c46988bfac538f21a8ef2": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 1.0, "min": 0.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 228.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 1.0, "min": 0.0}, "range": {"bounds": {"max": -Infinity, "min": Infinity}, "max": 60.0, "min": 132.0}, "scale": "linear"}]}};
     
       function sign(x)
       {
         return x < 0 ? -1 : x > 0 ? 1 : 0;
       }
     
-      function log_n(x, base)
+      function _mix(a, b, amount)
+      {
+        return ((1.0 - amount) * a) + (amount * b);
+      }
+    
+      function _log(x, base)
       {
         return Math.log(Math.abs(x)) / Math.log(base);
       }
     
-      function mix(a, b, amount)
+      function _in_range(a, x, b)
       {
-        return ((1.0 - amount) * a) + (amount * b);
+        var left = Math.min(a, b);
+        var right = Math.max(a, b);
+        return left <= x && x <= right;
       }
     
       function to_domain(projection, range)
@@ -369,17 +384,18 @@ You can also specify the quantity and units separately:
         for(var i = 0; i != projection.length; ++i)
         {
           var segment = projection[i];
-          if(Math.min(segment.range.bounds.min, segment.range.bounds.max) <= point[0] && point[0] < Math.max(segment.range.bounds.min, segment.range.bounds.max))
+          if(_in_range(segment.range.bounds.min, range, segment.range.bounds.max))
           {
-            var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
             if(segment.scale == "linear")
             {
-              return mix(segment.domain.min, segment.domain.max, amount)
+              var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
+              return _mix(segment.domain.min, segment.domain.max, amount)
             }
             else if(segment.scale[0] == "log")
             {
+              var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
               var base = segment.scale[1];
-              return sign(segment.domain.min) * Math.pow(base, mix(log_n(Math.abs(segment.domain.min), base), log_n(Math.abs(segment.domain.max), base), amount));
+              return sign(segment.domain.min) * Math.pow(base, _mix(_log(segment.domain.min, base), _log(segment.domain.max, base), amount));
             }
           }
         }
@@ -449,7 +465,7 @@ If you don't specify any units, the canvas assumes a default unit of
 
 .. raw:: html
 
-    <div align="center" class="toyplot" id="t41346336d1c04166a92bda59af09bc68"><svg height="400.0px" id="t83482e3934084870951c030447af5cda" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="600.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="t1cba69e3f55a4a649ad4073ee7e8d8eb"><clipPath id="tf76160f9d87a409a9c5902351a9d2687"><rect height="300.0" width="500.0" x="50.0" y="50.0"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#tf76160f9d87a409a9c5902351a9d2687)" style="cursor:crosshair"><rect height="300.0" style="pointer-events:all;visibility:hidden" width="500.0" x="50.0" y="50.0"></rect><g class="toyplot-mark-Plot" id="td8e3f0a6d2a84ecfbca80be43743f971" style="fill:none"><g class="toyplot-Series"><path d="M 60.0 340.0 L 69.795918367346943 339.88338192419826 L 79.591836734693871 339.53352769679299 L 89.387755102040813 338.95043731778424 L 99.183673469387742 338.13411078717201 L 108.97959183673468 337.08454810495624 L 118.77551020408163 335.80174927113706 L 128.57142857142856 334.28571428571428 L 138.36734693877551 332.53644314868802 L 148.16326530612244 330.55393586005829 L 157.95918367346937 328.33819241982508 L 167.75510204081633 325.88921282798833 L 177.55102040816325 323.20699708454811 L 187.34693877551018 320.2915451895044 L 197.14285714285714 317.14285714285717 L 206.93877551020407 313.7609329446064 L 216.73469387755102 310.1457725947522 L 226.53061224489795 306.29737609329447 L 236.32653061224488 302.21574344023327 L 246.12244897959184 297.90087463556853 L 255.91836734693874 293.35276967930031 L 265.71428571428572 288.57142857142856 L 275.51020408163265 283.55685131195338 L 285.30612244897958 278.30903790087467 L 295.10204081632651 272.82798833819237 L 304.89795918367349 267.1137026239067 L 314.69387755102036 261.1661807580175 L 324.48979591836735 254.98542274052483 L 334.28571428571428 248.57142857142861 L 344.08163265306121 241.92419825072884 L 353.87755102040813 235.04373177842569 L 363.67346938775506 227.93002915451893 L 373.46938775510199 220.58309037900875 L 383.26530612244892 213.00291545189506 L 393.0612244897959 205.18950437317784 L 402.85714285714283 197.14285714285717 L 412.65306122448976 188.86297376093296 L 422.44897959183675 180.34985422740527 L 432.24489795918367 171.60349854227405 L 442.04081632653055 162.62390670553941 L 451.83673469387747 153.41107871720121 L 461.63265306122446 143.96501457725952 L 471.42857142857139 134.28571428571431 L 481.22448979591832 124.37317784256564 L 491.0204081632653 114.22740524781346 L 500.81632653061223 103.84839650145778 L 510.61224489795916 93.23615160349857 L 520.40816326530614 82.390670553935863 L 530.20408163265301 71.311953352769692 L 540.0 60.0" style="fill:none;stroke:rgba(40%,76.1%,64.7%,1);stroke-opacity:1.0;stroke-width:2.0"></path></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14.0" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="450.0" y="60.0"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="495.0" y="67.0"></text></g><line style="" x1="60.0" x2="540.0" y1="350.0" y2="350.0"></line><g><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="60.0" y="350.0">0.0</text><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="300.0" y="350.0">0.5</text><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="540.0" y="350.0">1.0</text></g><line style="" x1="50.0" x2="50.0" y1="60.0" y2="340.0"></line><g><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 340.0)" x="50.0" y="340.0">0.0</text><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 200.0)" x="50.0" y="200.0">0.5</text><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 60.0)" x="50.0" y="60.0">1.0</text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
+    <div align="center" class="toyplot" id="tf161eeeee1364385b80d2e1fc15338be"><svg height="400.0px" id="tb73c53d06410478d9b054062a0158275" style="background-color:transparent;fill:#292724;fill-opacity:1.0;font-family:helvetica;font-size:12px;opacity:1.0;stroke:#292724;stroke-opacity:1.0;stroke-width:1.0" width="600.0px" xmlns="http://www.w3.org/2000/svg" xmlns:toyplot="http://www.sandia.gov/toyplot"><g class="toyplot-axes-Cartesian" id="t2a89c7f7a78d4e68852af9ae13330179"><clipPath id="td61e1cea71f54d57a076d0e59abeb30a"><rect height="300.0" width="500.0" x="50.0" y="50.0"></rect></clipPath><g class="toyplot-coordinate-events" clip-path="url(#td61e1cea71f54d57a076d0e59abeb30a)" style="cursor:crosshair"><rect height="300.0" style="pointer-events:all;visibility:hidden" width="500.0" x="50.0" y="50.0"></rect><g class="toyplot-mark-Plot" id="t25af38dd935d4256beb51c896ea121cd" style="fill:none"><g class="toyplot-Series"><path d="M 60.0 340.0 L 69.795918367346943 339.88338192419826 L 79.591836734693871 339.53352769679299 L 89.387755102040813 338.95043731778424 L 99.183673469387742 338.13411078717201 L 108.97959183673468 337.08454810495624 L 118.77551020408163 335.80174927113706 L 128.57142857142856 334.28571428571428 L 138.36734693877551 332.53644314868802 L 148.16326530612244 330.55393586005829 L 157.95918367346937 328.33819241982508 L 167.75510204081633 325.88921282798833 L 177.55102040816325 323.20699708454811 L 187.34693877551018 320.2915451895044 L 197.14285714285714 317.14285714285717 L 206.93877551020407 313.7609329446064 L 216.73469387755102 310.1457725947522 L 226.53061224489795 306.29737609329447 L 236.32653061224488 302.21574344023327 L 246.12244897959184 297.90087463556853 L 255.91836734693874 293.35276967930031 L 265.71428571428572 288.57142857142856 L 275.51020408163265 283.55685131195338 L 285.30612244897958 278.30903790087467 L 295.10204081632651 272.82798833819237 L 304.89795918367349 267.1137026239067 L 314.69387755102036 261.1661807580175 L 324.48979591836735 254.98542274052483 L 334.28571428571428 248.57142857142861 L 344.08163265306121 241.92419825072884 L 353.87755102040813 235.04373177842569 L 363.67346938775506 227.93002915451893 L 373.46938775510199 220.58309037900875 L 383.26530612244892 213.00291545189506 L 393.0612244897959 205.18950437317784 L 402.85714285714283 197.14285714285717 L 412.65306122448976 188.86297376093296 L 422.44897959183675 180.34985422740527 L 432.24489795918367 171.60349854227405 L 442.04081632653055 162.62390670553941 L 451.83673469387747 153.41107871720121 L 461.63265306122446 143.96501457725952 L 471.42857142857139 134.28571428571431 L 481.22448979591832 124.37317784256564 L 491.0204081632653 114.22740524781346 L 500.81632653061223 103.84839650145778 L 510.61224489795916 93.23615160349857 L 520.40816326530614 82.390670553935863 L 530.20408163265301 71.311953352769692 L 540.0 60.0" style="fill:none;stroke:rgba(40%,76.1%,64.7%,1);stroke-opacity:1.0;stroke-width:2.0"></path></g></g></g><g class="toyplot-coordinates" style="visibility:hidden"><rect height="14.0" style="fill:white;opacity:0.75;stroke:none" width="90.0" x="450.0" y="60.0"></rect><text style="alignment-baseline:middle;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="495.0" y="67.0"></text></g><line style="" x1="60.0" x2="540.0" y1="350.0" y2="350.0"></line><g><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="60.0" y="350.0">0.0</text><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="300.0" y="350.0">0.5</text><text style="alignment-baseline:middle;baseline-shift:-80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" x="540.0" y="350.0">1.0</text></g><line style="" x1="50.0" x2="50.0" y1="60.0" y2="340.0"></line><g><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 340.0)" x="50.0" y="340.0">0.0</text><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 200.0)" x="50.0" y="200.0">0.5</text><text style="alignment-baseline:middle;baseline-shift:80%;font-size:10px;font-weight:normal;stroke:none;text-anchor:middle" transform="rotate(-90, 50.0, 60.0)" x="50.0" y="60.0">1.0</text></g></g></svg><div class="toyplot-controls"><ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden"><li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;"></li><li class="toyplot-mark-popup-save-csv" onmouseout="this.style.color='white';this.style.background='steelblue'" onmouseover="this.style.color='steelblue';this.style.background='white'" style="border-radius:3px;padding:5px;list-style:none;margin:0;">Save as .csv</li></ul><script>
     (function()
     {
       if(window.CSS !== undefined && window.CSS.supports !== undefined)
@@ -457,7 +473,7 @@ If you don't specify any units, the canvas assumes a default unit of
         if(!window.CSS.supports("alignment-baseline", "middle"))
         {
           var re = /\s*alignment-baseline\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#t41346336d1c04166a92bda59af09bc68 text");
+          var text = document.querySelectorAll("#tf161eeeee1364385b80d2e1fc15338be text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -477,7 +493,7 @@ If you don't specify any units, the canvas assumes a default unit of
         if(!window.CSS.supports("baseline-shift", "0"))
         {
           var re = /\s*baseline-shift\s*:\s*([^;\s]*)\s*/;
-          var text = document.querySelectorAll("#t41346336d1c04166a92bda59af09bc68 text");
+          var text = document.querySelectorAll("#tf161eeeee1364385b80d2e1fc15338be text");
           for(var i = 0; i != text.length; ++i)
           {
             var match = re.exec(text[i].attributes.style.value);
@@ -497,7 +513,7 @@ If you don't specify any units, the canvas assumes a default unit of
     </script><script>
     (function()
     {
-      var data_tables = [{"data": [[0.0, 0.02040816326530612, 0.04081632653061224, 0.061224489795918366, 0.08163265306122448, 0.1020408163265306, 0.12244897959183673, 0.14285714285714285, 0.16326530612244897, 0.18367346938775508, 0.2040816326530612, 0.22448979591836732, 0.24489795918367346, 0.26530612244897955, 0.2857142857142857, 0.3061224489795918, 0.32653061224489793, 0.3469387755102041, 0.36734693877551017, 0.3877551020408163, 0.4081632653061224, 0.42857142857142855, 0.44897959183673464, 0.4693877551020408, 0.4897959183673469, 0.5102040816326531, 0.5306122448979591, 0.5510204081632653, 0.5714285714285714, 0.5918367346938775, 0.6122448979591836, 0.6326530612244897, 0.6530612244897959, 0.673469387755102, 0.6938775510204082, 0.7142857142857142, 0.7346938775510203, 0.7551020408163265, 0.7755102040816326, 0.7959183673469387, 0.8163265306122448, 0.836734693877551, 0.8571428571428571, 0.8775510204081632, 0.8979591836734693, 0.9183673469387754, 0.9387755102040816, 0.9591836734693877, 0.9795918367346939, 1.0], [0.0, 0.00041649312786339016, 0.0016659725114535606, 0.003748438150770512, 0.006663890045814243, 0.010412328196584754, 0.014993752603082049, 0.02040816326530612, 0.02665556018325697, 0.033735943356934604, 0.041649312786339016, 0.05039566847147021, 0.059975010412328195, 0.07038733860891293, 0.08163265306122448, 0.09371095376926278, 0.10662224073302788, 0.12036651395251978, 0.13494377342773842, 0.15035401915868388, 0.16659725114535606, 0.18367346938775508, 0.20158267388588083, 0.22032486463973341, 0.23990004164931278, 0.2603082049146189, 0.2815493544356517, 0.3036234902124114, 0.32653061224489793, 0.3502707205331112, 0.3748438150770511, 0.40024989587671794, 0.4264889629321115, 0.453561016243232, 0.4814660558100791, 0.510204081632653, 0.5397750937109537, 0.5701790920449812, 0.6014160766347355, 0.6334860474802164, 0.6663890045814242, 0.7001249479383589, 0.7346938775510203, 0.7700957934194085, 0.8063306955435233, 0.8433985839233651, 0.8812994585589337, 0.920033319450229, 0.9596001665972511, 1.0]], "names": ["x", "y0"], "id": "td8e3f0a6d2a84ecfbca80be43743f971", "title": "Plot Data"}];
+      var data_tables = [{"data": [[0.0, 0.02040816326530612, 0.04081632653061224, 0.061224489795918366, 0.08163265306122448, 0.1020408163265306, 0.12244897959183673, 0.14285714285714285, 0.16326530612244897, 0.18367346938775508, 0.2040816326530612, 0.22448979591836732, 0.24489795918367346, 0.26530612244897955, 0.2857142857142857, 0.3061224489795918, 0.32653061224489793, 0.3469387755102041, 0.36734693877551017, 0.3877551020408163, 0.4081632653061224, 0.42857142857142855, 0.44897959183673464, 0.4693877551020408, 0.4897959183673469, 0.5102040816326531, 0.5306122448979591, 0.5510204081632653, 0.5714285714285714, 0.5918367346938775, 0.6122448979591836, 0.6326530612244897, 0.6530612244897959, 0.673469387755102, 0.6938775510204082, 0.7142857142857142, 0.7346938775510203, 0.7551020408163265, 0.7755102040816326, 0.7959183673469387, 0.8163265306122448, 0.836734693877551, 0.8571428571428571, 0.8775510204081632, 0.8979591836734693, 0.9183673469387754, 0.9387755102040816, 0.9591836734693877, 0.9795918367346939, 1.0], [0.0, 0.00041649312786339016, 0.0016659725114535606, 0.003748438150770512, 0.006663890045814243, 0.010412328196584754, 0.014993752603082049, 0.02040816326530612, 0.02665556018325697, 0.033735943356934604, 0.041649312786339016, 0.05039566847147021, 0.059975010412328195, 0.07038733860891293, 0.08163265306122448, 0.09371095376926278, 0.10662224073302788, 0.12036651395251978, 0.13494377342773842, 0.15035401915868388, 0.16659725114535606, 0.18367346938775508, 0.20158267388588083, 0.22032486463973341, 0.23990004164931278, 0.2603082049146189, 0.2815493544356517, 0.3036234902124114, 0.32653061224489793, 0.3502707205331112, 0.3748438150770511, 0.40024989587671794, 0.4264889629321115, 0.453561016243232, 0.4814660558100791, 0.510204081632653, 0.5397750937109537, 0.5701790920449812, 0.6014160766347355, 0.6334860474802164, 0.6663890045814242, 0.7001249479383589, 0.7346938775510203, 0.7700957934194085, 0.8063306955435233, 0.8433985839233651, 0.8812994585589337, 0.920033319450229, 0.9596001665972511, 1.0]], "names": ["x", "y0"], "id": "t25af38dd935d4256beb51c896ea121cd", "title": "Plot Data"}];
     
       function save_csv(data_table)
       {
@@ -536,7 +552,7 @@ If you don't specify any units, the canvas assumes a default unit of
       {
         return function(e)
         {
-          var popup = document.querySelector("#t41346336d1c04166a92bda59af09bc68 .toyplot-mark-popup");
+          var popup = document.querySelector("#tf161eeeee1364385b80d2e1fc15338be .toyplot-mark-popup");
           popup.querySelector(".toyplot-mark-popup-title").innerHTML = data_table.title;
           popup.querySelector(".toyplot-mark-popup-save-csv").onclick = function() { popup.style.visibility = "hidden"; save_csv(data_table); }
           popup.style.left = (e.clientX - 50) + "px";
@@ -558,21 +574,28 @@ If you don't specify any units, the canvas assumes a default unit of
     </script><script>
     (function()
     {
-      var axes = {"t1cba69e3f55a4a649ad4073ee7e8d8eb": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 1.0, "min": 0.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 540.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 1.0, "min": 0.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 60.0, "min": 340.0}, "scale": "linear"}]}};
+      var axes = {"t2a89c7f7a78d4e68852af9ae13330179": {"x": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 1.0, "min": 0.0}, "range": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 540.0, "min": 60.0}, "scale": "linear"}], "y": [{"domain": {"bounds": {"max": Infinity, "min": -Infinity}, "max": 1.0, "min": 0.0}, "range": {"bounds": {"max": -Infinity, "min": Infinity}, "max": 60.0, "min": 340.0}, "scale": "linear"}]}};
     
       function sign(x)
       {
         return x < 0 ? -1 : x > 0 ? 1 : 0;
       }
     
-      function log_n(x, base)
+      function _mix(a, b, amount)
+      {
+        return ((1.0 - amount) * a) + (amount * b);
+      }
+    
+      function _log(x, base)
       {
         return Math.log(Math.abs(x)) / Math.log(base);
       }
     
-      function mix(a, b, amount)
+      function _in_range(a, x, b)
       {
-        return ((1.0 - amount) * a) + (amount * b);
+        var left = Math.min(a, b);
+        var right = Math.max(a, b);
+        return left <= x && x <= right;
       }
     
       function to_domain(projection, range)
@@ -580,17 +603,18 @@ If you don't specify any units, the canvas assumes a default unit of
         for(var i = 0; i != projection.length; ++i)
         {
           var segment = projection[i];
-          if(Math.min(segment.range.bounds.min, segment.range.bounds.max) <= point[0] && point[0] < Math.max(segment.range.bounds.min, segment.range.bounds.max))
+          if(_in_range(segment.range.bounds.min, range, segment.range.bounds.max))
           {
-            var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
             if(segment.scale == "linear")
             {
-              return mix(segment.domain.min, segment.domain.max, amount)
+              var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
+              return _mix(segment.domain.min, segment.domain.max, amount)
             }
             else if(segment.scale[0] == "log")
             {
+              var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
               var base = segment.scale[1];
-              return sign(segment.domain.min) * Math.pow(base, mix(log_n(Math.abs(segment.domain.min), base), log_n(Math.abs(segment.domain.max), base), amount));
+              return sign(segment.domain.min) * Math.pow(base, _mix(_log(segment.domain.min, base), _log(segment.domain.max, base), amount));
             }
           }
         }

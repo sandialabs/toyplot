@@ -7,6 +7,35 @@
 Release Notes
 =============
 
+Toyplot 0.6.0 - July 13, 2015
+-----------------------------
+
+* Unicode text wasn't handled correctly by text marks.
+* Added an experimental matrix visualization using table axes.
+* Added a "title" property for table cells.
+* Fix inconsistencies in our use of alignment-baseline and text-anchor CSS properties.
+* Added a new section to the user guide on the convenience API.
+* Allow real-world units for canvas layouts, and tweak the parameter order for corner layouts.
+* Expanded user guide documentation on canvas layouts.
+* Added table axes regions for all four sides and corners, plus a property to access every cell in a region.
+* Added automatic conversion from numpy NpzFile to toyplot.data.Table.
+* Added experimental support for graph visualization.
+* Allow toyplot.data.Table initialization from a sequence of 2-tuples.
+* Cairo backends were ignoring -toyplot-anchor-shift.
+* Cairo backends didn't handle all supported alignment-baseline values.
+* Added matrix and table visualizations to the convenience API.
+* Added accessors for shape, row count, and column count for table axes and regions.
+* Added toyplot.locator.Integer, and a step parameter to control labelling for matrix visualizations.
+* Always return a unicode string from toyplot.canvas.Canvas._repr_html_(), for compatibility with Jupyter / IPython notebooks running Python 3 kernels.
+* Assign a sensible default filename for CSV downloads, for browsers that support it.
+* Added a contributed Conda build recipe.
+* Allow toyplot.data.Table to be initialized from a 2D numpy array.
+* Rename the toyplot.axes.Table "title" parameter to "label" for consistency with the other axes.
+* Added a new "Labels and Legends" section to the user guide.
+* Added a new "Tick Locators" section to the user guide.
+* Added experimental toyplot.data.contiguous() function to identify contiguous ranges in an array.
+* Fix a problem with interactive Y coordinates when using a log scale that straddled the origin.
+
 Toyplot 0.5.0 - May 26, 2015
 ----------------------------
 

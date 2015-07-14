@@ -145,14 +145,21 @@ _show_mouse_coordinates = string.Template("""
     return x < 0 ? -1 : x > 0 ? 1 : 0;
   }
 
-  function log_n(x, base)
+  function _mix(a, b, amount)
+  {
+    return ((1.0 - amount) * a) + (amount * b);
+  }
+
+  function _log(x, base)
   {
     return Math.log(Math.abs(x)) / Math.log(base);
   }
 
-  function mix(a, b, amount)
+  function _in_range(a, x, b)
   {
-    return ((1.0 - amount) * a) + (amount * b);
+    var left = Math.min(a, b);
+    var right = Math.max(a, b);
+    return left <= x && x <= right;
   }
 
   function to_domain(projection, range)
@@ -160,17 +167,18 @@ _show_mouse_coordinates = string.Template("""
     for(var i = 0; i != projection.length; ++i)
     {
       var segment = projection[i];
-      if(Math.min(segment.range.bounds.min, segment.range.bounds.max) <= point[0] && point[0] < Math.max(segment.range.bounds.min, segment.range.bounds.max))
+      if(_in_range(segment.range.bounds.min, range, segment.range.bounds.max))
       {
-        var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
         if(segment.scale == "linear")
         {
-          return mix(segment.domain.min, segment.domain.max, amount)
+          var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
+          return _mix(segment.domain.min, segment.domain.max, amount)
         }
         else if(segment.scale[0] == "log")
         {
+          var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
           var base = segment.scale[1];
-          return sign(segment.domain.min) * Math.pow(base, mix(log_n(Math.abs(segment.domain.min), base), log_n(Math.abs(segment.domain.max), base), amount));
+          return sign(segment.domain.min) * Math.pow(base, _mix(_log(segment.domain.min, base), _log(segment.domain.max, base), amount));
         }
       }
     }
@@ -506,14 +514,21 @@ def render(canvas, fobj=None, animation=False):
     xml.SubElement(controls, "script").text = _export_data_tables.substitute(root_id=root.get("id"), data_tables=json.dumps(data_tables))
 
   # Provide interactive mouse coordinates.
+  def _flip_infinities(value):
+    if numpy.isinf(value):
+      return -value
+    return value
+
   if context._cartesian_axes:
     cartesian_axes = dict()
     for key, axes in context._cartesian_axes.items():
       cartesian_axes[key] = dict()
-      for axis, projection in [("x", axes._xprojection), ("y", axes._yprojection)]:
-        cartesian_axes[key][axis] = list()
-        for segment in projection._segments:
-           cartesian_axes[key][axis].append({"scale":segment.scale, "domain":{"min":segment.domain.min, "max":segment.domain.max, "bounds":{"min":segment.domain.bounds.min, "max":segment.domain.bounds.max}}, "range":{"min":segment.range.min, "max":segment.range.max, "bounds":{"min":segment.range.bounds.min, "max":segment.range.bounds.max}}})
+      cartesian_axes[key]["x"] = list()
+      for segment in axes._xprojection._segments:
+        cartesian_axes[key]["x"].append({"scale":segment.scale, "domain":{"min":segment.domain.min, "max":segment.domain.max, "bounds":{"min":segment.domain.bounds.min, "max":segment.domain.bounds.max}}, "range":{"min":segment.range.min, "max":segment.range.max, "bounds":{"min":segment.range.bounds.min, "max":segment.range.bounds.max}}})
+      cartesian_axes[key]["y"] = list()
+      for segment in axes._yprojection._segments:
+        cartesian_axes[key]["y"].append({"scale":segment.scale, "domain":{"min":segment.domain.min, "max":segment.domain.max, "bounds":{"min":segment.domain.bounds.min, "max":segment.domain.bounds.max}}, "range":{"min":segment.range.min, "max":segment.range.max, "bounds":{"min":_flip_infinities(segment.range.bounds.min), "max":_flip_infinities(segment.range.bounds.max)}}})
 
     xml.SubElement(controls, "script").text = _show_mouse_coordinates.substitute(root_id=root.get("id"), cartesian_axes=json.dumps(cartesian_axes, cls=_NumpyJSONEncoder, sort_keys=True))
 

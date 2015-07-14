@@ -751,7 +751,7 @@ more prominent, and lose the gridlines:
 .. code:: python
 
     canvas = toyplot.Canvas(width=700, height=400)
-    table = canvas.table(data_table, hrows=2, label="Temperature Readings")
+    table = canvas.table(data_table, hrows=2, title="Temperature Readings")
     table.column(0).width = 150
     table.column(1).width = 150
     table.column(2).width = 100

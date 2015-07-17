@@ -29,7 +29,15 @@ class AxisLines(Mark):
     :meth:`toyplot.axes.Cartesian.hlines` and :meth:`toyplot.axes.Cartesian.vlines` instead.
     """
 
-    def __init__(self, table, coordinates, axes, stroke, opacity, title, style):
+    def __init__(
+            self,
+            table,
+            coordinates,
+            axes,
+            stroke,
+            opacity,
+            title,
+            style):
         table = toyplot.require.instance(table, toyplot.data.Table)
         coordinates = toyplot.require.table_keys(table, coordinates, length=1)
         axes = toyplot.require.string_vector(axes, len(coordinates))
@@ -56,7 +64,18 @@ class BarBoundaries(Mark):
     :func:`toyplot.bars` or :meth:`toyplot.axes.Cartesian.bars` instead.
     """
 
-    def __init__(self, table, left, right, left_right_axis, boundaries, boundary_axis, fill, opacity, title, style):
+    def __init__(
+            self,
+            table,
+            left,
+            right,
+            left_right_axis,
+            boundaries,
+            boundary_axis,
+            fill,
+            opacity,
+            title,
+            style):
         table = toyplot.require.instance(table, toyplot.data.Table)
         left = toyplot.require.table_keys(table, left, length=1)
         right = toyplot.require.table_keys(table, right, length=1)
@@ -95,7 +114,19 @@ class BarMagnitudes(Mark):
     :func:`toyplot.bars` or :meth:`toyplot.axes.Cartesian.bars` instead.
     """
 
-    def __init__(self, table, left, right, left_right_axis, baseline, magnitudes, magnitude_axis, fill, opacity, title, style):
+    def __init__(
+            self,
+            table,
+            left,
+            right,
+            left_right_axis,
+            baseline,
+            magnitudes,
+            magnitude_axis,
+            fill,
+            opacity,
+            title,
+            style):
         table = toyplot.require.instance(table, toyplot.data.Table)
         left = toyplot.require.table_keys(table, left, length=1)
         right = toyplot.require.table_keys(table, right, length=1)
@@ -136,7 +167,17 @@ class FillBoundaries(Mark):
     as :func:`toyplot.fill` or :meth:`toyplot.axes.Cartesian.fill` instead.
     """
 
-    def __init__(self, table, position, position_axis, boundaries, boundary_axis, fill, opacity, title, style):
+    def __init__(
+            self,
+            table,
+            position,
+            position_axis,
+            boundaries,
+            boundary_axis,
+            fill,
+            opacity,
+            title,
+            style):
         table = toyplot.require.instance(table, toyplot.data.Table)
         position = toyplot.require.table_keys(table, position, length=1)
         position_axis = toyplot.require.string_vector(position_axis, length=1)
@@ -164,7 +205,18 @@ class FillMagnitudes(Mark):
     as :func:`toyplot.fill` or :meth:`toyplot.axes.Cartesian.fill` instead.
     """
 
-    def __init__(self, table, position, position_axis, baseline, magnitudes, magnitude_axis, fill, opacity, title, style):
+    def __init__(
+            self,
+            table,
+            position,
+            position_axis,
+            baseline,
+            magnitudes,
+            magnitude_axis,
+            fill,
+            opacity,
+            title,
+            style):
         table = toyplot.require.instance(table, toyplot.data.Table)
         position = toyplot.require.table_keys(table, position, length=1)
         position_axis = toyplot.require.string_vector(position_axis, length=1)
@@ -195,7 +247,29 @@ class Graph(Mark):
     :meth:`toyplot.axes.Cartesian.graph` instead.
     """
 
-    def __init__(self, vertex_table, coordinates, coordinate_axis, series, series_axis, marker, msize, mfill, mstroke, mopacity, title, mstyle, mlstyle, edge_table, source, target, show_edges, stroke, stroke_width, stroke_opacity, edge_style):
+    def __init__(
+            self,
+            vertex_table,
+            coordinates,
+            coordinate_axis,
+            series,
+            series_axis,
+            marker,
+            msize,
+            mfill,
+            mstroke,
+            mopacity,
+            title,
+            mstyle,
+            mlstyle,
+            edge_table,
+            source,
+            target,
+            show_edges,
+            stroke,
+            stroke_width,
+            stroke_opacity,
+            edge_style):
         vertex_table = toyplot.require.instance(
             vertex_table, toyplot.data.Table)
         coordinates = toyplot.require.table_keys(
@@ -264,7 +338,26 @@ class Plot(Mark):
     :meth:`toyplot.axes.Cartesian.scatterplot` instead.
     """
 
-    def __init__(self, table, coordinates, coordinate_axes, series, series_axis, show_stroke, stroke, stroke_width, stroke_opacity, marker, msize, mfill, mstroke, mopacity, title, style, mstyle, mlstyle):
+    def __init__(
+            self,
+            table,
+            coordinates,
+            coordinate_axes,
+            series,
+            series_axis,
+            show_stroke,
+            stroke,
+            stroke_width,
+            stroke_opacity,
+            marker,
+            msize,
+            mfill,
+            mstroke,
+            mopacity,
+            title,
+            style,
+            mstyle,
+            mlstyle):
         table = toyplot.require.instance(table, toyplot.data.Table)
         coordinates = toyplot.require.table_keys(
             table, coordinates, min_length=1)
@@ -317,7 +410,19 @@ class Rect(Mark):
     :meth:`toyplot.axes.Cartesian.rect` instead.
     """
 
-    def __init__(self, table, left, right, left_right_axis, top, bottom, top_bottom_axis, fill, opacity, title, style):
+    def __init__(
+            self,
+            table,
+            left,
+            right,
+            left_right_axis,
+            top,
+            bottom,
+            top_bottom_axis,
+            fill,
+            opacity,
+            title,
+            style):
         table = toyplot.require.instance(table, toyplot.data.Table)
         left = toyplot.require.table_keys(table, left, length=1)
         right = toyplot.require.table_keys(table, right, length=1)
@@ -354,7 +459,17 @@ class Text(Mark):
     :meth:`toyplot.canvas.Canvas.text` or :meth:`toyplot.axes.Cartesian.text` instead.
     """
 
-    def __init__(self, table, coordinates, axes, text, angle, fill, opacity, title, style):
+    def __init__(
+            self,
+            table,
+            coordinates,
+            axes,
+            text,
+            angle,
+            fill,
+            opacity,
+            title,
+            style):
         table = toyplot.require.instance(table, toyplot.data.Table)
         coordinates = toyplot.require.table_keys(table, coordinates)
         axes = toyplot.require.string_vector(axes, length=len(coordinates))
@@ -435,8 +550,15 @@ class VColorBar(Mark):
 
         def __init__(self, label, style):
             self._text = label
-            self._style = toyplot.style.combine({"font-size": "12px", "font-weight": "bold", "stroke": "none",
-                                                 "text-anchor": "middle", "alignment-baseline": "middle", "baseline-shift": "-200%"}, toyplot.require.style(style))
+            self._style = toyplot.style.combine(
+                {
+                    "font-size": "12px",
+                    "font-weight": "bold",
+                    "stroke": "none",
+                    "text-anchor": "middle",
+                    "alignment-baseline": "middle",
+                    "baseline-shift": "-200%"},
+                toyplot.require.style(style))
 
         @property
         def text(self):
@@ -487,8 +609,11 @@ class VColorBar(Mark):
                 return VColorBar.PerTickHelper.TickProxy(self._values[value])
 
         def styles(self, values):
-            results = [self._indices[index].get(
-                "style", None) if index in self._indices else None for index in range(len(values))]
+            results = [
+                self._indices[index].get(
+                    "style",
+                    None) if index in self._indices else None for index in range(
+                    len(values))]
             for value in self._values:
                 deltas = numpy.abs(values - value)
                 results[numpy.argmin(deltas)] = self._values[
@@ -563,7 +688,20 @@ class VColorBar(Mark):
             self._style = toyplot.style.combine(
                 self._style, toyplot.require.style(value))
 
-    def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, label, colormap, padding, tick_length, min, max, tick_locator, style):
+    def __init__(
+            self,
+            xmin_range,
+            xmax_range,
+            ymin_range,
+            ymax_range,
+            label,
+            colormap,
+            padding,
+            tick_length,
+            min,
+            max,
+            tick_locator,
+            style):
         Mark.__init__(self)
 
         self._xmin_range = xmin_range
@@ -582,9 +720,11 @@ class VColorBar(Mark):
 
     def _update_domain(self, vmin, vmax):
         self._vmin_implicit = vmin if self._vmin_implicit is None else self._vmin_implicit if vmin is None else min(
-            vmin, self._vmin_implicit)
+            vmin,
+            self._vmin_implicit)
         self._vmax_implicit = vmax if self._vmax_implicit is None else self._vmax_implicit if vmin is None else max(
-            vmax, self._vmax_implicit)
+            vmax,
+            self._vmax_implicit)
 
     def _finalize_domain(self):
         # Begin with the implicit domain defined by any explicitly-specified
@@ -632,15 +772,24 @@ class VColorBar(Mark):
 
         def linear_projection(domain_min, domain_max, range_min, range_max):
             def implementation(x):
-                return (1 - ((x - domain_min) / (domain_max - domain_min))) * (range_max - range_min) + range_min
+                return (1 - ((x - domain_min) / (domain_max - domain_min))
+                        ) * (range_max - range_min) + range_min
             return implementation
 
         if self._scale == "linear":
             self._projection = linear_projection(
-                vmin, vmax, self._ymin_range + self._padding, self._ymax_range - self._padding)
+                vmin,
+                vmax,
+                self._ymin_range +
+                self._padding,
+                self._ymax_range -
+                self._padding)
 
     def _project_y(self, v):
         return self._projection(v)
 
     def _project_color(self, v):
-        return self._colormap.colors(v, self._vmin_computed, self._vmax_computed)
+        return self._colormap.colors(
+            v,
+            self._vmin_computed,
+            self._vmax_computed)

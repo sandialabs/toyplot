@@ -33,7 +33,13 @@ def step_impl(context):
 def step_impl(context):
     canvas = toyplot.Canvas()
     axes = canvas.axes(
-        xticklocator=toyplot.locator.Explicit(locations=[0, 2, numpy.pi, 4, 6]))
+        xticklocator=toyplot.locator.Explicit(
+            locations=[
+                0,
+                2,
+                numpy.pi,
+                4,
+                6]))
     axes.plot(context.x, context.y)
     toyplot.testing.assert_canvas_equal(
         canvas, "explicit-tick-locator-locations")

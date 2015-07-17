@@ -4,17 +4,20 @@ import nose.tools
 import toyplot.units
 
 
-@when(u'converting "0" without default units to points the response should be 0.0')
+@when(
+    u'converting "0" without default units to points the response should be 0.0')
 def step_impl(context):
     nose.tools.assert_equal(toyplot.units.convert("0", "pt"), 0.0)
 
 
-@when(u'converting 0 without default units to points the response should be 0.0')
+@when(
+    u'converting 0 without default units to points the response should be 0.0')
 def step_impl(context):
     nose.tools.assert_equal(toyplot.units.convert(0, "pt"), 0.0)
 
 
-@when(u'converting 72 without default units to points the response should be raise ValueError')
+@when(
+    u'converting 72 without default units to points the response should be raise ValueError')
 def step_impl(context):
     with nose.tools.assert_raises(ValueError):
         toyplot.units.convert(72, "pt")
@@ -35,7 +38,8 @@ def step_impl(context):
     nose.tools.assert_equal(toyplot.units.convert((72, "pt"), "in"), 1.0)
 
 
-@when(u'converting "100%" without reference to in the response should be raise ValueError')
+@when(
+    u'converting "100%" without reference to in the response should be raise ValueError')
 def step_impl(context):
     with nose.tools.assert_raises(ValueError):
         toyplot.units.convert("100%", "in")

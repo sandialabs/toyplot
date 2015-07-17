@@ -24,11 +24,19 @@ def convert_notebook(name):
     source = os.path.join(docs_dir, "%s.ipynb" % name)
     target = os.path.join(docs_dir, "%s.rst" % name)
 
-    if os.path.exists(target) and os.path.getmtime(target) >= os.path.getmtime(source) and not arguments.clean:
+    if os.path.exists(target) and os.path.getmtime(
+            target) >= os.path.getmtime(source) and not arguments.clean:
         return
 
-    subprocess.check_call(["ipython", "nbconvert", "--execute",
-                           "--to", "rst", source, "--output", os.path.join(docs_dir, name)])
+    subprocess.check_call(["ipython",
+                           "nbconvert",
+                           "--execute",
+                           "--to",
+                           "rst",
+                           source,
+                           "--output",
+                           os.path.join(docs_dir,
+                                        name)])
 
     # Unmangle Sphinx cross-references in the tutorial that get mangled by
     # markdown.
@@ -50,7 +58,22 @@ def convert_notebook(name):
 if os.path.exists(build_dir):
     shutil.rmtree(build_dir)
 
-for name in ["canvas-layout", "cartesian-axes", "color", "convenience", "data-tables", "embedding", "labels-and-legends", "markers", "matrix-visualization", "rendering", "table-axes", "text", "tick-locators", "tutorial", "units"]:
+for name in [
+        "canvas-layout",
+        "cartesian-axes",
+        "color",
+        "convenience",
+        "data-tables",
+        "embedding",
+        "labels-and-legends",
+        "markers",
+        "matrix-visualization",
+        "rendering",
+        "table-axes",
+        "text",
+        "tick-locators",
+        "tutorial",
+        "units"]:
     convert_notebook(name)
 
 # Generate the HTML documentation.

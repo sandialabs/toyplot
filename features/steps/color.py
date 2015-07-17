@@ -116,7 +116,8 @@ def step_impl(context):
     context.value = toyplot.color.broadcast(numpy.array(["red", "blue"]), 2)
 
 
-@then(u'toyplot.color.broadcast should broadcast the 1d array of colors to the 1d array')
+@then(
+    u'toyplot.color.broadcast should broadcast the 1d array of colors to the 1d array')
 def step_impl(context):
     numpy.testing.assert_array_equal(
         context.value, toyplot.color.array([(1, 0, 0, 1), (0, 0, 1, 1)]))
@@ -128,7 +129,8 @@ def step_impl(context):
         numpy.array(["red", "blue"]), (2, 2))
 
 
-@then(u'toyplot.color.broadcast should broadcast the 1d array of colors to the 2d array')
+@then(
+    u'toyplot.color.broadcast should broadcast the 1d array of colors to the 2d array')
 def step_impl(context):
     numpy.testing.assert_array_equal(context.value, toyplot.color.array(
         [[(1, 0, 0, 1), (0, 0, 1, 1)], [(1, 0, 0, 1), (0, 0, 1, 1)]]))
@@ -178,18 +180,19 @@ def step_impl(context):
 @then(u'individual values can be mapped to colors by the diverging color map')
 def step_impl(context):
     toyplot.testing.assert_color_equal(
-        context.color_map.color(-1), [0.33479085,  0.28308437,  0.75649522,  1.])
+        context.color_map.color(-1), [0.33479085, 0.28308437, 0.75649522, 1.])
     toyplot.testing.assert_color_equal(
-        context.color_map.color(0), [0.33479085,  0.28308437,  0.75649522,  1.])
+        context.color_map.color(0), [0.33479085, 0.28308437, 0.75649522, 1.])
     toyplot.testing.assert_color_equal(
-        context.color_map.color(0.5), [0.86541961,  0.86538428,  0.86533315,  1.])
+        context.color_map.color(0.5), [0.86541961, 0.86538428, 0.86533315, 1.])
     toyplot.testing.assert_color_equal(
-        context.color_map.color(1), [0.69462562,  0.00296461,  0.15458183,  1.])
+        context.color_map.color(1), [0.69462562, 0.00296461, 0.15458183, 1.])
     toyplot.testing.assert_color_equal(
-        context.color_map.color(2), [0.69462562,  0.00296461,  0.15458183,  1.])
+        context.color_map.color(2), [0.69462562, 0.00296461, 0.15458183, 1.])
 
 
-@then(u'individual values can be mapped to css colors by the diverging color map')
+@then(
+    u'individual values can be mapped to css colors by the diverging color map')
 def step_impl(context):
     nose.tools.assert_equal(
         context.color_map.css(-1), "rgba(33.5%,28.3%,75.6%,1)")

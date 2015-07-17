@@ -84,7 +84,8 @@ def step_impl(context):
     numpy.testing.assert_array_equal(table["a"], [8])
 
 
-@then(u'extracting rows using multiple indices should return a new table with the specified rows')
+@then(
+    u'extracting rows using multiple indices should return a new table with the specified rows')
 def step_impl(context):
     table = context.data.rows([1, 2, 3])
     nose.tools.assert_equal(list(table.keys()), ["a", "b"])
@@ -142,7 +143,8 @@ def step_impl(context):
     context.data = table
 
 
-@when(u'toyplot.data.Table is initialized with an OrderedDict containing columns')
+@when(
+    u'toyplot.data.Table is initialized with an OrderedDict containing columns')
 def step_impl(context):
     context.data = collections.OrderedDict(
         [("a", numpy.arange(10)), ("b", numpy.arange(10) ** 2)])
@@ -200,7 +202,10 @@ def step_impl(context):
     buffer = io.BytesIO()
     toyplot.latex.render(context.data, buffer)
     toyplot.testing.assert_latex_equal(
-        toyplot.compatibility.unicode_type(buffer.getvalue(), "utf-8"), "data-table")
+        toyplot.compatibility.unicode_type(
+            buffer.getvalue(),
+            "utf-8"),
+        "data-table")
 
 
 @then(u'the table can be rendered as format latex file')
@@ -213,7 +218,10 @@ def step_impl(context):
 @then(u'the table can be rendered as format latex string with hline')
 def step_impl(context):
     toyplot.testing.assert_latex_equal(
-        toyplot.latex.render(context.data, hlines=[5]), "data-table-with-hline")
+        toyplot.latex.render(
+            context.data,
+            hlines=[5]),
+        "data-table-with-hline")
 
 
 @then(u'the table can be rendered as format ipython html string')

@@ -127,7 +127,17 @@ class Cartesian(object):
     """
     class AxisHelper(object):
 
-        def __init__(self, show, label, label_style, min, max, tick_length, tick_locator, tick_angle, scale):
+        def __init__(
+                self,
+                show,
+                label,
+                label_style,
+                min,
+                max,
+                tick_length,
+                tick_locator,
+                tick_angle,
+                scale):
             self.spine = Cartesian.SpineHelper()
             self.ticks = Cartesian.TicksHelper(
                 tick_length, tick_locator, tick_angle)
@@ -169,7 +179,14 @@ class Cartesian(object):
 
     class CoordinatesHelper(object):
 
-        def __init__(self, show, xmin_range, xmax_range, ymin_range, ymax_range, style):
+        def __init__(
+                self,
+                show,
+                xmin_range,
+                xmax_range,
+                ymin_range,
+                ymax_range,
+                style):
             self._show = show
             self._xmin_range = xmin_range
             self._xmax_range = xmax_range
@@ -199,8 +216,14 @@ class Cartesian(object):
     class CoordinatesLabelHelper(object):
 
         def __init__(self, style):
-            self._style = toyplot.style.combine({"font-size": "10px", "font-weight": "normal", "stroke":
-                                                 "none", "text-anchor": "middle", "alignment-baseline": "middle"}, toyplot.require.style(style))
+            self._style = toyplot.style.combine(
+                {
+                    "font-size": "10px",
+                    "font-weight": "normal",
+                    "stroke": "none",
+                    "text-anchor": "middle",
+                    "alignment-baseline": "middle"},
+                toyplot.require.style(style))
 
         @property
         def style(self):
@@ -238,7 +261,12 @@ class Cartesian(object):
         def __init__(self, label, style):
             self._text = label
             self._style = toyplot.style.combine(
-                {"font-weight": "bold", "stroke": "none", "text-anchor": "middle", "alignment-baseline": "middle"}, toyplot.require.style(style))
+                {
+                    "font-weight": "bold",
+                    "stroke": "none",
+                    "text-anchor": "middle",
+                    "alignment-baseline": "middle"},
+                toyplot.require.style(style))
 
         @property
         def text(self):
@@ -321,8 +349,11 @@ class Cartesian(object):
                 return Cartesian.PerTickHelper.TickProxy(self._values[value])
 
         def styles(self, values):
-            results = [self._indices[index].get(
-                "style", None) if index in self._indices else None for index in range(len(values))]
+            results = [
+                self._indices[index].get(
+                    "style",
+                    None) if index in self._indices else None for index in range(
+                    len(values))]
             for value in self._values:
                 deltas = numpy.abs(values - value)
                 results[numpy.argmin(deltas)] = self._values[
@@ -417,7 +448,30 @@ class Cartesian(object):
             self._style = toyplot.style.combine(
                 self._style, toyplot.require.style(value))
 
-    def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, xmin, xmax, ymin, ymax, show, xshow, yshow, label, xlabel, ylabel, xticklocator, yticklocator, xscale, yscale, palette, padding, tick_length, parent):
+    def __init__(
+            self,
+            xmin_range,
+            xmax_range,
+            ymin_range,
+            ymax_range,
+            xmin,
+            xmax,
+            ymin,
+            ymax,
+            show,
+            xshow,
+            yshow,
+            label,
+            xlabel,
+            ylabel,
+            xticklocator,
+            yticklocator,
+            xscale,
+            yscale,
+            palette,
+            padding,
+            tick_length,
+            parent):
         self._xmin_range = xmin_range
         self._xmax_range = xmax_range
         self._ymin_range = ymin_range
@@ -456,13 +510,36 @@ class Cartesian(object):
         self._show = show
 
         self.coordinates = Cartesian.CoordinatesHelper(
-            show=True, xmin_range=xmax_range - 100, xmax_range=xmax_range - 10, ymin_range=ymin_range + 10, ymax_range=ymin_range + 24, style={})
+            show=True,
+            xmin_range=xmax_range - 100,
+            xmax_range=xmax_range - 10,
+            ymin_range=ymin_range + 10,
+            ymax_range=ymin_range + 24,
+            style={})
         self.label = Cartesian.LabelHelper(
             label=label, style={"font-size": "14px", "baseline-shift": "100%"})
-        self.x = Cartesian.AxisHelper(show=xshow, label=xlabel, label_style={
-                                      "baseline-shift": "-200%"}, min=xmin, max=xmax, tick_length=tick_length, tick_locator=xticklocator, tick_angle=0, scale=xscale)
-        self.y = Cartesian.AxisHelper(show=yshow, label=ylabel, label_style={
-                                      "baseline-shift": "200%"}, min=ymin, max=ymax, tick_length=tick_length, tick_locator=yticklocator, tick_angle=90, scale=yscale)
+        self.x = Cartesian.AxisHelper(
+            show=xshow,
+            label=xlabel,
+            label_style={
+                "baseline-shift": "-200%"},
+            min=xmin,
+            max=xmax,
+            tick_length=tick_length,
+            tick_locator=xticklocator,
+            tick_angle=0,
+            scale=xscale)
+        self.y = Cartesian.AxisHelper(
+            show=yshow,
+            label=ylabel,
+            label_style={
+                "baseline-shift": "200%"},
+            min=ymin,
+            max=ymax,
+            tick_length=tick_length,
+            tick_locator=yticklocator,
+            tick_angle=90,
+            scale=yscale)
 
         self._parent = parent
         self._children = []
@@ -537,21 +614,43 @@ class Cartesian(object):
     def _get_projections(self, xmin, xmax, ymin, ymax):
         if self.x._scale == "linear":
             xprojection = toyplot.projection.linear(
-                xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding)
+                xmin,
+                xmax,
+                self._xmin_range +
+                self._padding,
+                self._xmax_range -
+                self._padding)
         else:
             scale, base = self.x._scale
             if scale == "log":
                 xprojection = toyplot.projection.log(
-                    base, xmin, xmax, self._xmin_range + self._padding, self._xmax_range - self._padding)
+                    base,
+                    xmin,
+                    xmax,
+                    self._xmin_range +
+                    self._padding,
+                    self._xmax_range -
+                    self._padding)
 
         if self.y._scale == "linear":
             yprojection = toyplot.projection.linear(
-                ymin, ymax, self._ymax_range - self._padding, self._ymin_range + self._padding)
+                ymin,
+                ymax,
+                self._ymax_range -
+                self._padding,
+                self._ymin_range +
+                self._padding)
         else:
             scale, base = self.y._scale
             if scale == "log":
                 yprojection = toyplot.projection.log(
-                    base, ymin, ymax, self._ymax_range - self._padding, self._ymin_range + self._padding)
+                    base,
+                    ymin,
+                    ymax,
+                    self._ymax_range -
+                    self._padding,
+                    self._ymin_range +
+                    self._padding)
 
         return xprojection, yprojection
 
@@ -668,7 +767,19 @@ class Cartesian(object):
     def _project_y(self, y):
         return self._yprojection(y)
 
-    def bars(self, a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None):
+    def bars(
+            self,
+            a,
+            b=None,
+            c=None,
+            along="x",
+            baseline="stacked",
+            fill=None,
+            colormap=None,
+            palette=None,
+            opacity=1.0,
+            title=None,
+            style=None):
         """Add stacked bars to the axes.
 
         This command generates one-or-more series of stacked bars.  For
@@ -763,12 +874,21 @@ class Cartesian(object):
                 elif a.ndim == 2:
                     series = toyplot.require.scalar_matrix(a)
                 position = numpy.ma.column_stack(
-                    (numpy.arange(series.shape[0]) - 0.5, numpy.arange(series.shape[0]) + 0.5))
+                    (numpy.arange(
+                        series.shape[0]) -
+                        0.5,
+                        numpy.arange(
+                        series.shape[0]) +
+                        0.5))
 
             default_color = [next(self._bar_colors)
                              for i in range(series.shape[1] - 1)]
-            fill = toyplot.color.broadcast(default_color if fill is None else fill, (series.shape[
-                                           0], series.shape[1] - 1), colormap=colormap, palette=palette)
+            fill = toyplot.color.broadcast(
+                default_color if fill is None else fill,
+                (series.shape[0],
+                 series.shape[1] - 1),
+                colormap=colormap,
+                palette=palette)
             opacity = toyplot.broadcast.scalar(
                 opacity, (series.shape[0], series.shape[1] - 1))
             title = toyplot.broadcast.object(
@@ -797,7 +917,8 @@ class Cartesian(object):
             boundary_keys.append(boundary_axis + "0")
             table[boundary_keys[-1]] = series.T[0]
 
-            for index, (boundary_column, fill_column, opacity_column, title_column) in enumerate(zip(series.T[1:], fill.T, opacity.T, title.T)):
+            for index, (boundary_column, fill_column, opacity_column, title_column) in enumerate(
+                    zip(series.T[1:], fill.T, opacity.T, title.T)):
                 boundary_keys.append("boundary" + str(index + 1))
                 fill_keys.append("fill" + str(index))
                 opacity_keys.append("opacity" + str(index))
@@ -808,8 +929,18 @@ class Cartesian(object):
                 table[opacity_keys[-1]] = opacity_column
                 table[title_keys[-1]] = title_column
 
-            self._children.append(toyplot.mark.BarBoundaries(table=table, left="left", right="right", left_right_axis=left_right_axis,
-                                                             boundaries=boundary_keys, boundary_axis=boundary_axis, fill=fill_keys, opacity=opacity_keys, title=title_keys, style=style))
+            self._children.append(
+                toyplot.mark.BarBoundaries(
+                    table=table,
+                    left="left",
+                    right="right",
+                    left_right_axis=left_right_axis,
+                    boundaries=boundary_keys,
+                    boundary_axis=boundary_axis,
+                    fill=fill_keys,
+                    opacity=opacity_keys,
+                    title=title_keys,
+                    style=style))
             return self._children[-1]
         else:  # baseline is not None
             if a is not None and b is not None and c is not None:
@@ -838,7 +969,10 @@ class Cartesian(object):
                     counts, edges = a
                     position = numpy.ma.column_stack((edges[:-1], edges[1:]))
                     series = numpy.ma.column_stack(
-                        (toyplot.require.scalar_vector(counts, len(position)),))
+                        (toyplot.require.scalar_vector(
+                            counts,
+                            len(position)),
+                         ))
                 else:
                     a = toyplot.require.scalar_array(a)
                     if a.ndim == 1:
@@ -846,12 +980,20 @@ class Cartesian(object):
                     elif a.ndim == 2:
                         series = a
                     position = numpy.ma.column_stack(
-                        (numpy.arange(series.shape[0]) - 0.5, numpy.arange(series.shape[0]) + 0.5))
+                        (numpy.arange(
+                            series.shape[0]) -
+                            0.5,
+                            numpy.arange(
+                            series.shape[0]) +
+                            0.5))
 
             default_color = [next(self._bar_colors)
                              for i in range(series.shape[1])]
             fill = toyplot.color.broadcast(
-                default_color if fill is None else fill, series.shape, colormap=colormap, palette=palette)
+                default_color if fill is None else fill,
+                series.shape,
+                colormap=colormap,
+                palette=palette)
             opacity = toyplot.broadcast.scalar(opacity, series.shape)
             title = toyplot.broadcast.object(title, series.shape)
             style = toyplot.style.combine(
@@ -890,7 +1032,8 @@ class Cartesian(object):
             fill_keys = []
             opacity_keys = []
             title_keys = []
-            for index, (magnitude_column, fill_column, opacity_column, title_column) in enumerate(zip(series.T, fill.T, opacity.T, title.T)):
+            for index, (magnitude_column, fill_column, opacity_column, title_column) in enumerate(
+                    zip(series.T, fill.T, opacity.T, title.T)):
                 magnitude_keys.append("magnitude" + str(index))
                 fill_keys.append("fill" + str(index))
                 opacity_keys.append("opacity" + str(index))
@@ -901,25 +1044,74 @@ class Cartesian(object):
                 table[opacity_keys[-1]] = opacity_column
                 table[title_keys[-1]] = title_column
 
-            self._children.append(toyplot.mark.BarMagnitudes(table=table, left="left", right="right", left_right_axis=left_right_axis, baseline="baseline",
-                                                             magnitudes=magnitude_keys, magnitude_axis=magnitude_axis, fill=fill_keys, opacity=opacity_keys, title=title_keys, style=style))
+            self._children.append(
+                toyplot.mark.BarMagnitudes(
+                    table=table,
+                    left="left",
+                    right="right",
+                    left_right_axis=left_right_axis,
+                    baseline="baseline",
+                    magnitudes=magnitude_keys,
+                    magnitude_axis=magnitude_axis,
+                    fill=fill_keys,
+                    opacity=opacity_keys,
+                    title=title_keys,
+                    style=style))
             return self._children[-1]
 
-    def colorbar(self, values=None, palette=None, colormap=None, label=None, min=None, max=None, tick_length=5, tick_locator=None, offset=0, width=10, style=None):
+    def colorbar(
+            self,
+            values=None,
+            palette=None,
+            colormap=None,
+            label=None,
+            min=None,
+            max=None,
+            tick_length=5,
+            tick_locator=None,
+            offset=0,
+            width=10,
+            style=None):
         if colormap is None:
             if palette is None:
                 palette = toyplot.color.brewer("BlueGreen")
             colormap = toyplot.color.LinearMap(palette=palette)
         style = toyplot.require.style(style)
 
-        mark = toyplot.mark.VColorBar(xmin_range=self._xmax_range + offset, xmax_range=self._xmax_range + offset + width, ymin_range=self._ymin_range,
-                                      ymax_range=self._ymax_range, label=label, colormap=colormap, padding=self._padding, tick_length=tick_length, min=min, max=max, tick_locator=tick_locator, style=style)
+        mark = toyplot.mark.VColorBar(
+            xmin_range=self._xmax_range +
+            offset,
+            xmax_range=self._xmax_range +
+            offset +
+            width,
+            ymin_range=self._ymin_range,
+            ymax_range=self._ymax_range,
+            label=label,
+            colormap=colormap,
+            padding=self._padding,
+            tick_length=tick_length,
+            min=min,
+            max=max,
+            tick_locator=tick_locator,
+            style=style)
         if values is not None:
             mark._update_domain(numpy.min(values), numpy.max(values))
         self._parent._children.append(mark)
         return mark
 
-    def fill(self, a, b=None, c=None, along="x", baseline=None, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None):
+    def fill(
+            self,
+            a,
+            b=None,
+            c=None,
+            along="x",
+            baseline=None,
+            fill=None,
+            colormap=None,
+            palette=None,
+            opacity=1.0,
+            title=None,
+            style=None):
         """Fill multiple regions separated by curves.
 
         Parameters
@@ -972,8 +1164,11 @@ class Cartesian(object):
 
             default_color = [next(self._fill_colors)
                              for i in range(series.shape[1] - 1)]
-            fill = toyplot.color.broadcast(default_color if fill is None else fill, series.shape[
-                                           1] - 1, colormap=colormap, palette=palette)
+            fill = toyplot.color.broadcast(
+                default_color if fill is None else fill,
+                series.shape[1] - 1,
+                colormap=colormap,
+                palette=palette)
             opacity = toyplot.broadcast.scalar(opacity, series.shape[1] - 1)
             title = toyplot.broadcast.object(title, series.shape[1] - 1)
             style = toyplot.style.combine(
@@ -997,8 +1192,17 @@ class Cartesian(object):
                 _mark_exportable(table, key)
                 boundaries.append(key)
 
-            self._children.append(toyplot.mark.FillBoundaries(table=table, position=position_axis, position_axis=position_axis,
-                                                              boundaries=boundaries, boundary_axis=boundary_axis, fill=fill, opacity=opacity, title=title, style=style))
+            self._children.append(
+                toyplot.mark.FillBoundaries(
+                    table=table,
+                    position=position_axis,
+                    position_axis=position_axis,
+                    boundaries=boundaries,
+                    boundary_axis=boundary_axis,
+                    fill=fill,
+                    opacity=opacity,
+                    title=title,
+                    style=style))
             return self._children[-1]
         else:  # baseline is not None
             if a is not None and b is not None:
@@ -1018,8 +1222,11 @@ class Cartesian(object):
 
             default_color = [next(self._fill_colors)
                              for i in range(series.shape[1])]
-            fill = toyplot.color.broadcast(default_color if fill is None else fill, series.shape[
-                                           1], colormap=colormap, palette=palette)
+            fill = toyplot.color.broadcast(
+                default_color if fill is None else fill,
+                series.shape[1],
+                colormap=colormap,
+                palette=palette)
             opacity = toyplot.broadcast.scalar(opacity, series.shape[1])
             title = toyplot.broadcast.object(title, series.shape[1])
             style = toyplot.style.combine(
@@ -1061,11 +1268,45 @@ class Cartesian(object):
                 _mark_exportable(table, key)
                 magnitudes.append(key)
 
-            self._children.append(toyplot.mark.FillMagnitudes(table=table, position=position_axis, position_axis=position_axis,
-                                                              baseline="baseline", magnitudes=magnitudes, magnitude_axis=magnitude_axis, fill=fill, opacity=opacity, title=title, style=style))
+            self._children.append(
+                toyplot.mark.FillMagnitudes(
+                    table=table,
+                    position=position_axis,
+                    position_axis=position_axis,
+                    baseline="baseline",
+                    magnitudes=magnitudes,
+                    magnitude_axis=magnitude_axis,
+                    fill=fill,
+                    opacity=opacity,
+                    title=title,
+                    style=style))
             return self._children[-1]
 
-    def graph(self, a, b, c, d, along="x", vertex_color=None, vertex_colormap=None, vertex_palette=None, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, edge_color=None, edge_colormap=None, edge_palette=None, edge_width=1.0, edge_opacity=1.0, edge_style=None, mstyle=None, mlstyle=None):
+    def graph(
+            self,
+            a,
+            b,
+            c,
+            d,
+            along="x",
+            vertex_color=None,
+            vertex_colormap=None,
+            vertex_palette=None,
+            marker="o",
+            size=20,
+            fill=None,
+            fill_colormap=None,
+            fill_palette=None,
+            opacity=1.0,
+            title=None,
+            edge_color=None,
+            edge_colormap=None,
+            edge_palette=None,
+            edge_width=1.0,
+            edge_opacity=1.0,
+            edge_style=None,
+            mstyle=None,
+            mlstyle=None):
         """Add a graph plot to the axes.
 
         Parameters
@@ -1094,12 +1335,18 @@ class Cartesian(object):
 
         default_color = [next(self._graph_colors)]
         vertex_color = toyplot.color.broadcast(
-            default_color if vertex_color is None else vertex_color, series.shape, colormap=vertex_colormap, palette=vertex_palette)
+            default_color if vertex_color is None else vertex_color,
+            series.shape,
+            colormap=vertex_colormap,
+            palette=vertex_palette)
 
         marker = toyplot.broadcast.object(marker, series.shape)
         msize = toyplot.broadcast.scalar(size, series.shape)
         mfill = toyplot.color.broadcast(
-            vertex_color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
+            vertex_color if fill is None else fill,
+            series.shape,
+            colormap=fill_colormap,
+            palette=fill_palette)
         mstroke = toyplot.color.broadcast(mfill, series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
         title = toyplot.broadcast.object(title, series.shape)
@@ -1107,7 +1354,10 @@ class Cartesian(object):
         mlstyle = toyplot.style.combine(toyplot.require.style(mlstyle))
 
         edge_color = toyplot.color.broadcast(
-            default_color if edge_color is None else edge_color, source.shape, colormap=edge_colormap, palette=edge_palette)
+            default_color if edge_color is None else edge_color,
+            source.shape,
+            colormap=edge_colormap,
+            palette=edge_palette)
         edge_width = toyplot.broadcast.scalar(edge_width, source.shape)
         edge_opacity = toyplot.broadcast.scalar(edge_opacity, source.shape)
         edge_style = toyplot.style.combine(
@@ -1142,11 +1392,51 @@ class Cartesian(object):
         edge_table["stroke-width"] = edge_width
         edge_table["stroke-opacity"] = edge_opacity
 
-        self._children.append(toyplot.mark.Graph(vertex_table=vertex_table, coordinates=coordinate_axis, coordinate_axis=coordinate_axis, series=series_axis, series_axis=series_axis, marker=["marker"], msize=["size"], mfill=["fill"], mstroke=["stroke"], mopacity=[
-                              "opacity"], title=["title"], mstyle=mstyle, mlstyle=mlstyle, edge_table=edge_table, source=["source"], target=["target"], show_edges=True, stroke=["stroke"], stroke_width=["stroke-width"], stroke_opacity=["stroke-opacity"], edge_style=edge_style))
+        self._children.append(
+            toyplot.mark.Graph(
+                vertex_table=vertex_table,
+                coordinates=coordinate_axis,
+                coordinate_axis=coordinate_axis,
+                series=series_axis,
+                series_axis=series_axis,
+                marker=["marker"],
+                msize=["size"],
+                mfill=["fill"],
+                mstroke=["stroke"],
+                mopacity=["opacity"],
+                title=["title"],
+                mstyle=mstyle,
+                mlstyle=mlstyle,
+                edge_table=edge_table,
+                source=["source"],
+                target=["target"],
+                show_edges=True,
+                stroke=["stroke"],
+                stroke_width=["stroke-width"],
+                stroke_opacity=["stroke-opacity"],
+                edge_style=edge_style))
         return self._children[-1]
 
-    def plot(self, a, b=None, along="x", color=None, colormap=None, palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None):
+    def plot(
+            self,
+            a,
+            b=None,
+            along="x",
+            color=None,
+            colormap=None,
+            palette=None,
+            stroke_width=2.0,
+            stroke_opacity=1.0,
+            marker=None,
+            size=20,
+            fill=None,
+            fill_colormap=None,
+            fill_palette=None,
+            opacity=1.0,
+            title=None,
+            style=None,
+            mstyle=None,
+            mlstyle=None):
         """Add bivariate line plots to the axes.
 
         Parameters
@@ -1225,15 +1515,21 @@ class Cartesian(object):
 
         default_color = [next(self._plot_colors)
                          for i in range(series.shape[1])]
-        color = toyplot.color.broadcast(default_color if color is None else color, series.shape[
-                                        1], colormap=colormap, palette=palette)
+        color = toyplot.color.broadcast(
+            default_color if color is None else color,
+            series.shape[1],
+            colormap=colormap,
+            palette=palette)
         stroke_width = toyplot.broadcast.scalar(stroke_width, series.shape[1])
         stroke_opacity = toyplot.broadcast.scalar(
             stroke_opacity, series.shape[1])
         marker = toyplot.broadcast.object(marker, series.shape)
         msize = toyplot.broadcast.scalar(size, series.shape)
         mfill = toyplot.color.broadcast(
-            color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
+            color if fill is None else fill,
+            series.shape,
+            colormap=fill_colormap,
+            palette=fill_palette)
         mstroke = toyplot.color.broadcast(mfill, series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
         title = toyplot.broadcast.object(title, series.shape[1])
@@ -1259,7 +1555,8 @@ class Cartesian(object):
         mfill_keys = []
         mstroke_keys = []
         mopacity_keys = []
-        for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column) in enumerate(zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T)):
+        for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column) in enumerate(
+                zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T)):
             series_keys.append(series_axis + str(index))
             marker_keys.append("marker" + str(index))
             msize_keys.append("size" + str(index))
@@ -1274,11 +1571,46 @@ class Cartesian(object):
             table[mstroke_keys[-1]] = mstroke_column
             table[mopacity_keys[-1]] = mopacity_column
 
-        self._children.append(toyplot.mark.Plot(table=table, coordinates=coordinate_axes, coordinate_axes=coordinate_axes, series=series_keys, series_axis=series_axis, show_stroke=True, stroke=color, stroke_width=stroke_width,
-                                                stroke_opacity=stroke_opacity, marker=marker_keys, msize=msize_keys, mfill=mfill_keys, mstroke=mstroke_keys, mopacity=mopacity_keys, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle))
+        self._children.append(
+            toyplot.mark.Plot(
+                table=table,
+                coordinates=coordinate_axes,
+                coordinate_axes=coordinate_axes,
+                series=series_keys,
+                series_axis=series_axis,
+                show_stroke=True,
+                stroke=color,
+                stroke_width=stroke_width,
+                stroke_opacity=stroke_opacity,
+                marker=marker_keys,
+                msize=msize_keys,
+                mfill=mfill_keys,
+                mstroke=mstroke_keys,
+                mopacity=mopacity_keys,
+                title=title,
+                style=style,
+                mstyle=mstyle,
+                mlstyle=mlstyle))
         return self._children[-1]
 
-    def scatterplot(self, a, b=None, along="x", color=None, colormap=None, palette=None, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None):
+    def scatterplot(
+            self,
+            a,
+            b=None,
+            along="x",
+            color=None,
+            colormap=None,
+            palette=None,
+            marker="o",
+            size=20,
+            fill=None,
+            fill_colormap=None,
+            fill_palette=None,
+            opacity=1.0,
+            title=None,
+            style=None,
+            mstyle=None,
+            mlstyle=None):
         """Add a bivariate plot to the axes.
 
         Parameters
@@ -1322,14 +1654,20 @@ class Cartesian(object):
 
         default_color = [next(self._scatterplot_colors)
                          for i in range(series.shape[1])]
-        color = toyplot.color.broadcast(default_color if color is None else color, series.shape[
-                                        1], colormap=colormap, palette=palette)
+        color = toyplot.color.broadcast(
+            default_color if color is None else color,
+            series.shape[1],
+            colormap=colormap,
+            palette=palette)
         stroke_width = toyplot.broadcast.scalar(0.0, series.shape[1])
         stroke_opacity = toyplot.broadcast.scalar(0.0, series.shape[1])
         marker = toyplot.broadcast.object(marker, series.shape)
         msize = toyplot.broadcast.scalar(size, series.shape)
         mfill = toyplot.color.broadcast(
-            color if fill is None else fill, series.shape, colormap=fill_colormap, palette=fill_palette)
+            color if fill is None else fill,
+            series.shape,
+            colormap=fill_colormap,
+            palette=fill_palette)
         mstroke = toyplot.color.broadcast(mfill, series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
         title = toyplot.broadcast.object(title, series.shape[1])
@@ -1355,7 +1693,8 @@ class Cartesian(object):
         mfill_keys = []
         mstroke_keys = []
         mopacity_keys = []
-        for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column) in enumerate(zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T)):
+        for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column) in enumerate(
+                zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T)):
             series_keys.append(series_axis + str(index))
             marker_keys.append("marker" + str(index))
             msize_keys.append("size" + str(index))
@@ -1370,11 +1709,42 @@ class Cartesian(object):
             table[mstroke_keys[-1]] = mstroke_column
             table[mopacity_keys[-1]] = mopacity_column
 
-        self._children.append(toyplot.mark.Plot(table=table, coordinates=coordinate_axes, coordinate_axes=coordinate_axes, series=series_keys, series_axis=series_axis, show_stroke=False, stroke=color,
-                                                stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker_keys, msize=msize_keys, mfill=mfill_keys, mstroke=mstroke_keys, mopacity=mopacity_keys, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle))
+        self._children.append(
+            toyplot.mark.Plot(
+                table=table,
+                coordinates=coordinate_axes,
+                coordinate_axes=coordinate_axes,
+                series=series_keys,
+                series_axis=series_axis,
+                show_stroke=False,
+                stroke=color,
+                stroke_width=stroke_width,
+                stroke_opacity=stroke_opacity,
+                marker=marker_keys,
+                msize=msize_keys,
+                mfill=mfill_keys,
+                mstroke=mstroke_keys,
+                mopacity=mopacity_keys,
+                title=title,
+                style=style,
+                mstyle=mstyle,
+                mlstyle=mlstyle))
         return self._children[-1]
 
-    def rect(self, a, b, c, d, along="x", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style={"stroke": "none"}):
+    def rect(
+            self,
+            a,
+            b,
+            c,
+            d,
+            along="x",
+            fill=None,
+            colormap=None,
+            palette=None,
+            opacity=1.0,
+            title=None,
+            style={
+            "stroke": "none"}):
         table = toyplot.data.Table()
         table["left"] = toyplot.require.scalar_vector(a)
         table["right"] = toyplot.require.scalar_vector(
@@ -1389,24 +1759,54 @@ class Cartesian(object):
 
         default_color = next(self._rect_colors)
         table["toyplot:fill"] = toyplot.color.broadcast(
-            default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
+            default_color if fill is None else fill,
+            table.shape[0],
+            colormap=colormap,
+            palette=palette)
 
         if along == "x":
             left_right_axis = "x"
             top_bottom_axis = "y"
-            self._update_domain(numpy.concatenate(
-                (table["left"], table["right"])), numpy.concatenate((table["top"], table["bottom"])))
+            self._update_domain(
+                numpy.concatenate(
+                    (table["left"], table["right"])), numpy.concatenate(
+                    (table["top"], table["bottom"])))
         elif along == "y":
             left_right_axis = "y"
             top_bottom_axis = "x"
-            self._update_domain(numpy.concatenate(
-                (table["top"], table["bottom"])), numpy.concatenate((table["left"], table["right"])))
+            self._update_domain(
+                numpy.concatenate(
+                    (table["top"], table["bottom"])), numpy.concatenate(
+                    (table["left"], table["right"])))
 
-        self._children.append(toyplot.mark.Rect(table=table, left="left", right="right", left_right_axis=left_right_axis, top="top",
-                                                bottom="bottom", top_bottom_axis=top_bottom_axis, fill="toyplot:fill", opacity="opacity", title="title", style=style))
+        self._children.append(
+            toyplot.mark.Rect(
+                table=table,
+                left="left",
+                right="right",
+                left_right_axis=left_right_axis,
+                top="top",
+                bottom="bottom",
+                top_bottom_axis=top_bottom_axis,
+                fill="toyplot:fill",
+                opacity="opacity",
+                title="title",
+                style=style))
         return self._children[-1]
 
-    def text(self, a, b, text, angle=0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, annotation=True):
+    def text(
+            self,
+            a,
+            b,
+            text,
+            angle=0,
+            fill=None,
+            colormap=None,
+            palette=None,
+            opacity=1.0,
+            title=None,
+            style=None,
+            annotation=True):
         """Add text to the axes.
 
         Parameters
@@ -1439,23 +1839,51 @@ class Cartesian(object):
         table["fill"] = toyplot.broadcast.object(fill, table.shape[0])
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
-        style = toyplot.style.combine({"font-size": "12px", "font-weight": "normal", "stroke": "none",
-                                       "text-anchor": "middle", "alignment-baseline": "middle"}, toyplot.require.style(style))
+        style = toyplot.style.combine({"font-size": "12px",
+                                       "font-weight": "normal",
+                                       "stroke": "none",
+                                       "text-anchor": "middle",
+                                       "alignment-baseline": "middle"},
+                                      toyplot.require.style(style))
 
         default_color = next(self._text_colors)
         table["toyplot:fill"] = toyplot.color.broadcast(
-            default_color if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
+            default_color if fill is None else fill,
+            table.shape[0],
+            colormap=colormap,
+            palette=palette)
 
         self._update_domain(
             table["x"], table["y"], display=True, data=not annotation)
         self._expand_domain_range(table["x"], table["y"], toyplot.text.extents(
             table["text"], table["angle"], style))
 
-        self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=[
-                              "x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style))
+        self._children.append(
+            toyplot.mark.Text(
+                table=table,
+                coordinates=[
+                    "x",
+                    "y"],
+                axes=[
+                    "x",
+                    "y"],
+                text="text",
+                angle="angle",
+                fill="toyplot:fill",
+                opacity="opacity",
+                title="title",
+                style=style))
         return self._children[-1]
 
-    def hlines(self, y, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style=None):
+    def hlines(
+            self,
+            y,
+            stroke=None,
+            colormap=None,
+            palette=None,
+            opacity=1.0,
+            title=None,
+            style=None):
         """Add horizontal line(s) to the axes.
 
         Horizontal lines are convenient because they're guaranteed to fill the axes from
@@ -1484,14 +1912,32 @@ class Cartesian(object):
         style = toyplot.style.combine(toyplot.require.style(style))
 
         table["toyplot:stroke"] = toyplot.color.broadcast(
-            toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
+            toyplot.color.near_black if stroke is None else stroke,
+            table.shape[0],
+            colormap=colormap,
+            palette=palette)
 
         self._update_domain(numpy.array([]), table["y"])
-        self._children.append(toyplot.mark.AxisLines(table=table, coordinates=["y"], axes=[
-                              "y"], stroke="toyplot:stroke", opacity="opacity", title="title", style=style))
+        self._children.append(
+            toyplot.mark.AxisLines(
+                table=table,
+                coordinates=["y"],
+                axes=["y"],
+                stroke="toyplot:stroke",
+                opacity="opacity",
+                title="title",
+                style=style))
         return self._children[-1]
 
-    def vlines(self, x, stroke=None, colormap=None, palette=None, opacity=1.0, title=None, style=None):
+    def vlines(
+            self,
+            x,
+            stroke=None,
+            colormap=None,
+            palette=None,
+            opacity=1.0,
+            title=None,
+            style=None):
         """Add vertical line(s) to the axes.
 
         Vertical lines are convenient because they're guaranteed to fill the axes from
@@ -1520,14 +1966,33 @@ class Cartesian(object):
         style = toyplot.style.combine(toyplot.require.style(style))
 
         table["toyplot:stroke"] = toyplot.color.broadcast(
-            toyplot.color.near_black if stroke is None else stroke, table.shape[0], colormap=colormap, palette=palette)
+            toyplot.color.near_black if stroke is None else stroke,
+            table.shape[0],
+            colormap=colormap,
+            palette=palette)
 
         self._update_domain(table["x"], numpy.array([]))
-        self._children.append(toyplot.mark.AxisLines(table=table, coordinates=["x"], axes=[
-                              "x"], stroke="toyplot:stroke", opacity="opacity", title="title", style=style))
+        self._children.append(
+            toyplot.mark.AxisLines(
+                table=table,
+                coordinates=["x"],
+                axes=["x"],
+                stroke="toyplot:stroke",
+                opacity="opacity",
+                title="title",
+                style=style))
         return self._children[-1]
 
-    def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style=None, label_style=None):
+    def legend(
+            self,
+            marks,
+            bounds=None,
+            rect=None,
+            corner=None,
+            grid=None,
+            gutter=50,
+            style=None,
+            label_style=None):
         """Add a legend to the axes.
 
         Parameters
@@ -1579,7 +2044,14 @@ class Cartesian(object):
         xmin, xmax, ymin, ymax = toyplot.layout.region(
             self._xmin_range, self._xmax_range, self._ymin_range, self._ymax_range, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
         self._children.append(
-            toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style))
+            toyplot.mark.Legend(
+                xmin,
+                xmax,
+                ymin,
+                ymax,
+                marks,
+                style,
+                label_style))
         return self._children[-1]
 
 ##########################################################################
@@ -1595,7 +2067,12 @@ class Table(object):
         def __init__(self, label, style):
             self._text = label
             self._style = toyplot.style.combine(
-                {"font-weight": "bold", "stroke": "none", "text-anchor": "middle", "alignment-baseline": "middle"}, toyplot.require.style(style))
+                {
+                    "font-weight": "bold",
+                    "stroke": "none",
+                    "text-anchor": "middle",
+                    "alignment-baseline": "middle"},
+                toyplot.require.style(style))
 
         @property
         def text(self):
@@ -1652,12 +2129,14 @@ class Table(object):
         show = property(fset=_set_show)
 
         def _set_data(self, value):
-            for left, right in numpy.nditer([self._cells, value], flags=["refs_ok"], op_flags=[["readwrite"], ["readonly"]]):
+            for left, right in numpy.nditer(
+                    [self._cells, value], flags=["refs_ok"], op_flags=[["readwrite"], ["readonly"]]):
                 left[()]._data = right[()]
         data = property(fset=_set_data)
 
         def _set_title(self, value):
-            for left, right in numpy.nditer([self._cells, value], flags=["refs_ok"], op_flags=[["readwrite"], ["readonly"]]):
+            for left, right in numpy.nditer(
+                    [self._cells, value], flags=["refs_ok"], op_flags=[["readwrite"], ["readonly"]]):
                 left[()]._title = right[()]
         title = property(fset=_set_title)
 
@@ -1703,15 +2182,54 @@ class Table(object):
                 cell._row_offset = value
         row_offset = property(fset=_set_row_offset)
 
-        def axes(self, xmin=None, xmax=None, ymin=None, ymax=None, show=False, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=5, tick_length=5):
+        def axes(
+                self,
+                xmin=None,
+                xmax=None,
+                ymin=None,
+                ymax=None,
+                show=False,
+                xshow=True,
+                yshow=True,
+                label=None,
+                xlabel=None,
+                ylabel=None,
+                xticklocator=None,
+                yticklocator=None,
+                xscale="linear",
+                yscale="linear",
+                palette=None,
+                padding=5,
+                tick_length=5):
             self._table._finalize()
             left = numpy.min([cell._left for cell in self._cells.flat])
             right = numpy.max([cell._right for cell in self._cells.flat])
             top = numpy.min([cell._top for cell in self._cells.flat])
             bottom = numpy.max([cell._bottom for cell in self._cells.flat])
 
-            axes = toyplot.axes.Cartesian(left, right, top, bottom, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel,
-                                          xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self._table._parent)
+            axes = toyplot.axes.Cartesian(
+                left,
+                right,
+                top,
+                bottom,
+                xmin=xmin,
+                xmax=xmax,
+                ymin=ymin,
+                ymax=ymax,
+                show=show,
+                xshow=xshow,
+                yshow=yshow,
+                label=label,
+                xlabel=xlabel,
+                ylabel=ylabel,
+                xticklocator=xticklocator,
+                yticklocator=yticklocator,
+                xscale=xscale,
+                yscale=yscale,
+                palette=palette,
+                padding=padding,
+                tick_length=tick_length,
+                parent=self._table._parent)
             axes.coordinates.show = False
             self._table._children.append(axes)
             return axes
@@ -1805,7 +2323,13 @@ class Table(object):
             return Table.CellReference(self._table, self._cells[row])
 
         def cell(self, row, column, rowspan=1, colspan=1):
-            return Table.CellReference(self._table, self._cells[row: row + rowspan, column: column + colspan])
+            return Table.CellReference(
+                self._table,
+                self._cells[
+                    row: row +
+                    rowspan,
+                    column: column +
+                    colspan])
 
         @property
         def shape(self):
@@ -1823,7 +2347,20 @@ class Table(object):
         def cells(self):
             return Table.CellReference(self._table, self._cells)
 
-    def __init__(self, xmin_range, xmax_range, ymin_range, ymax_range, rows, columns, trows, brows, lcols, rcols, label, parent):
+    def __init__(
+            self,
+            xmin_range,
+            xmax_range,
+            ymin_range,
+            ymax_range,
+            rows,
+            columns,
+            trows,
+            brows,
+            lcols,
+            rcols,
+            label,
+            parent):
         self._xmin_range = xmin_range
         self._xmax_range = xmax_range
         self._ymin_range = ymin_range
@@ -1841,13 +2378,45 @@ class Table(object):
             label, style={"font-size": "14px", "baseline-shift": "100%"})
 
         self._hlines = numpy.empty(
-            (trows + rows + brows + 1, lcols + columns + rcols + 0), dtype=object)
+            (trows +
+             rows +
+             brows +
+             1,
+             lcols +
+             columns +
+             rcols +
+             0),
+            dtype=object)
         self._vlines = numpy.empty(
-            (trows + rows + brows + 0, lcols + columns + rcols + 1), dtype=object)
+            (trows +
+             rows +
+             brows +
+             0,
+             lcols +
+             columns +
+             rcols +
+             1),
+            dtype=object)
         self._hmask = numpy.zeros(
-            (trows + rows + brows + 1, lcols + columns + rcols + 0), dtype=bool)
+            (trows +
+             rows +
+             brows +
+             1,
+             lcols +
+             columns +
+             rcols +
+             0),
+            dtype=bool)
         self._vmask = numpy.zeros(
-            (trows + rows + brows + 0, lcols + columns + rcols + 1), dtype=bool)
+            (trows +
+             rows +
+             brows +
+             0,
+             lcols +
+             columns +
+             rcols +
+             1),
+            dtype=bool)
         self._separation = 2
         self._gstyle = {
             "stroke": toyplot.color.near_black, "stroke-width": 0.5}
@@ -1855,8 +2424,12 @@ class Table(object):
         self._rgaps = numpy.zeros(trows + rows + brows + 1)
         self._cgaps = numpy.zeros(lcols + columns + rcols + 1)
 
-        hstyle = {"font-size": "12px", "stroke": "none", "fill": toyplot.color.near_black,
-                  "alignment-baseline": "middle", "font-weight": "bold"}
+        hstyle = {
+            "font-size": "12px",
+            "stroke": "none",
+            "fill": toyplot.color.near_black,
+            "alignment-baseline": "middle",
+            "font-weight": "bold"}
         style = {"font-size": "12px", "stroke": "none", "fill":
                  toyplot.color.near_black, "alignment-baseline": "middle"}
 
@@ -1864,7 +2437,8 @@ class Table(object):
             (trows + rows + brows, lcols + columns + rcols), dtype="object")
         for row in range(trows + rows + brows):
             for column in range(lcols + columns + rcols):
-                if row < trows or row >= trows + rows or column < lcols or column >= lcols + columns:
+                if row < trows or row >= trows + \
+                        rows or column < lcols or column >= lcols + columns:
                     self._cells[row, column] = Table.Cell(
                         row, column, "center", hstyle)
                 else:
@@ -1965,27 +2539,56 @@ class Table(object):
         return Table.Region(
             self,
             self._cells[
-                self._trows: self._trows + self._rows, self._lcols + self._columns:],
+                self._trows: self._trows +
+                self._rows,
+                self._lcols +
+                self._columns:],
             self._hlines[
-                self._trows: self._trows + self._rows + 1, self._lcols + self._columns:],
+                self._trows: self._trows +
+                self._rows +
+                1,
+                self._lcols +
+                self._columns:],
             self._vlines[
-                self._trows: self._trows + self._rows, self._lcols + self._columns:],
-            self._rgaps[self._trows: self._trows + self._rows + 1],
-            self._cgaps[self._lcols + self._columns:],
+                self._trows: self._trows +
+                self._rows,
+                self._lcols +
+                self._columns:],
+            self._rgaps[
+                self._trows: self._trows +
+                self._rows +
+                1],
+            self._cgaps[
+                self._lcols +
+                self._columns:],
         )
 
     @property
     def bottom(self):
         region = Table.Region(
             self,
-            self._cells[self._trows + self._rows:,
-                        self._lcols: self._lcols + self._columns],
+            self._cells[
+                self._trows +
+                self._rows:,
+                self._lcols: self._lcols +
+                self._columns],
             self._hlines[
-                self._trows + self._rows:, self._lcols: self._lcols + self._columns],
-            self._vlines[self._trows + self._rows:,
-                         self._lcols: self._lcols + self._columns + 1],
-            self._rgaps[self._trows + self._rows:],
-            self._cgaps[self._lcols: self._lcols + self._columns],
+                self._trows +
+                self._rows:,
+                self._lcols: self._lcols +
+                self._columns],
+            self._vlines[
+                self._trows +
+                self._rows:,
+                self._lcols: self._lcols +
+                self._columns +
+                1],
+            self._rgaps[
+                self._trows +
+                self._rows:],
+            self._cgaps[
+                self._lcols: self._lcols +
+                self._columns],
         )
 
         region.left = Table.Region(
@@ -2026,7 +2629,13 @@ class Table(object):
         return Table.CellReference(self, self._cells[row])
 
     def cell(self, row, column, rowspan=1, colspan=1):
-        return Table.CellReference(self, self._cells[row: row + rowspan, column: column + colspan])
+        return Table.CellReference(
+            self,
+            self._cells[
+                row: row +
+                rowspan,
+                column: column +
+                colspan])
 
     def _finalize(self):
         if self._finalized:

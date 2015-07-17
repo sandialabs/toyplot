@@ -30,13 +30,21 @@ def _assert_content_equal(content, test_file, reference_file):
             with open(test_file, "wb") as file:
                 file.write(content)
             #raise AssertionError("Test output %s doesn't match %s." % (test_file, reference_file))
-            raise AssertionError("\n".join(list(difflib.context_diff(content.split(
-                "\n"), reference.split("\n"), lineterm="", fromfile="test", tofile="reference"))))
+            raise AssertionError(
+                "\n".join(
+                    list(
+                        difflib.context_diff(
+                            content.split("\n"),
+                            reference.split("\n"),
+                            lineterm="",
+                            fromfile="test",
+                            tofile="reference"))))
     else:
         with open(reference_file, "wb") as file:
             file.write(content)
         raise AssertionError(
-            "Created new reference file %s.  You should verify its contents before re-running the test." % (reference_file))
+            "Created new reference file %s.  You should verify its contents before re-running the test." %
+            (reference_file))
 
 
 def _assert_string_equal(content, test_file, reference_file, encoding="utf-8"):
@@ -51,12 +59,14 @@ def _assert_string_equal(content, test_file, reference_file, encoding="utf-8"):
             with open(test_file, "wb") as file:
                 file.write(content.encode(encoding))
             raise AssertionError(
-                "Test output %s doesn't match %s." % (test_file, reference_file))
+                "Test output %s doesn't match %s." %
+                (test_file, reference_file))
     else:
         with open(reference_file, "wb") as file:
             file.write(content.encode(encoding))
         raise AssertionError(
-            "Created new reference file %s.  You should verify its contents before re-running the test." % (reference_file))
+            "Created new reference file %s.  You should verify its contents before re-running the test." %
+            (reference_file))
 
 
 def _json_comparison_string(o):
@@ -75,7 +85,8 @@ def _json_comparison_string(o):
     if isinstance(o, collections.Sequence):
         return "[" + ",".join([_json_comparison_string(i) for i in o]) + "]"
     if isinstance(o, collections.Mapping):
-        return "{" + ",".join(["\"" + key + "\":" + _json_comparison_string(value) for key, value in o.items()]) + "}"
+        return "{" + ",".join(["\"" + key + "\":" + _json_comparison_string(value)
+                               for key, value in o.items()]) + "}"
     raise Exception("Unexpected value: %s" % o)
 
 
@@ -109,7 +120,9 @@ def _xml_comparison_string(element):
                 buffer.write(u" %s='%s'" % (key, format_value(value)))
 
         text = element.text if element.text is not None else ""
-        if element.tag in ["{http://www.sandia.gov/toyplot}data-table", "{http://www.sandia.gov/toyplot}axes"]:
+        if element.tag in [
+                "{http://www.sandia.gov/toyplot}data-table",
+                "{http://www.sandia.gov/toyplot}axes"]:
             text = str(_json_comparison_string(json.loads(element.text)))
         buffer.write(u">%s\n" % text)
         for child in list(element):
@@ -204,7 +217,8 @@ def assert_canvas_equal(canvas, name):
         with open(reference_file, "wb") as file:
             file.write(svg.getvalue())
         raise AssertionError(
-            "Created new reference file %s ... you should verify its contents before re-running the test." % reference_file)
+            "Created new reference file %s ... you should verify its contents before re-running the test." %
+            reference_file)
 
     # Compare the SVG representation of the canvas to the SVG reference ...
     svg_dom = xml.fromstring(svg.getvalue())
@@ -215,8 +229,15 @@ def assert_canvas_equal(canvas, name):
 
     try:
         if svg_string != reference_string:
-            raise Exception("\n".join(list(difflib.context_diff(svg_string.split(
-                "\n"), reference_string.split("\n"), lineterm="", fromfile="test svg", tofile="reference svg"))))
+            raise Exception(
+                "\n".join(
+                    list(
+                        difflib.context_diff(
+                            svg_string.split("\n"),
+                            reference_string.split("\n"),
+                            lineterm="",
+                            fromfile="test svg",
+                            tofile="reference svg"))))
     except Exception as e:
         #    if not os.path.exists("tests/diffs"):
         #      os.mkdir("tests/diffs")
@@ -229,4 +250,5 @@ def assert_canvas_equal(canvas, name):
         with open(test_file, "wb") as file:
             file.write(svg.getvalue())
         raise AssertionError(
-            "Test output %s doesn't match %s:\n%s" % (test_file, reference_file, e))
+            "Test output %s doesn't match %s:\n%s" %
+            (test_file, reference_file, e))

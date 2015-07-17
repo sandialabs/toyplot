@@ -116,7 +116,12 @@ class Explicit(TickLocator):
       Format string used to generate labels from tick locations.
     """
 
-    def __init__(self, locations=None, labels=None, titles=None, format="{:g}"):
+    def __init__(
+            self,
+            locations=None,
+            labels=None,
+            titles=None,
+            format="{:g}"):
         if locations is not None and labels is not None:
             locations = numpy.array(locations).astype("float64")
             labels = toyplot.broadcast.string(labels, len(locations))
@@ -215,7 +220,10 @@ class Extended(TickLocator):
         """
         def coverage(dmin, dmax, lmin, lmax):
             range = dmax - dmin
-            return 1 - 0.5 * (numpy.power(dmax - lmax, 2) + numpy.power(dmin - lmin, 2)) / numpy.power(0.1 * range, 2)
+            return 1 - 0.5 * (numpy.power(dmax - lmax,
+                                          2) + numpy.power(dmin - lmin,
+                                                           2)) / numpy.power(0.1 * range,
+                                                                             2)
 
         def coverage_max(dmin, dmax, span):
             range = dmax - dmin
@@ -283,7 +291,8 @@ class Extended(TickLocator):
                             step = j * q * numpy.power(10, z)
                             cm = coverage_max(dmin, dmax, step * (k - 1.0))
 
-                            if w[0] * sm + w[1] * cm + w[2] * dm + w[3] < best_score:
+                            if w[0] * sm + w[1] * cm + \
+                                    w[2] * dm + w[3] < best_score:
                                 break
 
                             min_start = numpy.floor(
@@ -294,7 +303,9 @@ class Extended(TickLocator):
                                 z = z + 1
                                 break
 
-                            for start in range(int(min_start), int(max_start) + 1):
+                            for start in range(
+                                    int(min_start),
+                                    int(max_start) + 1):
                                 lmin = start * (step / j)
                                 lmax = lmin + step * (k - 1.0)
                                 lstep = step
@@ -307,7 +318,9 @@ class Extended(TickLocator):
                                 score = w[0] * s + w[1] * \
                                     c + w[2] * d + w[3] * l
 
-                                if score > best_score and (not only_inside or (lmin >= dmin and lmax <= dmax)):
+                                if score > best_score and (
+                                    not only_inside or (
+                                        lmin >= dmin and lmax <= dmax)):
                                     best_score = score
                                     best = (lmin, lmax, lstep, q, k)
                             z = z + 1
@@ -483,8 +496,14 @@ class Log(TickLocator):
           Titles for each tick location.  Typically, backends render titles as tooltips.
         """
         if domain_min < 0 and domain_max < 0:
-            negative_exponents = numpy.arange(numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(
-                self._base)), numpy.floor(numpy.log10(numpy.abs(domain_max)) / numpy.log10(self._base)) - 1, -1)
+            negative_exponents = numpy.arange(
+                numpy.ceil(
+                    numpy.log10(
+                        numpy.abs(domain_min)) / numpy.log10(
+                        self._base)), numpy.floor(
+                    numpy.log10(
+                        numpy.abs(domain_max)) / numpy.log10(
+                            self._base)) - 1, -1)
         elif domain_min < 0:
             negative_exponents = numpy.arange(
                 numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)), -1, -1)
@@ -498,11 +517,24 @@ class Log(TickLocator):
             linear_locations = []
 
         if domain_min > 0 and domain_max > 0:
-            positive_exponents = numpy.arange(numpy.floor(numpy.log10(
-                domain_min) / numpy.log10(self._base)), numpy.ceil(numpy.log10(domain_max) / numpy.log10(self._base)) + 1)
+            positive_exponents = numpy.arange(
+                numpy.floor(
+                    numpy.log10(domain_min) /
+                    numpy.log10(
+                        self._base)),
+                numpy.ceil(
+                    numpy.log10(domain_max) /
+                    numpy.log10(
+                        self._base)) +
+                1)
         elif domain_max > 0:
-            positive_exponents = numpy.arange(0, numpy.ceil(
-                numpy.log10(domain_max) / numpy.log10(self._base)) + 1) if domain_max != 0 else []
+            positive_exponents = numpy.arange(
+                0,
+                numpy.ceil(
+                    numpy.log10(domain_max) /
+                    numpy.log10(
+                        self._base)) +
+                1) if domain_max != 0 else []
         else:
             positive_exponents = []
         positive_locations = numpy.power(self._base, positive_exponents)
@@ -510,11 +542,26 @@ class Log(TickLocator):
         # print domain_min, negative_exponents, linear_locations,
         # positive_exponents, domain_max
 
-        negative_labels = ["-" + _log_format(self._base, int(exponent), location, self._format)
-                           for exponent, location in zip(negative_exponents, negative_locations)]
+        negative_labels = [
+            "-" +
+            _log_format(
+                self._base,
+                int(exponent),
+                location,
+                self._format) for exponent,
+            location in zip(
+                negative_exponents,
+                negative_locations)]
         linear_labels = [str(location) for location in linear_locations]
-        positive_labels = [_log_format(self._base, int(exponent), location, self._format)
-                           for exponent, location in zip(positive_exponents, positive_locations)]
+        positive_labels = [
+            _log_format(
+                self._base,
+                int(exponent),
+                location,
+                self._format) for exponent,
+            location in zip(
+                positive_exponents,
+                positive_locations)]
 
         locations = numpy.concatenate(
             (negative_locations, linear_locations, positive_locations))

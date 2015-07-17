@@ -18,7 +18,13 @@ def _require_ffmpeg():
     raise Exception("An ffmpeg executable is required.")  # pragma: no cover
 
 
-def render(canvas, filename, width=None, height=None, scale=None, progress=None):
+def render(
+        canvas,
+        filename,
+        width=None,
+        height=None,
+        scale=None,
+        progress=None):
     """Render a canvas as an MPEG-4 video.
 
     By default, canvas drawing units are mapped directly to pixels in the output
@@ -63,8 +69,13 @@ def render(canvas, filename, width=None, height=None, scale=None, progress=None)
         filename,
     ]
     ffmpeg = subprocess.Popen(
-        command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    for frame, png in enumerate(toyplot.png.render_frames(canvas=canvas, width=width, height=height, scale=scale)):
+        command,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    for frame, png in enumerate(
+            toyplot.png.render_frames(
+            canvas=canvas, width=width, height=height, scale=scale)):
         if progress is not None:
             progress(frame)
         ffmpeg.stdin.write(png)

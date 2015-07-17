@@ -38,8 +38,12 @@ def step_impl(context):
 
     nose.tools.assert_equal(
         selenium.mock_calls[0], ("webdriver.Firefox", (), {}))
-    nose.tools.assert_equal(selenium.mock_calls[
-                            1], ("webdriver.Firefox().set_window_size", (900.0, 900.0), {}))
+    nose.tools.assert_equal(
+        selenium.mock_calls[1],
+        ("webdriver.Firefox().set_window_size",
+         (900.0,
+          900.0),
+         {}))
     nose.tools.assert_equal(
         selenium.mock_calls[2][0], "webdriver.Firefox().get")
     nose.tools.assert_true(selenium.mock_calls[2][1][0], "file://")

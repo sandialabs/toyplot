@@ -51,7 +51,14 @@ def convert(value, target, default=None, reference=None):
             return 0
         value, units = re.match(r"([^a-zA-Z%]+)([a-zA-Z%]+)\Z", value).groups()
         value = (float(value), units)
-    if not (isinstance(value, tuple) and len(value) == 2 and isinstance(value[0], numbers.Number) and isinstance(value[1], toyplot.compatibility.string_type)):
+    if not (
+        isinstance(
+            value,
+            tuple) and len(value) == 2 and isinstance(
+            value[0],
+            numbers.Number) and isinstance(
+                value[1],
+            toyplot.compatibility.string_type)):
         raise ValueError(
             "Value must be a number, string or (number, string) tuple.")
     value, units = value

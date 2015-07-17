@@ -12,7 +12,16 @@ import toyplot.compatibility
 import toyplot.units
 
 
-def region(xmin, xmax, ymin, ymax, bounds=None, rect=None, corner=None, grid=None, gutter=40):
+def region(
+        xmin,
+        xmax,
+        ymin,
+        ymax,
+        bounds=None,
+        rect=None,
+        corner=None,
+        grid=None,
+        gutter=40):
     """Specify a rectangular target region relative to a parent region.
 
     Parameters
@@ -47,7 +56,12 @@ def region(xmin, xmax, ymin, ymax, bounds=None, rect=None, corner=None, grid=Non
     # Specify explicit bounds for the region
     if bounds is not None:
         if isinstance(bounds, tuple) and len(bounds) == 4:
-            return (convert(xmin, xmax, bounds[0]), convert(xmin, xmax, bounds[1]), convert(ymin, ymax, bounds[2]), convert(ymin, ymax, bounds[3]))
+            return (
+                convert(
+                    xmin, xmax, bounds[0]), convert(
+                    xmin, xmax, bounds[1]), convert(
+                    ymin, ymax, bounds[2]), convert(
+                    ymin, ymax, bounds[3]))
         raise TypeError(
             "bounds parameter must be an (xmin, xmax, ymin, ymax) tuple.")
     # Specify an explicit rectangle for the region
@@ -73,21 +87,75 @@ def region(xmin, xmax, ymin, ymax, bounds=None, rect=None, corner=None, grid=Non
         else:
             raise ValueError("Unrecognized corner type")
         if position == "top":
-            return ((xmin + xmax - width) / 2, (xmin + xmax + width) / 2, ymin + inset, ymin + inset + height)
+            return ((xmin + xmax - width) / 2,
+                    (xmin + xmax + width) / 2,
+                    ymin + inset,
+                    ymin + inset + height)
         elif position == "top-right":
-            return (xmax - width - inset, xmax - inset, ymin + inset, ymin + inset + height)
+            return (
+                xmax -
+                width -
+                inset,
+                xmax -
+                inset,
+                ymin +
+                inset,
+                ymin +
+                inset +
+                height)
         elif position == "right":
-            return (xmax - width - inset, xmax - inset, (ymin + ymax - height) / 2, (ymin + ymax + height) / 2)
+            return (
+                xmax - width - inset,
+                xmax - inset,
+                (ymin + ymax - height) / 2,
+                (ymin + ymax + height) / 2)
         elif position == "bottom-right":
-            return (xmax - width - inset, xmax - inset, ymax - inset - height, ymax - inset)
+            return (
+                xmax -
+                width -
+                inset,
+                xmax -
+                inset,
+                ymax -
+                inset -
+                height,
+                ymax -
+                inset)
         elif position == "bottom":
-            return ((xmin + xmax - width) / 2, (xmin + xmax + width) / 2, ymax - inset - height, ymax - inset)
+            return ((xmin + xmax - width) / 2,
+                    (xmin + xmax + width) / 2,
+                    ymax - inset - height,
+                    ymax - inset)
         elif position == "bottom-left":
-            return (xmin + inset, xmin + inset + width, ymax - inset - height, ymax - inset)
+            return (
+                xmin +
+                inset,
+                xmin +
+                inset +
+                width,
+                ymax -
+                inset -
+                height,
+                ymax -
+                inset)
         elif position == "left":
-            return (xmin + inset, xmin + inset + width, (ymin + ymax - height) / 2, (ymin + ymax + height) / 2)
+            return (
+                xmin + inset,
+                xmin + inset + width,
+                (ymin + ymax - height) / 2,
+                (ymin + ymax + height) / 2)
         elif position == "top-left":
-            return (xmin + inset, xmin + inset + width, ymin + inset, ymin + inset + height)
+            return (
+                xmin +
+                inset,
+                xmin +
+                inset +
+                width,
+                ymin +
+                inset,
+                ymin +
+                inset +
+                height)
         else:
             raise ValueError("Unrecognized corner")
     # Choose a cell from an MxN grid, with optional column/row spanning.

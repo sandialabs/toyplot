@@ -35,7 +35,11 @@ setup(
     maintainer="Timothy M. Shead",
     maintainer_email="tshead@sandia.gov",
     url="http://toyplot.readthedocs.org",
-    version=re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                      open("toyplot/__init__.py", "r").read(), re.M).group(1),
+    version=re.search(
+        r"^__version__ = ['\"]([^'\"]*)['\"]",
+        open(
+            "toyplot/__init__.py",
+            "r").read(),
+        re.M).group(1),
     packages=find_packages(),
 )

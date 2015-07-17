@@ -58,7 +58,8 @@ def render(table, fobj=None, hlines=None):
     for row_index in numpy.arange(len(table)):
         if row_index in hlines:
             latex += "\\hline\n"
-        for index, (iterator, formatter) in enumerate(zip(iterators, formatters)):
+        for index, (iterator, formatter) in enumerate(
+                zip(iterators, formatters)):
             value = next(iterator)
             if index != 0:
                 latex += " & "

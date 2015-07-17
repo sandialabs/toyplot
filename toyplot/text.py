@@ -19,7 +19,11 @@ def extents(text, angle, style):
 
     font_size = toyplot.units.convert(style["font-size"], target="px")
     anchor_shift = toyplot.units.convert(
-        style.get("-toyplot-anchor-shift", "0px"), target="px", reference=font_size)
+        style.get(
+            "-toyplot-anchor-shift",
+            "0px"),
+        target="px",
+        reference=font_size)
     text_anchor = style["text-anchor"]
     baseline_shift = toyplot.units.convert(
         style.get("baseline-shift", "0px"), target="px", reference=font_size)
@@ -77,8 +81,10 @@ def extents(text, angle, style):
         corner2.T[0], numpy.minimum(corner3.T[0], corner4.T[0])))
     right = numpy.maximum(corner1.T[0], numpy.maximum(
         corner2.T[0], numpy.maximum(corner3.T[0], corner4.T[0])))
-    top = -numpy.maximum(corner1.T[1], numpy.maximum(corner2.T[1],
-                                                     numpy.maximum(corner3.T[1], corner4.T[1])))
+    top = -numpy.maximum(corner1.T[1],
+                         numpy.maximum(corner2.T[1],
+                                       numpy.maximum(corner3.T[1],
+                                                     corner4.T[1])))
     bottom = - \
         numpy.minimum(corner1.T[1], numpy.minimum(
             corner2.T[1], numpy.minimum(corner3.T[1], corner4.T[1])))

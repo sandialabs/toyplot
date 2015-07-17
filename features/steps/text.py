@@ -36,8 +36,14 @@ def step_impl(context):
 
 @then(u'text can be aligned with positive anchor shift')
 def step_impl(context):
-    context.axes.text(0, 0, "Text!", style={
-                      "font-size": "24px", "text-anchor": "middle", "-toyplot-anchor-shift": "10px"})
+    context.axes.text(
+        0,
+        0,
+        "Text!",
+        style={
+            "font-size": "24px",
+            "text-anchor": "middle",
+            "-toyplot-anchor-shift": "10px"})
     context.axes.scatterplot(0, 0, color="black", size=7)
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-anchor-shift-positive")
@@ -45,8 +51,14 @@ def step_impl(context):
 
 @then(u'text can be aligned with negative anchor shift')
 def step_impl(context):
-    context.axes.text(0, 0, "Text!", style={
-                      "font-size": "24px", "text-anchor": "middle", "-toyplot-anchor-shift": "-10px"})
+    context.axes.text(
+        0,
+        0,
+        "Text!",
+        style={
+            "font-size": "24px",
+            "text-anchor": "middle",
+            "-toyplot-anchor-shift": "-10px"})
     context.axes.scatterplot(0, 0, color="black", size=7)
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-anchor-shift-negative")
@@ -55,7 +67,12 @@ def step_impl(context):
 @then(u'text can be aligned with hanging alignment')
 def step_impl(context):
     context.axes.text(
-        0, 0, "Text!", style={"font-size": "24px", "alignment-baseline": "hanging"})
+        0,
+        0,
+        "Text!",
+        style={
+            "font-size": "24px",
+            "alignment-baseline": "hanging"})
     context.axes.scatterplot(0, 0, color="black", size=7)
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-alignment-baseline-hanging")
@@ -64,7 +81,12 @@ def step_impl(context):
 @then(u'text can be aligned with central alignment')
 def step_impl(context):
     context.axes.text(
-        0, 0, "Text!", style={"font-size": "24px", "alignment-baseline": "central"})
+        0,
+        0,
+        "Text!",
+        style={
+            "font-size": "24px",
+            "alignment-baseline": "central"})
     context.axes.scatterplot(0, 0, color="black", size=7)
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-alignment-baseline-central")
@@ -73,7 +95,12 @@ def step_impl(context):
 @then(u'text can be aligned with middle alignment')
 def step_impl(context):
     context.axes.text(
-        0, 0, "Text!", style={"font-size": "24px", "alignment-baseline": "middle"})
+        0,
+        0,
+        "Text!",
+        style={
+            "font-size": "24px",
+            "alignment-baseline": "middle"})
     context.axes.scatterplot(0, 0, color="black", size=7)
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-alignment-baseline-middle")
@@ -82,7 +109,12 @@ def step_impl(context):
 @then(u'text can be aligned with alphabetic alignment')
 def step_impl(context):
     context.axes.text(
-        0, 0, "Text!", style={"font-size": "24px", "alignment-baseline": "alphabetic"})
+        0,
+        0,
+        "Text!",
+        style={
+            "font-size": "24px",
+            "alignment-baseline": "alphabetic"})
     context.axes.scatterplot(0, 0, color="black", size=7)
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-alignment-baseline-alphabetic")

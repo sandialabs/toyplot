@@ -63,7 +63,8 @@ def step_impl(context):
         context.canvas, "axes-cartesian-x-spine-show")
 
 
-@then(u'the cartesian axes can be rendered with x spine at an explicit position')
+@then(
+    u'the cartesian axes can be rendered with x spine at an explicit position')
 def step_impl(context):
     context.axes.x.spine.position = 0
     nose.tools.assert_equal(context.axes.x.spine.position, 0)
@@ -113,7 +114,8 @@ def step_impl(context):
         context.canvas, "axes-cartesian-x-ticks-style")
 
 
-@then(u'the cartesian axes can be rendered with x ticks controlled by a locator')
+@then(
+    u'the cartesian axes can be rendered with x ticks controlled by a locator')
 def step_impl(context):
     context.axes.x.ticks.show = True
     locator = toyplot.locator.Basic(count=11)
@@ -123,7 +125,8 @@ def step_impl(context):
         context.canvas, "axes-cartesian-x-ticks-locator")
 
 
-@then(u'the cartesian axes can be rendered with x axis per-tick styles identified by index')
+@then(
+    u'the cartesian axes can be rendered with x axis per-tick styles identified by index')
 def step_impl(context):
     context.axes.x.ticks.show = True
     context.axes.x.ticks.tick(index=0).style = {"stroke": "red"}
@@ -133,7 +136,8 @@ def step_impl(context):
         context.canvas, "axes-cartesian-x-ticks-tick-index-style")
 
 
-@then(u'the cartesian axes can be rendered with x axis per-tick styles identified by value')
+@then(
+    u'the cartesian axes can be rendered with x axis per-tick styles identified by value')
 def step_impl(context):
     context.axes.x.ticks.show = True
     context.axes.x.ticks.tick(value=0).style = {"stroke": "red"}
@@ -173,7 +177,8 @@ def step_impl(context):
         context.canvas, "axes-cartesian-x-ticks-labels-style")
 
 
-@then(u'the cartesian axes can be rendered with x axis per-tick-label styles identified by index')
+@then(
+    u'the cartesian axes can be rendered with x axis per-tick-label styles identified by index')
 def step_impl(context):
     context.axes.x.ticks.labels.label(index=0).style = {"fill": "red"}
     nose.tools.assert_equal(
@@ -182,7 +187,8 @@ def step_impl(context):
         context.canvas, "axes-cartesian-x-ticks-labels-label-index-style")
 
 
-@then(u'the cartesian axes can be rendered with x axis per-tick-label styles identified by value')
+@then(
+    u'the cartesian axes can be rendered with x axis per-tick-label styles identified by value')
 def step_impl(context):
     context.axes.x.ticks.labels.label(value=0).style = {"fill": "red"}
     nose.tools.assert_equal(
@@ -235,7 +241,8 @@ def step_impl(context):
         context.canvas, "axes-cartesian-y-spine-show")
 
 
-@then(u'the cartesian axes can be rendered with y spine at an explicit position')
+@then(
+    u'the cartesian axes can be rendered with y spine at an explicit position')
 def step_impl(context):
     context.axes.y.spine.position = 10
     nose.tools.assert_equal(context.axes.y.spine.position, 10)
@@ -285,7 +292,8 @@ def step_impl(context):
         context.canvas, "axes-cartesian-y-ticks-style")
 
 
-@then(u'the cartesian axes can be rendered with y ticks controlled by a locator')
+@then(
+    u'the cartesian axes can be rendered with y ticks controlled by a locator')
 def step_impl(context):
     context.axes.y.ticks.show = True
     locator = toyplot.locator.Basic(count=5)
@@ -295,7 +303,8 @@ def step_impl(context):
         context.canvas, "axes-cartesian-y-ticks-locator")
 
 
-@then(u'the cartesian axes can be rendered with y axis per-tick styles identified by index')
+@then(
+    u'the cartesian axes can be rendered with y axis per-tick styles identified by index')
 def step_impl(context):
     context.axes.y.ticks.show = True
     context.axes.y.ticks.tick(index=0).style = {"stroke": "red"}
@@ -305,7 +314,8 @@ def step_impl(context):
         context.canvas, "axes-cartesian-y-ticks-tick-index-style")
 
 
-@then(u'the cartesian axes can be rendered with y axis per-tick styles identified by value')
+@then(
+    u'the cartesian axes can be rendered with y axis per-tick styles identified by value')
 def step_impl(context):
     context.axes.y.ticks.show = True
     context.axes.y.ticks.tick(value=0).style = {"stroke": "red"}
@@ -345,7 +355,8 @@ def step_impl(context):
         context.canvas, "axes-cartesian-y-ticks-labels-style")
 
 
-@then(u'the cartesian axes can be rendered with y axis per-tick-label styles identified by index')
+@then(
+    u'the cartesian axes can be rendered with y axis per-tick-label styles identified by index')
 def step_impl(context):
     context.axes.y.ticks.labels.label(index=0).style = {"fill": "red"}
     nose.tools.assert_equal(
@@ -354,7 +365,8 @@ def step_impl(context):
         context.canvas, "axes-cartesian-y-ticks-labels-label-index-style")
 
 
-@then(u'the cartesian axes can be rendered with y axis per-tick-label styles identified by value')
+@then(
+    u'the cartesian axes can be rendered with y axis per-tick-label styles identified by value')
 def step_impl(context):
     context.axes.y.ticks.labels.label(value=0).style = {"fill": "red"}
     nose.tools.assert_equal(
@@ -718,8 +730,11 @@ def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(50, 100))
     context.position = numpy.linspace(0, 1)
-    context.boundaries = numpy.column_stack((numpy.min(observations, axis=1), numpy.mean(
-        observations, axis=1), numpy.max(observations, axis=1)))
+    context.boundaries = numpy.column_stack(
+        (numpy.min(
+            observations, axis=1), numpy.mean(
+            observations, axis=1), numpy.max(
+                observations, axis=1)))
 
 
 @when(u'creating a fill plot with one boundary')
@@ -727,7 +742,8 @@ def step_impl(context):
     context.canvas, axes, mark = toyplot.fill(context.boundaries.T[1])
 
 
-@then(u'the result should be a fill plot between the boundary and the origin with implicit x')
+@then(
+    u'the result should be a fill plot between the boundary and the origin with implicit x')
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-fill-one-boundary")
@@ -762,7 +778,8 @@ def step_impl(context):
     context.canvas, axes, mark = toyplot.fill(context.boundaries)
 
 
-@then(u'the result should be multiple fill series between the boundaries with implicit x')
+@then(
+    u'the result should be multiple fill series between the boundaries with implicit x')
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-boundaries")
@@ -786,7 +803,8 @@ def step_impl(context):
         context.position, context.boundaries, along="y")
 
 
-@then(u'the result should be multiple fill series between the boundaries along y')
+@then(
+    u'the result should be multiple fill series between the boundaries along y')
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-boundaries-position-along-y")
@@ -798,7 +816,8 @@ def step_impl(context):
         context.boundaries, title=["1st half", "2nd half"])
 
 
-@then(u'the result should be multiple fill series between the boundaries with titles')
+@then(
+    u'the result should be multiple fill series between the boundaries with titles')
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-boundaries-titles")
@@ -819,7 +838,8 @@ def step_impl(context):
         context.magnitudes.T[0], baseline="stacked")
 
 
-@then(u'the result should be one fill series stacked above the origin with implicit x')
+@then(
+    u'the result should be one fill series stacked above the origin with implicit x')
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-fill-one-magnitude")
@@ -843,7 +863,8 @@ def step_impl(context):
         context.magnitudes, baseline="stacked")
 
 
-@then(u'the result should be multiple fill series stacked above the origin with implicit x')
+@then(
+    u'the result should be multiple fill series stacked above the origin with implicit x')
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-magnitudes")
@@ -867,7 +888,8 @@ def step_impl(context):
         context.position, context.magnitudes, baseline="stacked", along="y")
 
 
-@then(u'the result should be multiple fill series stacked above the origin along y')
+@then(
+    u'the result should be multiple fill series stacked above the origin along y')
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-magnitudes-position-along-y")
@@ -876,10 +898,12 @@ def step_impl(context):
 @when(u'creating a fill plot with multiple magnitudes and per-series titles')
 def step_impl(context):
     context.canvas, axes, mark = toyplot.fill(
-        context.position, context.magnitudes, baseline="stacked", title=["1st half", "2nd half"])
+        context.position, context.magnitudes, baseline="stacked", title=[
+            "1st half", "2nd half"])
 
 
-@then(u'the result should be multiple fill series stacked above the origin with titles')
+@then(
+    u'the result should be multiple fill series stacked above the origin with titles')
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-magnitudes-position-titles")
@@ -891,7 +915,8 @@ def step_impl(context):
         context.magnitudes, baseline="symmetric")
 
 
-@then(u'the result should be multiple fill series stacked with symmetric baseline')
+@then(
+    u'the result should be multiple fill series stacked with symmetric baseline')
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-magnitudes-symmetric-baseline")
@@ -903,7 +928,8 @@ def step_impl(context):
         context.magnitudes, baseline="wiggle")
 
 
-@then(u'the result should be multiple fill series stacked with wiggle baseline')
+@then(
+    u'the result should be multiple fill series stacked with wiggle baseline')
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-magnitudes-wiggle-baseline")

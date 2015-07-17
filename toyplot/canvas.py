@@ -37,7 +37,8 @@ class AnimationFrame(object):
         self._changes[self._end]
 
     def __repr__(self):
-        return "<toyplot.canvas.AnimationFrame %s %.2f %.2f>" % (self._index, self._begin, self._end)
+        return "<toyplot.canvas.AnimationFrame %s %.2f %.2f>" % (
+            self._index, self._begin, self._end)
 
     def index(self):
         """Return the current animation frame index.
@@ -76,7 +77,12 @@ class AnimationFrame(object):
         index: zero-based index of the datum to modify
         style: dict containing CSS style information
         """
-        if not isinstance(mark, (toyplot.mark.BarBoundaries, toyplot.mark.BarMagnitudes, toyplot.mark.Plot, toyplot.mark.Text)):
+        if not isinstance(
+            mark,
+            (toyplot.mark.BarBoundaries,
+             toyplot.mark.BarMagnitudes,
+             toyplot.mark.Plot,
+             toyplot.mark.Text)):
             raise ValueError("Cannot set datum style for %s." % type(mark))
         self._changes[self._begin][
             "set-datum-style"].append((mark, series, datum, style))
@@ -132,8 +138,18 @@ class Canvas(object):
             width, "px", default="px") if width is not None else 600
         self._height = toyplot.units.convert(
             height, "px", default="px") if height is not None else self._width
-        self._style = toyplot.style.combine({"background-color": "transparent", "fill": toyplot.color.near_black, "fill-opacity": 1.0, "font-family":
-                                             "helvetica", "font-size": "12px", "opacity": 1.0, "stroke": toyplot.color.near_black, "stroke-opacity": 1.0, "stroke-width": 1.0}, style)
+        self._style = toyplot.style.combine(
+            {
+                "background-color": "transparent",
+                "fill": toyplot.color.near_black,
+                "fill-opacity": 1.0,
+                "font-family": "helvetica",
+                "font-size": "12px",
+                "opacity": 1.0,
+                "stroke": toyplot.color.near_black,
+                "stroke-opacity": 1.0,
+                "stroke-width": 1.0},
+            style)
         self._animation = collections.defaultdict(
             lambda: collections.defaultdict(list))
         self._children = []
@@ -144,7 +160,12 @@ class Canvas(object):
     def _repr_html_(self):
         import toyplot.html
         import xml.etree.ElementTree as xml
-        return toyplot.compatibility.unicode_type(xml.tostring(toyplot.html.render(self), encoding="utf-8", method="html"), encoding="utf-8")
+        return toyplot.compatibility.unicode_type(
+            xml.tostring(
+                toyplot.html.render(self),
+                encoding="utf-8",
+                method="html"),
+            encoding="utf-8")
 
     def animate(self, frames, callback=None):
         """Generate a collection of animation frames, calling a callback to store an explicit representation of what changes at each frame.
@@ -206,7 +227,30 @@ class Canvas(object):
             if self in Canvas._autorender_list:
                 Canvas._autorender_list.remove(self)
 
-    def axes(self, bounds=None, rect=None, corner=None, grid=None, gutter=50, xmin=None, xmax=None, ymin=None, ymax=None, show=True, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xticklocator=None, yticklocator=None, xscale="linear", yscale="linear", palette=None, padding=10, tick_length=5):
+    def axes(
+            self,
+            bounds=None,
+            rect=None,
+            corner=None,
+            grid=None,
+            gutter=50,
+            xmin=None,
+            xmax=None,
+            ymin=None,
+            ymax=None,
+            show=True,
+            xshow=True,
+            yshow=True,
+            label=None,
+            xlabel=None,
+            ylabel=None,
+            xticklocator=None,
+            yticklocator=None,
+            xscale="linear",
+            yscale="linear",
+            palette=None,
+            padding=10,
+            tick_length=5):
         """Add a set of 2D axes to the canvas.
 
         Parameters
@@ -240,11 +284,42 @@ class Canvas(object):
         """
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-        self._children.append(toyplot.axes.Cartesian(xmin_range, xmax_range, ymin_range, ymax_range, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label,
-                                                     xlabel=xlabel, ylabel=ylabel, xticklocator=xticklocator, yticklocator=yticklocator, xscale=xscale, yscale=yscale, palette=palette, padding=padding, tick_length=tick_length, parent=self))
+        self._children.append(
+            toyplot.axes.Cartesian(
+                xmin_range,
+                xmax_range,
+                ymin_range,
+                ymax_range,
+                xmin=xmin,
+                xmax=xmax,
+                ymin=ymin,
+                ymax=ymax,
+                show=show,
+                xshow=xshow,
+                yshow=yshow,
+                label=label,
+                xlabel=xlabel,
+                ylabel=ylabel,
+                xticklocator=xticklocator,
+                yticklocator=yticklocator,
+                xscale=xscale,
+                yscale=yscale,
+                palette=palette,
+                padding=padding,
+                tick_length=tick_length,
+                parent=self))
         return self._children[-1]
 
-    def legend(self, marks, bounds=None, rect=None, corner=None, grid=None, gutter=50, style=None, label_style=None):
+    def legend(
+            self,
+            marks,
+            bounds=None,
+            rect=None,
+            corner=None,
+            grid=None,
+            gutter=50,
+            style=None,
+            label_style=None):
         """Add a legend to the canvas.
 
         Parameters
@@ -297,10 +372,28 @@ class Canvas(object):
         xmin, xmax, ymin, ymax = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
         self._children.append(
-            toyplot.mark.Legend(xmin, xmax, ymin, ymax, marks, style, label_style))
+            toyplot.mark.Legend(
+                xmin,
+                xmax,
+                ymin,
+                ymax,
+                marks,
+                style,
+                label_style))
         return self._children[-1]
 
-    def matrix(self, matrix, label=None, step=1, colormap=None, palette=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
+    def matrix(
+            self,
+            matrix,
+            label=None,
+            step=1,
+            colormap=None,
+            palette=None,
+            bounds=None,
+            rect=None,
+            corner=None,
+            grid=None,
+            gutter=50):
         """Add a matrix visualization to the canvas.
 
         Parameters
@@ -320,18 +413,31 @@ class Canvas(object):
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-        table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, trows=1, brows=0,
-                                   lcols=1, rcols=0, rows=matrix.shape[0], columns=matrix.shape[1], label=label, parent=self)
+        table = toyplot.axes.Table(
+            xmin_range,
+            xmax_range,
+            ymin_range,
+            ymax_range,
+            trows=1,
+            brows=0,
+            lcols=1,
+            rcols=0,
+            rows=matrix.shape[0],
+            columns=matrix.shape[1],
+            label=label,
+            parent=self)
 
         table.top.row(0).height = 20
         table.left.column(0).width = 20
 
         table.left.column(0).align = "right"
-        for i, label, title in zip(*toyplot.locator.Integer(step=step).ticks(0, matrix.shape[0] - 1)):
+        for i, label, title in zip(
+                *toyplot.locator.Integer(step=step).ticks(0, matrix.shape[0] - 1)):
             table.left.cell(i, 0).data = label
             #table.left.cell(i, 0).title = title
 
-        for j, label, title in zip(*toyplot.locator.Integer(step=step).ticks(0, matrix.shape[1] - 1)):
+        for j, label, title in zip(
+                *toyplot.locator.Integer(step=step).ticks(0, matrix.shape[1] - 1)):
             table.top.cell(0, j).data = label
             #table.top.cell(0, j).title = title
 
@@ -344,7 +450,21 @@ class Canvas(object):
         self._children.append(table)
         return table
 
-    def table(self, data=None, rows=None, columns=None, hrows=None, brows=None, lcols=None, rcols=None, label=None, bounds=None, rect=None, corner=None, grid=None, gutter=50):
+    def table(
+            self,
+            data=None,
+            rows=None,
+            columns=None,
+            hrows=None,
+            brows=None,
+            lcols=None,
+            rcols=None,
+            label=None,
+            bounds=None,
+            rect=None,
+            corner=None,
+            grid=None,
+            gutter=50):
         """Add a set of table axes to the canvas.
 
         Parameters
@@ -374,8 +494,19 @@ class Canvas(object):
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-        table = toyplot.axes.Table(xmin_range, xmax_range, ymin_range, ymax_range, rows=rows,
-                                   columns=columns, label=label, trows=hrows, brows=brows, lcols=lcols, rcols=rcols, parent=self)
+        table = toyplot.axes.Table(
+            xmin_range,
+            xmax_range,
+            ymin_range,
+            ymax_range,
+            rows=rows,
+            columns=columns,
+            label=label,
+            trows=hrows,
+            brows=brows,
+            lcols=lcols,
+            rcols=rcols,
+            parent=self)
 
         if data is not None:
             for index, (key, column) in enumerate(data.items()):
@@ -400,7 +531,18 @@ class Canvas(object):
         self._children.append(table)
         return table
 
-    def text(self, x, y, text, angle=0.0, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None):
+    def text(
+            self,
+            x,
+            y,
+            text,
+            angle=0.0,
+            fill=None,
+            colormap=None,
+            palette=None,
+            opacity=1.0,
+            title=None,
+            style=None):
         """Add text to the canvas.
 
         Parameters
@@ -428,14 +570,35 @@ class Canvas(object):
         table["angle"] = toyplot.broadcast.scalar(angle, table.shape[0])
         table["fill"] = toyplot.broadcast.object(fill, table.shape[0])
         table["toyplot:fill"] = toyplot.color.broadcast(
-            toyplot.color.near_black if fill is None else fill, table.shape[0], colormap=colormap, palette=palette)
+            toyplot.color.near_black if fill is None else fill,
+            table.shape[0],
+            colormap=colormap,
+            palette=palette)
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.style.combine(
-            {"font-weight": "normal", "stroke": "none", "text-anchor": "middle", "alignment-baseline": "middle"}, toyplot.require.style(style))
+            {
+                "font-weight": "normal",
+                "stroke": "none",
+                "text-anchor": "middle",
+                "alignment-baseline": "middle"},
+            toyplot.require.style(style))
 
-        self._children.append(toyplot.mark.Text(table=table, coordinates=["x", "y"], axes=[
-                              "x", "y"], text="text", angle="angle", fill="toyplot:fill", opacity="opacity", title="title", style=style))
+        self._children.append(
+            toyplot.mark.Text(
+                table=table,
+                coordinates=[
+                    "x",
+                    "y"],
+                axes=[
+                    "x",
+                    "y"],
+                text="text",
+                angle="angle",
+                fill="toyplot:fill",
+                opacity="opacity",
+                title="title",
+                style=style))
         return self._children[-1]
 
     def time(self, begin, end, index=None):
@@ -462,7 +625,8 @@ class Canvas(object):
 
     def _pixel_scale(self, width=None, height=None, scale=None):
         """Return a scale factor to convert this canvas to a target width or height in pixels."""
-        if numpy.count_nonzero([width is not None, height is not None, scale is not None]) > 1:
+        if numpy.count_nonzero(
+                [width is not None, height is not None, scale is not None]) > 1:
             raise ValueError("Specify only one of width, height, or scale.")
         if width is not None:
             scale = width / self._width
@@ -474,7 +638,8 @@ class Canvas(object):
 
     def _point_scale(self, width=None, height=None, scale=None):
         """Return a scale factor to convert this canvas to a target width or height in points."""
-        if numpy.count_nonzero([width is not None, height is not None, scale is not None]) > 1:
+        if numpy.count_nonzero(
+                [width is not None, height is not None, scale is not None]) > 1:
             raise ValueError("Specify only one of width, height, or scale.")
 
         if width is not None:

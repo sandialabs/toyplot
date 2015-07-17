@@ -39,7 +39,11 @@ class Table(object):
 
         if data is not None:
             # Input data for which an explicit column ordering is known.
-            if isinstance(data, (collections.OrderedDict, toyplot.data.Table, numpy.lib.npyio.NpzFile)):
+            if isinstance(
+                data,
+                (collections.OrderedDict,
+                 toyplot.data.Table,
+                 numpy.lib.npyio.NpzFile)):
                 for key in data.keys():
                     self[key] = data[key]
             # Input data for which an explicit column ordering is not known.
@@ -68,7 +72,8 @@ class Table(object):
         # Return a single row by index
         if isinstance(index, numbers.Integral):
             index = slice(index, index + 1)
-        return Table(collections.OrderedDict([(key, self._columns[key][index]) for key in self._columns.keys()]))
+        return Table(collections.OrderedDict(
+            [(key, self._columns[key][index]) for key in self._columns.keys()]))
 
     def __setitem__(self, key, value):
         if not isinstance(key, toyplot.compatibility.string_type):
@@ -80,24 +85,34 @@ class Table(object):
         for column in self._columns.values():
             if column.shape != value.shape:
                 raise ValueError(
-                    "Expected %s values, received %s." % (column.shape[0], value.shape[0]))
+                    "Expected %s values, received %s." %
+                    (column.shape[0], value.shape[0]))
         self._columns[key] = value
 
     def __delitem__(self, key):
         return self._columns.__delitem__(key)
 
     def __len__(self):
-        return list(self._columns.values())[0].shape[0] if len(self._columns) else 0
+        return list(
+            self._columns.values())[0].shape[0] if len(
+            self._columns) else 0
 
     def _repr_html_(self):
         root_xml = xml.Element(
-            "table", style="border-collapse:collapse; border:none; color: %s" % toyplot.color.near_black)
+            "table",
+            style="border-collapse:collapse; border:none; color: %s" %
+            toyplot.color.near_black)
         root_xml.set("class", "toyplot-data-Table")
         header_xml = xml.SubElement(
-            root_xml, "tr", style="border:none;border-bottom:1px solid %s" % toyplot.color.near_black)
+            root_xml,
+            "tr",
+            style="border:none;border-bottom:1px solid %s" %
+            toyplot.color.near_black)
         for name in self._columns.keys():
             xml.SubElement(
-                header_xml, "th", style="text-align:left;border:none;padding-right:1em;").text = toyplot.compatibility.unicode_type(name)
+                header_xml,
+                "th",
+                style="text-align:left;border:none;padding-right:1em;").text = toyplot.compatibility.unicode_type(name)
 
         iterators = [iter(column) for column in self._columns.values()]
         for row_index in numpy.arange(len(self)):
@@ -107,7 +122,9 @@ class Table(object):
                     row_xml = xml.SubElement(
                         root_xml, "tr", style="border:none")
                 xml.SubElement(
-                    row_xml, "td", style="border:none;padding-right:1em;").text = toyplot.compatibility.unicode_type(value)
+                    row_xml,
+                    "td",
+                    style="border:none;padding-right:1em;").text = toyplot.compatibility.unicode_type(value)
 
         return xml.tostring(root_xml, method="html", encoding="utf-8")
 
@@ -119,7 +136,11 @@ class Table(object):
         -------
         shape: (number of rows, number of columns) tuple.
         """
-        return (list(self._columns.values())[0].shape[0] if len(self._columns) else 0, len(self._columns))
+        return (
+            list(
+                self._columns.values())[0].shape[0] if len(
+                self._columns) else 0, len(
+                self._columns))
 
     def items(self):
         """Return the table names and columns, in column order.
@@ -159,7 +180,8 @@ class Table(object):
         -------
         table: :class:`toyplot.data.Table` containing the requested columns.
         """
-        return Table(collections.OrderedDict([(key, self._columns[key]) for key in keys]))
+        return Table(
+            collections.OrderedDict([(key, self._columns[key]) for key in keys]))
 
     def metadata(self, column):
         """Return metadata for one of the table's columns.
@@ -190,7 +212,8 @@ class Table(object):
         """
         if isinstance(index, numbers.Integral):
             index = slice(index, index + 1)
-        return Table(collections.OrderedDict([(key, self._columns[key][index]) for key in self._columns.keys()]))
+        return Table(collections.OrderedDict(
+            [(key, self._columns[key][index]) for key in self._columns.keys()]))
 
     def matrix(self):
         """Convert the table to a matrix (2D numpy array).
@@ -240,4 +263,5 @@ def read_csv(fobj):
         fobj = open(fobj, "r")
     rows = [row for row in csv.reader(fobj)]
     columns = zip(*rows)
-    return Table(collections.OrderedDict([(column[0], column[1:]) for column in columns]))
+    return Table(collections.OrderedDict(
+        [(column[0], column[1:]) for column in columns]))

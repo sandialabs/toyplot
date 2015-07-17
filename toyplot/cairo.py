@@ -65,7 +65,13 @@ def render(svg, context):
 
         fill_opacity = float(style.get("fill-opacity", 1.0))
         opacity = float(style.get("opacity", 1.0))
-        return (color["r"], color["g"], color["b"], color["a"] * fill_opacity * opacity)
+        return (
+            color["r"],
+            color["g"],
+            color["b"],
+            color["a"] *
+            fill_opacity *
+            opacity)
 
     def get_stroke(style):
         if "stroke" not in style:
@@ -76,7 +82,13 @@ def render(svg, context):
 
         stroke_opacity = float(style.get("stroke-opacity", 1.0))
         opacity = float(style.get("opacity", 1.0))
-        return (color["r"], color["g"], color["b"], color["a"] * stroke_opacity * opacity)
+        return (
+            color["r"],
+            color["g"],
+            color["b"],
+            color["a"] *
+            stroke_opacity *
+            opacity)
 
     def render_element(svg, element, context, styles):
         current_style = push_style(element.get("style", ""), styles, context)
@@ -96,7 +108,16 @@ def render(svg, context):
             if element.tag == "svg":
                 if "background-color" in current_style:
                     context.rectangle(
-                        0, 0, float(element.get("width")[:-2]), float(element.get("height")[:-2]))
+                        0,
+                        0,
+                        float(
+                            element.get("width")[
+                                :-
+                                2]),
+                        float(
+                            element.get("height")[
+                                :-
+                                2]))
                     context.set_source_rgba(
                         *get_color_rgba(current_style, "background-color"))
                     context.fill()
@@ -217,8 +238,8 @@ def render(svg, context):
                         font_description.set_family(
                             current_style["font-family"])
                     if "font-weight" in current_style:
-                        font_description.set_weight(pango.WEIGHT_BOLD if current_style[
-                                                    "font-weight"] == "bold" else pango.WEIGHT_NORMAL)
+                        font_description.set_weight(
+                            pango.WEIGHT_BOLD if current_style["font-weight"] == "bold" else pango.WEIGHT_NORMAL)
                     if "font-size" in current_style:
                         size = current_style["font-size"].strip()
                         if size[-2:] == "px":
@@ -260,7 +281,8 @@ def render(svg, context):
                         y -= layout_iter.get_baseline() / pango.SCALE
                     else:
                         raise ValueError(
-                            "Unsupported alignment-baseline: %s" % alignment_baseline)
+                            "Unsupported alignment-baseline: %s" %
+                            alignment_baseline)
 
                     baseline_shift = current_style.get(
                         "baseline-shift", "0").strip()

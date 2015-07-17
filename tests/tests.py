@@ -77,7 +77,8 @@ def json_comparison_string(o):
     if isinstance(o, collections.Sequence):
         return "[" + ",".join([json_comparison_string(i) for i in o]) + "]"
     if isinstance(o, collections.Mapping):
-        return "{" + ",".join(["\"" + key + "\":" + json_comparison_string(value) for key, value in o.items()]) + "}"
+        return "{" + ",".join(["\"" + key + "\":" + json_comparison_string(value)
+                               for key, value in o.items()]) + "}"
     raise Exception("Unexpected value: %s" % o)
 
 
@@ -111,7 +112,9 @@ def xml_comparison_string(element):
                 buffer.write(u" %s='%s'" % (key, format_value(value)))
 
         text = element.text if element.text is not None else ""
-        if element.tag in ["{http://www.sandia.gov/toyplot}data-table", "{http://www.sandia.gov/toyplot}axes"]:
+        if element.tag in [
+                "{http://www.sandia.gov/toyplot}data-table",
+                "{http://www.sandia.gov/toyplot}axes"]:
             text = str(json_comparison_string(json.loads(element.text)))
         buffer.write(u">%s\n" % text)
         for child in list(element):
@@ -156,7 +159,8 @@ def assert_canvas_matches(canvas, name):
         with open("tests/reference/%s.svg" % name, "wb") as file:
             file.write(svg.getvalue())
         raise AssertionError(
-            "Created new reference file tests/reference/%s.svg ... you should verify its contents before re-running the test." % name)
+            "Created new reference file tests/reference/%s.svg ... you should verify its contents before re-running the test." %
+            name)
 
     # Compare the SVG representation of the canvas to the SVG reference ...
     svg_dom = xml.fromstring(svg.getvalue())
@@ -167,8 +171,15 @@ def assert_canvas_matches(canvas, name):
 
     try:
         if svg_string != reference_string:
-            raise Exception("\n".join(list(difflib.context_diff(svg_string.split(
-                "\n"), reference_string.split("\n"), lineterm="", fromfile="test svg", tofile="reference svg"))))
+            raise Exception(
+                "\n".join(
+                    list(
+                        difflib.context_diff(
+                            svg_string.split("\n"),
+                            reference_string.split("\n"),
+                            lineterm="",
+                            fromfile="test svg",
+                            tofile="reference svg"))))
     except Exception as e:
         if not os.path.exists("tests/diffs"):
             os.mkdir("tests/diffs")
@@ -181,7 +192,8 @@ def assert_canvas_matches(canvas, name):
         with open("tests/failed/%s.svg" % name, "wb") as file:
             file.write(svg.getvalue())
         raise AssertionError(
-            "Test output tests/failed/%s.svg doesn't match tests/reference/%s.svg:\n%s" % (name, name, e))
+            "Test output tests/failed/%s.svg doesn't match tests/reference/%s.svg:\n%s" %
+            (name, name, e))
 
 
 def assert_html_matches(html, name):
@@ -197,12 +209,14 @@ def assert_html_matches(html, name):
             with open(test_file, "wb") as file:
                 file.write(html)
             raise AssertionError(
-                "Test output %s doesn't match %s." % (test_file, reference_file))
+                "Test output %s doesn't match %s." %
+                (test_file, reference_file))
     else:
         with open(reference_file, "wb") as file:
             file.write(html)
         raise AssertionError(
-            "Created new reference file %s.  You should verify its contents before re-running the test." % (reference_file))
+            "Created new reference file %s.  You should verify its contents before re-running the test." %
+            (reference_file))
 
 ##########################################################################
 # Test test fixtures.
@@ -213,16 +227,26 @@ def test_xml_comparison_string():
         xml_comparison_string(xml.fromstring("<svg/>")), "<svg>\n</svg>\n")
     nose.tools.assert_equal(xml_comparison_string(
         xml.fromstring("<svg><a/></svg>")), "<svg>\n  <a>\n  </a>\n</svg>\n")
-    nose.tools.assert_equal(xml_comparison_string(
-        xml.fromstring("<svg><a>foo</a></svg>")), "<svg>\n  <a>foo\n  </a>\n</svg>\n")
-    nose.tools.assert_equal(xml_comparison_string(xml.fromstring(
-        "<svg><a b='c'>foo</a></svg>")), "<svg>\n  <a b='c'>foo\n  </a>\n</svg>\n")
-    nose.tools.assert_equal(xml_comparison_string(xml.fromstring(
-        "<svg><a b='.333333333333333'>foo</a></svg>")), "<svg>\n  <a b='0.333333333'>foo\n  </a>\n</svg>\n")
-    nose.tools.assert_equal(xml_comparison_string(xml.fromstring(
-        "<svg><a b='.666666666666666'>foo</a></svg>")), "<svg>\n  <a b='0.666666667'>foo\n  </a>\n</svg>\n")
-    nose.tools.assert_equal(xml_comparison_string(
-        xml.fromstring("<svg><a id='1234'/></svg>")), "<svg>\n  <a>\n  </a>\n</svg>\n")
+    nose.tools.assert_equal(
+        xml_comparison_string(
+            xml.fromstring("<svg><a>foo</a></svg>")),
+        "<svg>\n  <a>foo\n  </a>\n</svg>\n")
+    nose.tools.assert_equal(
+        xml_comparison_string(
+            xml.fromstring("<svg><a b='c'>foo</a></svg>")),
+        "<svg>\n  <a b='c'>foo\n  </a>\n</svg>\n")
+    nose.tools.assert_equal(
+        xml_comparison_string(
+            xml.fromstring("<svg><a b='.333333333333333'>foo</a></svg>")),
+        "<svg>\n  <a b='0.333333333'>foo\n  </a>\n</svg>\n")
+    nose.tools.assert_equal(
+        xml_comparison_string(
+            xml.fromstring("<svg><a b='.666666666666666'>foo</a></svg>")),
+        "<svg>\n  <a b='0.666666667'>foo\n  </a>\n</svg>\n")
+    nose.tools.assert_equal(
+        xml_comparison_string(
+            xml.fromstring("<svg><a id='1234'/></svg>")),
+        "<svg>\n  <a>\n  </a>\n</svg>\n")
 
 ##########################################################################
 # toyplot
@@ -273,12 +297,29 @@ def test_require_scalar_array():
                         [1, 2], [3, 4]], [[False, False], [False, False]])
     assert_masked_array(toyplot.require.scalar_array(
         numpy.array([1, 2, 3])), "float64", [1, 2, 3], [False, False, False])
-    assert_masked_array(toyplot.require.scalar_array(numpy.ma.array(
-        [1, 2, 3], mask=[False, True, False])), "float64", [1, 2, 3], [False, True, False])
-    assert_masked_array(toyplot.require.scalar_array(numpy.array(
-        [1, numpy.nan, 3])), "float64", [1, numpy.nan, 3], [False, True, False])
-    assert_masked_array(toyplot.require.scalar_array(numpy.ma.array([1, numpy.nan, 3], mask=[
-                        False, False, True])), "float64", [1, numpy.nan, 3], [False, True, True])
+    assert_masked_array(
+        toyplot.require.scalar_array(
+            numpy.ma.array(
+                [
+                    1, 2, 3], mask=[
+                    False, True, False])), "float64", [
+                        1, 2, 3], [
+                            False, True, False])
+    assert_masked_array(
+        toyplot.require.scalar_array(
+            numpy.array(
+                [
+                    1, numpy.nan, 3])), "float64", [
+            1, numpy.nan, 3], [
+                        False, True, False])
+    assert_masked_array(
+        toyplot.require.scalar_array(
+            numpy.ma.array(
+                [
+                    1, numpy.nan, 3], mask=[
+                    False, False, True])), "float64", [
+                        1, numpy.nan, 3], [
+                            False, True, True])
     with nose.tools.assert_raises(ValueError):
         toyplot.require.scalar_array("foo")
     with nose.tools.assert_raises(ValueError):
@@ -811,13 +852,24 @@ def test_axes_bars_n_boundaries_edges():
 def test_axes_bars_n_boundaries_titles():
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
-    series = numpy.column_stack((numpy.min(observations, axis=1), numpy.percentile(observations, 25, axis=1), numpy.percentile(
-        observations, 50, axis=1), numpy.percentile(observations, 75, axis=1), numpy.max(observations, axis=1)))
+    series = numpy.column_stack(
+        (numpy.min(
+            observations, axis=1), numpy.percentile(
+            observations, 25, axis=1), numpy.percentile(
+                observations, 50, axis=1), numpy.percentile(
+                    observations, 75, axis=1), numpy.max(
+                        observations, axis=1)))
 
     canvas = toyplot.Canvas()
     axes = canvas.axes()
-    axes.bars(series, title=[
-              "1st quartile", "2nd quartile", "3rd quartile", "4th quartile"], baseline=None)
+    axes.bars(
+        series,
+        title=[
+            "1st quartile",
+            "2nd quartile",
+            "3rd quartile",
+            "4th quartile"],
+        baseline=None)
     assert_canvas_matches(canvas, "axes-bars-n-boundaries-titles")
 
 
@@ -1119,8 +1171,14 @@ def test_axes_scatterplot_markers():
 
     canvas = toyplot.Canvas()
     axes = canvas.axes()
-    axes.scatterplot(numpy.arange(len(markers)), fill="steelblue",
-                     marker=markers, size=100, mstyle=marker_style, mlstyle=label_style)
+    axes.scatterplot(
+        numpy.arange(
+            len(markers)),
+        fill="steelblue",
+        marker=markers,
+        size=100,
+        mstyle=marker_style,
+        mlstyle=label_style)
     assert_canvas_matches(canvas, "axes-scatterplot-markers")
 
 
@@ -1171,8 +1229,17 @@ def test_axes_text_angle_fill():
 
     canvas = toyplot.Canvas(400, 400)
     axes = canvas.axes(xmin=-0.25, xmax=0.5, ymin=-0.5, ymax=0.25)
-    axes.text(x, y, text="Toyplot!", angle=angle, fill=fill, style={
-              "font-size": "36px", "font-weight": "bold", "stroke": "white", "text-anchor": "start"})
+    axes.text(
+        x,
+        y,
+        text="Toyplot!",
+        angle=angle,
+        fill=fill,
+        style={
+            "font-size": "36px",
+            "font-weight": "bold",
+            "stroke": "white",
+            "text-anchor": "start"})
 
     assert_canvas_matches(canvas, "axes-text-angle-fill")
 
@@ -1187,7 +1254,11 @@ def test_axes_legend():
 
 def test_animation_frame_sanity_checks():
     frame = toyplot.canvas.AnimationFrame(
-        index=1, begin=2.3, end=2.4, changes=collections.defaultdict(lambda: collections.defaultdict(list)))
+        index=1,
+        begin=2.3,
+        end=2.4,
+        changes=collections.defaultdict(
+            lambda: collections.defaultdict(list)))
     nose.tools.assert_equal(frame.index(), 1)
     nose.tools.assert_equal(frame.time(), 2.3)
     numpy.testing.assert_almost_equal(frame.duration(), 0.1)
@@ -1432,8 +1503,15 @@ def test_basic_api():
     axes = canvas.axes(grid=(2, 2, 3), label="3rd Axes")
     axes.plot(x, y, style={"stroke": "green"})
 
-    canvas.text(300, 30, "Plot Title", style={
-                "font-size": "16px", "font-weight": "bold", "text-anchor": "middle"}, title="The plot's title")
+    canvas.text(
+        300,
+        30,
+        "Plot Title",
+        style={
+            "font-size": "16px",
+            "font-weight": "bold",
+            "text-anchor": "middle"},
+        title="The plot's title")
 
     assert_canvas_matches(canvas, "basic-api")
 
@@ -1463,8 +1541,14 @@ def test_axes_layout():
     canvas = toyplot.Canvas()
     axes = canvas.axes(label="Title", xlabel="X Label",
                        ylabel="Y Label", xmin=0, xmax=1, ymin=0, ymax=1)
-    axes.text(0.5, 0.5, "Axes Region", style={
-              "fill": toyplot.color.near_black, "text-anchor": "middle", "alignment-baseline": "middle"})
+    axes.text(
+        0.5,
+        0.5,
+        "Axes Region",
+        style={
+            "fill": toyplot.color.near_black,
+            "text-anchor": "middle",
+            "alignment-baseline": "middle"})
     assert_canvas_matches(canvas, "axes-layout")
 
 
@@ -1549,6 +1633,14 @@ def test_grid_placement():
         grid=(3, 3, 1, 1), gutter=20, label="3x3 Grid gutter=20")
     inset.plot(x, numpy.sin(x))
     inset = canvas.axes(
-        grid=(3, 3, 1, 2, 2, 1), gutter=20, label="3x3 Grid gutter=20 rowspan=2")
+        grid=(
+            3,
+            3,
+            1,
+            2,
+            2,
+            1),
+        gutter=20,
+        label="3x3 Grid gutter=20 rowspan=2")
     inset.plot(x, numpy.sin(x))
     assert_canvas_matches(canvas, "grid-placement")

@@ -13,7 +13,8 @@ def style(style):
     """Verify that the given object is usable as a style."""
     if not isinstance(style, (dict, type(None))):
         raise ValueError(
-            "Expected a dictionary of CSS styles or None, received %s." % style)
+            "Expected a dictionary of CSS styles or None, received %s." %
+            style)
     return style
 
 
@@ -37,7 +38,8 @@ def table_keys(table, keys, length=None, min_length=None):
     for key in keys:
         if key not in allowed:
             raise ValueError(
-                "Table key must match one of %s, received %s." % (", ".join(allowed), key))
+                "Table key must match one of %s, received %s." %
+                (", ".join(allowed), key))
     return keys
 
 
@@ -95,7 +97,8 @@ def scalar_matrix(value, rows=None, columns=None):
     if columns is not None:
         if array.shape[1] != columns:
             raise ValueError(
-                "Expected %s columns, received %s." % (columns, array.shape[1]))
+                "Expected %s columns, received %s." %
+                (columns, array.shape[1]))
     return array
 
 
@@ -118,7 +121,8 @@ def string_vector(value, length=None, min_length=None):
     if min_length is not None:
         if len(array) < min_length:
             raise ValueError(
-                "Expected %s or more values, received %s" % (min_length, len(array)))
+                "Expected %s or more values, received %s" %
+                (min_length, len(array)))
     return array
 
 

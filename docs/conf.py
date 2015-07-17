@@ -21,28 +21,30 @@ import os
 
 # Provide stubs for external dependencies, so we can generate our reference
 # documentation without having to install them.
+
+
 class module_proxy(object):
-  __all__ = []
+    __all__ = []
 
-  def __init__(self, *args, **kwargs):
-    pass
+    def __init__(self, *args, **kwargs):
+        pass
 
-  def __call__(self, *args, **kwargs):
-    return module_proxy()
+    def __call__(self, *args, **kwargs):
+        return module_proxy()
 
-  @classmethod
-  def __getattr__(cls, name):
-    if name in ("__file__", "__path__"):
-        return "/dev/null"
-    elif name[0] == name[0].upper():
-      proxy_type = type(name, (), {})
-      proxy_type.__module__ = __name__
-      return proxy_type
-    else:
-      return module_proxy()
+    @classmethod
+    def __getattr__(cls, name):
+        if name in ("__file__", "__path__"):
+            return "/dev/null"
+        elif name[0] == name[0].upper():
+            proxy_type = type(name, (), {})
+            proxy_type.__module__ = __name__
+            return proxy_type
+        else:
+            return module_proxy()
 
 for module_name in ["cairo", "numpy", "numpy.ma", "numpy.testing", "pango", "pangocairo"]:
-  sys.modules[module_name] = module_proxy()
+    sys.modules[module_name] = module_proxy()
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -136,7 +138,8 @@ pygments_style = 'sphinx'
 
 # -- Options for HTML output ----------------------------------------------
 
-# on_rtd is whether we are on readthedocs.org, this line of code grabbed from docs.readthedocs.org
+# on_rtd is whether we are on readthedocs.org, this line of code grabbed
+# from docs.readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if not on_rtd:  # only import and set the theme if we're building docs locally
@@ -144,7 +147,8 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
     html_theme = 'sphinx_rtd_theme'
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
-# otherwise, readthedocs.org uses their theme by default, so no need to specify it
+# otherwise, readthedocs.org uses their theme by default, so no need to
+# specify it
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
@@ -233,22 +237,22 @@ htmlhelp_basename = 'toyplotdoc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-# The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    #'papersize': 'letterpaper',
 
-# The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    #'pointsize': '10pt',
 
-# Additional stuff for the LaTeX preamble.
-#'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    #'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'toyplot.tex', u'Toyplot Documentation',
-   u'Sandia National Laboratories', 'manual'),
+    ('index', 'toyplot.tex', u'Toyplot Documentation',
+     u'Sandia National Laboratories', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -291,9 +295,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'toyplot', u'Toyplot Documentation',
-   u'Sandia National Laboratories', 'toyplot', 'One line description of project.',
-   'Miscellaneous'),
+    ('index', 'toyplot', u'Toyplot Documentation',
+     u'Sandia National Laboratories', 'toyplot', 'One line description of project.',
+     'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.

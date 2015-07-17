@@ -3,15 +3,17 @@
 # functionality is equivalent.
 
 try:
-  from PyQt5.QtWidgets import *
-  from PyQt5.QtWebKitWidgets import *
+    from PyQt5.QtWidgets import *
+    from PyQt5.QtWebKitWidgets import *
 except:
-  from PySide.QtGui import *
-  from PySide.QtWebKit import *
+    from PySide.QtGui import *
+    from PySide.QtWebKit import *
 
 import numpy
 import sys
-import toyplot.html, toyplot.png, toyplot.svg
+import toyplot.html
+import toyplot.png
+import toyplot.svg
 import xml.etree.ElementTree as xml
 
 application = QApplication(sys.argv)

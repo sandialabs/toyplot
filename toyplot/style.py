@@ -4,12 +4,12 @@
 
 from __future__ import division
 
-def combine(*styles):
-  """Combine multiple style specifications into one.
-  """
-  computed_style = {}
-  for style in styles:
-    if style is not None:
-      computed_style.update(style)
-  return computed_style
 
+def combine(*styles):
+    """Combine multiple style specifications into one.
+    """
+    computed_style = {}
+    for style in styles:
+        if style is not None:
+            computed_style.update(style)
+    return computed_style

@@ -9,18 +9,17 @@ without the use of code-modification tools like `2to3`.  The
 `toyplot.compatibility` module contains code to facilitate this.
 """
 try:
-  string_type = basestring
-except: # pragma: no cover
-  string_type = str
+    string_type = basestring
+except:  # pragma: no cover
+    string_type = str
 
 try:
-  basestring
-  unicode_type = unicode
+    basestring
+    unicode_type = unicode
 except:
-  unicode_type = str
+    unicode_type = str
 
 try:
-  bytes_type = bytes
-except: # pragma: no cover
-  bytes_type = str
-
+    bytes_type = bytes
+except:  # pragma: no cover
+    bytes_type = str

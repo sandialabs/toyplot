@@ -6,39 +6,46 @@ from __future__ import division
 
 import numpy
 
+
 class Formatter(object):
-  """Base class for formatters - objects that compute text representations from data."""
-  def format(self, value):
-    """Return a text representation of the given value.
 
-    Parameters
-    ----------
-    value: value to be formatted
+    """Base class for formatters - objects that compute text representations from data."""
 
-    Returns
-    -------
-    prefix : string
-      Formatted data to be displayed before the separator.
-    separator : string
-      Separator between formatted data, or empty string.
-    suffix : string
-      Formatted data to be displayed after the separator, or empty string.
-    """
-    raise NotImplementedError()
+    def format(self, value):
+        """Return a text representation of the given value.
+
+        Parameters
+        ----------
+        value: value to be formatted
+
+        Returns
+        -------
+        prefix : string
+          Formatted data to be displayed before the separator.
+        separator : string
+          Separator between formatted data, or empty string.
+        suffix : string
+          Formatted data to be displayed after the separator, or empty string.
+        """
+        raise NotImplementedError()
+
 
 class DefaultFormatter(Formatter):
-  def format(self, value):
-    return "%s" % value, "", ""
+
+    def format(self, value):
+        return "%s" % value, "", ""
+
 
 class FloatFormatter(Formatter):
-  def __init__(self, format="{:.6g}"):
-    self._format = format
 
-  def format(self, value):
-    try:
-      formatted = self._format.format(value).split(".")
-      if len(formatted) == 1:
-        return formatted[0], "", ""
-      return formatted[0], ".", formatted[1]
-    except:
-      return str(value), "", ""
+    def __init__(self, format="{:.6g}"):
+        self._format = format
+
+    def format(self, value):
+        try:
+            formatted = self._format.format(value).split(".")
+            if len(formatted) == 1:
+                return formatted[0], "", ""
+            return formatted[0], ".", formatted[1]
+        except:
+            return str(value), "", ""

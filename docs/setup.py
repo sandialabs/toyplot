@@ -45,7 +45,7 @@ def convert_notebook(name):
 if os.path.exists(build_dir):
   shutil.rmtree(build_dir)
 
-for name in ["canvas-layout", "cartesian-axes", "color", "convenience", "data-tables", "embedding", "labels-and-legends", "markers", "matrix-visualization", "rendering", "table-axes", "text", "tick-locators", "tutorial", "units"]:
+for name in ["canvas-layout", "cartesian-axes", "color", "convenience", "data-tables", "labels-and-legends", "markers", "matrix-visualization", "rendering", "table-axes", "text", "tick-locators", "tutorial", "units"]:
   convert_notebook(name)
 
 # Generate the HTML documentation.

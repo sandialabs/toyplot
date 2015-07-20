@@ -8,111 +8,376 @@ __version__ = "0.7.0"
 
 from toyplot.canvas import Canvas
 
-def bars(a, b=None, c=None, along="x", baseline="stacked", fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, xmin=None, xmax=None, ymin=None, ymax=None, show=True, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style=None):
-  """Convenience function for creating a bar plot in a single call.
 
-  See :meth:`toyplot.axes.Cartesian.bars`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+def bars(
+        a,
+        b=None,
+        c=None,
+        along="x",
+        baseline="stacked",
+        fill=None,
+        colormap=None,
+        palette=None,
+        opacity=1.0,
+        title=None,
+        style=None,
+        xmin=None,
+        xmax=None,
+        ymin=None,
+        ymax=None,
+        show=True,
+        xshow=True,
+        yshow=True,
+        label=None,
+        xlabel=None,
+        ylabel=None,
+        xscale="linear",
+        yscale="linear",
+        padding=10,
+        width=None,
+        height=None,
+        canvas_style=None):
+    """Convenience function for creating a bar plot in a single call.
 
-  Returns
-  -------
-  canvas: :class:`toyplot.canvas.Canvas`
-    A new canvas object.
-  axes: :class:`toyplot.axes.Cartesian`
-    A new set of 2D axes that fill the canvas.
-  mark: :class:`toyplot.mark.BarMagnitudes` or :class:`toyplot.mark.BarBoundaries`
-    The new bar mark.
-  """
-  canvas = Canvas(width=width, height=height, style=canvas_style)
-  axes = canvas.axes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, padding=padding)
-  mark = axes.bars(a=a, b=b, c=c, along=along, baseline=baseline, fill=fill, colormap=colormap, palette=palette, opacity=opacity, title=title, style=style)
-  return canvas, axes, mark
+    See :meth:`toyplot.axes.Cartesian.bars`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
 
-def fill(a, b=None, c=None, along="x", baseline=None, fill=None, colormap=None, palette=None, opacity=1.0, title=None, style=None, xmin=None, xmax=None, ymin=None, ymax=None, show=True, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style=None):
-  """Convenience function for creating a fill plot in a single call.
+    Returns
+    -------
+    canvas: :class:`toyplot.canvas.Canvas`
+      A new canvas object.
+    axes: :class:`toyplot.axes.Cartesian`
+      A new set of 2D axes that fill the canvas.
+    mark: :class:`toyplot.mark.BarMagnitudes` or :class:`toyplot.mark.BarBoundaries`
+      The new bar mark.
+    """
+    canvas = Canvas(width=width, height=height, style=canvas_style)
+    axes = canvas.axes(
+        xmin=xmin,
+        xmax=xmax,
+        ymin=ymin,
+        ymax=ymax,
+        show=show,
+        xshow=xshow,
+        yshow=yshow,
+        label=label,
+        xlabel=xlabel,
+        ylabel=ylabel,
+        xscale=xscale,
+        yscale=yscale,
+        padding=padding)
+    mark = axes.bars(
+        a=a,
+        b=b,
+        c=c,
+        along=along,
+        baseline=baseline,
+        fill=fill,
+        colormap=colormap,
+        palette=palette,
+        opacity=opacity,
+        title=title,
+        style=style)
+    return canvas, axes, mark
 
-  See :meth:`toyplot.axes.Cartesian.fill`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
 
-  Returns
-  -------
-  canvas: :class:`toyplot.canvas.Canvas`
-    A new canvas object.
-  axes: :class:`toyplot.axes.Cartesian`
-    A new set of 2D axes that fill the canvas.
-  mark: :class:`toyplot.mark.FillBoundaries` or :class:`toyplot.mark.FillMagnitudes`
-    The new bar mark.
-  """
-  canvas = Canvas(width=width, height=height, style=canvas_style)
-  axes = canvas.axes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, padding=padding)
-  mark = axes.fill(a=a, b=b, c=c, along=along, baseline=baseline, fill=fill, colormap=colormap, palette=palette, opacity=opacity, title=title, style=style)
-  return canvas, axes, mark
+def fill(
+        a,
+        b=None,
+        c=None,
+        along="x",
+        baseline=None,
+        fill=None,
+        colormap=None,
+        palette=None,
+        opacity=1.0,
+        title=None,
+        style=None,
+        xmin=None,
+        xmax=None,
+        ymin=None,
+        ymax=None,
+        show=True,
+        xshow=True,
+        yshow=True,
+        label=None,
+        xlabel=None,
+        ylabel=None,
+        xscale="linear",
+        yscale="linear",
+        padding=10,
+        width=None,
+        height=None,
+        canvas_style=None):
+    """Convenience function for creating a fill plot in a single call.
 
-def plot(a, b=None, along="x", color=None, colormap=None, palette=None, stroke_width=2.0, stroke_opacity=1.0, marker=None, size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None, xmin=None, xmax=None, ymin=None, ymax=None, show=True, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style=None):
-  """Convenience function for creating a line plot in a single call.
+    See :meth:`toyplot.axes.Cartesian.fill`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
 
-  See :meth:`toyplot.axes.Cartesian.plot`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+    Returns
+    -------
+    canvas: :class:`toyplot.canvas.Canvas`
+      A new canvas object.
+    axes: :class:`toyplot.axes.Cartesian`
+      A new set of 2D axes that fill the canvas.
+    mark: :class:`toyplot.mark.FillBoundaries` or :class:`toyplot.mark.FillMagnitudes`
+      The new bar mark.
+    """
+    canvas = Canvas(width=width, height=height, style=canvas_style)
+    axes = canvas.axes(
+        xmin=xmin,
+        xmax=xmax,
+        ymin=ymin,
+        ymax=ymax,
+        show=show,
+        xshow=xshow,
+        yshow=yshow,
+        label=label,
+        xlabel=xlabel,
+        ylabel=ylabel,
+        xscale=xscale,
+        yscale=yscale,
+        padding=padding)
+    mark = axes.fill(
+        a=a,
+        b=b,
+        c=c,
+        along=along,
+        baseline=baseline,
+        fill=fill,
+        colormap=colormap,
+        palette=palette,
+        opacity=opacity,
+        title=title,
+        style=style)
+    return canvas, axes, mark
 
-  Returns
-  -------
-  canvas: :class:`toyplot.canvas.Canvas`
-    A new canvas object.
-  axes: :class:`toyplot.axes.Cartesian`
-    A new set of 2D axes that fill the canvas.
-  mark: :class:`toyplot.mark.Plot`
-    The new plot mark.
-  """
-  canvas = Canvas(width=width, height=height, style=canvas_style)
-  axes = canvas.axes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, padding=padding)
-  mark = axes.plot(a=a, b=b, along=along, color=color, colormap=colormap, palette=palette, stroke_width=stroke_width, stroke_opacity=stroke_opacity, marker=marker, size=size, fill=fill, fill_colormap=fill_colormap, fill_palette=fill_palette, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle)
-  return canvas, axes, mark
 
-def scatterplot(a, b=None, along="x", color=None, colormap=None, palette=None, marker="o", size=20, fill=None, fill_colormap=None, fill_palette=None, opacity=1.0, title=None, style=None, mstyle=None, mlstyle=None, xmin=None, xmax=None, ymin=None, ymax=None, show=True, xshow=True, yshow=True, label=None, xlabel=None, ylabel=None, xscale="linear", yscale="linear", padding=10, width=None, height=None, canvas_style=None):
-  """Convenience function for creating a scatter plot in a single call.
+def plot(
+        a,
+        b=None,
+        along="x",
+        color=None,
+        colormap=None,
+        palette=None,
+        stroke_width=2.0,
+        stroke_opacity=1.0,
+        marker=None,
+        size=20,
+        fill=None,
+        fill_colormap=None,
+        fill_palette=None,
+        opacity=1.0,
+        title=None,
+        style=None,
+        mstyle=None,
+        mlstyle=None,
+        xmin=None,
+        xmax=None,
+        ymin=None,
+        ymax=None,
+        show=True,
+        xshow=True,
+        yshow=True,
+        label=None,
+        xlabel=None,
+        ylabel=None,
+        xscale="linear",
+        yscale="linear",
+        padding=10,
+        width=None,
+        height=None,
+        canvas_style=None):
+    """Convenience function for creating a line plot in a single call.
 
-  See :meth:`toyplot.axes.Cartesian.scatterplot`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+    See :meth:`toyplot.axes.Cartesian.plot`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
 
-  Returns
-  -------
-  canvas: :class:`toyplot.canvas.Canvas`
-    A new canvas object.
-  axes: :class:`toyplot.axes.Cartesian`
-    A new set of 2D axes that fill the canvas.
-  mark: :class:`toyplot.mark.Plot`
-    The new scatter plot mark.
-  """
-  canvas = Canvas(width=width, height=height, style=canvas_style)
-  axes = canvas.axes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, show=show, xshow=xshow, yshow=yshow, label=label, xlabel=xlabel, ylabel=ylabel, xscale=xscale, yscale=yscale, padding=padding)
-  mark = axes.scatterplot(a=a, b=b, along=along, color=color, colormap=colormap, palette=palette, marker=marker, size=size, fill=fill, fill_colormap=fill_colormap, fill_palette=fill_palette, opacity=opacity, title=title, style=style, mstyle=mstyle, mlstyle=mlstyle)
-  return canvas, axes, mark
+    Returns
+    -------
+    canvas: :class:`toyplot.canvas.Canvas`
+      A new canvas object.
+    axes: :class:`toyplot.axes.Cartesian`
+      A new set of 2D axes that fill the canvas.
+    mark: :class:`toyplot.mark.Plot`
+      The new plot mark.
+    """
+    canvas = Canvas(width=width, height=height, style=canvas_style)
+    axes = canvas.axes(
+        xmin=xmin,
+        xmax=xmax,
+        ymin=ymin,
+        ymax=ymax,
+        show=show,
+        xshow=xshow,
+        yshow=yshow,
+        label=label,
+        xlabel=xlabel,
+        ylabel=ylabel,
+        xscale=xscale,
+        yscale=yscale,
+        padding=padding)
+    mark = axes.plot(
+        a=a,
+        b=b,
+        along=along,
+        color=color,
+        colormap=colormap,
+        palette=palette,
+        stroke_width=stroke_width,
+        stroke_opacity=stroke_opacity,
+        marker=marker,
+        size=size,
+        fill=fill,
+        fill_colormap=fill_colormap,
+        fill_palette=fill_palette,
+        opacity=opacity,
+        title=title,
+        style=style,
+        mstyle=mstyle,
+        mlstyle=mlstyle)
+    return canvas, axes, mark
 
-def matrix(matrix, label=None, step=1, colormap=None, palette=None, width=None, height=None, canvas_style=None):
-  """Convenience function to create a matrix visualization in a single call.
 
-  See :meth:`toyplot.canvas.Canvas.matrix`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+def scatterplot(
+        a,
+        b=None,
+        along="x",
+        color=None,
+        colormap=None,
+        palette=None,
+        marker="o",
+        size=20,
+        fill=None,
+        fill_colormap=None,
+        fill_palette=None,
+        opacity=1.0,
+        title=None,
+        style=None,
+        mstyle=None,
+        mlstyle=None,
+        xmin=None,
+        xmax=None,
+        ymin=None,
+        ymax=None,
+        show=True,
+        xshow=True,
+        yshow=True,
+        label=None,
+        xlabel=None,
+        ylabel=None,
+        xscale="linear",
+        yscale="linear",
+        padding=10,
+        width=None,
+        height=None,
+        canvas_style=None):
+    """Convenience function for creating a scatter plot in a single call.
 
-  Returns
-  -------
-  canvas: :class:`toyplot.canvas.Canvas`
-    A new canvas object.
-  table: :class:`toyplot.axes.Table`
-    A new set of table axes that fill the canvas.
-  """
-  canvas = Canvas(width=width, height=height, style=canvas_style)
-  table = canvas.matrix(matrix=matrix, label=label, step=step, colormap=colormap, palette=palette)
-  return canvas, table
+    See :meth:`toyplot.axes.Cartesian.scatterplot`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
 
-def table(data=None, rows=None, columns=None, hrows=None, brows=None, lcols=None, rcols=None, label=None, width=None, height=None, canvas_style=None):
-  """Convenience function to create a table visualization in a single call.
+    Returns
+    -------
+    canvas: :class:`toyplot.canvas.Canvas`
+      A new canvas object.
+    axes: :class:`toyplot.axes.Cartesian`
+      A new set of 2D axes that fill the canvas.
+    mark: :class:`toyplot.mark.Plot`
+      The new scatter plot mark.
+    """
+    canvas = Canvas(width=width, height=height, style=canvas_style)
+    axes = canvas.axes(
+        xmin=xmin,
+        xmax=xmax,
+        ymin=ymin,
+        ymax=ymax,
+        show=show,
+        xshow=xshow,
+        yshow=yshow,
+        label=label,
+        xlabel=xlabel,
+        ylabel=ylabel,
+        xscale=xscale,
+        yscale=yscale,
+        padding=padding)
+    mark = axes.scatterplot(
+        a=a,
+        b=b,
+        along=along,
+        color=color,
+        colormap=colormap,
+        palette=palette,
+        marker=marker,
+        size=size,
+        fill=fill,
+        fill_colormap=fill_colormap,
+        fill_palette=fill_palette,
+        opacity=opacity,
+        title=title,
+        style=style,
+        mstyle=mstyle,
+        mlstyle=mlstyle)
+    return canvas, axes, mark
 
-  See :meth:`toyplot.canvas.Canvas.table`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
 
-  Returns
-  -------
-  canvas: :class:`toyplot.canvas.Canvas`
-    A new canvas object.
-  table: :class:`toyplot.axes.Table`
-    A new set of table axes that fill the canvas.
-  """
-  canvas = Canvas(width=width, height=height, style=canvas_style)
-  table = canvas.table(data=data, rows=rows, columns=columns, hrows=hrows, brows=brows, lcols=lcols, rcols=rcols, label=label)
-  return canvas, table
+def matrix(
+        matrix,
+        label=None,
+        step=1,
+        colormap=None,
+        palette=None,
+        width=None,
+        height=None,
+        canvas_style=None):
+    """Convenience function to create a matrix visualization in a single call.
 
+    See :meth:`toyplot.canvas.Canvas.matrix`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+
+    Returns
+    -------
+    canvas: :class:`toyplot.canvas.Canvas`
+      A new canvas object.
+    table: :class:`toyplot.axes.Table`
+      A new set of table axes that fill the canvas.
+    """
+    canvas = Canvas(width=width, height=height, style=canvas_style)
+    table = canvas.matrix(
+        matrix=matrix,
+        label=label,
+        step=step,
+        colormap=colormap,
+        palette=palette)
+    return canvas, table
+
+
+def table(
+        data=None,
+        rows=None,
+        columns=None,
+        hrows=None,
+        brows=None,
+        lcols=None,
+        rcols=None,
+        label=None,
+        width=None,
+        height=None,
+        canvas_style=None):
+    """Convenience function to create a table visualization in a single call.
+
+    See :meth:`toyplot.canvas.Canvas.table`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+
+    Returns
+    -------
+    canvas: :class:`toyplot.canvas.Canvas`
+      A new canvas object.
+    table: :class:`toyplot.axes.Table`
+      A new set of table axes that fill the canvas.
+    """
+    canvas = Canvas(width=width, height=height, style=canvas_style)
+    table = canvas.table(
+        data=data,
+        rows=rows,
+        columns=columns,
+        hrows=hrows,
+        brows=brows,
+        lcols=lcols,
+        rcols=rcols,
+        label=label)
+    return canvas, table

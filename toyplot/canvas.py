@@ -340,7 +340,7 @@ class Canvas(object):
           upper-left-hand corner, width, and height.  Each parameter may be specified
           in absolute drawing units, or as a percentage of the canvas width / height
           using strings that end with "%".
-        corner: (corner, width, height, inset) tuple, optional
+        corner: (corner, inset, width, height) tuple, optional
           Use the corner property to position / size the legend by specifying its
           width and height, plus an inset from a corner of the canvas.  Allowed
           corner values are "top-left", "top", "top-right", "right",

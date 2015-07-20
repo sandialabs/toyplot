@@ -34,4 +34,6 @@ def object(value, shape):
     if array.ndim == 1 and isinstance(shape, tuple) and len(
             shape) == 2 and array.shape[0] == shape[0] and shape[1] == 1:
         return numpy.reshape(array, shape)
-    return numpy.broadcast_arrays(array, numpy.empty(shape))[0]
+    result = numpy.empty(shape, dtype="object")
+    result.flat = [u for u,v in numpy.broadcast(array, result)]
+    return result

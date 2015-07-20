@@ -8,7 +8,6 @@ import numpy
 import os
 import tempfile
 import toyplot.data
-import toyplot.latex
 import toyplot.testing
 
 root_dir = os.path.dirname(os.path.dirname(__file__))
@@ -189,39 +188,6 @@ def step_impl(context):
     context.data["bar"] = numpy.random.random(10)
     context.data["baz"] = numpy.random.choice(
         ["red", "green", "blue"], size=10)
-
-
-@then(u'the table can be rendered as format latex string')
-def step_impl(context):
-    toyplot.testing.assert_latex_equal(
-        toyplot.latex.render(context.data), "data-table")
-
-
-@then(u'the table can be rendered as format latex fobj')
-def step_impl(context):
-    buffer = io.BytesIO()
-    toyplot.latex.render(context.data, buffer)
-    toyplot.testing.assert_latex_equal(
-        toyplot.compatibility.unicode_type(
-            buffer.getvalue(),
-            "utf-8"),
-        "data-table")
-
-
-@then(u'the table can be rendered as format latex file')
-def step_impl(context):
-    path = os.path.join(tempfile.mkdtemp(), "test.tex")
-    toyplot.latex.render(context.data, path)
-    toyplot.testing.assert_latex_equal(open(path, "r").read(), "data-table")
-
-
-@then(u'the table can be rendered as format latex string with hline')
-def step_impl(context):
-    toyplot.testing.assert_latex_equal(
-        toyplot.latex.render(
-            context.data,
-            hlines=[5]),
-        "data-table-with-hline")
 
 
 @then(u'the table can be rendered as format ipython html string')

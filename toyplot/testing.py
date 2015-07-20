@@ -164,23 +164,6 @@ def assert_html_equal(html, name):
     _assert_content_equal(html, test_file, reference_file)
 
 
-def assert_latex_equal(latex, name):
-    """Raise an exception if LaTeX content doesn't match a reference.
-
-    Parameters
-    ----------
-    latex: string, required
-      The LaTeX content to be compared.
-    name: string, required
-      Unique identifier of the reference file to use as a comparison.
-      The reference file will be located at toyplot/features/reference/<name>.tex
-    """
-
-    test_file = os.path.join(failed_dir, "%s.tex" % name)
-    reference_file = os.path.join(reference_dir, "%s.tex" % name)
-    _assert_string_equal(latex, test_file, reference_file)
-
-
 def assert_canvas_equal(canvas, name):
     test_file = os.path.join(failed_dir, "%s.svg" % name)
     reference_file = os.path.join(reference_dir, "%s.svg" % name)

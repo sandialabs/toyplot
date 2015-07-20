@@ -30,8 +30,4 @@ Feature: Data tables
 
     Examples:
       | format                  |
-      | latex string            |
-      | latex fobj              |
-      | latex file              |
-      | latex string with hline |
       | ipython html string     |

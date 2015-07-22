@@ -222,7 +222,10 @@ def lighten(color, count=5, amount=0.9, reverse=False):
     return Palette(numpy.array(results), reverse=reverse)
 
 
-class CategoricalMap(object):
+class ColorMap(object):
+    pass
+
+class CategoricalMap(ColorMap):
 
     """Maps 1D categorical values (nonnegative integers) to colors.
 
@@ -309,7 +312,7 @@ class CategoricalMap(object):
         return xml.tostring(root_xml, method="html")
 
 
-class DivergingMap(object):
+class DivergingMap(ColorMap):
 
     """Maps 1D values to colors using a perceptually-uniform diverging color map.
 
@@ -456,7 +459,7 @@ class DivergingMap(object):
         return xml.tostring(root_xml, method="html")
 
 
-class LinearMap(object):
+class LinearMap(ColorMap):
 
     """Maps 1D values to colors.
 

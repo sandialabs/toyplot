@@ -79,33 +79,39 @@ def _require_color(color):
 
 
 def broadcast(colors, shape, colormap=None, palette=None):
-    if isinstance(colors, numpy.ndarray):
-        if 0 <= colors.ndim and colors.ndim <= 2 and colors.dtype == dtype:
-            array = colors
-        elif 0 <= colors.ndim and colors.ndim <= 2 and issubclass(colors.dtype.type, numpy.flexible):
-            array = numpy.array([_require_color(color)
-                                 for color in numpy.nditer(colors)], dtype=dtype)
-        elif 0 <= colors.ndim and colors.ndim <= 2 and colors.dtype.char in "bhilqBHILQefdg":
-            if palette is None:
-                palette = toyplot.color.brewer("BlueGreen")
-            if colormap is None:
-                colormap = LinearMap(palette, colors.min(), colors.max())
-            array = colormap.colors(colors)
+    if colormap is not None:
+        toyplot.log.warning("Separate colormap arguments are deprecated.  Combine values and colormaps into a (values, colormap) tuple instead.")
+    if palette is not None:
+        toyplot.log.warning("Separate palette arguments are deprecated.  Combine values and palettes into a (values, palette) tuple instead.")
+
+    # First, extract the user's choice of custom palette / colormap.
+    if isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Palette):
+        colors, palette = colors
+    if isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Map):
+        colors, colormap = colors
+
+    # Next, convert the supplied colors into a toyplot color array.
+    if isinstance(colors, numpy.ndarray) and colors.dtype == dtype:
+        pass
+    elif isinstance(colors, numpy.ndarray) and issubclass(colors.dtype.type, numpy.character):
+        colors = numpy.array([_require_color(color) for color in colors.flat], dtype=dtype).reshape(colors.shape)
+    elif isinstance(colors, numpy.ndarray) and issubclass(colors.dtype.type, numpy.number):
+        if palette is None:
+            palette = toyplot.color.brewer("BlueGreen")
+        if colormap is None:
+            colormap = LinearMap(palette, colors.min(), colors.max())
+        colors = colormap.colors(colors)
     elif isinstance(colors, list):
-        array = numpy.array([_require_color(color)
-                             for color in colors], dtype=dtype)
+        colors = numpy.array([_require_color(color) for color in colors], dtype=dtype)
     else:
-        array = _require_color(colors)
+        colors = _require_color(colors)
 
     # As a special-case, allow a vector with shape M to be matched-up with an
     # M x 1 matrix.
-    if array.ndim == 1 and isinstance(shape, tuple) and len(
-            shape) == 2 and array.shape[0] == shape[0] and shape[1] == 1:
-        return numpy.reshape(array, shape)
+    if colors.ndim == 1 and isinstance(shape, tuple) and len(shape) == 2 and colors.shape[0] == shape[0] and shape[1] == 1:
+        return numpy.reshape(colors, shape)
 
-    result = numpy.empty(shape, dtype=dtype)
-    result[...] = array
-    return result
+    return numpy.array(numpy.broadcast_arrays(colors, numpy.empty(shape))[0])
 
 
 class Palette(object):
@@ -222,10 +228,10 @@ def lighten(color, count=5, amount=0.9, reverse=False):
     return Palette(numpy.array(results), reverse=reverse)
 
 
-class ColorMap(object):
+class Map(object):
     pass
 
-class CategoricalMap(ColorMap):
+class CategoricalMap(Map):
 
     """Maps 1D categorical values (nonnegative integers) to colors.
 
@@ -312,7 +318,7 @@ class CategoricalMap(ColorMap):
         return xml.tostring(root_xml, method="html")
 
 
-class DivergingMap(ColorMap):
+class DivergingMap(Map):
 
     """Maps 1D values to colors using a perceptually-uniform diverging color map.
 
@@ -459,7 +465,7 @@ class DivergingMap(ColorMap):
         return xml.tostring(root_xml, method="html")
 
 
-class LinearMap(ColorMap):
+class LinearMap(Map):
 
     """Maps 1D values to colors.
 

@@ -15,7 +15,7 @@ Contents:
   canvas-layout.rst
   cartesian-axes.rst
   color.rst
-  convenience.rst
+  convenience-api.rst
   data-tables.rst
   embedding.rst
   labels-and-legends.rst

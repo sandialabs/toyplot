@@ -62,7 +62,7 @@ for name in [
         "canvas-layout",
         "cartesian-axes",
         "color",
-        "convenience",
+        "convenience-api",
         "data-tables",
         "labels-and-legends",
         "markers",

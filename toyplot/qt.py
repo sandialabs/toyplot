@@ -6,6 +6,8 @@
 # with specific versions (Qt 4.8.7 on a Mac) of QWebView.  Otherwise, the
 # functionality is equivalent.
 
+application = None
+
 def show(canvas, title="Toyplot Figure"):
     """Display a canvas in a Qt window.
 
@@ -34,13 +36,13 @@ def show(canvas, title="Toyplot Figure"):
     import toyplot.html
     import xml.etree.ElementTree as xml
 
-    application = QApplication(sys.argv)
+    if QApplication.instance() is None:
+      application = QApplication(sys.argv)
+
     window = QWebView()
     window.windowTitle = title
-
-    canvas, axes, mark = toyplot.plot(numpy.linspace(0, 1) ** 2)
-
     window.setHtml(xml.tostring(toyplot.html.render(canvas), method="html"))
-
     window.show()
-    application.exec_()
+
+    if application is not None:
+      application.exec_()

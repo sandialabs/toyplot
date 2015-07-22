@@ -7,7 +7,10 @@ from __future__ import division
 __version__ = "0.7.0"
 
 from toyplot.canvas import Canvas
+import logging
 
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
 
 def bars(
         a,

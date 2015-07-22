@@ -16,25 +16,25 @@ embedding in Toyplot have to offer that other tools don't?
 
 In a word: interaction.
 
-In their native HTML + Javascript format, Toyplot figures are
+In their preferred HTML + Javascript format, Toyplot figures are
 interactive - users can mouse over the figure to see interactive
 coordinates and even extract the data from a figure in CSV format using
 a context menu. This is just scratching the surface of what we want to
 achieve in interactivity, but the key point is that each figure is
 *completely self contained* and can be distributed as a single file
-without any need for an external server, special libraries or
-stylesheets.
+without any need for a server, libraries, stylesheets, or even a network
+connection.
 
-Here are just a few examples of Toyplot embedding in-action:
+Here are some examples of Toyplot embedding in-action:
 
 Jupyter (IPython) Notebooks
 ---------------------------
 
 To use Toyplot in a Jupyter (IPython) notebook, simply import the
-library and create a plot - no magics or backends required. The library
+library and create a plot - no extra statements, "magics", or backend configuration required. The library
 knows that it's being executed in the Jupyter environment, and
 automatically renders the plot into your notebook using the interactive
-HTML format:
+HTML + Javascript format:
 
 .. image:: jupyter-embedding.png
 
@@ -63,16 +63,16 @@ authored in a completely separate environment!
 Documentation
 -------------
 
-Similarly, you can convert your notebook to restructured text (the markup of
+Similarly, you can convert a Jupyter notebook to restructured text (the markup of
 choice for most Python documentation):
 
 ::
 
     $ ipython nbconvert --to rst mynotebook.ipynb --output mynotebook.rst
 
-and the HTML Toyplot figures will be embedded in the restructured text and remain
-fully-interactive in the generated docs. This, by the way, is how most of the
-Toyplot documentation is written, including the page that you're reading - we
+and the HTML + Javascript Toyplot figures will be embedded in the restructured text and remain
+fully-interactive in the generated docs. This, by the way, is how much of the
+Toyplot documentation you're reading right now is written - we
 author examples using Jupyter notebooks, which are converted to .rst files,
 then compiled into HTML documentation using `Sphinx <http://sphinx-doc.org>`_:
 
@@ -81,25 +81,25 @@ then compiled into HTML documentation using `Sphinx <http://sphinx-doc.org>`_:
 Electronic Publication
 ----------------------
 
-This leads us to one of the key goals of the Toyplot authors: supporting
-electronic publication, and changing authors' and viewers' expectations for
+This leads to one of our key goals for Toyplot: supporting
+electronic publication, and changing what people expect from
 data graphics.  Many scientific and engineering journals have begun to
 experiment with HTML-based publishing formats, and figures created with Toyplot
-are uniquely suited to an HTML publishing environment, providing useful
-interaction in a completely self-contained "package" that trivially inserted
-into an HTML document without additional modification.  Because the Toyplot
+are uniquely suited to the HTML publishing environment, providing useful
+interaction in a completely self-contained "package" that can be trivially inserted
+into an HTML document without introducing any other dependencies.  Because Toyplot
 figures don't rely on external libraries or stylesheets, they can be embedded,
-copied, and moved from place-to-place where they will Just Work without
-modification.
+copied, and moved from place-to-place where they will continue to Just Work without
+modification - properties that are critical for archival and accessibility.
 
 E-Mail
 ------
 
 Because a Toyplot figure is fully self-contained, it can be easily
 shared through e-mail or other electronic communication channels. You
-can e-mail a Toyplot .html file to a colleague, and they will be able to
+can e-mail a Toyplot figure to a colleague as an HTML file, and they will be able to
 easily view and interact with the file, in many cases right inside their
-e-mail client:
+e-mail client.
 
 PyQT / PySide
 -------------
@@ -128,16 +128,16 @@ or
 
     window.setContent(toyplot.png.render(canvas), "image/png")
 
-Automated Embedding
--------------------
+Programmatic Embedding
+----------------------
 
 Toyplot provides a wide variety of rendering backends in addition to the preferred,
 interactive HTML + Javascript backend.  The API implemented by the backends has been
 carefully crafted to support embedding and maximize consistency:
 
-* Most backends take a `fileobj` parameter in their :meth:`render` method.  If you pass a string `fileobj`, the canvas will be written to the given filename on disk using whatever file format (HTML, SVG, PDF, PNG, etc.) the backend implements.
-* If you pass a file-like object as the `fileobj` parameter, the canvas to the object in the backend file format.  So you could use :class:`StringIO.StringIO` to store a figure to an in-memory buffer for subsequent processing.
-* If you don't supply the `fileobj` parameter, the canvas will be returned from :meth:`render` in whatever form is most appropriate for the file format:
-    * The HTML and SVG backends return an instance of :class:`xml.etree.ElementTree.Element` that contains the figure DOM.  This makes it easy to manipulate the tree for embedding in a larger tree or subsequent processing.
-    * The PDF and PNG backends return the raw bytes of the PDF or PNG file.  So you could pass the PNG image bytes to :mod:`PIL`, for example.
+* Most backends take a `fileobj` parameter in their :meth:`render` method.  If you pass a string `fileobj`, the canvas will be written to the given filename on disk using the backend file format (HTML, SVG, PDF, PNG, etc).
+* If you pass a file-like object as the `fileobj` parameter, the canvas will be written to the object using the backend file format.  So you can store any figure to an in-memory :class:`StringIO.StringIO` buffer for subsequent processing.
+* If you don't supply the `fileobj` parameter when rendering, the canvas will be returned to the caller in whatever high-level form is most appropriate for that backend:
+    * The :mod:`toyplot.html` and :mod:`toyplot.svg` backends return an instance of :class:`xml.etree.ElementTree.Element` that contains the DOM representation of the figure.  This makes it easy to manipulate the figure for embedding in a larger DOM or subsequent processing.
+    * The :mod:`toyplot.pdf` and :mod:`toyplot.png` backends return the raw bytes of a PDF or PNG file, respectively.  So you could pass the PNG image bytes to :mod:`PIL`, for example.
 

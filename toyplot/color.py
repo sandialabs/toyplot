@@ -78,13 +78,26 @@ def _require_color(color):
             "Expected a CSS color string or a Toyplot.color.value.")
 
 
-def broadcast(colors, shape, colormap=None, palette=None):
-    if colormap is not None:
-        toyplot.log.warning("Separate colormap arguments are deprecated.  Combine values and colormaps into a (values, colormap) tuple instead.")
-    if palette is not None:
-        toyplot.log.warning("Separate palette arguments are deprecated.  Combine values and palettes into a (values, palette) tuple instead.")
+def broadcast(
+        colors,
+        shape,
+        default=None,
+        colormap=None,
+        palette=None,
+        colors_parameter=None,
+        colormap_parameter=None,
+        palette_parameter=None):
 
-    # First, extract the user's choice of custom palette / colormap.
+    if colormap is not None:
+        toyplot.log.warning("'%s' parameter is deprecated and will be removed in the next release.  Pass a (values, colormap) tuple to '%s' instead." % (colormap_parameter, colors_parameter))
+    if palette is not None:
+        toyplot.log.warning("'%s' parameter is deprecated and will be removed in the next release.  Pass a (values, palette) tuple to '%s' instead." % (palette_parameter, colors_parameter))
+
+    # Supply default color(s).
+    if colors is None:
+        colors = default
+
+    # Next, extract the user's choice of custom palette / colormap.
     if isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Palette):
         colors, palette = colors
     if isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Map):

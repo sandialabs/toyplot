@@ -137,7 +137,7 @@ def render(svg, context):
                             context.rectangle(x, y, width, height)
                             context.clip()
                         else:
-                            print "Unhandled clip tag: %s" % child.tag
+                            toyplot.log.error("Unhandled clip tag: %s" % child.tag)
 
                 for child in element:
                     render_element(svg, child, context, styles)

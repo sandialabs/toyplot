@@ -729,14 +729,41 @@ def render(canvas, fobj=None, animation=False):
         return root
 
 
+import sys
+def _color_fixup(styles):
+    """It turns-out that many applications and libraries (Inkscape, Adobe Illustrator, Qt)
+    don't handle CSS rgba() colors correctly.  So convert them to CSS rgb colors and use
+    fill-opacity / stroke-opacity instead."""
+
+    if "fill" in styles:
+        color = toyplot.color.css(styles["fill"])
+        if color is not None:
+            opacity = float(styles.get("fill-opacity", 1.0))
+            styles["fill"] = "rgb(%.3g%%,%.3g%%,%.3g%%)" % (
+                color["r"] * 100, color["g"] * 100, color["b"] * 100)
+            try:
+                styles["fill-opacity"] = str(color["a"] * opacity)
+            except:
+                sys.stderr.write("%s\n" % styles)
+                sys.stderr.flush()
+    if "stroke" in styles:
+        color = toyplot.color.css(styles["stroke"])
+        if color is not None:
+            opacity = float(styles.get("stroke-opacity", 1.0))
+            styles["stroke"] = "rgb(%.3g%%,%.3g%%,%.3g%%)" % (
+                color["r"] * 100, color["g"] * 100, color["b"] * 100)
+            styles["stroke-opacity"] = str(color["a"] * opacity)
+
+    return styles
+
 def _css_style(*styles):
-    style = toyplot.style.combine(*styles)
+    style = _color_fixup(toyplot.style.combine(*styles))
     return ";".join(["%s:%s" % (key, value)
                      for key, value in sorted(style.items())])
 
 
 def _css_attrib(*styles):
-    style = toyplot.style.combine(*styles)
+    style = _color_fixup(toyplot.style.combine(*styles))
     attrib = {}
     if len(style):
         attrib["style"] = ";".join(

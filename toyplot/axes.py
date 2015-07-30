@@ -1912,7 +1912,8 @@ class Cartesian(object):
             palette=None,
             opacity=1.0,
             title=None,
-            style=None):
+            style=None,
+            annotation=True):
         """Add horizontal line(s) to the axes.
 
         Horizontal lines are convenient because they're guaranteed to fill the axes from
@@ -1928,6 +1929,8 @@ class Cartesian(object):
         style: dict, optional
           Collection of CSS styles to apply to the mark.  See
           :class:`toyplot.mark.AxisLines` for a list of useful styles.
+        annotation: boolean, optional
+          Set to True if this mark should be considered an annotation.
 
         Returns
         -------
@@ -1935,6 +1938,7 @@ class Cartesian(object):
         """
         table = toyplot.data.Table()
         table["y"] = toyplot.require.scalar_vector(y)
+        _mark_exportable(table, "y", not annotation)
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.style.combine(toyplot.require.style(style))
@@ -1949,7 +1953,8 @@ class Cartesian(object):
             colormap_parameter="colormap",
             palette_parameter="palette")
 
-        self._update_domain(numpy.array([]), table["y"])
+        self._update_domain(numpy.array([]), table["y"], display=True, data=not annotation)
+
         self._children.append(
             toyplot.mark.AxisLines(
                 table=table,
@@ -1969,7 +1974,8 @@ class Cartesian(object):
             palette=None,
             opacity=1.0,
             title=None,
-            style=None):
+            style=None,
+            annotation=True):
         """Add vertical line(s) to the axes.
 
         Vertical lines are convenient because they're guaranteed to fill the axes from
@@ -1985,6 +1991,8 @@ class Cartesian(object):
         style: dict, optional
           Collection of CSS styles to apply to the mark.  See
           :class:`toyplot.mark.AxisLines` for a list of useful styles.
+        annotation: boolean, optional
+          Set to True if this mark should be considered an annotation.
 
         Returns
         -------
@@ -1992,6 +2000,7 @@ class Cartesian(object):
         """
         table = toyplot.data.Table()
         table["x"] = toyplot.require.scalar_vector(x)
+        _mark_exportable(table, "x", not annotation)
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.style.combine(toyplot.require.style(style))
@@ -2006,7 +2015,8 @@ class Cartesian(object):
             colormap_parameter="colormap",
             palette_parameter="palette")
 
-        self._update_domain(table["x"], numpy.array([]))
+        self._update_domain(table["x"], numpy.array([]), display=True, data=not annotation)
+
         self._children.append(
             toyplot.mark.AxisLines(
                 table=table,

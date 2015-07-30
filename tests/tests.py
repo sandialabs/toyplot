@@ -873,48 +873,6 @@ def test_axes_bars_n_boundaries_titles():
     assert_canvas_matches(canvas, "axes-bars-n-boundaries-titles")
 
 
-def test_axes_hlines_fail():
-    with nose.tools.assert_raises(ValueError):
-        canvas = toyplot.Canvas()
-        axes = canvas.axes()
-        axes.hlines("foo")
-
-
-def test_axes_hlines():
-    canvas = toyplot.Canvas()
-    axes = canvas.axes()
-    axes.hlines(0)
-    assert_canvas_matches(canvas, "axes-hlines")
-
-
-def test_axes_hlines_multiple():
-    canvas = toyplot.Canvas()
-    axes = canvas.axes()
-    axes.hlines(numpy.linspace(-1, 1, 10))
-    assert_canvas_matches(canvas, "axes-hlines-multiple")
-
-
-def test_axes_vlines_fail():
-    with nose.tools.assert_raises(ValueError):
-        canvas = toyplot.Canvas()
-        axes = canvas.axes()
-        axes.vlines("foo")
-
-
-def test_axes_vlines():
-    canvas = toyplot.Canvas()
-    axes = canvas.axes()
-    axes.vlines(0)
-    assert_canvas_matches(canvas, "axes-vlines")
-
-
-def test_axes_vlines_multiple():
-    canvas = toyplot.Canvas()
-    axes = canvas.axes()
-    axes.vlines(numpy.linspace(-1, 1, 10))
-    assert_canvas_matches(canvas, "axes-vlines-multiple")
-
-
 def test_axes_plot_one_variable():
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))

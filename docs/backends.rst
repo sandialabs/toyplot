@@ -15,7 +15,6 @@ Contents:
    toyplot.mp4.rst
    toyplot.pdf.rst
    toyplot.png.rst
-   toyplot.selenium.rst
    toyplot.svg.rst
    toyplot.webm.rst
 

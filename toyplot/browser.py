@@ -27,12 +27,11 @@ def show(canvas, title="Toyplot Figure"):
     import xml.etree.ElementTree as xml
     import webbrowser
 
-    figure = toyplot.html.render(canvas)
     html = xml.Element("html")
     head = xml.SubElement(html, "head")
     xml.SubElement(head, "title").text = title
     body = xml.SubElement(html, "body")
-    body.append(figure)
+    body.append(toyplot.html.render(canvas))
 
     fd, path = tempfile.mkstemp(suffix=".html")
     with os.fdopen(fd, "wb") as file:

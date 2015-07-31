@@ -6,7 +6,10 @@ from __future__ import absolute_import
 from __future__ import division
 
 
-import toyplot.cairo.pdf
+import cairo
+import numpy
+import toyplot.svg
+import toyplot.cairo
 
 
 def render(canvas, fobj, width=None, height=None, scale=None):
@@ -43,4 +46,12 @@ def render(canvas, fobj, width=None, height=None, scale=None):
     The output PDF is rendered using an SVG representation of the canvas
     generated with :func:`toyplot.svg.render()`.
     """
-    return toyplot.cairo.pdf.render(canvas, fobj, width, height, scale)
+    svg = toyplot.svg.render(canvas)
+    scale = canvas._point_scale(width=width, height=height, scale=scale)
+    surface = cairo.PDFSurface(
+        fobj, scale * canvas._width, scale * canvas._height)
+    context = cairo.Context(surface)
+    context.scale(scale, scale)
+    toyplot.cairo.render(svg, context)
+    surface.flush()
+    surface.finish()

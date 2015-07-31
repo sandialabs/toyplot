@@ -6,7 +6,24 @@
 # with specific versions (Qt 4.8.7 on a Mac) of QWebView.  Otherwise, the
 # functionality is equivalent.
 
-application = None
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtPrintSupport import *
+from PyQt5.QtWebKitWidgets import *
+from PyQt5.QtWidgets import *
+
+import numpy
+import sys
+import toyplot.html
+import xml.etree.ElementTree as xml
+
+def application():
+    if application.instance is None:
+        application.instance = QApplication.instance()
+        if application.instance is None:
+            application.instance = QApplication(sys.argv)
+    return application.instance
+application.instance = None
 
 def show(canvas, title="Toyplot Figure"):
     """Display a canvas in a Qt window.
@@ -24,25 +41,11 @@ def show(canvas, title="Toyplot Figure"):
     The output HTML is generated using :func:`toyplot.html.render`.
     """
 
-    try:
-        from PyQt5.QtWidgets import QApplication
-        from PyQt5.QtWebKitWidgets import QWebView
-    except:
-        from PySide.QtGui import QApplication
-        from PySide.QtWebKit import QWebView
-
-    import numpy
-    import sys
-    import toyplot.html
-    import xml.etree.ElementTree as xml
-
-    if QApplication.instance() is None:
-      application = QApplication(sys.argv)
+    qapplication = application()
 
     window = QWebView()
     window.windowTitle = title
     window.setHtml(xml.tostring(toyplot.html.render(canvas), method="html"))
     window.show()
 
-    if application is not None:
-      application.exec_()
+    qapplication.exec_()

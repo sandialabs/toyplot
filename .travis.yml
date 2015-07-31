@@ -20,9 +20,9 @@ before_install:
   - export PATH=$TRAVIS_BUILD_DIR/ffmpeg:$PATH
 
 install:
-  - pip install behave "colormath>=2.1.0" coverage coveralls mock multipledispatch networkx "numpy>=1.7"
+  - pip install behave "colormath>=2.1.0" coverage coveralls mock multipledispatch networkx nose-exclude "numpy>=1.7"
 script:
-  - coverage run --source toyplot --omit toyplot/testing.py -m nose
+  - coverage run --source toyplot --omit toyplot/testing.py -m nose --exclude-dir toyplot
   - coverage run --append --source toyplot --omit toyplot/testing.py -m behave
   - coverage report
 after_script:

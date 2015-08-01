@@ -468,7 +468,7 @@ def render(canvas, fobj=None, animation=False):
         attrib={ "xmlns:toyplot": "http://www.sandia.gov/toyplot"},
         width="%rpx" % canvas._width,
         height="%rpx" % canvas._height,
-        viewBox="0 0 %rpx %rpx" % (canvas._width, canvas._height),
+        viewBox="0 0 %r %r" % (canvas._width, canvas._height),
         preserveAspectRatio="xMidyMid meet",
         style=_css_style( canvas._style),
         id=context.get_id(canvas))

@@ -5,12 +5,14 @@
 from __future__ import absolute_import
 from __future__ import division
 
+import tempfile
+import toyplot.compatibility
 import toyplot.qt
 import toyplot.svg
 import xml.etree.ElementTree as xml
 
 
-def render(canvas, fobj, width=None, height=None, scale=None):
+def render(canvas, fobj=None, width=None, height=None, scale=None):
     """Render the PDF representation of a canvas using Qt.
 
     Because the canvas dimensions are specified explicitly at creation time, they
@@ -67,6 +69,15 @@ def render(canvas, fobj, width=None, height=None, scale=None):
     printer = toyplot.qt.QPrinter()
     printer.setPageSize(page_size)
     printer.setOutputFormat(toyplot.qt.QPrinter.PdfFormat)
-    printer.setOutputFileName(fobj)
-    page.mainFrame().print_(printer)
+    if isinstance(fobj, toyplot.compatibility.string_type):
+        printer.setOutputFileName(fobj)
+        page.mainFrame().print_(printer)
+    else:
+        fd, path = tempfile.mkstemp(suffix=".pdf")
+        printer.setOutputFileName(path)
+        page.mainFrame().print_(printer)
+        if fobj is None:
+            return open(path, "r").read()
+        else:
+            fobj.write(open(path, "r").read())
 

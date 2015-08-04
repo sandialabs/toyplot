@@ -5,12 +5,13 @@
 from __future__ import absolute_import
 from __future__ import division
 
+import toyplot.compatibility
 import toyplot.qt
 import toyplot.svg
 import xml.etree.ElementTree as xml
 
 
-def render(canvas, fobj, width=None, height=None, scale=None):
+def render(canvas, fobj=None, width=None, height=None, scale=None):
     """Render the PNG representation of a canvas using Qt.
 
     Because the canvas dimensions in CSS pixels are mapped directly to pixels
@@ -49,22 +50,28 @@ def render(canvas, fobj, width=None, height=None, scale=None):
     """
     qapplication = toyplot.qt.application()
 
-    html = xml.Element("html")
-    head = xml.SubElement(html, "head")
-    style = xml.SubElement(head, "style")
-    style.text = """body { background-color: rgba(100%, 100%, 100%, 0.0); }"""
-    body = xml.SubElement(html, "body")
-    body.append(toyplot.svg.render(canvas))
-
+    svg = toyplot.svg.render(canvas)
     scale = canvas._point_scale(width=width, height=height, scale=scale)
     #surface = cairo.PDFSurface(fobj, scale * canvas._width, scale * canvas._height)
 
     page = toyplot.qt.QWebPage()
-    page.mainFrame().setHtml(xml.tostring(html, method="html"))
+    page.mainFrame().setHtml(xml.tostring(svg, method="html"))
     page.setViewportSize(page.mainFrame().contentsSize())
 
     image = toyplot.qt.QImage(page.viewportSize(), toyplot.qt.QImage.Format_ARGB32)
     painter = toyplot.qt.QPainter(image)
     page.mainFrame().render(painter)
     painter.end()
-    image.save(fobj)
+
+    if isinstance(fobj, toyplot.compatibility.string_type):
+        image.save(fobj, "PNG")
+    else:
+        storage = toyplot.qt.QByteArray()
+        buffer = toyplot.qt.QBuffer(storage)
+        buffer.open(toyplot.qt.QIODevice.WriteOnly)
+        image.save(buffer, "PNG")
+        if fobj is None:
+            return storage.data()
+        else:
+            fobj.write(storage.data())
+

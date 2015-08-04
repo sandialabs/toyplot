@@ -13,16 +13,18 @@ import xml.etree.ElementTree as xml
 def render(canvas, fobj, width=None, height=None, scale=None):
     """Render the PNG representation of a canvas using Qt.
 
-    Because the canvas dimensions are specified explicitly at creation time, they
-    map directly to real-world units in the output PNG image.  Use one of
-    `width`, `height`, or `scale` to override this behavior.
+    Because the canvas dimensions in CSS pixels are mapped directly to pixels
+    in the output PNG image.  Use one of `width`, `height`, or `scale` to
+    override this behavior.
 
     Parameters
     ----------
     canvas: :class:`toyplot.canvas.Canvas`
       Canvas to be rendered.
-    fobj: file-like object or string
+    fobj: file-like object or string, optional
       The file to write.  Use a string filepath to write data directly to disk.
+      If `None` (the default), the PNG data will be returned to the caller
+      instead.
     width: number, string, or (number, string) tuple, optional
       Specify the width of the output image with optional units.  If the units
       aren't specified, defaults to points.  See :ref:`units` for details on
@@ -33,20 +35,17 @@ def render(canvas, fobj, width=None, height=None, scale=None):
       unit conversion in Toyplot.
     scale: number, optional
       Scales the output `canvas` by the given ratio.
-    qapplication: :class:`QApplication`, optional
-        If you're using Toyplot as part of a larger Qt application,
-        pass your global QApplication instance here.  Otherwise,
-        an internal QApplication instance will be created automatically.
+
+    Returns
+    -------
+    png: PNG image data, or `None`
+      PNG representation of `canvas`, or `None` if the caller specifies the
+      `fobj` parameter.
 
     Examples
     --------
 
     >>> toyplot.pdf.render(canvas, "figure-1.pdf", width=(4, "inches"))
-
-    Notes
-    -----
-    The output PDF is rendered using an SVG representation of the canvas
-    generated with :func:`toyplot.svg.render()`.
     """
     qapplication = toyplot.qt.application()
 

@@ -18,6 +18,17 @@ import toyplot.html
 import xml.etree.ElementTree as xml
 
 def application():
+    """Return a singleton QApplication instance.
+
+    If an instance of :class:`QApplication` has already been created, returns
+    it.  Otherwise, an instance of QApplication is created and returned.
+
+    Returns
+    -------
+    qapplication: :class:`QApplication`
+        The Qt global singleton application object.
+    """
+
     if application.instance is None:
         application.instance = QApplication.instance()
         if application.instance is None:
@@ -28,6 +39,11 @@ application.instance = None
 def show(canvas, title="Toyplot Figure"):
     """Display a canvas in a Qt window.
 
+    Displays a Toyplot canvas in a popup Qt window, using Toyplot's preferred
+    interactive HTML+SVG+Javascript backend.
+
+    Note: this function blocks until the user closes the figure window.
+
     Parameters
     ----------
     canvas: :class:`toyplot.canvas.Canvas`
@@ -35,10 +51,6 @@ def show(canvas, title="Toyplot Figure"):
 
     title: string, optional
       Optional page title to be displayed in the window.
-
-    Notes
-    -----
-    The output HTML is generated using :func:`toyplot.html.render`.
     """
 
     qapplication = application()

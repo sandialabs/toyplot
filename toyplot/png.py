@@ -39,8 +39,8 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
     Notes
     -----
-    The output PNG is rendered using an SVG representation of the canvas
-    generated with :func:`toyplot.svg.render()`.
+    The output PNG is currently rendered using
+    :func:`toyplot.cairo.png.render()`.  This may change in the future.
     """
     return toyplot.cairo.png.render(canvas, fobj, width, height, scale)
 
@@ -71,8 +71,8 @@ def render_frames(canvas, width=None, height=None, scale=None):
 
     Notes
     -----
-    The output PNG images are rendered using an SVG representation of the canvas
-    generated with :func:`toyplot.svg.render()`.
+    The output PNG images are currently rendered using
+    :func:`toyplot.cairo.png.render_frames()`.  This may change in the future.
 
     Examples
     --------

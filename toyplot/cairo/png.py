@@ -17,7 +17,7 @@ except:  # pragma: no cover
 
 
 def render(canvas, fobj=None, width=None, height=None, scale=None):
-    """Render the PNG bitmap representation of a canvas.
+    """Render the PNG bitmap representation of a canvas using Cairo.
 
     By default, canvas dimensions in CSS pixels are mapped directly to pixels in
     the output PNG image.  Use one of `width`, `height`, or `scale` to override
@@ -43,11 +43,6 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     png: PNG image data, or `None`
       PNG representation of `canvas`, or `None` if the caller specifies the
       `fobj` parameter.
-
-    Notes
-    -----
-    The output PNG is rendered using an SVG representation of the canvas
-    generated with :func:`toyplot.svg.render()`.
     """
     svg = toyplot.svg.render(canvas)
     scale = canvas._pixel_scale(width=width, height=height, scale=scale)
@@ -65,7 +60,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
 
 def render_frames(canvas, width=None, height=None, scale=None):
-    """Render a canvas as a sequence of PNG images.
+    """Render a canvas as a sequence of PNG images using Cairo.
 
     By default, canvas dimensions in CSS pixels are mapped directly to pixels in
     the output PNG images.  Use one of `width`, `height`, or `scale` to override
@@ -87,11 +82,6 @@ def render_frames(canvas, width=None, height=None, scale=None):
     frames: Python generator expression that returns each PNG image in the sequence.
       The caller must iterate over the returned frames and is responsible for all
       subsequent processing, including disk I/O, video compression, etc.
-
-    Notes
-    -----
-    The output PNG images are rendered using an SVG representation of the canvas
-    generated with :func:`toyplot.svg.render()`.
 
     Examples
     --------

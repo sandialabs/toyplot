@@ -23,6 +23,8 @@ def render(canvas, fobj, width=None, height=None, scale=None):
       Canvas to be rendered.
     fobj: file-like object or string
       The file to write.  Use a string filepath to write data directly to disk.
+      If `None` (the default), the PDF data will be returned to the caller
+      instead.
     width: number, string, or (number, string) tuple, optional
       Specify the width of the output image with optional units.  If the units
       aren't specified, defaults to points.  See :ref:`units` for details on
@@ -33,20 +35,17 @@ def render(canvas, fobj, width=None, height=None, scale=None):
       unit conversion in Toyplot.
     scale: number, optional
       Scales the output `canvas` by the given ratio.
-    qapplication: :class:`QApplication`, optional
-        If you're using Toyplot as part of a larger Qt application,
-        pass your global QApplication instance here.  Otherwise,
-        an internal QApplication instance will be created automatically.
+
+    Returns
+    -------
+    pdf: PDF data, or `None`
+      PDF representation of `canvas`, or `None` if the caller specifies the
+      `fobj` parameter.
 
     Examples
     --------
 
     >>> toyplot.pdf.render(canvas, "figure-1.pdf", width=(4, "inches"))
-
-    Notes
-    -----
-    The output PDF is rendered using an SVG representation of the canvas
-    generated with :func:`toyplot.svg.render()`.
     """
     qapplication = toyplot.qt.application()
 

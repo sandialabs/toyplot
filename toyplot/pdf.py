@@ -22,6 +22,8 @@ def render(canvas, fobj, width=None, height=None, scale=None):
       Canvas to be rendered.
     fobj: file-like object or string
       The file to write.  Use a string filepath to write data directly to disk.
+      If `None` (the default), the PDF data will be returned to the caller
+      instead.
     width: number, string, or (number, string) tuple, optional
       Specify the width of the output image with optional units.  If the units
       aren't specified, defaults to points.  See :ref:`units` for details on
@@ -33,6 +35,12 @@ def render(canvas, fobj, width=None, height=None, scale=None):
     scale: number, optional
       Scales the output `canvas` by the given ratio.
 
+    Returns
+    -------
+    pdf: PDF data, or `None`
+      PDF representation of `canvas`, or `None` if the caller specifies the
+      `fobj` parameter.
+
     Examples
     --------
 
@@ -40,7 +48,7 @@ def render(canvas, fobj, width=None, height=None, scale=None):
 
     Notes
     -----
-    The output PDF is rendered using an SVG representation of the canvas
-    generated with :func:`toyplot.svg.render()`.
+    The output PDF is currently rendered using
+    :func:`toyplot.cairo.pdf.render()`.  This may change in the future.
     """
     return toyplot.cairo.pdf.render(canvas, fobj, width, height, scale)

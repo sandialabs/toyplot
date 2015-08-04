@@ -8,17 +8,19 @@ from __future__ import division
 def show(canvas, title="Toyplot Figure"):
     """Display a canvas in a web browser.
 
+    Uses Toyplot's preferred HTML+SVG+Javascript backend to display an
+    interactive canvas in a web browser window.
+
+    Because the canvas is displayed in a separate web browser process,
+    this function returns immediately.
+
     Parameters
     ----------
     canvas: :class:`toyplot.canvas.Canvas`
       The canvas to be displayed.
 
     title: string, optional
-      Optional page title to be displayed in the browser.
-
-    Notes
-    -----
-    The output HTML is generated using :func:`toyplot.html.render`.
+      Optional page title to be displayed by the browser.
     """
 
     import os

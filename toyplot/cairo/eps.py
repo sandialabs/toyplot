@@ -10,9 +10,15 @@ import cairo
 import toyplot.cairo
 import toyplot.svg
 
+try:
+    import cStringIO as StringIO
+except:  # pragma: no cover
+    import StringIO
 
-def render(canvas, fobj, width=None, height=None, scale=None):
-    """Render the Encapsulated Postscript representation of a canvas.
+
+def render(canvas, fobj=None, width=None, height=None, scale=None):
+    """Render the Encapsulated Postscript representation of a canvas using
+    Cairo.
 
     Because the canvas dimensions are explicitly specified when it's created,
     they map directly to real-world units in the output EPS image.  Use one of
@@ -24,6 +30,8 @@ def render(canvas, fobj, width=None, height=None, scale=None):
       Canvas to be rendered.
     fobj: file-like object or string
       The file to write.  Use a string filepath to write data directly to disk.
+      If `None` (the default), the EPS data will be returned to the caller
+      instead.
     width: number, string, or (number, string) tuple, optional
       Specify the width of the output image with optional units.  If the units
       aren't specified, defaults to points.  See :ref:`units` for details on
@@ -34,6 +42,12 @@ def render(canvas, fobj, width=None, height=None, scale=None):
       unit conversion in Toyplot.
     scale: number, optional
       Scales the output `canvas` by the given ratio.
+
+    Returns
+    -------
+    eps: EPS image data, or `None`
+      EPS representation of `canvas`, or `None` if the caller specifies the
+      `fobj` parameter.
 
     Examples
     --------
@@ -51,11 +65,18 @@ def render(canvas, fobj, width=None, height=None, scale=None):
     """
     svg = toyplot.svg.render(canvas)
     scale = canvas._point_scale(width=width, height=height, scale=scale)
-    surface = cairo.PSSurface(
-        fobj, scale * canvas._width, scale * canvas._height)
+    if fobj is None:
+        buffer = StringIO.StringIO()
+        surface = cairo.PSSurface(
+            buffer, scale * canvas._width, scale * canvas._height)
+    else:
+        surface = cairo.PSSurface(
+            fobj, scale * canvas._width, scale * canvas._height)
     surface.set_eps(True)
     context = cairo.Context(surface)
     context.scale(scale, scale)
     toyplot.cairo.render(svg, context)
     surface.flush()
     surface.finish()
+    if fobj is None:
+        return buffer.getvalue()

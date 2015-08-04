@@ -51,9 +51,11 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     """
     qapplication = toyplot.qt.application()
 
+    scale = canvas._pixel_scale(width=width, height=height, scale=scale)
+    width = canvas._width * scale
+    height = canvas._height * scale
+
     svg = toyplot.svg.render(canvas)
-    scale = canvas._point_scale(width=width, height=height, scale=scale)
-    #surface = cairo.PDFSurface(fobj, scale * canvas._width, scale * canvas._height)
 
     page = toyplot.qt.QWebPage()
     page.mainFrame().setContent(xml.tostring(toyplot.svg.render(canvas)), "image/svg+xml")
@@ -61,23 +63,38 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
     page_size = toyplot.qt.QPageSize(
         toyplot.qt.QSizeF(
-            toyplot.units.convert((canvas._width, "px"), "pt"),
-            toyplot.units.convert((canvas._height, "px"), "pt")),
+            toyplot.units.convert((width, "px"), "pt"),
+            toyplot.units.convert((height, "px"), "pt")),
         toyplot.qt.QPageSize.Point,
         matchPolicy=toyplot.qt.QPageSize.ExactMatch)
 
-    printer = toyplot.qt.QPrinter()
-    printer.setPageSize(page_size)
-    printer.setOutputFormat(toyplot.qt.QPrinter.PdfFormat)
+    page_layout = toyplot.qt.QPageLayout(
+        page_size,
+        toyplot.qt.QPageLayout.Portrait,
+        toyplot.qt.QMarginsF(0, 0, 0, 0),
+        )
+
     if isinstance(fobj, toyplot.compatibility.string_type):
-        printer.setOutputFileName(fobj)
-        page.mainFrame().print_(printer)
+        pdf = toyplot.qt.QPdfWriter(fobj)
     else:
-        fd, path = tempfile.mkstemp(suffix=".pdf")
-        printer.setOutputFileName(path)
-        page.mainFrame().print_(printer)
+        storage = toyplot.qt.QByteArray()
+        buffer = toyplot.qt.QBuffer(storage)
+        buffer.open(toyplot.qt.QIODevice.WriteOnly)
+        pdf = toyplot.qt.QPdfWriter(buffer)
+
+    pdf.setPageLayout(page_layout)
+    pdf.setResolution(96) # CSS pixels per inch
+
+    painter = toyplot.qt.QPainter(pdf)
+    painter.scale(scale, scale)
+    page.mainFrame().render(painter)
+    painter.end()
+
+    if isinstance(fobj, toyplot.compatibility.string_type):
+        pass
+    else:
         if fobj is None:
-            return open(path, "r").read()
+            return storage.data()
         else:
-            fobj.write(open(path, "r").read())
+            fobj.write(storage.data())
 

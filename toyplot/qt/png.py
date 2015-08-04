@@ -50,16 +50,19 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     """
     qapplication = toyplot.qt.application()
 
+    scale = canvas._pixel_scale(width=width, height=height, scale=scale)
+    width = canvas._width * scale
+    height = canvas._height * scale
+
     svg = toyplot.svg.render(canvas)
-    scale = canvas._point_scale(width=width, height=height, scale=scale)
-    #surface = cairo.PDFSurface(fobj, scale * canvas._width, scale * canvas._height)
 
     page = toyplot.qt.QWebPage()
     page.mainFrame().setHtml(xml.tostring(svg, method="html"))
     page.setViewportSize(page.mainFrame().contentsSize())
 
-    image = toyplot.qt.QImage(page.viewportSize(), toyplot.qt.QImage.Format_ARGB32)
+    image = toyplot.qt.QImage(width, height, toyplot.qt.QImage.Format_ARGB32)
     painter = toyplot.qt.QPainter(image)
+    painter.scale(scale, scale)
     page.mainFrame().render(painter)
     painter.end()
 

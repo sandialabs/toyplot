@@ -64,6 +64,7 @@ for name in [
         "color",
         "convenience-api",
         "data-tables",
+        "interaction",
         "labels-and-legends",
         "markers",
         "matrix-visualization",

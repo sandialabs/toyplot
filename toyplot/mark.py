@@ -75,7 +75,8 @@ class BarBoundaries(Mark):
             fill,
             opacity,
             title,
-            style):
+            style,
+            filename):
         table = toyplot.require.instance(table, toyplot.data.Table)
         left = toyplot.require.table_keys(table, left, length=1)
         right = toyplot.require.table_keys(table, right, length=1)
@@ -91,6 +92,7 @@ class BarBoundaries(Mark):
         title = toyplot.require.table_keys(
             table, title, length=len(boundaries) - 1)
         style = toyplot.require.style(style)
+        filename = toyplot.require.filename(filename)
 
         Mark.__init__(self)
         self._table = table
@@ -102,8 +104,8 @@ class BarBoundaries(Mark):
         self._fill = fill  # N-1 fill color columns
         self._opacity = opacity  # N-1 opacity columns
         self._title = title  # N-1 title columns
-        self._style = toyplot.style.combine(
-            {"stroke": "none"}, style)  # Bar style
+        self._style = toyplot.style.combine({"stroke": "none"}, style)  # Bar style
+        self._filename = filename
 
 
 class BarMagnitudes(Mark):
@@ -126,7 +128,8 @@ class BarMagnitudes(Mark):
             fill,
             opacity,
             title,
-            style):
+            style,
+            filename):
         table = toyplot.require.instance(table, toyplot.data.Table)
         left = toyplot.require.table_keys(table, left, length=1)
         right = toyplot.require.table_keys(table, right, length=1)
@@ -143,6 +146,7 @@ class BarMagnitudes(Mark):
         title = toyplot.require.table_keys(
             table, title, length=len(magnitudes))
         style = toyplot.require.style(style)
+        filename = toyplot.require.filename(filename)
 
         Mark.__init__(self)
         self._table = table
@@ -157,6 +161,7 @@ class BarMagnitudes(Mark):
         self._title = title  # N title columns
         self._style = toyplot.style.combine(
             {"stroke": "none"}, style)  # Bar style
+        self._filename = filename
 
 
 class FillBoundaries(Mark):
@@ -177,13 +182,15 @@ class FillBoundaries(Mark):
             fill,
             opacity,
             title,
-            style):
+            style,
+            filename):
         table = toyplot.require.instance(table, toyplot.data.Table)
         position = toyplot.require.table_keys(table, position, length=1)
         position_axis = toyplot.require.string_vector(position_axis, length=1)
         boundaries = toyplot.require.table_keys(table, boundaries)
         boundary_axis = toyplot.require.string_vector(boundary_axis, length=1)
         style = toyplot.require.style(style)
+        filename = toyplot.require.filename(filename)
 
         Mark.__init__(self)
         self._table = table
@@ -195,6 +202,7 @@ class FillBoundaries(Mark):
         self._opacity = opacity   # N-1 opacities
         self._title = title       # N-1 titles
         self._style = style       # Fill style
+        self._filename = filename
 
 
 class FillMagnitudes(Mark):
@@ -216,7 +224,8 @@ class FillMagnitudes(Mark):
             fill,
             opacity,
             title,
-            style):
+            style,
+            filename):
         table = toyplot.require.instance(table, toyplot.data.Table)
         position = toyplot.require.table_keys(table, position, length=1)
         position_axis = toyplot.require.string_vector(position_axis, length=1)
@@ -225,6 +234,7 @@ class FillMagnitudes(Mark):
         magnitude_axis = toyplot.require.string_vector(
             magnitude_axis, length=1)
         style = toyplot.require.style(style)
+        filename = toyplot.require.filename(filename)
 
         Mark.__init__(self)
         self._table = table
@@ -237,6 +247,7 @@ class FillMagnitudes(Mark):
         self._opacity = opacity       # N opacities
         self._title = title           # N titles
         self._style = style           # Fill style
+        self._filename = filename
 
 
 class Graph(Mark):
@@ -357,7 +368,8 @@ class Plot(Mark):
             title,
             style,
             mstyle,
-            mlstyle):
+            mlstyle,
+            filename):
         table = toyplot.require.instance(table, toyplot.data.Table)
         coordinates = toyplot.require.table_keys(
             table, coordinates, min_length=1)
@@ -380,6 +392,7 @@ class Plot(Mark):
         style = toyplot.require.style(style)
         mstyle = toyplot.require.style(mstyle)
         mlstyle = toyplot.require.style(mlstyle)
+        filename = toyplot.require.filename(filename)
 
         Mark.__init__(self)
         self._table = table
@@ -400,6 +413,7 @@ class Plot(Mark):
         self._style = style                   # Line style
         self._mstyle = mstyle                 # Marker style
         self._mlstyle = mlstyle               # Marker label style
+        self._filename = filename
 
 
 class Rect(Mark):
@@ -422,7 +436,8 @@ class Rect(Mark):
             fill,
             opacity,
             title,
-            style):
+            style,
+            filename):
         table = toyplot.require.instance(table, toyplot.data.Table)
         left = toyplot.require.table_keys(table, left, length=1)
         right = toyplot.require.table_keys(table, right, length=1)
@@ -436,6 +451,7 @@ class Rect(Mark):
         opacity = toyplot.require.table_keys(table, opacity, length=1)
         title = toyplot.require.table_keys(table, title, length=1)
         style = toyplot.require.style(style)
+        filename = toyplot.require.filename(filename)
 
         Mark.__init__(self)
         self._table = table
@@ -449,6 +465,7 @@ class Rect(Mark):
         self._opacity = opacity  # 1 opacity column
         self._title = title     # 1 title column
         self._style = style     # Rectangle style
+        self._filename = filename
 
 
 class Text(Mark):
@@ -469,7 +486,8 @@ class Text(Mark):
             fill,
             opacity,
             title,
-            style):
+            style,
+            filename):
         table = toyplot.require.instance(table, toyplot.data.Table)
         coordinates = toyplot.require.table_keys(table, coordinates)
         axes = toyplot.require.string_vector(axes, length=len(coordinates))
@@ -479,6 +497,7 @@ class Text(Mark):
         opacity = toyplot.require.table_keys(table, opacity, length=1)
         title = toyplot.require.table_keys(table, title, length=1)
         style = toyplot.require.style(style)
+        filename = toyplot.require.filename(filename)
 
         Mark.__init__(self)
         self._table = table
@@ -490,6 +509,8 @@ class Text(Mark):
         self._opacity = opacity         # 1 opacity column
         self._title = title             # 1 title column
         self._style = style             # Text style
+        self._filename = filename
+
 
 ##########################################################################
 # More specialized marks

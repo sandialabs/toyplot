@@ -24,6 +24,7 @@ def bars(
         opacity=1.0,
         title=None,
         style=None,
+        filename=None,
         xmin=None,
         xmax=None,
         ymin=None,
@@ -79,7 +80,8 @@ def bars(
         palette=palette,
         opacity=opacity,
         title=title,
-        style=style)
+        style=style,
+        filename=filename)
     return canvas, axes, mark
 
 
@@ -95,6 +97,7 @@ def fill(
         opacity=1.0,
         title=None,
         style=None,
+        filename=None,
         xmin=None,
         xmax=None,
         ymin=None,
@@ -150,7 +153,8 @@ def fill(
         palette=palette,
         opacity=opacity,
         title=title,
-        style=style)
+        style=style,
+        filename=filename)
     return canvas, axes, mark
 
 
@@ -173,6 +177,7 @@ def plot(
         style=None,
         mstyle=None,
         mlstyle=None,
+        filename=None,
         xmin=None,
         xmax=None,
         ymin=None,
@@ -235,7 +240,8 @@ def plot(
         title=title,
         style=style,
         mstyle=mstyle,
-        mlstyle=mlstyle)
+        mlstyle=mlstyle,
+        filename=filename)
     return canvas, axes, mark
 
 
@@ -256,6 +262,7 @@ def scatterplot(
         style=None,
         mstyle=None,
         mlstyle=None,
+        filename=None,
         xmin=None,
         xmax=None,
         ymin=None,
@@ -316,7 +323,8 @@ def scatterplot(
         title=title,
         style=style,
         mstyle=mstyle,
-        mlstyle=mlstyle)
+        mlstyle=mlstyle,
+        filename=filename)
     return canvas, axes, mark
 
 

@@ -779,7 +779,8 @@ class Cartesian(object):
             palette=None,
             opacity=1.0,
             title=None,
-            style=None):
+            style=None,
+            filename=None):
         """Add stacked bars to the axes.
 
         This command generates one-or-more series of stacked bars.  For
@@ -943,7 +944,8 @@ class Cartesian(object):
                     fill=fill_keys,
                     opacity=opacity_keys,
                     title=title_keys,
-                    style=style))
+                    style=style,
+                    filename=filename))
             return self._children[-1]
         else:  # baseline is not None
             if a is not None and b is not None and c is not None:
@@ -1063,7 +1065,8 @@ class Cartesian(object):
                     fill=fill_keys,
                     opacity=opacity_keys,
                     title=title_keys,
-                    style=style))
+                    style=style,
+                    filename=filename))
             return self._children[-1]
 
     def colorbar(
@@ -1118,7 +1121,8 @@ class Cartesian(object):
             palette=None,
             opacity=1.0,
             title=None,
-            style=None):
+            style=None,
+            filename=None):
         """Fill multiple regions separated by curves.
 
         Parameters
@@ -1213,7 +1217,8 @@ class Cartesian(object):
                     fill=fill,
                     opacity=opacity,
                     title=title,
-                    style=style))
+                    style=style,
+                    filename=filename))
             return self._children[-1]
         else:  # baseline is not None
             if a is not None and b is not None:
@@ -1294,7 +1299,8 @@ class Cartesian(object):
                     fill=fill,
                     opacity=opacity,
                     title=title,
-                    style=style))
+                    style=style,
+                    filename=filename))
             return self._children[-1]
 
     def graph(
@@ -1442,7 +1448,8 @@ class Cartesian(object):
             title=None,
             style=None,
             mstyle=None,
-            mlstyle=None):
+            mlstyle=None,
+            filename=None):
         """Add bivariate line plots to the axes.
 
         Parameters
@@ -1604,7 +1611,8 @@ class Cartesian(object):
                 title=title,
                 style=style,
                 mstyle=mstyle,
-                mlstyle=mlstyle))
+                mlstyle=mlstyle,
+                filename=filename))
         return self._children[-1]
 
     def scatterplot(
@@ -1624,7 +1632,8 @@ class Cartesian(object):
             title=None,
             style=None,
             mstyle=None,
-            mlstyle=None):
+            mlstyle=None,
+            filename=None):
         """Add a bivariate plot to the axes.
 
         Parameters
@@ -1750,7 +1759,8 @@ class Cartesian(object):
                 title=title,
                 style=style,
                 mstyle=mstyle,
-                mlstyle=mlstyle))
+                mlstyle=mlstyle,
+                filename=filename))
         return self._children[-1]
 
     def rect(
@@ -1766,7 +1776,8 @@ class Cartesian(object):
             opacity=1.0,
             title=None,
             style={
-            "stroke": "none"}):
+            "stroke": "none"},
+            filename=None):
         table = toyplot.data.Table()
         table["left"] = toyplot.require.scalar_vector(a)
         table["right"] = toyplot.require.scalar_vector(
@@ -1817,7 +1828,8 @@ class Cartesian(object):
                 fill="toyplot:fill",
                 opacity="opacity",
                 title="title",
-                style=style))
+                style=style,
+                filename=filename))
         return self._children[-1]
 
     def text(
@@ -1832,6 +1844,7 @@ class Cartesian(object):
             opacity=1.0,
             title=None,
             style=None,
+            filename=None,
             annotation=True):
         """Add text to the axes.
 
@@ -1901,7 +1914,8 @@ class Cartesian(object):
                 fill="toyplot:fill",
                 opacity="opacity",
                 title="title",
-                style=style))
+                style=style,
+                filename=filename))
         return self._children[-1]
 
     def hlines(

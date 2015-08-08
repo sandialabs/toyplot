@@ -602,7 +602,8 @@ class Canvas(object):
                 fill="toyplot:fill",
                 opacity="opacity",
                 title="title",
-                style=style))
+                style=style,
+                filename=None))
         return self._children[-1]
 
     def time(self, begin, end, index=None):

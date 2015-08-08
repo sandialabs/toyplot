@@ -100,7 +100,7 @@ _export_data_tables = string.Template("""
     {
       link.href = uri;
       link.style = "visibility:hidden";
-      link.download = "toyplot.csv";
+      link.download = data_table.filename + ".csv";
 
       document.body.appendChild(link);
       link.click();
@@ -544,6 +544,7 @@ def render(canvas, fobj=None, animation=False):
             mark = data_table["mark"]
             title = data_table["title"]
             table = data_table["table"]
+            filename = data_table["filename"] if data_table["filename"] else "toyplot"
 
             names = []
             data = []
@@ -560,7 +561,7 @@ def render(canvas, fobj=None, animation=False):
                         data.append(column.tolist())
             if names:
                 data_tables.append(
-                    {"id": context.get_id(mark), "title": title, "names": names, "data": data})
+                    {"id": context.get_id(mark), "filename": filename, "title": title, "names": names, "data": data})
 
         xml.SubElement(
             controls,
@@ -783,9 +784,9 @@ class _RenderContext(object):
         self._cartesian_axes = dict(
         ) if cartesian_axes is None else cartesian_axes
 
-    def add_data_table(self, mark, table, title):
+    def add_data_table(self, mark, table, title, filename):
         self._data_tables.append(
-            {"mark": mark, "title": title, "table": table})
+            {"mark": mark, "title": title, "table": table, "filename": filename})
 
     def add_cartesian_axes(self, axes):
         self._cartesian_axes[self.get_id(axes)] = axes
@@ -1496,7 +1497,7 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-BarBoundaries"})
-    context.add_data_table(mark, mark._table, title="Bar Data")
+    context.add_data_table(mark, mark._table, title="Bar Data", filename=mark._filename)
 
     for boundary1, boundary2, fill, opacity, title in zip(
         boundaries.T[
@@ -1564,7 +1565,7 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-BarMagnitudes"})
-    context.add_data_table(mark, mark._table, title="Bar Data")
+    context.add_data_table(mark, mark._table, title="Bar Data", filename=mark._filename)
 
     for boundary1, boundary2, fill, opacity, title in zip(
         boundaries.T[
@@ -1616,7 +1617,7 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-FillBoundaries"})
-    context.add_data_table(mark, mark._table, title="Fill Data")
+    context.add_data_table(mark, mark._table, title="Fill Data", filename=mark._filename)
 
     for boundary1, boundary2, fill, opacity, title in zip(
             boundaries.T[:-1], boundaries.T[1:], mark._fill, mark._opacity, mark._title):
@@ -1683,7 +1684,7 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-FillMagnitudes"})
-    context.add_data_table(mark, mark._table, title="Fill Data")
+    context.add_data_table(mark, mark._table, title="Fill Data", filename=mark._filename)
 
     for boundary1, boundary2, fill, opacity, title in zip(
             boundaries.T[:-1], boundaries.T[1:], mark._fill, mark._opacity, mark._title):
@@ -1906,8 +1907,8 @@ def _render(axes, mark, context):
 
     mark_xml = xml.SubElement(context.root, "g", id=context.get_id(
         mark), attrib={"class": "toyplot-mark-Graph"})
-    #context.add_data_table(mark, mark._vertex_table, title="Graph Vertex Data")
-    #context.add_data_table(mark, mark._edge_table, title="Graph Edge Data")
+    #context.add_data_table(mark, mark._vertex_table, title="Graph Vertex Data", filename=mark._vertex_filename)
+    #context.add_data_table(mark, mark._edge_table, title="Graph Edge Data", filename=mark._edge_filename)
     if mark._show_edges:
         edge_xml = xml.SubElement(
             mark_xml, "g", attrib={"class": "toyplot-Edges"})
@@ -1969,7 +1970,7 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-Plot"})
-    context.add_data_table(mark, mark._table, title="Plot Data")
+    context.add_data_table(mark, mark._table, title="Plot Data", filename=mark._filename)
 
     for series, stroke, stroke_width, stroke_opacity, title, marker, msize, mfill, mstroke, mopacity in zip(
         series.T, mark._stroke.T, mark._stroke_width.T, mark._stroke_opacity.T, mark._title.T, [
@@ -2045,7 +2046,7 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-Rect"})
-    context.add_data_table(mark, mark._table, title="Rect Data")
+    context.add_data_table(mark, mark._table, title="Rect Data", filename=mark._filename)
 
     series_xml = xml.SubElement(
         mark_xml, "g", attrib={"class": "toyplot-Series"})
@@ -2091,7 +2092,7 @@ def _render(parent, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-Text"})
-    context.add_data_table(mark, mark._table, title="Text Data")
+    context.add_data_table(mark, mark._table, title="Text Data", filename=mark._filename)
     series_xml = xml.SubElement(
         mark_xml, "g", attrib={"class": "toyplot-Series"})
     for dx, dy, dtext, dangle, dfill, dopacity, dtitle in zip(

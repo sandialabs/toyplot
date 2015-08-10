@@ -15,6 +15,10 @@ install:
     - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION mock multipledispatch networkx numpy pip pyqt5
     - source activate test-environment
     - pip install behave "colormath>=2.1.0" coverage coveralls nose-exclude
+    - wget http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
+    - mkdir ffmpeg
+    - tar xf ffmpeg-release-64bit-static.tar.xz --strip-components 1 -C ffmpeg
+    - export PATH=$TRAVIS_BUILD_DIR/ffmpeg:$PATH
     #- python setup.py install
 #  - sdo apt-get update -qq
 #  - sdo apt-get install -y python-gtk2 wget
@@ -26,10 +30,6 @@ install:
 #  - ln -s /usr/lib/python2.7/dist-packages/pygtk.pth lib/python2.7/dist-packages/
 #  - ln -s /usr/lib/python2.7/dist-packages/cairo lib/python2.7/dist-packages/
 #  - cd $TRAVIS_BUILD_DIR
-#  - wget http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
-#  - mkdir ffmpeg
-#  - tar xf ffmpeg-release-64bit-static.tar.xz --strip-components 1 -C ffmpeg
-#  - export PATH=$TRAVIS_BUILD_DIR/ffmpeg:$PATH
 #  - pip install behave "colormath>=2.1.0" coverage coveralls mock multipledispatch networkx nose-exclude "numpy>=1.7"
 script:
     - coverage run --source toyplot --omit toyplot/testing.py -m nose --exclude-dir toyplot

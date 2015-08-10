@@ -227,7 +227,7 @@ class Table(object):
         -------
         matrix: :class:`numpy.ma.array` with two dimensions.
         """
-        return numpy.ma.column_stack(self._columns.values())
+        return numpy.ma.column_stack(list(self._columns.values()))
 
     def to_csv(self, fobj):
         import csv

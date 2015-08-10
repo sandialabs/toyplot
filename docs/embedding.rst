@@ -55,7 +55,7 @@ As another example, you can convert your Jupyter notebook into an interactive
 utility, and the embedded Toyplot figures in your slides will still be
 interactive during your presentation:
 
-``ipython nbconvert --to slides mynotebook.ipynb --output mynotebook.slides.html``
+``ipython nbconvert mynotebook.ipynb --to slides --post serve``
 
 Imagine being able to respond to audience questions with a live figure that was
 authored in a completely separate environment!
@@ -68,7 +68,7 @@ choice for most Python documentation):
 
 ::
 
-    $ ipython nbconvert --to rst mynotebook.ipynb --output mynotebook.rst
+    $ ipython nbconvert mynotebook.ipynb --to rst --output mynotebook.rst
 
 and the HTML Toyplot figures will be embedded in the restructured text and remain
 fully-interactive in the generated docs. This, by the way, is how much of the

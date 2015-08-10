@@ -229,16 +229,6 @@ class Table(object):
         """
         return numpy.ma.column_stack(list(self._columns.values()))
 
-    def to_csv(self, fobj):
-        import csv
-        if isinstance(fobj, toyplot.compatibility.string_type):
-            fobj = open(fobj, "wb")
-        writer = csv.writer(fobj)
-        writer.writerow(self._columns.keys())
-        iterators = [iter(column) for column in self._columns.values()]
-        for row_index in numpy.arange(len(self)):
-            writer.writerow([next(iterator) for iterator in iterators])
-
 
 def read_csv(fobj):
     """Load a CSV (delimited text) file.

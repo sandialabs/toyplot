@@ -16,7 +16,7 @@ install:
     - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION mock multipledispatch networkx numpy pip
     - source activate test-environment
     - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-        conda install pyqt5
+        conda install pyqt5;
     - pip install behave "colormath>=2.1.0" coverage coveralls nose-exclude
     - wget http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
     - mkdir ffmpeg

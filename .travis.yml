@@ -2,7 +2,7 @@ language: python
 python:
   - "2.7"
   - "3.3"
-before_install:
+install:
   - sudo apt-get update -qq
   - sudo apt-get install -y python-gtk2 wget
   - env | sort
@@ -18,8 +18,6 @@ before_install:
   - mkdir ffmpeg
   - tar xf ffmpeg-release-64bit-static.tar.xz --strip-components 1 -C ffmpeg
   - export PATH=$TRAVIS_BUILD_DIR/ffmpeg:$PATH
-
-install:
   - pip install behave "colormath>=2.1.0" coverage coveralls mock multipledispatch networkx nose-exclude "numpy>=1.7"
 script:
   - coverage run --source toyplot --omit toyplot/testing.py -m nose --exclude-dir toyplot

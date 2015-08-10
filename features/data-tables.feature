@@ -12,6 +12,8 @@ Feature: Data tables
     And new columns must have the same number of rows as existing columns
     And new columns must be one-dimensional
     And per-column metadata can be specified
+    And the table can be converted to a numpy matrix
+    And the table can be saved as a CSV
 
   Scenario Outline: Data table creation
     When toyplot.data.Table is initialized with <input>

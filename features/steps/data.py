@@ -120,6 +120,19 @@ def step_impl(context):
         context.data.metadata("c")
 
 
+@then(u'the table can be converted to a numpy matrix')
+def step_impl(context):
+    matrix = context.data.matrix()
+    numpy.testing.assert_array_equal(matrix, [[0,0],[1,1],[2,4],[3,9],[4,16],[5,25],[6,36],[7,49],[8,64],[9,81]])
+
+
+@then(u'the table can be saved as a CSV')
+def step_impl(context):
+    buffer = io.BytesIO()
+    context.data.to_csv(buffer)
+    nose.tools.assert_equal(buffer.getvalue(), 'a,b\r\n0,0\r\n1,1\r\n2,4\r\n3,9\r\n4,16\r\n5,25\r\n6,36\r\n7,49\r\n8,64\r\n9,81\r\n')
+
+
 @when(u'toyplot.data.Table is initialized with nothing')
 def step_impl(context):
     context.data = toyplot.data.Table()

@@ -14,10 +14,10 @@ install:
     - conda info -a
     - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION mock multipledispatch networkx numpy pip pyqt5
     - source activate test-environment
-    - pip install "colormath>=2.1.0" coverage coveralls nose-exclude
+    - pip install behave "colormath>=2.1.0" coverage coveralls nose-exclude
     #- python setup.py install
-#  - sudo apt-get update -qq
-#  - sudo apt-get install -y python-gtk2 wget
+#  - sdo apt-get update -qq
+#  - sdo apt-get install -y python-gtk2 wget
 #  - cd $VIRTUAL_ENV
 #  - mkdir -p lib/python2.7/dist-packages/
 #  - ln -s /usr/lib/python2.7/dist-packages/glib/ lib/python2.7/dist-packages/

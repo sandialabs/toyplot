@@ -10,9 +10,45 @@ import os
 import numbers
 import numpy.testing
 import re
+import sys
 import toyplot.html
 import toyplot.svg
 import xml.etree.ElementTree as xml
+
+try:
+    import toyplot.pdf
+except:
+    pass
+
+try:
+    import toyplot.png
+except:
+    pass
+
+try:
+    import toyplot.cairo.eps
+except:
+    pass
+
+try:
+    import toyplot.cairo.pdf
+except:
+    pass
+
+try:
+    import toyplot.cairo.png
+except:
+    pass
+
+try:
+    import toyplot.qt.pdf
+except:
+    pass
+
+try:
+    import toyplot.qt.png
+except:
+    pass
 
 root_dir = os.path.dirname(os.path.dirname(__file__))
 failed_dir = os.path.join(root_dir, "features", "failed")
@@ -175,17 +211,10 @@ def assert_canvas_equal(canvas, name):
     svg = io.BytesIO()
     toyplot.svg.render(canvas, svg)
 
-    if hasattr(toyplot, "eps"):
-        eps = io.BytesIO()
-        toyplot.eps.render(canvas, eps)
-
-    if hasattr(toyplot, "pdf"):
-        pdf = io.BytesIO()
-        toyplot.pdf.render(canvas, pdf)
-
-    if hasattr(toyplot, "png"):
-        png = io.BytesIO()
-        toyplot.png.render(canvas, png)
+    for module in ["toyplot.pdf", "toyplot.png", "toyplot.cairo.eps", "toyplot.cairo.pdf", "toyplot.cairo.png", "toyplot.qt.pdf", "toyplot.qt.png"]:
+        if module in sys.modules:
+            buffer = io.BytesIO()
+            sys.modules[module].render(canvas, buffer)
 
     # Get rid of any past failures ...
 #  if os.path.exists("tests/diffs/%s.svg" % name):

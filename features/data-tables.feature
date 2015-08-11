@@ -24,6 +24,11 @@ Feature: Data tables
       | a toyplot.data.Table              | contains the columns                |
       | an OrderedDict containing columns | contains the columns                |
       | a dict containing columns         | contains the columns, sorted by key |
+      | a sequence of name, column tuples | contains the columns                |
+      | a matrix                          | contains the matrix columns with generated keys |
+      | an array                          | raises ValueError                   |
+      | an integer                        | raises ValueError                   |
+      | a csv file                        | contains the csv file columns       |
 
   Scenario Outline: Data table rendering
     Given a toyplot.data.table with some data

@@ -36,3 +36,19 @@ Feature: Color palettes
   Scenario: Incrementally grow color palettes
     Given a color palette
     Then another palette can be appended
+
+  Scenario: Color palette CSS names
+    Given a collection of CSS color names, a color palette can be created
+
+  Scenario: Color palette getitem
+    Given a color palette, colors can be retrieved using item notation
+
+  Scenario: Color palette iteration
+    Given a color palette, callers can iterate over the colors
+
+  Scenario: Color palette color retrieval
+    Given a color palette, callers can retrieve colors by index
+
+  Scenario: Color palette css color retrieval
+    Given a color palette, colors can retrieve css colors by index
+

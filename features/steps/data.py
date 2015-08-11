@@ -198,4 +198,7 @@ def step_impl(context):
 
 @then(u'the table can be rendered as format ipython html string')
 def step_impl(context):
-    toyplot.testing.assert_html_equal(context.data._repr_html_(), "data-table")
+    html = context.data._repr_html_()
+    nose.tools.assert_is_instance(html, toyplot.compatibility.unicode_type)
+    toyplot.testing.assert_html_equal(html, "data-table")
+

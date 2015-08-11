@@ -25,3 +25,15 @@ Feature: Color maps
   Scenario: Diverging color map css
     When the user creates a default diverging color map with domain
     Then individual values can be mapped to css colors by the diverging color map
+
+  Scenario: Categorical color maps
+    Given a categorical color map, the map can be rendered as ipython html
+
+  Scenario: Categorial color map colors
+    Given a categorical color map, multiple colors can be returned by index
+
+  Scenario: Categorical color map color
+    Given a categorical color map, individual colors can be returned by index
+
+  Scenario: Categorical color map css
+    Given a categorical color map, individual css colors can be returned by index

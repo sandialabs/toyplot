@@ -314,3 +314,70 @@ def step_impl(context):
 def step_impl(context):
     toyplot.testing.assert_html_equal(
         context.palette._repr_html_(), "color-palette-reverse")
+
+@given(u'a collection of CSS color names, a color palette can be created')
+def step_impl(context):
+    palette = toyplot.color.Palette(["red", "green", "blue", (1, 1, 0)])
+    toyplot.testing.assert_html_equal(palette._repr_html_(), "color-palette-css-names")
+
+@given(u'a color palette, colors can be retrieved using item notation')
+def step_impl(context):
+    palette = toyplot.color.Palette([(1, 0, 0), (0, 1, 0), (0, 0, 1)])
+    toyplot.testing.assert_color_equal(palette[0], (1, 0, 0, 1))
+    toyplot.testing.assert_color_equal(palette[1], (0, 1, 0, 1))
+    toyplot.testing.assert_color_equal(palette[-1], (0, 0, 1, 1))
+    with nose.tools.assert_raises(IndexError):
+        palette[3]
+    with nose.tools.assert_raises(TypeError):
+        palette[0:3]
+
+@given(u'a color palette, callers can iterate over the colors')
+def step_impl(context):
+    palette = toyplot.color.Palette([(1, 0, 0), (0, 1, 0), (0, 0, 1)])
+    color = iter(palette)
+    toyplot.testing.assert_color_equal(next(color), (1, 0, 0, 1))
+    toyplot.testing.assert_color_equal(next(color), (0, 1, 0, 1))
+    toyplot.testing.assert_color_equal(next(color), (0, 0, 1, 1))
+    with nose.tools.assert_raises(StopIteration):
+        next(color)
+
+@given(u'a color palette, callers can retrieve colors by index')
+def step_impl(context):
+    palette = toyplot.color.Palette([(1, 0, 0), (0, 1, 0), (0, 0, 1)])
+    toyplot.testing.assert_color_equal(palette.color(0), (1, 0, 0, 1))
+    toyplot.testing.assert_color_equal(palette.color(-1), (0, 0, 1, 1))
+
+@given(u'a color palette, colors can retrieve css colors by index')
+def step_impl(context):
+    palette = toyplot.color.Palette([(1, 0, 0), (0, 1, 0), (0, 0, 1)])
+    nose.tools.assert_equal(palette.css(0), "rgba(100%,0%,0%,1)")
+    nose.tools.assert_equal(palette.css(-1), "rgba(0%,0%,100%,1)")
+
+@given(u'a categorical color map, the map can be rendered as ipython html')
+def step_impl(context):
+    colormap = toyplot.color.CategoricalMap(
+        toyplot.color.brewer("BlueGreenBrown", 3))
+    toyplot.testing.assert_html_equal(colormap._repr_html_(), "color-categorical-map")
+
+@given(u'a categorical color map, multiple colors can be returned by index')
+def step_impl(context):
+    colormap = toyplot.color.CategoricalMap(
+        toyplot.color.Palette(["red", "lime", "blue", (1, 1, 1)]))
+    toyplot.testing.assert_colors_equal(colormap.colors(
+        [0, 1, 3, 4]), [(1, 0, 0, 1), (0, 1, 0, 1), (1, 1, 1, 1), (1, 0, 0, 1)])
+
+@given(u'a categorical color map, individual colors can be returned by index')
+def step_impl(context):
+    colormap = toyplot.color.CategoricalMap(
+        toyplot.color.Palette(["red", "lime", "blue", (1, 1, 1)]))
+    toyplot.testing.assert_color_equal(colormap.color(0), (1, 0, 0, 1))
+    toyplot.testing.assert_color_equal(colormap.color(-1), (1, 1, 1, 1))
+
+@given(u'a categorical color map, individual css colors can be returned by index')
+def step_impl(context):
+    colormap = toyplot.color.CategoricalMap(
+        toyplot.color.Palette(["red", "lime", "blue", (1, 1, 1)]))
+    nose.tools.assert_equal(colormap.css(0), "rgba(100%,0%,0%,1)")
+    nose.tools.assert_equal(colormap.css(-1), "rgba(100%,100%,100%,1)")
+
+

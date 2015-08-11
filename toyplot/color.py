@@ -181,7 +181,7 @@ class Palette(object):
                 "div",
                 style="float:left;width:20px;height:20px;background-color:%s" %
                 to_css(color))
-        return xml.tostring(root_xml, method="html")
+        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
     def __add__(self, other):
         if not isinstance(other, Palette):
@@ -328,7 +328,7 @@ class CategoricalMap(Map):
                 "div",
                 style="float:left;width:20px;height:20px;background-color:%s" %
                 to_css(color))
-        return xml.tostring(root_xml, method="html")
+        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
 
 class DivergingMap(Map):
@@ -475,7 +475,7 @@ class DivergingMap(Map):
                 "div",
                 style="float:left;width:1px;height:20px;background-color:%s" %
                 to_css(color))
-        return xml.tostring(root_xml, method="html")
+        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
 
 class LinearMap(Map):
@@ -581,7 +581,7 @@ class LinearMap(Map):
                 style="float:left;width:%spx;height:20px;background-color:%s" %
                 (sample_width,
                  to_css(color)))
-        return xml.tostring(root_xml, method="html")
+        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
 
 def brewer(name, count=None, reverse=False):

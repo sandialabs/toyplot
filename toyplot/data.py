@@ -126,7 +126,7 @@ class Table(object):
                     "td",
                     style="border:none;padding-right:1em;").text = toyplot.compatibility.unicode_type(value)
 
-        return xml.tostring(root_xml, method="html", encoding="utf-8")
+        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
     @property
     def shape(self):

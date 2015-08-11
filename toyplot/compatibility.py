@@ -16,7 +16,7 @@ except:  # pragma: no cover
 try:
     basestring
     unicode_type = unicode
-except:
+except:  # pragma: no cover
     unicode_type = str
 
 try:

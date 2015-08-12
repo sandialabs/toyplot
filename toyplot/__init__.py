@@ -332,6 +332,8 @@ def matrix(
         matrix,
         label=None,
         step=1,
+        xshow=True,
+        yshow=True,
         colormap=None,
         palette=None,
         width=None,
@@ -353,6 +355,8 @@ def matrix(
         matrix=matrix,
         label=label,
         step=step,
+        xshow=xshow,
+        yshow=yshow,
         colormap=colormap,
         palette=palette)
     return canvas, table

@@ -387,6 +387,8 @@ class Canvas(object):
             matrix,
             label=None,
             step=1,
+            xshow=True,
+            yshow=True,
             colormap=None,
             palette=None,
             bounds=None,
@@ -419,27 +421,33 @@ class Canvas(object):
             ymin_range,
             ymax_range,
             trows=1,
-            brows=0,
+            brows=1,
             lcols=1,
-            rcols=0,
+            rcols=1,
             rows=matrix.shape[0],
             columns=matrix.shape[1],
             label=label,
             parent=self)
 
         table.top.row(0).height = 20
+        table.bottom.row(0).height = 20
         table.left.column(0).width = 20
+        table.right.column(0).width = 20
 
         table.left.column(0).align = "right"
-        for i, label, title in zip(
-                *toyplot.locator.Integer(step=step).ticks(0, matrix.shape[0] - 1)):
-            table.left.cell(i, 0).data = label
-            #table.left.cell(i, 0).title = title
+        table.right.column(0).align = "left"
 
-        for j, label, title in zip(
-                *toyplot.locator.Integer(step=step).ticks(0, matrix.shape[1] - 1)):
-            table.top.cell(0, j).data = label
-            #table.top.cell(0, j).title = title
+        if yshow:
+            for i, label, title in zip(
+                    *toyplot.locator.Integer(step=step).ticks(0, matrix.shape[0] - 1)):
+                table.left.cell(i, 0).data = label
+                #table.left.cell(i, 0).title = title
+
+        if xshow:
+            for j, label, title in zip(
+                    *toyplot.locator.Integer(step=step).ticks(0, matrix.shape[1] - 1)):
+                table.top.cell(0, j).data = label
+                #table.top.cell(0, j).title = title
 
         for i, row in enumerate(matrix):
             for j, value in enumerate(row):

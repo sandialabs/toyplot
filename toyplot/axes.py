@@ -775,8 +775,6 @@ class Cartesian(object):
             along="x",
             baseline="stacked",
             fill=None,
-            colormap=None,
-            palette=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -823,12 +821,6 @@ class Cartesian(object):
           Specify a single color for all bars, one color per series, or one color per bar.
           Color values can be explicit toyplot colors, or scalar values to be mapped
           to colors using the `colormap` or `palette` parameter.
-        colormap: :class:`toyplot.color.Map`, optional
-          Colormap to be used for mapping scalar `fill` values to colors.  If
-          unspecified, a default :class:`toyplot.color.LinearMap` is used.
-        palette: :class:`toyplot.color.Palette`, optional
-          Palette to be used for mapping scalar `fill` values to colors.  If
-          unspecified, a default :class:`toyplot.color.Palette` is used.
         opacity: array-like set of opacities, optional
           Specify a single opacity for all bars, one opacity per series, or one opacity per bar.
         title: array-like set of strings, optional
@@ -887,12 +879,7 @@ class Cartesian(object):
             fill = toyplot.color.broadcast(
                 default=default_color,
                 colors=fill,
-                shape=(series.shape[0], series.shape[1] - 1),
-                colormap=colormap,
-                palette=palette,
-                colors_parameter="fill",
-                colormap_parameter="colormap",
-                palette_parameter="palette")
+                shape=(series.shape[0], series.shape[1] - 1))
             opacity = toyplot.broadcast.scalar(
                 opacity, (series.shape[0], series.shape[1] - 1))
             title = toyplot.broadcast.object(
@@ -997,12 +984,7 @@ class Cartesian(object):
             fill = toyplot.color.broadcast(
                 default=default_color,
                 colors=fill,
-                shape=series.shape,
-                colormap=colormap,
-                palette=palette,
-                colors_parameter="fill",
-                colormap_parameter="colormap",
-                palette_parameter="palette")
+                shape=series.shape)
             opacity = toyplot.broadcast.scalar(opacity, series.shape)
             title = toyplot.broadcast.object(title, series.shape)
             style = toyplot.style.combine(
@@ -1117,8 +1099,6 @@ class Cartesian(object):
             along="x",
             baseline=None,
             fill=None,
-            colormap=None,
-            palette=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -1178,12 +1158,7 @@ class Cartesian(object):
             fill = toyplot.color.broadcast(
                 default=default_color,
                 colors=fill,
-                shape=series.shape[1] - 1,
-                colormap=colormap,
-                palette=palette,
-                colors_parameter="fill",
-                colormap_parameter="colormap",
-                palette_parameter="palette")
+                shape=series.shape[1] - 1)
             opacity = toyplot.broadcast.scalar(opacity, series.shape[1] - 1)
             title = toyplot.broadcast.object(title, series.shape[1] - 1)
             style = toyplot.style.combine(
@@ -1241,12 +1216,7 @@ class Cartesian(object):
             fill = toyplot.color.broadcast(
                 default=default_color,
                 colors=fill,
-                shape=series.shape[1],
-                colormap=colormap,
-                palette=palette,
-                colors_parameter="fill",
-                colormap_parameter="colormap",
-                palette_parameter="palette")
+                shape=series.shape[1])
             opacity = toyplot.broadcast.scalar(opacity, series.shape[1])
             title = toyplot.broadcast.object(title, series.shape[1])
             style = toyplot.style.combine(
@@ -1435,15 +1405,11 @@ class Cartesian(object):
             b=None,
             along="x",
             color=None,
-            colormap=None,
-            palette=None,
             stroke_width=2.0,
             stroke_opacity=1.0,
             marker=None,
             size=20,
             fill=None,
-            fill_colormap=None,
-            fill_palette=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -1466,10 +1432,6 @@ class Cartesian(object):
           Overrides the default per-series colors provided by the axis palette.  Specify
           one color, or one-color-per-series.  Colors may be CSS colors, toyplot colors,
           or scalar values that will be mapped to colors using `colormap` or `palette`.
-        colormap: color map object, optional
-          Colormap object to map scalar `color` values to colors.
-        palette: :class:`toyplot.color.Palette`, optional
-          Color palette used to map scalar `color` values to colors with a linear colormap.
         stroke_width: array-like, optional
           Overrides the default stroke width of the plots.  Specify one width in drawing
           units, or one-width-per-series.
@@ -1486,10 +1448,6 @@ class Cartesian(object):
           by `color`.  Specify one color, one-color-per-series, or one-color-per-datum.  Colors
           may be CSS colors, toyplot colors, or scalar values that will be mapped to colors using
           `fill_colormap` or `fill_palette`.
-        fill_colormap: color map object, optional
-          Colormap object used to map scalar `fill` values to colors.
-        fill_palette: :class:`toyplot.color.Palette`, optional
-          Color palette used to map scalar `fill` values to colors with a linear colormap.
         opacity: array-like, optional
           Overrides the default opacity of the markers.  Specify one opacity, one-opacity-per-series,
           or one-opacity-per-datum.
@@ -1531,12 +1489,7 @@ class Cartesian(object):
         color = toyplot.color.broadcast(
             default=default_color,
             colors=color,
-            shape=series.shape[1],
-            colormap=colormap,
-            palette=palette,
-            colors_parameter="color",
-            colormap_parameter="colormap",
-            palette_parameter="palette")
+            shape=series.shape[1])
         stroke_width = toyplot.broadcast.scalar(stroke_width, series.shape[1])
         stroke_opacity = toyplot.broadcast.scalar(
             stroke_opacity, series.shape[1])
@@ -1545,12 +1498,7 @@ class Cartesian(object):
         mfill = toyplot.color.broadcast(
             default=color,
             colors=fill,
-            shape=series.shape,
-            colormap=fill_colormap,
-            palette=fill_palette,
-            colors_parameter="fill",
-            colormap_parameter="fill_colormap",
-            palette_parameter="fill_palette")
+            shape=series.shape)
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
         title = toyplot.broadcast.object(title, series.shape[1])
@@ -1621,13 +1569,9 @@ class Cartesian(object):
             b=None,
             along="x",
             color=None,
-            colormap=None,
-            palette=None,
             marker="o",
             size=20,
             fill=None,
-            fill_colormap=None,
-            fill_palette=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -1680,12 +1624,7 @@ class Cartesian(object):
         color = toyplot.color.broadcast(
             default=default_color,
             colors=color,
-            shape=series.shape[1],
-            colormap=colormap,
-            palette=palette,
-            colors_parameter="color",
-            colormap_parameter="colormap",
-            palette_parameter="palette")
+            shape=series.shape[1])
         stroke_width = toyplot.broadcast.scalar(0.0, series.shape[1])
         stroke_opacity = toyplot.broadcast.scalar(0.0, series.shape[1])
         marker = toyplot.broadcast.object(marker, series.shape)
@@ -1693,12 +1632,7 @@ class Cartesian(object):
         mfill = toyplot.color.broadcast(
             default=color,
             colors=fill,
-            shape=series.shape,
-            colormap=fill_colormap,
-            palette=fill_palette,
-            colors_parameter="fill",
-            colormap_parameter="fill_colormap",
-            palette_parameter="fill_palette")
+            shape=series.shape)
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
         title = toyplot.broadcast.object(title, series.shape[1])
@@ -1771,8 +1705,6 @@ class Cartesian(object):
             d,
             along="x",
             fill=None,
-            colormap=None,
-            palette=None,
             opacity=1.0,
             title=None,
             style={
@@ -1785,7 +1717,6 @@ class Cartesian(object):
         table["top"] = toyplot.require.scalar_vector(c, length=table.shape[0])
         table["bottom"] = toyplot.require.scalar_vector(
             d, length=table.shape[0])
-        table["fill"] = toyplot.broadcast.object(fill, table.shape[0])
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.style.combine(toyplot.require.style(style))
@@ -1794,12 +1725,7 @@ class Cartesian(object):
         table["toyplot:fill"] = toyplot.color.broadcast(
             default=default_color,
             colors=fill,
-            shape=table.shape[0],
-            colormap=colormap,
-            palette=palette,
-            colors_parameter="fill",
-            colormap_parameter="colormap",
-            palette_parameter="palette")
+            shape=table.shape[0])
 
         if along == "x":
             left_right_axis = "x"
@@ -1839,8 +1765,6 @@ class Cartesian(object):
             text,
             angle=0,
             fill=None,
-            colormap=None,
-            palette=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -1888,12 +1812,7 @@ class Cartesian(object):
         table["toyplot:fill"] = toyplot.color.broadcast(
             default=default_color,
             colors=fill,
-            shape=table.shape[0],
-            colormap=colormap,
-            palette=palette,
-            colors_parameter="fill",
-            colormap_parameter="colormap",
-            palette_parameter="palette")
+            shape=table.shape[0])
 
         self._update_domain(
             table["x"], table["y"], display=True, data=not annotation)
@@ -1922,8 +1841,6 @@ class Cartesian(object):
             self,
             y,
             stroke=None,
-            colormap=None,
-            palette=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -1960,12 +1877,7 @@ class Cartesian(object):
         table["toyplot:stroke"] = toyplot.color.broadcast(
             default=toyplot.color.near_black,
             colors=stroke,
-            shape=table.shape[0],
-            colormap=colormap,
-            palette=palette,
-            colors_parameter="stroke",
-            colormap_parameter="colormap",
-            palette_parameter="palette")
+            shape=table.shape[0])
 
         self._update_domain(numpy.array([]), table["y"], display=True, data=not annotation)
 
@@ -1984,8 +1896,6 @@ class Cartesian(object):
             self,
             x,
             stroke=None,
-            colormap=None,
-            palette=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -2022,12 +1932,7 @@ class Cartesian(object):
         table["toyplot:stroke"] = toyplot.color.broadcast(
             default=toyplot.color.near_black,
             colors=stroke,
-            shape=table.shape[0],
-            colormap=colormap,
-            palette=palette,
-            colors_parameter="stroke",
-            colormap_parameter="colormap",
-            palette_parameter="palette")
+            shape=table.shape[0])
 
         self._update_domain(table["x"], numpy.array([]), display=True, data=not annotation)
 

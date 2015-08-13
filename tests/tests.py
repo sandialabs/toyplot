@@ -1178,7 +1178,7 @@ def test_axes_rect():
 
     canvas = toyplot.Canvas()
     axes = canvas.axes()
-    axes.rect(x1, x2, y1, y2, fill=fill, palette=palette, title=title)
+    axes.rect(x1, x2, y1, y2, fill=(fill, palette), title=title)
     assert_canvas_matches(canvas, "axes-rect")
 
 

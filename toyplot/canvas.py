@@ -546,8 +546,6 @@ class Canvas(object):
             text,
             angle=0.0,
             fill=None,
-            colormap=None,
-            palette=None,
             opacity=1.0,
             title=None,
             style=None):
@@ -580,12 +578,7 @@ class Canvas(object):
         table["toyplot:fill"] = toyplot.color.broadcast(
             default=toyplot.color.near_black,
             colors=fill,
-            shape=table.shape[0],
-            colormap=colormap,
-            palette=palette,
-            colors_parameter="fill",
-            colormap_parameter="colormap",
-            palette_parameter="palette")
+            shape=table.shape[0])
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.style.combine(

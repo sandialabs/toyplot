@@ -35,5 +35,6 @@ script:
     - coverage run --source toyplot --omit toyplot/testing.py -m nose --exclude-dir toyplot
     - coverage run --append --source toyplot --omit toyplot/testing.py -m behave
     - coverage report
+    - python backend-report.py
 after_script:
     - coveralls

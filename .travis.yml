@@ -1,4 +1,4 @@
-sudo: false
+sudo: true
 language: python
 python:
     - "2.7"
@@ -16,25 +16,23 @@ install:
     - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION mock multipledispatch networkx numpy pip
     - source activate test-environment
     - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+        # Setup PyQt5
         conda install pyqt5;
+        # Setup Pango / Cairo
+        sudo apt-get update -qq;
+        sudo apt-get install -y python-gtk2 wget;
+        export SITE_PACKAGES="$HOME/miniconda/envs/test-environment/lib/python$TRAVIS_PYTHON_VERSION/site-packages/"
+        ln -s /usr/lib/python2.7/dist-packages/glib/ $SITE_PACKAGES;
+        ln -s /usr/lib/python2.7/dist-packages/gobject/ $SITE_PACKAGES;
+        ln -s /usr/lib/python2.7/dist-packages/gtk-2.0* $SITE_PACKAGES;
+        ln -s /usr/lib/python2.7/dist-packages/pygtk.pth $SITE_PACKAGES;
+        ln -s /usr/lib/python2.7/dist-packages/cairo $SITE_PACKAGES;
       fi
     - pip install behave "colormath>=2.1.0" coverage coveralls nose-exclude
     - wget http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
     - mkdir ffmpeg
     - tar xf ffmpeg-release-64bit-static.tar.xz --strip-components 1 -C ffmpeg
     - export PATH=$TRAVIS_BUILD_DIR/ffmpeg:$PATH
-    #- python setup.py install
-#  - sdo apt-get update -qq
-#  - sdo apt-get install -y python-gtk2 wget
-#  - cd $VIRTUAL_ENV
-#  - mkdir -p lib/python2.7/dist-packages/
-#  - ln -s /usr/lib/python2.7/dist-packages/glib/ lib/python2.7/dist-packages/
-#  - ln -s /usr/lib/python2.7/dist-packages/gobject/ lib/python2.7/dist-packages/
-#  - ln -s /usr/lib/python2.7/dist-packages/gtk-2.0* lib/python2.7/dist-packages/
-#  - ln -s /usr/lib/python2.7/dist-packages/pygtk.pth lib/python2.7/dist-packages/
-#  - ln -s /usr/lib/python2.7/dist-packages/cairo lib/python2.7/dist-packages/
-#  - cd $TRAVIS_BUILD_DIR
-#  - pip install behave "colormath>=2.1.0" coverage coveralls mock multipledispatch networkx nose-exclude "numpy>=1.7"
 script:
     - coverage run --source toyplot --omit toyplot/testing.py -m nose --exclude-dir toyplot
     - coverage run --append --source toyplot --omit toyplot/testing.py -m behave

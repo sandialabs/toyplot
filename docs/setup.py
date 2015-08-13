@@ -16,18 +16,36 @@ arguments = parser.parse_args()
 root_dir = os.path.abspath(os.path.join(__file__, "..", ".."))
 docs_dir = os.path.join(root_dir, "docs")
 build_dir = os.path.join(docs_dir, "_build")
-
+test_dir = os.path.join(docs_dir, "_test")
 
 def convert_notebook(name):
-    # Convert the notebook into restructured text suitable for the
-    # documentation.
+    # If the Sphinx source is up-to-date, we're done.
     source = os.path.join(docs_dir, "%s.ipynb" % name)
     target = os.path.join(docs_dir, "%s.rst" % name)
-
     if os.path.exists(target) and os.path.getmtime(
             target) >= os.path.getmtime(source) and not arguments.clean:
         return
 
+    # Convert the notebook to pure Python, so we can run verify
+    # that it runs without any errors.
+
+    if not os.path.exists(test_dir):
+        os.mkdir(test_dir)
+
+    subprocess.check_call(["ipython",
+                           "nbconvert",
+                           "--execute",
+                           "--to",
+                           "python",
+                           source,
+                           "--output",
+                           os.path.join(test_dir,
+                                        name)])
+
+    subprocess.check_call(["python", os.path.join(test_dir, "%s.py" % name)])
+
+    # Convert the notebook into restructured text suitable for the
+    # documentation.
     subprocess.check_call(["ipython",
                            "nbconvert",
                            "--execute",

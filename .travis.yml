@@ -21,7 +21,7 @@ install:
         # Setup Pango / Cairo
         sudo apt-get update -qq;
         sudo apt-get install -y python-gtk2 wget;
-        export SITE_PACKAGES="$HOME/miniconda/envs/test-environment/lib/python$TRAVIS_PYTHON_VERSION/site-packages/"
+        export SITE_PACKAGES="$HOME/miniconda/envs/test-environment/lib/python$TRAVIS_PYTHON_VERSION/site-packages/";
         ln -s /usr/lib/python2.7/dist-packages/glib/ $SITE_PACKAGES;
         ln -s /usr/lib/python2.7/dist-packages/gobject/ $SITE_PACKAGES;
         ln -s /usr/lib/python2.7/dist-packages/gtk-2.0* $SITE_PACKAGES;

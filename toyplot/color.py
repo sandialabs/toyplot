@@ -86,9 +86,18 @@ def broadcast(colors, shape, default=None):
     # Next, extract the user's choice of custom palette / colormap.
     palette = None
     colormap = None
-    if isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Palette):
+    if isinstance(colors, (toyplot.color.Palette, toyplot.color.Map)):
+        if isinstance(colors, toyplot.color.Palette):
+            palette = colors
+        elif isinstance(colors, toyplot.color.Map):
+            colormap = colors
+        if isinstance(shape, tuple) and len(shape) == 2:
+            colors = numpy.arange(shape[1]) if shape[1] > 1 else numpy.arange(shape[0])
+        else:
+            colors = numpy.arange(shape)
+    elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Palette):
         colors, palette = colors
-    if isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Map):
+    elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Map):
         colors, colormap = colors
 
     # Next, convert the supplied colors into a toyplot color array.

@@ -5,6 +5,7 @@
 .ipynb_checkpoints
 build
 dist
+features/backends
 features/diffs
 features/failed
 tests/diffs

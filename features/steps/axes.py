@@ -725,6 +725,20 @@ def step_impl(context):
         context.canvas, "axes-log-2-scale-negative-1000-1000")
 
 
+@given(u'log 10 axes on x and y with custom format')
+def step_impl(context):
+    context.canvas = toyplot.Canvas()
+    context.axes = context.canvas.axes(xscale="log10", yscale="log10")
+    context.axes.x.ticks.locator = toyplot.locator.Log(base=10, format="{base}^{exponent}")
+    context.axes.y.ticks.locator = toyplot.locator.Log(base=10, format="{base}^{exponent}")
+
+
+@then(u'the result should be a log-log plot from -1000 to 1000 with custom labels')
+def step_impl(context):
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "axes-log-10-scale-negative-1000-1000-custom-format")
+
+
 @given(u'position and boundary data')
 def step_impl(context):
     numpy.random.seed(1234)
@@ -962,5 +976,23 @@ def step_impl(context):
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-lines-data")
+
+@given(u'a matrix')
+def step_impl(context):
+    numpy.random.seed(1234)
+    context.matrix = numpy.random.normal(size=(10, 10))
+
+@then(u'a default matrix visualization can be created with the convenience API')
+def step_impl(context):
+    canvas, table = toyplot.matrix(context.matrix)
+    toyplot.testing.assert_canvas_equal(
+        canvas, "matrix-default")
+
+@then(u'a default matrix visualization can be created with the standard API')
+def step_impl(context):
+    canvas = toyplot.Canvas()
+    table = canvas.matrix(context.matrix)
+    toyplot.testing.assert_canvas_equal(
+        canvas, "matrix-default")
 
 

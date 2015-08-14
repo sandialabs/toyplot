@@ -1291,7 +1291,7 @@ class Cartesian(object):
             edge_opacity=1.0,
             edge_style=None,
             mstyle=None,
-            mlstyle=None):
+            mlstyle=None): # pragma: no cover
         """Add a graph plot to the axes.
 
         Parameters

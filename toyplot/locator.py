@@ -52,7 +52,7 @@ class TickLocator(object):
         titles : sequence of strings
           Titles for each tick location.  Typically, backends render titles as tooltips.
         """
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
 
 class Basic(TickLocator):

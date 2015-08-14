@@ -1289,18 +1289,6 @@ def test_color_require_color():
 # toyplot.html
 
 
-def test_html_render_dom():
-    canvas = toyplot.Canvas()
-    canvas.axes()
-    dom = toyplot.html.render(canvas)
-
-
-def test_html_render_path():
-    canvas = toyplot.Canvas()
-    canvas.axes()
-    toyplot.html.render(canvas, os.path.join(tempfile.mkdtemp(), "test.html"))
-
-
 def test_html_render_animation():
     canvas = toyplot.Canvas()
     axes = canvas.axes()
@@ -1324,32 +1312,6 @@ def test_html_ipython_html():
 
 ##########################################################################
 # toyplot.png
-
-
-def test_png_render_defaults():
-    if hasattr(toyplot, "png"):
-        canvas = toyplot.Canvas()
-        canvas.axes()
-        image = toyplot.png.render(canvas)
-        nose.tools.assert_is_instance(image, toyplot.compatibility.string_type)
-        nose.tools.assert_equal(image[1:4], "PNG")
-
-
-def test_png_render_buffer():
-    if hasattr(toyplot, "png"):
-        buffer = io.BytesIO()
-        canvas = toyplot.Canvas()
-        canvas.axes()
-        toyplot.png.render(canvas, buffer)
-        nose.tools.assert_equal(buffer.getvalue()[1:4], "PNG")
-
-
-def test_png_render_path():
-    if hasattr(toyplot, "png"):
-        canvas = toyplot.Canvas()
-        canvas.axes()
-        toyplot.png.render(
-            canvas, os.path.join(tempfile.mkdtemp(), "test.png"))
 
 
 def test_png_render_frames():
@@ -1377,15 +1339,6 @@ def test_cairo_small_font():
         axes = canvas.axes(label="Small Text!")
         axes.label.style = {"font-size": "8px"}
         toyplot.png.render(canvas)
-
-##########################################################################
-# toyplot.svg
-
-
-def test_svg_render_path():
-    canvas = toyplot.Canvas()
-    canvas.axes()
-    toyplot.svg.render(canvas, os.path.join(tempfile.mkdtemp(), "test.svg"))
 
 ##########################################################################
 # High-level tests that combine multiple API calls into whole figures.

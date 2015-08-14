@@ -137,7 +137,7 @@ def render(svg, context):
                             context.rectangle(x, y, width, height)
                             context.clip()
                         else:
-                            toyplot.log.error("Unhandled clip tag: %s" % child.tag)
+                            toyplot.log.error("Unhandled clip tag: %s" % child.tag) # pragma: no cover
 
                 for child in element:
                     render_element(svg, child, context, styles)
@@ -154,17 +154,17 @@ def render(svg, context):
                         float(element.get("x2")), float(element.get("y2")))
                     context.set_source_rgba(*stroke)
                     context.stroke()
-            elif element.tag == "polyline":
-                stroke = get_stroke(current_style)
-                if stroke is not None:
-                    points = [point.split(",")
-                              for point in element.get("points").split()]
-                    for point in points[:1]:
-                        context.move_to(float(point[0]), float(point[1]))
-                    for point in points[1:]:
-                        context.line_to(float(point[0]), float(point[1]))
-                    context.set_source_rgba(*stroke)
-                    context.stroke()
+#            elif element.tag == "polyline":
+#                stroke = get_stroke(current_style)
+#                if stroke is not None:
+#                    points = [point.split(",")
+#                              for point in element.get("points").split()]
+#                    for point in points[:1]:
+#                        context.move_to(float(point[0]), float(point[1]))
+#                    for point in points[1:]:
+#                        context.line_to(float(point[0]), float(point[1]))
+#                    context.set_source_rgba(*stroke)
+#                    context.stroke()
             elif element.tag == "path":
                 stroke = get_stroke(current_style)
                 if stroke is not None:

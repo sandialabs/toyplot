@@ -55,17 +55,6 @@ class Piecewise(object):
             self.range.bounds.min = range_bounds_min
             self.range.bounds.max = range_bounds_max
 
-        def __repr__(self):
-            return "toyplot.projection.Piecewise.Segment(%s, %s, %s, %s, %s, %s, %s, %s, %s)" % (self.scale,
-                                                                                                 self.domain.min,
-                                                                                                 self.domain.max,
-                                                                                                 self.range.min,
-                                                                                                 self.range.max,
-                                                                                                 self.domain.bounds.min,
-                                                                                                 self.domain.bounds.max,
-                                                                                                 self.range.bounds.min,
-                                                                                                 self.range.bounds.max)
-
     def __init__(self, segments):
         self._segments = segments
 
@@ -94,7 +83,7 @@ class Piecewise(object):
                     range_values[indices] = _mix(
                         segment.range.min, segment.range.max, amount)
                 else:
-                    raise Exception("Unknown scale: %s" % (scale,))
+                    raise Exception("Unknown scale: %s" % (scale,)) # pragma: no cover
 
         if range_values.shape == ():
             range_values = numpy.asscalar(range_values)
@@ -126,7 +115,7 @@ class Piecewise(object):
                                 segment.domain.min, base), _log(
                                 segment.domain.max, base), amount))
                 else:
-                    raise Exception("Unknown scale: %s" % (scale,))
+                    raise Exception("Unknown scale: %s" % (scale,)) # pragma: no cover
 
         if domain_values.shape == ():
             domain_values = numpy.asscalar(domain_values)

@@ -81,3 +81,15 @@ def step_impl(context):
 def step_impl(context):
     with nose.tools.assert_raises(ValueError):
         toyplot.units.convert("1furlong", "in")
+
+@when(u'converting ("72pt",) to in the response should be raise ValueError')
+def step_impl(context):
+    with nose.tools.assert_raises(ValueError):
+        toyplot.units.convert(("72pt",), "in")
+
+@when(u'converting "1in" to furlong the response should be raise ValueError')
+def step_impl(context):
+    with nose.tools.assert_raises(ValueError):
+        toyplot.units.convert("1in", "furlong")
+
+

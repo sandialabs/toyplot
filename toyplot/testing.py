@@ -53,6 +53,7 @@ except:
 root_dir = os.path.dirname(os.path.dirname(__file__))
 failed_dir = os.path.join(root_dir, "features", "failed")
 reference_dir = os.path.join(root_dir, "features", "reference")
+backend_dir = os.path.join(root_dir, "features", "backends")
 
 
 def _assert_string_equal(content, test_file, reference_file, encoding="utf-8"):

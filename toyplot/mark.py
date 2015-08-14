@@ -250,7 +250,7 @@ class FillMagnitudes(Mark):
         self._filename = filename
 
 
-class Graph(Mark):
+class Graph(Mark): # pragma: no cover
 
     """Plot a graph (collection of vertices and edges).
 
@@ -620,10 +620,10 @@ class VColorBar(Mark):
 
         def __call__(self, index=None, value=None, style=None):
             if index is None and value is None:
-                raise ValueError("Must specify tick index or value.")
+                raise ValueError("Must specify tick index or value.") # pragma: no cover
             if index is not None and value is not None:
                 raise ValueError(
-                    "Must specify either index or value, not both.")
+                    "Must specify either index or value, not both.") # pragma: no cover
             if index is not None:
                 return VColorBar.PerTickHelper.TickProxy(self._indices[index])
             if value is not None:

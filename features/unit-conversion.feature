@@ -18,3 +18,5 @@ Feature: Unit conversion
       | ".5in"                        | pt            | 36.0             |
       | "1in"                         | cm            | 2.54             |
       | "1furlong"                    | in            | raise ValueError |
+      | ("72pt",)                     | in            | raise ValueError |
+      | "1in"                         | furlong       | raise ValueError |

@@ -247,7 +247,7 @@ def render(svg, context):
                             size = int(
                                 pango.SCALE * float(size[:-2]) * 72.0 / 96.0)
                         else:
-                            raise ValueError("font-size must use pixel units")
+                            raise ValueError("font-size must use pixel units") # pragma: no cover
                         font_description.set_size(size)
                     layout.set_font_description(font_description)
 
@@ -282,7 +282,7 @@ def render(svg, context):
                     else:
                         raise ValueError(
                             "Unsupported alignment-baseline: %s" %
-                            alignment_baseline)
+                            alignment_baseline) # pragma: no cover
 
                     baseline_shift = current_style.get(
                         "baseline-shift", "0").strip()
@@ -309,7 +309,7 @@ def render(svg, context):
             elif element.tag in ["title"]:
                 pass
             else:
-                raise Exception("unhandled tag: %s" % element.tag)
+                raise Exception("unhandled tag: %s" % element.tag) # pragma: no cover
 
         pop_style(context, styles)
 

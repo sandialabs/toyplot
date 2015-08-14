@@ -590,6 +590,11 @@ def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-table-without-header")
 
+@then(u'the table can be rendered using the convenience API')
+def step_impl(context):
+    canvas, table = toyplot.table(context.data)
+    toyplot.testing.assert_canvas_equal(canvas, "axes-table-convenience-api")
+
 
 @given(u'values from -1000 to -1')
 def step_impl(context):

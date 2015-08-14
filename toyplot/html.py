@@ -1883,7 +1883,7 @@ def _render(canvas, legend, context):
 
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Graph, _RenderContext)
-def _render(axes, mark, context):
+def _render(axes, mark, context): # pragma: no cover
     position = mark._vertex_table[mark._coordinates[0]]
     series = mark._vertex_table[mark._series[0]]
 

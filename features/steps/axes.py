@@ -583,6 +583,14 @@ def step_impl(context):
     toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-label")
 
 
+@then(u'the table can be rendered with multiple embedded axes in merged cells')
+def step_impl(context):
+    numpy.random.seed(1234)
+    context.axes.body.column(2).merge().axes().bars(numpy.random.random(20), along="y")
+    context.axes.body.column(3).merge().axes().bars(numpy.random.random(20), along="y")
+    toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-multiple-axes")
+
+
 @then(u'an instance of toyplot.axes.Table can be rendered without a header')
 def step_impl(context):
     context.canvas = toyplot.Canvas()

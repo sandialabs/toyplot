@@ -2023,7 +2023,6 @@ class Cartesian(object):
 
 
 class Table(object):
-
     """Experimental table coordinate system.
     """
     class Label(object):
@@ -2075,6 +2074,35 @@ class Table(object):
             self._column_offset = 0
             self._row_offset = 0
             self._parents = None
+
+        @property
+        def left(self):
+            if self._left is None and self._parents is not None:
+                self._left = numpy.min(
+                    [parent._left for parent in self._parents.flat])
+            return self._left
+
+        @property
+        def right(self):
+            if self._right is None and self._parents is not None:
+                self._right = numpy.max(
+                    [parent._right for parent in self._parents.flat])
+            return self._right
+
+        @property
+        def top(self):
+            if self._top is None and self._parents is not None:
+                self._top = numpy.min(
+                    [parent._top for parent in self._parents.flat])
+            return self._top
+
+        @property
+        def bottom(self):
+            if self._bottom is None and self._parents is not None:
+                self._bottom = numpy.max(
+                    [parent._bottom for parent in self._parents.flat])
+            return self._bottom
+
         default_format = toyplot.format.DefaultFormatter()
 
     class CellReference(object):
@@ -2127,11 +2155,15 @@ class Table(object):
         bstyle = property(fset=_set_bstyle)
 
         def _set_width(self, value):
+            if self._table._finalized:
+                raise ValueError("Cannot set cell widths after inserting axes into the table.")
             for cell in self._cells.flat:
                 cell._width = value
         width = property(fset=_set_width)
 
         def _set_height(self, value):
+            if self._table._finalized:
+                raise ValueError("Cannot set cell heights after inserting axes into the table.")
             for cell in self._cells.flat:
                 cell._height = value
         height = property(fset=_set_height)
@@ -2166,10 +2198,10 @@ class Table(object):
                 padding=5,
                 tick_length=5):
             self._table._finalize()
-            left = numpy.min([cell._left for cell in self._cells.flat])
-            right = numpy.max([cell._right for cell in self._cells.flat])
-            top = numpy.min([cell._top for cell in self._cells.flat])
-            bottom = numpy.max([cell._bottom for cell in self._cells.flat])
+            left = numpy.min([cell.left for cell in self._cells.flat])
+            right = numpy.max([cell.right for cell in self._cells.flat])
+            top = numpy.min([cell.top for cell in self._cells.flat])
+            bottom = numpy.max([cell.bottom for cell in self._cells.flat])
 
             axes = toyplot.axes.Cartesian(
                 left,
@@ -2654,18 +2686,6 @@ class Table(object):
             cell._right = gap_cell_column_boundaries[cell._column * 2 + 2]
             cell._top = gap_cell_row_boundaries[cell._row * 2 + 1]
             cell._bottom = gap_cell_row_boundaries[cell._row * 2 + 2]
-
-        # Assign coordinates to merged cells.
-        for cell in self._visible_cells:
-            if cell._parents is not None:
-                cell._left = numpy.min(
-                    [parent._left for parent in cell._parents.flat])
-                cell._right = numpy.max(
-                    [parent._right for parent in cell._parents.flat])
-                cell._top = numpy.min(
-                    [parent._top for parent in cell._parents.flat])
-                cell._bottom = numpy.max(
-                    [parent._bottom for parent in cell._parents.flat])
 
         # Compute grid boundaries.
         self._column_boundaries = (

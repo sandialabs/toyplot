@@ -29,6 +29,7 @@ Feature: Table axes
             | with center justification              |
             | with right justification               |
             | with a label                           |
+            | with multiple embedded axes in merged cells |
 
     Scenario: Render table without header
         Given a sample toyplot.data.Table

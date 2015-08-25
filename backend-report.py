@@ -13,5 +13,20 @@ def print_report(module):
         sys.stdout.write("%s\n\n" % e)
 
 
-for module in ["toyplot.cairo", "toyplot.cairo.eps", "toyplot.cairo.pdf", "toyplot.cairo.png", "toyplot.qt", "toyplot.qt.pdf", "toyplot.qt.png"]:
+for module in [
+    "toyplot.browser",
+    "toyplot.cairo",
+    "toyplot.cairo.eps",
+    "toyplot.cairo.pdf",
+    "toyplot.cairo.png",
+    "toyplot.html",
+    "toyplot.mp4",
+    "toyplot.pdf",
+    "toyplot.png",
+    "toyplot.qt",
+    "toyplot.qt.pdf",
+    "toyplot.qt.png",
+    "toyplot.svg",
+    "toyplot.webm",
+    ]:
     print_report(module)

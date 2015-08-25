@@ -11,10 +11,10 @@ import subprocess
 import toyplot.png
 
 
-def _require_ffmpeg():
-    for path in os.environ["PATH"].split(os.pathsep):
-        if os.path.exists(os.path.join(path, "ffmpeg")):
-            return
+for path in os.environ["PATH"].split(os.pathsep):
+    if os.path.exists(os.path.join(path, "ffmpeg")):
+        break
+else:
     raise Exception("An ffmpeg executable is required.")  # pragma: no cover
 
 
@@ -59,7 +59,6 @@ def render(
     ...   print "Writing frame %s" % frame
     ... toyplot.mp4.render(canvas, "test.mp4", progress=callback)
     """
-    _require_ffmpeg()
 
     command = [
         "ffmpeg",

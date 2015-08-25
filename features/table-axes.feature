@@ -30,6 +30,7 @@ Feature: Table axes
             | with right justification               |
             | with a label                           |
             | with multiple embedded axes in merged cells |
+            | with real world units                  |
 
     Scenario: Render table without header
         Given a sample toyplot.data.Table

@@ -591,6 +591,14 @@ def step_impl(context):
     toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-multiple-axes")
 
 
+@then(u'the table can be rendered with real world units')
+def step_impl(context):
+    context.axes.grid.hlines[...] = "single"
+    context.axes.grid.vlines[...] = "single"
+    context.axes.column(0).width = (1, "cm")
+    context.axes.row(0).height = "1cm"
+    toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-units")
+
 @then(u'an instance of toyplot.axes.Table can be rendered without a header')
 def step_impl(context):
     context.canvas = toyplot.Canvas()

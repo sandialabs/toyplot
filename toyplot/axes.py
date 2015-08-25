@@ -2158,14 +2158,14 @@ class Table(object):
             if self._table._finalized:
                 raise ValueError("Cannot set cell widths after inserting axes into the table.")
             for cell in self._cells.flat:
-                cell._width = value
+                cell._width = toyplot.units.convert(value, "px", "px")
         width = property(fset=_set_width)
 
         def _set_height(self, value):
             if self._table._finalized:
                 raise ValueError("Cannot set cell heights after inserting axes into the table.")
             for cell in self._cells.flat:
-                cell._height = value
+                cell._height = toyplot.units.convert(value, "px", "px")
         height = property(fset=_set_height)
 
         def _set_column_offset(self, value):

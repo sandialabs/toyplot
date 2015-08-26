@@ -517,20 +517,21 @@ class Canvas(object):
             parent=self)
 
         if data is not None:
-            for index, (key, column) in enumerate(data.items()):
+            for j, (key, column) in enumerate(data.items()):
                 if hrows:
-                    table.header.cell(hrows - 1, index).data = key
-                table.body.column(index).data = column
+                    table.header.cell(hrows - 1, j).data = key
+                for i, (value, mask) in enumerate(zip(column, numpy.ma.getmaskarray(column))):
+                    if not mask:
+                        table.body.cell(i, j).data = value
                 if issubclass(column._data.dtype.type, numpy.floating):
                     if hrows:
-                        table.header.cell(0, index).align = "center"
-                    table.body.column(
-                        index).format = toyplot.format.FloatFormatter()
-                    table.body.column(index).align = "separator"
+                        table.header.cell(0, j).align = "center"
+                    table.body.column(j).format = toyplot.format.FloatFormatter()
+                    table.body.column(j).align = "separator"
                 elif issubclass(column._data.dtype.type, numpy.character):
-                    table.column(index).align = "left"
+                    table.column(j).align = "left"
                 elif issubclass(column._data.dtype.type, numpy.integer):
-                    table.column(index).align = "right"
+                    table.column(j).align = "right"
 
         # Enable a single horizontal line between header and body.
         if hrows:

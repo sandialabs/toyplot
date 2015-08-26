@@ -612,6 +612,19 @@ def step_impl(context):
     toyplot.testing.assert_canvas_equal(canvas, "axes-table-convenience-api")
 
 
+@given(u'a sample toyplot.data.Table containing null values')
+def step_impl(context):
+    numpy.random.seed(1234)
+    context.data = toyplot.data.Table(numpy.random.random((4, 4)))
+    for key, column in context.data.items():
+        context.data[key] = numpy.ma.masked_where(column < 0.5, column)
+
+@then(u'the table can be rendered using table axes, and the null values will be excluded')
+def step_impl(context):
+    canvas, table = toyplot.table(context.data)
+    toyplot.testing.assert_canvas_equal(canvas, "axes-table-nulls")
+
+
 @given(u'values from -1000 to -1')
 def step_impl(context):
     context.x = numpy.linspace(-1000, -1, 100)

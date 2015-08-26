@@ -39,3 +39,7 @@ Feature: Table axes
     Scenario: Render table using convenience API
         Given a sample toyplot.data.Table
         Then the table can be rendered using the convenience API
+
+    Scenario: Render table containing null values
+        Given a sample toyplot.data.Table containing null values
+        Then the table can be rendered using table axes, and the null values will be excluded

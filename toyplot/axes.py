@@ -2061,6 +2061,7 @@ class Table(object):
             self._column = column
             self._format = Table.Cell.default_format
             self._align = align
+            self._angle = 0
             self._style = style
             self._bstyle = None
             self._data = None
@@ -2141,6 +2142,11 @@ class Table(object):
             for cell in self._cells.flat:
                 cell._align = value
         align = property(fset=_set_align)
+
+        def _set_angle(self, value):
+            for cell in self._cells.flat:
+                cell._angle = value
+        angle = property(fset=_set_angle)
 
         def _set_style(self, value):
             value = toyplot.require.style(value)

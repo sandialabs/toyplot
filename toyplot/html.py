@@ -1339,7 +1339,12 @@ def _render(canvas, axes, context):
         elif cell._align == "center":
             x = column_center + cell._column_offset
             xml.SubElement(
-                axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(
+                axes_xml,
+                "text",
+                x=repr(x),
+                y=repr(y),
+                transform="rotate(%r,%r,%r)" % (-cell._angle, x, y),
+                style=_css_style(
                     toyplot.style.combine(
                         cell._style, {
                             "text-anchor": "middle"}))).text = prefix + separator + suffix
@@ -2107,15 +2112,10 @@ def _render(parent, mark, context):
         datum_xml = xml.SubElement(
             series_xml,
             "text",
-            attrib={
-                "class": "toyplot-Datum"},
+            attrib={"class": "toyplot-Datum"},
             x=repr(dx),
             y=repr(dy),
-            transform="rotate(%r, %r, %r)" %
-            (-
-             dangle,
-             dx,
-             dy),
+            transform="rotate(%r, %r, %r)" % (-dangle, dx, dy),
             style=_css_style(dstyle))
         if "-toyplot-anchor-shift" in dstyle:
             datum_xml.set("dx", str(dstyle["-toyplot-anchor-shift"]))

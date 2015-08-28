@@ -1298,15 +1298,15 @@ def _render(canvas, axes, context):
                 axes_xml,
                 "rect",
                 x=repr(
-                    cell._left),
+                    cell.left),
                 y=repr(
-                    cell._top),
+                    cell.top),
                 width=repr(
-                    cell._right -
-                    cell._left),
+                    cell.right -
+                    cell.left),
                 height=repr(
-                    cell._bottom -
-                    cell._top),
+                    cell.bottom -
+                    cell.top),
                 style=_css_style(
                     cell._bstyle))
             if cell._title is not None:
@@ -1319,13 +1319,13 @@ def _render(canvas, axes, context):
 
         padding = 5
 
-        column_left = cell._left + padding
-        column_right = cell._right - padding
-        column_center = (cell._left + cell._right) / 2
+        column_left = cell.left + padding
+        column_right = cell.right - padding
+        column_center = (cell.left + cell.right) / 2
 
-        row_top = cell._top
-        row_bottom = cell._bottom
-        row_center = (cell._top + cell._bottom) / 2
+        row_top = cell.top
+        row_bottom = cell.bottom
+        row_center = (cell.top + cell.bottom) / 2
 
         y = row_center + cell._row_offset
 

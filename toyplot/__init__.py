@@ -307,6 +307,10 @@ def scatterplot(
 def matrix(
         matrix,
         label=None,
+        tlabel=None,
+        blabel=None,
+        llabel=None,
+        rlabel=None,
         step=1,
         xshow=True,
         yshow=True,
@@ -330,6 +334,10 @@ def matrix(
     table = canvas.matrix(
         matrix=matrix,
         label=label,
+        tlabel=tlabel,
+        blabel=blabel,
+        llabel=llabel,
+        rlabel=rlabel,
         step=step,
         xshow=xshow,
         yshow=yshow,

@@ -391,10 +391,10 @@ class Canvas(object):
             rlabel=None,
             blabel=None,
             step=1,
-            tshow=True,
-            lshow=True,
-            rshow=False,
-            bshow=False,
+            tshow=None,
+            lshow=None,
+            rshow=None,
+            bshow=None,
             tlocator=None,
             llocator=None,
             rlocator=None,
@@ -470,6 +470,8 @@ class Canvas(object):
             cell = table.bottom.row(1).merge()
             cell.data = blabel
 
+        if tshow is None:
+            tshow = True
         if tshow:
             if tlocator is None:
                 tlocator = toyplot.locator.Integer(step=step)
@@ -477,6 +479,8 @@ class Canvas(object):
                 table.top.cell(1, j).data = label
                 #table.top.cell(1, j).title = title
 
+        if lshow is None:
+            lshow = True
         if lshow:
             if llocator is None:
                 llocator = toyplot.locator.Integer(step=step)
@@ -484,6 +488,8 @@ class Canvas(object):
                 table.left.cell(i, 1).data = label
                 #table.left.cell(i, 1).title = title
 
+        if rshow is None and rlocator is not None:
+            rshow = True
         if rshow:
             if rlocator is None:
                 rlocator = toyplot.locator.Integer(step=step)
@@ -491,6 +497,8 @@ class Canvas(object):
                 table.right.cell(i, 0).data = label
                 #table.right.cell(i, 0).title = title
 
+        if bshow is None and blocator is not None:
+            bshow = True
         if bshow:
             if blocator is None:
                 blocator = toyplot.locator.Integer(step=step)

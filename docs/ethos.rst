@@ -7,6 +7,11 @@
 The Toyplot Ethos
 =================
 
+    | *Always look your best.*
+    | *Share your things.*
+    | *Play well with others.*
+    | *Never tell a lie.*
+
 What began as a quick workaround to reduce the size of animated figures in
 Jupyter notebooks quickly grew into Toyplot, "the kid-sized plotting toolkit with
 grownup-sized goals".  In a nutshell, we think that scientists and engineers
@@ -24,7 +29,7 @@ of the Toyplot graphics you will see in this documentation are live and
 interactive, despite the fact that they were created offline in a Jupyter
 notebook and passed through several publishing steps on the way to becoming our
 documentation.  Of course, we provide backends to publish Toyplot figures to
-legacy formats including PNG, PDF, Encapsulated Postscript, and MP4.
+legacy formats including PNG, PDF, Encapsulated Postscript, and MP4 *(Play well with others)*.
 
 With most toolkits, interactivity means throwaway features like pan-and-zoom.  For
 Toyplot, we're exploring simple-but-effective ideas to address the questions a
@@ -35,13 +40,13 @@ with compression artifacts; and interactive data cursors that display quantities
 of interest and descriptive statistics just by hovering the mouse.  And since
 the raw data is already implicitly embedded in a graphic, why not support
 reproducibility by making it easy to export, so the viewer can work with it
-themselves?  That's why Toyplot has a context menu to export raw data from a
-figure in CSV format.
+themselves?  That's why Toyplot figures can export their underlying raw data
+in CSV format *(Share your things)*.
 
 Last but definitely not least: Toyplot fully embraces principles and best
 practices for clarity and aesthetics in data graphics that are well-established
 by the visualization community, yet sadly lacking in contemporary plotting
-libraries.  Toyplot has beautiful color palettes and sensible default styling
+libraries *(Always look your best)*.  Toyplot has beautiful color palettes and sensible default styling
 that minimize chartjunk and maximize data ink out of the box, not as
 afterthoughts or addons.
 

@@ -55,6 +55,11 @@ class TickLocator(object):
         raise NotImplementedError() # pragma: no cover
 
 
+class Null(TickLocator):
+    """Do-nothing locator that generates no ticks."""
+    def ticks(self, domain_min, domain_max):
+        return [], [], []
+
 class Basic(TickLocator):
 
     """Generate N evenly spaced ticks that include the minimum and maximum values of a domain.

@@ -384,13 +384,21 @@ class Canvas(object):
 
     def matrix(
             self,
-            matrix,
+            data,
             label=None,
+            tlabel=None,
+            llabel=None,
+            rlabel=None,
+            blabel=None,
             step=1,
-            xshow=True,
-            yshow=True,
-            colormap=None,
-            palette=None,
+            tshow=None,
+            lshow=None,
+            rshow=None,
+            bshow=None,
+            tlocator=None,
+            llocator=None,
+            rlocator=None,
+            blocator=None,
             bounds=None,
             rect=None,
             corner=None,
@@ -405,7 +413,17 @@ class Canvas(object):
         -------
         axes: :class:`toyplot.axes.Table`
         """
-        matrix = toyplot.require.scalar_matrix(matrix)
+        colormap = None
+        palette = None
+        if isinstance(data, tuple):
+            data, colors = data
+            matrix = toyplot.require.scalar_matrix(data)
+            if isinstance(colors, toyplot.color.Palette):
+                palette = colors
+            elif isinstance(colors, toyplot.color.Map):
+                colormap = colors
+        else:
+            matrix = toyplot.require.scalar_matrix(data)
 
         if colormap is None:
             if palette is None:
@@ -415,39 +433,86 @@ class Canvas(object):
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+
         table = toyplot.axes.Table(
             xmin_range,
             xmax_range,
             ymin_range,
             ymax_range,
-            trows=1,
-            brows=1,
-            lcols=1,
-            rcols=1,
+            trows=2,
+            brows=2,
+            lcols=2,
+            rcols=2,
             rows=matrix.shape[0],
             columns=matrix.shape[1],
             label=label,
             parent=self)
 
         table.top.row(0).height = 20
+        table.top.row(1).height = 20
         table.bottom.row(0).height = 20
+        table.bottom.row(1).height = 20
         table.left.column(0).width = 20
+        table.left.column(1).width = 20
         table.right.column(0).width = 20
+        table.right.column(1).width = 20
 
-        table.left.column(0).align = "right"
+        table.left.column(1).align = "right"
         table.right.column(0).align = "left"
 
-        if yshow:
-            for i, label, title in zip(
-                    *toyplot.locator.Integer(step=step).ticks(0, matrix.shape[0] - 1)):
-                table.left.cell(i, 0).data = label
-                #table.left.cell(i, 0).title = title
+        if tlabel is not None:
+            cell = table.top.row(0).merge()
+            cell.data = tlabel
 
-        if xshow:
-            for j, label, title in zip(
-                    *toyplot.locator.Integer(step=step).ticks(0, matrix.shape[1] - 1)):
-                table.top.cell(0, j).data = label
-                #table.top.cell(0, j).title = title
+        if llabel is not None:
+            cell = table.left.column(0).merge()
+            cell.data = llabel
+            cell.angle = 90
+
+        if rlabel is not None:
+            cell = table.right.column(1).merge()
+            cell.data = rlabel
+            cell.angle = 90
+
+        if blabel is not None:
+            cell = table.bottom.row(1).merge()
+            cell.data = blabel
+
+        if tshow is None:
+            tshow = True
+        if tshow:
+            if tlocator is None:
+                tlocator = toyplot.locator.Integer(step=step)
+            for j, label, title in zip(*tlocator.ticks(0, matrix.shape[1] - 1)):
+                table.top.cell(1, j).data = label
+                #table.top.cell(1, j).title = title
+
+        if lshow is None:
+            lshow = True
+        if lshow:
+            if llocator is None:
+                llocator = toyplot.locator.Integer(step=step)
+            for i, label, title in zip(*llocator.ticks(0, matrix.shape[0] - 1)):
+                table.left.cell(i, 1).data = label
+                #table.left.cell(i, 1).title = title
+
+        if rshow is None and rlocator is not None:
+            rshow = True
+        if rshow:
+            if rlocator is None:
+                rlocator = toyplot.locator.Integer(step=step)
+            for i, label, title in zip(*rlocator.ticks(0, matrix.shape[0] - 1)):
+                table.right.cell(i, 0).data = label
+                #table.right.cell(i, 0).title = title
+
+        if bshow is None and blocator is not None:
+            bshow = True
+        if bshow:
+            if blocator is None:
+                blocator = toyplot.locator.Integer(step=step)
+            for j, label, title in zip(*blocator.ticks(0, matrix.shape[1] - 1)):
+                table.bottom.cell(0, j).data = label
+                #table.bottom.cell(0, j).title = title
 
         for i, row in enumerate(matrix):
             for j, value in enumerate(row):

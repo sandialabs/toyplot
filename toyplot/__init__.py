@@ -150,6 +150,56 @@ def fill(
     return canvas, axes, mark
 
 
+def matrix(
+        data,
+        label=None,
+        tlabel=None,
+        llabel=None,
+        rlabel=None,
+        blabel=None,
+        step=1,
+        tshow=None,
+        lshow=None,
+        rshow=None,
+        bshow=None,
+        tlocator=None,
+        llocator=None,
+        rlocator=None,
+        blocator=None,
+        width=None,
+        height=None,
+        canvas_style=None):
+    """Convenience function to create a matrix visualization in a single call.
+
+    See :meth:`toyplot.canvas.Canvas.matrix`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+
+    Returns
+    -------
+    canvas: :class:`toyplot.canvas.Canvas`
+      A new canvas object.
+    table: :class:`toyplot.axes.Table`
+      A new set of table axes that fill the canvas.
+    """
+    canvas = Canvas(width=width, height=height, style=canvas_style)
+    table = canvas.matrix(
+        data=data,
+        label=label,
+        tlabel=tlabel,
+        llabel=llabel,
+        rlabel=rlabel,
+        blabel=blabel,
+        step=step,
+        tshow=tshow,
+        lshow=lshow,
+        rshow=rshow,
+        bshow=bshow,
+        tlocator=tlocator,
+        llocator=llocator,
+        rlocator=rlocator,
+        blocator=blocator)
+    return canvas, table
+
+
 def plot(
         a,
         b=None,
@@ -302,40 +352,6 @@ def scatterplot(
         mlstyle=mlstyle,
         filename=filename)
     return canvas, axes, mark
-
-
-def matrix(
-        matrix,
-        label=None,
-        step=1,
-        xshow=True,
-        yshow=True,
-        colormap=None,
-        palette=None,
-        width=None,
-        height=None,
-        canvas_style=None):
-    """Convenience function to create a matrix visualization in a single call.
-
-    See :meth:`toyplot.canvas.Canvas.matrix`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
-
-    Returns
-    -------
-    canvas: :class:`toyplot.canvas.Canvas`
-      A new canvas object.
-    table: :class:`toyplot.axes.Table`
-      A new set of table axes that fill the canvas.
-    """
-    canvas = Canvas(width=width, height=height, style=canvas_style)
-    table = canvas.matrix(
-        matrix=matrix,
-        label=label,
-        step=step,
-        xshow=xshow,
-        yshow=yshow,
-        colormap=colormap,
-        palette=palette)
-    return canvas, table
 
 
 def table(

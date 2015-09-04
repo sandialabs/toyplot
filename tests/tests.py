@@ -14,7 +14,6 @@ import numpy
 import os
 import re
 import sys
-import tempfile
 import xml.etree.ElementTree as xml
 
 import toyplot

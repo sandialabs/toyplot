@@ -388,7 +388,9 @@ class Canvas(object):
             label=None,
             step=1,
             xshow=True,
+            xlabel=None,
             yshow=True,
+            ylabel=None,
             colormap=None,
             palette=None,
             bounds=None,
@@ -414,7 +416,8 @@ class Canvas(object):
                 palette, matrix.min(), matrix.max())
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
-            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+            0, self._width, 0, self._height, bounds=bounds, rect=rect,
+            corner=corner, grid=grid, gutter=gutter)
         table = toyplot.axes.Table(
             xmin_range,
             xmax_range,
@@ -437,17 +440,27 @@ class Canvas(object):
         table.left.column(0).align = "right"
         table.right.column(0).align = "left"
 
-        if yshow:
+        if yshow and ylabel is None:
             for i, label, title in zip(
-                    *toyplot.locator.Integer(step=step).ticks(0, matrix.shape[0] - 1)):
+                    *(toyplot.locator.Integer(step=step).
+                      ticks(0, matrix.shape[0] - 1))):
                 table.left.cell(i, 0).data = label
-                #table.left.cell(i, 0).title = title
 
-        if xshow:
+        if ylabel is not None:
+            assert len(ylabel) == matrix.shape[0]
+            for i, label in enumerate(ylabel):
+                table.left.cell(i, 0).data = label
+
+        if xshow and xlabel is None:
             for j, label, title in zip(
-                    *toyplot.locator.Integer(step=step).ticks(0, matrix.shape[1] - 1)):
+                    *(toyplot.locator.Integer(step=step).
+                      ticks(0, matrix.shape[1] - 1))):
                 table.top.cell(0, j).data = label
-                #table.top.cell(0, j).title = title
+
+        if xlabel is not None:
+            assert len(xlabel) == matrix.shape[1]
+            for j, label in enumerate(xlabel):
+                table.top.cell(0, j).data = label
 
         for i, row in enumerate(matrix):
             for j, value in enumerate(row):

@@ -583,12 +583,46 @@ def step_impl(context):
     toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-label")
 
 
+@then(u'the table can be rendered with multiple embedded axes in merged cells')
+def step_impl(context):
+    numpy.random.seed(1234)
+    context.axes.body.column(2).merge().axes().bars(numpy.random.random(20), along="y")
+    context.axes.body.column(3).merge().axes().bars(numpy.random.random(20), along="y")
+    toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-multiple-axes")
+
+
+@then(u'the table can be rendered with real world units')
+def step_impl(context):
+    context.axes.grid.hlines[...] = "single"
+    context.axes.grid.vlines[...] = "single"
+    context.axes.column(0).width = (1, "cm")
+    context.axes.row(0).height = "1cm"
+    toyplot.testing.assert_canvas_equal(context.canvas, "axes-table-units")
+
 @then(u'an instance of toyplot.axes.Table can be rendered without a header')
 def step_impl(context):
     context.canvas = toyplot.Canvas()
     context.axes = context.canvas.table(context.data, hrows=0)
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-table-without-header")
+
+@then(u'the table can be rendered using the convenience API')
+def step_impl(context):
+    canvas, table = toyplot.table(context.data)
+    toyplot.testing.assert_canvas_equal(canvas, "axes-table-convenience-api")
+
+
+@given(u'a sample toyplot.data.Table containing null values')
+def step_impl(context):
+    numpy.random.seed(1234)
+    context.data = toyplot.data.Table(numpy.random.random((4, 4)))
+    for key, column in context.data.items():
+        context.data[key] = numpy.ma.masked_where(column < 0.5, column)
+
+@then(u'the table can be rendered using table axes, and the null values will be excluded')
+def step_impl(context):
+    canvas, table = toyplot.table(context.data)
+    toyplot.testing.assert_canvas_equal(canvas, "axes-table-nulls")
 
 
 @given(u'values from -1000 to -1')
@@ -723,6 +757,20 @@ def step_impl(context):
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-log-2-scale-negative-1000-1000")
+
+
+@given(u'log 10 axes on x and y with custom format')
+def step_impl(context):
+    context.canvas = toyplot.Canvas()
+    context.axes = context.canvas.axes(xscale="log10", yscale="log10")
+    context.axes.x.ticks.locator = toyplot.locator.Log(base=10, format="{base}^{exponent}")
+    context.axes.y.ticks.locator = toyplot.locator.Log(base=10, format="{base}^{exponent}")
+
+
+@then(u'the result should be a log-log plot from -1000 to 1000 with custom labels')
+def step_impl(context):
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "axes-log-10-scale-negative-1000-1000-custom-format")
 
 
 @given(u'position and boundary data')
@@ -933,3 +981,52 @@ def step_impl(context):
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-magnitudes-wiggle-baseline")
+
+
+@when(u'adding default line marks to axes')
+def step_impl(context):
+    context.canvas = toyplot.Canvas()
+    axes = context.canvas.axes()
+    axes.hlines(numpy.linspace(0, 0.6), style={"stroke":"steelblue", "opacity":0.4})
+    axes.vlines(numpy.linspace(0, 1), style={"stroke":"steelblue", "opacity":0.4})
+    axes.plot(numpy.linspace(0.25, 0.75), numpy.linspace(0.25, 0.75) ** 2);
+
+@then(u'the line marks should be treated as annotations.')
+def step_impl(context):
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "axes-lines-annotation")
+
+
+@when(u'adding data line marks to axes')
+def step_impl(context):
+    context.canvas = toyplot.Canvas()
+    axes = context.canvas.axes()
+    axes.hlines(numpy.linspace(0, 0.6), style={"stroke":"steelblue", "opacity":0.4}, annotation=False)
+    axes.vlines(numpy.linspace(0, 1), style={"stroke":"steelblue", "opacity":0.4}, annotation=False)
+    axes.plot(numpy.linspace(0.25, 0.75), numpy.linspace(0.25, 0.75) ** 2);
+
+
+@then(u'the line marks should be treated as data.')
+def step_impl(context):
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "axes-lines-data")
+
+@given(u'a matrix')
+def step_impl(context):
+    numpy.random.seed(1234)
+    context.matrix = numpy.random.normal(size=(10, 10))
+
+@then(u'a default matrix visualization can be created with the convenience API')
+def step_impl(context):
+    canvas, table = toyplot.matrix(context.matrix)
+    toyplot.testing.assert_canvas_equal(
+        canvas, "matrix-default")
+
+@then(u'a default matrix visualization can be created with the standard API')
+def step_impl(context):
+    canvas = toyplot.Canvas()
+    table = canvas.matrix(context.matrix)
+    toyplot.testing.assert_canvas_equal(
+        canvas, "matrix-default")
+
+

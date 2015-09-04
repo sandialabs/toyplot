@@ -1,35 +1,45 @@
 Feature: Table axes
-  Scenario Outline: Table axes API
-    Given a sample toyplot.data.Table
-    And an instance of toyplot.axes.Table
-    Then the table can be rendered <phrase>
+    Scenario Outline: Table axes API
+        Given a sample toyplot.data.Table
+        And an instance of toyplot.axes.Table
+        Then the table can be rendered <phrase>
 
-    Examples:
-      | phrase                                 |
-      | with defaults                          |
-      | with header styles                     |
-      | with column styles                     |
-      | with row styles                        |
-      | with cell styles                       |
-      | and row styles override column styles  |
-      | and cell styles override row styles    |
-      | and cell styles override column styles |
-      | with extra horizontal lines            |
-      | with extra vertical lines              |
-      | with a full grid                       |
-      | with grid styles                       |
-      | with doubled lines                     |
-      | with custom doubled line separation    |
-      | with column offsets                    |
-      | with custom header content             |
-      | with custom cell content               |
-      | with embedded plots                    |
-      | with custom column widths              |
-      | with left justification                |
-      | with center justification              |
-      | with right justification               |
-      | with a label                           |
+        Examples:
+            | phrase                                 |
+            | with defaults                          |
+            | with header styles                     |
+            | with column styles                     |
+            | with row styles                        |
+            | with cell styles                       |
+            | and row styles override column styles  |
+            | and cell styles override row styles    |
+            | and cell styles override column styles |
+            | with extra horizontal lines            |
+            | with extra vertical lines              |
+            | with a full grid                       |
+            | with grid styles                       |
+            | with doubled lines                     |
+            | with custom doubled line separation    |
+            | with column offsets                    |
+            | with custom header content             |
+            | with custom cell content               |
+            | with embedded plots                    |
+            | with custom column widths              |
+            | with left justification                |
+            | with center justification              |
+            | with right justification               |
+            | with a label                           |
+            | with multiple embedded axes in merged cells |
+            | with real world units                  |
 
-  Scenario: Table without header
-    Given a sample toyplot.data.Table
-    Then an instance of toyplot.axes.Table can be rendered without a header
+    Scenario: Render table without header
+        Given a sample toyplot.data.Table
+        Then an instance of toyplot.axes.Table can be rendered without a header
+
+    Scenario: Render table using convenience API
+        Given a sample toyplot.data.Table
+        Then the table can be rendered using the convenience API
+
+    Scenario: Render table containing null values
+        Given a sample toyplot.data.Table containing null values
+        Then the table can be rendered using table axes, and the null values will be excluded

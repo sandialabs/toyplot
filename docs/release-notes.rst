@@ -7,6 +7,32 @@
 Release Notes
 =============
 
+Toyplot 0.7.0 - August 12, 2015
+-------------------------------
+
+* Added a user guide section on embedding plots.
+* Added a user guide example of datetime objects as tick labels.
+* Make the Toyplot sourcecode fully PEP-8 conforming - thanks to Chris Morgan.
+* Worked around problems with numpy.broadcast_arrays() in numpy 1.8.
+* Removed LaTeX table formatting functionality that was replaced by table axes.
+* Added a new backend to display figures in a standalone Qt window.
+* Switched to the Python logger module for warnings / errors.
+* Updated the public API for specifying scalar color palettes / maps, and deprecated separate color palette / map API parameters.
+* Changed the way we encode opacities, for compatibility with Inkscape and Adobe Illustrator.
+* Removed the obsolete toyplot.selenium backend.
+* Treat hlines() and vlines() as annotation (so they don't affect the data domain), unless the caller specifies otherwise.
+* Created new Qt backends to generate PDF and PNG figures.
+* Figures can be resized consistently across all browsers, particularly Firefox and IE.
+* Reorganized the backend documentation, and explicitly documented the distinction between backends and displays.
+* Fixed a case where canvas resizing didn't handle explicit units correctly.
+* Added a new section on interaction to the user guide.
+* Allow figure creators to override the default filename when users export data from an interactive figure.
+* Significant changes to our travis-ci.org test environment.
+* toyplot.data.Table.matrix() didn't work in Python 3.
+* Removed toyplot.data.Table.to_csv(), we want to discourage people from using Toyplot for data manipulation.
+* Many objects didn't render properly in Jupyter notebooks with Python 3.
+* Added parameters to disable the row and column labels in matrix visualizations.
+
 Toyplot 0.6.0 - July 13, 2015
 -----------------------------
 

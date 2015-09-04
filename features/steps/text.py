@@ -1,5 +1,7 @@
 from behave import *
 
+import nose.tools
+import toyplot.html
 import toyplot.testing
 
 
@@ -136,3 +138,19 @@ def step_impl(context):
     context.axes.scatterplot(0, 0, color="black", size=7)
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-baseline-shift-negative")
+
+@when(u'text is aligned with an unknown text-anchor value, an exception is raised.')
+def step_impl(context):
+    with nose.tools.assert_raises(ValueError):
+        context.axes.text(
+            0, 0, "Text!", style={"text-anchor": "foo"})
+        toyplot.html.render(context.canvas)
+
+@when(u'text is aligned with an unknown alignment-baseline value, an exception is raised.')
+def step_impl(context):
+    with nose.tools.assert_raises(ValueError):
+        context.axes.text(
+            0, 0, "Text!", style={"alignment-baseline": "foo"})
+        toyplot.html.render(context.canvas)
+
+

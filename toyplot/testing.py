@@ -10,41 +10,50 @@ import os
 import numbers
 import numpy.testing
 import re
+import sys
 import toyplot.html
 import toyplot.svg
 import xml.etree.ElementTree as xml
 
+try:
+    import toyplot.pdf
+except:
+    pass
+
+try:
+    import toyplot.png
+except:
+    pass
+
+try:
+    import toyplot.cairo.eps
+except:
+    pass
+
+try:
+    import toyplot.cairo.pdf
+except:
+    pass
+
+try:
+    import toyplot.cairo.png
+except:
+    pass
+
+try:
+    import toyplot.qt.pdf
+except:
+    pass
+
+try:
+    import toyplot.qt.png
+except:
+    pass
+
 root_dir = os.path.dirname(os.path.dirname(__file__))
 failed_dir = os.path.join(root_dir, "features", "failed")
 reference_dir = os.path.join(root_dir, "features", "reference")
-
-
-def _assert_content_equal(content, test_file, reference_file):
-    if os.path.exists(test_file):
-        os.remove(test_file)
-    if os.path.exists(reference_file):
-        reference = open(reference_file, "rb").read()
-        if content != reference:
-            if not os.path.exists(failed_dir):
-                os.mkdir(failed_dir)
-            with open(test_file, "wb") as file:
-                file.write(content)
-            #raise AssertionError("Test output %s doesn't match %s." % (test_file, reference_file))
-            raise AssertionError(
-                "\n".join(
-                    list(
-                        difflib.context_diff(
-                            content.split("\n"),
-                            reference.split("\n"),
-                            lineterm="",
-                            fromfile="test",
-                            tofile="reference"))))
-    else:
-        with open(reference_file, "wb") as file:
-            file.write(content)
-        raise AssertionError(
-            "Created new reference file %s.  You should verify its contents before re-running the test." %
-            (reference_file))
+backend_dir = os.path.join(root_dir, "features", "backends")
 
 
 def _assert_string_equal(content, test_file, reference_file, encoding="utf-8"):
@@ -148,6 +157,20 @@ def assert_color_equal(a, b):
         (a["r"], a["g"], a["b"], a["a"]), b)
 
 
+def assert_colors_equal(a, b):
+    """Raise an exception if sequence of toyplot colors don't match a reference.
+
+    Parameters
+    ----------
+    a: sequence of toyplot RGBA colors, required
+    b: sequence of 4-tuples
+    """
+    for ai, bi in zip(a, b):
+        if ai is not None and bi is not None:
+            numpy.testing.assert_array_almost_equal(
+                (ai["r"], ai["g"], ai["b"], ai["a"]), bi)
+
+
 def assert_html_equal(html, name):
     """Raise an exception if HTML content doesn't match a reference.
 
@@ -161,7 +184,7 @@ def assert_html_equal(html, name):
     """
     test_file = os.path.join(failed_dir, "%s.html" % name)
     reference_file = os.path.join(reference_dir, "%s.html" % name)
-    _assert_content_equal(html, test_file, reference_file)
+    _assert_string_equal(html, test_file, reference_file)
 
 
 def assert_canvas_equal(canvas, name):
@@ -175,17 +198,10 @@ def assert_canvas_equal(canvas, name):
     svg = io.BytesIO()
     toyplot.svg.render(canvas, svg)
 
-    if hasattr(toyplot, "eps"):
-        eps = io.BytesIO()
-        toyplot.eps.render(canvas, eps)
-
-    if hasattr(toyplot, "pdf"):
-        pdf = io.BytesIO()
-        toyplot.pdf.render(canvas, pdf)
-
-    if hasattr(toyplot, "png"):
-        png = io.BytesIO()
-        toyplot.png.render(canvas, png)
+    for module in ["toyplot.pdf", "toyplot.png", "toyplot.cairo.eps", "toyplot.cairo.pdf", "toyplot.cairo.png", "toyplot.qt.pdf", "toyplot.qt.png"]:
+        if module in sys.modules:
+            buffer = io.BytesIO()
+            sys.modules[module].render(canvas, buffer)
 
     # Get rid of any past failures ...
 #  if os.path.exists("tests/diffs/%s.svg" % name):

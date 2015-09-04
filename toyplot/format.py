@@ -27,7 +27,7 @@ class Formatter(object):
         suffix : string
           Formatted data to be displayed after the separator, or empty string.
         """
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
 
 class DefaultFormatter(Formatter):

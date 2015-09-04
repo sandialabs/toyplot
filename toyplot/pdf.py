@@ -6,10 +6,7 @@ from __future__ import absolute_import
 from __future__ import division
 
 
-import cairo
-import numpy
-import toyplot.svg
-import toyplot.cairo
+import toyplot.cairo.pdf
 
 
 def render(canvas, fobj, width=None, height=None, scale=None):
@@ -25,6 +22,8 @@ def render(canvas, fobj, width=None, height=None, scale=None):
       Canvas to be rendered.
     fobj: file-like object or string
       The file to write.  Use a string filepath to write data directly to disk.
+      If `None` (the default), the PDF data will be returned to the caller
+      instead.
     width: number, string, or (number, string) tuple, optional
       Specify the width of the output image with optional units.  If the units
       aren't specified, defaults to points.  See :ref:`units` for details on
@@ -36,6 +35,12 @@ def render(canvas, fobj, width=None, height=None, scale=None):
     scale: number, optional
       Scales the output `canvas` by the given ratio.
 
+    Returns
+    -------
+    pdf: PDF data, or `None`
+      PDF representation of `canvas`, or `None` if the caller specifies the
+      `fobj` parameter.
+
     Examples
     --------
 
@@ -43,15 +48,7 @@ def render(canvas, fobj, width=None, height=None, scale=None):
 
     Notes
     -----
-    The output PDF is rendered using an SVG representation of the canvas
-    generated with :func:`toyplot.svg.render()`.
+    The output PDF is currently rendered using
+    :func:`toyplot.cairo.pdf.render()`.  This may change in the future.
     """
-    svg = toyplot.svg.render(canvas)
-    scale = canvas._point_scale(width=width, height=height, scale=scale)
-    surface = cairo.PDFSurface(
-        fobj, scale * canvas._width, scale * canvas._height)
-    context = cairo.Context(surface)
-    context.scale(scale, scale)
-    toyplot.cairo.render(svg, context)
-    surface.flush()
-    surface.finish()
+    return toyplot.cairo.pdf.render(canvas, fobj, width, height, scale)

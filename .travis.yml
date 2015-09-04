@@ -1,29 +1,40 @@
+sudo: true
 language: python
 python:
-  - "2.7"
-  - "3.3"
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y python-gtk2 wget
-  - env | sort
-  - cd $VIRTUAL_ENV
-  - mkdir -p lib/python2.7/dist-packages/
-  - ln -s /usr/lib/python2.7/dist-packages/glib/ lib/python2.7/dist-packages/
-  - ln -s /usr/lib/python2.7/dist-packages/gobject/ lib/python2.7/dist-packages/
-  - ln -s /usr/lib/python2.7/dist-packages/gtk-2.0* lib/python2.7/dist-packages/
-  - ln -s /usr/lib/python2.7/dist-packages/pygtk.pth lib/python2.7/dist-packages/
-  - ln -s /usr/lib/python2.7/dist-packages/cairo lib/python2.7/dist-packages/
-  - cd $TRAVIS_BUILD_DIR
-  - wget http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
-  - mkdir ffmpeg
-  - tar xf ffmpeg-release-64bit-static.tar.xz --strip-components 1 -C ffmpeg
-  - export PATH=$TRAVIS_BUILD_DIR/ffmpeg:$PATH
-
+    - "2.7"
+    - "3.3"
 install:
-  - pip install behave "colormath>=2.1.0" coverage coveralls mock multipledispatch networkx "numpy>=1.7"
+    - env | sort
+    - wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH="$HOME/miniconda/bin:$PATH"
+    - hash -r
+    - conda config --set always_yes yes --set changeps1 no
+    - conda config --add channels dsdale24
+    - conda update -q conda
+    - conda info -a
+    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION mock multipledispatch networkx numpy pip
+    - source activate test-environment
+    - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+        conda install pyqt5;
+        sudo apt-get update -qq;
+        sudo apt-get install -y python-gtk2 wget;
+        export SITE_PACKAGES="$HOME/miniconda/envs/test-environment/lib/python$TRAVIS_PYTHON_VERSION/site-packages/";
+        ln -s /usr/lib/python2.7/dist-packages/glib/ $SITE_PACKAGES;
+        ln -s /usr/lib/python2.7/dist-packages/gobject/ $SITE_PACKAGES;
+        ln -s /usr/lib/python2.7/dist-packages/gtk-2.0* $SITE_PACKAGES;
+        ln -s /usr/lib/python2.7/dist-packages/pygtk.pth $SITE_PACKAGES;
+        ln -s /usr/lib/python2.7/dist-packages/cairo $SITE_PACKAGES;
+      fi
+    - pip install behave "colormath>=2.1.0" coverage coveralls nose-exclude
+    - wget http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
+    - mkdir ffmpeg
+    - tar xf ffmpeg-release-64bit-static.tar.xz --strip-components 1 -C ffmpeg
+    - export PATH=$TRAVIS_BUILD_DIR/ffmpeg:$PATH
 script:
-  - coverage run --source toyplot --omit toyplot/testing.py -m nose
-  - coverage run --append --source toyplot --omit toyplot/testing.py -m behave
-  - coverage report
+    - coverage run --source toyplot --omit toyplot/testing.py -m nose --exclude-dir toyplot
+    - coverage run --append --source toyplot --omit toyplot/testing.py -m behave
+    - coverage report
+    - python backend-report.py
 after_script:
-  - coveralls
+    - coveralls

@@ -100,7 +100,7 @@ _export_data_tables = string.Template("""
     {
       link.href = uri;
       link.style = "visibility:hidden";
-      link.download = "toyplot.csv";
+      link.download = data_table.filename + ".csv";
 
       document.body.appendChild(link);
       link.click();
@@ -465,14 +465,12 @@ def render(canvas, fobj=None, animation=False):
     svg = xml.Element(
         "svg",
         xmlns="http://www.w3.org/2000/svg",
-        attrib={
-            "xmlns:toyplot": "http://www.sandia.gov/toyplot"},
-        width="%rpx" %
-        canvas._width,
-        height="%rpx" %
-        canvas._height,
-        style=_css_style(
-            canvas._style),
+        attrib={ "xmlns:toyplot": "http://www.sandia.gov/toyplot"},
+        width="%rpx" % canvas._width,
+        height="%rpx" % canvas._height,
+        viewBox="0 0 %r %r" % (canvas._width, canvas._height),
+        preserveAspectRatio="xMidyMid meet",
+        style=_css_style( canvas._style),
         id=context.get_id(canvas))
     for child in canvas._children:
         _render(canvas, child, context.push(svg))
@@ -546,6 +544,7 @@ def render(canvas, fobj=None, animation=False):
             mark = data_table["mark"]
             title = data_table["title"]
             table = data_table["table"]
+            filename = data_table["filename"] if data_table["filename"] else "toyplot"
 
             names = []
             data = []
@@ -562,7 +561,7 @@ def render(canvas, fobj=None, animation=False):
                         data.append(column.tolist())
             if names:
                 data_tables.append(
-                    {"id": context.get_id(mark), "title": title, "names": names, "data": data})
+                    {"id": context.get_id(mark), "filename": filename, "title": title, "names": names, "data": data})
 
         xml.SubElement(
             controls,
@@ -729,14 +728,41 @@ def render(canvas, fobj=None, animation=False):
         return root
 
 
+import sys
+def _color_fixup(styles):
+    """It turns-out that many applications and libraries (Inkscape, Adobe Illustrator, Qt)
+    don't handle CSS rgba() colors correctly.  So convert them to CSS rgb colors and use
+    fill-opacity / stroke-opacity instead."""
+
+    if "fill" in styles:
+        color = toyplot.color.css(styles["fill"])
+        if color is not None:
+            opacity = float(styles.get("fill-opacity", 1.0))
+            styles["fill"] = "rgb(%.3g%%,%.3g%%,%.3g%%)" % (
+                color["r"] * 100, color["g"] * 100, color["b"] * 100)
+            try:
+                styles["fill-opacity"] = str(color["a"] * opacity)
+            except:
+                sys.stderr.write("%s\n" % styles)
+                sys.stderr.flush()
+    if "stroke" in styles:
+        color = toyplot.color.css(styles["stroke"])
+        if color is not None:
+            opacity = float(styles.get("stroke-opacity", 1.0))
+            styles["stroke"] = "rgb(%.3g%%,%.3g%%,%.3g%%)" % (
+                color["r"] * 100, color["g"] * 100, color["b"] * 100)
+            styles["stroke-opacity"] = str(color["a"] * opacity)
+
+    return styles
+
 def _css_style(*styles):
-    style = toyplot.style.combine(*styles)
+    style = _color_fixup(toyplot.style.combine(*styles))
     return ";".join(["%s:%s" % (key, value)
                      for key, value in sorted(style.items())])
 
 
 def _css_attrib(*styles):
-    style = toyplot.style.combine(*styles)
+    style = _color_fixup(toyplot.style.combine(*styles))
     attrib = {}
     if len(style):
         attrib["style"] = ";".join(
@@ -758,9 +784,9 @@ class _RenderContext(object):
         self._cartesian_axes = dict(
         ) if cartesian_axes is None else cartesian_axes
 
-    def add_data_table(self, mark, table, title):
+    def add_data_table(self, mark, table, title, filename):
         self._data_tables.append(
-            {"mark": mark, "title": title, "table": table})
+            {"mark": mark, "title": title, "table": table, "filename": filename})
 
     def add_cartesian_axes(self, axes):
         self._cartesian_axes[self.get_id(axes)] = axes
@@ -1272,15 +1298,15 @@ def _render(canvas, axes, context):
                 axes_xml,
                 "rect",
                 x=repr(
-                    cell._left),
+                    cell.left),
                 y=repr(
-                    cell._top),
+                    cell.top),
                 width=repr(
-                    cell._right -
-                    cell._left),
+                    cell.right -
+                    cell.left),
                 height=repr(
-                    cell._bottom -
-                    cell._top),
+                    cell.bottom -
+                    cell.top),
                 style=_css_style(
                     cell._bstyle))
             if cell._title is not None:
@@ -1293,13 +1319,13 @@ def _render(canvas, axes, context):
 
         padding = 5
 
-        column_left = cell._left + padding
-        column_right = cell._right - padding
-        column_center = (cell._left + cell._right) / 2
+        column_left = cell.left + padding
+        column_right = cell.right - padding
+        column_center = (cell.left + cell.right) / 2
 
-        row_top = cell._top
-        row_bottom = cell._bottom
-        row_center = (cell._top + cell._bottom) / 2
+        row_top = cell.top
+        row_bottom = cell.bottom
+        row_center = (cell.top + cell.bottom) / 2
 
         y = row_center + cell._row_offset
 
@@ -1313,7 +1339,12 @@ def _render(canvas, axes, context):
         elif cell._align == "center":
             x = column_center + cell._column_offset
             xml.SubElement(
-                axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(
+                axes_xml,
+                "text",
+                x=repr(x),
+                y=repr(y),
+                transform="rotate(%r,%r,%r)" % (-cell._angle, x, y),
+                style=_css_style(
                     toyplot.style.combine(
                         cell._style, {
                             "text-anchor": "middle"}))).text = prefix + separator + suffix
@@ -1471,7 +1502,7 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-BarBoundaries"})
-    context.add_data_table(mark, mark._table, title="Bar Data")
+    context.add_data_table(mark, mark._table, title="Bar Data", filename=mark._filename)
 
     for boundary1, boundary2, fill, opacity, title in zip(
         boundaries.T[
@@ -1539,7 +1570,7 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-BarMagnitudes"})
-    context.add_data_table(mark, mark._table, title="Bar Data")
+    context.add_data_table(mark, mark._table, title="Bar Data", filename=mark._filename)
 
     for boundary1, boundary2, fill, opacity, title in zip(
         boundaries.T[
@@ -1591,7 +1622,7 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-FillBoundaries"})
-    context.add_data_table(mark, mark._table, title="Fill Data")
+    context.add_data_table(mark, mark._table, title="Fill Data", filename=mark._filename)
 
     for boundary1, boundary2, fill, opacity, title in zip(
             boundaries.T[:-1], boundaries.T[1:], mark._fill, mark._opacity, mark._title):
@@ -1658,7 +1689,7 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-FillMagnitudes"})
-    context.add_data_table(mark, mark._table, title="Fill Data")
+    context.add_data_table(mark, mark._table, title="Fill Data", filename=mark._filename)
 
     for boundary1, boundary2, fill, opacity, title in zip(
             boundaries.T[:-1], boundaries.T[1:], mark._fill, mark._opacity, mark._title):
@@ -1857,7 +1888,7 @@ def _render(canvas, legend, context):
 
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Graph, _RenderContext)
-def _render(axes, mark, context):
+def _render(axes, mark, context): # pragma: no cover
     position = mark._vertex_table[mark._coordinates[0]]
     series = mark._vertex_table[mark._series[0]]
 
@@ -1881,8 +1912,8 @@ def _render(axes, mark, context):
 
     mark_xml = xml.SubElement(context.root, "g", id=context.get_id(
         mark), attrib={"class": "toyplot-mark-Graph"})
-    #context.add_data_table(mark, mark._vertex_table, title="Graph Vertex Data")
-    #context.add_data_table(mark, mark._edge_table, title="Graph Edge Data")
+    #context.add_data_table(mark, mark._vertex_table, title="Graph Vertex Data", filename=mark._vertex_filename)
+    #context.add_data_table(mark, mark._edge_table, title="Graph Edge Data", filename=mark._edge_filename)
     if mark._show_edges:
         edge_xml = xml.SubElement(
             mark_xml, "g", attrib={"class": "toyplot-Edges"})
@@ -1944,7 +1975,7 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-Plot"})
-    context.add_data_table(mark, mark._table, title="Plot Data")
+    context.add_data_table(mark, mark._table, title="Plot Data", filename=mark._filename)
 
     for series, stroke, stroke_width, stroke_opacity, title, marker, msize, mfill, mstroke, mopacity in zip(
         series.T, mark._stroke.T, mark._stroke_width.T, mark._stroke_opacity.T, mark._title.T, [
@@ -2020,7 +2051,7 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-Rect"})
-    context.add_data_table(mark, mark._table, title="Rect Data")
+    context.add_data_table(mark, mark._table, title="Rect Data", filename=mark._filename)
 
     series_xml = xml.SubElement(
         mark_xml, "g", attrib={"class": "toyplot-Series"})
@@ -2066,7 +2097,7 @@ def _render(parent, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-Text"})
-    context.add_data_table(mark, mark._table, title="Text Data")
+    context.add_data_table(mark, mark._table, title="Text Data", filename=mark._filename)
     series_xml = xml.SubElement(
         mark_xml, "g", attrib={"class": "toyplot-Series"})
     for dx, dy, dtext, dangle, dfill, dopacity, dtitle in zip(
@@ -2081,15 +2112,10 @@ def _render(parent, mark, context):
         datum_xml = xml.SubElement(
             series_xml,
             "text",
-            attrib={
-                "class": "toyplot-Datum"},
+            attrib={"class": "toyplot-Datum"},
             x=repr(dx),
             y=repr(dy),
-            transform="rotate(%r, %r, %r)" %
-            (-
-             dangle,
-             dx,
-             dy),
+            transform="rotate(%r, %r, %r)" % (-dangle, dx, dy),
             style=_css_style(dstyle))
         if "-toyplot-anchor-shift" in dstyle:
             datum_xml.set("dx", str(dstyle["-toyplot-anchor-shift"]))

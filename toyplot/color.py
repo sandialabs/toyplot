@@ -78,29 +78,26 @@ def _require_color(color):
             "Expected a CSS color string or a Toyplot.color.value.")
 
 
-def broadcast(
-        colors,
-        shape,
-        default=None,
-        colormap=None,
-        palette=None,
-        colors_parameter=None,
-        colormap_parameter=None,
-        palette_parameter=None):
-
-    if colormap is not None:
-        toyplot.log.warning("'%s' parameter is deprecated and will be removed in the next release.  Pass a (values, colormap) tuple to '%s' instead." % (colormap_parameter, colors_parameter))
-    if palette is not None:
-        toyplot.log.warning("'%s' parameter is deprecated and will be removed in the next release.  Pass a (values, palette) tuple to '%s' instead." % (palette_parameter, colors_parameter))
-
+def broadcast(colors, shape, default=None):
     # Supply default color(s).
     if colors is None:
         colors = default
 
     # Next, extract the user's choice of custom palette / colormap.
-    if isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Palette):
+    palette = None
+    colormap = None
+    if isinstance(colors, (toyplot.color.Palette, toyplot.color.Map)):
+        if isinstance(colors, toyplot.color.Palette):
+            palette = colors
+        elif isinstance(colors, toyplot.color.Map):
+            colormap = colors
+        if isinstance(shape, tuple) and len(shape) == 2:
+            colors = numpy.arange(shape[1]) if shape[1] > 1 else numpy.arange(shape[0])
+        else:
+            colors = numpy.arange(shape)
+    elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Palette):
         colors, palette = colors
-    if isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Map):
+    elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Map):
         colors, colormap = colors
 
     # Next, convert the supplied colors into a toyplot color array.
@@ -181,7 +178,7 @@ class Palette(object):
                 "div",
                 style="float:left;width:20px;height:20px;background-color:%s" %
                 to_css(color))
-        return xml.tostring(root_xml, method="html")
+        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
     def __add__(self, other):
         if not isinstance(other, Palette):
@@ -328,7 +325,7 @@ class CategoricalMap(Map):
                 "div",
                 style="float:left;width:20px;height:20px;background-color:%s" %
                 to_css(color))
-        return xml.tostring(root_xml, method="html")
+        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
 
 class DivergingMap(Map):
@@ -475,7 +472,7 @@ class DivergingMap(Map):
                 "div",
                 style="float:left;width:1px;height:20px;background-color:%s" %
                 to_css(color))
-        return xml.tostring(root_xml, method="html")
+        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
 
 class LinearMap(Map):
@@ -581,7 +578,7 @@ class LinearMap(Map):
                 style="float:left;width:%spx;height:20px;background-color:%s" %
                 (sample_width,
                  to_css(color)))
-        return xml.tostring(root_xml, method="html")
+        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
 
 def brewer(name, count=None, reverse=False):

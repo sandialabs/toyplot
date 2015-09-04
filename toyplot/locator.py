@@ -52,8 +52,13 @@ class TickLocator(object):
         titles : sequence of strings
           Titles for each tick location.  Typically, backends render titles as tooltips.
         """
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
+
+class Null(TickLocator):
+    """Do-nothing locator that generates no ticks."""
+    def ticks(self, domain_min, domain_max):
+        return [], [], []
 
 class Basic(TickLocator):
 

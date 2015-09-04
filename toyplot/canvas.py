@@ -384,11 +384,21 @@ class Canvas(object):
 
     def matrix(
             self,
-            matrix,
+            data,
             label=None,
+            tlabel=None,
+            llabel=None,
+            rlabel=None,
+            blabel=None,
             step=1,
-            colormap=None,
-            palette=None,
+            tshow=None,
+            lshow=None,
+            rshow=None,
+            bshow=None,
+            tlocator=None,
+            llocator=None,
+            rlocator=None,
+            blocator=None,
             bounds=None,
             rect=None,
             corner=None,
@@ -403,7 +413,17 @@ class Canvas(object):
         -------
         axes: :class:`toyplot.axes.Table`
         """
-        matrix = toyplot.require.scalar_matrix(matrix)
+        colormap = None
+        palette = None
+        if isinstance(data, tuple):
+            data, colors = data
+            matrix = toyplot.require.scalar_matrix(data)
+            if isinstance(colors, toyplot.color.Palette):
+                palette = colors
+            elif isinstance(colors, toyplot.color.Map):
+                colormap = colors
+        else:
+            matrix = toyplot.require.scalar_matrix(data)
 
         if colormap is None:
             if palette is None:
@@ -413,33 +433,86 @@ class Canvas(object):
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+
         table = toyplot.axes.Table(
             xmin_range,
             xmax_range,
             ymin_range,
             ymax_range,
-            trows=1,
-            brows=0,
-            lcols=1,
-            rcols=0,
+            trows=2,
+            brows=2,
+            lcols=2,
+            rcols=2,
             rows=matrix.shape[0],
             columns=matrix.shape[1],
             label=label,
             parent=self)
 
         table.top.row(0).height = 20
+        table.top.row(1).height = 20
+        table.bottom.row(0).height = 20
+        table.bottom.row(1).height = 20
         table.left.column(0).width = 20
+        table.left.column(1).width = 20
+        table.right.column(0).width = 20
+        table.right.column(1).width = 20
 
-        table.left.column(0).align = "right"
-        for i, label, title in zip(
-                *toyplot.locator.Integer(step=step).ticks(0, matrix.shape[0] - 1)):
-            table.left.cell(i, 0).data = label
-            #table.left.cell(i, 0).title = title
+        table.left.column(1).align = "right"
+        table.right.column(0).align = "left"
 
-        for j, label, title in zip(
-                *toyplot.locator.Integer(step=step).ticks(0, matrix.shape[1] - 1)):
-            table.top.cell(0, j).data = label
-            #table.top.cell(0, j).title = title
+        if tlabel is not None:
+            cell = table.top.row(0).merge()
+            cell.data = tlabel
+
+        if llabel is not None:
+            cell = table.left.column(0).merge()
+            cell.data = llabel
+            cell.angle = 90
+
+        if rlabel is not None:
+            cell = table.right.column(1).merge()
+            cell.data = rlabel
+            cell.angle = 90
+
+        if blabel is not None:
+            cell = table.bottom.row(1).merge()
+            cell.data = blabel
+
+        if tshow is None:
+            tshow = True
+        if tshow:
+            if tlocator is None:
+                tlocator = toyplot.locator.Integer(step=step)
+            for j, label, title in zip(*tlocator.ticks(0, matrix.shape[1] - 1)):
+                table.top.cell(1, j).data = label
+                #table.top.cell(1, j).title = title
+
+        if lshow is None:
+            lshow = True
+        if lshow:
+            if llocator is None:
+                llocator = toyplot.locator.Integer(step=step)
+            for i, label, title in zip(*llocator.ticks(0, matrix.shape[0] - 1)):
+                table.left.cell(i, 1).data = label
+                #table.left.cell(i, 1).title = title
+
+        if rshow is None and rlocator is not None:
+            rshow = True
+        if rshow:
+            if rlocator is None:
+                rlocator = toyplot.locator.Integer(step=step)
+            for i, label, title in zip(*rlocator.ticks(0, matrix.shape[0] - 1)):
+                table.right.cell(i, 0).data = label
+                #table.right.cell(i, 0).title = title
+
+        if bshow is None and blocator is not None:
+            bshow = True
+        if bshow:
+            if blocator is None:
+                blocator = toyplot.locator.Integer(step=step)
+            for j, label, title in zip(*blocator.ticks(0, matrix.shape[1] - 1)):
+                table.bottom.cell(0, j).data = label
+                #table.bottom.cell(0, j).title = title
 
         for i, row in enumerate(matrix):
             for j, value in enumerate(row):
@@ -509,20 +582,21 @@ class Canvas(object):
             parent=self)
 
         if data is not None:
-            for index, (key, column) in enumerate(data.items()):
+            for j, (key, column) in enumerate(data.items()):
                 if hrows:
-                    table.header.cell(hrows - 1, index).data = key
-                table.body.column(index).data = column
+                    table.header.cell(hrows - 1, j).data = key
+                for i, (value, mask) in enumerate(zip(column, numpy.ma.getmaskarray(column))):
+                    if not mask:
+                        table.body.cell(i, j).data = value
                 if issubclass(column._data.dtype.type, numpy.floating):
                     if hrows:
-                        table.header.cell(0, index).align = "center"
-                    table.body.column(
-                        index).format = toyplot.format.FloatFormatter()
-                    table.body.column(index).align = "separator"
+                        table.header.cell(0, j).align = "center"
+                    table.body.column(j).format = toyplot.format.FloatFormatter()
+                    table.body.column(j).align = "separator"
                 elif issubclass(column._data.dtype.type, numpy.character):
-                    table.column(index).align = "left"
+                    table.column(j).align = "left"
                 elif issubclass(column._data.dtype.type, numpy.integer):
-                    table.column(index).align = "right"
+                    table.column(j).align = "right"
 
         # Enable a single horizontal line between header and body.
         if hrows:
@@ -538,8 +612,6 @@ class Canvas(object):
             text,
             angle=0.0,
             fill=None,
-            colormap=None,
-            palette=None,
             opacity=1.0,
             title=None,
             style=None):
@@ -572,12 +644,7 @@ class Canvas(object):
         table["toyplot:fill"] = toyplot.color.broadcast(
             default=toyplot.color.near_black,
             colors=fill,
-            shape=table.shape[0],
-            colormap=colormap,
-            palette=palette,
-            colors_parameter="fill",
-            colormap_parameter="colormap",
-            palette_parameter="palette")
+            shape=table.shape[0])
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.style.combine(
@@ -602,7 +669,8 @@ class Canvas(object):
                 fill="toyplot:fill",
                 opacity="opacity",
                 title="title",
-                style=style))
+                style=style,
+                filename=None))
         return self._children[-1]
 
     def time(self, begin, end, index=None):
@@ -633,9 +701,9 @@ class Canvas(object):
                 [width is not None, height is not None, scale is not None]) > 1:
             raise ValueError("Specify only one of width, height, or scale.")
         if width is not None:
-            scale = width / self._width
+            scale = toyplot.units.convert(width, "px") / self._width
         elif height is not None:
-            scale = height / self._height
+            scale = toyplot.units.convert(height, "px") / self._height
         elif scale is None:
             scale = 1.0
         return scale

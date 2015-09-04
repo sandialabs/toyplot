@@ -19,3 +19,4 @@ Feature: Log scale axes
       | values from -1000 to -1          | log 2 axes on x and y  | a base 2 log-log plot from -1000 to -1        |
       | values from 1 to 1000            | log 2 axes on x and y  | a base 2 log-log plot from 1 to 1000          |
       | values from -1000 to 1000        | log 2 axes on x and y  | a base 2 log-log plot from -1000 to 1000      |
+      | values from -1000 to 1000        | log 10 axes on x and y with custom format | a log-log plot from -1000 to 1000 with custom labels |

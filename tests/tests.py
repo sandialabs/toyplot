@@ -26,17 +26,37 @@ import toyplot.locator
 import toyplot.svg
 
 try:
-    import toyplot.eps
-except:
-    pass
-
-try:
     import toyplot.pdf
 except:
     pass
 
 try:
     import toyplot.png
+except:
+    pass
+
+try:
+    import toyplot.cairo.eps
+except:
+    pass
+
+try:
+    import toyplot.cairo.pdf
+except:
+    pass
+
+try:
+    import toyplot.cairo.png
+except:
+    pass
+
+try:
+    import toyplot.qt.pdf
+except:
+    pass
+
+try:
+    import toyplot.qt.png
 except:
     pass
 
@@ -134,17 +154,10 @@ def assert_canvas_matches(canvas, name):
     svg = io.BytesIO()
     toyplot.svg.render(canvas, svg)
 
-    if hasattr(toyplot, "eps"):
-        eps = io.BytesIO()
-        toyplot.eps.render(canvas, eps)
-
-    if hasattr(toyplot, "pdf"):
-        pdf = io.BytesIO()
-        toyplot.pdf.render(canvas, pdf)
-
-    if hasattr(toyplot, "png"):
-        png = io.BytesIO()
-        toyplot.png.render(canvas, png)
+    for module in ["toyplot.pdf", "toyplot.png", "toyplot.cairo.eps", "toyplot.cairo.pdf", "toyplot.cairo.png", "toyplot.qt.pdf", "toyplot.qt.png"]:
+        if module in sys.modules:
+            buffer = io.BytesIO()
+            sys.modules[module].render(canvas, buffer)
 
     # Get rid of any past failures ...
     if os.path.exists("tests/diffs/%s.svg" % name):
@@ -873,48 +886,6 @@ def test_axes_bars_n_boundaries_titles():
     assert_canvas_matches(canvas, "axes-bars-n-boundaries-titles")
 
 
-def test_axes_hlines_fail():
-    with nose.tools.assert_raises(ValueError):
-        canvas = toyplot.Canvas()
-        axes = canvas.axes()
-        axes.hlines("foo")
-
-
-def test_axes_hlines():
-    canvas = toyplot.Canvas()
-    axes = canvas.axes()
-    axes.hlines(0)
-    assert_canvas_matches(canvas, "axes-hlines")
-
-
-def test_axes_hlines_multiple():
-    canvas = toyplot.Canvas()
-    axes = canvas.axes()
-    axes.hlines(numpy.linspace(-1, 1, 10))
-    assert_canvas_matches(canvas, "axes-hlines-multiple")
-
-
-def test_axes_vlines_fail():
-    with nose.tools.assert_raises(ValueError):
-        canvas = toyplot.Canvas()
-        axes = canvas.axes()
-        axes.vlines("foo")
-
-
-def test_axes_vlines():
-    canvas = toyplot.Canvas()
-    axes = canvas.axes()
-    axes.vlines(0)
-    assert_canvas_matches(canvas, "axes-vlines")
-
-
-def test_axes_vlines_multiple():
-    canvas = toyplot.Canvas()
-    axes = canvas.axes()
-    axes.vlines(numpy.linspace(-1, 1, 10))
-    assert_canvas_matches(canvas, "axes-vlines-multiple")
-
-
 def test_axes_plot_one_variable():
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -1207,7 +1178,7 @@ def test_axes_rect():
 
     canvas = toyplot.Canvas()
     axes = canvas.axes()
-    axes.rect(x1, x2, y1, y2, fill=fill, palette=palette, title=title)
+    axes.rect(x1, x2, y1, y2, fill=(fill, palette), title=title)
     assert_canvas_matches(canvas, "axes-rect")
 
 
@@ -1314,85 +1285,8 @@ def test_color_require_color():
     with nose.tools.assert_raises(ValueError):
         toyplot.color._require_color(5)
 
-
-def test_color_palette_css_names():
-    palette = toyplot.color.Palette(["red", "green", "blue", (1, 1, 0)])
-    assert_html_matches(palette._repr_html_(), "color-palette-css-names")
-
-
-def test_color_palette_getitem():
-    palette = toyplot.color.Palette([(1, 0, 0), (0, 1, 0), (0, 0, 1)])
-    assert_color_equal(palette[0], (1, 0, 0, 1))
-    assert_color_equal(palette[1], (0, 1, 0, 1))
-    assert_color_equal(palette[-1], (0, 0, 1, 1))
-    with nose.tools.assert_raises(IndexError):
-        palette[3]
-    with nose.tools.assert_raises(TypeError):
-        palette[0:3]
-
-
-def test_color_palette_iter():
-    palette = toyplot.color.Palette([(1, 0, 0), (0, 1, 0), (0, 0, 1)])
-    color = iter(palette)
-    assert_color_equal(next(color), (1, 0, 0, 1))
-    assert_color_equal(next(color), (0, 1, 0, 1))
-    assert_color_equal(next(color), (0, 0, 1, 1))
-    with nose.tools.assert_raises(StopIteration):
-        next(color)
-
-
-def test_color_palette_color():
-    palette = toyplot.color.Palette([(1, 0, 0), (0, 1, 0), (0, 0, 1)])
-    assert_color_equal(palette.color(0), (1, 0, 0, 1))
-    assert_color_equal(palette.color(-1), (0, 0, 1, 1))
-
-
-def test_color_palette_css():
-    palette = toyplot.color.Palette([(1, 0, 0), (0, 1, 0), (0, 0, 1)])
-    nose.tools.assert_equal(palette.css(0), "rgba(100%,0%,0%,1)")
-    nose.tools.assert_equal(palette.css(-1), "rgba(0%,0%,100%,1)")
-
-
-def test_color_categorical_map():
-    colormap = toyplot.color.CategoricalMap(
-        toyplot.color.brewer("BlueGreenBrown", 3))
-    assert_html_matches(colormap._repr_html_(), "color-categorical-map")
-
-
-def test_color_categorical_map_colors():
-    colormap = toyplot.color.CategoricalMap(
-        toyplot.color.Palette(["red", "lime", "blue", (1, 1, 1)]))
-    assert_colors_equal(colormap.colors(
-        [0, 1, 3, 4]), [(1, 0, 0, 1), (0, 1, 0, 1), (1, 1, 1, 1), (1, 0, 0, 1)])
-
-
-def test_color_categorical_map_color():
-    colormap = toyplot.color.CategoricalMap(
-        toyplot.color.Palette(["red", "lime", "blue", (1, 1, 1)]))
-    assert_color_equal(colormap.color(0), (1, 0, 0, 1))
-    assert_color_equal(colormap.color(-1), (1, 1, 1, 1))
-
-
-def test_color_categorical_map_css():
-    colormap = toyplot.color.CategoricalMap(
-        toyplot.color.Palette(["red", "lime", "blue", (1, 1, 1)]))
-    nose.tools.assert_equal(colormap.css(0), "rgba(100%,0%,0%,1)")
-    nose.tools.assert_equal(colormap.css(-1), "rgba(100%,100%,100%,1)")
-
 ##########################################################################
 # toyplot.html
-
-
-def test_html_render_dom():
-    canvas = toyplot.Canvas()
-    canvas.axes()
-    dom = toyplot.html.render(canvas)
-
-
-def test_html_render_path():
-    canvas = toyplot.Canvas()
-    canvas.axes()
-    toyplot.html.render(canvas, os.path.join(tempfile.mkdtemp(), "test.html"))
 
 
 def test_html_render_animation():
@@ -1420,32 +1314,6 @@ def test_html_ipython_html():
 # toyplot.png
 
 
-def test_png_render_defaults():
-    if hasattr(toyplot, "png"):
-        canvas = toyplot.Canvas()
-        canvas.axes()
-        image = toyplot.png.render(canvas)
-        nose.tools.assert_is_instance(image, toyplot.compatibility.string_type)
-        nose.tools.assert_equal(image[1:4], "PNG")
-
-
-def test_png_render_buffer():
-    if hasattr(toyplot, "png"):
-        buffer = io.BytesIO()
-        canvas = toyplot.Canvas()
-        canvas.axes()
-        toyplot.png.render(canvas, buffer)
-        nose.tools.assert_equal(buffer.getvalue()[1:4], "PNG")
-
-
-def test_png_render_path():
-    if hasattr(toyplot, "png"):
-        canvas = toyplot.Canvas()
-        canvas.axes()
-        toyplot.png.render(
-            canvas, os.path.join(tempfile.mkdtemp(), "test.png"))
-
-
 def test_png_render_frames():
     if hasattr(toyplot, "png"):
         canvas = toyplot.Canvas()
@@ -1471,15 +1339,6 @@ def test_cairo_small_font():
         axes = canvas.axes(label="Small Text!")
         axes.label.style = {"font-size": "8px"}
         toyplot.png.render(canvas)
-
-##########################################################################
-# toyplot.svg
-
-
-def test_svg_render_path():
-    canvas = toyplot.Canvas()
-    canvas.axes()
-    toyplot.svg.render(canvas, os.path.join(tempfile.mkdtemp(), "test.svg"))
 
 ##########################################################################
 # High-level tests that combine multiple API calls into whole figures.

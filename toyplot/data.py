@@ -126,7 +126,7 @@ class Table(object):
                     "td",
                     style="border:none;padding-right:1em;").text = toyplot.compatibility.unicode_type(value)
 
-        return xml.tostring(root_xml, method="html", encoding="utf-8")
+        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
     @property
     def shape(self):
@@ -227,17 +227,7 @@ class Table(object):
         -------
         matrix: :class:`numpy.ma.array` with two dimensions.
         """
-        return numpy.ma.column_stack(self._columns.values())
-
-    def to_csv(self, fobj):
-        import csv
-        if isinstance(fobj, toyplot.compatibility.string_type):
-            fobj = open(fobj, "wb")
-        writer = csv.writer(fobj)
-        writer.writerow(self._columns.keys())
-        iterators = [iter(column) for column in self._columns.values()]
-        for row_index in numpy.arange(len(self)):
-            writer.writerow([next(iterator) for iterator in iterators])
+        return numpy.ma.column_stack(list(self._columns.values()))
 
 
 def read_csv(fobj):

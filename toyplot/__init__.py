@@ -4,7 +4,7 @@
 
 from __future__ import division
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 
 from toyplot.canvas import Canvas
 import logging
@@ -19,11 +19,10 @@ def bars(
         along="x",
         baseline="stacked",
         fill=None,
-        colormap=None,
-        palette=None,
         opacity=1.0,
         title=None,
         style=None,
+        filename=None,
         xmin=None,
         xmax=None,
         ymin=None,
@@ -75,11 +74,10 @@ def bars(
         along=along,
         baseline=baseline,
         fill=fill,
-        colormap=colormap,
-        palette=palette,
         opacity=opacity,
         title=title,
-        style=style)
+        style=style,
+        filename=filename)
     return canvas, axes, mark
 
 
@@ -90,11 +88,10 @@ def fill(
         along="x",
         baseline=None,
         fill=None,
-        colormap=None,
-        palette=None,
         opacity=1.0,
         title=None,
         style=None,
+        filename=None,
         xmin=None,
         xmax=None,
         ymin=None,
@@ -146,12 +143,61 @@ def fill(
         along=along,
         baseline=baseline,
         fill=fill,
-        colormap=colormap,
-        palette=palette,
         opacity=opacity,
         title=title,
-        style=style)
+        style=style,
+        filename=filename)
     return canvas, axes, mark
+
+
+def matrix(
+        data,
+        label=None,
+        tlabel=None,
+        llabel=None,
+        rlabel=None,
+        blabel=None,
+        step=1,
+        tshow=None,
+        lshow=None,
+        rshow=None,
+        bshow=None,
+        tlocator=None,
+        llocator=None,
+        rlocator=None,
+        blocator=None,
+        width=None,
+        height=None,
+        canvas_style=None):
+    """Convenience function to create a matrix visualization in a single call.
+
+    See :meth:`toyplot.canvas.Canvas.matrix`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+
+    Returns
+    -------
+    canvas: :class:`toyplot.canvas.Canvas`
+      A new canvas object.
+    table: :class:`toyplot.axes.Table`
+      A new set of table axes that fill the canvas.
+    """
+    canvas = Canvas(width=width, height=height, style=canvas_style)
+    table = canvas.matrix(
+        data=data,
+        label=label,
+        tlabel=tlabel,
+        llabel=llabel,
+        rlabel=rlabel,
+        blabel=blabel,
+        step=step,
+        tshow=tshow,
+        lshow=lshow,
+        rshow=rshow,
+        bshow=bshow,
+        tlocator=tlocator,
+        llocator=llocator,
+        rlocator=rlocator,
+        blocator=blocator)
+    return canvas, table
 
 
 def plot(
@@ -159,20 +205,17 @@ def plot(
         b=None,
         along="x",
         color=None,
-        colormap=None,
-        palette=None,
         stroke_width=2.0,
         stroke_opacity=1.0,
         marker=None,
         size=20,
         fill=None,
-        fill_colormap=None,
-        fill_palette=None,
         opacity=1.0,
         title=None,
         style=None,
         mstyle=None,
         mlstyle=None,
+        filename=None,
         xmin=None,
         xmax=None,
         ymin=None,
@@ -222,20 +265,17 @@ def plot(
         b=b,
         along=along,
         color=color,
-        colormap=colormap,
-        palette=palette,
         stroke_width=stroke_width,
         stroke_opacity=stroke_opacity,
         marker=marker,
         size=size,
         fill=fill,
-        fill_colormap=fill_colormap,
-        fill_palette=fill_palette,
         opacity=opacity,
         title=title,
         style=style,
         mstyle=mstyle,
-        mlstyle=mlstyle)
+        mlstyle=mlstyle,
+        filename=filename)
     return canvas, axes, mark
 
 
@@ -244,18 +284,15 @@ def scatterplot(
         b=None,
         along="x",
         color=None,
-        colormap=None,
-        palette=None,
         marker="o",
         size=20,
         fill=None,
-        fill_colormap=None,
-        fill_palette=None,
         opacity=1.0,
         title=None,
         style=None,
         mstyle=None,
         mlstyle=None,
+        filename=None,
         xmin=None,
         xmax=None,
         ymin=None,
@@ -305,49 +342,16 @@ def scatterplot(
         b=b,
         along=along,
         color=color,
-        colormap=colormap,
-        palette=palette,
         marker=marker,
         size=size,
         fill=fill,
-        fill_colormap=fill_colormap,
-        fill_palette=fill_palette,
         opacity=opacity,
         title=title,
         style=style,
         mstyle=mstyle,
-        mlstyle=mlstyle)
+        mlstyle=mlstyle,
+        filename=filename)
     return canvas, axes, mark
-
-
-def matrix(
-        matrix,
-        label=None,
-        step=1,
-        colormap=None,
-        palette=None,
-        width=None,
-        height=None,
-        canvas_style=None):
-    """Convenience function to create a matrix visualization in a single call.
-
-    See :meth:`toyplot.canvas.Canvas.matrix`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
-
-    Returns
-    -------
-    canvas: :class:`toyplot.canvas.Canvas`
-      A new canvas object.
-    table: :class:`toyplot.axes.Table`
-      A new set of table axes that fill the canvas.
-    """
-    canvas = Canvas(width=width, height=height, style=canvas_style)
-    table = canvas.matrix(
-        matrix=matrix,
-        label=label,
-        step=step,
-        colormap=colormap,
-        palette=palette)
-    return canvas, table
 
 
 def table(

@@ -143,3 +143,7 @@ def marker_array(value, length=None):
             raise ValueError(
                 "Expected %s values, received %s." % (length, len(array)))
     return array
+
+def filename(value):
+    return optional_string(value)
+

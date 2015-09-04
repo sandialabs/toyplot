@@ -11,10 +11,10 @@ import subprocess
 import toyplot.png
 
 
-def _require_ffmpeg():
-    for path in os.environ["PATH"].split(os.pathsep):
-        if os.path.exists(os.path.join(path, "ffmpeg")):
-            return
+for path in os.environ["PATH"].split(os.pathsep):
+    if os.path.exists(os.path.join(path, "ffmpeg")):
+        break
+else:
     raise Exception("An ffmpeg executable is required.")  # pragma: no cover
 
 
@@ -27,8 +27,9 @@ def render(
         progress=None):
     """Render a canvas as an MPEG-4 video.
 
-    By default, canvas drawing units are mapped directly to pixels in the output
-    MPEG-4 video.  Use one of `width`, `height`, or `scale` to override this behavior.
+    By default, the canvas dimensions in CSS pixels are mapped directly to
+    pixels in the output MPEG-4 video.  Use one of `width`, `height`, or
+    `scale` to override this behavior.
 
     Parameters
     ----------
@@ -48,8 +49,9 @@ def render(
 
     Notes
     -----
-    The output video frames are rendered using a PNG representation of the
-    canvas generated with :func:`toyplot.png.render()`.
+    Currently, the output video frames are rendered using PNG representations
+    of the canvas generated with :func:`toyplot.cairo.png.render_frames()`.  This may
+    change in the future.
 
     Examples
     --------
@@ -57,7 +59,6 @@ def render(
     ...   print "Writing frame %s" % frame
     ... toyplot.mp4.render(canvas, "test.mp4", progress=callback)
     """
-    _require_ffmpeg()
 
     command = [
         "ffmpeg",

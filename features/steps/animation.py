@@ -37,31 +37,16 @@ def step_impl(context):
     context.canvas.animate(11, callback)
 
 
-@when(u'rendering a {type} video')
+@then(u'the canvas can be rendered as {type} video')
 def step_impl(context, type):
     nose.tools.assert_in(type, ["mp4", "webm"])
-
-    # Return quietly if the video backend isn't available
-    if not hasattr(toyplot, type):
-        return
-
-    backend = getattr(toyplot, type)
 
     def progress(frame):
         pass
     context.path = os.path.join(tempfile.mkdtemp(), "test.%s" % type)
-    backend.render(context.canvas, context.path, progress=progress)
+    context.backend.render(context.canvas, context.path, progress=progress)
     sys.stderr.write("**** %s ****\n" % context.path)
     sys.stderr.flush()
-
-
-@then(u'the backend should return a {type} video')
-def step_impl(context, type):
-    nose.tools.assert_in(type, ["mp4", "webm"])
-
-    # Return quietly if the video backend isn't available
-    if not hasattr(toyplot, type):
-        return
 
     command = ["ffprobe", "-print_format", "json", "-show_format",
                "-show_streams", "-count_frames", context.path]
@@ -79,3 +64,4 @@ def step_impl(context, type):
     nose.tools.assert_equal(video_stream["width"], 600)
     nose.tools.assert_equal(video_stream["height"], 600)
     nose.tools.assert_equal(video_stream["nb_read_frames"], "11")
+

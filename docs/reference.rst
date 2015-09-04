@@ -30,6 +30,7 @@ Contents:
    toyplot.mp4.rst
    toyplot.pdf.rst
    toyplot.png.rst
+   toyplot.projection.rst
    toyplot.qt.rst
    toyplot.qt.pdf.rst
    toyplot.qt.png.rst

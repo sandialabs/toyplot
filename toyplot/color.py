@@ -88,8 +88,12 @@ def broadcast(colors, shape, default=None):
     colormap = None
     if isinstance(colors, (toyplot.color.Palette, toyplot.color.Map)):
         if isinstance(colors, toyplot.color.Palette):
-            palette = colors
-            colormap = toyplot.color.CategoricalMap(palette)
+            if isinstance(shape, tuple) and len(shape) != 1:
+                palette = colors
+                colormap = toyplot.color.LinearMap(palette)
+            else:
+                palette = colors
+                colormap = toyplot.color.CategoricalMap(palette)
         elif isinstance(colors, toyplot.color.Map):
             colormap = colors
         if isinstance(shape, tuple) and len(shape) == 2:
@@ -116,6 +120,8 @@ def broadcast(colors, shape, default=None):
         colors = numpy.array([_require_color(color) for color in colors], dtype=dtype)
     else:
         colors = _require_color(colors)
+
+    toyplot.log.debug("broadcast %s to %s" % (colors.shape, shape))
 
     # As a special-case, allow a vector with shape M to be matched-up with an
     # M x 1 matrix.

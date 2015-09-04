@@ -774,7 +774,7 @@ class Cartesian(object):
             c=None,
             along="x",
             baseline="stacked",
-            fill=None,
+            color=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -817,7 +817,7 @@ class Cartesian(object):
         along: string, "x" or "y", optional
           Specify "x" (the default) for vertical bars, or "y" for horizontal bars.
         baseline: array-like, "stacked", "symmetrical", "wiggle", or None
-        fill: array-like set of colors, optional
+        color: array-like set of colors, optional
           Specify a single color for all bars, one color per series, or one color per bar.
           Color values can be explicit toyplot colors, or scalar values to be mapped
           to colors using the `colormap` or `palette` parameter.
@@ -876,9 +876,9 @@ class Cartesian(object):
 
             default_color = [next(self._bar_colors)
                              for i in range(series.shape[1] - 1)]
-            fill = toyplot.color.broadcast(
+            color = toyplot.color.broadcast(
                 default=default_color,
-                colors=fill,
+                colors=color,
                 shape=(series.shape[0], series.shape[1] - 1))
             opacity = toyplot.broadcast.scalar(
                 opacity, (series.shape[0], series.shape[1] - 1))
@@ -909,7 +909,7 @@ class Cartesian(object):
             table[boundary_keys[-1]] = series.T[0]
 
             for index, (boundary_column, fill_column, opacity_column, title_column) in enumerate(
-                    zip(series.T[1:], fill.T, opacity.T, title.T)):
+                    zip(series.T[1:], color.T, opacity.T, title.T)):
                 boundary_keys.append("boundary" + str(index + 1))
                 fill_keys.append("fill" + str(index))
                 opacity_keys.append("opacity" + str(index))
@@ -981,9 +981,9 @@ class Cartesian(object):
 
             default_color = [next(self._bar_colors)
                              for i in range(series.shape[1])]
-            fill = toyplot.color.broadcast(
+            color = toyplot.color.broadcast(
                 default=default_color,
-                colors=fill,
+                colors=color,
                 shape=series.shape)
             opacity = toyplot.broadcast.scalar(opacity, series.shape)
             title = toyplot.broadcast.object(title, series.shape)
@@ -1024,7 +1024,7 @@ class Cartesian(object):
             opacity_keys = []
             title_keys = []
             for index, (magnitude_column, fill_column, opacity_column, title_column) in enumerate(
-                    zip(series.T, fill.T, opacity.T, title.T)):
+                    zip(series.T, color.T, opacity.T, title.T)):
                 magnitude_keys.append("magnitude" + str(index))
                 fill_keys.append("fill" + str(index))
                 opacity_keys.append("opacity" + str(index))
@@ -1098,7 +1098,7 @@ class Cartesian(object):
             c=None,
             along="x",
             baseline=None,
-            fill=None,
+            color=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -1155,9 +1155,9 @@ class Cartesian(object):
 
             default_color = [next(self._fill_colors)
                              for i in range(series.shape[1] - 1)]
-            fill = toyplot.color.broadcast(
+            color = toyplot.color.broadcast(
                 default=default_color,
-                colors=fill,
+                colors=color,
                 shape=series.shape[1] - 1)
             opacity = toyplot.broadcast.scalar(opacity, series.shape[1] - 1)
             title = toyplot.broadcast.object(title, series.shape[1] - 1)
@@ -1189,7 +1189,7 @@ class Cartesian(object):
                     position_axis=position_axis,
                     boundaries=boundaries,
                     boundary_axis=boundary_axis,
-                    fill=fill,
+                    fill=color,
                     opacity=opacity,
                     title=title,
                     style=style,
@@ -1213,9 +1213,9 @@ class Cartesian(object):
 
             default_color = [next(self._fill_colors)
                              for i in range(series.shape[1])]
-            fill = toyplot.color.broadcast(
+            color = toyplot.color.broadcast(
                 default=default_color,
-                colors=fill,
+                colors=color,
                 shape=series.shape[1])
             opacity = toyplot.broadcast.scalar(opacity, series.shape[1])
             title = toyplot.broadcast.object(title, series.shape[1])
@@ -1266,7 +1266,7 @@ class Cartesian(object):
                     baseline="baseline",
                     magnitudes=magnitudes,
                     magnitude_axis=magnitude_axis,
-                    fill=fill,
+                    fill=color,
                     opacity=opacity,
                     title=title,
                     style=style,
@@ -1764,7 +1764,7 @@ class Cartesian(object):
             b,
             text,
             angle=0,
-            fill=None,
+            color=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -1809,10 +1809,12 @@ class Cartesian(object):
                                       toyplot.require.style(style))
 
         default_color = next(self._text_colors)
-        table["toyplot:fill"] = toyplot.color.broadcast(
+
+        color = toyplot.color.broadcast(
             default=default_color,
-            colors=fill,
-            shape=table.shape[0])
+            colors=color,
+            shape=(table.shape[0], 1))
+        table["toyplot:fill"] = color[:,0]
 
         self._update_domain(
             table["x"], table["y"], display=True, data=not annotation)
@@ -1840,7 +1842,7 @@ class Cartesian(object):
     def hlines(
             self,
             y,
-            stroke=None,
+            color=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -1874,10 +1876,11 @@ class Cartesian(object):
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.style.combine(toyplot.require.style(style))
 
-        table["toyplot:stroke"] = toyplot.color.broadcast(
+        color = toyplot.color.broadcast(
             default=toyplot.color.near_black,
-            colors=stroke,
-            shape=table.shape[0])
+            colors=color,
+            shape=(table.shape[0], 1))
+        table["toyplot:stroke"] = color[:,0]
 
         self._update_domain(numpy.array([]), table["y"], display=True, data=not annotation)
 
@@ -1895,7 +1898,7 @@ class Cartesian(object):
     def vlines(
             self,
             x,
-            stroke=None,
+            color=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -1929,10 +1932,11 @@ class Cartesian(object):
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.style.combine(toyplot.require.style(style))
 
-        table["toyplot:stroke"] = toyplot.color.broadcast(
+        color = toyplot.color.broadcast(
             default=toyplot.color.near_black,
-            colors=stroke,
-            shape=table.shape[0])
+            colors=color,
+            shape=(table.shape[0], 1))
+        table["toyplot:stroke"] = color[:,0]
 
         self._update_domain(table["x"], numpy.array([]), display=True, data=not annotation)
 

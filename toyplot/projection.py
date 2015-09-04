@@ -22,7 +22,6 @@ def _in_range(a, x, b):
 
 
 class Piecewise(object):
-
     """Compute a projection from an arbitrary collection of linear and log segments."""
 
     class Segment(object):
@@ -123,6 +122,20 @@ class Piecewise(object):
 
 
 def linear(domain_min, domain_max, range_min, range_max):
+    """Return an instance of :class:`toyplot.projection.Piecewise` that performs a linear projection.
+
+    Parameters
+    -----------
+    domain_min, domain_max : number
+        Defines a closed interval of domain values that will be mapped to the range.
+    range_min, range_max : number
+        Defines a closed interval of range values that will be mapped to the domain.
+
+    Returns
+    -------
+    projection : :class:`toyplot.projection.Piecewise`
+    """
+
     return Piecewise([
         Piecewise.Segment("linear", domain_min, domain_max, range_min,
                           range_max, -numpy.inf, numpy.inf, -numpy.inf, numpy.inf),
@@ -137,6 +150,29 @@ def log(
         range_max,
         linear_domain_min=-1,
         linear_domain_max=1):
+    """Return an instance of :class:`toyplot.projection.Piecewise` that performs a log projection.
+
+    The returned projection will work correctly with both positive, negative,
+    and zero domain values.  To support mapping zero, the projection will
+    switch from log projection to a linear projection within a user-defined
+    region around the origin.
+
+    Parameters
+    -----------
+    base : number
+        Logarithmic base used to map from domain values to range values.
+    domain_min, domain_max : number
+        Defines a closed interval of domain values that will be mapped to the range.
+    range_min, range_max : number
+        Defines a closed interval of range values that will be mapped to the domain.
+    linear_domain_min, linear_domain_max : number, optional
+        Defines an interval of domain values around the origin that will be mapped linearly.
+
+    Returns
+    -------
+    projection : :class:`toyplot.projection.Piecewise`
+    """
+
     # Negative domain
     if domain_max < 0:
         return Piecewise([

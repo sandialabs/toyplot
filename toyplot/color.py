@@ -89,6 +89,7 @@ def broadcast(colors, shape, default=None):
     if isinstance(colors, (toyplot.color.Palette, toyplot.color.Map)):
         if isinstance(colors, toyplot.color.Palette):
             palette = colors
+            colormap = toyplot.color.CategoricalMap(palette)
         elif isinstance(colors, toyplot.color.Map):
             colormap = colors
         if isinstance(shape, tuple) and len(shape) == 2:

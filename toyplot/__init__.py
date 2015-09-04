@@ -151,7 +151,7 @@ def fill(
 
 
 def matrix(
-        matrix,
+        data,
         label=None,
         tlabel=None,
         llabel=None,
@@ -166,8 +166,6 @@ def matrix(
         llocator=None,
         rlocator=None,
         blocator=None,
-        colormap=None,
-        palette=None,
         width=None,
         height=None,
         canvas_style=None):
@@ -184,7 +182,7 @@ def matrix(
     """
     canvas = Canvas(width=width, height=height, style=canvas_style)
     table = canvas.matrix(
-        matrix=matrix,
+        data=data,
         label=label,
         tlabel=tlabel,
         llabel=llabel,
@@ -198,9 +196,7 @@ def matrix(
         tlocator=tlocator,
         llocator=llocator,
         rlocator=rlocator,
-        blocator=blocator,
-        colormap=colormap,
-        palette=palette)
+        blocator=blocator)
     return canvas, table
 
 

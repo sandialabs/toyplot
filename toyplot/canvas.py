@@ -384,7 +384,7 @@ class Canvas(object):
 
     def matrix(
             self,
-            matrix,
+            data,
             label=None,
             tlabel=None,
             llabel=None,
@@ -399,8 +399,6 @@ class Canvas(object):
             llocator=None,
             rlocator=None,
             blocator=None,
-            colormap=None,
-            palette=None,
             bounds=None,
             rect=None,
             corner=None,
@@ -415,7 +413,17 @@ class Canvas(object):
         -------
         axes: :class:`toyplot.axes.Table`
         """
-        matrix = toyplot.require.scalar_matrix(matrix)
+        colormap = None
+        palette = None
+        if isinstance(data, tuple):
+            data, colors = data
+            matrix = toyplot.require.scalar_matrix(data)
+            if isinstance(colors, toyplot.color.Palette):
+                palette = colors
+            elif isinstance(colors, toyplot.color.Map):
+                colormap = colors
+        else:
+            matrix = toyplot.require.scalar_matrix(data)
 
         if colormap is None:
             if palette is None:

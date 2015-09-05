@@ -69,6 +69,14 @@ Feature: Color broadcasting
             | scatterplots                         | per-datum value colors                               |
             | scatterplots                         | per-datum value + palette colors                     |
             | scatterplots                         | per-datum value + colormap colors                    |
+            | text                         | default colors                                       |
+            | text                         | one explicit color                                   |
+            | text                         | per-datum explicit colors                            |
+            | text                         | palette colors                                       |
+            | text                         | colormap colors                                      |
+            | text                         | per-datum value colors                               |
+            | text                         | per-datum value + palette colors                     |
+            | text                         | per-datum value + colormap colors                    |
             | vlines                         | default colors                                       |
             | vlines                         | one explicit color                                   |
             | vlines                         | per-datum explicit colors                            |

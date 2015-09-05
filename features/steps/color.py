@@ -702,6 +702,65 @@ def step_impl(context):
         context.canvas, "color-broadcast-scatterplots-per-datum-values-colormap")
 
 
+@then(u'text can be rendered with default colors')
+def step_impl(context):
+    text = ["#"] * len(context.series)
+    context.axes.text(context.x, context.series[:,0], text)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-text-default")
+
+@then(u'text can be rendered with one explicit color')
+def step_impl(context):
+    text = ["#"] * len(context.series)
+    context.axes.text(context.x, context.series[:,0], text, color="red")
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-text-one-color")
+
+@then(u'text can be rendered with per-datum explicit colors')
+def step_impl(context):
+    text = ["#"] * len(context.series)
+    context.axes.text(context.x, context.series[:,0], text, color=context.datum_colors[:,0])
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-text-per-datum-colors")
+
+@then(u'text can be rendered with palette colors')
+def step_impl(context):
+    text = ["#"] * len(context.series)
+    context.axes.text(context.x, context.series[:,0], text, color=toyplot.color.brewer("Set1"))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-text-palette")
+
+@then(u'text can be rendered with colormap colors')
+def step_impl(context):
+    text = ["#"] * len(context.series)
+    context.axes.text(context.x, context.series[:,0], text, color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-text-colormap")
+
+@then(u'text can be rendered with per-datum value colors')
+def step_impl(context):
+    text = ["#"] * len(context.series)
+    datum_values = numpy.arange(len(context.series[:,0]))
+    context.axes.text(context.x, context.series[:,0], text, color=datum_values)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-text-per-datum-values")
+
+@then(u'text can be rendered with per-datum value + palette colors')
+def step_impl(context):
+    text = ["#"] * len(context.series)
+    datum_values = numpy.arange(len(context.series[:,0]))
+    context.axes.text(context.x, context.series[:,0], text, color=(datum_values, toyplot.color.brewer("Reds")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-text-per-datum-values-palette")
+
+@then(u'text can be rendered with per-datum value + colormap colors')
+def step_impl(context):
+    text = ["#"] * len(context.series)
+    datum_values = numpy.arange(len(context.series[:,0]))
+    context.axes.text(context.x, context.series[:,0], text, color=(datum_values, toyplot.color.LinearMap()))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-text-per-datum-values-colormap")
+
 
 @then(u'vlines can be rendered with default colors')
 def step_impl(context):

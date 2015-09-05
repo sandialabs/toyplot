@@ -380,4 +380,115 @@ def step_impl(context):
     nose.tools.assert_equal(colormap.css(0), "rgba(100%,0%,0%,1)")
     nose.tools.assert_equal(colormap.css(-1), "rgba(100%,100%,100%,1)")
 
+@then(u'bars can be rendered with default colors')
+def step_impl(context):
+    m1 = numpy.linspace(0, 1)
+    m2 = numpy.linspace(0, 1) ** 2
+    series = numpy.column_stack((m1, m2))
+    context.axes.bars(series)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-bars-default-colors")
+
+@then(u'bars can be rendered with palette colors')
+def step_impl(context):
+    m1 = numpy.linspace(0, 1)
+    m2 = numpy.linspace(0, 1) ** 2
+    series = numpy.column_stack((m1, m2))
+    context.axes.bars(series, color=toyplot.color.brewer("Set1"))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-bars-palette-colors")
+
+@then(u'bars can be rendered with colormap colors')
+def step_impl(context):
+    m1 = numpy.linspace(0, 1)
+    m2 = numpy.linspace(0, 1) ** 2
+    series = numpy.column_stack((m1, m2))
+    context.axes.bars(series, color=toyplot.color.LinearMap(toyplot.color.brewer("GreenYellowRed")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-bars-colormap-colors")
+
+@then(u'hlines can be rendered with default colors')
+def step_impl(context):
+    x = numpy.linspace(0, 1)
+    context.axes.hlines(x)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-hline-default-colors")
+
+@then(u'hlines can be rendered with palette colors')
+def step_impl(context):
+    x = numpy.linspace(0, 1)
+    context.axes.hlines(x, color=toyplot.color.brewer("Reds"))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-hline-palette-colors")
+
+@then(u'hlines can be rendered with colormap colors')
+def step_impl(context):
+    x = numpy.linspace(0, 1)
+    context.axes.hlines(x, color=toyplot.color.LinearMap(toyplot.color.brewer("Greens")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-hline-colormap-colors")
+
+@then(u'hlines can be rendered with value colors')
+def step_impl(context):
+    x = numpy.linspace(0, 1)
+    context.axes.hlines(x, color=numpy.linspace(0, 1))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-hline-value-colors")
+
+@then(u'hlines can be rendered with value + palette colors')
+def step_impl(context):
+    x = numpy.linspace(0, 1)
+    context.axes.hlines(x, color=(x, toyplot.color.brewer("Purples")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-hline-value-palette-colors")
+
+@then(u'hlines can be rendered with value + colormap colors')
+def step_impl(context):
+    x = numpy.linspace(0, 1)
+    context.axes.hlines(x, color=(x, toyplot.color.LinearMap(toyplot.color.brewer("Oranges"))))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-hline-value-colormap-colors")
+
+@then(u'vlines can be rendered with default colors')
+def step_impl(context):
+    y = numpy.linspace(0, 1)
+    context.axes.vlines(y)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-vline-default-colors")
+
+@then(u'vlines can be rendered with palette colors')
+def step_impl(context):
+    y = numpy.linspace(0, 1)
+    context.axes.vlines(y, color=toyplot.color.brewer("Reds"))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-vline-palette-colors")
+
+@then(u'vlines can be rendered with colormap colors')
+def step_impl(context):
+    y = numpy.linspace(0, 1)
+    context.axes.vlines(y, color=toyplot.color.LinearMap(toyplot.color.brewer("Greens")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-vline-colormap-colors")
+
+@then(u'vlines can be rendered with value colors')
+def step_impl(context):
+    y = numpy.linspace(0, 1)
+    context.axes.vlines(y, color=y)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-vline-value-colors")
+
+@then(u'vlines can be rendered with value + palette colors')
+def step_impl(context):
+    y = numpy.linspace(0, 1)
+    context.axes.vlines(y, color=(y, toyplot.color.brewer("Purples")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-vline-value-palette-colors")
+
+@then(u'vlines can be rendered with value + colormap colors')
+def step_impl(context):
+    y = numpy.linspace(0, 1)
+    context.axes.vlines(y, color=(y, toyplot.color.LinearMap(toyplot.color.brewer("Oranges"))))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-vline-value-colormap-colors")
+
 

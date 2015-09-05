@@ -389,6 +389,36 @@ def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "color-bars-default-colors")
 
+@then(u'bars can be rendered with one explicit color')
+def step_impl(context):
+    m1 = numpy.linspace(0, 1)
+    m2 = numpy.linspace(0, 1) ** 2
+    series = numpy.column_stack((m1, m2))
+    context.axes.bars(series, color="red")
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-bars-one-color")
+
+@then(u'bars can be rendered with per-series explicit colors')
+def step_impl(context):
+    m1 = numpy.linspace(0, 1)
+    m2 = numpy.linspace(0, 1) ** 2
+    series = numpy.column_stack((m1, m2))
+    context.axes.bars(series, color=["red", "yellow"])
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-bars-per-series-colors")
+
+@then(u'bars can be rendered with per-datum explicit colors')
+def step_impl(context):
+    m1 = numpy.linspace(0, 1)
+    m2 = numpy.linspace(0, 1) ** 2
+    series = numpy.column_stack((m1, m2))
+    color = numpy.tile(toyplot.color.css("black"), series.shape)
+    color[5:10, 0] = toyplot.color.css("red")
+    color[20:25, 1] = toyplot.color.css("blue")
+    context.axes.bars(series, color=color)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-bars-per-datum-colors")
+
 @then(u'bars can be rendered with palette colors')
 def step_impl(context):
     m1 = numpy.linspace(0, 1)
@@ -403,9 +433,39 @@ def step_impl(context):
     m1 = numpy.linspace(0, 1)
     m2 = numpy.linspace(0, 1) ** 2
     series = numpy.column_stack((m1, m2))
-    context.axes.bars(series, color=toyplot.color.LinearMap(toyplot.color.brewer("GreenYellowRed")))
+    context.axes.bars(series, color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
     toyplot.testing.assert_canvas_equal(
         context.canvas, "color-bars-colormap-colors")
+
+@then(u'bars can be rendered with value colors')
+def step_impl(context):
+    m1 = numpy.linspace(0, 1)
+    m2 = numpy.linspace(0, 1) ** 2
+    series = numpy.column_stack((m1, m2))
+    values = numpy.arange(numpy.product(series.shape)).reshape(series.shape, order="F")
+    context.axes.bars(series, color=values)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-bars-values-colors")
+
+@then(u'bars can be rendered with value + palette colors')
+def step_impl(context):
+    m1 = numpy.linspace(0, 1)
+    m2 = numpy.linspace(0, 1) ** 2
+    series = numpy.column_stack((m1, m2))
+    values = numpy.arange(numpy.product(series.shape)).reshape(series.shape, order="F")
+    context.axes.bars(series, color=(values, toyplot.color.brewer("Reds")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-bars-values-palette-colors")
+
+@then(u'bars can be rendered with value + colormap colors')
+def step_impl(context):
+    m1 = numpy.linspace(0, 1)
+    m2 = numpy.linspace(0, 1) ** 2
+    series = numpy.column_stack((m1, m2))
+    values = numpy.arange(numpy.product(series.shape)).reshape(series.shape, order="F")
+    context.axes.bars(series, color=(values, toyplot.color.LinearMap()))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-bars-values-colormap-colors")
 
 @then(u'hlines can be rendered with default colors')
 def step_impl(context):

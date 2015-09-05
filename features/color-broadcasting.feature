@@ -40,22 +40,28 @@ Feature: Color broadcasting
 
     Scenario Outline: Color broadcasting use-cases
         Given a set of cartesian axes
-        Then <mark> can be rendered with <color> colors
+        Then <mark> can be rendered with <color>
 
         Examples:
-            | mark                         | color                                          |
-#            | bars                         | default                                        |
-#            | bars                         | palette                                        |
-#            | bars                         | colormap                                       |
-            | hlines                       | default                                        |
-            | hlines                       | palette                                        |
-            | hlines                       | colormap                                       |
-            | hlines                       | value                                          |
-            | hlines                       | value + palette                                |
-            | hlines                       | value + colormap                               |
-            | vlines                       | default                                        |
-            | vlines                       | palette                                        |
-            | vlines                       | colormap                                       |
-            | vlines                       | value                                          |
-            | vlines                       | value + palette                                |
-            | vlines                       | value + colormap                               |
+            | mark                         | color                                                |
+            | bars                         | default colors                                       |
+            | bars                         | one explicit color                                   |
+            | bars                         | per-series explicit colors                           |
+            | bars                         | per-datum explicit colors                            |
+            | bars                         | palette colors                                       |
+            | bars                         | colormap colors                                      |
+            | bars                         | value colors                                         |
+            | bars                         | value + palette colors                               |
+            | bars                         | value + colormap colors                              |
+            | hlines                       | default colors                                       |
+            | hlines                       | palette colors                                       |
+            | hlines                       | colormap colors                                      |
+            | hlines                       | value colors                                         |
+            | hlines                       | value + palette colors                               |
+            | hlines                       | value + colormap colors                              |
+            | vlines                       | default colors                                       |
+            | vlines                       | palette colors                                       |
+            | vlines                       | colormap colors                                      |
+            | vlines                       | value colors                                         |
+            | vlines                       | value + palette colors                               |
+            | vlines                       | value + colormap colors                              |

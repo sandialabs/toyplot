@@ -130,10 +130,6 @@ def broadcast(colors, shape, default=None):
                 colors = numpy.arange(shape[1])
             else: # Just one series, so generate N values
                 colors = numpy.arange(shape[0])
-        if isinstance(shape, tuple) and len(shape) == 2:
-            colors = numpy.arange(shape[1]) if shape[1] > 1 else numpy.arange(shape[0])
-        else:
-            colors = numpy.arange(shape[0])
     elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Palette):
         colors, palette = colors
     elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Map):
@@ -157,7 +153,7 @@ def broadcast(colors, shape, default=None):
 
     # As a special-case, allow a vector with shape M to be matched-up with an
     # M x 1 matrix.
-    if colors.ndim == 1 and isinstance(shape, tuple) and len(shape) == 2 and colors.shape[0] == shape[0] and shape[1] == 1:
+    if colors.ndim == 1 and per_datum and colors.shape[0] == shape[0] and shape[1] == 1:
         return numpy.reshape(colors, shape)
 
     return numpy.array(numpy.broadcast_arrays(colors, numpy.empty(shape))[0])

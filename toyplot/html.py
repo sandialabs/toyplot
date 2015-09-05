@@ -2076,6 +2076,82 @@ def _render(axes, mark, context):
             xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
+@dispatch(toyplot.axes.Cartesian, toyplot.mark.Scatterplot, _RenderContext)
+def _render(axes, mark, context):
+    position = mark._table[mark._coordinates[0]]
+    series = numpy.ma.column_stack([mark._table[key] for key in mark._series])
+
+    if mark._coordinate_axes[0] == "x":
+        position = axes._project_x(position)
+        series = axes._project_y(series)
+    elif mark._coordinate_axes[0] == "y":
+        position = axes._project_y(position)
+        series = axes._project_x(series)
+
+    mark_xml = xml.SubElement(
+        context.root,
+        "g",
+        style=_css_style(
+            mark._style),
+        id=context.get_id(mark),
+        attrib={
+            "class": "toyplot-mark-Scatterplot"})
+    context.add_data_table(mark, mark._table, title="Scatterplot Data", filename=mark._filename)
+
+    for series, stroke, stroke_width, stroke_opacity, title, marker, msize, mfill, mstroke, mopacity in zip(
+        series.T, mark._stroke.T, mark._stroke_width.T, mark._stroke_opacity.T, mark._title.T, [
+            mark._table[key] for key in mark._marker], [
+            mark._table[key] for key in mark._msize], [
+                mark._table[key] for key in mark._mfill], [
+                    mark._table[key] for key in mark._mstroke], [
+                        mark._table[key] for key in mark._mopacity]):
+        not_null = numpy.invert(numpy.logical_or(
+            numpy.ma.getmaskarray(position), numpy.ma.getmaskarray(series)))
+        segments = _flat_contiguous(not_null)
+
+        msize = numpy.sqrt(msize)
+        stroke_style = toyplot.style.combine(
+            {
+                "stroke": toyplot.color.to_css(stroke),
+                "stroke-width": stroke_width,
+                "stroke-opacity": stroke_opacity},
+            mark._style)
+        if mark._coordinate_axes[0] == "x":
+            x = position
+            y = series
+        elif mark._coordinate_axes[0] == "y":
+            x = series
+            y = position
+        series_xml = xml.SubElement(
+            mark_xml, "g", attrib={"class": "toyplot-Series"})
+        if mark._show_stroke:
+            d = []
+            for segment in segments:
+                start, stop, step = segment.indices(len(not_null))
+                for i in range(start, start + 1):
+                    d.append("M %r %r" % (x[i], y[i]))
+                for i in range(start + 1, stop):
+                    d.append("L %r %r" % (x[i], y[i]))
+            xml.SubElement(
+                series_xml,
+                "path",
+                d=" ".join(d),
+                style=_css_style(stroke_style))
+        for dx, dy, dmarker, dsize, dfill, dstroke, dopacity in zip(x[not_null], y[not_null], marker[
+                                                                    not_null], msize[not_null], mfill[not_null], mstroke[not_null], mopacity[not_null]):
+            dstyle = toyplot.style.combine(
+                {
+                    "fill": toyplot.color.to_css(dfill),
+                    "stroke": toyplot.color.to_css(dstroke),
+                    "opacity": dopacity},
+                mark._mstyle)
+            _render_marker(series_xml, dx, dy, dsize, dmarker,
+                           dstyle, mark._mlstyle, extra_class="toyplot-Datum")
+
+        if title is not None:
+            xml.SubElement(series_xml, "title").text = str(title)
+
+
 @dispatch(
     (toyplot.canvas.Canvas,
      toyplot.axes.Cartesian),

@@ -1686,7 +1686,7 @@ class Cartesian(object):
             table[mopacity_keys[-1]] = mopacity_column
 
         self._children.append(
-            toyplot.mark.Plot(
+            toyplot.mark.Scatterplot(
                 table=table,
                 coordinates=coordinate_axes,
                 coordinate_axes=coordinate_axes,

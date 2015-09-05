@@ -79,6 +79,30 @@ def _require_color(color):
 
 
 def broadcast(colors, shape, default=None):
+    """Return a 1D or 2D array of colors with the given shape.
+
+    Parameters
+    ----------
+    shape : tuple
+        Shape of the desired output array. A 1-tuple will produce a 1D output
+        array containing :math:`N` per-series colors.  A 2-tuple will produce
+        an :math:`M \\times N` output matrix of per-datum colors grouped into
+        :math:`N` series.
+
+    Returns
+    -------
+    colors : numpy.ndarray containing RGBA colors.
+    """
+    if colors is None and default is None:
+        raise ValueError("Must supply colors or default.")
+    if not isinstance(shape, tuple):
+        raise ValueError("Shape parameter must be a tuple with length 1 or 2.")
+    if not 0 < len(shape) < 3:
+        raise ValueError("Shape parameter must be a tuple with length 1 or 2.")
+
+    per_series = len(shape) == 1
+    per_datum = len(shape) == 2
+
     # Supply default color(s).
     if colors is None:
         colors = default
@@ -87,22 +111,29 @@ def broadcast(colors, shape, default=None):
     palette = None
     colormap = None
     if isinstance(colors, toyplot.color.Palette):
-        if isinstance(shape, tuple):
-            if len(shape) == 2 and shape[1] == 1:
+        if per_series:
+            colormap = toyplot.color.CategoricalMap(colors)
+            colors = numpy.arange(shape[0])
+        if per_datum:
+            if shape[1] > 1: # More than one series, so generate M categorical values
+                colormap = toyplot.color.CategoricalMap(colors)
+                colors = numpy.arange(shape[1])
+            else: # Just one series, so generate N linear values
                 colormap = toyplot.color.LinearMap(colors)
                 colors = numpy.arange(shape[0])
-            else:
-                colormap = toyplot.color.CategoricalMap(colors)
-                colors = numpy.arange(shape[-1])
-        else:
-            colormap = toyplot.color.LinearMap(colors)
-            colors = numpy.arange(shape)
     elif isinstance(colors, toyplot.color.Map):
         colormap = colors
+        if per_series:
+            colors = numpy.arange(shape[0])
+        if per_datum:
+            if shape[1] > 1: # More than one series, so generate M values
+                colors = numpy.arange(shape[1])
+            else: # Just one series, so generate N values
+                colors = numpy.arange(shape[0])
         if isinstance(shape, tuple) and len(shape) == 2:
             colors = numpy.arange(shape[1]) if shape[1] > 1 else numpy.arange(shape[0])
         else:
-            colors = numpy.arange(shape)
+            colors = numpy.arange(shape[0])
     elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Palette):
         colors, palette = colors
     elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Map):
@@ -123,8 +154,6 @@ def broadcast(colors, shape, default=None):
         colors = numpy.array([_require_color(color) for color in colors], dtype=dtype)
     else:
         colors = _require_color(colors)
-
-    toyplot.log.debug("broadcast %s to %s" % (colors.shape, shape))
 
     # As a special-case, allow a vector with shape M to be matched-up with an
     # M x 1 matrix.

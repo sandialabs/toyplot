@@ -1196,7 +1196,7 @@ def test_axes_text_angle_fill():
     x = numpy.zeros(10)
     y = x
     angle = numpy.linspace(-90, 0, len(x), endpoint=True)
-    fill = numpy.linspace(1, 0, len(x))
+    color = numpy.linspace(1, 0, len(x))
 
     canvas = toyplot.Canvas(400, 400)
     axes = canvas.axes(xmin=-0.25, xmax=0.5, ymin=-0.5, ymax=0.25)
@@ -1205,7 +1205,7 @@ def test_axes_text_angle_fill():
         y,
         text="Toyplot!",
         angle=angle,
-        fill=fill,
+        color=color,
         style={
             "font-size": "36px",
             "font-weight": "bold",

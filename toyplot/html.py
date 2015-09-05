@@ -2098,8 +2098,8 @@ def _render(axes, mark, context):
             "class": "toyplot-mark-Scatterplot"})
     context.add_data_table(mark, mark._table, title="Scatterplot Data", filename=mark._filename)
 
-    for series, stroke, stroke_width, stroke_opacity, title, marker, msize, mfill, mstroke, mopacity in zip(
-        series.T, mark._stroke.T, mark._stroke_width.T, mark._stroke_opacity.T, mark._title.T, [
+    for series, title, marker, msize, mfill, mstroke, mopacity in zip(
+        series.T, mark._title.T, [
             mark._table[key] for key in mark._marker], [
             mark._table[key] for key in mark._msize], [
                 mark._table[key] for key in mark._mfill], [
@@ -2107,15 +2107,8 @@ def _render(axes, mark, context):
                         mark._table[key] for key in mark._mopacity]):
         not_null = numpy.invert(numpy.logical_or(
             numpy.ma.getmaskarray(position), numpy.ma.getmaskarray(series)))
-        segments = _flat_contiguous(not_null)
 
         msize = numpy.sqrt(msize)
-        stroke_style = toyplot.style.combine(
-            {
-                "stroke": toyplot.color.to_css(stroke),
-                "stroke-width": stroke_width,
-                "stroke-opacity": stroke_opacity},
-            mark._style)
         if mark._coordinate_axes[0] == "x":
             x = position
             y = series
@@ -2124,19 +2117,6 @@ def _render(axes, mark, context):
             y = position
         series_xml = xml.SubElement(
             mark_xml, "g", attrib={"class": "toyplot-Series"})
-        if mark._show_stroke:
-            d = []
-            for segment in segments:
-                start, stop, step = segment.indices(len(not_null))
-                for i in range(start, start + 1):
-                    d.append("M %r %r" % (x[i], y[i]))
-                for i in range(start + 1, stop):
-                    d.append("L %r %r" % (x[i], y[i]))
-            xml.SubElement(
-                series_xml,
-                "path",
-                d=" ".join(d),
-                style=_css_style(stroke_style))
         for dx, dy, dmarker, dsize, dfill, dstroke, dopacity in zip(x[not_null], y[not_null], marker[
                                                                     not_null], msize[not_null], mfill[not_null], mstroke[not_null], mopacity[not_null]):
             dstyle = toyplot.style.combine(

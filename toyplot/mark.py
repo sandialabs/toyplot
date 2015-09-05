@@ -484,10 +484,6 @@ class Scatterplot(Mark):
             coordinate_axes,
             series,
             series_axis,
-            show_stroke,
-            stroke,
-            stroke_width,
-            stroke_opacity,
             marker,
             msize,
             mfill,
@@ -505,10 +501,6 @@ class Scatterplot(Mark):
             coordinate_axes, length=len(coordinates))
         series = toyplot.require.table_keys(table, series, min_length=1)
         series_axis = toyplot.require.string_vector(series_axis, length=1)
-        # show_stroke
-        # stroke
-        # stroke_width
-        # stroke_opacity
         marker = toyplot.require.table_keys(table, marker, length=len(series))
         msize = toyplot.require.table_keys(table, msize, length=len(series))
         mfill = toyplot.require.table_keys(table, mfill, length=len(series))
@@ -528,10 +520,6 @@ class Scatterplot(Mark):
         self._coordinate_axes = coordinate_axes  # D-1 axis identifiers
         self._series = series                 # N coordinate columns
         self._series_axis = series_axis       # 1 axis identifier
-        self._show_stroke = show_stroke       # Boolean
-        self._stroke = stroke                 # N stroke colors
-        self._stroke_width = stroke_width     # N stroke widths
-        self._stroke_opacity = stroke_opacity  # N stroke opacities
         self._marker = marker                 # N marker columns
         self._msize = msize                   # N marker size columns
         self._mfill = mfill                   # N marker fill color columns

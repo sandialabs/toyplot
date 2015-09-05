@@ -1416,7 +1416,7 @@ class Cartesian(object):
             stroke_opacity=1.0,
             marker=None,
             size=20,
-            fill=None,
+            mfill=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -1493,7 +1493,7 @@ class Cartesian(object):
 
         default_color = [next(self._plot_colors)
                          for i in range(series.shape[1])]
-        color = toyplot.color.broadcast(
+        stroke = toyplot.color.broadcast(
             colors=color,
             shape=(series.shape[1],),
             default=default_color,
@@ -1504,9 +1504,9 @@ class Cartesian(object):
         marker = toyplot.broadcast.object(marker, series.shape)
         msize = toyplot.broadcast.scalar(size, series.shape)
         mfill = toyplot.color.broadcast(
-            colors=fill,
+            colors=mfill,
             shape=series.shape,
-            default=color,
+            default=stroke,
             )
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
@@ -1557,7 +1557,7 @@ class Cartesian(object):
                 series=series_keys,
                 series_axis=series_axis,
                 show_stroke=True,
-                stroke=color,
+                stroke=stroke,
                 stroke_width=stroke_width,
                 stroke_opacity=stroke_opacity,
                 marker=marker_keys,

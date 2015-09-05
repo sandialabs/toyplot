@@ -46,6 +46,17 @@ Feature: Color broadcasting
             | plots                         | per-series value colors                              |
             | plots                         | per-series value + palette colors                    |
             | plots                         | per-series value + colormap colors                   |
+            | plots                         | default marker colors                                       |
+            | plots                         | one explicit marker color                                   |
+            | plots                         | per-series explicit marker colors                           |
+            | plots                         | palette marker colors                                       |
+            | plots                         | colormap marker colors                                      |
+            | plots                         | per-series value marker colors                              |
+            | plots                         | per-series value + palette marker colors                    |
+            | plots                         | per-series value + colormap marker colors                   |
+            | plots                         | per-datum value marker colors                              |
+            | plots                         | per-datum value + palette marker colors                    |
+            | plots                         | per-datum value + colormap marker colors                   |
             | scatterplots                         | default colors                                       |
             | scatterplots                         | one explicit color                                   |
             | scatterplots                         | per-series explicit colors                           |

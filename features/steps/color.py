@@ -561,6 +561,72 @@ def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "color-broadcast-plots-per-series-values-colormap")
 
+@then(u'plots can be rendered with default marker colors')
+def step_impl(context):
+    context.axes.plot(context.series, marker="o")
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-marker-default")
+
+@then(u'plots can be rendered with one explicit marker color')
+def step_impl(context):
+    context.axes.plot(context.series, marker="o", mfill="red")
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-one-marker-color")
+
+@then(u'plots can be rendered with per-series explicit marker colors')
+def step_impl(context):
+    context.axes.plot(context.series, marker="o", mfill=context.series_colors)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-per-series-marker-colors")
+
+@then(u'plots can be rendered with palette marker colors')
+def step_impl(context):
+    context.axes.plot(context.series, marker="o", mfill=toyplot.color.brewer("Set1"))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-palette-marker")
+
+@then(u'plots can be rendered with colormap marker colors')
+def step_impl(context):
+    context.axes.plot(context.series, marker="o", mfill=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-colormap-marker")
+
+@then(u'plots can be rendered with per-series value marker colors')
+def step_impl(context):
+    context.axes.plot(context.series, marker="o", mfill=context.series_values)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-per-series-values-marker")
+
+@then(u'plots can be rendered with per-series value + palette marker colors')
+def step_impl(context):
+    context.axes.plot(context.series, marker="o", mfill=(context.series_values, toyplot.color.brewer("Reds")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-per-series-values-palette-marker")
+
+@then(u'plots can be rendered with per-series value + colormap marker colors')
+def step_impl(context):
+    context.axes.plot(context.series, marker="o", mfill=(context.series_values, toyplot.color.LinearMap()))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-per-series-values-colormap-marker")
+
+@then(u'plots can be rendered with per-datum value marker colors')
+def step_impl(context):
+    context.axes.plot(context.series, marker="o", mfill=context.datum_values)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-per-datum-values-marker")
+
+@then(u'plots can be rendered with per-datum value + palette marker colors')
+def step_impl(context):
+    context.axes.plot(context.series, marker="o", mfill=(context.datum_values, toyplot.color.brewer("Reds")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-per-datum-values-palette-marker")
+
+@then(u'plots can be rendered with per-datum value + colormap marker colors')
+def step_impl(context):
+    context.axes.plot(context.series, marker="o", mfill=(context.datum_values, toyplot.color.LinearMap()))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-per-datum-values-colormap-marker")
+
 
 
 @then(u'scatterplots can be rendered with default colors')

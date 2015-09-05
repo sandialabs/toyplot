@@ -1580,7 +1580,6 @@ class Cartesian(object):
             color=None,
             marker="o",
             size=20,
-            fill=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -1630,18 +1629,13 @@ class Cartesian(object):
 
         default_color = [next(self._scatterplot_colors)
                          for i in range(series.shape[1])]
-        color = toyplot.color.broadcast(
+        mfill = toyplot.color.broadcast(
             colors=color,
-            shape=(series.shape[1],),
+            shape=series.shape,
             default=default_color,
             )
         marker = toyplot.broadcast.object(marker, series.shape)
         msize = toyplot.broadcast.scalar(size, series.shape)
-        mfill = toyplot.color.broadcast(
-            colors=fill,
-            shape=series.shape,
-            default=color,
-            )
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
         title = toyplot.broadcast.object(title, series.shape[1])

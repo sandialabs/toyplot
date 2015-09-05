@@ -1050,11 +1050,11 @@ def test_axes_scatterplot_one_variable_fill():
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
     y = numpy.mean(observations, axis=1)
-    fill = numpy.arange(len(observations))
+    color = numpy.arange(len(observations))
 
     canvas = toyplot.Canvas()
     axes = canvas.axes()
-    axes.scatterplot(y, fill=fill)
+    axes.scatterplot(y, color=color)
     assert_canvas_matches(canvas, "axes-scatterplot-one-variable-fill")
 
 
@@ -1102,7 +1102,7 @@ def test_axes_scatterplot_singular():
     canvas = toyplot.Canvas()
     axes = canvas.axes()
     axes.plot(x, y)
-    axes.scatterplot(x[0], y[0], fill="red")
+    axes.scatterplot(x[0], y[0], color="red")
     assert_canvas_matches(canvas, "axes-scatterplot-singular")
 
 
@@ -1145,7 +1145,7 @@ def test_axes_scatterplot_markers():
     axes.scatterplot(
         numpy.arange(
             len(markers)),
-        fill="steelblue",
+        color="steelblue",
         marker=markers,
         size=100,
         mstyle=marker_style,

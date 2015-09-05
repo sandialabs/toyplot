@@ -41,15 +41,15 @@ Feature: Color broadcasting
             | scatterplots                         | default colors                                       |
             | scatterplots                         | one explicit color                                   |
             | scatterplots                         | per-series explicit colors                           |
-#            | scatterplots                         | per-datum explicit colors                            |
+            | scatterplots                         | per-datum explicit colors                            |
             | scatterplots                         | palette colors                                       |
             | scatterplots                         | colormap colors                                      |
             | scatterplots                         | per-series value colors                              |
             | scatterplots                         | per-series value + palette colors                    |
             | scatterplots                         | per-series value + colormap colors                   |
-#            | scatterplots                         | per-datum value colors                               |
-#            | scatterplots                         | per-datum value + palette colors                     |
-#            | scatterplots                         | per-datum value + colormap colors                    |
+            | scatterplots                         | per-datum value colors                               |
+            | scatterplots                         | per-datum value + palette colors                     |
+            | scatterplots                         | per-datum value + colormap colors                    |
             | vlines                         | default colors                                       |
             | vlines                         | one explicit color                                   |
             | vlines                         | per-datum explicit colors                            |

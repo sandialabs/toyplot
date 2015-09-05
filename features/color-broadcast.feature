@@ -38,6 +38,14 @@ Feature: Color broadcasting
             | hlines                         | per-datum value colors                               |
             | hlines                         | per-datum value + palette colors                     |
             | hlines                         | per-datum value + colormap colors                    |
+            | plots                         | default colors                                       |
+            | plots                         | one explicit color                                   |
+            | plots                         | per-series explicit colors                           |
+            | plots                         | palette colors                                       |
+            | plots                         | colormap colors                                      |
+            | plots                         | per-series value colors                              |
+            | plots                         | per-series value + palette colors                    |
+            | plots                         | per-series value + colormap colors                   |
             | scatterplots                         | default colors                                       |
             | scatterplots                         | one explicit color                                   |
             | scatterplots                         | per-series explicit colors                           |

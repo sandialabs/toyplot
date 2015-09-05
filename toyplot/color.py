@@ -151,6 +151,10 @@ def broadcast(colors, shape, default=None):
     else:
         colors = _require_color(colors)
 
+    # Sanity-check to ensure that per-datum colors aren't broadcasted as a per-series shape
+    if colors.ndim > len(shape):
+        raise ValueError("Per-datum colors aren't allowed here - expecting per-series colors.")
+
     # As a special-case, allow a vector with shape M to be matched-up with an
     # M x 1 matrix.
     if colors.ndim == 1 and per_datum and colors.shape[0] == shape[0] and shape[1] == 1:

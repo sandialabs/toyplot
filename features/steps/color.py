@@ -513,6 +513,56 @@ def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "color-broadcast-hlines-per-datum-values-colormap")
 
+@then(u'plots can be rendered with default colors')
+def step_impl(context):
+    context.axes.plot(context.series)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-default")
+
+@then(u'plots can be rendered with one explicit color')
+def step_impl(context):
+    context.axes.plot(context.series, color="red")
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-one-color")
+
+@then(u'plots can be rendered with per-series explicit colors')
+def step_impl(context):
+    context.axes.plot(context.series, color=context.series_colors)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-per-series-colors")
+
+@then(u'plots can be rendered with palette colors')
+def step_impl(context):
+    context.axes.plot(context.series, color=toyplot.color.brewer("Set1"))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-palette")
+
+@then(u'plots can be rendered with colormap colors')
+def step_impl(context):
+    context.axes.plot(context.series, color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-colormap")
+
+@then(u'plots can be rendered with per-series value colors')
+def step_impl(context):
+    context.axes.plot(context.series, color=context.series_values)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-per-series-values")
+
+@then(u'plots can be rendered with per-series value + palette colors')
+def step_impl(context):
+    context.axes.plot(context.series, color=(context.series_values, toyplot.color.brewer("Reds")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-per-series-values-palette")
+
+@then(u'plots can be rendered with per-series value + colormap colors')
+def step_impl(context):
+    context.axes.plot(context.series, color=(context.series_values, toyplot.color.LinearMap()))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-plots-per-series-values-colormap")
+
+
+
 @then(u'scatterplots can be rendered with default colors')
 def step_impl(context):
     context.axes.scatterplot(context.series)

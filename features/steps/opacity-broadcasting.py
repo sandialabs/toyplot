@@ -12,12 +12,7 @@ def step_impl(context):
 @given(u'a set of per-datum opacity values')
 def step_impl(context):
     numpy.random.seed(1234)
-    context.datum_opacities = numpy.column_stack((
-        numpy.random.uniform(1, 0.75, size=context.series.shape[0]),
-        numpy.random.uniform(0.75, 0.5, size=context.series.shape[0]),
-        numpy.random.uniform(0.5, 0.25, size=context.series.shape[0]),
-        numpy.random.uniform(0.25, 0.1, size=context.series.shape[0]),
-        ))
+    context.datum_opacities = numpy.random.uniform(0, 1, size=context.series.shape)
 
 @then(u'bars can be rendered with one explicit opacity')
 def step_impl(context):
@@ -57,7 +52,7 @@ def step_impl(context):
 
 @then(u'hlines can be rendered with per-datum opacities')
 def step_impl(context):
-    context.axes.hlines(context.series[:,0], opacity=numpy.linspace(0, 1, context.series.shape[0]))
+    context.axes.hlines(context.series[:,0], opacity=context.datum_opacities[:,0])
     toyplot.testing.assert_canvas_equal(
         context.canvas, "opacity-broadcast-hlines-per-datum-opacities")
 
@@ -81,9 +76,27 @@ def step_impl(context):
 
 @then(u'rects can be rendered with per-datum opacities')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], opacity=numpy.linspace(0, 1, context.series.shape[0]-1))
+    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], opacity=context.datum_opacities[:-1,0])
     toyplot.testing.assert_canvas_equal(
         context.canvas, "opacity-broadcast-rects-per-datum-opacities")
+
+@then(u'scatterplots can be rendered with one explicit opacity')
+def step_impl(context):
+    context.axes.scatterplot(context.series, opacity=0.2)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "opacity-broadcast-scatterplots-one-opacity")
+
+@then(u'scatterplots can be rendered with per-series opacities')
+def step_impl(context):
+    context.axes.scatterplot(context.series, opacity=context.series_opacities)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "opacity-broadcast-scatterplots-per-series-opacities")
+
+@then(u'scatterplots can be rendered with per-datum opacities')
+def step_impl(context):
+    context.axes.scatterplot(context.series, opacity=context.datum_opacities)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "opacity-broadcast-scatterplots-per-datum-opacities")
 
 @then(u'text can be rendered with one explicit opacity')
 def step_impl(context):
@@ -95,7 +108,7 @@ def step_impl(context):
 @then(u'text can be rendered with per-datum opacities')
 def step_impl(context):
     text = ["#"] * len(context.series)
-    context.axes.text(context.x, context.series[:,0], text, opacity=numpy.linspace(0, 1, context.series.shape[0]))
+    context.axes.text(context.x, context.series[:,0], text, opacity=context.datum_opacities[:,0])
     toyplot.testing.assert_canvas_equal(
         context.canvas, "opacity-broadcast-text-per-datum-opacities")
 
@@ -107,7 +120,7 @@ def step_impl(context):
 
 @then(u'vlines can be rendered with per-datum opacities')
 def step_impl(context):
-    context.axes.vlines(context.series[:,0], opacity=numpy.linspace(0, 1, context.series.shape[0]))
+    context.axes.vlines(context.series[:,0], opacity=context.datum_opacities[:,0])
     toyplot.testing.assert_canvas_equal(
         context.canvas, "opacity-broadcast-vlines-per-datum-opacities")
 

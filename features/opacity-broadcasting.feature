@@ -19,6 +19,9 @@ Feature: Opacity Broadcasting
             | plots                        | per-series opacities                                 |
             | rects                        | one explicit opacity                                 |
             | rects                        | per-datum opacities                                  |
+            | scatterplots                 | one explicit opacity                                 |
+            | scatterplots                 | per-series opacities                                 |
+            | scatterplots                 | per-datum opacities                                  |
             | text                         | one explicit opacity                                 |
             | text                         | per-datum opacities                                  |
             | vlines                       | one explicit opacity                                 |

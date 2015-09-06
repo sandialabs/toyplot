@@ -31,6 +31,20 @@ def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "opacity-broadcast-hlines-per-datum-opacities")
 
+@then(u'text can be rendered with one explicit opacity')
+def step_impl(context):
+    text = ["#"] * len(context.series)
+    context.axes.text(context.x, context.series[:,0], text, opacity=0.2)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "opacity-broadcast-text-one-opacity")
+
+@then(u'text can be rendered with per-datum opacities')
+def step_impl(context):
+    text = ["#"] * len(context.series)
+    context.axes.text(context.x, context.series[:,0], text, opacity=numpy.linspace(0, 1, context.series.shape[0]))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "opacity-broadcast-text-per-datum-opacities")
+
 @then(u'vlines can be rendered with one explicit opacity')
 def step_impl(context):
     context.axes.vlines(context.series[:,0], opacity=0.1)

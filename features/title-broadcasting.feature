@@ -17,6 +17,8 @@ Feature: Title Broadcasting
             | hlines                       | per-datum titles                                  |
             | plots                        | one explicit title                                 |
             | plots                        | per-series titles                                 |
+            | plots                        | per datum titles                                   |
+            | plots                        | per-series and per datum titles                   |
             | rects                        | one explicit title                                 |
             | rects                        | per-datum titles                                  |
             | scatterplots                 | one explicit title                                 |

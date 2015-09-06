@@ -67,6 +67,18 @@ def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "title-broadcast-plots-per-series-titles")
 
+@then(u'plots can be rendered with per datum titles')
+def step_impl(context):
+    context.axes.plot(context.series, marker="o", mtitle=context.datum_titles)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "title-broadcast-plots-per-datum-titles")
+
+@then(u'plots can be rendered with per-series and per datum titles')
+def step_impl(context):
+    context.axes.plot(context.series, title=context.series_titles, marker="o", mtitle=context.datum_titles)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "title-broadcast-plots-per-series-per-datum-titles")
+
 @then(u'rects can be rendered with one explicit title')
 def step_impl(context):
     context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], title="rect")

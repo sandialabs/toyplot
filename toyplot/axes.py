@@ -1414,11 +1414,12 @@ class Cartesian(object):
             color=None,
             stroke_width=2.0,
             opacity=1.0,
+            title=None,
             marker=None,
             size=20,
             mfill=None,
             mopacity=1.0,
-            title=None,
+            mtitle=None,
             style=None,
             mstyle=None,
             mlstyle=None,
@@ -1501,6 +1502,7 @@ class Cartesian(object):
         stroke_width = toyplot.broadcast.scalar(stroke_width, series.shape[1])
         stroke_opacity = toyplot.broadcast.scalar(
             opacity, series.shape[1])
+        stroke_title = toyplot.broadcast.object(title, series.shape[1])
         marker = toyplot.broadcast.object(marker, series.shape)
         msize = toyplot.broadcast.scalar(size, series.shape)
         mfill = toyplot.color.broadcast(
@@ -1510,7 +1512,7 @@ class Cartesian(object):
             )
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
         mopacity = toyplot.broadcast.scalar(mopacity, series.shape)
-        title = toyplot.broadcast.object(title, series.shape[1])
+        mtitle = toyplot.broadcast.object(mtitle, series.shape)
         style = toyplot.style.combine(
             {"fill": "none"}, toyplot.require.style(style))
         mstyle = toyplot.style.combine({}, toyplot.require.style(mstyle))
@@ -1533,14 +1535,16 @@ class Cartesian(object):
         mfill_keys = []
         mstroke_keys = []
         mopacity_keys = []
-        for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column) in enumerate(
-                zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T)):
+        mtitle_keys = []
+        for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column, mtitle_column) in enumerate(
+                zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T, mtitle.T)):
             series_keys.append(series_axis + str(index))
             marker_keys.append("marker" + str(index))
             msize_keys.append("size" + str(index))
             mfill_keys.append("fill" + str(index))
             mstroke_keys.append("stroke" + str(index))
             mopacity_keys.append("opacity" + str(index))
+            mtitle_keys.append("title" + str(index))
             table[series_keys[-1]] = series_column
             _mark_exportable(table, series_keys[-1])
             table[marker_keys[-1]] = marker_column
@@ -1548,6 +1552,7 @@ class Cartesian(object):
             table[mfill_keys[-1]] = mfill_column
             table[mstroke_keys[-1]] = mstroke_column
             table[mopacity_keys[-1]] = mopacity_column
+            table[mtitle_keys[-1]] = mtitle_column
 
         self._children.append(
             toyplot.mark.Plot(
@@ -1556,16 +1561,16 @@ class Cartesian(object):
                 coordinate_axes=coordinate_axes,
                 series=series_keys,
                 series_axis=series_axis,
-                show_stroke=True,
                 stroke=stroke,
                 stroke_width=stroke_width,
                 stroke_opacity=stroke_opacity,
+                stroke_title=stroke_title,
                 marker=marker_keys,
                 msize=msize_keys,
                 mfill=mfill_keys,
                 mstroke=mstroke_keys,
                 mopacity=mopacity_keys,
-                title=title,
+                mtitle=mtitle_keys,
                 style=style,
                 mstyle=mstyle,
                 mlstyle=mlstyle,

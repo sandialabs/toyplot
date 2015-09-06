@@ -828,7 +828,8 @@ def _render_marker(
         marker,
         marker_style=None,
         label_style=None,
-        extra_class=None):
+        extra_class=None,
+        title=None):
     if marker is None:
         return
     if isinstance(marker, toyplot.compatibility.string_type):
@@ -848,6 +849,8 @@ def _render_marker(
     if extra_class is not None:
         attrib["class"] = extra_class
     marker_xml = xml.SubElement(root, "g", attrib=attrib)
+    if title is not None:
+        xml.SubElement(marker_xml, "title").text = str(title)
     if shape == "|":
         xml.SubElement(marker_xml,
                        "line",
@@ -1979,13 +1982,19 @@ def _render(axes, mark, context):
             "class": "toyplot-mark-Plot"})
     context.add_data_table(mark, mark._table, title="Plot Data", filename=mark._filename)
 
-    for series, stroke, stroke_width, stroke_opacity, title, marker, msize, mfill, mstroke, mopacity in zip(
-        series.T, mark._stroke.T, mark._stroke_width.T, mark._stroke_opacity.T, mark._title.T, [
-            mark._table[key] for key in mark._marker], [
-            mark._table[key] for key in mark._msize], [
-                mark._table[key] for key in mark._mfill], [
-                    mark._table[key] for key in mark._mstroke], [
-                        mark._table[key] for key in mark._mopacity]):
+    for series, stroke, stroke_width, stroke_opacity, stroke_title, marker, msize, mfill, mstroke, mopacity, mtitle in zip(
+        series.T,
+        mark._stroke.T,
+        mark._stroke_width.T,
+        mark._stroke_opacity.T,
+        mark._stroke_title.T,
+        [mark._table[key] for key in mark._marker],
+        [mark._table[key] for key in mark._msize],
+        [mark._table[key] for key in mark._mfill],
+        [mark._table[key] for key in mark._mstroke],
+        [mark._table[key] for key in mark._mopacity],
+        [mark._table[key] for key in mark._mtitle],
+        ):
         not_null = numpy.invert(numpy.logical_or(
             numpy.ma.getmaskarray(position), numpy.ma.getmaskarray(series)))
         segments = _flat_contiguous(not_null)
@@ -2005,32 +2014,39 @@ def _render(axes, mark, context):
             y = position
         series_xml = xml.SubElement(
             mark_xml, "g", attrib={"class": "toyplot-Series"})
-        if mark._show_stroke:
-            d = []
-            for segment in segments:
-                start, stop, step = segment.indices(len(not_null))
-                for i in range(start, start + 1):
-                    d.append("M %r %r" % (x[i], y[i]))
-                for i in range(start + 1, stop):
-                    d.append("L %r %r" % (x[i], y[i]))
-            xml.SubElement(
-                series_xml,
-                "path",
-                d=" ".join(d),
-                style=_css_style(stroke_style))
-        for dx, dy, dmarker, dsize, dfill, dstroke, dopacity in zip(x[not_null], y[not_null], marker[
-                                                                    not_null], msize[not_null], mfill[not_null], mstroke[not_null], mopacity[not_null]):
+        if stroke_title is not None:
+            xml.SubElement(series_xml, "title").text = str(stroke_title)
+
+        d = []
+        for segment in segments:
+            start, stop, step = segment.indices(len(not_null))
+            for i in range(start, start + 1):
+                d.append("M %r %r" % (x[i], y[i]))
+            for i in range(start + 1, stop):
+                d.append("L %r %r" % (x[i], y[i]))
+        xml.SubElement(
+            series_xml,
+            "path",
+            d=" ".join(d),
+            style=_css_style(stroke_style))
+        for dx, dy, dmarker, dsize, dfill, dstroke, dopacity, dtitle in zip(
+            x[not_null],
+            y[not_null],
+            marker[not_null],
+            msize[not_null],
+            mfill[not_null],
+            mstroke[not_null],
+            mopacity[not_null],
+            mtitle[not_null],
+            ):
             dstyle = toyplot.style.combine(
                 {
                     "fill": toyplot.color.to_css(dfill),
                     "stroke": toyplot.color.to_css(dstroke),
                     "opacity": dopacity},
                 mark._mstyle)
-            _render_marker(series_xml, dx, dy, dsize, dmarker,
-                           dstyle, mark._mlstyle, extra_class="toyplot-Datum")
-
-        if title is not None:
-            xml.SubElement(series_xml, "title").text = str(title)
+            datum_xml = _render_marker(series_xml, dx, dy, dsize, dmarker,
+                           dstyle, mark._mlstyle, extra_class="toyplot-Datum", title=dtitle)
 
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Rect, _RenderContext)

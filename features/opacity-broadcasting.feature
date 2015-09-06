@@ -15,6 +15,8 @@ Feature: Opacity Broadcasting
             | fills                        | per-series opacities                                 |
             | hlines                       | one explicit opacity                                 |
             | hlines                       | per-datum opacities                                  |
+            | plots                        | one explicit opacity                                 |
+            | plots                        | per-series opacities                                 |
             | rects                        | one explicit opacity                                 |
             | rects                        | per-datum opacities                                  |
             | text                         | one explicit opacity                                 |

@@ -61,6 +61,18 @@ def step_impl(context):
     toyplot.testing.assert_canvas_equal(
         context.canvas, "opacity-broadcast-hlines-per-datum-opacities")
 
+@then(u'plots can be rendered with one explicit opacity')
+def step_impl(context):
+    context.axes.plot(context.series, opacity=0.2)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "opacity-broadcast-plots-one-opacity")
+
+@then(u'plots can be rendered with per-series opacities')
+def step_impl(context):
+    context.axes.plot(context.series, opacity=context.series_opacities)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "opacity-broadcast-plots-per-series-opacities")
+
 @then(u'rects can be rendered with one explicit opacity')
 def step_impl(context):
     context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], opacity=0.2)

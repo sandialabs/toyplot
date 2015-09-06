@@ -10,6 +10,8 @@ Feature: Opacity Broadcasting
             | mark                         | opacity                                              |
             | hlines                       | one explicit opacity                                 |
             | hlines                       | per-datum opacities                                  |
+            | rects                        | one explicit opacity                                 |
+            | rects                        | per-datum opacities                                  |
             | text                         | one explicit opacity                                 |
             | text                         | per-datum opacities                                  |
             | vlines                       | one explicit opacity                                 |

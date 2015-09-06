@@ -26,7 +26,9 @@ S. Glassner (Ed.). Academic Press Professional, Inc., San Diego, CA, USA 61-63.
 Ian Storm Taylor, "Design Tip: Never Use Black,"
 http://ianstormtaylor.com/design-tip-never-use-black, accessed October, 2014.
 
-L. Byron and M. Wattenberg, “Stacked Graphs – Geometry & Aesthetics,” IEEE Transactions on Visualization and Computer Graphics, vol. 14, no. 6, pp. 1245–1252, Nov. 2008, http://leebyron.com/streamgraph/stackedgraphs_byron_wattenberg.pdf.
+L. Byron and M. Wattenberg, “Stacked Graphs – Geometry & Aesthetics,” IEEE
+Transactions on Visualization and Computer Graphics, vol. 14, no. 6, pp.
+1245–1252, Nov. 2008, http://leebyron.com/streamgraph/stackedgraphs_byron_wattenberg.pdf.
 
 Influential Reading
 -------------------

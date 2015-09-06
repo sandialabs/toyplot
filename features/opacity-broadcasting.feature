@@ -8,6 +8,9 @@ Feature: Opacity Broadcasting
 
         Examples:
             | mark                         | opacity                                              |
+            | bars                         | one explicit opacity                                 |
+            | bars                         | per-series opacities                                 |
+            | bars                         | per-datum opacities                                  |
             | fills                        | one explicit opacity                                 |
             | fills                        | per-series opacities                                 |
             | hlines                       | one explicit opacity                                 |

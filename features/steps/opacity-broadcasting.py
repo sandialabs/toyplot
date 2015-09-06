@@ -19,18 +19,35 @@ def step_impl(context):
         numpy.random.uniform(0.25, 0.1, size=context.series.shape[0]),
         ))
 
+@then(u'bars can be rendered with one explicit opacity')
+def step_impl(context):
+    context.axes.bars(context.series, baseline="symmetric", opacity=0.2)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "opacity-broadcast-bars-one-opacity")
+
+@then(u'bars can be rendered with per-series opacities')
+def step_impl(context):
+    context.axes.bars(context.series, baseline="symmetric", opacity=numpy.linspace(0.2, 0.8, 4))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "opacity-broadcast-bars-per-series-opacities")
+
+@then(u'bars can be rendered with per-datum opacities')
+def step_impl(context):
+    context.axes.bars(context.series, baseline="symmetric", opacity=context.datum_opacities)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "opacity-broadcast-bars-per-datum-opacities")
+
 @then(u'fills can be rendered with one explicit opacity')
 def step_impl(context):
     context.axes.fill(context.series, opacity=0.2)
     toyplot.testing.assert_canvas_equal(
         context.canvas, "opacity-broadcast-fills-one-opacity")
 
-import sys
 @then(u'fills can be rendered with per-series opacities')
 def step_impl(context):
     context.axes.fill(context.series, opacity=numpy.linspace(0.2, 0.8, 3))
     toyplot.testing.assert_canvas_equal(
-        context.canvas, "opacity-broadcast-fills-per-datum-opacities")
+        context.canvas, "opacity-broadcast-fills-per-series-opacities")
 
 @then(u'hlines can be rendered with one explicit opacity')
 def step_impl(context):

@@ -1018,6 +1018,8 @@ def _render_marker(
                                            "font-size": "%rpx" % (size * 0.75)},
                                           label_style,
                                           shape_label_style)).text = shape_label
+    return marker_xml
+
 _render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<": (
     "^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
@@ -2098,13 +2100,15 @@ def _render(axes, mark, context):
             "class": "toyplot-mark-Scatterplot"})
     context.add_data_table(mark, mark._table, title="Scatterplot Data", filename=mark._filename)
 
-    for series, title, marker, msize, mfill, mstroke, mopacity in zip(
-        series.T, mark._title.T, [
-            mark._table[key] for key in mark._marker], [
-            mark._table[key] for key in mark._msize], [
-                mark._table[key] for key in mark._mfill], [
-                    mark._table[key] for key in mark._mstroke], [
-                        mark._table[key] for key in mark._mopacity]):
+    for series, marker, msize, mfill, mstroke, mopacity, mtitle in zip(
+        series.T,
+        [mark._table[key] for key in mark._marker],
+        [mark._table[key] for key in mark._msize],
+        [mark._table[key] for key in mark._mfill],
+        [mark._table[key] for key in mark._mstroke],
+        [mark._table[key] for key in mark._mopacity],
+        [mark._table[key] for key in mark._mtitle],
+        ):
         not_null = numpy.invert(numpy.logical_or(
             numpy.ma.getmaskarray(position), numpy.ma.getmaskarray(series)))
 
@@ -2117,19 +2121,27 @@ def _render(axes, mark, context):
             y = position
         series_xml = xml.SubElement(
             mark_xml, "g", attrib={"class": "toyplot-Series"})
-        for dx, dy, dmarker, dsize, dfill, dstroke, dopacity in zip(x[not_null], y[not_null], marker[
-                                                                    not_null], msize[not_null], mfill[not_null], mstroke[not_null], mopacity[not_null]):
+        for dx, dy, dmarker, dsize, dfill, dstroke, dopacity, dtitle in zip(
+            x[not_null],
+            y[not_null],
+            marker[not_null],
+            msize[not_null],
+            mfill[not_null],
+            mstroke[not_null],
+            mopacity[not_null],
+            mtitle[not_null],
+            ):
             dstyle = toyplot.style.combine(
                 {
                     "fill": toyplot.color.to_css(dfill),
                     "stroke": toyplot.color.to_css(dstroke),
                     "opacity": dopacity},
                 mark._mstyle)
-            _render_marker(series_xml, dx, dy, dsize, dmarker,
+            datum_xml = _render_marker(series_xml, dx, dy, dsize, dmarker,
                            dstyle, mark._mlstyle, extra_class="toyplot-Datum")
 
-        if title is not None:
-            xml.SubElement(series_xml, "title").text = str(title)
+            if dtitle is not None:
+                xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
 @dispatch(

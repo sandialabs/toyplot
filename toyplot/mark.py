@@ -489,7 +489,7 @@ class Scatterplot(Mark):
             mfill,
             mstroke,
             mopacity,
-            title,
+            mtitle,
             style,
             mstyle,
             mlstyle,
@@ -508,7 +508,8 @@ class Scatterplot(Mark):
             table, mstroke, length=len(series))
         mopacity = toyplot.require.table_keys(
             table, mopacity, length=len(series))
-        # title
+        mtitle = toyplot.require.table_keys(
+            table, mtitle, length=len(series))
         style = toyplot.require.style(style)
         mstyle = toyplot.require.style(mstyle)
         mlstyle = toyplot.require.style(mlstyle)
@@ -525,7 +526,7 @@ class Scatterplot(Mark):
         self._mfill = mfill                   # N marker fill color columns
         self._mstroke = mstroke               # N marker stroke color columns
         self._mopacity = mopacity             # N marker opacity columns
-        self._title = title                   # N titles
+        self._mtitle = mtitle                 # N marker title columns
         self._style = style                   # Line style
         self._mstyle = mstyle                 # Marker style
         self._mlstyle = mlstyle               # Marker label style

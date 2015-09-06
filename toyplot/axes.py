@@ -1638,7 +1638,7 @@ class Cartesian(object):
         msize = toyplot.broadcast.scalar(size, series.shape)
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
-        title = toyplot.broadcast.object(title, series.shape[1])
+        mtitle = toyplot.broadcast.object(title, series.shape)
         style = toyplot.style.combine(
             {"stroke": "none"}, toyplot.require.style(style))
         mstyle = toyplot.style.combine({}, toyplot.require.style(mstyle))
@@ -1661,14 +1661,16 @@ class Cartesian(object):
         mfill_keys = []
         mstroke_keys = []
         mopacity_keys = []
-        for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column) in enumerate(
-                zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T)):
+        mtitle_keys = []
+        for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column, mtitle_column) in enumerate(
+                zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T, mtitle.T)):
             series_keys.append(series_axis + str(index))
             marker_keys.append("marker" + str(index))
             msize_keys.append("size" + str(index))
             mfill_keys.append("fill" + str(index))
             mstroke_keys.append("stroke" + str(index))
             mopacity_keys.append("opacity" + str(index))
+            mtitle_keys.append("title" + str(index))
             table[series_keys[-1]] = series_column
             _mark_exportable(table, series_keys[-1])
             table[marker_keys[-1]] = marker_column
@@ -1676,6 +1678,7 @@ class Cartesian(object):
             table[mfill_keys[-1]] = mfill_column
             table[mstroke_keys[-1]] = mstroke_column
             table[mopacity_keys[-1]] = mopacity_column
+            table[mtitle_keys[-1]] = mtitle_column
 
         self._children.append(
             toyplot.mark.Scatterplot(
@@ -1689,7 +1692,7 @@ class Cartesian(object):
                 mfill=mfill_keys,
                 mstroke=mstroke_keys,
                 mopacity=mopacity_keys,
-                title=title,
+                mtitle=mtitle_keys,
                 style=style,
                 mstyle=mstyle,
                 mlstyle=mlstyle,

@@ -541,7 +541,7 @@ def step_impl(context):
     context.axes.body.cell(1, 3).axes().bars(
         numpy.random.uniform(0.1, 1, size=10))
     context.axes.body.cell(2, 3).axes().bars(numpy.random.choice(
-        [-1, 1], size=30), fill=numpy.random.choice(["red", "blue"], size=30))
+        [-1, 1], size=30), color=numpy.random.choice(["red", "blue"], size=30))
     context.axes.body.cell(3, 3, rowspan=2).axes().fill(
         3 + numpy.cos(numpy.linspace(0, 5)) + numpy.sin(numpy.linspace(0, 20)))
     toyplot.testing.assert_canvas_equal(

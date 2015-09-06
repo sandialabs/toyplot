@@ -9,8 +9,7 @@ import shutil
 import subprocess
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--clean", action="store_true",
-                    help="Force a clean rebuild of the documentation.")
+parser.add_argument("command", nargs="?", default="build", choices=["build", "clean"], help="Command to run.")
 arguments = parser.parse_args()
 
 root_dir = os.path.abspath(os.path.join(__file__, "..", ".."))
@@ -23,7 +22,7 @@ def convert_notebook(name):
     source = os.path.join(docs_dir, "%s.ipynb" % name)
     target = os.path.join(docs_dir, "%s.rst" % name)
     if os.path.exists(target) and os.path.getmtime(
-            target) >= os.path.getmtime(source) and not arguments.clean:
+            target) >= os.path.getmtime(source):
         return
 
     # Convert the notebook to pure Python, so we can run verify
@@ -76,7 +75,7 @@ def convert_notebook(name):
 if os.path.exists(build_dir):
     shutil.rmtree(build_dir)
 
-for name in [
+notebooks = [
         "canvas-layout",
         "cartesian-axes",
         "color",
@@ -91,8 +90,15 @@ for name in [
         "text",
         "tick-locators",
         "tutorial",
-        "units"]:
-    convert_notebook(name)
+        "units"]
+
+# Clean the build.
+if arguments.command == "clean":
+    for name in notebooks:
+        os.remove("%s.rst" % name)
 
 # Generate the HTML documentation.
-subprocess.check_call(["make", "html"], cwd=docs_dir)
+if arguments.command == "build":
+    for name in notebooks:
+        convert_notebook(name)
+    subprocess.check_call(["make", "html"], cwd=docs_dir)

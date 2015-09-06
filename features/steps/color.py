@@ -8,78 +8,6 @@ import numpy
 import toyplot.color
 import toyplot.testing
 
-@given(u'a broadcast color {value}')
-def step_impl(context, value):
-    context.color = eval(value)
-
-
-@given(u'a broadcast shape {value}')
-def step_impl(context, value):
-    context.shape = eval(value)
-
-
-@then(u'toyplot.color.broadcast should return an all-red color array with shape (2)')
-def step_impl(context):
-    array = toyplot.color.broadcast(context.color, context.shape)
-    numpy.testing.assert_array_equal(array, toyplot.color.array([(1,0,0,1), (1,0,0,1)]))
-
-
-@then(u'toyplot.color.broadcast should return an all-red color array with shape (2,3)')
-def step_impl(context):
-    array = toyplot.color.broadcast(context.color, context.shape)
-    numpy.testing.assert_array_equal(array, toyplot.color.array([[(1,0,0,1), (1,0,0,1), (1,0,0,1)], [(1,0,0,1), (1,0,0,1), (1,0,0,1)]]))
-
-
-@then(u'toyplot.color.broadcast should return a red-blue color array with shape (2)')
-def step_impl(context):
-    array = toyplot.color.broadcast(context.color, context.shape)
-    numpy.testing.assert_array_equal(array, toyplot.color.array([(1,0,0,1), (0,0,1,1)]))
-
-
-@then(u'toyplot.color.broadcast should return a red-blue color array with shape (3,2)')
-def step_impl(context):
-    array = toyplot.color.broadcast(context.color, context.shape)
-    numpy.testing.assert_array_equal(array, toyplot.color.array([[(1,0,0,1), (0,0,1,1)], [(1,0,0,1), (0,0,1,1)], [(1,0,0,1), (0,0,1,1)]]))
-
-
-@then(u'toyplot.color.broadcast should return a red-green-blue-yellow color array with shape (2,2)')
-def step_impl(context):
-    array = toyplot.color.broadcast(context.color, context.shape)
-    numpy.testing.assert_array_equal(array, toyplot.color.array([[(1,0,0,1), (0,1,0,1)], [(0,0,1,1), (1,1,0,1)]]))
-
-
-@then(u'toyplot.color.broadcast should return a blues color array with shape (3)')
-def step_impl(context):
-    array = toyplot.color.broadcast(context.color, context.shape)
-    numpy.testing.assert_array_equal(array, toyplot.color.array([
-        (0.03137254901960784, 0.25098039215686274, 0.5058823529411764, 1.0),
-        (0.4823529411764706, 0.8, 0.7686274509803922, 1.0),
-        (0.9686274509803922, 0.9882352941176471, 0.9411764705882353, 1.0)]))
-
-
-@then(u'toyplot.color.broadcast should return a blues color array with shape (2,3) and identical columns')
-def step_impl(context):
-    array = toyplot.color.broadcast(context.color, context.shape)
-    numpy.testing.assert_array_equal(array, toyplot.color.array([
-        [(0.03137254901960784, 0.25098039215686274, 0.5058823529411764, 1.0),
-        (0.4823529411764706, 0.8, 0.7686274509803922, 1.0),
-        (0.9686274509803922, 0.9882352941176471, 0.9411764705882353, 1.0)],
-        [(0.03137254901960784, 0.25098039215686274, 0.5058823529411764, 1.0),
-        (0.4823529411764706, 0.8, 0.7686274509803922, 1.0),
-        (0.9686274509803922, 0.9882352941176471, 0.9411764705882353, 1.0)]]))
-
-
-@then(u'toyplot.color.broadcast should return a blues color array with shape (2,3)')
-def step_impl(context):
-    array = toyplot.color.broadcast(context.color, context.shape)
-    numpy.testing.assert_array_equal(array, toyplot.color.array([
-        [(0.03137254901960784, 0.25098039215686274, 0.5058823529411764, 1.0),
-        (0.11372549019607844, 0.49254901960784314, 0.7168627450980393, 1.0),
-        (0.3411764705882353, 0.7215686274509804, 0.8156862745098039, 1.0)],
-        [(0.6235294117647059, 0.8533333333333334, 0.7215686274509804, 1.0),
-        (0.8313725490196079, 0.9341176470588235, 0.8070588235294117, 1.0),
-        (0.9686274509803922, 0.9882352941176471, 0.9411764705882353, 1.0)]]))
-
 
 @when(u'toyplot.color.css receives {value}')
 def step_impl(context, value):
@@ -379,5 +307,4 @@ def step_impl(context):
         toyplot.color.Palette(["red", "lime", "blue", (1, 1, 1)]))
     nose.tools.assert_equal(colormap.css(0), "rgba(100%,0%,0%,1)")
     nose.tools.assert_equal(colormap.css(-1), "rgba(100%,100%,100%,1)")
-
 

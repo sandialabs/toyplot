@@ -356,16 +356,16 @@ class Plot(Mark):
             coordinate_axes,
             series,
             series_axis,
-            show_stroke,
             stroke,
             stroke_width,
             stroke_opacity,
+            stroke_title,
             marker,
             msize,
             mfill,
             mstroke,
             mopacity,
-            title,
+            mtitle,
             style,
             mstyle,
             mlstyle,
@@ -381,6 +381,7 @@ class Plot(Mark):
         # stroke
         # stroke_width
         # stroke_opacity
+        # stroke_title
         marker = toyplot.require.table_keys(table, marker, length=len(series))
         msize = toyplot.require.table_keys(table, msize, length=len(series))
         mfill = toyplot.require.table_keys(table, mfill, length=len(series))
@@ -388,7 +389,8 @@ class Plot(Mark):
             table, mstroke, length=len(series))
         mopacity = toyplot.require.table_keys(
             table, mopacity, length=len(series))
-        # title
+        mtitle = toyplot.require.table_keys(
+            table, mtitle, length=len(series))
         style = toyplot.require.style(style)
         mstyle = toyplot.require.style(mstyle)
         mlstyle = toyplot.require.style(mlstyle)
@@ -400,16 +402,16 @@ class Plot(Mark):
         self._coordinate_axes = coordinate_axes  # D-1 axis identifiers
         self._series = series                 # N coordinate columns
         self._series_axis = series_axis       # 1 axis identifier
-        self._show_stroke = show_stroke       # Boolean
         self._stroke = stroke                 # N stroke colors
         self._stroke_width = stroke_width     # N stroke widths
         self._stroke_opacity = stroke_opacity  # N stroke opacities
+        self._stroke_title = stroke_title     # N stroke titles
         self._marker = marker                 # N marker columns
         self._msize = msize                   # N marker size columns
         self._mfill = mfill                   # N marker fill color columns
         self._mstroke = mstroke               # N marker stroke color columns
         self._mopacity = mopacity             # N marker opacity columns
-        self._title = title                   # N titles
+        self._mtitle = mtitle                 # N marker title columns
         self._style = style                   # Line style
         self._mstyle = mstyle                 # Marker style
         self._mlstyle = mlstyle               # Marker label style
@@ -465,6 +467,71 @@ class Rect(Mark):
         self._opacity = opacity  # 1 opacity column
         self._title = title     # 1 title column
         self._style = style     # Rectangle style
+        self._filename = filename
+
+
+class Scatterplot(Mark):
+
+    """Plot multiple bivariate data series using markers.
+
+    Do not create Scatterplot instances directly.  Use factory methods such as
+    :func:`toyplot.scatterplot` and :meth:`toyplot.axes.Cartesian.scatterplot`
+    instead.
+    """
+
+    def __init__(
+            self,
+            table,
+            coordinates,
+            coordinate_axes,
+            series,
+            series_axis,
+            marker,
+            msize,
+            mfill,
+            mstroke,
+            mopacity,
+            mtitle,
+            style,
+            mstyle,
+            mlstyle,
+            filename):
+        table = toyplot.require.instance(table, toyplot.data.Table)
+        coordinates = toyplot.require.table_keys(
+            table, coordinates, min_length=1)
+        coordinate_axes = toyplot.require.string_vector(
+            coordinate_axes, length=len(coordinates))
+        series = toyplot.require.table_keys(table, series, min_length=1)
+        series_axis = toyplot.require.string_vector(series_axis, length=1)
+        marker = toyplot.require.table_keys(table, marker, length=len(series))
+        msize = toyplot.require.table_keys(table, msize, length=len(series))
+        mfill = toyplot.require.table_keys(table, mfill, length=len(series))
+        mstroke = toyplot.require.table_keys(
+            table, mstroke, length=len(series))
+        mopacity = toyplot.require.table_keys(
+            table, mopacity, length=len(series))
+        mtitle = toyplot.require.table_keys(
+            table, mtitle, length=len(series))
+        style = toyplot.require.style(style)
+        mstyle = toyplot.require.style(mstyle)
+        mlstyle = toyplot.require.style(mlstyle)
+        filename = toyplot.require.filename(filename)
+
+        Mark.__init__(self)
+        self._table = table
+        self._coordinates = coordinates       # D-1 coordinate columns
+        self._coordinate_axes = coordinate_axes  # D-1 axis identifiers
+        self._series = series                 # N coordinate columns
+        self._series_axis = series_axis       # 1 axis identifier
+        self._marker = marker                 # N marker columns
+        self._msize = msize                   # N marker size columns
+        self._mfill = mfill                   # N marker fill color columns
+        self._mstroke = mstroke               # N marker stroke color columns
+        self._mopacity = mopacity             # N marker opacity columns
+        self._mtitle = mtitle                 # N marker title columns
+        self._style = style                   # Line style
+        self._mstyle = mstyle                 # Marker style
+        self._mlstyle = mlstyle               # Marker label style
         self._filename = filename
 
 

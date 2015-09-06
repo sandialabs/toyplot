@@ -1050,11 +1050,11 @@ def test_axes_scatterplot_one_variable_fill():
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
     y = numpy.mean(observations, axis=1)
-    fill = numpy.arange(len(observations))
+    color = numpy.arange(len(observations))
 
     canvas = toyplot.Canvas()
     axes = canvas.axes()
-    axes.scatterplot(y, fill=fill)
+    axes.scatterplot(y, color=color)
     assert_canvas_matches(canvas, "axes-scatterplot-one-variable-fill")
 
 
@@ -1102,7 +1102,7 @@ def test_axes_scatterplot_singular():
     canvas = toyplot.Canvas()
     axes = canvas.axes()
     axes.plot(x, y)
-    axes.scatterplot(x[0], y[0], fill="red")
+    axes.scatterplot(x[0], y[0], color="red")
     assert_canvas_matches(canvas, "axes-scatterplot-singular")
 
 
@@ -1145,7 +1145,7 @@ def test_axes_scatterplot_markers():
     axes.scatterplot(
         numpy.arange(
             len(markers)),
-        fill="steelblue",
+        color="steelblue",
         marker=markers,
         size=100,
         mstyle=marker_style,
@@ -1156,14 +1156,14 @@ def test_axes_scatterplot_markers():
 def test_axes_rect_singular():
     canvas = toyplot.Canvas()
     axes = canvas.axes(xmin=0, xmax=1, ymin=0, ymax=1)
-    axes.rect(0.1, 0.2, 0.3, 0.6)
+    axes.rects(0.1, 0.2, 0.3, 0.6)
     assert_canvas_matches(canvas, "axes-rect-singular")
 
 
 def test_axes_rect_singular_along_y():
     canvas = toyplot.Canvas()
     axes = canvas.axes(xmin=0, xmax=1, ymin=0, ymax=1)
-    axes.rect(0.1, 0.2, 0.3, 0.6, along="y")
+    axes.rects(0.1, 0.2, 0.3, 0.6, along="y")
     assert_canvas_matches(canvas, "axes-rect-singular-along-y")
 
 
@@ -1172,13 +1172,13 @@ def test_axes_rect():
     x2 = x1 + 0.5
     y1 = x1 - 0.5
     y2 = x1 ** 1.5
-    fill = x1
+    color = x1
     title = x1
     palette = toyplot.color.brewer("BlueRed")
 
     canvas = toyplot.Canvas()
     axes = canvas.axes()
-    axes.rect(x1, x2, y1, y2, fill=(fill, palette), title=title)
+    axes.rects(x1, x2, y1, y2, color=(color, palette), title=title)
     assert_canvas_matches(canvas, "axes-rect")
 
 
@@ -1196,7 +1196,7 @@ def test_axes_text_angle_fill():
     x = numpy.zeros(10)
     y = x
     angle = numpy.linspace(-90, 0, len(x), endpoint=True)
-    fill = numpy.linspace(1, 0, len(x))
+    color = numpy.linspace(1, 0, len(x))
 
     canvas = toyplot.Canvas(400, 400)
     axes = canvas.axes(xmin=-0.25, xmax=0.5, ymin=-0.5, ymax=0.25)
@@ -1205,7 +1205,7 @@ def test_axes_text_angle_fill():
         y,
         text="Toyplot!",
         angle=angle,
-        fill=fill,
+        color=color,
         style={
             "font-size": "36px",
             "font-weight": "bold",

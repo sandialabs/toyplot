@@ -2154,10 +2154,7 @@ def _render(axes, mark, context):
                     "opacity": dopacity},
                 mark._mstyle)
             datum_xml = _render_marker(series_xml, dx, dy, dsize, dmarker,
-                           dstyle, mark._mlstyle, extra_class="toyplot-Datum")
-
-            if dtitle is not None:
-                xml.SubElement(datum_xml, "title").text = str(dtitle)
+                           dstyle, mark._mlstyle, extra_class="toyplot-Datum", title=dtitle)
 
 
 @dispatch(

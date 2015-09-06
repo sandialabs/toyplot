@@ -19,6 +19,19 @@ def step_impl(context):
         numpy.random.uniform(0.25, 0.1, size=context.series.shape[0]),
         ))
 
+@then(u'fills can be rendered with one explicit opacity')
+def step_impl(context):
+    context.axes.fill(context.series, opacity=0.2)
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "opacity-broadcast-fills-one-opacity")
+
+import sys
+@then(u'fills can be rendered with per-series opacities')
+def step_impl(context):
+    context.axes.fill(context.series, opacity=numpy.linspace(0.2, 0.8, 3))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "opacity-broadcast-fills-per-datum-opacities")
+
 @then(u'hlines can be rendered with one explicit opacity')
 def step_impl(context):
     context.axes.hlines(context.series[:,0], opacity=0.1)

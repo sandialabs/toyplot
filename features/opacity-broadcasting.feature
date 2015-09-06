@@ -8,6 +8,8 @@ Feature: Opacity Broadcasting
 
         Examples:
             | mark                         | opacity                                              |
+            | fills                        | one explicit opacity                                 |
+            | fills                        | per-series opacities                                 |
             | hlines                       | one explicit opacity                                 |
             | hlines                       | per-datum opacities                                  |
             | rects                        | one explicit opacity                                 |

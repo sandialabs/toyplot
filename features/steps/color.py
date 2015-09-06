@@ -628,6 +628,55 @@ def step_impl(context):
         context.canvas, "color-broadcast-plots-per-datum-values-colormap-marker")
 
 
+@then(u'rects can be rendered with default colors')
+def step_impl(context):
+    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1])
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-rects-default")
+
+@then(u'rects can be rendered with one explicit color')
+def step_impl(context):
+    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color="red")
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-rects-one-color")
+
+@then(u'rects can be rendered with per-datum explicit colors')
+def step_impl(context):
+    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=context.datum_colors[:-1,0])
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-rects-per-datum-colors")
+
+@then(u'rects can be rendered with palette colors')
+def step_impl(context):
+    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=toyplot.color.brewer("Set1"))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-rects-palette")
+
+@then(u'rects can be rendered with colormap colors')
+def step_impl(context):
+    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-rects-colormap")
+
+@then(u'rects can be rendered with per-datum value colors')
+def step_impl(context):
+    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=context.datum_values[:-1,0])
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-rects-per-datum-values")
+
+@then(u'rects can be rendered with per-datum value + palette colors')
+def step_impl(context):
+    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=(context.datum_values[:-1,0], toyplot.color.brewer("Reds")))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-rects-per-datum-values-palette")
+
+@then(u'rects can be rendered with per-datum value + colormap colors')
+def step_impl(context):
+    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=(context.datum_values[:-1,0], toyplot.color.LinearMap()))
+    toyplot.testing.assert_canvas_equal(
+        context.canvas, "color-broadcast-rects-per-datum-values-colormap")
+
+
 
 @then(u'scatterplots can be rendered with default colors')
 def step_impl(context):

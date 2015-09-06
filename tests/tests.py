@@ -1156,14 +1156,14 @@ def test_axes_scatterplot_markers():
 def test_axes_rect_singular():
     canvas = toyplot.Canvas()
     axes = canvas.axes(xmin=0, xmax=1, ymin=0, ymax=1)
-    axes.rect(0.1, 0.2, 0.3, 0.6)
+    axes.rects(0.1, 0.2, 0.3, 0.6)
     assert_canvas_matches(canvas, "axes-rect-singular")
 
 
 def test_axes_rect_singular_along_y():
     canvas = toyplot.Canvas()
     axes = canvas.axes(xmin=0, xmax=1, ymin=0, ymax=1)
-    axes.rect(0.1, 0.2, 0.3, 0.6, along="y")
+    axes.rects(0.1, 0.2, 0.3, 0.6, along="y")
     assert_canvas_matches(canvas, "axes-rect-singular-along-y")
 
 
@@ -1172,13 +1172,13 @@ def test_axes_rect():
     x2 = x1 + 0.5
     y1 = x1 - 0.5
     y2 = x1 ** 1.5
-    fill = x1
+    color = x1
     title = x1
     palette = toyplot.color.brewer("BlueRed")
 
     canvas = toyplot.Canvas()
     axes = canvas.axes()
-    axes.rect(x1, x2, y1, y2, fill=(fill, palette), title=title)
+    axes.rects(x1, x2, y1, y2, color=(color, palette), title=title)
     assert_canvas_matches(canvas, "axes-rect")
 
 

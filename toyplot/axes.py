@@ -1696,14 +1696,14 @@ class Cartesian(object):
                 filename=filename))
         return self._children[-1]
 
-    def rect(
+    def rects(
             self,
             a,
             b,
             c,
             d,
             along="x",
-            fill=None,
+            color=None,
             opacity=1.0,
             title=None,
             style={
@@ -1722,10 +1722,10 @@ class Cartesian(object):
 
         default_color = next(self._rect_colors)
         table["toyplot:fill"] = toyplot.color.broadcast(
-            colors=fill,
-            shape=(table.shape[0],),
+            colors=color,
+            shape=(table.shape[0], 1),
             default=default_color,
-            )
+            )[:,0]
 
         if along == "x":
             left_right_axis = "x"

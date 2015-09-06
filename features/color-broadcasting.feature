@@ -1,4 +1,4 @@
-Feature: Broadcasting
+Feature: Color Broadcasting
     Scenario Outline: Color broadcasting use-cases
         Given a set of cartesian axes
         And a set of diverging series
@@ -93,3 +93,4 @@ Feature: Broadcasting
             | vlines                       | per-datum value colors                               |
             | vlines                       | per-datum value + palette colors                     |
             | vlines                       | per-datum value + colormap colors                    |
+

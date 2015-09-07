@@ -22,6 +22,7 @@ Contents:
   labels-and-legends.rst
   markers.rst
   matrix-visualization.rst
+  null-data.rst
   rendering.rst
   table-axes.rst
   text.rst

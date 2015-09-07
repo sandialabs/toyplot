@@ -85,6 +85,7 @@ notebooks = [
         "labels-and-legends",
         "markers",
         "matrix-visualization",
+        "null-data",
         "rendering",
         "table-axes",
         "text",

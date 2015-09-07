@@ -1,8 +1,9 @@
-.. _ethos:
 
 .. image:: ../artwork/toyplot.png
   :width: 200px
   :align: right
+
+.. _ethos:
 
 The Toyplot Ethos
 =================

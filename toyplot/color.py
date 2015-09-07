@@ -96,6 +96,8 @@ def broadcast(colors, shape, default=None):
     if colors is None and default is None:
         raise ValueError("Must supply colors or default.")
     if not isinstance(shape, tuple):
+        shape = (shape,)
+    if not isinstance(shape, tuple):
         raise ValueError("Shape parameter must be a tuple with length 1 or 2.")
     if not 0 < len(shape) < 3:
         raise ValueError("Shape parameter must be a tuple with length 1 or 2.")

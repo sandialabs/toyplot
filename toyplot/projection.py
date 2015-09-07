@@ -18,7 +18,10 @@ def _log(x, base):
 def _in_range(a, x, b):
     left = min(a, b)
     right = max(a, b)
-    return numpy.logical_and(left <= x, x <= right)
+    old_settings = numpy.seterr(invalid="ignore")
+    result = numpy.logical_and(left <= x, x <= right)
+    numpy.seterr(**old_settings)
+    return result
 
 
 class Piecewise(object):

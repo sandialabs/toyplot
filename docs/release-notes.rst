@@ -7,6 +7,31 @@
 Release Notes
 =============
 
+Toyplot 0.8.0 - September 7, 2015
+---------------------------------
+
+* Removed deprecated colormap and palette parameters from the API.
+* Allow simplified color mapping specifications.
+* Improved test coverage.
+* Fix a problem embedding embedding axes in tables using more than one merged cell.
+* Add table cell width / height support for real-world units.
+* Hide masked values in table axes.
+* Reorganize the installation documentation.
+* Add support for rotated text in table cells.
+* Add top/bottom/left/right label support for matrix visualizations.
+* Add new toyplot.locator.Null do-nothing tick locator.
+* Add matrix visualization support for right / bottom ticks.
+* Add custom locator support for matrix visualizations.
+* Make matrix visualization color parameters consistent with the rest of the API.
+* Add missing reference documentation for toyplot.projection module.
+* Cleanup the toyplot.color.broadcast(...) API and implementation.
+* Make the API for specifying color mapping consistent across all visualization types.
+* Allow per-datum titles on line plots and scatterplots.
+* Expand the color section in the user guide to cover color mapping.
+* Add a new section on null data to the user guide.
+* Eliminate nuisance warnings from numpy.
+* Automatically validate source notebooks as part of the documentation build.
+
 Toyplot 0.7.0 - August 12, 2015
 -------------------------------
 

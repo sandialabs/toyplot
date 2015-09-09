@@ -1284,18 +1284,18 @@ class Cartesian(object):
             c,
             d,
             along="x",
-            vertex_color=None,
-            marker="o",
-            size=20,
-            fill=None,
-            opacity=1.0,
-            title=None,
-            edge_color=None,
-            edge_width=1.0,
-            edge_opacity=1.0,
-            edge_style=None,
-            mstyle=None,
-            mlstyle=None): # pragma: no cover
+            vcolor=None,
+            vmarker="o",
+            vsize=20,
+            vopacity=1.0,
+            vtitle=None,
+            vstyle=None,
+            vlstyle=None,
+            ecolor=None,
+            ewidth=1.0,
+            eopacity=1.0,
+            estyle=None,
+            ): # pragma: no cover
         """Add a graph plot to the axes.
 
         Parameters
@@ -1304,7 +1304,7 @@ class Cartesian(object):
           If `a` and `b` are provided, they specify the X coordinates and Y
           coordinates of each point in the plot.  If only `a` is provided, it
           specifies the Y coordinates, and the X coordinates will range from [0, N).
-        title: string, optional
+        vtitle: string, optional
           Human-readable title for the mark.  The SVG / HTML backends render the
           title as a tooltip.
         style: dict, optional
@@ -1323,34 +1323,29 @@ class Cartesian(object):
         target = toyplot.require.integer_vector(d, len(source))
 
         default_color = [next(self._graph_colors)]
-        vertex_color = toyplot.color.broadcast(
-            colors=vertex_color,
+        vcolor = toyplot.color.broadcast(
+            colors=vcolor,
             shape=series.shape,
             default=default_color,
             )
 
-        marker = toyplot.broadcast.object(marker, series.shape)
-        msize = toyplot.broadcast.scalar(size, series.shape)
-        mfill = toyplot.color.broadcast(
-            colors=fill,
-            shape=series.shape,
-            default=vertex_color,
-            )
-        mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
-        mopacity = toyplot.broadcast.scalar(opacity, series.shape)
-        title = toyplot.broadcast.object(title, series.shape)
-        mstyle = toyplot.style.combine({}, toyplot.require.style(mstyle))
-        mlstyle = toyplot.style.combine(toyplot.require.style(mlstyle))
+        vmarker = toyplot.broadcast.object(vmarker, series.shape)
+        vsize = toyplot.broadcast.scalar(vsize, series.shape)
+        vstroke = toyplot.color.broadcast(colors=vcolor, shape=series.shape)
+        vopacity = toyplot.broadcast.scalar(vopacity, series.shape)
+        vtitle = toyplot.broadcast.object(vtitle, series.shape)
+        vstyle = toyplot.style.combine({}, toyplot.require.style(vstyle))
+        vlstyle = toyplot.style.combine(toyplot.require.style(vlstyle))
 
-        edge_color = toyplot.color.broadcast(
-            colors=edge_color,
+        ecolor = toyplot.color.broadcast(
+            colors=ecolor,
             shape=source.shape,
             default=default_color,
             )
-        edge_width = toyplot.broadcast.scalar(edge_width, source.shape)
-        edge_opacity = toyplot.broadcast.scalar(edge_opacity, source.shape)
-        edge_style = toyplot.style.combine(
-            {}, toyplot.require.style(edge_style))
+        ewidth = toyplot.broadcast.scalar(ewidth, source.shape)
+        eopacity = toyplot.broadcast.scalar(eopacity, source.shape)
+        estyle = toyplot.style.combine(
+            {}, toyplot.require.style(estyle))
 
         if along == "x":
             self._update_domain(position, series)
@@ -1365,21 +1360,21 @@ class Cartesian(object):
         _mark_exportable(vertex_table, coordinate_axis)
         vertex_table[series_axis] = series
         _mark_exportable(vertex_table, series_axis)
-        vertex_table["marker"] = marker
-        vertex_table["size"] = msize
-        vertex_table["fill"] = mfill
-        vertex_table["stroke"] = mstroke
-        vertex_table["opacity"] = mopacity
-        vertex_table["title"] = title
+        vertex_table["marker"] = vmarker
+        vertex_table["size"] = vsize
+        vertex_table["fill"] = vcolor
+        vertex_table["stroke"] = vstroke
+        vertex_table["opacity"] = vopacity
+        vertex_table["title"] = vtitle
 
         edge_table = toyplot.data.Table()
         edge_table["source"] = source
         _mark_exportable(edge_table, "source")
         edge_table["target"] = target
         _mark_exportable(edge_table, "target")
-        edge_table["stroke"] = edge_color
-        edge_table["stroke-width"] = edge_width
-        edge_table["stroke-opacity"] = edge_opacity
+        edge_table["stroke"] = ecolor
+        edge_table["stroke-width"] = ewidth
+        edge_table["stroke-opacity"] = eopacity
 
         self._children.append(
             toyplot.mark.Graph(
@@ -1394,8 +1389,8 @@ class Cartesian(object):
                 mstroke=["stroke"],
                 mopacity=["opacity"],
                 title=["title"],
-                mstyle=mstyle,
-                mlstyle=mlstyle,
+                mstyle=vstyle,
+                mlstyle=vlstyle,
                 edge_table=edge_table,
                 source=["source"],
                 target=["target"],
@@ -1403,7 +1398,7 @@ class Cartesian(object):
                 stroke=["stroke"],
                 stroke_width=["stroke-width"],
                 stroke_opacity=["stroke-opacity"],
-                edge_style=edge_style))
+                edge_style=estyle))
         return self._children[-1]
 
     def plot(

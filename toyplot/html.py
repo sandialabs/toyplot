@@ -1909,7 +1909,7 @@ def _render(axes, mark, context): # pragma: no cover
     mfill = mark._vertex_table[mark._mfill[0]]
     mstroke = mark._vertex_table[mark._mstroke[0]]
     mopacity = mark._vertex_table[mark._mopacity[0]]
-    title = mark._title
+    title = mark._vertex_table[mark._title[0]]
 
     stroke = mark._stroke
     stroke_width = mark._stroke_width
@@ -1945,8 +1945,8 @@ def _render(axes, mark, context): # pragma: no cover
     vertex_xml = xml.SubElement(
         mark_xml, "g", attrib={"class": "toyplot-Vertices"})
     msize = numpy.sqrt(msize)
-    for dx, dy, dmarker, dsize, dfill, dstroke, dopacity in itertools.izip(
-            x, y, marker, msize, mfill, mstroke, mopacity):
+    for dx, dy, dmarker, dsize, dfill, dstroke, dopacity, dtitle in itertools.izip(
+            x, y, marker, msize, mfill, mstroke, mopacity, title):
         dstyle = toyplot.style.combine(
             {
                 "fill": toyplot.color.to_css(dfill),
@@ -1954,11 +1954,7 @@ def _render(axes, mark, context): # pragma: no cover
                 "opacity": dopacity},
             mark._mstyle)
         _render_marker(vertex_xml, dx, dy, dsize, dmarker,
-                       dstyle, mark._mlstyle, extra_class="toyplot-Datum")
-
-    if title is not None:
-        xml.SubElement(vertex_xml, "title").text = str(title)
-
+                       dstyle, mark._mlstyle, extra_class="toyplot-Datum", title=dtitle)
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Plot, _RenderContext)
 def _render(axes, mark, context):

@@ -19,6 +19,8 @@ Toyplot yet, drop them a line and let them know you'd like them to add it!
 .. toctree::
   :maxdepth: 2
 
+  conda-installation.rst
+  freebsd-installation.rst
   macports-installation.rst
 
 Using Pip / Easy Install

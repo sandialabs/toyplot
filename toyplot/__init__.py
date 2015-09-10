@@ -150,6 +150,62 @@ def fill(
     return canvas, axes, mark
 
 
+def graph(
+        a,
+        b,
+        c,
+        d,
+        along="x",
+        vcolor=None,
+        vmarker="o",
+        vsize=20,
+        vopacity=1.0,
+        vtitle=None,
+        vstyle=None,
+        vlstyle=None,
+        ecolor=None,
+        ewidth=1.0,
+        eopacity=1.0,
+        estyle=None,
+        width=None,
+        height=None,
+        canvas_style=None,
+        ): # pragma: no cover
+    """Convenience function for creating a graph plot in a single call.
+
+    See :meth:`toyplot.axes.Cartesian.graph`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+
+    Returns
+    -------
+    canvas: :class:`toyplot.canvas.Canvas`
+        A new canvas object.
+    axes: :class:`toyplot.axes.Cartesian`
+        A new set of 2D axes that fill the canvas.
+    mark: :class:`toyplot.mark.Graph`
+        The new graph mark.
+    """
+    canvas = Canvas(width=width, height=height, style=canvas_style)
+    axes = canvas.axes(show=False)
+    mark = axes.graph(
+        a=a,
+        b=b,
+        c=c,
+        d=d,
+        along=along,
+        vcolor=vcolor,
+        vmarker=vmarker,
+        vsize=vsize,
+        vopacity=vopacity,
+        vtitle=vtitle,
+        vstyle=vstyle,
+        vlstyle=vlstyle,
+        ecolor=ecolor,
+        ewidth=ewidth,
+        eopacity=eopacity,
+        estyle=estyle,
+        )
+    return canvas, axes, mark
+
 def matrix(
         data,
         label=None,

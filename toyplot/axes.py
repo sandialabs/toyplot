@@ -1324,8 +1324,8 @@ class Cartesian(object):
         target = toyplot.require.integer_vector(d, len(source))
 
         if layout is None:
-            layout = toyplot.layout.Random(seed=1234)
-        layout.compute(position, series, source, target)
+            layout = toyplot.layout.GraphViz()
+        layout.compute(position, series, zip(source, target))
 
         default_color = [next(self._graph_colors)]
         vcolor = toyplot.color.broadcast(

@@ -7,12 +7,12 @@
 
 from __future__ import division
 
+import io
 import numbers
 import numpy
 import subprocess
 import toyplot.compatibility
 import toyplot.units
-import StringIO
 
 def region(
         xmin,
@@ -219,7 +219,7 @@ class Random(Graph):
 class GraphViz(Graph):
     """Compute a graph layout using GraphViz."""
     def compute(self, x, y, edges):
-        dotfile = StringIO.StringIO()
+        dotfile = io.BytesIO()
         dotfile.write("digraph {\n")
         for source, target in edges:
             dotfile.write("%s -> %s\n" % (source, target))
@@ -237,7 +237,7 @@ class GraphViz(Graph):
         stdout, stderr = graphviz.communicate(dotfile.getvalue())
         vertices = []
         edges = []
-        for line in StringIO.StringIO(stdout):
+        for line in io.BytesIO(stdout):
             if line.startswith("node"):
                 vertices.append(line.split())
             elif line.startswith("edge"):

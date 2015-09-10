@@ -184,3 +184,20 @@ def region(
         )
     # If nothing else fits, consume the entire region
     return (xmin + gutter, xmax - gutter, ymin + gutter, ymax - gutter)
+
+class Graph(object):
+    """Base class for graph layout algorithms - objects that compute the positions and orientations of graph vertices and edges."""
+
+    def layout(self, x, y, sources, targets):
+        """Return a set of coordinates for the given graph.
+
+        Parameters
+        ----------
+        x, y: numpy.ma.array
+            Coordinates for each vertex in the graph.  The arrays will contain
+            masked values for each vertex whose coordinates should be computed.
+        sources, targets: numpy.array
+            Vertex indices for each edge in the graph.
+        """
+
+        raise NotImplementedError()

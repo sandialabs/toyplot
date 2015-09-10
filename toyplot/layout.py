@@ -8,6 +8,7 @@
 from __future__ import division
 
 import numbers
+import numpy
 import toyplot.compatibility
 import toyplot.units
 
@@ -188,7 +189,7 @@ def region(
 class Graph(object):
     """Base class for graph layout algorithms - objects that compute the positions and orientations of graph vertices and edges."""
 
-    def layout(self, x, y, sources, targets):
+    def compute(self, x, y, source, target):
         """Return a set of coordinates for the given graph.
 
         Parameters
@@ -196,8 +197,23 @@ class Graph(object):
         x, y: numpy.ma.array
             Coordinates for each vertex in the graph.  The arrays will contain
             masked values for each vertex whose coordinates should be computed.
-        sources, targets: numpy.array
+        source, target: numpy.array
             Vertex indices for each edge in the graph.
         """
 
         raise NotImplementedError()
+
+class Null(Graph):
+    """Do-nothing graph layout."""
+    def compute(self, x, y, source, target):
+        pass
+
+class Random(Graph):
+    """Compute a random graph layout."""
+    def __init__(self, seed):
+        self._generator = numpy.random.RandomState(seed=seed)
+
+    def compute(self, x, y, source, target):
+        x[...] = self._generator.uniform(size=x.shape)
+        y[...] = self._generator.uniform(size=y.shape)
+

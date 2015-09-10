@@ -1283,6 +1283,7 @@ class Cartesian(object):
             b,
             c,
             d,
+            layout=None,
             along="x",
             vcolor=None,
             vmarker="o",
@@ -1321,6 +1322,10 @@ class Cartesian(object):
         series = toyplot.require.scalar_vector(b, len(position))
         source = toyplot.require.integer_vector(c)
         target = toyplot.require.integer_vector(d, len(source))
+
+        if layout is None:
+            layout = toyplot.layout.Random(seed=1234)
+        layout.compute(position, series, source, target)
 
         default_color = [next(self._graph_colors)]
         vcolor = toyplot.color.broadcast(

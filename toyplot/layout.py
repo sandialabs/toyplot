@@ -190,21 +190,18 @@ def region(
 class Graph(object):
     """Base class for graph layout algorithms - objects that compute the positions and orientations of graph vertices and edges."""
 
-    def compute(self, x, y, edges):
+    def graph(self, vcount, edges, vcoordinates):
         """Return a set of coordinates for the given graph.
 
         Parameters
         ----------
-        x, y: numpy.ma.array
-            Coordinates for each vertex in the graph.  The arrays will contain
-            masked values for each vertex whose coordinates should be computed.
         """
 
         raise NotImplementedError()
 
 class Null(Graph):
     """Do-nothing graph layout."""
-    def compute(self, x, y, edges):
+    def graph(self, vcount, edges, vcoordinates):
         pass
 
 class Random(Graph):
@@ -212,13 +209,12 @@ class Random(Graph):
     def __init__(self, seed):
         self._generator = numpy.random.RandomState(seed=seed)
 
-    def compute(self, x, y, edges):
-        x[...] = self._generator.uniform(size=x.shape)
-        y[...] = self._generator.uniform(size=y.shape)
+    def graph(self, vcount, edges, vcoordinates):
+        vcoordinates[...] = self._generator.uniform(size=vcoordinates.shape)
 
 class GraphViz(Graph):
     """Compute a graph layout using GraphViz."""
-    def compute(self, x, y, edges):
+    def graph(self, vcount, edges, vcoordinates):
         dotfile = io.BytesIO()
         dotfile.write("digraph {\n")
         for source, target in edges:
@@ -243,6 +239,7 @@ class GraphViz(Graph):
             elif line.startswith("edge"):
                 edges.append(line.split())
         for index, vertex in enumerate(vertices):
-            x[index] = float(vertex[2])
-            y[index] = float(vertex[3])
-
+            vcoordinates[index, 0] = float(vertex[2])
+            vcoordinates[index, 1] = float(vertex[3])
+        #for edge in edges:
+        #    print edge

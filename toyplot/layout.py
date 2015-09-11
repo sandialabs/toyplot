@@ -188,25 +188,47 @@ def region(
     return (xmin + gutter, xmax - gutter, ymin + gutter, ymax - gutter)
 
 class Graph(object):
-    """Base class for graph layout algorithms - objects that compute the positions and orientations of graph vertices and edges."""
-
+    """Base class for graph layout algorithms - objects that compute coordinates for graph vertices and edges."""
     def graph(self, vcount, edges):
-        """Return a set of coordinates for the given graph.
-
-        Parameters
-        ----------
-        """
-
         raise NotImplementedError()
+
+
+class GraphEdges(object):
+    """Based class for graph edge layout algorithms - objects that compute coordinates for graph edges only."""
+    def edges(self, vcount, edges, vcoordinates):
+        raise NotImplementedError()
+
+
+class StraightEdges(GraphEdges):
+    """Creates straight edges between graph vertices."""
+    def edges(self, vcount, edges, vcoordinates):
+        eshape = []
+        ecoordinates = []
+        for source, target in edges:
+            eshape.append("ML")
+            ecoordinates.append([vcoordinates[source][0], vcoordinates[source][1]])
+            ecoordinates.append([vcoordinates[target][0], vcoordinates[target][1]])
+
+        eshape = numpy.array(eshape)
+        ecoordinates = numpy.array(ecoordinates)
+
+        return eshape, ecoordinates
+
 
 class Random(Graph):
     """Compute a random graph layout."""
-    def __init__(self, seed):
+    def __init__(self, edges=None, seed=1234):
+        if edges is None:
+            edges = StraightEdges()
+
+        self._edges = edges
         self._generator = numpy.random.RandomState(seed=seed)
 
     def graph(self, vcount, edges):
         vcoordinates = numpy.ma.array(self._generator.uniform(size=(vcount, 2)))
-        return vcoordinates, None, None
+        eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
+        return vcoordinates, eshape, ecoordinates
+
 
 class GraphViz(Graph):
     """Compute a graph layout using GraphViz."""

@@ -316,7 +316,9 @@ class Graph(Mark): # pragma: no cover
             for segment in shape:
                 if segment == "M":
                     ecoordinate_count += 1
-                elif segment =="C":
+                elif segment == "L":
+                    ecoordinate_count += 1
+                elif segment == "C":
                     ecoordinate_count += 3
                 else:
                     raise ValueError("Unknown edge shape segment: %s" % segment)

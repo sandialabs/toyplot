@@ -1928,6 +1928,8 @@ def _render(axes, mark, context): # pragma: no cover
         for segment in eshape:
             if segment == "M":
                 count = 1
+            elif segment == "L":
+                count = 1
             elif segment == "C":
                 count = 3
             path.append(segment)

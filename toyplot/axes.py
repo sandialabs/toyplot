@@ -1327,7 +1327,7 @@ class Cartesian(object):
         if layout is None:
             layout = toyplot.layout.GraphViz()
         #vcoordinates = numpy.ma.column_stack((vcoordinates_a, vcoordinates_b))
-        vcoordinates, epaths, ecoordinates = layout.graph(vcount, zip(source, target))
+        vcoordinates, eshape, ecoordinates = layout.graph(vcount, zip(source, target))
 
         default_color = [next(self._graph_colors)]
         vcolor = toyplot.color.broadcast(
@@ -1355,9 +1355,11 @@ class Cartesian(object):
 
         if along == "x":
             self._update_domain(vcoordinates.T[0], vcoordinates.T[1])
+            self._update_domain(ecoordinates.T[0], ecoordinates.T[1])
             coordinate_axes = ["x", "y"]
         elif along == "y":
             self._update_domain(vcoordinates.T[1], vcoordinates.T[0])
+            self._update_domain(ecoordinates.T[1], ecoordinates.T[0])
             coordinate_axes = ["y", "x"]
 
         vtable = toyplot.data.Table()
@@ -1375,9 +1377,10 @@ class Cartesian(object):
         _mark_exportable(etable, "source")
         etable["target"] = target
         _mark_exportable(etable, "target")
-        etable["ecolor"] = ecolor
-        etable["ewidth"] = ewidth
-        etable["eopacity"] = eopacity
+        etable["shape"] = eshape
+        etable["color"] = ecolor
+        etable["width"] = ewidth
+        etable["opacity"] = eopacity
 
         self._children.append(
             toyplot.mark.Graph(
@@ -1394,9 +1397,11 @@ class Cartesian(object):
                 etable=etable,
                 esource=["source"],
                 etarget=["target"],
-                ecolor=["ecolor"],
-                ewidth=["ewidth"],
-                eopacity=["eopacity"],
+                eshape=["shape"],
+                ecoordinates=ecoordinates,
+                ecolor=["color"],
+                ewidth=["width"],
+                eopacity=["opacity"],
                 estyle=estyle))
         return self._children[-1]
 

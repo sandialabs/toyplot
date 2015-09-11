@@ -1894,39 +1894,61 @@ def _render(canvas, legend, context):
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Graph, _RenderContext)
 def _render(axes, mark, context): # pragma: no cover
+    # Project edge coordinates
     for i in range(2):
         if mark._coordinate_axes[i] == "x":
-            x = axes._project_x(mark._vtable[mark._vcoordinates[i]])
+            x = axes._project_x(mark._ecoordinates.T[i])
         elif mark._coordinate_axes[i] == "y":
-            y = axes._project_y(mark._vtable[mark._vcoordinates[i]])
+            y = axes._project_y(mark._ecoordinates.T[i])
 
     mark_xml = xml.SubElement(context.root, "g", id=context.get_id(mark), attrib={"class": "toyplot-mark-Graph"})
     #context.add_data_table(mark, mark._vtable, title="Graph Vertex Data", filename=mark._vertex_filename)
     #context.add_data_table(mark, mark._etable, title="Graph Edge Data", filename=mark._edge_filename)
+
+    coordinate_index = 0
     edge_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Edges"})
-    for esource, etarget, ecolor, ewidth, eopacity in itertools.izip(
+    for esource, etarget, eshape, ecolor, ewidth, eopacity in itertools.izip(
         mark._etable[mark._esource[0]],
         mark._etable[mark._etarget[0]],
+        mark._etable[mark._eshape[0]],
         mark._etable[mark._ecolor[0]],
         mark._etable[mark._ewidth[0]],
         mark._etable[mark._eopacity[0]],
         ):
         estyle = toyplot.style.combine(
             {
+            "fill": "none",
             "stroke": toyplot.color.to_css(ecolor),
             "stroke-width": ewidth,
             "stroke-opacity": eopacity,
             },
             mark._estyle)
+
+        path = []
+        for segment in eshape:
+            if segment == "M":
+                count = 1
+            elif segment == "C":
+                count = 3
+            path.append(segment)
+            for i in range(count):
+                path.append(str(x[coordinate_index]))
+                path.append(str(y[coordinate_index]))
+                coordinate_index += 1
+
         xml.SubElement(
             edge_xml,
-            "line",
-            x1=repr(x[esource]),
-            y1=repr(y[esource]),
-            x2=repr(x[etarget]),
-            y2=repr(y[etarget]),
+            "path",
+            d=" ".join(path),
             style=_css_style(estyle),
             )
+
+    # Project vertex coordinates
+    for i in range(2):
+        if mark._coordinate_axes[i] == "x":
+            x = axes._project_x(mark._vtable[mark._vcoordinates[i]])
+        elif mark._coordinate_axes[i] == "y":
+            y = axes._project_y(mark._vtable[mark._vcoordinates[i]])
 
     vertex_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Vertices"})
     for vx, vy, vmarker, vsize, vcolor, vopacity, vtitle in itertools.izip(

@@ -220,7 +220,7 @@ class GraphViz(Graph):
         dotfile.write("}\n")
 
         command = [
-            "fdp",
+            "dot",
             "-Tplain",
             ]
         graphviz = subprocess.Popen(
@@ -244,17 +244,18 @@ class GraphViz(Graph):
             vcoordinates[index, 0] = float(vertex[2])
             vcoordinates[index, 1] = float(vertex[3])
 
-        epaths = []
+        eshape = []
         ecoordinates = []
         for edge in edges:
             count = int(edge[3])
-            if count != 4:
-                raise NotImplementedError()
-            epaths.append("MC")
-            for i in range(4, 4 + count, 2):
+            shape = "M"
+            for i in range((count - 1) // 3):
+                shape += "C"
+            eshape.append(shape)
+            for i in range(4, 4 + count * 2, 2):
                 ecoordinates.append([float(edge[i]), float(edge[i+1])])
 
-        epaths = numpy.array(epaths)
+        eshape = numpy.array(eshape)
         ecoordinates = numpy.array(ecoordinates)
 
-        return vcoordinates, epaths, ecoordinates
+        return vcoordinates, eshape, ecoordinates

@@ -273,6 +273,8 @@ class Graph(Mark): # pragma: no cover
             etable,
             esource,
             etarget,
+            eshape,
+            ecoordinates,
             ecolor,
             ewidth,
             eopacity,
@@ -306,6 +308,22 @@ class Graph(Mark): # pragma: no cover
         self._esource = toyplot.require.table_keys(etable, esource, length=1)
         # 1 edge target column
         self._etarget = toyplot.require.table_keys(etable, etarget, length=1)
+        # 1 edge shape column
+        self._eshape = toyplot.require.table_keys(etable, eshape, length=1)
+
+        ecoordinate_count = 0
+        for shape in self._etable[self._eshape[0]]:
+            for segment in shape:
+                if segment == "M":
+                    ecoordinate_count += 1
+                elif segment =="C":
+                    ecoordinate_count += 3
+                else:
+                    raise ValueError("Unknown edge shape segment: %s" % segment)
+
+        # C x D edge coordinate columns
+        self._ecoordinates = toyplot.require.scalar_matrix(ecoordinates, rows=ecoordinate_count, columns=len(self._coordinate_axes))
+
         # 1 edge color column
         self._ecolor = toyplot.require.table_keys(etable, ecolor, length=1)
         # 1 edge width column

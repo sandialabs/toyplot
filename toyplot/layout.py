@@ -213,8 +213,9 @@ class GraphViz(Graph):
     def graph(self, vcount, edges):
         dotfile = io.BytesIO()
         dotfile.write("digraph {\n")
+        dotfile.write("node [fixedsize = shape; width=0; height=0;]\n")
         for vertex in numpy.arange(vcount):
-            dotfile.write("%s\n" % vertex)
+            dotfile.write("""%s\n""" % vertex)
         for source, target in edges:
             dotfile.write("%s -> %s\n" % (source, target))
         dotfile.write("}\n")
@@ -229,6 +230,9 @@ class GraphViz(Graph):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         stdout, stderr = graphviz.communicate(dotfile.getvalue())
+
+        if stderr:
+            toyplot.log.error(stderr)
 
         vertices = []
         edges = []

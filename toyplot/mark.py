@@ -260,83 +260,80 @@ class Graph(Mark): # pragma: no cover
 
     def __init__(
             self,
-            vertex_table,
-            coordinates,
+            vtable,
+            vcoordinates,
             coordinate_axis,
             series,
             series_axis,
-            marker,
-            msize,
-            mfill,
-            mstroke,
-            mopacity,
-            title,
-            mstyle,
-            mlstyle,
-            edge_table,
-            source,
-            target,
+            vmarker,
+            vsize,
+            vcolor,
+            vopacity,
+            vtitle,
+            vstyle,
+            vlstyle,
+            etable,
+            esource,
+            etarget,
             show_edges,
-            stroke,
-            stroke_width,
-            stroke_opacity,
-            edge_style):
-        vertex_table = toyplot.require.instance(
-            vertex_table, toyplot.data.Table)
-        coordinates = toyplot.require.table_keys(
-            vertex_table, coordinates, length=1)
+            ecolor,
+            ewidth,
+            eopacity,
+            estyle,
+            ):
+        vtable = toyplot.require.instance(
+            vtable, toyplot.data.Table)
+        vcoordinates = toyplot.require.table_keys(
+            vtable, vcoordinates, length=1)
         coordinate_axis = toyplot.require.string_vector(
             coordinate_axis, length=1)
-        series = toyplot.require.table_keys(vertex_table, series, length=1)
+        series = toyplot.require.table_keys(vtable, series, length=1)
         series_axis = toyplot.require.string_vector(series_axis, length=1)
-        marker = toyplot.require.table_keys(
-            vertex_table, marker, length=len(series))
-        msize = toyplot.require.table_keys(
-            vertex_table, msize, length=len(series))
-        mfill = toyplot.require.table_keys(
-            vertex_table, mfill, length=len(series))
-        mstroke = toyplot.require.table_keys(
-            vertex_table, mstroke, length=len(series))
-        mopacity = toyplot.require.table_keys(
-            vertex_table, mopacity, length=len(series))
-        title = toyplot.require.table_keys(
-            vertex_table, title, length=len(series))
-        mstyle = toyplot.require.style(mstyle)
-        mlstyle = toyplot.require.style(mlstyle)
+        vmarker = toyplot.require.table_keys(
+            vtable, vmarker, length=len(series))
+        vsize = toyplot.require.table_keys(
+            vtable, vsize, length=len(series))
+        vcolor = toyplot.require.table_keys(
+            vtable, vcolor, length=len(series))
+        vopacity = toyplot.require.table_keys(
+            vtable, vopacity, length=len(series))
+        vtitle = toyplot.require.table_keys(
+            vtable, vtitle, length=len(series))
+        vstyle = toyplot.require.style(vstyle)
+        vlstyle = toyplot.require.style(vlstyle)
 
-        edge_table = toyplot.require.instance(edge_table, toyplot.data.Table)
-        source = toyplot.require.table_keys(edge_table, source, length=1)
-        target = toyplot.require.table_keys(edge_table, target, length=1)
-        stroke = toyplot.require.table_keys(edge_table, stroke, length=1)
-        stroke_width = toyplot.require.table_keys(
-            edge_table, stroke_width, length=1)
-        stroke_opacity = toyplot.require.table_keys(
-            edge_table, stroke_opacity, length=1)
-        edge_style = toyplot.require.style(edge_style)
+        etable = toyplot.require.instance(etable, toyplot.data.Table)
+        esource = toyplot.require.table_keys(etable, esource, length=1)
+        etarget = toyplot.require.table_keys(etable, etarget, length=1)
+        ecolor = toyplot.require.table_keys(etable, ecolor, length=1)
+        ewidth = toyplot.require.table_keys(
+            etable, ewidth, length=1)
+        eopacity = toyplot.require.table_keys(
+            etable, eopacity, length=1)
+        estyle = toyplot.require.style(estyle)
 
         Mark.__init__(self)
-        self._vertex_table = vertex_table
-        self._coordinates = coordinates       # 1 coordinate column
+        self._vtable = vtable
+        self._vcoordinates = vcoordinates       # 1 coordinate column
         self._coordinate_axis = coordinate_axis  # 1 axis identifier
         self._series = series                 # 1 coordinate columns
         self._series_axis = series_axis       # 1 axis identifier
-        self._marker = marker                 # 1 marker columns
-        self._msize = msize                   # 1 marker size columns
-        self._mfill = mfill                   # 1 marker fill color columns
-        self._mstroke = mstroke               # 1 marker stroke color columns
-        self._mopacity = mopacity             # 1 marker opacity columns
-        self._title = title                   # 1 titles column
-        self._mstyle = mstyle                 # Marker style
-        self._mlstyle = mlstyle               # Marker label style
+        self._vmarker = vmarker                 # 1 vertex marker columns
+        self._vsize = vsize                   # 1 vertex marker size columns
+        self._vcolor = vcolor                   # 1 vertex marker color columns
+        self._vopacity = vopacity             # 1 marker opacity columns
+        self._vtitle = vtitle                   # 1 vertex titles column
+        self._vstyle = vstyle                 # Vertex marker style
+        self._vlstyle = vlstyle               # Vertex marker label style
 
-        self._edge_table = edge_table
-        self._source = source                 # 1 source column
-        self._target = target                 # 1 target column
+        self._etable = etable
+        self._esource = esource                 # 1 edge source column
+        self._etarget = etarget                 # 1 edge target column
         self._show_edges = show_edges         # Boolean
-        self._stroke = stroke                 # M stroke colors
-        self._stroke_width = stroke_width     # M stroke widths
-        self._stroke_opacity = stroke_opacity  # M stroke opacities
-        self._edge_style = edge_style         # Edge style
+        self._ecolor = ecolor                 # M edge colors
+        self._ewidth = ewidth     # M edge widths
+        self._eopacity = eopacity  # M edge opacities
+        self._estyle = estyle         # Edge style
 
 
 class Plot(Mark):

@@ -190,7 +190,7 @@ def region(
 class Graph(object):
     """Base class for graph layout algorithms - objects that compute the positions and orientations of graph vertices and edges."""
 
-    def graph(self, vcount, edges, vcoordinates):
+    def graph(self, vcount, edges, vcoordinates, ecoordinates):
         """Return a set of coordinates for the given graph.
 
         Parameters
@@ -201,7 +201,7 @@ class Graph(object):
 
 class Null(Graph):
     """Do-nothing graph layout."""
-    def graph(self, vcount, edges, vcoordinates):
+    def graph(self, vcount, edges, vcoordinates, ecoordinates):
         pass
 
 class Random(Graph):
@@ -214,7 +214,7 @@ class Random(Graph):
 
 class GraphViz(Graph):
     """Compute a graph layout using GraphViz."""
-    def graph(self, vcount, edges, vcoordinates):
+    def graph(self, vcount, edges, vcoordinates, ecoordinates):
         dotfile = io.BytesIO()
         dotfile.write("digraph {\n")
         for source, target in edges:
@@ -241,5 +241,8 @@ class GraphViz(Graph):
         for index, vertex in enumerate(vertices):
             vcoordinates[index, 0] = float(vertex[2])
             vcoordinates[index, 1] = float(vertex[3])
-        #for edge in edges:
-        #    print edge
+        for edge in edges:
+            ecoordinates[0].append(len(ecoordinates[1]))
+            for value in edge[4:4 + int(edge[3])]:
+                ecoordinates[1].append(float(value))
+

@@ -1326,7 +1326,8 @@ class Cartesian(object):
         if layout is None:
             layout = toyplot.layout.GraphViz()
         vcoordinates = numpy.ma.column_stack((position, series))
-        layout.graph(len(vcoordinates), zip(source, target), vcoordinates)
+        ecoordinates = [[], []]
+        layout.graph(len(vcoordinates), zip(source, target), vcoordinates, ecoordinates)
         position = vcoordinates.T[0]
         series = vcoordinates.T[1]
 
@@ -1339,7 +1340,6 @@ class Cartesian(object):
 
         vmarker = toyplot.broadcast.object(vmarker, series.shape)
         vsize = toyplot.broadcast.scalar(vsize, series.shape)
-        vstroke = toyplot.color.broadcast(colors=vcolor, shape=series.shape)
         vopacity = toyplot.broadcast.scalar(vopacity, series.shape)
         vtitle = toyplot.broadcast.object(vtitle, series.shape)
         vstyle = toyplot.style.combine({}, toyplot.require.style(vstyle))
@@ -1363,50 +1363,48 @@ class Cartesian(object):
         coordinate_axis = along
         series_axis = "y" if along == "x" else "x"
 
-        vertex_table = toyplot.data.Table()
-        vertex_table[coordinate_axis] = position
-        _mark_exportable(vertex_table, coordinate_axis)
-        vertex_table[series_axis] = series
-        _mark_exportable(vertex_table, series_axis)
-        vertex_table["marker"] = vmarker
-        vertex_table["size"] = vsize
-        vertex_table["fill"] = vcolor
-        vertex_table["stroke"] = vstroke
-        vertex_table["opacity"] = vopacity
-        vertex_table["title"] = vtitle
+        vtable = toyplot.data.Table()
+        vtable[coordinate_axis] = position
+        _mark_exportable(vtable, coordinate_axis)
+        vtable[series_axis] = series
+        _mark_exportable(vtable, series_axis)
+        vtable["marker"] = vmarker
+        vtable["size"] = vsize
+        vtable["color"] = vcolor
+        vtable["opacity"] = vopacity
+        vtable["title"] = vtitle
 
-        edge_table = toyplot.data.Table()
-        edge_table["source"] = source
-        _mark_exportable(edge_table, "source")
-        edge_table["target"] = target
-        _mark_exportable(edge_table, "target")
-        edge_table["stroke"] = ecolor
-        edge_table["stroke-width"] = ewidth
-        edge_table["stroke-opacity"] = eopacity
+        etable = toyplot.data.Table()
+        etable["source"] = source
+        _mark_exportable(etable, "source")
+        etable["target"] = target
+        _mark_exportable(etable, "target")
+        etable["ecolor"] = ecolor
+        etable["ewidth"] = ewidth
+        etable["eopacity"] = eopacity
 
         self._children.append(
             toyplot.mark.Graph(
-                vertex_table=vertex_table,
-                coordinates=coordinate_axis,
+                vtable=vtable,
+                vcoordinates=coordinate_axis,
                 coordinate_axis=coordinate_axis,
                 series=series_axis,
                 series_axis=series_axis,
-                marker=["marker"],
-                msize=["size"],
-                mfill=["fill"],
-                mstroke=["stroke"],
-                mopacity=["opacity"],
-                title=["title"],
-                mstyle=vstyle,
-                mlstyle=vlstyle,
-                edge_table=edge_table,
-                source=["source"],
-                target=["target"],
+                vmarker=["marker"],
+                vsize=["size"],
+                vcolor=["color"],
+                vopacity=["opacity"],
+                vtitle=["title"],
+                vstyle=vstyle,
+                vlstyle=vlstyle,
+                etable=etable,
+                esource=["source"],
+                etarget=["target"],
                 show_edges=True,
-                stroke=["stroke"],
-                stroke_width=["stroke-width"],
-                stroke_opacity=["stroke-opacity"],
-                edge_style=estyle))
+                ecolor=["ecolor"],
+                ewidth=["ewidth"],
+                eopacity=["eopacity"],
+                estyle=estyle))
         return self._children[-1]
 
     def plot(

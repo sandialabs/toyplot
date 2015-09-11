@@ -190,7 +190,7 @@ def region(
 class Graph(object):
     """Base class for graph layout algorithms - objects that compute the positions and orientations of graph vertices and edges."""
 
-    def graph(self, vcount, edges, vcoordinates, ecoordinates):
+    def graph(self, vcount, edges):
         """Return a set of coordinates for the given graph.
 
         Parameters
@@ -244,15 +244,17 @@ class GraphViz(Graph):
             vcoordinates[index, 0] = float(vertex[2])
             vcoordinates[index, 1] = float(vertex[3])
 
-        ecounts = []
+        epaths = []
         ecoordinates = []
         for edge in edges:
             count = int(edge[3])
-            ecounts.append(count)
+            if count != 4:
+                raise NotImplementedError()
+            epaths.append("MC")
             for i in range(4, 4 + count, 2):
                 ecoordinates.append([float(edge[i]), float(edge[i+1])])
 
-        ecounts = numpy.array(ecounts)
+        epaths = numpy.array(epaths)
         ecoordinates = numpy.array(ecoordinates)
 
-        return vcoordinates, ecounts, ecoordinates
+        return vcoordinates, epaths, ecoordinates

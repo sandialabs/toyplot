@@ -1326,9 +1326,8 @@ class Cartesian(object):
 
         if layout is None:
             layout = toyplot.layout.GraphViz()
-        vcoordinates = numpy.ma.column_stack((vcoordinates_a, vcoordinates_b))
-        ecoordinates = [[], []]
-        layout.graph(vcount, zip(source, target), vcoordinates, ecoordinates)
+        #vcoordinates = numpy.ma.column_stack((vcoordinates_a, vcoordinates_b))
+        vcoordinates, ecounts, ecoordinates = layout.graph(vcount, zip(source, target))
 
         default_color = [next(self._graph_colors)]
         vcolor = toyplot.color.broadcast(

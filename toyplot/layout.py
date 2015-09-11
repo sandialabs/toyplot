@@ -199,24 +199,22 @@ class Graph(object):
 
         raise NotImplementedError()
 
-class Null(Graph):
-    """Do-nothing graph layout."""
-    def graph(self, vcount, edges, vcoordinates, ecoordinates):
-        pass
-
 class Random(Graph):
     """Compute a random graph layout."""
     def __init__(self, seed):
         self._generator = numpy.random.RandomState(seed=seed)
 
-    def graph(self, vcount, edges, vcoordinates):
-        vcoordinates[...] = self._generator.uniform(size=vcoordinates.shape)
+    def graph(self, vcount, edges):
+        vcoordinates = numpy.ma.array(self._generator.uniform(size=(vcount, 2)))
+        return vcoordinates, None, None
 
 class GraphViz(Graph):
     """Compute a graph layout using GraphViz."""
-    def graph(self, vcount, edges, vcoordinates, ecoordinates):
+    def graph(self, vcount, edges):
         dotfile = io.BytesIO()
         dotfile.write("digraph {\n")
+        for vertex in numpy.arange(vcount):
+            dotfile.write("%s\n" % vertex)
         for source, target in edges:
             dotfile.write("%s -> %s\n" % (source, target))
         dotfile.write("}\n")
@@ -231,6 +229,7 @@ class GraphViz(Graph):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         stdout, stderr = graphviz.communicate(dotfile.getvalue())
+
         vertices = []
         edges = []
         for line in io.BytesIO(stdout):
@@ -238,11 +237,22 @@ class GraphViz(Graph):
                 vertices.append(line.split())
             elif line.startswith("edge"):
                 edges.append(line.split())
-        for index, vertex in enumerate(vertices):
+
+        vcoordinates = numpy.ma.empty((vcount, 2))
+        for vertex in vertices:
+            index = int(vertex[1])
             vcoordinates[index, 0] = float(vertex[2])
             vcoordinates[index, 1] = float(vertex[3])
-        for edge in edges:
-            ecoordinates[0].append(len(ecoordinates[1]))
-            for value in edge[4:4 + int(edge[3])]:
-                ecoordinates[1].append(float(value))
 
+        ecounts = []
+        ecoordinates = []
+        for edge in edges:
+            count = int(edge[3])
+            ecounts.append(count)
+            for i in range(4, 4 + count, 2):
+                ecoordinates.append([float(edge[i]), float(edge[i+1])])
+
+        ecounts = numpy.array(ecounts)
+        ecoordinates = numpy.array(ecoordinates)
+
+        return vcoordinates, ecounts, ecoordinates

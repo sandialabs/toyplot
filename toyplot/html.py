@@ -1894,62 +1894,67 @@ def _render(canvas, legend, context):
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Graph, _RenderContext)
 def _render(axes, mark, context): # pragma: no cover
-    vcoordinates = mark._vtable[mark._vcoordinates[0]]
-    series = mark._vtable[mark._series[0]]
+    for i in range(2):
+        if mark._vcoordinate_axes[i] == "x":
+            x = axes._project_x(mark._vtable[mark._vcoordinates[i]])
+        elif mark._vcoordinate_axes[i] == "y":
+            y = axes._project_y(mark._vtable[mark._vcoordinates[i]])
 
-    if mark._coordinate_axis[0] == "x":
-        x = axes._project_x(vcoordinates)
-        y = axes._project_y(series)
-    elif mark._coordinate_axis[0] == "y":
-        y = axes._project_y(vcoordinates)
-        x = axes._project_x(series)
-
-    vmarker = mark._vtable[mark._vmarker[0]]
-    vsize = mark._vtable[mark._vsize[0]]
-    vcolor = mark._vtable[mark._vcolor[0]]
-    vopacity = mark._vtable[mark._vopacity[0]]
-    vtitle = mark._vtable[mark._vtitle[0]]
-
-    mark_xml = xml.SubElement(context.root, "g", id=context.get_id(
-        mark), attrib={"class": "toyplot-mark-Graph"})
+    mark_xml = xml.SubElement(context.root, "g", id=context.get_id(mark), attrib={"class": "toyplot-mark-Graph"})
     #context.add_data_table(mark, mark._vtable, title="Graph Vertex Data", filename=mark._vertex_filename)
     #context.add_data_table(mark, mark._etable, title="Graph Edge Data", filename=mark._edge_filename)
-    if mark._show_edges:
-        edge_xml = xml.SubElement(
-            mark_xml, "g", attrib={"class": "toyplot-Edges"})
-        for source, target, dstroke, dstroke_width, dstroke_opacity in itertools.izip(
-            mark._etable[mark._esource[0]],
-            mark._etable[mark._etarget[0]],
-            mark._etable[mark._ecolor[0]],
-            mark._etable[mark._ewidth[0]],
-            mark._etable[mark._eopacity[0]],
-            ):
-            estyle = toyplot.style.combine(
-                {
-                    "stroke": toyplot.color.to_css(dstroke),
-                    "stroke-width": dstroke_width,
-                    "stroke-opacity": dstroke_opacity},
-                mark._estyle)
-            xml.SubElement(
-                edge_xml, "line", x1=repr(
-                    x[source]), y1=repr(
-                    y[source]), x2=repr(
-                    x[target]), y2=repr(
-                    y[target]), style=_css_style(estyle))
-
-    vertex_xml = xml.SubElement(
-        mark_xml, "g", attrib={"class": "toyplot-Vertices"})
-    vsize = numpy.sqrt(vsize)
-    for dx, dy, dmarker, dsize, dfill, dopacity, dtitle in itertools.izip(
-            x, y, vmarker, vsize, vcolor, vopacity, vtitle):
-        dstyle = toyplot.style.combine(
+    edge_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Edges"})
+    for esource, etarget, ecolor, ewidth, eopacity in itertools.izip(
+        mark._etable[mark._esource[0]],
+        mark._etable[mark._etarget[0]],
+        mark._etable[mark._ecolor[0]],
+        mark._etable[mark._ewidth[0]],
+        mark._etable[mark._eopacity[0]],
+        ):
+        estyle = toyplot.style.combine(
             {
-                "fill": toyplot.color.to_css(dfill),
-                "stroke": toyplot.color.to_css(dfill),
-                "opacity": dopacity},
+            "stroke": toyplot.color.to_css(ecolor),
+            "stroke-width": ewidth,
+            "stroke-opacity": eopacity,
+            },
+            mark._estyle)
+        xml.SubElement(
+            edge_xml,
+            "line",
+            x1=repr(x[esource]),
+            y1=repr(y[esource]),
+            x2=repr(x[etarget]),
+            y2=repr(y[etarget]),
+            style=_css_style(estyle),
+            )
+
+    vertex_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Vertices"})
+    for vx, vy, vmarker, vsize, vcolor, vopacity, vtitle in itertools.izip(
+        x,
+        y,
+        mark._vtable[mark._vmarker[0]],
+        numpy.sqrt(mark._vtable[mark._vsize[0]]),
+        mark._vtable[mark._vcolor[0]],
+        mark._vtable[mark._vopacity[0]],
+        mark._vtable[mark._vtitle[0]],
+        ):
+        vstyle = toyplot.style.combine(
+            {
+            "fill": toyplot.color.to_css(vcolor),
+            "stroke": toyplot.color.to_css(vcolor),
+            "opacity": vopacity},
             mark._vstyle)
-        _render_marker(vertex_xml, dx, dy, dsize, dmarker,
-                       dstyle, mark._vlstyle, extra_class="toyplot-Datum", title=dtitle)
+        _render_marker(
+            vertex_xml,
+            vx,
+            vy,
+            vsize,
+            vmarker,
+            vstyle,
+            mark._vlstyle,
+            extra_class="toyplot-Datum",
+            title=vtitle,
+            )
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Plot, _RenderContext)
 def _render(axes, mark, context):

@@ -262,9 +262,7 @@ class Graph(Mark): # pragma: no cover
             self,
             vtable,
             vcoordinates,
-            coordinate_axis,
-            series,
-            series_axis,
+            vcoordinate_axes,
             vmarker,
             vsize,
             vcolor,
@@ -275,65 +273,46 @@ class Graph(Mark): # pragma: no cover
             etable,
             esource,
             etarget,
-            show_edges,
             ecolor,
             ewidth,
             eopacity,
             estyle,
             ):
-        vtable = toyplot.require.instance(
-            vtable, toyplot.data.Table)
-        vcoordinates = toyplot.require.table_keys(
-            vtable, vcoordinates, length=1)
-        coordinate_axis = toyplot.require.string_vector(
-            coordinate_axis, length=1)
-        series = toyplot.require.table_keys(vtable, series, length=1)
-        series_axis = toyplot.require.string_vector(series_axis, length=1)
-        vmarker = toyplot.require.table_keys(
-            vtable, vmarker, length=len(series))
-        vsize = toyplot.require.table_keys(
-            vtable, vsize, length=len(series))
-        vcolor = toyplot.require.table_keys(
-            vtable, vcolor, length=len(series))
-        vopacity = toyplot.require.table_keys(
-            vtable, vopacity, length=len(series))
-        vtitle = toyplot.require.table_keys(
-            vtable, vtitle, length=len(series))
-        vstyle = toyplot.require.style(vstyle)
-        vlstyle = toyplot.require.style(vlstyle)
-
-        etable = toyplot.require.instance(etable, toyplot.data.Table)
-        esource = toyplot.require.table_keys(etable, esource, length=1)
-        etarget = toyplot.require.table_keys(etable, etarget, length=1)
-        ecolor = toyplot.require.table_keys(etable, ecolor, length=1)
-        ewidth = toyplot.require.table_keys(
-            etable, ewidth, length=1)
-        eopacity = toyplot.require.table_keys(
-            etable, eopacity, length=1)
-        estyle = toyplot.require.style(estyle)
-
         Mark.__init__(self)
-        self._vtable = vtable
-        self._vcoordinates = vcoordinates       # 1 coordinate column
-        self._coordinate_axis = coordinate_axis  # 1 axis identifier
-        self._series = series                 # 1 coordinate columns
-        self._series_axis = series_axis       # 1 axis identifier
-        self._vmarker = vmarker                 # 1 vertex marker columns
-        self._vsize = vsize                   # 1 vertex marker size columns
-        self._vcolor = vcolor                   # 1 vertex marker color columns
-        self._vopacity = vopacity             # 1 marker opacity columns
-        self._vtitle = vtitle                   # 1 vertex titles column
-        self._vstyle = vstyle                 # Vertex marker style
-        self._vlstyle = vlstyle               # Vertex marker label style
 
-        self._etable = etable
-        self._esource = esource                 # 1 edge source column
-        self._etarget = etarget                 # 1 edge target column
-        self._show_edges = show_edges         # Boolean
-        self._ecolor = ecolor                 # M edge colors
-        self._ewidth = ewidth     # M edge widths
-        self._eopacity = eopacity  # M edge opacities
-        self._estyle = estyle         # Edge style
+        self._vtable = toyplot.require.instance(vtable, toyplot.data.Table)
+        # D coordinate columns
+        self._vcoordinates = toyplot.require.table_keys(vtable, vcoordinates)
+        # D axis identifiers
+        self._vcoordinate_axes = toyplot.require.string_vector(vcoordinate_axes, length=len(self._vcoordinates))
+        # 1 vertex marker column
+        self._vmarker = toyplot.require.table_keys(vtable, vmarker, length=1)
+        # 1 vertex marker size column
+        self._vsize = toyplot.require.table_keys(vtable, vsize, length=1)
+        # 1 vertex marker color column
+        self._vcolor = toyplot.require.table_keys(vtable, vcolor, length=1)
+        # 1 marker opacity column
+        self._vopacity = toyplot.require.table_keys(vtable, vopacity, length=1)
+        # 1 vertex titles column
+        self._vtitle = toyplot.require.table_keys(vtable, vtitle, length=1)
+        # Vertex marker style
+        self._vstyle = toyplot.require.style(vstyle)
+        # Vertex marker label style
+        self._vlstyle = toyplot.require.style(vlstyle)
+
+        self._etable = toyplot.require.instance(etable, toyplot.data.Table)
+        # 1 edge source column
+        self._esource = toyplot.require.table_keys(etable, esource, length=1)
+        # 1 edge target column
+        self._etarget = toyplot.require.table_keys(etable, etarget, length=1)
+        # 1 edge color column
+        self._ecolor = toyplot.require.table_keys(etable, ecolor, length=1)
+        # 1 edge width column
+        self._ewidth = toyplot.require.table_keys(etable, ewidth, length=1)
+        # 1 edge opacity column
+        self._eopacity = toyplot.require.table_keys(etable, eopacity, length=1)
+        # Edge style
+        self._estyle = toyplot.require.style(estyle)
 
 
 class Plot(Mark):

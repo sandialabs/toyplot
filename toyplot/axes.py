@@ -1318,30 +1318,29 @@ class Cartesian(object):
         """
         along = toyplot.require.value_in(along, ["x", "y"])
 
-        position = toyplot.require.scalar_vector(a)
-        series = toyplot.require.scalar_vector(b, len(position))
+        vcoordinates_a = toyplot.require.scalar_vector(a)
+        vcount = len(vcoordinates_a)
+        vcoordinates_b = toyplot.require.scalar_vector(b, vcount)
         source = toyplot.require.integer_vector(c)
         target = toyplot.require.integer_vector(d, len(source))
 
         if layout is None:
             layout = toyplot.layout.GraphViz()
-        vcoordinates = numpy.ma.column_stack((position, series))
+        vcoordinates = numpy.ma.column_stack((vcoordinates_a, vcoordinates_b))
         ecoordinates = [[], []]
-        layout.graph(len(vcoordinates), zip(source, target), vcoordinates, ecoordinates)
-        position = vcoordinates.T[0]
-        series = vcoordinates.T[1]
+        layout.graph(vcount, zip(source, target), vcoordinates, ecoordinates)
 
         default_color = [next(self._graph_colors)]
         vcolor = toyplot.color.broadcast(
             colors=vcolor,
-            shape=series.shape,
+            shape=vcount,
             default=default_color,
             )
 
-        vmarker = toyplot.broadcast.object(vmarker, series.shape)
-        vsize = toyplot.broadcast.scalar(vsize, series.shape)
-        vopacity = toyplot.broadcast.scalar(vopacity, series.shape)
-        vtitle = toyplot.broadcast.object(vtitle, series.shape)
+        vmarker = toyplot.broadcast.object(vmarker, vcount)
+        vsize = toyplot.broadcast.scalar(vsize, vcount)
+        vopacity = toyplot.broadcast.scalar(vopacity, vcount)
+        vtitle = toyplot.broadcast.object(vtitle, vcount)
         vstyle = toyplot.style.combine({}, toyplot.require.style(vstyle))
         vlstyle = toyplot.style.combine(toyplot.require.style(vlstyle))
 
@@ -1356,18 +1355,16 @@ class Cartesian(object):
             {}, toyplot.require.style(estyle))
 
         if along == "x":
-            self._update_domain(position, series)
+            self._update_domain(vcoordinates.T[0], vcoordinates.T[1])
+            vcoordinate_axes = ["x", "y"]
         elif along == "y":
-            self._update_domain(series, position)
-
-        coordinate_axis = along
-        series_axis = "y" if along == "x" else "x"
+            self._update_domain(vcoordinates.T[1], vcoordinates.T[0])
+            vcoordinate_axes = ["y", "x"]
 
         vtable = toyplot.data.Table()
-        vtable[coordinate_axis] = position
-        _mark_exportable(vtable, coordinate_axis)
-        vtable[series_axis] = series
-        _mark_exportable(vtable, series_axis)
+        for axis, coordinates in zip(vcoordinate_axes, vcoordinates.T):
+            vtable[axis] = coordinates
+            _mark_exportable(vtable, axis)
         vtable["marker"] = vmarker
         vtable["size"] = vsize
         vtable["color"] = vcolor
@@ -1386,10 +1383,8 @@ class Cartesian(object):
         self._children.append(
             toyplot.mark.Graph(
                 vtable=vtable,
-                vcoordinates=coordinate_axis,
-                coordinate_axis=coordinate_axis,
-                series=series_axis,
-                series_axis=series_axis,
+                vcoordinates=vcoordinate_axes,
+                vcoordinate_axes=vcoordinate_axes,
                 vmarker=["marker"],
                 vsize=["size"],
                 vcolor=["color"],
@@ -1400,7 +1395,6 @@ class Cartesian(object):
                 etable=etable,
                 esource=["source"],
                 etarget=["target"],
-                show_edges=True,
                 ecolor=["ecolor"],
                 ewidth=["ewidth"],
                 eopacity=["eopacity"],

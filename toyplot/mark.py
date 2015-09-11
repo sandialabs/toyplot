@@ -260,9 +260,9 @@ class Graph(Mark): # pragma: no cover
 
     def __init__(
             self,
+            coordinate_axes,
             vtable,
             vcoordinates,
-            vcoordinate_axes,
             vmarker,
             vsize,
             vcolor,
@@ -280,11 +280,12 @@ class Graph(Mark): # pragma: no cover
             ):
         Mark.__init__(self)
 
+        # D axis identifiers
+        self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, min_length=1)
+
         self._vtable = toyplot.require.instance(vtable, toyplot.data.Table)
         # D coordinate columns
-        self._vcoordinates = toyplot.require.table_keys(vtable, vcoordinates)
-        # D axis identifiers
-        self._vcoordinate_axes = toyplot.require.string_vector(vcoordinate_axes, length=len(self._vcoordinates))
+        self._vcoordinates = toyplot.require.table_keys(vtable, vcoordinates, length=len(self._coordinate_axes))
         # 1 vertex marker column
         self._vmarker = toyplot.require.table_keys(vtable, vmarker, length=1)
         # 1 vertex marker size column

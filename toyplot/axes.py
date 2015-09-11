@@ -1356,13 +1356,13 @@ class Cartesian(object):
 
         if along == "x":
             self._update_domain(vcoordinates.T[0], vcoordinates.T[1])
-            vcoordinate_axes = ["x", "y"]
+            coordinate_axes = ["x", "y"]
         elif along == "y":
             self._update_domain(vcoordinates.T[1], vcoordinates.T[0])
-            vcoordinate_axes = ["y", "x"]
+            coordinate_axes = ["y", "x"]
 
         vtable = toyplot.data.Table()
-        for axis, coordinates in zip(vcoordinate_axes, vcoordinates.T):
+        for axis, coordinates in zip(coordinate_axes, vcoordinates.T):
             vtable[axis] = coordinates
             _mark_exportable(vtable, axis)
         vtable["marker"] = vmarker
@@ -1382,9 +1382,9 @@ class Cartesian(object):
 
         self._children.append(
             toyplot.mark.Graph(
+                coordinate_axes=coordinate_axes,
                 vtable=vtable,
-                vcoordinates=vcoordinate_axes,
-                vcoordinate_axes=vcoordinate_axes,
+                vcoordinates=coordinate_axes,
                 vmarker=["marker"],
                 vsize=["size"],
                 vcolor=["color"],

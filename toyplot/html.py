@@ -1895,9 +1895,9 @@ def _render(canvas, legend, context):
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Graph, _RenderContext)
 def _render(axes, mark, context): # pragma: no cover
     for i in range(2):
-        if mark._vcoordinate_axes[i] == "x":
+        if mark._coordinate_axes[i] == "x":
             x = axes._project_x(mark._vtable[mark._vcoordinates[i]])
-        elif mark._vcoordinate_axes[i] == "y":
+        elif mark._coordinate_axes[i] == "y":
             y = axes._project_y(mark._vtable[mark._vcoordinates[i]])
 
     mark_xml = xml.SubElement(context.root, "g", id=context.get_id(mark), attrib={"class": "toyplot-mark-Graph"})

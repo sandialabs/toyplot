@@ -1930,6 +1930,8 @@ def _render(axes, mark, context): # pragma: no cover
                 count = 1
             elif segment == "L":
                 count = 1
+            elif segment == "Q":
+                count = 2
             elif segment == "C":
                 count = 3
             path.append(segment)

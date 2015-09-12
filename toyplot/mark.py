@@ -318,6 +318,8 @@ class Graph(Mark): # pragma: no cover
                     ecoordinate_count += 1
                 elif segment == "L":
                     ecoordinate_count += 1
+                elif segment == "Q":
+                    ecoordinate_count += 2
                 elif segment == "C":
                     ecoordinate_count += 3
                 else:

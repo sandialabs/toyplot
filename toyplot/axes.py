@@ -1301,20 +1301,10 @@ class Cartesian(object):
 
         Parameters
         ----------
-        a, b: array-like sets of coordinates
-          If `a` and `b` are provided, they specify the X coordinates and Y
-          coordinates of each point in the plot.  If only `a` is provided, it
-          specifies the Y coordinates, and the X coordinates will range from [0, N).
-        vtitle: string, optional
-          Human-readable title for the mark.  The SVG / HTML backends render the
-          title as a tooltip.
-        style: dict, optional
-          Collection of CSS styles to apply across all datums.  See
-          :class:`toyplot.toyplot.Plot` for a list of useful styles.
 
         Returns
         -------
-        plot: :class:`toyplot.mark.Plot`
+        plot: :class:`toyplot.mark.Graph`
         """
         along = toyplot.require.value_in(along, ["x", "y"])
 

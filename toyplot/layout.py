@@ -256,6 +256,52 @@ class Random(Graph):
         return vcoordinates, eshape, ecoordinates
 
 
+class Eades(Graph):
+    """Compute a force directed graph layout using the 1984 algorithm by Eades."""
+    def __init__(self, edges=None, c1=2, c2=1, c3=1, c4=0.1, M=100, seed=1234):
+        if edges is None:
+            edges = StraightEdges()
+
+        self._edges = edges
+        self._c1 = c1
+        self._c2 = c2
+        self._c3 = c3
+        self._c4 = c4
+        self._M = M
+        self._generator = numpy.random.RandomState(seed=seed)
+
+    def graph(self, vcount, edges):
+        # Initialize coordinates
+        vcoordinates = numpy.ma.array(self._generator.uniform(size=(vcount, 2)))
+
+        # Repeatedly apply attract / repel forces to the vertices
+        for iteration in numpy.arange(self._M):
+            forces = numpy.zeros((vcount, 2))
+
+            # Repel
+            for i in numpy.arange(vcount):
+                for j in numpy.arange(i+1, vcount):
+                    a = vcoordinates[i]
+                    b = vcoordinates[j]
+                    d = numpy.linalg.norm(a - b)
+                    f = self._c3 / numpy.square(d)
+                    forces[i] += (a - b) / d * f
+                    forces[j] += (b - a) / d * f
+
+            # Attract
+            for source, target in edges:
+                a = vcoordinates[source]
+                b = vcoordinates[target]
+                d = numpy.linalg.norm(a - b)
+                f = self._c1 * numpy.log(d / self._c2)
+                forces[source] += (b-a) / d * f
+                forces[target] += (a-b) / d * f
+
+            vcoordinates += self._c4 * forces
+
+        eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
+        return vcoordinates, eshape, ecoordinates
+
 class GraphViz(Graph):
     """Compute a graph layout using GraphViz."""
     def graph(self, vcount, edges):

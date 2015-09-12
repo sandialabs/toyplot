@@ -1315,7 +1315,7 @@ class Cartesian(object):
 
         if layout is None:
             layout = toyplot.layout.GraphViz()
-        vcoordinates, eshape, ecoordinates = layout.graph(vcount, zip(source, target))
+        vcoordinates, eshape, ecoordinates = layout.graph(vcount, numpy.column_stack((source, target)))
 
         along = toyplot.require.value_in(along, ["x", "y"])
 

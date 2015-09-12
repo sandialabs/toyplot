@@ -202,18 +202,10 @@ class GraphEdges(object):
 class StraightEdges(GraphEdges):
     """Creates straight edges between graph vertices."""
     def edges(self, vcount, edges, vcoordinates):
-        eshape = []
-        ecoordinates = []
-        for source, target in edges:
-            a = vcoordinates[source]
-            b = vcoordinates[target]
-            eshape.append("ML")
-            ecoordinates.append([a[0], a[1]])
-            ecoordinates.append([b[0], b[1]])
-
-        eshape = numpy.array(eshape)
-        ecoordinates = numpy.array(ecoordinates)
-
+        eshape = numpy.tile("ML", len(edges))
+        ecoordinates = numpy.empty((len(edges) * 2, 2))
+        ecoordinates[0::2] = vcoordinates[edges.T[0]]
+        ecoordinates[1::2] = vcoordinates[edges.T[1]]
         return eshape, ecoordinates
 
 
@@ -223,20 +215,17 @@ class CurvedEdges(GraphEdges):
         self._curvature = curvature
 
     def edges(self, vcount, edges, vcoordinates):
-        eshape = []
-        ecoordinates = []
-        for source, target in edges:
-            a = vcoordinates[source]
-            b = vcoordinates[target]
-            offset = numpy.dot([[0, -1],[1, 0]], a - b) * self._curvature
-            c = ((a + b) * 0.5) + offset
-            eshape.append("MQ")
-            ecoordinates.append(a.tolist())
-            ecoordinates.append(c.tolist())
-            ecoordinates.append(b.tolist())
+        eshape = numpy.tile("MQ", len(edges))
+        ecoordinates = numpy.empty((len(edges) * 3, 2))
 
-        eshape = numpy.array(eshape)
-        ecoordinates = numpy.array(ecoordinates)
+        sources = vcoordinates[edges.T[0]]
+        targets = vcoordinates[edges.T[1]]
+        offsets = numpy.dot(targets - sources, [[0, 1], [-1, 0]]) * self._curvature
+        midpoints = ((sources + targets) * 0.5) + offsets
+
+        ecoordinates[0::3] = sources
+        ecoordinates[1::3] = midpoints
+        ecoordinates[2::3] = targets
 
         return eshape, ecoordinates
 

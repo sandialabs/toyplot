@@ -42,6 +42,10 @@ def table_keys(table, keys, length=None, min_length=None):
                 (", ".join(allowed), key))
     return keys
 
+def integer(value):
+    if not isinstance(value, numbers.Integer):
+        raise ValueError("Expected an integer, received %s." % value)
+    return value
 
 def scalar(value):
     if not isinstance(value, numbers.Number):

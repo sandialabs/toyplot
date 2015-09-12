@@ -1281,8 +1281,7 @@ class Cartesian(object):
             self,
             a,
             b,
-            c,
-            d,
+            c=None,
             layout=None,
             along="x",
             vcolor=None,
@@ -1306,18 +1305,19 @@ class Cartesian(object):
         -------
         plot: :class:`toyplot.mark.Graph`
         """
-        along = toyplot.require.value_in(along, ["x", "y"])
+        source = toyplot.require.integer_vector(a)
+        target = toyplot.require.integer_vector(b, len(source))
 
-        vcoordinates_a = toyplot.require.scalar_vector(a)
-        vcount = len(vcoordinates_a)
-        vcoordinates_b = toyplot.require.scalar_vector(b, vcount)
-        source = toyplot.require.integer_vector(c)
-        target = toyplot.require.integer_vector(d, len(source))
+        if c is None:
+            vcount = numpy.max(numpy.concatenate((source, target))) + 1
+        else:
+            vcount = toyplot.require.integer(c)
 
         if layout is None:
             layout = toyplot.layout.GraphViz()
-        #vcoordinates = numpy.ma.column_stack((vcoordinates_a, vcoordinates_b))
         vcoordinates, eshape, ecoordinates = layout.graph(vcount, zip(source, target))
+
+        along = toyplot.require.value_in(along, ["x", "y"])
 
         default_color = [next(self._graph_colors)]
         vcolor = toyplot.color.broadcast(

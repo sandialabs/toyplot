@@ -153,8 +153,7 @@ def fill(
 def graph(
         a,
         b,
-        c,
-        d,
+        c=None,
         layout=None,
         along="x",
         vcolor=None,
@@ -191,7 +190,6 @@ def graph(
         a=a,
         b=b,
         c=c,
-        d=d,
         layout=layout,
         along=along,
         vcolor=vcolor,

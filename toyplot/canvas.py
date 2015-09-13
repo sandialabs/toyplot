@@ -239,6 +239,7 @@ class Canvas(object):
             xmax=None,
             ymin=None,
             ymax=None,
+            aspect=None,
             show=True,
             xshow=True,
             yshow=True,
@@ -259,6 +260,9 @@ class Canvas(object):
         xmin, xmax, ymin, ymax: float, optional
           Used to explicitly override the axis domain (normally, the domain is
           implicitly defined by any marks added to the axes).
+        aspect: string, optional
+          Set to "expand-domain" to automatically expand the domain so that its
+          aspect ratio matches the aspect ratio of the range.
         show: bool, optional
           Set to `False` to hide both axes (the axes contents will still be visible).
         xshow, yshow: bool, optional
@@ -291,6 +295,7 @@ class Canvas(object):
                 xmax_range,
                 ymin_range,
                 ymax_range,
+                aspect=aspect,
                 xmin=xmin,
                 xmax=xmax,
                 ymin=ymin,

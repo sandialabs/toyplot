@@ -455,6 +455,7 @@ class Cartesian(object):
             xmax_range,
             ymin_range,
             ymax_range,
+            aspect,
             xmin,
             xmax,
             ymin,
@@ -477,6 +478,7 @@ class Cartesian(object):
         self._xmax_range = xmax_range
         self._ymin_range = ymin_range
         self._ymax_range = ymax_range
+        self._aspect = aspect
         self._xmin_data_domain_implicit = None
         self._xmax_data_domain_implicit = None
         self._ymin_data_domain_implicit = None
@@ -551,6 +553,16 @@ class Cartesian(object):
         self._ytick_locations = []
         self._ytick_labels = []
         self._ytick_titles = []
+
+    @property
+    def aspect(self):
+        return self._aspect
+
+    @aspect.setter
+    def aspect(self, value):
+        if value not in [None, "expand-domain"]:
+            raise ValueError("Unknown aspect value: %s" % value)
+        self._aspect = value
 
     @property
     def show(self):
@@ -704,6 +716,22 @@ class Cartesian(object):
             xmax = _null_max(domain_right.max(), xmax)
             ymin = _null_min(domain_bottom.min(), ymin)
             ymax = _null_max(domain_top.max(), ymax)
+
+        # Optionally expand the domain to match the aspect ratio of the range.
+        if self._aspect == "expand-domain":
+            dwidth = (xmax - xmin)
+            dheight = (ymax - ymin)
+            daspect = dwidth / dheight
+            raspect = (self._xmax_range - self._xmin_range) / (self._ymax_range - self._ymin_range)
+
+            if daspect < raspect:
+                offset = ((dwidth * (raspect / daspect)) - dwidth) * 0.5
+                xmin -= offset
+                xmax += offset
+            elif daspect > raspect:
+                offset = ((dheight * (daspect / raspect)) - dheight) * 0.5
+                ymin -= offset
+                ymax += offset
 
         # Allow users to override the domain.
         if self.x.domain._min is not None:

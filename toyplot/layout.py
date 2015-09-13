@@ -234,6 +234,10 @@ class GraphEdges(object):
 class StraightEdges(GraphEdges):
     """Creates straight edges between graph vertices."""
     def edges(self, vcount, edges, vcoordinates):
+        loops = edges.T[0] == edges.T[1]
+        if numpy.any(loops):
+            toyplot.log.warning("Graph contains %s loop edges that will not be displayed." % numpy.count_nonzero(loops))
+
         eshape = numpy.tile("ML", len(edges))
         ecoordinates = numpy.empty((len(edges) * 2, 2))
         ecoordinates[0::2] = vcoordinates[edges.T[0]]
@@ -247,6 +251,10 @@ class CurvedEdges(GraphEdges):
         self._curvature = curvature
 
     def edges(self, vcount, edges, vcoordinates):
+        loops = edges.T[0] == edges.T[1]
+        if numpy.any(loops):
+            toyplot.log.warning("Graph contains %s loop edges that will not be displayed." % numpy.count_nonzero(loops))
+
         eshape = numpy.tile("MQ", len(edges))
         ecoordinates = numpy.empty((len(edges) * 3, 2))
 

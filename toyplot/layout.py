@@ -241,7 +241,7 @@ class Random(Graph):
         self._generator = numpy.random.RandomState(seed=seed)
 
     def graph(self, vcount, edges):
-        vcoordinates = numpy.ma.array(self._generator.uniform(size=(vcount, 2)))
+        vcoordinates = numpy.ma.array(self._generator.uniform(-1, 1, size=(vcount, 2)))
         eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
         return vcoordinates, eshape, ecoordinates
 
@@ -275,7 +275,7 @@ class Eades(Graph):
 
     def graph(self, vcount, edges):
         # Initialize coordinates
-        vcoordinates = numpy.ma.array(self._generator.uniform(size=(vcount, 2)))
+        vcoordinates = numpy.ma.array(self._generator.uniform(-1, 1, size=(vcount, 2)))
 
         # Repeatedly apply attract / repel forces to the vertices
         vertices = numpy.column_stack(numpy.triu_indices(n=vcount, k=1))
@@ -328,7 +328,7 @@ class FruchtermanReingold(Graph):
         k = numpy.sqrt(self._area / vcount)
 
         # Initialize coordinates
-        vcoordinates = numpy.ma.array(self._generator.uniform(size=(vcount, 2)))
+        vcoordinates = numpy.ma.array(self._generator.uniform(-1, 1, size=(vcount, 2)))
 
         # Repeatedly apply attract / repel forces to the vertices
         vertices = numpy.column_stack(numpy.triu_indices(n=vcount, k=1))

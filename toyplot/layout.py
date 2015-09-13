@@ -245,12 +245,19 @@ class Random(Graph):
         eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
         return vcoordinates, eshape, ecoordinates
 
-def add_at(target, target_indices, source):
+def _add_at(target, target_indices, source):
+    """Add source values to the target and handle duplicate indices correctly.
+
+    With numpy, the expression `target[indices] += source` does not work intuitively
+    if there are duplicate indices.  This function handles this case as you would
+    expect, by accumulating multiple values for a single target.
+    """
     if getattr(numpy.add, "at", None) is not None:
         numpy.add.at(target, target_indices, source)
     else: # Shim for numpy < 1.8
         for source_index, target_index in enumerate(target_indices):
             target[target_index] += source[source_index]
+
 
 class Eades(Graph):
     """Compute a force directed graph layout using the 1984 algorithm by Eades."""
@@ -283,8 +290,8 @@ class Eades(Graph):
             delta /= distance
             force = self._c3 / numpy.square(distance)
             delta *= force
-            add_at(forces, vertices.T[0], delta)
-            add_at(forces, vertices.T[1], -delta)
+            _add_at(forces, vertices.T[0], delta)
+            _add_at(forces, vertices.T[1], -delta)
 
             # Attract
             a = vcoordinates[edges.T[0]]
@@ -294,11 +301,65 @@ class Eades(Graph):
             delta /= distance
             force = self._c1 * numpy.log(distance / self._c2)
             delta *= force
-            add_at(forces, edges.T[0], delta)
-            add_at(forces, edges.T[1], -delta)
+            _add_at(forces, edges.T[0], delta)
+            _add_at(forces, edges.T[1], -delta)
 
             # Sum forces
             vcoordinates += self._c4 * forces
+
+        eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
+        return vcoordinates, eshape, ecoordinates
+
+
+class FruchtermanReingold(Graph):
+    """Compute a force directed graph layout using the 1991 algorithm of Fruchterman and Reingold."""
+    def __init__(self, edges=None, area=1, temperature=0.1, C=1, M=50, seed=1234):
+        if edges is None:
+            edges = StraightEdges()
+
+        self._edges = edges
+        self._area = area
+        self._temperature = temperature
+        self._C = C
+        self._M = M
+        self._generator = numpy.random.RandomState(seed=seed)
+
+    def graph(self, vcount, edges):
+        # Setup parameters
+        k = self._C * numpy.sqrt(self._area / vcount)
+
+        # Initialize coordinates
+        vcoordinates = numpy.ma.array(self._generator.uniform(size=(vcount, 2)))
+
+        # Repeatedly apply attract / repel forces to the vertices
+        vertices = numpy.column_stack(numpy.triu_indices(n=vcount, k=1))
+        for temperature in numpy.linspace(self._temperature, 0, self._M):
+            forces = numpy.zeros((vcount, 2))
+
+            # Repel
+            a = vcoordinates[vertices.T[0]]
+            b = vcoordinates[vertices.T[1]]
+            delta = a - b
+            distance = numpy.linalg.norm(delta, axis=1)[:,None]
+            delta /= distance
+            force = numpy.square(k) / distance
+            delta *= force
+            _add_at(forces, vertices.T[0], +delta)
+            _add_at(forces, vertices.T[1], -delta)
+
+            # Attract
+            a = vcoordinates[edges.T[0]]
+            b = vcoordinates[edges.T[1]]
+            delta = b - a
+            distance = numpy.linalg.norm(delta, axis=1)[:,None]
+            delta /= distance
+            force = numpy.square(distance) / k
+            delta *= force
+            _add_at(forces, edges.T[0], +delta)
+            _add_at(forces, edges.T[1], -delta)
+
+            # Sum forces
+            vcoordinates += temperature * forces
 
         eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
         return vcoordinates, eshape, ecoordinates

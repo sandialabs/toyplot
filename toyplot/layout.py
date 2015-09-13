@@ -188,6 +188,43 @@ def region(
     return (xmin + gutter, xmax - gutter, ymin + gutter, ymax - gutter)
 
 
+def _add_at(target, target_indices, source):
+    """Add source values to the target and handle duplicate indices correctly.
+
+    With numpy, the expression `target[indices] += source` does not work intuitively
+    if there are duplicate indices.  This function handles this case as you would
+    expect, by accumulating multiple values for a single target.
+    """
+    if getattr(numpy.add, "at", None) is not None:
+        numpy.add.at(target, target_indices, source)
+    else: # Shim for numpy < 1.8
+        for source_index, target_index in enumerate(target_indices):
+            target[target_index] += source[source_index]
+
+
+def _floyd_warshall_shortest_path(vcount, edges):
+    """Compute the shortest paths between every pair of vertices in a graph, using the Floyd-Warshall algorithm.
+
+    Floyd-Warshall is a good choice for computing paths between all pairs of vertices in dense graphs.
+
+    Returns
+    -------
+    shortest_paths: :math:`V \\times V matrix`
+        A matrix where element :math:`E_ij` contains the shortest path distance
+        between vertex :math:`i` and vertex :math:`j`.
+    """
+    distance = numpy.empty((vcount, vcount))
+    distance[...] = numpy.inf
+    distance[numpy.diag_indices_from(distance)] = 0
+    distance[edges.T[0], edges.T[1]] = 1
+    for k in numpy.arange(vcount):
+        for i in numpy.arange(vcount):
+            for j in numpy.arange(vcount):
+                if distance[i,j] > distance[i,k] + distance[k,j]:
+                    distance[i,j] = distance[i,k] + distance[k,j]
+
+    return distance
+
 class GraphEdges(object):
     """Based class for graph edge layout algorithms - objects that compute coordinates for graph edges only."""
     def edges(self, vcount, edges, vcoordinates):
@@ -244,19 +281,6 @@ class Random(Graph):
         vcoordinates = numpy.ma.array(self._generator.uniform(-1, 1, size=(vcount, 2)))
         eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
         return vcoordinates, eshape, ecoordinates
-
-def _add_at(target, target_indices, source):
-    """Add source values to the target and handle duplicate indices correctly.
-
-    With numpy, the expression `target[indices] += source` does not work intuitively
-    if there are duplicate indices.  This function handles this case as you would
-    expect, by accumulating multiple values for a single target.
-    """
-    if getattr(numpy.add, "at", None) is not None:
-        numpy.add.at(target, target_indices, source)
-    else: # Shim for numpy < 1.8
-        for source_index, target_index in enumerate(target_indices):
-            target[target_index] += source[source_index]
 
 
 class Eades(Graph):
@@ -368,6 +392,7 @@ class FruchtermanReingold(Graph):
         eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
         return vcoordinates, eshape, ecoordinates
 
+
 class GraphViz(Graph):
     """Compute a graph layout using GraphViz."""
     def graph(self, vcount, edges):
@@ -423,3 +448,4 @@ class GraphViz(Graph):
         ecoordinates = numpy.array(ecoordinates)
 
         return vcoordinates, eshape, ecoordinates
+

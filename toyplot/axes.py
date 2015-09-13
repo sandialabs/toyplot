@@ -17,6 +17,7 @@ import toyplot.mark
 import toyplot.projection
 import toyplot.require
 import toyplot.text
+import time
 
 ##########################################################################
 # Helpers
@@ -1315,7 +1316,10 @@ class Cartesian(object):
 
         if layout is None:
             layout = toyplot.layout.GraphViz()
+
+        start = time.time()
         vcoordinates, eshape, ecoordinates = layout.graph(vcount, numpy.column_stack((source, target)))
+        toyplot.log.info("Graph layout time: %s ms" % ((time.time() - start) * 1000))
 
         along = toyplot.require.value_in(along, ["x", "y"])
 

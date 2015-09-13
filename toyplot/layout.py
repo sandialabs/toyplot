@@ -187,11 +187,6 @@ def region(
     # If nothing else fits, consume the entire region
     return (xmin + gutter, xmax - gutter, ymin + gutter, ymax - gutter)
 
-class Graph(object):
-    """Base class for graph layout algorithms - objects that compute coordinates for graph vertices and edges."""
-    def graph(self, vcount, edges):
-        raise NotImplementedError()
-
 
 class GraphEdges(object):
     """Based class for graph edge layout algorithms - objects that compute coordinates for graph edges only."""
@@ -230,6 +225,12 @@ class CurvedEdges(GraphEdges):
         return eshape, ecoordinates
 
 
+class Graph(object):
+    """Base class for graph layout algorithms - objects that compute coordinates for graph vertices and edges."""
+    def graph(self, vcount, edges):
+        raise NotImplementedError()
+
+
 class Random(Graph):
     """Compute a random graph layout."""
     def __init__(self, edges=None, seed=1234):
@@ -244,6 +245,12 @@ class Random(Graph):
         eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
         return vcoordinates, eshape, ecoordinates
 
+def add_at(target, target_indices, source):
+    if getattr(numpy.add, "at", None) is not None:
+        numpy.add.at(target, target_indices, source)
+    else: # Shim for numpy < 1.8
+        for source_index, target_index in enumerate(target_indices):
+            target[target_index] += source[source_index]
 
 class Eades(Graph):
     """Compute a force directed graph layout using the 1984 algorithm by Eades."""
@@ -264,28 +271,33 @@ class Eades(Graph):
         vcoordinates = numpy.ma.array(self._generator.uniform(size=(vcount, 2)))
 
         # Repeatedly apply attract / repel forces to the vertices
+        vertices = numpy.column_stack(numpy.triu_indices(n=vcount, k=1))
         for iteration in numpy.arange(self._M):
             forces = numpy.zeros((vcount, 2))
 
             # Repel
-            for i in numpy.arange(vcount):
-                for j in numpy.arange(i+1, vcount):
-                    a = vcoordinates[i]
-                    b = vcoordinates[j]
-                    d = numpy.linalg.norm(a - b)
-                    f = self._c3 / numpy.square(d)
-                    forces[i] += (a - b) / d * f
-                    forces[j] += (b - a) / d * f
+            a = vcoordinates[vertices.T[0]]
+            b = vcoordinates[vertices.T[1]]
+            delta = a - b
+            distance = numpy.linalg.norm(delta, axis=1)[:,None]
+            delta /= distance
+            force = self._c3 / numpy.square(distance)
+            delta *= force
+            add_at(forces, vertices.T[0], delta)
+            add_at(forces, vertices.T[1], -delta)
 
             # Attract
-            for source, target in edges:
-                a = vcoordinates[source]
-                b = vcoordinates[target]
-                d = numpy.linalg.norm(a - b)
-                f = self._c1 * numpy.log(d / self._c2)
-                forces[source] += (b-a) / d * f
-                forces[target] += (a-b) / d * f
+            a = vcoordinates[edges.T[0]]
+            b = vcoordinates[edges.T[1]]
+            delta = b - a
+            distance = numpy.linalg.norm(delta, axis=1)[:,None]
+            delta /= distance
+            force = self._c1 * numpy.log(distance / self._c2)
+            delta *= force
+            add_at(forces, edges.T[0], delta)
+            add_at(forces, edges.T[1], -delta)
 
+            # Sum forces
             vcoordinates += self._c4 * forces
 
         eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)

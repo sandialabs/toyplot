@@ -1350,7 +1350,7 @@ class Cartesian(object):
                 raise ValueError("Graph edges induce more than %s vertices." % (vcount))
 
         if layout is None:
-            layout = toyplot.layout.GraphViz()
+            layout = toyplot.layout.FruchtermanReingold()
 
         start = time.time()
         vcoordinates, eshape, ecoordinates = layout.graph(vcount, edges)

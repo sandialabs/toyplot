@@ -226,8 +226,36 @@ def _floyd_warshall_shortest_path(vcount, edges):
     return distance
 
 class GraphEdges(object):
-    """Based class for graph edge layout algorithms - objects that compute coordinates for graph edges only."""
+    """Base class for algorithms that compute coordinates for graph edges only."""
     def edges(self, vcount, edges, vcoordinates):
+        """Return edge coordinates for a graph.
+
+        Parameters
+        ----------
+        vcount : integer
+            The number of vertices in the graph.
+        edges : :math:`E \\times 2` matrix
+            Contains the integer vertex indices for every graph edge in edge
+            order.  The first and second matrix columns contain the source and
+            target vertices respectively.
+        vcoordinates : :math:`V \\times 2` matrix
+            Contains the coordinates for every graph vertex, in vertex order.
+
+        Returns
+        -------
+        eshape : array of :math:`E` strings
+            Contains a shape string for each edge, in edge order.  The shape
+            string contains drawing codes that define an arbitrary-complexity
+            path for the edge, using a set of current coordinates and a turtle
+            drawing model.  The following codes are currently allowed:
+
+            * `M` - change the current coordinates without drawing (requires one set of coordinates).
+            * `L` - draw a straight line segment (requires one set of coordinates).
+            * `Q` - draw a quadratic Bezier curve (requires two sets of coordinates).
+            * `C` - draw a cubic Bezier curve (requires three sets of coordinates).
+        ecoordinates : matrix containing two columns
+            Contains coordinates for each of the edge shape strings, in drawing-code order.
+        """
         raise NotImplementedError()
 
 
@@ -246,7 +274,15 @@ class StraightEdges(GraphEdges):
 
 
 class CurvedEdges(GraphEdges):
-    """Creates curved edges between graph vertices."""
+    """Creates curved edges between graph vertices.
+
+    Parameters
+    ----------
+    curvature : number
+        Controls the curvature of each edge's arc, as a percentage of the
+        distance between the edge's vertices.  Use negative values to curve
+        edges in the opposite direction.
+    """
     def __init__(self, curvature=0.15):
         self._curvature = curvature
 
@@ -271,13 +307,49 @@ class CurvedEdges(GraphEdges):
 
 
 class Graph(object):
-    """Base class for graph layout algorithms - objects that compute coordinates for graph vertices and edges."""
+    """Base class for algorithms that compute coordinates for graph vertices and edges."""
     def graph(self, vcount, edges):
+        """Return vertex and edge coordinates for a graph.
+
+        Parameters
+        ----------
+        vcount : integer
+            The number of vertices in the graph.
+        edges : :math:`E \\times 2` matrix
+            Contains the integer vertex indices for every graph edge in edge
+            order.  The first and second matrix columns contain the source and
+            target vertices respectively.
+
+        Returns
+        -------
+        vcoordinates : :math:`V \\times 2` matrix
+            Contains coordinates for every graph vertex, in vertex order.
+        eshape : array of :math:`E` strings
+            Contains a shape string for each edge, in edge order.  The shape
+            string contains drawing codes that define an arbitrary-complexity
+            path for the edge, using a set of current coordinates and a turtle
+            drawing model.  The following codes are currently allowed:
+
+            * `M` - change the current coordinates without drawing (requires one set of coordinates).
+            * `L` - draw a straight line segment (requires one set of coordinates).
+            * `Q` - draw a quadratic Bezier curve (requires two sets of coordinates).
+            * `C` - draw a cubic Bezier curve (requires three sets of coordinates).
+        ecoordinates : matrix containing two columns
+            Contains coordinates for each of the edge shape strings, in drawing-code order.
+        """
         raise NotImplementedError()
 
 
 class Random(Graph):
-    """Compute a random graph layout."""
+    """Compute a random graph layout.
+
+    Parameters
+    ----------
+    edges: :class:`toyplot.layout.GraphEdges` instance, optional
+        The default will generate straight edges.
+    seed: integer, optional
+        Random seed used to generate vertex coordinates.
+    """
     def __init__(self, edges=None, seed=1234):
         if edges is None:
             edges = StraightEdges()
@@ -292,7 +364,19 @@ class Random(Graph):
 
 
 class Eades(Graph):
-    """Compute a force directed graph layout using the 1984 algorithm by Eades."""
+    """Compute a force directed graph layout using the 1984 algorithm of Eades.
+
+    Parameters
+    ----------
+    edges: :class:`toyplot.layout.GraphEdges` instance, optional
+        The default will generate straight edges.
+    c1, c2, c3, c4: numbers, optional
+        Constants defined in Eades' original paper.
+    M: integer, optional
+        Number of iterations to run the spring simulation.
+    seed: integer, optional
+        Random seed used to initialize vertex coordinates.
+    """
     def __init__(self, edges=None, c1=2, c2=1, c3=1, c4=0.1, M=100, seed=1234):
         if edges is None:
             edges = StraightEdges()
@@ -344,7 +428,19 @@ class Eades(Graph):
 
 
 class FruchtermanReingold(Graph):
-    """Compute a force directed graph layout using the 1991 algorithm of Fruchterman and Reingold."""
+    """Compute a force directed graph layout using the 1991 algorithm of Fruchterman and Reingold.
+
+    Parameters
+    ----------
+    edges: :class:`toyplot.layout.GraphEdges` instance, optional
+        The default will generate straight edges.
+    area, temperature: numbers, optional
+        Constants defined in the original paper.
+    M: integer, optional
+        Number of iterations to run the spring simulation.
+    seed: integer, optional
+        Random seed used to initialize vertex coordinates.
+    """
     def __init__(self, edges=None, area=1, temperature=0.1, M=50, seed=1234):
         if edges is None:
             edges = StraightEdges()

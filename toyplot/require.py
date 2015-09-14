@@ -130,6 +130,22 @@ def string_vector(value, length=None, min_length=None):
     return array
 
 
+def vector(value, length=None, min_length=None):
+    array = numpy.ma.array(value)
+    if array.ndim != 1:
+        raise ValueError("Expected a vector.")
+    if length is not None:
+        if len(array) != length:
+            raise ValueError(
+                "Expected %s values, received %s" % (length, len(array)))
+    if min_length is not None:
+        if len(array) < min_length:
+            raise ValueError(
+                "Expected %s or more values, received %s" %
+                (min_length, len(array)))
+    return array
+
+
 def optional_string(value):
     if not isinstance(value, (toyplot.compatibility.string_type, type(None))):
         raise ValueError(

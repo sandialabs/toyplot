@@ -43,7 +43,7 @@ def table_keys(table, keys, length=None, min_length=None):
     return keys
 
 def integer(value):
-    if not isinstance(value, numbers.Integer):
+    if not isinstance(value, numbers.Integral):
         raise ValueError("Expected an integer, received %s." % value)
     return value
 

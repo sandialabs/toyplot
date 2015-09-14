@@ -77,8 +77,12 @@ def integer_array(value):
     return array
 
 
-def integer_vector(value, length=None):
-    array = integer_array(value)
+def integer_vector(value, length=None, min_length=None):
+    return vector(value, length=length, min_length=min_length).astype("int64")
+
+
+def vector(value, length=None, min_length=None):
+    array = numpy.ma.array(value)
     if array.shape == ():
         array = numpy.ma.repeat(array, 1)
     if array.ndim != 1:
@@ -86,7 +90,12 @@ def integer_vector(value, length=None):
     if length is not None:
         if len(array) != length:
             raise ValueError(
-                "Expected %s values, received %s." % (length, len(array)))
+                "Expected %s values, received %s" % (length, len(array)))
+    if min_length is not None:
+        if len(array) < min_length:
+            raise ValueError(
+                "Expected %s or more values, received %s" %
+                (min_length, len(array)))
     return array
 
 
@@ -116,22 +125,6 @@ def string_vector(value, length=None, min_length=None):
     if isinstance(value, (toyplot.compatibility.string_type)):
         value = [value]
     array = numpy.ma.array(value).astype("unicode")
-    if array.ndim != 1:
-        raise ValueError("Expected a vector.")
-    if length is not None:
-        if len(array) != length:
-            raise ValueError(
-                "Expected %s values, received %s" % (length, len(array)))
-    if min_length is not None:
-        if len(array) < min_length:
-            raise ValueError(
-                "Expected %s or more values, received %s" %
-                (min_length, len(array)))
-    return array
-
-
-def vector(value, length=None, min_length=None):
-    array = numpy.ma.array(value)
     if array.ndim != 1:
         raise ValueError("Expected a vector.")
     if length is not None:

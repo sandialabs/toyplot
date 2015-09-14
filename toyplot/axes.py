@@ -1334,19 +1334,26 @@ class Cartesian(object):
         -------
         plot: :class:`toyplot.mark.Graph`
         """
-        source = toyplot.require.integer_vector(a)
-        target = toyplot.require.integer_vector(b, len(source))
+        source = toyplot.require.vector(a)
+        target = toyplot.require.vector(b, len(source))
+
+        vertex_dictionary, edges = numpy.unique(numpy.concatenate((source, target)), return_inverse=True)
+        edges = edges.reshape((len(source), 2), order="F")
+
+        induced_vcount = numpy.max(edges) + 1
 
         if c is None:
-            vcount = numpy.max(numpy.concatenate((source, target))) + 1
+            vcount = induced_vcount
         else:
             vcount = toyplot.require.integer(c)
+            if vcount < induced_vcount:
+                raise ValueError("Graph edges induce more than %s vertices." % (vcount))
 
         if layout is None:
             layout = toyplot.layout.GraphViz()
 
         start = time.time()
-        vcoordinates, eshape, ecoordinates = layout.graph(vcount, numpy.column_stack((source, target)))
+        vcoordinates, eshape, ecoordinates = layout.graph(vcount, edges)
         toyplot.log.info("Graph layout time: %s ms" % ((time.time() - start) * 1000))
 
         along = toyplot.require.value_in(along, ["x", "y"])

@@ -203,9 +203,14 @@ def _add_at(target, target_indices, source):
 
 
 def _floyd_warshall_shortest_path(vcount, edges):
-    """Compute the shortest paths between every pair of vertices in a graph, using the Floyd-Warshall algorithm.
+    """Compute the (directed) shortest paths between every pair of vertices in a graph, using the Floyd-Warshall algorithm.
 
-    Floyd-Warshall is a good choice for computing paths between all pairs of vertices in dense graphs.
+    Floyd-Warshall is a good choice for computing paths between all pairs of
+    vertices in dense graphs.
+
+    Note that this algorithm is directed, i.e. a path from i -> j doesn't imply
+    a path from j -> i.  The results will contain numpy.inf for vertices that
+    have no path.
 
     Returns
     -------
@@ -224,6 +229,15 @@ def _floyd_warshall_shortest_path(vcount, edges):
                     distance[i,j] = distance[i,k] + distance[k,j]
 
     return distance
+
+
+def _adjacency_list(vcount, edges):
+    """Return an adjacency list representation of a graph."""
+    adjacency = [[] for i in numpy.arange(vcount)]
+    for source, target in edges:
+        adjacency[source].append(target)
+    return adjacency
+
 
 class GraphEdges(object):
     """Base class for algorithms that compute coordinates for graph edges only."""

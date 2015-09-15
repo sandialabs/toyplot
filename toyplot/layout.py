@@ -239,12 +239,12 @@ def _adjacency_list(vcount, edges):
     return targets
 
 
-def _require_tree(targets):
+def _require_tree(children):
     """Return the root vertex and maximum depth of a tree.
 
     Parameters
     ----------
-    targets: list of lists
+    children: list of lists
         Adjacency list representation of a graph.
 
     Returns
@@ -254,20 +254,20 @@ def _require_tree(targets):
     depth: integer
         Maximum depth of the tree.
     """
-    roots = numpy.setdiff1d(numpy.arange(len(targets)), numpy.concatenate(targets))
+    roots = numpy.setdiff1d(numpy.arange(len(children)), numpy.concatenate(children))
     if len(roots) != 1:
         raise ValueError("Not a tree.")
     root = roots[0]
 
     depth = []
-    visited = numpy.zeros(len(targets), dtype=bool)
+    visited = numpy.zeros(len(children), dtype=bool)
     def mark_visited(vertex, vdepth=0):
         if visited[vertex]:
             raise ValueError("Not a tree.")
         depth.append(vdepth)
         visited[vertex] = True
-        for target in targets[vertex]:
-            mark_visited(target, vdepth + 1)
+        for child in children[vertex]:
+            mark_visited(child, vdepth + 1)
     mark_visited(root)
 
     return root, max(depth)
@@ -555,20 +555,131 @@ class WeatherellShannon(Graph):
 
     def graph(self, vcount, edges):
         # Convert the graph to an adjacency list
-        targets = _adjacency_list(vcount, edges)
+        children = _adjacency_list(vcount, edges)
         # Ensure we actually have a tree
-        root, depth = _require_tree(targets)
+        root, depth = _require_tree(children)
+
+        mod = numpy.zeros(vcount)
+        nexts = numpy.zeros(depth + 1)
+        offset = numpy.zeros(depth + 1)
+        vcoordinates = numpy.zeros((vcount, 2))
+
+        def setup(vertex, vdepth=0):
+            vcoordinates[vertex][1] = vdepth
+
+            for child in children[vertex]:
+                setup(child, vdepth + 1)
+
+            if len(children[vertex]) == 0:
+                place = nexts[vdepth]
+                vcoordinates[vertex][0] = place
+            elif len(children[vertex]) == 1:
+                place = vcoordinates[children[vertex][0]][0] - 1
+            else:
+                place  = (vcoordinates[children[vertex][0]][0] + vcoordinates[children[vertex][-1]][0]) * 0.5
+
+            offset[vdepth] = max(offset[vdepth], nexts[vdepth] - place)
+
+            if len(children[vertex]):
+                vcoordinates[vertex][0] = place + offset[vdepth]
+
+            nexts[vdepth] += 2
+            mod[vertex] = offset[vdepth]
+
+        def addmods(vertex, vdepth=0, modsum=0):
+            vcoordinates[vertex][0] += modsum
+            modsum += offset[vdepth]
+            for child in children[vertex]:
+                addmods(child, vdepth+1, modsum)
+
+        setup(root)
+        addmods(root)
+
+        vcoordinates = numpy.dot(vcoordinates, self._basis)
+
+        eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
+        return vcoordinates, eshape, ecoordinates
+
+class Buchheim(Graph):
+    """Compute a tree layout using the 2002 algorithm of Buchheim, Junger, and Leipert."""
+    def __init__(self, edges=None, basis=[[1, 0], [0, -1]]):
+        if edges is None:
+            edges = StraightEdges()
+
+        self._edges = edges
+        self._basis = numpy.array(basis)
+
+    def graph(self, vcount, edges):
+        # Convert the graph to an adjacency list
+        children = _adjacency_list(vcount, edges)
+        # Ensure we actually have a tree
+        root, depth = _require_tree(children)
+
+        # Convert our flat adjacency list into a hierarchy, to make the implementation easier.
+        class Vertex(object):
+                def __init__(self, vertex, parent=None, number=0, depth=0):
+                        self.vertex = vertex
+                        self.parent = parent
+                        self.number = number
+                        self.depth = depth
+                        self.children = [Vertex(child, self, number, depth+1) for number, child in enumerate(children[vertex])]
+                        self.mod = 0
+                        self.thread = 0
+                        self.ancestor = self
+                        self.prelim = 0
+
+        # We follow Appendix A of the original paper as closely as possible here.
+        distance = 1
+        def FirstWalk(v):
+                if not v.children: # v is a leaf
+                        v.prelim = 0
+                        if v.number: # v has a left sibling
+                                v.prelim = v.parent.children[v.number-1].prelim + distance
+                else: # v is not a leaf
+                        defaultAncestor = v.children[0] # leftmost child of v
+                        for w in v.children:
+                                FirstWalk(w)
+                                Apportion(w, defaultAncestor)
+                        ExecuteShifts(v)
+                        midpoint = 0.5 * (v.children[0].prelim + v.children[-1].prelim)
+                        if v.number: # v has a left sibling
+                                v.prelim = v.parent.children[v.number-1].prelim + distance
+                                v.mod = v.prelim - midpoint
+                        else:
+                                v.prelim = midpoint
+
+        def Apportion(v, defaultAncestor):
+                pass
+
+        def NextLeft(v):
+                pass
+
+        def NextRight(v):
+                pass
+
+        def MoveSubtree(wm, wp, shift):
+                pass
+
+        def ExecuteShifts(v):
+                pass
+
+        def Ancestor(vim, v, defaultAncestor):
+                pass
+
+        def SecondWalk(v, m):
+                pass
+
+        r = Vertex(root)
+        FirstWalk(r)
+        SecondWalk(r, -r.prelim)
 
         vcoordinates = numpy.zeros((vcount, 2))
-        nexts = numpy.zeros(depth + 1)
-        def assign_coordinates(vertex, vdepth=0):
-            vcoordinates[vertex][0] = nexts[vdepth]
-            vcoordinates[vertex][1] = vdepth
-            nexts[vdepth] += 1
-            for target in targets[vertex]:
-                assign_coordinates(target, vdepth + 1)
-        assign_coordinates(root)
-
+        def assign_coordinates(v):
+                vcoordinates[v.vertex][0] = v.prelim
+                vcoordinates[v.vertex][1] = v.depth
+                for child in v.children:
+                        assign_coordinates(child)
+        assign_coordinates(r)
         vcoordinates = numpy.dot(vcoordinates, self._basis)
 
         eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)

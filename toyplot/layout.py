@@ -239,29 +239,38 @@ def _adjacency_list(vcount, edges):
     return targets
 
 
-def _require_tree_root(targets):
-    """Return the root vertex of a tree.
+def _require_tree(targets):
+    """Return the root vertex and maximum depth of a tree.
 
     Parameters
     ----------
     targets: list of lists
         Adjacency list representation of a graph.
+
+    Returns
+    -------
+    root: integer
+        Index of the root vertex.
+    depth: integer
+        Maximum depth of the tree.
     """
     roots = numpy.setdiff1d(numpy.arange(len(targets)), numpy.concatenate(targets))
     if len(roots) != 1:
         raise ValueError("Not a tree.")
     root = roots[0]
 
+    depth = []
     visited = numpy.zeros(len(targets), dtype=bool)
-    def mark_visited(vertex):
+    def mark_visited(vertex, vdepth=0):
         if visited[vertex]:
             raise ValueError("Not a tree.")
+        depth.append(vdepth)
         visited[vertex] = True
         for target in targets[vertex]:
-            mark_visited(target)
+            mark_visited(target, vdepth + 1)
     mark_visited(root)
 
-    return root
+    return root, max(depth)
 
 class GraphEdges(object):
     """Base class for algorithms that compute coordinates for graph edges only."""
@@ -534,6 +543,36 @@ class FruchtermanReingold(Graph):
         eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
         return vcoordinates, eshape, ecoordinates
 
+
+class WeatherellShannon(Graph):
+    """Compute a tree layout using the 1979 algorithm of Wetherell and Shannon."""
+    def __init__(self, edges=None, basis=[[1, 0], [0, -1]]):
+        if edges is None:
+            edges = StraightEdges()
+
+        self._edges = edges
+        self._basis = numpy.array(basis)
+
+    def graph(self, vcount, edges):
+        # Convert the graph to an adjacency list
+        targets = _adjacency_list(vcount, edges)
+        # Ensure we actually have a tree
+        root, depth = _require_tree(targets)
+
+        vcoordinates = numpy.zeros((vcount, 2))
+        nexts = numpy.zeros(depth + 1)
+        def assign_coordinates(vertex, vdepth=0):
+            vcoordinates[vertex][0] = nexts[vdepth]
+            vcoordinates[vertex][1] = vdepth
+            nexts[vdepth] += 1
+            for target in targets[vertex]:
+                assign_coordinates(target, vdepth + 1)
+        assign_coordinates(root)
+
+        vcoordinates = numpy.dot(vcoordinates, self._basis)
+
+        eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
+        return vcoordinates, eshape, ecoordinates
 
 class GraphViz(Graph):
     """Compute a graph layout using GraphViz."""

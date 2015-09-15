@@ -233,11 +233,35 @@ def _floyd_warshall_shortest_path(vcount, edges):
 
 def _adjacency_list(vcount, edges):
     """Return an adjacency list representation of a graph."""
-    adjacency = [[] for i in numpy.arange(vcount)]
+    targets = [[] for i in numpy.arange(vcount)]
     for source, target in edges:
-        adjacency[source].append(target)
-    return adjacency
+        targets[source].append(target)
+    return targets
 
+
+def _require_tree_root(targets):
+    """Return the root vertex of a tree.
+
+    Parameters
+    ----------
+    targets: list of lists
+        Adjacency list representation of a graph.
+    """
+    roots = numpy.setdiff1d(numpy.arange(len(targets)), numpy.concatenate(targets))
+    if len(roots) != 1:
+        raise ValueError("Not a tree.")
+    root = roots[0]
+
+    visited = numpy.zeros(len(targets), dtype=bool)
+    def mark_visited(vertex):
+        if visited[vertex]:
+            raise ValueError("Not a tree.")
+        visited[vertex] = True
+        for target in targets[vertex]:
+            mark_visited(target)
+    mark_visited(root)
+
+    return root
 
 class GraphEdges(object):
     """Base class for algorithms that compute coordinates for graph edges only."""

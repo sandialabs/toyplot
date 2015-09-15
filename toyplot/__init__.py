@@ -152,7 +152,7 @@ def fill(
 
 def graph(
         a,
-        b,
+        b=None,
         c=None,
         layout=None,
         along="x",

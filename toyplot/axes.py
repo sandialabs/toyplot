@@ -1309,7 +1309,7 @@ class Cartesian(object):
     def graph(
             self,
             a,
-            b,
+            b=None,
             c=None,
             layout=None,
             along="x",
@@ -1334,18 +1334,26 @@ class Cartesian(object):
         -------
         plot: :class:`toyplot.mark.Graph`
         """
-        source = toyplot.require.vector(a)
-        target = toyplot.require.vector(b, len(source))
+        if isinstance(a, numpy.ndarray) and a.ndim == 2 and a.shape[1] == 2:
+            edges = a
+            ecount = a.shape[0]
+            vcount = b
+        else:
+            sources = toyplot.require.vector(a)
+            ecount = len(sources)
+            targets = toyplot.require.vector(b, ecount)
+            edges = numpy.column_stack((sources, targets))
+            vcount = c
 
-        vertex_dictionary, edges = numpy.unique(numpy.concatenate((source, target)), return_inverse=True)
-        edges = edges.reshape((len(source), 2), order="F")
+        vertex_dictionary, edges = numpy.unique(edges, return_inverse=True)
+        edges = edges.reshape((ecount, 2), order="C")
 
         induced_vcount = numpy.max(edges) + 1
 
-        if c is None:
+        if vcount is None:
             vcount = induced_vcount
         else:
-            vcount = toyplot.require.integer(c)
+            vcount = toyplot.require.integer(vcount)
             if vcount < induced_vcount:
                 raise ValueError("Graph edges induce more than %s vertices." % (vcount))
 
@@ -1374,11 +1382,11 @@ class Cartesian(object):
 
         ecolor = toyplot.color.broadcast(
             colors=ecolor,
-            shape=source.shape,
+            shape=ecount,
             default=default_color,
             )
-        ewidth = toyplot.broadcast.scalar(ewidth, source.shape)
-        eopacity = toyplot.broadcast.scalar(eopacity, source.shape)
+        ewidth = toyplot.broadcast.scalar(ewidth, ecount)
+        eopacity = toyplot.broadcast.scalar(eopacity, ecount)
         estyle = toyplot.style.combine(
             {}, toyplot.require.style(estyle))
 
@@ -1402,9 +1410,9 @@ class Cartesian(object):
         vtable["title"] = vtitle
 
         etable = toyplot.data.Table()
-        etable["source"] = source
+        etable["source"] = edges.T[0]
         _mark_exportable(etable, "source")
-        etable["target"] = target
+        etable["target"] = edges.T[1]
         _mark_exportable(etable, "target")
         etable["shape"] = eshape
         etable["color"] = ecolor

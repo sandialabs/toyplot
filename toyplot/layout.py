@@ -615,71 +615,105 @@ class Buchheim(Graph):
         # Ensure we actually have a tree
         root, depth = _require_tree(children)
 
+        vcoordinates = numpy.zeros((vcount, 2))
+
         # Convert our flat adjacency list into a hierarchy, to make the implementation easier.
         class Vertex(object):
-                def __init__(self, vertex, parent=None, number=0, depth=0):
-                        self.vertex = vertex
-                        self.parent = parent
-                        self.number = number
-                        self.depth = depth
-                        self.children = [Vertex(child, self, number, depth+1) for number, child in enumerate(children[vertex])]
-                        self.mod = 0
-                        self.thread = 0
-                        self.ancestor = self
-                        self.prelim = 0
+            def __init__(self, vertex, parent=None, number=0, depth=0):
+                self.vertex = vertex
+                self.parent = parent
+                self.number = number
+                self.depth = depth
+                self.children = [Vertex(child, self, number, depth+1) for number, child in enumerate(children[vertex])]
+                self.mod = 0
+                self.thread = 0
+                self.ancestor = self
+                self.prelim = 0
 
         # We follow Appendix A of the original paper as closely as possible here.
         distance = 1
         def FirstWalk(v):
-                if not v.children: # v is a leaf
-                        v.prelim = 0
-                        if v.number: # v has a left sibling
-                                v.prelim = v.parent.children[v.number-1].prelim + distance
-                else: # v is not a leaf
-                        defaultAncestor = v.children[0] # leftmost child of v
-                        for w in v.children:
-                                FirstWalk(w)
-                                Apportion(w, defaultAncestor)
-                        ExecuteShifts(v)
-                        midpoint = 0.5 * (v.children[0].prelim + v.children[-1].prelim)
-                        if v.number: # v has a left sibling
-                                v.prelim = v.parent.children[v.number-1].prelim + distance
-                                v.mod = v.prelim - midpoint
-                        else:
-                                v.prelim = midpoint
+            if not v.children: # v is a leaf
+                v.prelim = 0
+                if v.number: # v has a left sibling
+                    v.prelim = v.parent.children[v.number-1].prelim + distance
+            else: # v is not a leaf
+                defaultAncestor = v.children[0] # leftmost child of v
+                for w in v.children:
+                    FirstWalk(w)
+                    defaultAncestor = Apportion(w, defaultAncestor)
+                ExecuteShifts(v)
+                midpoint = 0.5 * (v.children[0].prelim + v.children[-1].prelim)
+                if v.number: # v has a left sibling
+                    v.prelim = v.parent.children[v.number-1].prelim + distance
+                    v.mod = v.prelim - midpoint
+                else:
+                    v.prelim = midpoint
 
         def Apportion(v, defaultAncestor):
-                pass
+            if v.number: # v has a left sibling
+                vip = vop = v
+                vim = v.parent.children[v.number-1]
+                vom = vip.parent.children[0]
+                sip = vip.mod
+                sop = vop.mod
+                sim = vim.mod
+                som = vom.mod
+                while NextRight(vim) != 0 and NextLeft(vip) != 0:
+                    vim = NextRight(vim)
+                    vip = NextLeft(vip)
+                    vom = NextLeft(vom)
+                    vop = NextRight(vop)
+                    vop.ancestor = v
+                    shift = (vim.prelim + sim) - (vip.prelim + sip) + distance
+                    if shift > 0:
+                        MoveSubtree(Ancestor(vim, v, defaultAncestor), v, shift)
+                        sip += shift
+                        sop += shift
+                    sim += vim.mod
+                    sip += vip.mod
+                    som += vom.mod
+                    sop += vop.mod
+                if NextRight(vim) != 0 and NextRight(vop) == 0:
+                    vop.thread = NextRight(vim)
+                    vop.mod += sim - sop
+                if NextLeft(vip) != 0 and NextLeft(vom) == 0:
+                    vom.thread = NextLeft(vip)
+                    vom.mod += sip - som
+                    defaultAncestor = v
+            return defaultAncestor
 
         def NextLeft(v):
-                pass
+            if v.children:
+                return v.children[0]
+            else:
+                return v.thread
 
         def NextRight(v):
-                pass
+            if v.children:
+                return v.children[-1]
+            else:
+                return v.thread
 
         def MoveSubtree(wm, wp, shift):
-                pass
+            pass
 
         def ExecuteShifts(v):
-                pass
+            pass
 
         def Ancestor(vim, v, defaultAncestor):
-                pass
+            pass
 
         def SecondWalk(v, m):
-                pass
+            vcoordinates[v.vertex][0] = v.prelim + m
+            vcoordinates[v.vertex][1] = v.depth
+            for w in v.children:
+                SecondWalk(w, m + v.mod)
 
         r = Vertex(root)
         FirstWalk(r)
         SecondWalk(r, -r.prelim)
 
-        vcoordinates = numpy.zeros((vcount, 2))
-        def assign_coordinates(v):
-                vcoordinates[v.vertex][0] = v.prelim
-                vcoordinates[v.vertex][1] = v.depth
-                for child in v.children:
-                        assign_coordinates(child)
-        assign_coordinates(r)
         vcoordinates = numpy.dot(vcoordinates, self._basis)
 
         eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)

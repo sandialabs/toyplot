@@ -35,5 +35,5 @@ def prufer_tree(sequence):
         sources.append(u)
         targets.append(v)
 
-        return numpy.array(sources), numpy.array(targets)
+        return numpy.column_stack((sources, targets))
 

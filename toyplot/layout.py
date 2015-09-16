@@ -544,62 +544,6 @@ class FruchtermanReingold(Graph):
         return vcoordinates, eshape, ecoordinates
 
 
-class WeatherellShannon(Graph):
-    """Compute a tree layout using the 1979 algorithm of Wetherell and Shannon."""
-    def __init__(self, edges=None, basis=[[1, 0], [0, -1]]):
-        if edges is None:
-            edges = StraightEdges()
-
-        self._edges = edges
-        self._basis = numpy.array(basis)
-
-    def graph(self, vcount, edges):
-        # Convert the graph to an adjacency list
-        children = _adjacency_list(vcount, edges)
-        # Ensure we actually have a tree
-        root, depth = _require_tree(children)
-
-        mod = numpy.zeros(vcount)
-        nexts = numpy.zeros(depth + 1)
-        offset = numpy.zeros(depth + 1)
-        vcoordinates = numpy.zeros((vcount, 2))
-
-        def setup(vertex, vdepth=0):
-            vcoordinates[vertex][1] = vdepth
-
-            for child in children[vertex]:
-                setup(child, vdepth + 1)
-
-            if len(children[vertex]) == 0:
-                place = nexts[vdepth]
-                vcoordinates[vertex][0] = place
-            elif len(children[vertex]) == 1:
-                place = vcoordinates[children[vertex][0]][0] - 1
-            else:
-                place  = (vcoordinates[children[vertex][0]][0] + vcoordinates[children[vertex][-1]][0]) * 0.5
-
-            offset[vdepth] = max(offset[vdepth], nexts[vdepth] - place)
-
-            if len(children[vertex]):
-                vcoordinates[vertex][0] = place + offset[vdepth]
-
-            nexts[vdepth] += 2
-            mod[vertex] = offset[vdepth]
-
-        def addmods(vertex, vdepth=0, modsum=0):
-            vcoordinates[vertex][0] += modsum
-            modsum += offset[vdepth]
-            for child in children[vertex]:
-                addmods(child, vdepth+1, modsum)
-
-        setup(root)
-        addmods(root)
-
-        vcoordinates = numpy.dot(vcoordinates, self._basis)
-
-        eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
-        return vcoordinates, eshape, ecoordinates
-
 class Buchheim(Graph):
     """Compute a tree layout using the 2002 algorithm of Buchheim, Junger, and Leipert."""
     def __init__(self, edges=None, basis=[[1, 0], [0, -1]]):

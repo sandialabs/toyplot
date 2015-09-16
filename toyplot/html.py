@@ -1959,7 +1959,7 @@ def _render(axes, mark, context): # pragma: no cover
         x,
         y,
         mark._vtable[mark._vmarker[0]],
-        numpy.sqrt(mark._vtable[mark._vsize[0]]),
+        mark._vtable[mark._vsize[0]],
         mark._vtable[mark._vcolor[0]],
         mark._vtable[mark._vopacity[0]],
         mark._vtable[mark._vtitle[0]],

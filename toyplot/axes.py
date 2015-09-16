@@ -1315,7 +1315,8 @@ class Cartesian(object):
             along="x",
             vcolor=None,
             vmarker="o",
-            vsize=20,
+            varea=None,
+            vsize=None,
             vopacity=1.0,
             vtitle=None,
             vstyle=None,
@@ -1374,7 +1375,17 @@ class Cartesian(object):
             )
 
         vmarker = toyplot.broadcast.object(vmarker, vcount)
-        vsize = toyplot.broadcast.scalar(vsize, vcount)
+
+        if varea is None and vsize is None:
+            vsize = numpy.sqrt(toyplot.broadcast.scalar(20, vcount))
+        elif varea is None and vsize is not None:
+            vsize = toyplot.broadcast.scalar(vsize, vcount)
+        elif varea is not None and vsize is None:
+            vsize = numpy.sqrt(toyplot.broadcast.scalar(varea, vcount))
+        elif varea is not None and vsize is not None:
+            toyplot.log.warning("Graph vsize parameter overrides varea.")
+            vsize = toyplot.broadcast.scalar(vsize, vcount)
+
         vopacity = toyplot.broadcast.scalar(vopacity, vcount)
         vtitle = toyplot.broadcast.object(vtitle, vcount)
         vstyle = toyplot.style.combine({}, toyplot.require.style(vstyle))

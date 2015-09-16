@@ -570,9 +570,11 @@ class Buchheim(Graph):
                 self.depth = depth
                 self.children = [Vertex(child, self, number, depth+1) for number, child in enumerate(children[vertex])]
                 self.mod = 0
-                self.thread = 0
+                self.thread = None
                 self.ancestor = self
                 self.prelim = 0
+                self.change = 0
+                self.shift = 0
 
         # We follow Appendix A of the original paper as closely as possible here.
         distance = 1
@@ -603,7 +605,7 @@ class Buchheim(Graph):
                 sop = vop.mod
                 sim = vim.mod
                 som = vom.mod
-                while NextRight(vim) != 0 and NextLeft(vip) != 0:
+                while NextRight(vim) and NextLeft(vip):
                     vim = NextRight(vim)
                     vip = NextLeft(vip)
                     vom = NextLeft(vom)
@@ -618,10 +620,10 @@ class Buchheim(Graph):
                     sip += vip.mod
                     som += vom.mod
                     sop += vop.mod
-                if NextRight(vim) != 0 and NextRight(vop) == 0:
+                if NextRight(vim) and not NextRight(vop):
                     vop.thread = NextRight(vim)
                     vop.mod += sim - sop
-                if NextLeft(vip) != 0 and NextLeft(vom) == 0:
+                if NextLeft(vip) and not NextLeft(vom):
                     vom.thread = NextLeft(vip)
                     vom.mod += sip - som
                     defaultAncestor = v
@@ -640,13 +642,27 @@ class Buchheim(Graph):
                 return v.thread
 
         def MoveSubtree(wm, wp, shift):
-            pass
+            subtrees = wp.number - wm.number
+            wp.change -= shift / subtrees
+            wp.shift += shift
+            wm.change += shift / subtrees
+            wp.prelim += shift
+            wp.mod += shift
 
         def ExecuteShifts(v):
-            pass
+            shift = 0
+            change = 0
+            for w in v.children:
+                w.prelim += shift
+                w.mod += shift
+                change += w.change
+                shift += w.shift + change
 
         def Ancestor(vim, v, defaultAncestor):
-            pass
+            if vim.ancestor in v.parent.children:
+                return vim.ancestor
+            else:
+                return defaultAncestor
 
         def SecondWalk(v, m):
             vcoordinates[v.vertex][0] = v.prelim + m

@@ -337,6 +337,15 @@ class Graph(Mark): # pragma: no cover
         # Edge style
         self._estyle = toyplot.require.style(estyle)
 
+    @property
+    def vcount(self):
+        """Return the number of vertices in the graph."""
+        return len(self._vtable)
+
+    @property
+    def vcoordinates(self):
+        """Return the graph vertex coordinates."""
+        return numpy.column_stack([self._vtable[column] for column in self._vcoordinates])
 
 class Plot(Mark):
 

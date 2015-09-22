@@ -1550,7 +1550,7 @@ def _render(axes, mark, context):
     not_null = numpy.invert(
         numpy.ma.any(numpy.ma.getmaskarray(boundaries), axis=1))
 
-    if mark._left_right_axis == "x":
+    if mark._coordinate_axes.tolist() == ["x", "y"]:
         axis1 = "x"
         axis2 = "y"
         distance1 = "width"
@@ -1558,7 +1558,7 @@ def _render(axes, mark, context):
         left = axes._project_x(left)
         right = axes._project_x(right)
         boundaries = axes._project_y(boundaries)
-    elif mark._left_right_axis == "y":
+    elif mark._coordinate_axes.tolist() == ["y", "x"]:
         axis1 = "y"
         axis2 = "x"
         distance1 = "height"

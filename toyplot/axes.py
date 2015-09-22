@@ -1035,11 +1035,10 @@ class Cartesian(object):
                 numpy.column_stack((baseline, series)), axis=1)
             if along == "x":
                 self._update_domain(position, boundaries)
+                coordinate_axes = ["x", "y"]
             elif along == "y":
                 self._update_domain(boundaries, position)
-
-            left_right_axis = along
-            magnitude_axis = "y" if along == "x" else "x"
+                coordinate_axes = ["y", "x"]
 
             table = toyplot.data.Table()
             table["left"] = position.T[0]
@@ -1066,13 +1065,12 @@ class Cartesian(object):
 
             self._children.append(
                 toyplot.mark.BarMagnitudes(
+                    coordinate_axes=coordinate_axes,
                     table=table,
                     left="left",
                     right="right",
-                    left_right_axis=left_right_axis,
                     baseline="baseline",
                     magnitudes=magnitude_keys,
-                    magnitude_axis=magnitude_axis,
                     fill=fill_keys,
                     opacity=opacity_keys,
                     title=title_keys,

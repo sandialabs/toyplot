@@ -262,6 +262,7 @@ class Graph(Mark): # pragma: no cover
             self,
             coordinate_axes,
             vtable,
+            vid,
             vcoordinates,
             vmarker,
             vsize,
@@ -286,6 +287,8 @@ class Graph(Mark): # pragma: no cover
         self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, min_length=1)
 
         self._vtable = toyplot.require.instance(vtable, toyplot.data.Table)
+        # 1 vertex id column
+        self._vid = toyplot.require.table_keys(vtable, vid, length=1)
         # D coordinate columns
         self._vcoordinates = toyplot.require.table_keys(vtable, vcoordinates, length=len(self._coordinate_axes))
         # 1 vertex marker column
@@ -343,9 +346,19 @@ class Graph(Mark): # pragma: no cover
         return len(self._vtable)
 
     @property
+    def vid(self):
+        """Returns the graph vertex identifiers."""
+        return self._vtable[self._vid[0]]
+
+    @property
     def vcoordinates(self):
         """Return the graph vertex coordinates."""
         return numpy.column_stack([self._vtable[column] for column in self._vcoordinates])
+
+    @property
+    def edges(self):
+        """Return the graph edges as a :math:`E \\times 2` matrix of source, target indices."""
+        return numpy.column_stack((self._etable[self._esource[0]], self._etable[self._etarget[0]]))
 
 class Plot(Mark):
 

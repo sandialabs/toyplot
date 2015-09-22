@@ -1346,17 +1346,18 @@ class Cartesian(object):
             edges = numpy.column_stack((sources, targets))
             vcount = c
 
-        vertex_dictionary, edges = numpy.unique(edges, return_inverse=True)
+        vid, edges = numpy.unique(edges, return_inverse=True)
         edges = edges.reshape((ecount, 2), order="C")
 
-        induced_vcount = numpy.max(edges) + 1
-
         if vcount is None:
-            vcount = induced_vcount
+            vcount = len(vid)
         else:
             vcount = toyplot.require.integer(vcount)
-            if vcount < induced_vcount:
+            if vcount < len(vid):
                 raise ValueError("Graph edges induce more than %s vertices." % (vcount))
+
+        if vcount > len(vid):
+            vid = numpy.append(vid, numpy.zeros(vcount - len(vid), dtype=vid.dtype))
 
         if layout is None:
             layout = toyplot.layout.FruchtermanReingold()
@@ -1411,6 +1412,7 @@ class Cartesian(object):
             coordinate_axes = ["y", "x"]
 
         vtable = toyplot.data.Table()
+        vtable["id"] = vid
         for axis, coordinates in zip(coordinate_axes, vcoordinates.T):
             vtable[axis] = coordinates
             _mark_exportable(vtable, axis)
@@ -1434,6 +1436,7 @@ class Cartesian(object):
             toyplot.mark.Graph(
                 coordinate_axes=coordinate_axes,
                 vtable=vtable,
+                vid=["id"],
                 vcoordinates=coordinate_axes,
                 vmarker=["marker"],
                 vsize=["size"],

@@ -31,29 +31,31 @@ class AxisLines(Mark):
 
     def __init__(
             self,
+            coordinate_axes,
             table,
             coordinates,
-            axes,
             stroke,
             opacity,
             title,
-            style):
-        table = toyplot.require.instance(table, toyplot.data.Table)
-        coordinates = toyplot.require.table_keys(table, coordinates, length=1)
-        axes = toyplot.require.string_vector(axes, len(coordinates))
-        stroke = toyplot.require.table_keys(table, stroke, length=1)
-        opacity = toyplot.require.table_keys(table, opacity, length=1)
-        title = toyplot.require.table_keys(table, title, length=1)
-        style = toyplot.require.style(style)
-
+            style,
+            ):
         Mark.__init__(self)
-        self._table = table
-        self._coordinates = coordinates  # 1 coordinate column
-        self._axes = axes               # 1 axis identifier
-        self._stroke = stroke           # 1 stroke color column
-        self._opacity = opacity         # 1 opacity column
-        self._title = title             # 1 title column
-        self._style = style             # Line style
+
+        # 1 axis identifier
+        self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=1)
+
+        self._table = toyplot.require.instance(table, toyplot.data.Table)
+        # 1 coordinate column
+        self._coordinates = toyplot.require.table_keys(table, coordinates, length=1)
+        # 1 stroke color column
+        self._stroke = toyplot.require.table_keys(table, stroke, length=1)
+        # 1 opacity column
+        self._opacity = toyplot.require.table_keys(table, opacity, length=1)
+        # 1 title column
+        self._title = toyplot.require.table_keys(table, title, length=1)
+        # Line style
+        self._style = toyplot.require.style(style)
+
 
 
 class BarBoundaries(Mark):

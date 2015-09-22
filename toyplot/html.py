@@ -1729,7 +1729,7 @@ def _render(axes, mark, context):
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.AxisLines, _RenderContext)
 def _render(axes, mark, context):
-    if mark._axes[0] == "x":
+    if mark._coordinate_axes[0] == "x":
         p1 = "x1"
         p2 = "x2"
         b1 = "y1"
@@ -1737,7 +1737,7 @@ def _render(axes, mark, context):
         position = axes._project_x(mark._table[mark._coordinates[0]])
         boundary1 = axes._ymin_range
         boundary2 = axes._ymax_range
-    elif mark._axes[0] == "y":
+    elif mark._coordinate_axes[0] == "y":
         p1 = "y1"
         p2 = "y2"
         b1 = "x1"

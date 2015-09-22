@@ -1905,7 +1905,8 @@ class Cartesian(object):
             opacity=1.0,
             title=None,
             style=None,
-            annotation=True):
+            annotation=True,
+            ):
         """Add horizontal line(s) to the axes.
 
         Horizontal lines are convenient because they're guaranteed to fill the axes from
@@ -1931,27 +1932,26 @@ class Cartesian(object):
         table = toyplot.data.Table()
         table["y"] = toyplot.require.scalar_vector(y)
         _mark_exportable(table, "y", not annotation)
-        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
-        table["title"] = toyplot.broadcast.object(title, table.shape[0])
-        style = toyplot.style.combine(toyplot.require.style(style))
-
         color = toyplot.color.broadcast(
             colors=color,
             shape=(table.shape[0], 1),
             default=toyplot.color.near_black,
             )
-        table["toyplot:stroke"] = color[:,0]
+        table["color"] = color[:,0]
+        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
+        table["title"] = toyplot.broadcast.object(title, table.shape[0])
+        style = toyplot.style.combine(toyplot.require.style(style))
 
         self._update_domain(numpy.array([]), table["y"], display=True, data=not annotation)
 
         self._children.append(
             toyplot.mark.AxisLines(
+                coordinate_axes=["y"],
                 table=table,
                 coordinates=["y"],
-                axes=["y"],
-                stroke="toyplot:stroke",
-                opacity="opacity",
-                title="title",
+                stroke=["color"],
+                opacity=["opacity"],
+                title=["title"],
                 style=style))
         return self._children[-1]
 
@@ -1962,7 +1962,8 @@ class Cartesian(object):
             opacity=1.0,
             title=None,
             style=None,
-            annotation=True):
+            annotation=True,
+            ):
         """Add vertical line(s) to the axes.
 
         Vertical lines are convenient because they're guaranteed to fill the axes from
@@ -1988,27 +1989,26 @@ class Cartesian(object):
         table = toyplot.data.Table()
         table["x"] = toyplot.require.scalar_vector(x)
         _mark_exportable(table, "x", not annotation)
-        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
-        table["title"] = toyplot.broadcast.object(title, table.shape[0])
-        style = toyplot.style.combine(toyplot.require.style(style))
-
         color = toyplot.color.broadcast(
             colors=color,
             shape=(table.shape[0], 1),
             default=toyplot.color.near_black,
             )
-        table["toyplot:stroke"] = color[:,0]
+        table["color"] = color[:,0]
+        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
+        table["title"] = toyplot.broadcast.object(title, table.shape[0])
+        style = toyplot.style.combine(toyplot.require.style(style))
 
         self._update_domain(table["x"], numpy.array([]), display=True, data=not annotation)
 
         self._children.append(
             toyplot.mark.AxisLines(
+                coordinate_axes=["x"],
                 table=table,
                 coordinates=["x"],
-                axes=["x"],
-                stroke="toyplot:stroke",
-                opacity="opacity",
-                title="title",
+                stroke=["color"],
+                opacity=["opacity"],
+                title=["title"],
                 style=style))
         return self._children[-1]
 

@@ -1482,7 +1482,7 @@ def _render(axes, mark, context):
     boundaries = numpy.ma.column_stack(
         [mark._table[key] for key in mark._boundaries])
 
-    if mark._left_right_axis == "x":
+    if mark._coordinate_axes.tolist() == ["x", "y"]:
         axis1 = "x"
         axis2 = "y"
         distance1 = "width"
@@ -1490,7 +1490,7 @@ def _render(axes, mark, context):
         left = axes._project_x(left)
         right = axes._project_x(right)
         boundaries = axes._project_y(boundaries)
-    elif mark._left_right_axis == "y":
+    elif mark._coordinate_axes.tolist() == ["y", "x"]:
         axis1 = "y"
         axis2 = "x"
         distance1 = "height"

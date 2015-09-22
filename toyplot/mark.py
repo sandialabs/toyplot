@@ -68,46 +68,40 @@ class BarBoundaries(Mark):
 
     def __init__(
             self,
+            coordinate_axes,
             table,
             left,
             right,
-            left_right_axis,
             boundaries,
-            boundary_axis,
             fill,
             opacity,
             title,
             style,
-            filename):
-        table = toyplot.require.instance(table, toyplot.data.Table)
-        left = toyplot.require.table_keys(table, left, length=1)
-        right = toyplot.require.table_keys(table, right, length=1)
-        left_right_axis = toyplot.require.string_vector(
-            left_right_axis, length=1)
-        boundaries = toyplot.require.table_keys(
-            table, boundaries, min_length=2)
-        boundary_axis = toyplot.require.string_vector(boundary_axis, length=1)
-        fill = toyplot.require.table_keys(
-            table, fill, length=len(boundaries) - 1)
-        opacity = toyplot.require.table_keys(
-            table, opacity, length=len(boundaries) - 1)
-        title = toyplot.require.table_keys(
-            table, title, length=len(boundaries) - 1)
-        style = toyplot.require.style(style)
-        filename = toyplot.require.filename(filename)
-
+            filename,
+            ):
         Mark.__init__(self)
-        self._table = table
-        self._left = left         # 1 coordinate column
-        self._right = right       # 1 coordinate column
-        self._left_right_axis = left_right_axis  # 1 axis identifier
-        self._boundaries = boundaries  # N bar boundary columns
-        self._boundary_axis = boundary_axis  # 1 axis identifier
-        self._fill = fill  # N-1 fill color columns
-        self._opacity = opacity  # N-1 opacity columns
-        self._title = title  # N-1 title columns
-        self._style = toyplot.style.combine({"stroke": "none"}, style)  # Bar style
-        self._filename = filename
+
+        # 2 axis identifiers
+        self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=2)
+
+        self._table = toyplot.require.instance(table, toyplot.data.Table)
+
+        # 1 coordinate column
+        self._left = toyplot.require.table_keys(table, left, length=1)
+        # 1 coordinate column
+        self._right = toyplot.require.table_keys(table, right, length=1)
+        # N bar boundary columns
+        self._boundaries = toyplot.require.table_keys(table, boundaries, min_length=2)
+        # N-1 fill color columns
+        self._fill = toyplot.require.table_keys(table, fill, length=len(boundaries) - 1)
+        # N-1 opacity columns
+        self._opacity = toyplot.require.table_keys(table, opacity, length=len(boundaries) - 1)
+        # N-1 title columns
+        self._title = toyplot.require.table_keys(table, title, length=len(boundaries) - 1)
+        # Bar style
+        self._style = toyplot.style.combine({"stroke": "none"}, toyplot.require.style(style))
+        # Export filename
+        self._filename = toyplot.require.filename(filename)
 
 
 class BarMagnitudes(Mark):

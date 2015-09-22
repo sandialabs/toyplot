@@ -919,11 +919,10 @@ class Cartesian(object):
 
             if along == "x":
                 self._update_domain(position, series)
+                coordinate_axes = ["x", "y"]
             elif along == "y":
                 self._update_domain(series, position)
-
-            left_right_axis = along
-            boundary_axis = "y" if along == "x" else "x"
+                coordinate_axes = ["y", "x"]
 
             table = toyplot.data.Table()
             table["left"] = position.T[0]
@@ -935,7 +934,7 @@ class Cartesian(object):
             opacity_keys = []
             title_keys = []
 
-            boundary_keys.append(boundary_axis + "0")
+            boundary_keys.append("boundary0")
             table[boundary_keys[-1]] = series.T[0]
 
             for index, (boundary_column, fill_column, opacity_column, title_column) in enumerate(
@@ -952,12 +951,11 @@ class Cartesian(object):
 
             self._children.append(
                 toyplot.mark.BarBoundaries(
+                    coordinate_axes=coordinate_axes,
                     table=table,
                     left="left",
                     right="right",
-                    left_right_axis=left_right_axis,
                     boundaries=boundary_keys,
-                    boundary_axis=boundary_axis,
                     fill=fill_keys,
                     opacity=opacity_keys,
                     title=title_keys,

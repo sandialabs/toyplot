@@ -162,35 +162,37 @@ class FillBoundaries(Mark):
 
     def __init__(
             self,
+            coordinate_axes,
             table,
             position,
-            position_axis,
             boundaries,
-            boundary_axis,
             fill,
             opacity,
             title,
             style,
-            filename):
-        table = toyplot.require.instance(table, toyplot.data.Table)
-        position = toyplot.require.table_keys(table, position, length=1)
-        position_axis = toyplot.require.string_vector(position_axis, length=1)
-        boundaries = toyplot.require.table_keys(table, boundaries)
-        boundary_axis = toyplot.require.string_vector(boundary_axis, length=1)
-        style = toyplot.require.style(style)
-        filename = toyplot.require.filename(filename)
-
+            filename,
+            ):
         Mark.__init__(self)
-        self._table = table
-        self._position = position  # 1 coordinate column
-        self._position_axis = position_axis  # 1 axis identifier
-        self._boundaries = boundaries  # N fill boundary columns
-        self._boundary_axis = boundary_axis  # 1 axis identifier
-        self._fill = fill         # N-1 fill colors
-        self._opacity = opacity   # N-1 opacities
-        self._title = title       # N-1 titles
-        self._style = style       # Fill style
-        self._filename = filename
+
+        # 2 axis identifiers
+        self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=2)
+
+        self._table = toyplot.require.instance(table, toyplot.data.Table)
+        # 1 coordinate column
+        self._position = toyplot.require.table_keys(table, position, length=1)
+        # N fill boundary columns
+        self._boundaries = toyplot.require.table_keys(table, boundaries, min_length=2)
+        # N-1 fill colors
+        self._fill = toyplot.require.vector(fill, length=len(boundaries) - 1)
+        # N-1 opacities
+        self._opacity = toyplot.require.scalar_vector(opacity, length=len(boundaries) - 1)
+        # N-1 titles
+        #self._title = toyplot.require.string_vector(title, length=len(boundaries) - 1)
+        self._title = title
+        # Fill style
+        self._style = toyplot.require.style(style)
+        # Export filename
+        self._filename = toyplot.require.filename(filename)
 
 
 class FillMagnitudes(Mark):

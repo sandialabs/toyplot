@@ -1194,29 +1194,27 @@ class Cartesian(object):
 
             if along == "x":
                 self._update_domain(position, series)
+                coordinate_axes = ["x", "y"]
             elif along == "y":
                 self._update_domain(series, position)
-
-            position_axis = along
-            boundary_axis = "y" if along == "x" else "x"
+                coordinate_axes = ["y", "x"]
 
             table = toyplot.data.Table()
-            table[position_axis] = position
-            _mark_exportable(table, position_axis)
+            table[coordinate_axes[0]] = position
+            _mark_exportable(table, coordinate_axes[0])
             boundaries = []
             for index, column in enumerate(series.T):
-                key = boundary_axis + str(index)
+                key = coordinate_axes[1] + str(index)
                 table[key] = column
                 _mark_exportable(table, key)
                 boundaries.append(key)
 
             self._children.append(
                 toyplot.mark.FillBoundaries(
+                    coordinate_axes=coordinate_axes,
                     table=table,
-                    position=position_axis,
-                    position_axis=position_axis,
+                    position=[coordinate_axes[0]],
                     boundaries=boundaries,
-                    boundary_axis=boundary_axis,
                     fill=color,
                     opacity=opacity,
                     title=title,

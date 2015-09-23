@@ -1562,15 +1562,14 @@ class Cartesian(object):
 
         if along == "x":
             self._update_domain(position, series)
+            coordinate_axes = ["x", "y"]
         elif along == "y":
             self._update_domain(series, position)
-
-        coordinate_axes = along
-        series_axis = "y" if along == "x" else "x"
+            coordinate_axes = ["y", "x"]
 
         table = toyplot.data.Table()
-        table[coordinate_axes] = position
-        _mark_exportable(table, coordinate_axes)
+        table[coordinate_axes[0]] = position
+        _mark_exportable(table, coordinate_axes[0])
         series_keys = []
         marker_keys = []
         msize_keys = []
@@ -1580,7 +1579,7 @@ class Cartesian(object):
         mtitle_keys = []
         for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column, mtitle_column) in enumerate(
                 zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T, mtitle.T)):
-            series_keys.append(series_axis + str(index))
+            series_keys.append(coordinate_axes[1] + str(index))
             marker_keys.append("marker" + str(index))
             msize_keys.append("size" + str(index))
             mfill_keys.append("fill" + str(index))
@@ -1598,11 +1597,10 @@ class Cartesian(object):
 
         self._children.append(
             toyplot.mark.Plot(
-                table=table,
-                coordinates=coordinate_axes,
                 coordinate_axes=coordinate_axes,
+                table=table,
+                coordinates=[coordinate_axes[0]],
                 series=series_keys,
-                series_axis=series_axis,
                 stroke=stroke,
                 stroke_width=stroke_width,
                 stroke_opacity=stroke_opacity,

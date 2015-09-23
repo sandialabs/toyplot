@@ -487,11 +487,10 @@ class Scatterplot(Mark):
 
     def __init__(
             self,
+            coordinate_axes,
             table,
             coordinates,
-            coordinate_axes,
             series,
-            series_axis,
             marker,
             msize,
             mfill,
@@ -501,44 +500,39 @@ class Scatterplot(Mark):
             style,
             mstyle,
             mlstyle,
-            filename):
-        table = toyplot.require.instance(table, toyplot.data.Table)
-        coordinates = toyplot.require.table_keys(
-            table, coordinates, min_length=1)
-        coordinate_axes = toyplot.require.string_vector(
-            coordinate_axes, length=len(coordinates))
-        series = toyplot.require.table_keys(table, series, min_length=1)
-        series_axis = toyplot.require.string_vector(series_axis, length=1)
-        marker = toyplot.require.table_keys(table, marker, length=len(series))
-        msize = toyplot.require.table_keys(table, msize, length=len(series))
-        mfill = toyplot.require.table_keys(table, mfill, length=len(series))
-        mstroke = toyplot.require.table_keys(
-            table, mstroke, length=len(series))
-        mopacity = toyplot.require.table_keys(
-            table, mopacity, length=len(series))
-        mtitle = toyplot.require.table_keys(
-            table, mtitle, length=len(series))
-        style = toyplot.require.style(style)
-        mstyle = toyplot.require.style(mstyle)
-        mlstyle = toyplot.require.style(mlstyle)
-        filename = toyplot.require.filename(filename)
-
+            filename,
+            ):
         Mark.__init__(self)
-        self._table = table
-        self._coordinates = coordinates       # D-1 coordinate columns
-        self._coordinate_axes = coordinate_axes  # D-1 axis identifiers
-        self._series = series                 # N coordinate columns
-        self._series_axis = series_axis       # 1 axis identifier
-        self._marker = marker                 # N marker columns
-        self._msize = msize                   # N marker size columns
-        self._mfill = mfill                   # N marker fill color columns
-        self._mstroke = mstroke               # N marker stroke color columns
-        self._mopacity = mopacity             # N marker opacity columns
-        self._mtitle = mtitle                 # N marker title columns
-        self._style = style                   # Line style
-        self._mstyle = mstyle                 # Marker style
-        self._mlstyle = mlstyle               # Marker label style
-        self._filename = filename
+
+        # 2 axis identifiers
+        self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=2)
+
+        self._table = toyplot.require.instance(table, toyplot.data.Table)
+
+        # 1 coordinate column
+        self._coordinates = toyplot.require.table_keys(table, coordinates, length=1)
+        # N coordinate columns
+        self._series = toyplot.require.table_keys(table, series, min_length=1)
+        # N marker columns
+        self._marker = toyplot.require.table_keys(table, marker, length=len(series))
+        # N marker size columns
+        self._msize = toyplot.require.table_keys(table, msize, length=len(series))
+        # N marker fill color columns
+        self._mfill = toyplot.require.table_keys(table, mfill, length=len(series))
+        # N marker stroke color columns
+        self._mstroke = toyplot.require.table_keys(table, mstroke, length=len(series))
+        # N marker opacity columns
+        self._mopacity = toyplot.require.table_keys(table, mopacity, length=len(series))
+        # N marker title columns
+        self._mtitle = toyplot.require.table_keys(table, mtitle, length=len(series))
+        # Global style
+        self._style = toyplot.require.style(style)
+        # Marker style
+        self._mstyle = toyplot.require.style(mstyle)
+        # Marker label style
+        self._mlstyle = toyplot.require.style(mlstyle)
+        # Export filename
+        self._filename = toyplot.require.filename(filename)
 
 
 class Text(Mark):

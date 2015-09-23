@@ -1268,31 +1268,29 @@ class Cartesian(object):
                 numpy.ma.column_stack((baseline, series)), axis=1)
             if along == "x":
                 self._update_domain(position, boundaries)
+                coordinate_axes = ["x", "y"]
             elif along == "y":
                 self._update_domain(boundaries, position)
-
-            position_axis = along
-            magnitude_axis = "y" if along == "x" else "x"
+                coordinate_axes = ["y", "x"]
 
             table = toyplot.data.Table()
-            table[position_axis] = position
-            _mark_exportable(table, position_axis)
+            table[coordinate_axes[0]] = position
+            _mark_exportable(table, coordinate_axes[0])
             table["baseline"] = baseline
             magnitudes = []
             for index, column in enumerate(series.T):
-                key = magnitude_axis + str(index)
+                key = coordinate_axes[1] + str(index)
                 table[key] = column
                 _mark_exportable(table, key)
                 magnitudes.append(key)
 
             self._children.append(
                 toyplot.mark.FillMagnitudes(
+                    coordinate_axes=coordinate_axes,
                     table=table,
-                    position=position_axis,
-                    position_axis=position_axis,
-                    baseline="baseline",
+                    position=[coordinate_axes[0]],
+                    baseline=["baseline"],
                     magnitudes=magnitudes,
-                    magnitude_axis=magnitude_axis,
                     fill=color,
                     opacity=opacity,
                     title=title,

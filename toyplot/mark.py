@@ -187,7 +187,7 @@ class FillBoundaries(Mark):
         # N-1 opacities
         self._opacity = toyplot.require.scalar_vector(opacity, length=len(boundaries) - 1)
         # N-1 titles
-        #self._title = toyplot.require.string_vector(title, length=len(boundaries) - 1)
+        #self._title = toyplot.require.object_vector(title, length=len(boundaries) - 1)
         self._title = title
         # Fill style
         self._style = toyplot.require.style(style)
@@ -205,39 +205,41 @@ class FillMagnitudes(Mark):
 
     def __init__(
             self,
+            coordinate_axes,
             table,
             position,
-            position_axis,
             baseline,
             magnitudes,
-            magnitude_axis,
             fill,
             opacity,
             title,
             style,
-            filename):
-        table = toyplot.require.instance(table, toyplot.data.Table)
-        position = toyplot.require.table_keys(table, position, length=1)
-        position_axis = toyplot.require.string_vector(position_axis, length=1)
-        baseline = toyplot.require.table_keys(table, baseline, length=1)
-        magnitudes = toyplot.require.table_keys(table, magnitudes)
-        magnitude_axis = toyplot.require.string_vector(
-            magnitude_axis, length=1)
-        style = toyplot.require.style(style)
-        filename = toyplot.require.filename(filename)
-
+            filename,
+            ):
         Mark.__init__(self)
-        self._table = table
-        self._position = position     # 1 coordinate column
-        self._position_axis = position_axis  # 1 axis identifier
-        self._baseline = baseline     # 1 baseline column
-        self._magnitudes = magnitudes  # N fill magnitude columns
-        self._magnitude_axis = magnitude_axis  # 1 axis identifier
-        self._fill = fill             # N fill colors
-        self._opacity = opacity       # N opacities
-        self._title = title           # N titles
-        self._style = style           # Fill style
-        self._filename = filename
+
+        # 2 axis identifiers
+        self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=2)
+
+        self._table = toyplot.require.instance(table, toyplot.data.Table)
+
+        # 1 coordinate column
+        self._position = toyplot.require.table_keys(table, position, length=1)
+        # 1 baseline column
+        self._baseline = toyplot.require.table_keys(table, baseline, length=1)
+        # N fill magnitude columns
+        self._magnitudes = toyplot.require.table_keys(table, magnitudes)
+        # N fill colors
+        self._fill = toyplot.require.vector(fill, length=len(magnitudes))
+        # N opacities
+        self._opacity = toyplot.require.scalar_vector(opacity, length=len(magnitudes))
+        # N titles
+        #self._title = toyplot.require.object_vector(title, length=len(magnitudes))
+        self._title = title
+        # Fill style
+        self._style = toyplot.require.style(style)
+        # Export filename
+        self._filename = toyplot.require.filename(filename)
 
 
 class Graph(Mark): # pragma: no cover

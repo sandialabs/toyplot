@@ -1673,15 +1673,12 @@ def _render(axes, mark, context):
         numpy.ma.any(numpy.ma.getmaskarray(boundaries), axis=1))
     segments = _flat_contiguous(not_null)
 
-    if mark._position_axis == "x":
+    if mark._coordinate_axes.tolist() == ["x", "y"]:
         position = axes._project_x(mark._table[mark._position[0]])
-    else:
-        position = axes._project_y(mark._table[mark._position[0]])
-
-    if mark._magnitude_axis == "x":
-        boundaries = axes._project_x(boundaries)
-    else:
         boundaries = axes._project_y(boundaries)
+    elif mark._coordinate_axes.tolist() == ["y", "x"]:
+        position = axes._project_y(mark._table[mark._position[0]])
+        boundaries = axes._project_x(boundaries)
 
     mark_xml = xml.SubElement(
         context.root,
@@ -1698,7 +1695,7 @@ def _render(axes, mark, context):
         series_style = toyplot.style.combine(
             {"fill": toyplot.color.to_css(fill), "opacity": opacity}, mark._style)
         for segment in segments:
-            if mark._position_axis == "x":
+            if mark._coordinate_axes[0] == "x":
                 coordinates = zip(
                     numpy.concatenate(
                         (position[segment],
@@ -1708,7 +1705,7 @@ def _render(axes, mark, context):
                         (boundary1[segment],
                          boundary2[segment][
                             ::-1])))
-            elif mark._position_axis == "y":
+            elif mark._coordinate_axes[0] == "y":
                 coordinates = zip(
                     numpy.concatenate(
                         (boundary1[segment],

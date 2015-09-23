@@ -664,18 +664,14 @@ class Canvas(object):
 
         self._children.append(
             toyplot.mark.Text(
+                coordinate_axes=["x", "y"],
                 table=table,
-                coordinates=[
-                    "x",
-                    "y"],
-                axes=[
-                    "x",
-                    "y"],
-                text="text",
-                angle="angle",
-                fill="toyplot:fill",
-                opacity="opacity",
-                title="title",
+                coordinates=["x", "y"],
+                text=["text"],
+                angle=["angle"],
+                fill=["toyplot:fill"],
+                opacity=["opacity"],
+                title=["title"],
                 style=style,
                 filename=None))
         return self._children[-1]

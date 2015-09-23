@@ -2185,8 +2185,8 @@ def _render(axes, mark, context):
     toyplot.mark.Text,
     _RenderContext)
 def _render(parent, mark, context):
-    x = mark._table[mark._coordinates[numpy.where(mark._axes == "x")[0][0]]]
-    y = mark._table[mark._coordinates[numpy.where(mark._axes == "y")[0][0]]]
+    x = mark._table[mark._coordinates[numpy.where(mark._coordinate_axes == "x")[0][0]]]
+    y = mark._table[mark._coordinates[numpy.where(mark._coordinate_axes == "y")[0][0]]]
 
     if isinstance(parent, toyplot.axes.Cartesian):
         x = parent._project_x(x)

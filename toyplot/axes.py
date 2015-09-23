@@ -1865,7 +1865,7 @@ class Cartesian(object):
             shape=(table.shape[0], 1),
             default=default_color,
             )
-        table["toyplot:fill"] = color[:,0]
+        table["fill"] = color[:,0]
 
         self._update_domain(
             table["x"], table["y"], display=True, data=not annotation)
@@ -1874,18 +1874,14 @@ class Cartesian(object):
 
         self._children.append(
             toyplot.mark.Text(
+                coordinate_axes=["x", "y"],
                 table=table,
-                coordinates=[
-                    "x",
-                    "y"],
-                axes=[
-                    "x",
-                    "y"],
-                text="text",
-                angle="angle",
-                fill="toyplot:fill",
-                opacity="opacity",
-                title="title",
+                coordinates=["x", "y"],
+                text=["text"],
+                angle=["angle"],
+                fill=["fill"],
+                opacity=["opacity"],
+                title=["title"],
                 style=style,
                 filename=filename))
         return self._children[-1]

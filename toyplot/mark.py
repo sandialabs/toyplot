@@ -558,38 +558,40 @@ class Text(Mark):
 
     def __init__(
             self,
+            coordinate_axes,
             table,
             coordinates,
-            axes,
             text,
             angle,
             fill,
             opacity,
             title,
             style,
-            filename):
-        table = toyplot.require.instance(table, toyplot.data.Table)
-        coordinates = toyplot.require.table_keys(table, coordinates)
-        axes = toyplot.require.string_vector(axes, length=len(coordinates))
-        text = toyplot.require.table_keys(table, text, length=1)
-        angle = toyplot.require.table_keys(table, angle, length=1)
-        fill = toyplot.require.table_keys(table, fill, length=1)
-        opacity = toyplot.require.table_keys(table, opacity, length=1)
-        title = toyplot.require.table_keys(table, title, length=1)
-        style = toyplot.require.style(style)
-        filename = toyplot.require.filename(filename)
-
+            filename,
+            ):
         Mark.__init__(self)
-        self._table = table
-        self._coordinates = coordinates  # D coordinate columns
-        self._axes = axes               # D axis identifiers
-        self._text = text               # 1 text column
-        self._angle = angle             # 1 angle column
-        self._fill = fill               # 1 fill color column
-        self._opacity = opacity         # 1 opacity column
-        self._title = title             # 1 title column
-        self._style = style             # Text style
-        self._filename = filename
+
+        # D axis identifiers
+        self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, min_length=1)
+
+        self._table = toyplot.require.instance(table, toyplot.data.Table)
+        # D coordinate columns
+        self._coordinates = toyplot.require.table_keys(table, coordinates, length=len(self._coordinate_axes))
+        # 1 text column
+        self._text = toyplot.require.table_keys(table, text, length=1)
+        # 1 angle column
+        self._angle = toyplot.require.table_keys(table, angle, length=1)
+        # 1 fill color column
+        self._fill = toyplot.require.table_keys(table, fill, length=1)
+        # 1 opacity column
+        self._opacity = toyplot.require.table_keys(table, opacity, length=1)
+        # 1 title column
+        self._title = toyplot.require.table_keys(table, title, length=1)
+        # Text style
+        self._style = toyplot.require.style(style)
+        # Export filename
+        self._filename = toyplot.require.filename(filename)
+
 
 
 ##########################################################################

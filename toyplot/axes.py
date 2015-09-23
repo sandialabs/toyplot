@@ -1341,21 +1341,33 @@ class Cartesian(object):
         vid, edges = numpy.unique(edges, return_inverse=True)
         edges = edges.reshape((ecount, 2), order="C")
 
+        vcoordinates = None
         if vcount is None:
             vcount = len(vid)
+        elif isinstance(vcount, numpy.ndarray) and vcount.ndim == 2 and vcount.shape[1] == 2:
+            vcoordinates = vcount
+            vcount = len(vcoordinates)
         else:
             vcount = toyplot.require.integer(vcount)
-            if vcount < len(vid):
-                raise ValueError("Graph edges induce more than %s vertices." % (vcount))
+
+        if vcount < len(vid):
+            raise ValueError("Graph edges induce more than %s vertices." % (vcount))
 
         if vcount > len(vid):
             vid = numpy.append(vid, numpy.zeros(vcount - len(vid), dtype=vid.dtype))
 
-        if layout is None:
-            layout = toyplot.layout.FruchtermanReingold()
-
         start = time.time()
-        vcoordinates, eshape, ecoordinates = layout.graph(vcount, edges)
+
+        if vcoordinates is None:
+            # User didn't provide vertex coordinates, so compute them from scratch.
+            if layout is None:
+                layout = toyplot.layout.FruchtermanReingold()
+            vcoordinates, eshape, ecoordinates = layout.graph(vcount, edges)
+        else:
+            # User provided vertex coordinates, so all we have to provide are edges.
+            if layout is None:
+                layout = toyplot.layout.StraightEdges()
+            eshape, ecoordinates = layout.edges(vcount, edges, vcoordinates)
         toyplot.log.info("Graph layout time: %s ms" % ((time.time() - start) * 1000))
 
         along = toyplot.require.value_in(along, ["x", "y"])

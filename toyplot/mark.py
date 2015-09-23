@@ -434,46 +434,43 @@ class Rect(Mark):
 
     def __init__(
             self,
+            coordinate_axes,
             table,
             left,
             right,
-            left_right_axis,
             top,
             bottom,
-            top_bottom_axis,
             fill,
             opacity,
             title,
             style,
-            filename):
-        table = toyplot.require.instance(table, toyplot.data.Table)
-        left = toyplot.require.table_keys(table, left, length=1)
-        right = toyplot.require.table_keys(table, right, length=1)
-        left_right_axis = toyplot.require.string_vector(
-            left_right_axis, length=1)
-        top = toyplot.require.table_keys(table, top, length=1)
-        bottom = toyplot.require.table_keys(table, bottom, length=1)
-        top_bottom_axis = toyplot.require.string_vector(
-            top_bottom_axis, length=1)
-        fill = toyplot.require.table_keys(table, fill, length=1)
-        opacity = toyplot.require.table_keys(table, opacity, length=1)
-        title = toyplot.require.table_keys(table, title, length=1)
-        style = toyplot.require.style(style)
-        filename = toyplot.require.filename(filename)
-
+            filename,
+            ):
         Mark.__init__(self)
-        self._table = table
-        self._left = left       # 1 coordinate column
-        self._right = right     # 1 coordinate column
-        self._left_right_axis = left_right_axis  # 1 axis identifier
-        self._top = top         # 1 coordinate column
-        self._bottom = bottom   # 1 coordinate column
-        self._top_bottom_axis = top_bottom_axis  # 1 axis identifier
-        self._fill = fill       # 1 fill color column
-        self._opacity = opacity  # 1 opacity column
-        self._title = title     # 1 title column
-        self._style = style     # Rectangle style
-        self._filename = filename
+
+        # 2 axis identifiers
+        self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=2)
+
+        self._table = toyplot.require.instance(table, toyplot.data.Table)
+
+        # 1 coordinate column
+        self._left = toyplot.require.table_keys(table, left, length=1)
+        # 1 coordinate column
+        self._right = toyplot.require.table_keys(table, right, length=1)
+        # 1 coordinate column
+        self._top = toyplot.require.table_keys(table, top, length=1)
+        # 1 coordinate column
+        self._bottom = toyplot.require.table_keys(table, bottom, length=1)
+        # 1 fill color column
+        self._fill = toyplot.require.table_keys(table, fill, length=1)
+        # 1 opacity column
+        self._opacity = toyplot.require.table_keys(table, opacity, length=1)
+        # 1 title column
+        self._title = toyplot.require.table_keys(table, title, length=1)
+        # Rectangle style
+        self._style = toyplot.require.style(style)
+        # Export filename
+        self._filename = toyplot.require.filename(filename)
 
 
 class Scatterplot(Mark):

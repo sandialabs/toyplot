@@ -1774,15 +1774,13 @@ class Cartesian(object):
             )[:,0]
 
         if along == "x":
-            left_right_axis = "x"
-            top_bottom_axis = "y"
+            coordinate_axes = ["x", "y"]
             self._update_domain(
                 numpy.concatenate(
                     (table["left"], table["right"])), numpy.concatenate(
                     (table["top"], table["bottom"])))
         elif along == "y":
-            left_right_axis = "y"
-            top_bottom_axis = "x"
+            coordinate_axes = ["y", "x"]
             self._update_domain(
                 numpy.concatenate(
                     (table["top"], table["bottom"])), numpy.concatenate(
@@ -1790,16 +1788,15 @@ class Cartesian(object):
 
         self._children.append(
             toyplot.mark.Rect(
+                coordinate_axes,
                 table=table,
-                left="left",
-                right="right",
-                left_right_axis=left_right_axis,
-                top="top",
-                bottom="bottom",
-                top_bottom_axis=top_bottom_axis,
-                fill="toyplot:fill",
-                opacity="opacity",
-                title="title",
+                left=["left"],
+                right=["right"],
+                top=["top"],
+                bottom=["bottom"],
+                fill=["toyplot:fill"],
+                opacity=["opacity"],
+                title=["title"],
                 style=style,
                 filename=filename))
         return self._children[-1]

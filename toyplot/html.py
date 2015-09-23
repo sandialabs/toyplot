@@ -2072,12 +2072,12 @@ def _render(axes, mark, context):
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Rect, _RenderContext)
 def _render(axes, mark, context):
-    if mark._left_right_axis == "x":
+    if mark._coordinate_axes.tolist() == ["x", "y"]:
         x1 = axes._project_x(mark._table[mark._left[0]])
         x2 = axes._project_x(mark._table[mark._right[0]])
         y1 = axes._project_y(mark._table[mark._top[0]])
         y2 = axes._project_y(mark._table[mark._bottom[0]])
-    elif mark._left_right_axis == "y":
+    elif mark._coordinate_axes.tolist() == ["y", "x"]:
         x1 = axes._project_x(mark._table[mark._top[0]])
         x2 = axes._project_x(mark._table[mark._bottom[0]])
         y1 = axes._project_y(mark._table[mark._left[0]])

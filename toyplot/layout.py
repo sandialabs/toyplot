@@ -279,14 +279,12 @@ class GraphEdges(object):
 
         Parameters
         ----------
-        vcount : integer
-            The number of vertices in the graph.
+        vcoordinates : :math:`V \\times 2` matrix
+            Contains the coordinates for every graph vertex, in vertex order.
         edges : :math:`E \\times 2` matrix
             Contains the integer vertex indices for every graph edge in edge
             order.  The first and second matrix columns contain the source and
             target vertices respectively.
-        vcoordinates : :math:`V \\times 2` matrix
-            Contains the coordinates for every graph vertex, in vertex order.
 
         Returns
         -------
@@ -360,8 +358,8 @@ class Graph(object):
 
         Parameters
         ----------
-        vcount : integer
-            The number of vertices in the graph.
+        vcoordinates : :math:`V \\times 2` matrix
+            Contains (mostly uninitialized) coordinates for every graph vertex, in vertex order.
         edges : :math:`E \\times 2` matrix
             Contains the integer vertex indices for every graph edge in edge
             order.  The first and second matrix columns contain the source and
@@ -470,7 +468,6 @@ class Eades(Graph):
             _add_at(offsets, edges.T[1], -delta)
 
             # Sum offsets
-            #vcoordinates += self._c4 * offsets
             vcoordinates = numpy.ma.where(mask, vcoordinates + self._c4 * offsets, vcoordinates)
 
         eshape, ecoordinates = self._edges.edges(vcoordinates, edges)
@@ -503,15 +500,16 @@ class FruchtermanReingold(Graph):
 
     def graph(self, vcoordinates, edges):
         # Setup parameters
-        k = numpy.sqrt(self._area / vcount)
+        k = numpy.sqrt(self._area / len(vcoordinates))
 
         # Initialize coordinates
-        vcoordinates = numpy.ma.array(self._generator.uniform(-1, 1, size=(vcount, 2)))
+        mask = numpy.ma.getmaskarray(vcoordinates)
+        vcoordinates = numpy.ma.where(mask, self._generator.uniform(-1, 1, size=vcoordinates.shape), vcoordinates)
 
         # Repeatedly apply attract / repel forces to the vertices
-        vertices = numpy.column_stack(numpy.triu_indices(n=vcount, k=1))
+        vertices = numpy.column_stack(numpy.triu_indices(n=len(vcoordinates), k=1))
         for temperature in numpy.linspace(self._temperature, 0, self._M, endpoint=False):
-            offsets = numpy.zeros((vcount, 2))
+            offsets = numpy.zeros_like(vcoordinates)
 
             # Repel
             a = vcoordinates[vertices.T[0]]
@@ -541,14 +539,17 @@ class FruchtermanReingold(Graph):
             offsets *= numpy.minimum(temperature, distance)[:,None]
 
             # Sum offsets
-            vcoordinates += offsets
+            vcoordinates = numpy.ma.where(mask, vcoordinates + offsets, vcoordinates)
 
-        eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
+        eshape, ecoordinates = self._edges.edges(vcoordinates, edges)
         return vcoordinates, eshape, ecoordinates
 
 
 class Buchheim(Graph):
-    """Compute a tree layout using the 2002 algorithm of Buchheim, Junger, and Leipert."""
+    """Compute a tree layout using the 2002 algorithm of Buchheim, Junger, and Leipert.
+
+    Note: this layout currently ignores preexisting vertex coordinates.
+    """
     def __init__(self, edges=None, basis=[[1, 0], [0, -1]]):
         if edges is None:
             edges = StraightEdges()
@@ -558,11 +559,12 @@ class Buchheim(Graph):
 
     def graph(self, vcoordinates, edges):
         # Convert the graph to an adjacency list
-        children = _adjacency_list(vcount, edges)
+        children = _adjacency_list(len(vcoordinates), edges)
         # Ensure we actually have a tree
         root, depth = _require_tree(children)
 
-        vcoordinates = numpy.zeros((vcount, 2))
+        # Get rid of the mask, it complicates things.
+        vcoordinates = numpy.array(vcoordinates)
 
         # Convert our flat adjacency list into a hierarchy, to make the implementation easier.
         class Vertex(object):
@@ -679,16 +681,19 @@ class Buchheim(Graph):
 
         vcoordinates = numpy.dot(vcoordinates, self._basis)
 
-        eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
+        eshape, ecoordinates = self._edges.edges(vcoordinates, edges)
         return vcoordinates, eshape, ecoordinates
 
 class GraphViz(Graph):
-    """Compute a graph layout using GraphViz."""
+    """Compute a graph layout using GraphViz.
+
+    Note: this layout currently ignores preexisting vertex coordinates.
+    """
     def graph(self, vcoordinates, edges):
         dotfile = io.BytesIO()
         dotfile.write("digraph {\n")
         dotfile.write("node [fixedsize = shape; width=0; height=0;]\n")
-        for vertex in numpy.arange(vcount):
+        for vertex in numpy.arange(len(vcoordinates)):
             dotfile.write("""%s\n""" % vertex)
         for source, target in edges:
             dotfile.write("%s -> %s\n" % (source, target))
@@ -716,7 +721,6 @@ class GraphViz(Graph):
             elif line.startswith("edge"):
                 edges.append(line.split())
 
-        vcoordinates = numpy.ma.empty((vcount, 2))
         for vertex in vertices:
             index = int(vertex[1])
             vcoordinates[index, 0] = float(vertex[2])

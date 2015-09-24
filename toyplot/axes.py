@@ -1327,91 +1327,56 @@ class Cartesian(object):
         -------
         plot: :class:`toyplot.mark.Graph`
         """
-        if isinstance(a, numpy.ndarray) and a.ndim == 2 and a.shape[1] == 2:
-            edges = a
-            ecount = a.shape[0]
-            vcount = b
-        else:
-            sources = toyplot.require.vector(a)
-            ecount = len(sources)
-            targets = toyplot.require.vector(b, ecount)
-            edges = numpy.column_stack((sources, targets))
-            vcount = c
-
-        vid, edges = numpy.unique(edges, return_inverse=True)
-        edges = edges.reshape((ecount, 2), order="C")
-
-        if vcount is None:
-            vcount = len(vid)
-            vcoordinates = numpy.ma.masked_all((vcount, 2))
-        elif isinstance(vcount, numpy.ndarray) and vcount.ndim == 2 and vcount.shape[1] == 2:
-            vcoordinates = numpy.ma.array(vcount, copy=True)
-            vcount = len(vcoordinates)
-        else:
-            vcount = toyplot.require.integer(vcount)
-            vcoordinates = numpy.ma.masked_all((vcount, 2))
-
-        if vcount < len(vid):
-            raise ValueError("Graph edges induce more than %s vertices." % (vcount))
-
-        if vcount > len(vid):
-            vid = numpy.append(vid, numpy.zeros(vcount - len(vid), dtype=vid.dtype))
-
-        start = time.time()
-
-        if layout is None:
-            layout = toyplot.layout.FruchtermanReingold()
-        vcoordinates, eshape, ecoordinates = layout.graph(vcoordinates, edges)
-        toyplot.log.info("Graph layout time: %s ms" % ((time.time() - start) * 1000))
+        layout = toyplot.layout.graph(a, b, c, layout)
 
         along = toyplot.require.value_in(along, ["x", "y"])
 
         default_color = [next(self._graph_colors)]
         vcolor = toyplot.color.broadcast(
             colors=vcolor,
-            shape=vcount,
+            shape=layout.vcount,
             default=default_color,
             )
 
-        vmarker = toyplot.broadcast.object(vmarker, vcount)
+        vmarker = toyplot.broadcast.object(vmarker, layout.vcount)
 
         if varea is None and vsize is None:
-            vsize = numpy.sqrt(toyplot.broadcast.scalar(20, vcount))
+            vsize = numpy.sqrt(toyplot.broadcast.scalar(20, layout.vcount))
         elif varea is None and vsize is not None:
-            vsize = toyplot.broadcast.scalar(vsize, vcount)
+            vsize = toyplot.broadcast.scalar(vsize, layout.vcount)
         elif varea is not None and vsize is None:
-            vsize = numpy.sqrt(toyplot.broadcast.scalar(varea, vcount))
+            vsize = numpy.sqrt(toyplot.broadcast.scalar(varea, layout.vcount))
         elif varea is not None and vsize is not None:
             toyplot.log.warning("Graph vsize parameter overrides varea.")
-            vsize = toyplot.broadcast.scalar(vsize, vcount)
+            vsize = toyplot.broadcast.scalar(vsize, layout.vcount)
 
-        vopacity = toyplot.broadcast.scalar(vopacity, vcount)
-        vtitle = toyplot.broadcast.object(vtitle, vcount)
+        vopacity = toyplot.broadcast.scalar(vopacity, layout.vcount)
+        vtitle = toyplot.broadcast.object(vtitle, layout.vcount)
         vstyle = toyplot.style.combine({}, toyplot.require.style(vstyle))
         vlstyle = toyplot.style.combine(toyplot.require.style(vlstyle))
 
         ecolor = toyplot.color.broadcast(
             colors=ecolor,
-            shape=ecount,
+            shape=layout.ecount,
             default=default_color,
             )
-        ewidth = toyplot.broadcast.scalar(ewidth, ecount)
-        eopacity = toyplot.broadcast.scalar(eopacity, ecount)
+        ewidth = toyplot.broadcast.scalar(ewidth, layout.ecount)
+        eopacity = toyplot.broadcast.scalar(eopacity, layout.ecount)
         estyle = toyplot.style.combine(
             {}, toyplot.require.style(estyle))
 
         if along == "x":
-            self._update_domain(vcoordinates.T[0], vcoordinates.T[1])
-            self._update_domain(ecoordinates.T[0], ecoordinates.T[1])
+            self._update_domain(layout.vcoordinates.T[0], layout.vcoordinates.T[1])
+            self._update_domain(layout.ecoordinates.T[0], layout.ecoordinates.T[1])
             coordinate_axes = ["x", "y"]
         elif along == "y":
-            self._update_domain(vcoordinates.T[1], vcoordinates.T[0])
-            self._update_domain(ecoordinates.T[1], ecoordinates.T[0])
+            self._update_domain(layout.vcoordinates.T[1], layout.vcoordinates.T[0])
+            self._update_domain(layout.ecoordinates.T[1], layout.ecoordinates.T[0])
             coordinate_axes = ["y", "x"]
 
         vtable = toyplot.data.Table()
-        vtable["id"] = vid
-        for axis, coordinates in zip(coordinate_axes, vcoordinates.T):
+        vtable["id"] = layout.vid
+        for axis, coordinates in zip(coordinate_axes, layout.vcoordinates.T):
             vtable[axis] = coordinates
             _mark_exportable(vtable, axis)
         vtable["marker"] = vmarker
@@ -1421,11 +1386,11 @@ class Cartesian(object):
         vtable["title"] = vtitle
 
         etable = toyplot.data.Table()
-        etable["source"] = edges.T[0]
+        etable["source"] = layout.edges.T[0]
         _mark_exportable(etable, "source")
-        etable["target"] = edges.T[1]
+        etable["target"] = layout.edges.T[1]
         _mark_exportable(etable, "target")
-        etable["shape"] = eshape
+        etable["shape"] = layout.eshape
         etable["color"] = ecolor
         etable["width"] = ewidth
         etable["opacity"] = eopacity
@@ -1447,7 +1412,7 @@ class Cartesian(object):
                 esource=["source"],
                 etarget=["target"],
                 eshape=["shape"],
-                ecoordinates=ecoordinates,
+                ecoordinates=layout.ecoordinates,
                 ecolor=["color"],
                 ewidth=["width"],
                 eopacity=["opacity"],

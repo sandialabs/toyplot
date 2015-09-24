@@ -11,6 +11,7 @@ import io
 import numbers
 import numpy
 import subprocess
+import time
 import toyplot.compatibility
 import toyplot.units
 
@@ -188,6 +189,99 @@ def region(
     return (xmin + gutter, xmax - gutter, ymin + gutter, ymax - gutter)
 
 
+class GraphLayout(object):
+    """Stores graph layout information."""
+    def __init__(self, vid, vcoordinates, edges, eshape, ecoordinates):
+        self._vid = vid
+        self._vcoordinates = vcoordinates
+        self._edges = edges
+        self._eshape = eshape
+        self._ecoordinates = ecoordinates
+
+    @property
+    def vcount(self):
+        """Return the number of vertices in the graph."""
+        return len(self._vid)
+
+    @property
+    def vid(self):
+        """Returns the graph vertex identifiers."""
+        return self._vid
+
+    @property
+    def vcoordinates(self):
+        """Return the graph vertex coordinates."""
+        return self._vcoordinates
+
+    @property
+    def ecount(self):
+        """Return the number of edges in the graph."""
+        return len(self._edges)
+
+    @property
+    def esource(self):
+        return self._edges.T[0]
+
+    @property
+    def etarget(self):
+        return self._edges.T[1]
+
+    @property
+    def eshape(self):
+        return self._eshape
+
+    @property
+    def ecoordinates(self):
+        return self._ecoordinates
+
+    @property
+    def edges(self):
+        """Return the graph edges as a :math:`E \\times 2` matrix of source, target indices."""
+        return self._edges
+
+def graph(a, b=None, c=None, layout=None):
+    """Compute a graph layout."""
+    if isinstance(a, numpy.ndarray) and a.ndim == 2 and a.shape[1] == 2:
+        edges = a
+        ecount = a.shape[0]
+        vcount = b
+    else:
+        sources = toyplot.require.vector(a)
+        ecount = len(sources)
+        targets = toyplot.require.vector(b, ecount)
+        edges = numpy.column_stack((sources, targets))
+        vcount = c
+
+    vid, edges = numpy.unique(edges, return_inverse=True)
+    edges = edges.reshape((ecount, 2), order="C")
+
+    if vcount is None:
+        vcount = len(vid)
+        vcoordinates = numpy.ma.masked_all((vcount, 2))
+    elif isinstance(vcount, numpy.ndarray) and vcount.ndim == 2 and vcount.shape[1] == 2:
+        vcoordinates = numpy.ma.array(vcount, copy=True)
+        vcount = len(vcoordinates)
+    else:
+        vcount = toyplot.require.integer(vcount)
+        vcoordinates = numpy.ma.masked_all((vcount, 2))
+
+    if vcount < len(vid):
+        raise ValueError("Graph edges induce more than %s vertices." % (vcount))
+
+    if vcount > len(vid):
+        vid = numpy.append(vid, numpy.zeros(vcount - len(vid), dtype=vid.dtype))
+
+    start = time.time()
+    if layout is None:
+        layout = toyplot.layout.FruchtermanReingold()
+    vcoordinates, eshape, ecoordinates = layout.graph(vcoordinates, edges)
+    toyplot.log.info("Graph layout time: %s ms" % ((time.time() - start) * 1000))
+
+    if numpy.ma.is_masked(vcoordinates):
+        raise RuntimeError("Graph layout cannot return masked vertex coordinates.")
+
+    return GraphLayout(vid, vcoordinates, edges, eshape, ecoordinates)
+
 def _add_at(target, target_indices, source):
     """Add source values to the target and handle duplicate indices correctly.
 
@@ -358,8 +452,10 @@ class Graph(object):
 
         Parameters
         ----------
-        vcoordinates : :math:`V \\times 2` matrix
-            Contains (mostly uninitialized) coordinates for every graph vertex, in vertex order.
+        vcoordinates : :math:`V \\times 2` masked array
+            Coordinates for every graph vertex, in vertex order.  Where
+            practical, only masked coordinates will have values assigned by the
+            underlying algorithm.
         edges : :math:`E \\times 2` matrix
             Contains the integer vertex indices for every graph edge in edge
             order.  The first and second matrix columns contain the source and

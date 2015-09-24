@@ -274,7 +274,7 @@ def _require_tree(children):
 
 class GraphEdges(object):
     """Base class for algorithms that compute coordinates for graph edges only."""
-    def edges(self, vcount, edges, vcoordinates):
+    def edges(self, vcoordinates, edges):
         """Return edge coordinates for a graph.
 
         Parameters
@@ -308,7 +308,7 @@ class GraphEdges(object):
 
 class StraightEdges(GraphEdges):
     """Creates straight edges between graph vertices."""
-    def edges(self, vcount, edges, vcoordinates):
+    def edges(self, vcoordinates, edges):
         loops = edges.T[0] == edges.T[1]
         if numpy.any(loops):
             toyplot.log.warning("Graph contains %s loop edges that will not be displayed." % numpy.count_nonzero(loops))
@@ -333,7 +333,7 @@ class CurvedEdges(GraphEdges):
     def __init__(self, curvature=0.15):
         self._curvature = curvature
 
-    def edges(self, vcount, edges, vcoordinates):
+    def edges(self, vcoordinates, edges):
         loops = edges.T[0] == edges.T[1]
         if numpy.any(loops):
             toyplot.log.warning("Graph contains %s loop edges that will not be displayed." % numpy.count_nonzero(loops))
@@ -355,8 +355,8 @@ class CurvedEdges(GraphEdges):
 
 class Graph(object):
     """Base class for algorithms that compute coordinates for graph vertices and edges."""
-    def graph(self, vcount, edges):
-        """Return vertex and edge coordinates for a graph.
+    def graph(self, vcoordinates, edges):
+        """Compute vertex and edge coordinates for a graph.
 
         Parameters
         ----------
@@ -404,9 +404,10 @@ class Random(Graph):
         self._edges = edges
         self._generator = numpy.random.RandomState(seed=seed)
 
-    def graph(self, vcount, edges):
-        vcoordinates = numpy.ma.array(self._generator.uniform(-1, 1, size=(vcount, 2)))
-        eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
+    def graph(self, vcoordinates, edges):
+        mask = numpy.ma.getmaskarray(vcoordinates)
+        vcoordinates = numpy.ma.where(mask, self._generator.uniform(-1, 1, size=vcoordinates.shape), vcoordinates)
+        eshape, ecoordinates = self._edges.edges(vcoordinates, edges)
         return vcoordinates, eshape, ecoordinates
 
 
@@ -436,14 +437,15 @@ class Eades(Graph):
         self._M = M
         self._generator = numpy.random.RandomState(seed=seed)
 
-    def graph(self, vcount, edges):
+    def graph(self, vcoordinates, edges):
         # Initialize coordinates
-        vcoordinates = numpy.ma.array(self._generator.uniform(-1, 1, size=(vcount, 2)))
+        mask = numpy.ma.getmaskarray(vcoordinates)
+        vcoordinates = numpy.ma.where(mask, self._generator.uniform(-1, 1, size=vcoordinates.shape), vcoordinates)
 
         # Repeatedly apply attract / repel forces to the vertices
-        vertices = numpy.column_stack(numpy.triu_indices(n=vcount, k=1))
+        vertices = numpy.column_stack(numpy.triu_indices(n=len(vcoordinates), k=1))
         for iteration in numpy.arange(self._M):
-            offsets = numpy.zeros((vcount, 2))
+            offsets = numpy.zeros_like(vcoordinates)
 
             # Repel
             a = vcoordinates[vertices.T[0]]
@@ -468,9 +470,10 @@ class Eades(Graph):
             _add_at(offsets, edges.T[1], -delta)
 
             # Sum offsets
-            vcoordinates += self._c4 * offsets
+            #vcoordinates += self._c4 * offsets
+            vcoordinates = numpy.ma.where(mask, vcoordinates + self._c4 * offsets, vcoordinates)
 
-        eshape, ecoordinates = self._edges.edges(vcount, edges, vcoordinates)
+        eshape, ecoordinates = self._edges.edges(vcoordinates, edges)
         return vcoordinates, eshape, ecoordinates
 
 
@@ -498,7 +501,7 @@ class FruchtermanReingold(Graph):
         self._M = M
         self._generator = numpy.random.RandomState(seed=seed)
 
-    def graph(self, vcount, edges):
+    def graph(self, vcoordinates, edges):
         # Setup parameters
         k = numpy.sqrt(self._area / vcount)
 
@@ -553,7 +556,7 @@ class Buchheim(Graph):
         self._edges = edges
         self._basis = numpy.array(basis)
 
-    def graph(self, vcount, edges):
+    def graph(self, vcoordinates, edges):
         # Convert the graph to an adjacency list
         children = _adjacency_list(vcount, edges)
         # Ensure we actually have a tree
@@ -681,7 +684,7 @@ class Buchheim(Graph):
 
 class GraphViz(Graph):
     """Compute a graph layout using GraphViz."""
-    def graph(self, vcount, edges):
+    def graph(self, vcoordinates, edges):
         dotfile = io.BytesIO()
         dotfile.write("digraph {\n")
         dotfile.write("node [fixedsize = shape; width=0; height=0;]\n")

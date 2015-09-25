@@ -1303,8 +1303,10 @@ class Cartesian(object):
             a,
             b=None,
             c=None,
+            olayout=None,
             layout=None,
             along="x",
+            vcoordinates=None,
             vcolor=None,
             vmarker="o",
             varea=None,
@@ -1327,7 +1329,7 @@ class Cartesian(object):
         -------
         plot: :class:`toyplot.mark.Graph`
         """
-        layout = toyplot.layout.graph(a, b, c, layout)
+        layout = toyplot.layout.graph(a, b, c, olayout=olayout, layout=layout, vcoordinates=vcoordinates)
 
         along = toyplot.require.value_in(along, ["x", "y"])
 
@@ -1375,7 +1377,7 @@ class Cartesian(object):
             coordinate_axes = ["y", "x"]
 
         vtable = toyplot.data.Table()
-        vtable["id"] = layout.vid
+        vtable["id"] = layout.vids
         for axis, coordinates in zip(coordinate_axes, layout.vcoordinates.T):
             vtable[axis] = coordinates
             _mark_exportable(vtable, axis)

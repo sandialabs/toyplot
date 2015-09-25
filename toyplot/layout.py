@@ -191,8 +191,8 @@ def region(
 
 class GraphLayout(object):
     """Stores graph layout information."""
-    def __init__(self, vid, vcoordinates, edges, eshape, ecoordinates):
-        self._vid = vid
+    def __init__(self, vids, vcoordinates, edges, eshape, ecoordinates):
+        self._vids = vids
         self._vcoordinates = vcoordinates
         self._edges = edges
         self._eshape = eshape
@@ -201,12 +201,12 @@ class GraphLayout(object):
     @property
     def vcount(self):
         """Return the number of vertices in the graph."""
-        return len(self._vid)
+        return len(self._vids)
 
     @property
-    def vid(self):
+    def vids(self):
         """Returns the graph vertex identifiers."""
-        return self._vid
+        return self._vids
 
     @property
     def vcoordinates(self):
@@ -239,48 +239,59 @@ class GraphLayout(object):
         """Return the graph edges as a :math:`E \\times 2` matrix of source, target indices."""
         return self._edges
 
-def graph(a, b=None, c=None, layout=None):
+def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
     """Compute a graph layout."""
-    if isinstance(a, numpy.ndarray) and a.ndim == 2 and a.shape[1] == 2:
-        edges = a
-        ecount = a.shape[0]
-        vcount = b
-    else:
-        sources = toyplot.require.vector(a)
-        ecount = len(sources)
-        targets = toyplot.require.vector(b, ecount)
-        edges = numpy.column_stack((sources, targets))
-        vcount = c
 
-    vid, edges = numpy.unique(edges, return_inverse=True)
+    stack = [c, b, a]
+
+    # Identify the graph's edges.
+    if isinstance(stack[-1], numpy.ndarray) and stack[-1].ndim == 2 and stack[-1].shape[1] == 2:
+        edges = stack.pop()
+        ecount = edges.shape[0]
+    else:
+        sources = toyplot.require.vector(stack.pop())
+        ecount = len(sources)
+        targets = toyplot.require.vector(stack.pop(), ecount)
+        edges = numpy.column_stack((sources, targets))
+
+    # Identify the vertex ids induced by the edges.
+    vids, edges = numpy.unique(edges, return_inverse=True)
     edges = edges.reshape((ecount, 2), order="C")
 
-    if vcount is None:
-        vcount = len(vid)
-        vcoordinates = numpy.ma.masked_all((vcount, 2))
-    elif isinstance(vcount, numpy.ndarray) and vcount.ndim == 2 and vcount.shape[1] == 2:
-        vcoordinates = numpy.ma.array(vcount, copy=True)
-        vcount = len(vcoordinates)
-    else:
-        vcount = toyplot.require.integer(vcount)
-        vcoordinates = numpy.ma.masked_all((vcount, 2))
+    # If the caller supplied extra vertex ids, merge them in.
+    if isinstance(stack[-1], numpy.ndarray) and stack[-1].ndim == 1:
+        raise NotImplementedError()
 
-    if vcount < len(vid):
-        raise ValueError("Graph edges induce more than %s vertices." % (vcount))
+    # Setup storage to receive vertex coordinates
+    vcount = len(vids)
+    internal_vcoordinates = numpy.ma.masked_all((vcount, 2))
 
-    if vcount > len(vid):
-        vid = numpy.append(vid, numpy.zeros(vcount - len(vid), dtype=vid.dtype))
+    # If the caller supplied the layout for an external graph, merge those coordinates in.
+    if olayout is not None:
+        olayout = toyplot.require.instance(olayout, toyplot.layout.GraphLayout)
+        # Naive implementation
+        for index, vid in enumerate(vids):
+            match = olayout.vids == vid
+            if numpy.any(match):
+                internal_vcoordinates[index] = olayout.vcoordinates[numpy.flatnonzero(match)]
 
+    # If the caller supplied extra vertex coordinates, merge them in.
+    if vcoordinates is not None:
+        external_vcoordinates = toyplot.require.scalar_matrix(vcoordinates, rows=vcount, columns=2)
+        mask = numpy.ma.getmaskarray(external_vcoordinates)
+        internal_vcoordinates = numpy.ma.where(mask, internal_vcoordinates, external_vcoordinates)
+
+    # Apply the layout algorithm to whatever's left.
     start = time.time()
     if layout is None:
         layout = toyplot.layout.FruchtermanReingold()
-    vcoordinates, eshape, ecoordinates = layout.graph(vcoordinates, edges)
+    vcoordinates, eshape, ecoordinates = layout.graph(internal_vcoordinates, edges)
     toyplot.log.info("Graph layout time: %s ms" % ((time.time() - start) * 1000))
 
     if numpy.ma.is_masked(vcoordinates):
         raise RuntimeError("Graph layout cannot return masked vertex coordinates.")
 
-    return GraphLayout(vid, vcoordinates, edges, eshape, ecoordinates)
+    return GraphLayout(vids, vcoordinates, edges, eshape, ecoordinates)
 
 def _add_at(target, target_indices, source):
     """Add source values to the target and handle duplicate indices correctly.

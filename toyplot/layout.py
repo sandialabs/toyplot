@@ -259,8 +259,10 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
     edges = edges.reshape((ecount, 2), order="C")
 
     # If the caller supplied extra vertex ids, merge them in.
-    if isinstance(stack[-1], numpy.ndarray) and stack[-1].ndim == 1:
-        raise NotImplementedError()
+    if len(stack) and stack[-1] is not None:
+        extra_vids = toyplot.require.vector(stack.pop())
+        disconnected_vids = numpy.setdiff1d(extra_vids, vids)
+        vids = numpy.append(vids, disconnected_vids)
 
     # Setup storage to receive vertex coordinates
     vcount = len(vids)

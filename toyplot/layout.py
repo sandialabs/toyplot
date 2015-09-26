@@ -270,7 +270,7 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
 
     # If the caller supplied the layout for an external graph, merge those coordinates in.
     if olayout is not None:
-        olayout = toyplot.require.instance(olayout, toyplot.layout.GraphLayout)
+        olayout = toyplot.require.instance(olayout, (toyplot.mark.Graph, toyplot.layout.GraphLayout))
         # Naive implementation
         for index, vid in enumerate(vids):
             match = olayout.vids == vid

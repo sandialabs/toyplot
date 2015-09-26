@@ -338,7 +338,7 @@ class Graph(Mark): # pragma: no cover
         return len(self._vtable)
 
     @property
-    def vid(self):
+    def vids(self):
         """Returns the graph vertex identifiers."""
         return self._vtable[self._vid[0]]
 

@@ -189,7 +189,7 @@ def region(
     return (xmin + gutter, xmax - gutter, ymin + gutter, ymax - gutter)
 
 
-class GraphLayout(object):
+class Graph(object):
     """Stores graph layout information."""
     def __init__(self, vids, vcoordinates, edges, eshape, ecoordinates):
         self._vids = vids
@@ -270,7 +270,7 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
 
     # If the caller supplied the layout for an external graph, merge those coordinates in.
     if olayout is not None:
-        olayout = toyplot.require.instance(olayout, (toyplot.mark.Graph, toyplot.layout.GraphLayout))
+        olayout = toyplot.require.instance(olayout, (toyplot.mark.Graph, toyplot.layout.Graph))
         oindices = numpy.in1d(olayout.vids, vids, assume_unique=True)
         iindices = numpy.in1d(vids, olayout.vids, assume_unique=True)
         ivcoordinates[iindices] = olayout.vcoordinates[oindices]
@@ -291,7 +291,7 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
     if numpy.ma.is_masked(vcoordinates):
         raise RuntimeError("Graph layout cannot return masked vertex coordinates.")
 
-    return GraphLayout(vids, vcoordinates, edges, eshape, ecoordinates)
+    return Graph(vids, vcoordinates, edges, eshape, ecoordinates)
 
 def _add_at(target, target_indices, source):
     """Add source values to the target and handle duplicate indices correctly.
@@ -377,8 +377,8 @@ def _require_tree(children):
 
     return root, max(depth)
 
-class GraphEdges(object):
-    """Base class for algorithms that compute coordinates for graph edges only."""
+class EdgeLayout(object):
+    """Base class for algorithms that compute coordinates for graph edges."""
     def edges(self, vcoordinates, edges):
         """Return edge coordinates for a graph.
 
@@ -400,21 +400,21 @@ class GraphEdges(object):
             drawing model.  The following codes are currently allowed:
 
             * `M` - change the current coordinates without drawing (requires one set of coordinates).
-            * `L` - draw a straight line segment (requires one set of coordinates).
-            * `Q` - draw a quadratic Bezier curve (requires two sets of coordinates).
-            * `C` - draw a cubic Bezier curve (requires three sets of coordinates).
+            * `L` - draw a straight line segment from the current coordinates (requires one set of coordinates).
+            * `Q` - draw a quadratic Bezier curve from the current coordinates (requires two sets of coordinates).
+            * `C` - draw a cubic Bezier curve from the current coordinates (requires three sets of coordinates).
         ecoordinates : matrix containing two columns
             Contains coordinates for each of the edge shape strings, in drawing-code order.
         """
         raise NotImplementedError()
 
 
-class StraightEdges(GraphEdges):
+class StraightEdges(EdgeLayout):
     """Creates straight edges between graph vertices."""
     def edges(self, vcoordinates, edges):
         loops = edges.T[0] == edges.T[1]
         if numpy.any(loops):
-            toyplot.log.warning("Graph contains %s loop edges that will not be displayed." % numpy.count_nonzero(loops))
+            toyplot.log.warning("Graph contains %s loop edges that will not be visible." % numpy.count_nonzero(loops))
 
         eshape = numpy.tile("ML", len(edges))
         ecoordinates = numpy.empty((len(edges) * 2, 2))
@@ -423,7 +423,7 @@ class StraightEdges(GraphEdges):
         return eshape, ecoordinates
 
 
-class CurvedEdges(GraphEdges):
+class CurvedEdges(EdgeLayout):
     """Creates curved edges between graph vertices.
 
     Parameters
@@ -439,7 +439,7 @@ class CurvedEdges(GraphEdges):
     def edges(self, vcoordinates, edges):
         loops = edges.T[0] == edges.T[1]
         if numpy.any(loops):
-            toyplot.log.warning("Graph contains %s loop edges that will not be displayed." % numpy.count_nonzero(loops))
+            toyplot.log.warning("Graph contains %s loop edges that will not be visible." % numpy.count_nonzero(loops))
 
         eshape = numpy.tile("MQ", len(edges))
         ecoordinates = numpy.empty((len(edges) * 3, 2))
@@ -456,7 +456,7 @@ class CurvedEdges(GraphEdges):
         return eshape, ecoordinates
 
 
-class Graph(object):
+class GraphLayout(object):
     """Base class for algorithms that compute coordinates for graph vertices and edges."""
     def graph(self, vcoordinates, edges):
         """Compute vertex and edge coordinates for a graph.
@@ -492,12 +492,12 @@ class Graph(object):
         raise NotImplementedError()
 
 
-class Random(Graph):
+class Random(GraphLayout):
     """Compute a random graph layout.
 
     Parameters
     ----------
-    edges: :class:`toyplot.layout.GraphEdges` instance, optional
+    edges: :class:`toyplot.layout.EdgeLayout` instance, optional
         The default will generate straight edges.
     seed: integer, optional
         Random seed used to generate vertex coordinates.
@@ -516,12 +516,12 @@ class Random(Graph):
         return vcoordinates, eshape, ecoordinates
 
 
-class Eades(Graph):
+class Eades(GraphLayout):
     """Compute a force directed graph layout using the 1984 algorithm of Eades.
 
     Parameters
     ----------
-    edges: :class:`toyplot.layout.GraphEdges` instance, optional
+    edges: :class:`toyplot.layout.EdgeLayout` instance, optional
         The default will generate straight edges.
     c1, c2, c3, c4: numbers, optional
         Constants defined in Eades' original paper.
@@ -581,12 +581,12 @@ class Eades(Graph):
         return vcoordinates, eshape, ecoordinates
 
 
-class FruchtermanReingold(Graph):
+class FruchtermanReingold(GraphLayout):
     """Compute a force directed graph layout using the 1991 algorithm of Fruchterman and Reingold.
 
     Parameters
     ----------
-    edges: :class:`toyplot.layout.GraphEdges` instance, optional
+    edges: :class:`toyplot.layout.EdgeLayout` instance, optional
         The default will generate straight edges.
     area, temperature: numbers, optional
         Constants defined in the original paper.
@@ -652,7 +652,7 @@ class FruchtermanReingold(Graph):
         return vcoordinates, eshape, ecoordinates
 
 
-class Buchheim(Graph):
+class Buchheim(GraphLayout):
     """Compute a tree layout using the 2002 algorithm of Buchheim, Junger, and Leipert.
 
     Note: this layout currently ignores preexisting vertex coordinates.
@@ -791,7 +791,7 @@ class Buchheim(Graph):
         eshape, ecoordinates = self._edges.edges(vcoordinates, edges)
         return vcoordinates, eshape, ecoordinates
 
-class GraphViz(Graph):
+class GraphViz(GraphLayout):
     """Compute a graph layout using GraphViz.
 
     Note: this layout currently ignores preexisting vertex coordinates.

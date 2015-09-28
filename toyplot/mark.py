@@ -255,6 +255,7 @@ class Graph(Mark): # pragma: no cover
             coordinate_axes,
             vtable,
             vid,
+            vlabel,
             vcoordinates,
             vmarker,
             vsize,
@@ -263,6 +264,7 @@ class Graph(Mark): # pragma: no cover
             vtitle,
             vstyle,
             vlstyle,
+            vlshow,
             etable,
             esource,
             etarget,
@@ -281,6 +283,8 @@ class Graph(Mark): # pragma: no cover
         self._vtable = toyplot.require.instance(vtable, toyplot.data.Table)
         # 1 vertex id column
         self._vid = toyplot.require.table_keys(vtable, vid, length=1)
+        # 1 vertex label column
+        self._vlabel = toyplot.require.table_keys(vtable, vlabel, length=1)
         # D coordinate columns
         self._vcoordinates = toyplot.require.table_keys(vtable, vcoordinates, length=len(self._coordinate_axes))
         # 1 vertex marker column
@@ -297,6 +301,8 @@ class Graph(Mark): # pragma: no cover
         self._vstyle = toyplot.require.style(vstyle)
         # Vertex marker label style
         self._vlstyle = toyplot.require.style(vlstyle)
+        # Draw vertex labels
+        self._vlshow = vlshow
 
         self._etable = toyplot.require.instance(etable, toyplot.data.Table)
         # 1 edge source column

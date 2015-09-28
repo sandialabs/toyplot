@@ -1981,6 +1981,28 @@ def _render(axes, mark, context): # pragma: no cover
             title=vtitle,
             )
 
+    # Render vertex labels
+    if mark._vlshow:
+        vlabel_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Labels"})
+        for dx, dy, dtext in itertools.izip(
+            x,
+            y,
+            mark._vtable[mark._vlabel[0]],
+            ):
+            dstyle = toyplot.style.combine({}, mark._vlstyle)
+            datum_xml = xml.SubElement(
+                vlabel_xml,
+                "text",
+                attrib={"class": "toyplot-Datum"},
+                x=repr(dx),
+                y=repr(dy),
+                #transform="rotate(%r, %r, %r)" % (-dangle, dx, dy),
+                style=_css_style(dstyle))
+            if "-toyplot-anchor-shift" in dstyle:
+                datum_xml.set("dx", str(dstyle["-toyplot-anchor-shift"]))
+            if dtext is not None:
+                datum_xml.text = toyplot.compatibility.unicode_type(dtext)
+
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Plot, _RenderContext)
 def _render(axes, mark, context):
     position = mark._table[mark._coordinates[0]]

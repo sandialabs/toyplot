@@ -1306,6 +1306,7 @@ class Cartesian(object):
             olayout=None,
             layout=None,
             along="x",
+            vlabel=None,
             vcoordinates=None,
             vcolor=None,
             vmarker="o",
@@ -1315,6 +1316,7 @@ class Cartesian(object):
             vtitle=None,
             vstyle=None,
             vlstyle=None,
+            vlshow=True,
             ecolor=None,
             ewidth=1.0,
             eopacity=1.0,
@@ -1332,6 +1334,9 @@ class Cartesian(object):
         layout = toyplot.layout.graph(a, b, c, olayout=olayout, layout=layout, vcoordinates=vcoordinates)
 
         along = toyplot.require.value_in(along, ["x", "y"])
+
+        if vlabel is None:
+            vlabel = layout.vids
 
         default_color = [next(self._graph_colors)]
         vcolor = toyplot.color.broadcast(
@@ -1355,7 +1360,16 @@ class Cartesian(object):
         vopacity = toyplot.broadcast.scalar(vopacity, layout.vcount)
         vtitle = toyplot.broadcast.object(vtitle, layout.vcount)
         vstyle = toyplot.style.combine({}, toyplot.require.style(vstyle))
-        vlstyle = toyplot.style.combine(toyplot.require.style(vlstyle))
+        vlstyle = toyplot.style.combine(
+            {
+                "font-size": "12px",
+                "font-weight": "normal",
+                "stroke": "none",
+                "text-anchor": "middle",
+                "alignment-baseline": "middle",
+            },
+            toyplot.require.style(vlstyle),
+            )
 
         ecolor = toyplot.color.broadcast(
             colors=ecolor,
@@ -1381,6 +1395,7 @@ class Cartesian(object):
         for axis, coordinates in zip(coordinate_axes, layout.vcoordinates.T):
             vtable[axis] = coordinates
             _mark_exportable(vtable, axis)
+        vtable["label"] = vlabel
         vtable["marker"] = vmarker
         vtable["size"] = vsize
         vtable["color"] = vcolor
@@ -1402,6 +1417,7 @@ class Cartesian(object):
                 coordinate_axes=coordinate_axes,
                 vtable=vtable,
                 vid=["id"],
+                vlabel=["label"],
                 vcoordinates=coordinate_axes,
                 vmarker=["marker"],
                 vsize=["size"],
@@ -1410,6 +1426,7 @@ class Cartesian(object):
                 vtitle=["title"],
                 vstyle=vstyle,
                 vlstyle=vlstyle,
+                vlshow=vlshow,
                 etable=etable,
                 esource=["source"],
                 etarget=["target"],

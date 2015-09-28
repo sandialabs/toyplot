@@ -266,28 +266,26 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
 
     # Setup storage to receive vertex coordinates
     vcount = len(vids)
-    internal_vcoordinates = numpy.ma.masked_all((vcount, 2))
+    ivcoordinates = numpy.ma.masked_all((vcount, 2))
 
     # If the caller supplied the layout for an external graph, merge those coordinates in.
     if olayout is not None:
         olayout = toyplot.require.instance(olayout, (toyplot.mark.Graph, toyplot.layout.GraphLayout))
-        # Naive implementation
-        for index, vid in enumerate(vids):
-            match = olayout.vids == vid
-            if numpy.any(match):
-                internal_vcoordinates[index] = olayout.vcoordinates[numpy.flatnonzero(match)]
+        oindices = numpy.in1d(olayout.vids, vids, assume_unique=True)
+        iindices = numpy.in1d(vids, olayout.vids, assume_unique=True)
+        ivcoordinates[iindices] = olayout.vcoordinates[oindices]
 
     # If the caller supplied extra vertex coordinates, merge them in.
     if vcoordinates is not None:
         external_vcoordinates = toyplot.require.scalar_matrix(vcoordinates, rows=vcount, columns=2)
         mask = numpy.ma.getmaskarray(external_vcoordinates)
-        internal_vcoordinates = numpy.ma.where(mask, internal_vcoordinates, external_vcoordinates)
+        ivcoordinates = numpy.ma.where(mask, ivcoordinates, external_vcoordinates)
 
     # Apply the layout algorithm to whatever's left.
     start = time.time()
     if layout is None:
         layout = toyplot.layout.FruchtermanReingold()
-    vcoordinates, eshape, ecoordinates = layout.graph(internal_vcoordinates, edges)
+    vcoordinates, eshape, ecoordinates = layout.graph(ivcoordinates, edges)
     toyplot.log.info("Graph layout time: %s ms" % ((time.time() - start) * 1000))
 
     if numpy.ma.is_masked(vcoordinates):

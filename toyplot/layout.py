@@ -190,48 +190,55 @@ def region(
 
 
 class Graph(object):
-    """Stores graph layout information."""
-    def __init__(self, vids, vcoordinates, edges, eshape, ecoordinates):
+    """Stores graph layout information.
+
+    Typically used when sharing a layout among more than one graph.
+    """
+    def __init__(self, vids, vcoordinates, edges, eshapes, ecoordinates):
         self._vids = vids
         self._vcoordinates = vcoordinates
         self._edges = edges
-        self._eshape = eshape
+        self._eshapes = eshapes
         self._ecoordinates = ecoordinates
 
     @property
     def vcount(self):
-        """Return the number of vertices in the graph."""
+        """Return the number of vertices :math:`V` in the graph."""
         return len(self._vids)
 
     @property
     def vids(self):
-        """Returns the graph vertex identifiers."""
+        """Return :math:`V` graph vertex identifiers."""
         return self._vids
 
     @property
     def vcoordinates(self):
-        """Return the graph vertex coordinates."""
+        """Return graph vertex coordinates as a :math:`V \\times 2` matrix."""
         return self._vcoordinates
 
     @property
     def ecount(self):
-        """Return the number of edges in the graph."""
+        """Return the number of edges :math:`E` in the graph."""
         return len(self._edges)
 
     @property
-    def esource(self):
+    def esources(self):
+        """Return a vector of :math:`E` integer edge vertex indices."""
         return self._edges.T[0]
 
     @property
-    def etarget(self):
+    def etargets(self):
+        """Return a vector of :math:`E` integer edge vertex indices."""
         return self._edges.T[1]
 
     @property
-    def eshape(self):
-        return self._eshape
+    def eshapes(self):
+        """Return a vector of :math:`E` string edge shapes."""
+        return self._eshapes
 
     @property
     def ecoordinates(self):
+        """Return a matrix of edge coordinates.  The number of coordinates is determined by the contents of the `eshapes` vector."""
         return self._ecoordinates
 
     @property
@@ -285,13 +292,13 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
     start = time.time()
     if layout is None:
         layout = toyplot.layout.FruchtermanReingold()
-    vcoordinates, eshape, ecoordinates = layout.graph(ivcoordinates, edges)
+    vcoordinates, eshapes, ecoordinates = layout.graph(ivcoordinates, edges)
     toyplot.log.info("Graph layout time: %s ms" % ((time.time() - start) * 1000))
 
     if numpy.ma.is_masked(vcoordinates):
         raise RuntimeError("Graph layout cannot return masked vertex coordinates.")
 
-    return Graph(vids, vcoordinates, edges, eshape, ecoordinates)
+    return Graph(vids, vcoordinates, edges, eshapes, ecoordinates)
 
 def _add_at(target, target_indices, source):
     """Add source values to the target and handle duplicate indices correctly.
@@ -393,7 +400,7 @@ class EdgeLayout(object):
 
         Returns
         -------
-        eshape : array of :math:`E` strings
+        eshapes : array of :math:`E` strings
             Contains a shape string for each edge, in edge order.  The shape
             string contains drawing codes that define an arbitrary-complexity
             path for the edge, using a set of current coordinates and a turtle
@@ -416,11 +423,11 @@ class StraightEdges(EdgeLayout):
         if numpy.any(loops):
             toyplot.log.warning("Graph contains %s loop edges that will not be visible." % numpy.count_nonzero(loops))
 
-        eshape = numpy.tile("ML", len(edges))
+        eshapes = numpy.tile("ML", len(edges))
         ecoordinates = numpy.empty((len(edges) * 2, 2))
         ecoordinates[0::2] = vcoordinates[edges.T[0]]
         ecoordinates[1::2] = vcoordinates[edges.T[1]]
-        return eshape, ecoordinates
+        return eshapes, ecoordinates
 
 
 class CurvedEdges(EdgeLayout):
@@ -441,7 +448,7 @@ class CurvedEdges(EdgeLayout):
         if numpy.any(loops):
             toyplot.log.warning("Graph contains %s loop edges that will not be visible." % numpy.count_nonzero(loops))
 
-        eshape = numpy.tile("MQ", len(edges))
+        eshapes = numpy.tile("MQ", len(edges))
         ecoordinates = numpy.empty((len(edges) * 3, 2))
 
         sources = vcoordinates[edges.T[0]]
@@ -453,7 +460,7 @@ class CurvedEdges(EdgeLayout):
         ecoordinates[1::3] = midpoints
         ecoordinates[2::3] = targets
 
-        return eshape, ecoordinates
+        return eshapes, ecoordinates
 
 
 class GraphLayout(object):
@@ -476,7 +483,7 @@ class GraphLayout(object):
         -------
         vcoordinates : :math:`V \\times 2` matrix
             Contains coordinates for every graph vertex, in vertex order.
-        eshape : array of :math:`E` strings
+        eshapes : array of :math:`E` strings
             Contains a shape string for each edge, in edge order.  The shape
             string contains drawing codes that define an arbitrary-complexity
             path for the edge, using a set of current coordinates and a turtle
@@ -512,8 +519,8 @@ class Random(GraphLayout):
     def graph(self, vcoordinates, edges):
         mask = numpy.ma.getmaskarray(vcoordinates)
         vcoordinates = numpy.ma.where(mask, self._generator.uniform(-1, 1, size=vcoordinates.shape), vcoordinates)
-        eshape, ecoordinates = self._edges.edges(vcoordinates, edges)
-        return vcoordinates, eshape, ecoordinates
+        eshapes, ecoordinates = self._edges.edges(vcoordinates, edges)
+        return vcoordinates, eshapes, ecoordinates
 
 
 class Eades(GraphLayout):
@@ -577,8 +584,8 @@ class Eades(GraphLayout):
             # Sum offsets
             vcoordinates = numpy.ma.where(mask, vcoordinates + self._c4 * offsets, vcoordinates)
 
-        eshape, ecoordinates = self._edges.edges(vcoordinates, edges)
-        return vcoordinates, eshape, ecoordinates
+        eshapes, ecoordinates = self._edges.edges(vcoordinates, edges)
+        return vcoordinates, eshapes, ecoordinates
 
 
 class FruchtermanReingold(GraphLayout):
@@ -648,8 +655,8 @@ class FruchtermanReingold(GraphLayout):
             # Sum offsets
             vcoordinates = numpy.ma.where(mask, vcoordinates + offsets, vcoordinates)
 
-        eshape, ecoordinates = self._edges.edges(vcoordinates, edges)
-        return vcoordinates, eshape, ecoordinates
+        eshapes, ecoordinates = self._edges.edges(vcoordinates, edges)
+        return vcoordinates, eshapes, ecoordinates
 
 
 class Buchheim(GraphLayout):
@@ -788,8 +795,8 @@ class Buchheim(GraphLayout):
 
         vcoordinates = numpy.dot(vcoordinates, self._basis)
 
-        eshape, ecoordinates = self._edges.edges(vcoordinates, edges)
-        return vcoordinates, eshape, ecoordinates
+        eshapes, ecoordinates = self._edges.edges(vcoordinates, edges)
+        return vcoordinates, eshapes, ecoordinates
 
 class GraphViz(GraphLayout):
     """Compute a graph layout using GraphViz.
@@ -833,19 +840,19 @@ class GraphViz(GraphLayout):
             vcoordinates[index, 0] = float(vertex[2])
             vcoordinates[index, 1] = float(vertex[3])
 
-        eshape = []
+        eshapes = []
         ecoordinates = []
         for edge in edges:
             count = int(edge[3])
             shape = "M"
             for i in range((count - 1) // 3):
                 shape += "C"
-            eshape.append(shape)
+            eshapes.append(shape)
             for i in range(4, 4 + count * 2, 2):
                 ecoordinates.append([float(edge[i]), float(edge[i+1])])
 
-        eshape = numpy.array(eshape)
+        eshapes = numpy.array(eshapes)
         ecoordinates = numpy.array(ecoordinates)
 
-        return vcoordinates, eshape, ecoordinates
+        return vcoordinates, eshapes, ecoordinates
 

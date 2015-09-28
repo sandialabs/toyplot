@@ -353,15 +353,15 @@ class Graph(Mark): # pragma: no cover
         return len(self._etable)
 
     @property
-    def esource(self):
+    def esources(self):
         return self._etable[self._esource[0]]
 
     @property
-    def etarget(self):
+    def etargets(self):
         return self._etable[self._etarget[0]]
 
     @property
-    def eshape(self):
+    def eshapes(self):
         return self._etable[self._eshape[0]]
 
     @property

@@ -1392,7 +1392,7 @@ class Cartesian(object):
         _mark_exportable(etable, "source")
         etable["target"] = layout.edges.T[1]
         _mark_exportable(etable, "target")
-        etable["shape"] = layout.eshape
+        etable["shape"] = layout.eshapes
         etable["color"] = ecolor
         etable["width"] = ewidth
         etable["opacity"] = eopacity

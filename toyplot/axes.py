@@ -1756,7 +1756,7 @@ class Cartesian(object):
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.style.combine(toyplot.require.style(style))
 
-        default_color = next(self._rect_colors)
+        default_color = [next(self._rect_colors)]
         table["toyplot:fill"] = toyplot.color.broadcast(
             colors=color,
             shape=(table.shape[0], 1),
@@ -1841,7 +1841,7 @@ class Cartesian(object):
                                        "alignment-baseline": "middle"},
                                       toyplot.require.style(style))
 
-        default_color = next(self._text_colors)
+        default_color = [next(self._text_colors)]
 
         color = toyplot.color.broadcast(
             colors=color,

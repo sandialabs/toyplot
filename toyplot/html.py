@@ -1039,15 +1039,15 @@ def _render(canvas, axes, context):
         clip_xml,
         "rect",
         x=repr(
-            axes._xmin_range),
+            axes._xmin_range - axes.padding),
         y=repr(
-            axes._ymin_range),
+            axes._ymin_range - axes.padding),
         width=repr(
             axes._xmax_range -
-            axes._xmin_range),
+            axes._xmin_range + axes.padding * 2),
         height=repr(
             axes._ymax_range -
-            axes._ymin_range))
+            axes._ymin_range + axes.padding * 2))
 
     children_xml = xml.SubElement(axes_xml,
                                   "g",

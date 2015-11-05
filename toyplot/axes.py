@@ -1449,6 +1449,134 @@ class Cartesian(object):
                 estyle=estyle))
         return self._children[-1]
 
+    def hlines(
+            self,
+            y,
+            color=None,
+            opacity=1.0,
+            title=None,
+            style=None,
+            annotation=True,
+            ):
+        """Add horizontal line(s) to the axes.
+
+        Horizontal lines are convenient because they're guaranteed to fill the axes from
+        left to right regardless of the axes size.
+
+        Parameters
+        ----------
+        y: array-like set of Y coordinates
+          One horizontal line will be drawn through each Y coordinate provided.
+        title: string, optional
+          Human-readable title for the mark.  The SVG / HTML backends render the
+          title as a tooltip.
+        style: dict, optional
+          Collection of CSS styles to apply to the mark.  See
+          :class:`toyplot.mark.AxisLines` for a list of useful styles.
+        annotation: boolean, optional
+          Set to True if this mark should be considered an annotation.
+
+        Returns
+        -------
+        hlines: :class:`toyplot.mark.AxisLines`
+        """
+        table = toyplot.data.Table()
+        table["y"] = toyplot.require.scalar_vector(y)
+        _mark_exportable(table, "y", not annotation)
+        color = toyplot.color.broadcast(
+            colors=color,
+            shape=(table.shape[0], 1),
+            default=toyplot.color.near_black,
+            )
+        table["color"] = color[:,0]
+        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
+        table["title"] = toyplot.broadcast.object(title, table.shape[0])
+        style = toyplot.style.combine(toyplot.require.style(style))
+
+        self._update_domain(numpy.array([]), table["y"], display=True, data=not annotation)
+
+        self._children.append(
+            toyplot.mark.AxisLines(
+                coordinate_axes=["y"],
+                table=table,
+                coordinates=["y"],
+                stroke=["color"],
+                opacity=["opacity"],
+                title=["title"],
+                style=style))
+        return self._children[-1]
+
+    def legend(
+            self,
+            marks,
+            bounds=None,
+            rect=None,
+            corner=None,
+            grid=None,
+            gutter=50,
+            style=None,
+            label_style=None):
+        """Add a legend to the axes.
+
+        Parameters
+        ----------
+        marks: sequence of marks to add to the legend
+          Each mark to be displayed in the legend should be specified using either
+          a (label, mark) tuple or a (label, mark, style) tuple.  Each label should
+          be the human-readable text to be displayed next to the mark.  The mark
+          can be a string value "line" or "rect", a marker string "o", "s", "^",
+          or an actual intance of :class:`toyplot.mark.Mark`.
+        bounds: (xmin, xmax, ymin, ymax) tuple, optional
+          Use the bounds property to position / size the legend by specifying the
+          position of each of its boundaries.  The boundaries may be specified in
+          absolute drawing units, or as a percentage of the axes width / height
+          using strings that end with "%".
+        rect: (x, y, width, height) tuple, optional
+          Use the rect property to position / size the legend by specifying its
+          upper-left-hand corner, width, and height.  Each parameter may be specified
+          in absolute drawing units, or as a percentage of the axes width / height
+          using strings that end with "%".
+        corner: (corner, width, height, inset) tuple, optional
+          Use the corner property to position / size the legend by specifying its
+          width and height, plus an inset from a corner of the axes.  Allowed
+          corner values are "top-left", "top", "top-right", "right",
+          "bottom-right", "bottom", "bottom-left", and "left".  The width and
+          height may be specified in absolute drawing units, or as a percentage of
+          the axes width / height using strings that end with "%".  The inset is
+          specified in absolute drawing units.
+        grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
+          Use the grid property to position / size the legend using a collection of
+          grid cells filling the axes.  Specify the number of rows and columns in
+          the grid, then specify either a zero-based cell index (which runs in
+          left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
+          a set of i, column-span, j, row-span coordinates so the legend can cover
+          more than one cell.
+        gutter: size of the gutter around grid cells, optional
+          Specifies the amount of empty space to leave between grid cells When using the
+          `grid` parameter to position the legend.
+        style: dict, optional
+
+        Returns
+        -------
+        legend: :class:`toyplot.mark.Legend`
+        """
+        gutter = toyplot.require.scalar(gutter)
+        style = toyplot.style.combine(toyplot.require.style(style))
+        label_style = toyplot.style.combine(toyplot.require.style(label_style))
+
+        xmin, xmax, ymin, ymax = toyplot.layout.region(
+            self._xmin_range, self._xmax_range, self._ymin_range, self._ymax_range, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+        self._children.append(
+            toyplot.mark.Legend(
+                xmin,
+                xmax,
+                ymin,
+                ymax,
+                marks,
+                style,
+                label_style))
+        return self._children[-1]
+
     def plot(
             self,
             a,
@@ -1618,6 +1746,65 @@ class Cartesian(object):
                 filename=filename))
         return self._children[-1]
 
+    def rects(
+            self,
+            a,
+            b,
+            c,
+            d,
+            along="x",
+            color=None,
+            opacity=1.0,
+            title=None,
+            style={
+            "stroke": "none"},
+            filename=None):
+        table = toyplot.data.Table()
+        table["left"] = toyplot.require.scalar_vector(a)
+        table["right"] = toyplot.require.scalar_vector(
+            b, length=table.shape[0])
+        table["top"] = toyplot.require.scalar_vector(c, length=table.shape[0])
+        table["bottom"] = toyplot.require.scalar_vector(
+            d, length=table.shape[0])
+        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
+        table["title"] = toyplot.broadcast.object(title, table.shape[0])
+        style = toyplot.style.combine(toyplot.require.style(style))
+
+        default_color = [next(self._rect_colors)]
+        table["toyplot:fill"] = toyplot.color.broadcast(
+            colors=color,
+            shape=(table.shape[0], 1),
+            default=default_color,
+            )[:,0]
+
+        if along == "x":
+            coordinate_axes = ["x", "y"]
+            self._update_domain(
+                numpy.concatenate(
+                    (table["left"], table["right"])), numpy.concatenate(
+                    (table["top"], table["bottom"])))
+        elif along == "y":
+            coordinate_axes = ["y", "x"]
+            self._update_domain(
+                numpy.concatenate(
+                    (table["top"], table["bottom"])), numpy.concatenate(
+                    (table["left"], table["right"])))
+
+        self._children.append(
+            toyplot.mark.Rect(
+                coordinate_axes,
+                table=table,
+                left=["left"],
+                right=["right"],
+                top=["top"],
+                bottom=["bottom"],
+                fill=["toyplot:fill"],
+                opacity=["opacity"],
+                title=["title"],
+                style=style,
+                filename=filename))
+        return self._children[-1]
+
     def scatterplot(
             self,
             a,
@@ -1743,64 +1930,42 @@ class Cartesian(object):
                 filename=filename))
         return self._children[-1]
 
-    def rects(
+    def share(
             self,
-            a,
-            b,
-            c,
-            d,
-            along="x",
-            color=None,
-            opacity=1.0,
-            title=None,
-            style={
-            "stroke": "none"},
-            filename=None):
-        table = toyplot.data.Table()
-        table["left"] = toyplot.require.scalar_vector(a)
-        table["right"] = toyplot.require.scalar_vector(
-            b, length=table.shape[0])
-        table["top"] = toyplot.require.scalar_vector(c, length=table.shape[0])
-        table["bottom"] = toyplot.require.scalar_vector(
-            d, length=table.shape[0])
-        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
-        table["title"] = toyplot.broadcast.object(title, table.shape[0])
-        style = toyplot.style.combine(toyplot.require.style(style))
+            axis="x",
+            label=None,
+            ):
 
-        default_color = [next(self._rect_colors)]
-        table["toyplot:fill"] = toyplot.color.broadcast(
-            colors=color,
-            shape=(table.shape[0], 1),
-            default=default_color,
-            )[:,0]
+        shared = Cartesian(
+            xmin_range=self._xmin_range,
+            xmax_range=self._xmax_range,
+            ymin_range=self._ymin_range,
+            ymax_range=self._ymax_range,
+            aspect=self._aspect,
+            xmin=None,
+            xmax=None,
+            ymin=None,
+            ymax=None,
+            show=True,
+            xshow=axis == "y",
+            yshow=axis == "x",
+            label=None,
+            xlabel=label if axis == "y" else None,
+            ylabel=label if axis == "x" else None,
+            xticklocator=None,
+            yticklocator=None,
+            xscale="linear",
+            yscale="linear",
+            palette=None,
+            padding=self._padding,
+            tick_length=5,
+            parent=self._parent)
 
-        if along == "x":
-            coordinate_axes = ["x", "y"]
-            self._update_domain(
-                numpy.concatenate(
-                    (table["left"], table["right"])), numpy.concatenate(
-                    (table["top"], table["bottom"])))
-        elif along == "y":
-            coordinate_axes = ["y", "x"]
-            self._update_domain(
-                numpy.concatenate(
-                    (table["top"], table["bottom"])), numpy.concatenate(
-                    (table["left"], table["right"])))
+        shared.x.spine.position = "high" if axis == "y" else "low"
+        shared.y.spine.position = "high" if axis == "x" else "low"
 
-        self._children.append(
-            toyplot.mark.Rect(
-                coordinate_axes,
-                table=table,
-                left=["left"],
-                right=["right"],
-                top=["top"],
-                bottom=["bottom"],
-                fill=["toyplot:fill"],
-                opacity=["opacity"],
-                title=["title"],
-                style=style,
-                filename=filename))
-        return self._children[-1]
+        self._parent._children.append(shared)
+        return self._parent._children[-1]
 
     def text(
             self,
@@ -1880,63 +2045,6 @@ class Cartesian(object):
                 filename=filename))
         return self._children[-1]
 
-    def hlines(
-            self,
-            y,
-            color=None,
-            opacity=1.0,
-            title=None,
-            style=None,
-            annotation=True,
-            ):
-        """Add horizontal line(s) to the axes.
-
-        Horizontal lines are convenient because they're guaranteed to fill the axes from
-        left to right regardless of the axes size.
-
-        Parameters
-        ----------
-        y: array-like set of Y coordinates
-          One horizontal line will be drawn through each Y coordinate provided.
-        title: string, optional
-          Human-readable title for the mark.  The SVG / HTML backends render the
-          title as a tooltip.
-        style: dict, optional
-          Collection of CSS styles to apply to the mark.  See
-          :class:`toyplot.mark.AxisLines` for a list of useful styles.
-        annotation: boolean, optional
-          Set to True if this mark should be considered an annotation.
-
-        Returns
-        -------
-        hlines: :class:`toyplot.mark.AxisLines`
-        """
-        table = toyplot.data.Table()
-        table["y"] = toyplot.require.scalar_vector(y)
-        _mark_exportable(table, "y", not annotation)
-        color = toyplot.color.broadcast(
-            colors=color,
-            shape=(table.shape[0], 1),
-            default=toyplot.color.near_black,
-            )
-        table["color"] = color[:,0]
-        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
-        table["title"] = toyplot.broadcast.object(title, table.shape[0])
-        style = toyplot.style.combine(toyplot.require.style(style))
-
-        self._update_domain(numpy.array([]), table["y"], display=True, data=not annotation)
-
-        self._children.append(
-            toyplot.mark.AxisLines(
-                coordinate_axes=["y"],
-                table=table,
-                coordinates=["y"],
-                stroke=["color"],
-                opacity=["opacity"],
-                title=["title"],
-                style=style))
-        return self._children[-1]
-
     def vlines(
             self,
             x,
@@ -1992,77 +2100,6 @@ class Cartesian(object):
                 opacity=["opacity"],
                 title=["title"],
                 style=style))
-        return self._children[-1]
-
-    def legend(
-            self,
-            marks,
-            bounds=None,
-            rect=None,
-            corner=None,
-            grid=None,
-            gutter=50,
-            style=None,
-            label_style=None):
-        """Add a legend to the axes.
-
-        Parameters
-        ----------
-        marks: sequence of marks to add to the legend
-          Each mark to be displayed in the legend should be specified using either
-          a (label, mark) tuple or a (label, mark, style) tuple.  Each label should
-          be the human-readable text to be displayed next to the mark.  The mark
-          can be a string value "line" or "rect", a marker string "o", "s", "^",
-          or an actual intance of :class:`toyplot.mark.Mark`.
-        bounds: (xmin, xmax, ymin, ymax) tuple, optional
-          Use the bounds property to position / size the legend by specifying the
-          position of each of its boundaries.  The boundaries may be specified in
-          absolute drawing units, or as a percentage of the axes width / height
-          using strings that end with "%".
-        rect: (x, y, width, height) tuple, optional
-          Use the rect property to position / size the legend by specifying its
-          upper-left-hand corner, width, and height.  Each parameter may be specified
-          in absolute drawing units, or as a percentage of the axes width / height
-          using strings that end with "%".
-        corner: (corner, width, height, inset) tuple, optional
-          Use the corner property to position / size the legend by specifying its
-          width and height, plus an inset from a corner of the axes.  Allowed
-          corner values are "top-left", "top", "top-right", "right",
-          "bottom-right", "bottom", "bottom-left", and "left".  The width and
-          height may be specified in absolute drawing units, or as a percentage of
-          the axes width / height using strings that end with "%".  The inset is
-          specified in absolute drawing units.
-        grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
-          Use the grid property to position / size the legend using a collection of
-          grid cells filling the axes.  Specify the number of rows and columns in
-          the grid, then specify either a zero-based cell index (which runs in
-          left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
-          a set of i, column-span, j, row-span coordinates so the legend can cover
-          more than one cell.
-        gutter: size of the gutter around grid cells, optional
-          Specifies the amount of empty space to leave between grid cells When using the
-          `grid` parameter to position the legend.
-        style: dict, optional
-
-        Returns
-        -------
-        legend: :class:`toyplot.mark.Legend`
-        """
-        gutter = toyplot.require.scalar(gutter)
-        style = toyplot.style.combine(toyplot.require.style(style))
-        label_style = toyplot.style.combine(toyplot.require.style(label_style))
-
-        xmin, xmax, ymin, ymax = toyplot.layout.region(
-            self._xmin_range, self._xmax_range, self._ymin_range, self._ymax_range, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-        self._children.append(
-            toyplot.mark.Legend(
-                xmin,
-                xmax,
-                ymin,
-                ymax,
-                marks,
-                style,
-                label_style))
         return self._children[-1]
 
 ##########################################################################

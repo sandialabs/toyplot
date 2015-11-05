@@ -560,7 +560,7 @@ class Cartesian(object):
 
     @aspect.setter
     def aspect(self, value):
-        if value not in [None, "expand-domain"]:
+        if value not in [None, "fit-range"]:
             raise ValueError("Unknown aspect value: %s" % value)
         self._aspect = value
 
@@ -718,7 +718,7 @@ class Cartesian(object):
             ymax = _null_max(domain_top.max(), ymax)
 
         # Optionally expand the domain to match the aspect ratio of the range.
-        if self._aspect == "expand-domain":
+        if self._aspect == "fit-range":
             dwidth = (xmax - xmin)
             dheight = (ymax - ymin)
             daspect = dwidth / dheight

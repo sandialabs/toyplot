@@ -261,7 +261,7 @@ class Canvas(object):
           Used to explicitly override the axis domain (normally, the domain is
           implicitly defined by any marks added to the axes).
         aspect: string, optional
-          Set to "expand-domain" to automatically expand the domain so that its
+          Set to "fit-range" to automatically expand the domain so that its
           aspect ratio matches the aspect ratio of the range.
         show: bool, optional
           Set to `False` to hide both axes (the axes contents will still be visible).

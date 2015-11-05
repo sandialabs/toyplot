@@ -190,7 +190,7 @@ def graph(
         The new graph mark.
     """
     canvas = Canvas(width=width, height=height, style=canvas_style)
-    axes = canvas.axes(aspect="expand-domain", show=False)
+    axes = canvas.axes(aspect="fit-range", show=False)
     mark = axes.graph(
         a=a,
         b=b,

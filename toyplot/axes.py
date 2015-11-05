@@ -141,7 +141,7 @@ class Cartesian(object):
                 scale):
             self.spine = Cartesian.SpineHelper()
             self.ticks = Cartesian.TicksHelper(
-                tick_length, tick_locator, tick_angle)
+                tick_locator, tick_angle)
             self.label = Cartesian.LabelHelper(label, label_style)
             self.domain = Cartesian.DomainHelper(min, max)
             self._show = show
@@ -363,10 +363,11 @@ class Cartesian(object):
 
     class TicksHelper(object):
 
-        def __init__(self, length, locator, angle):
+        def __init__(self, locator, angle):
             self._locator = locator
             self._show = False
-            self._length = length
+            self._above = None
+            self._below = None
             self._style = {}
             self.labels = Cartesian.TickLabelsHelper(angle)
             self.tick = Cartesian.PerTickHelper()
@@ -388,13 +389,26 @@ class Cartesian(object):
             self._show = value
 
         @property
-        def length(self):
-            return self._length
+        def above(self):
+            return self._above
 
-        @length.setter
-        def length(self, value):
-            self._length = toyplot.units.convert(
-                value, target="px", default="px")
+        @above.setter
+        def above(self, value):
+            if value is None:
+                self._above = None
+            else:
+                self._above = toyplot.units.convert(value, target="px", default="px")
+
+        @property
+        def below(self):
+            return self._below
+
+        @below.setter
+        def below(self, value):
+            if value is None:
+                self._below = None
+            else:
+                self._below = toyplot.units.convert(value, target="px", default="px")
 
         @property
         def style(self):
@@ -493,8 +507,7 @@ class Cartesian(object):
         self._expand_domain_range_right = None
         self._expand_domain_range_top = None
         self._expand_domain_range_bottom = None
-        self._padding = toyplot.units.convert(
-            padding, target="px", default="px")
+        self._padding = toyplot.units.convert(padding, target="px", default="px")
 
         tick_length = toyplot.units.convert(
             tick_length, target="px", default="px")
@@ -629,10 +642,8 @@ class Cartesian(object):
             xprojection = toyplot.projection.linear(
                 xmin,
                 xmax,
-                self._xmin_range +
-                self._padding,
-                self._xmax_range -
-                self._padding)
+                self._xmin_range,
+                self._xmax_range)
         else:
             scale, base = self.x._scale
             if scale == "log":
@@ -640,19 +651,15 @@ class Cartesian(object):
                     base,
                     xmin,
                     xmax,
-                    self._xmin_range +
-                    self._padding,
-                    self._xmax_range -
-                    self._padding)
+                    self._xmin_range,
+                    self._xmax_range)
 
         if self.y._scale == "linear":
             yprojection = toyplot.projection.linear(
                 ymin,
                 ymax,
-                self._ymax_range -
-                self._padding,
-                self._ymin_range +
-                self._padding)
+                self._ymax_range,
+                self._ymin_range)
         else:
             scale, base = self.y._scale
             if scale == "log":
@@ -660,10 +667,8 @@ class Cartesian(object):
                     base,
                     ymin,
                     ymax,
-                    self._ymax_range -
-                    self._padding,
-                    self._ymin_range +
-                    self._padding)
+                    self._ymax_range,
+                    self._ymin_range)
 
         return xprojection, yprojection
 

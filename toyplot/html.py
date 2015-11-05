@@ -1096,18 +1096,30 @@ def _render(canvas, axes, context):
 
     if axes._show:
         if axes.x.spine._position == "low":
-            spine_y = axes._ymax_range
+            spine_y = axes._ymax_range + axes._padding
+            ticks_y1 = spine_y - (5 if axes.x.ticks.above is None else axes.x.ticks.above)
+            ticks_y2 = spine_y + (0 if axes.x.ticks.below is None else axes.x.ticks.below)
         elif axes.x.spine._position == "high":
-            spine_y = axes._ymin_range
+            spine_y = axes._ymin_range - axes._padding
+            ticks_y1 = spine_y - (0 if axes.x.ticks.above is None else axes.x.ticks.above)
+            ticks_y2 = spine_y + (5 if axes.x.ticks.below is None else axes.x.ticks.below)
         else:
             spine_y = axes._project_y(axes.x.spine._position)
+            ticks_y1 = spine_y - (5 if axes.x.ticks.above is None else axes.x.ticks.above)
+            ticks_y2 = spine_y + (5 if axes.x.ticks.below is None else axes.x.ticks.below)
 
         if axes.y.spine._position == "low":
-            spine_x = axes._xmin_range
+            spine_x = axes._xmin_range - axes._padding
+            ticks_x1 = spine_x + (5 if axes.y.ticks.above is None else axes.y.ticks.above)
+            ticks_x2 = spine_x - (0 if axes.y.ticks.below is None else axes.y.ticks.below)
         elif axes.y.spine._position == "high":
-            spine_x = axes._xmax_range
+            spine_x = axes._xmax_range + axes._padding
+            ticks_x1 = spine_x + (0 if axes.y.ticks.above is None else axes.y.ticks.above)
+            ticks_x2 = spine_x - (5 if axes.y.ticks.below is None else axes.y.ticks.below)
         else:
             spine_x = axes._project_x(axes.y.spine._position)
+            ticks_x1 = spine_x + (5 if axes.y.ticks.above is None else axes.y.ticks.above)
+            ticks_x2 = spine_x - (5 if axes.y.ticks.below is None else axes.y.ticks.below)
 
         if axes.x._show:
             if axes.x.spine._show:
@@ -1134,15 +1146,13 @@ def _render(canvas, axes, context):
                     axes._xtick_locations, axes.x.ticks.tick.styles(
                         axes._xtick_locations)):
                     x = axes._project_x(location)
-                    y1 = axes._ymax_range
-                    y2 = axes._ymax_range - axes.x.ticks._length
                     xml.SubElement(
                         ticks_group,
                         "line",
                         x1=repr(x),
-                        y1=repr(y1),
+                        y1=repr(ticks_y1),
                         x2=repr(x),
-                        y2=repr(y2),
+                        y2=repr(ticks_y2),
                         style=_css_style(
                             axes.x.ticks._style,
                             tick_style))
@@ -1153,7 +1163,7 @@ def _render(canvas, axes, context):
                     axes._xtick_locations, axes._xtick_labels, axes._xtick_titles, axes.x.ticks.labels.label.styles(
                         axes._xtick_locations)):
                     x = axes._project_x(location)
-                    y = axes._ymax_range + axes.x.ticks.labels._offset
+                    y = spine_y + axes.x.ticks.labels._offset
                     dstyle = toyplot.style.combine(
                         {
                             "text-anchor": "middle",
@@ -1180,7 +1190,7 @@ def _render(canvas, axes, context):
 
             if axes.x.label._text is not None:
                 x = (axes._xmin_range + axes._xmax_range) * 0.5
-                y = axes._ymax_range
+                y = axes._ymax_range + axes._padding
                 xml.SubElement(
                     axes_xml,
                     "text",
@@ -1214,14 +1224,12 @@ def _render(canvas, axes, context):
                     axes._ytick_locations, axes.y.ticks.tick.styles(
                         axes._ytick_locations)):
                     y = axes._project_y(location)
-                    x1 = axes._xmin_range
-                    x2 = axes._xmin_range + axes.y.ticks._length
                     xml.SubElement(
                         ticks_group,
                         "line",
-                        x1=repr(x1),
+                        x1=repr(ticks_x1),
                         y1=repr(y),
-                        x2=repr(x2),
+                        x2=repr(ticks_x2),
                         y2=repr(y),
                         style=_css_style(
                             axes.y.ticks._style,
@@ -1232,7 +1240,7 @@ def _render(canvas, axes, context):
                 for location, label, title, label_style in zip(
                     axes._ytick_locations, axes._ytick_labels, axes._ytick_titles, axes.y.ticks.labels.label.styles(
                         axes._ytick_locations)):
-                    x = axes._xmin_range - axes.y.ticks.labels._offset
+                    x = spine_x - axes.y.ticks.labels._offset
                     y = axes._project_y(location)
                     dstyle = toyplot.style.combine(
                         {
@@ -1259,7 +1267,7 @@ def _render(canvas, axes, context):
                         xml.SubElement(label_xml, "title").text = str(title)
 
             if axes.y.label._text is not None:
-                x = axes._xmin_range
+                x = axes._xmin_range - axes._padding
                 y = (axes._ymin_range + axes._ymax_range) * 0.5
                 xml.SubElement(
                     axes_xml, "text", x=repr(x), y=repr(y), transform="rotate(-90, %r, %r)" %

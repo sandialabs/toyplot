@@ -132,7 +132,6 @@ class Cartesian(object):
                 self,
                 show,
                 label,
-                label_style,
                 min,
                 max,
                 tick_length,
@@ -142,7 +141,7 @@ class Cartesian(object):
             self.spine = Cartesian.SpineHelper()
             self.ticks = Cartesian.TicksHelper(
                 tick_locator, tick_angle)
-            self.label = Cartesian.LabelHelper(label, label_style)
+            self.label = Cartesian.LabelHelper(label)
             self.domain = Cartesian.DomainHelper(min, max)
             self._show = show
             self.scale = scale
@@ -259,14 +258,16 @@ class Cartesian(object):
 
     class LabelHelper(object):
 
-        def __init__(self, label, style):
+        def __init__(self, label, style={}):
             self._text = label
+            self._offset = 0
             self._style = toyplot.style.combine(
                 {
                     "font-weight": "bold",
                     "stroke": "none",
                     "text-anchor": "middle",
-                    "alignment-baseline": "middle"},
+                    "alignment-baseline": "middle",
+                },
                 toyplot.require.style(style))
 
         @property
@@ -276,6 +277,15 @@ class Cartesian(object):
         @text.setter
         def text(self, value):
             self._text = value
+
+        @property
+        def offset(self):
+            return self._offset
+
+        @offset.setter
+        def offset(self, value):
+            self._offset = toyplot.units.convert(
+                value, target="px", default="px")
 
         @property
         def style(self):
@@ -537,8 +547,6 @@ class Cartesian(object):
         self.x = Cartesian.AxisHelper(
             show=xshow,
             label=xlabel,
-            label_style={
-                "baseline-shift": "-200%"},
             min=xmin,
             max=xmax,
             tick_length=tick_length,
@@ -548,8 +556,6 @@ class Cartesian(object):
         self.y = Cartesian.AxisHelper(
             show=yshow,
             label=ylabel,
-            label_style={
-                "baseline-shift": "200%"},
             min=ymin,
             max=ymax,
             tick_length=tick_length,

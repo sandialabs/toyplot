@@ -1099,27 +1099,51 @@ def _render(canvas, axes, context):
             spine_y = axes._ymax_range + axes._padding
             ticks_y1 = spine_y - (5 if axes.x.ticks.above is None else axes.x.ticks.above)
             ticks_y2 = spine_y + (0 if axes.x.ticks.below is None else axes.x.ticks.below)
+            tick_labels_y = spine_y + axes.x.ticks.labels.offset
+            tick_labels_baseline_shift_y = "-80%"
+            label_y = spine_y + axes.x.label.offset
+            label_baseline_shift_y = "-200%"
         elif axes.x.spine._position == "high":
             spine_y = axes._ymin_range - axes._padding
             ticks_y1 = spine_y - (0 if axes.x.ticks.above is None else axes.x.ticks.above)
             ticks_y2 = spine_y + (5 if axes.x.ticks.below is None else axes.x.ticks.below)
+            tick_labels_y = spine_y + axes.x.ticks.labels.offset
+            tick_labels_baseline_shift_y = "80%"
+            label_y = spine_y + axes.x.label.offset
+            label_baseline_shift_y = "200%"
         else:
             spine_y = axes._project_y(axes.x.spine._position)
             ticks_y1 = spine_y - (5 if axes.x.ticks.above is None else axes.x.ticks.above)
             ticks_y2 = spine_y + (5 if axes.x.ticks.below is None else axes.x.ticks.below)
+            tick_labels_y = spine_y + axes.x.ticks.labels.offset
+            tick_labels_baseline_shift_y = "-100%"
+            label_y = spine_y + axes.x.label.offset
+            label_baseline_shift_y = "-200%"
 
         if axes.y.spine._position == "low":
             spine_x = axes._xmin_range - axes._padding
             ticks_x1 = spine_x + (5 if axes.y.ticks.above is None else axes.y.ticks.above)
             ticks_x2 = spine_x - (0 if axes.y.ticks.below is None else axes.y.ticks.below)
+            tick_labels_x = spine_x + axes.y.ticks.labels.offset
+            tick_labels_baseline_shift_x = "80%"
+            label_x = spine_x + axes.y.label.offset
+            label_baseline_shift_x = "200%"
         elif axes.y.spine._position == "high":
             spine_x = axes._xmax_range + axes._padding
             ticks_x1 = spine_x + (0 if axes.y.ticks.above is None else axes.y.ticks.above)
             ticks_x2 = spine_x - (5 if axes.y.ticks.below is None else axes.y.ticks.below)
+            tick_labels_x = spine_x + axes.y.ticks.labels.offset
+            tick_labels_baseline_shift_x = "-80%"
+            label_x = spine_x + axes.y.label.offset
+            label_baseline_shift_x = "-200%"
         else:
             spine_x = axes._project_x(axes.y.spine._position)
             ticks_x1 = spine_x + (5 if axes.y.ticks.above is None else axes.y.ticks.above)
             ticks_x2 = spine_x - (5 if axes.y.ticks.below is None else axes.y.ticks.below)
+            tick_labels_x = spine_x + axes.y.ticks.labels.offset
+            tick_labels_baseline_shift_x = "80%"
+            label_x = spine_x + axes.y.label.offset
+            label_baseline_shift_x = "200%"
 
         if axes.x._show:
             if axes.x.spine._show:
@@ -1163,19 +1187,19 @@ def _render(canvas, axes, context):
                     axes._xtick_locations, axes._xtick_labels, axes._xtick_titles, axes.x.ticks.labels.label.styles(
                         axes._xtick_locations)):
                     x = axes._project_x(location)
-                    y = spine_y + axes.x.ticks.labels._offset
                     dstyle = toyplot.style.combine(
                         {
                             "text-anchor": "middle",
                             "alignment-baseline": "middle",
-                            "baseline-shift": "-80%"},
+                            "baseline-shift": tick_labels_baseline_shift_y,
+                        },
                         axes.x.ticks.labels._style,
                         label_style)
                     label_xml = xml.SubElement(
                         ticks_group,
                         "text",
                         x=repr(x),
-                        y=repr(y),
+                        y=repr(tick_labels_y),
                         style=_css_style(dstyle))
                     label_xml.text = label
                     if axes.x.ticks.labels._angle:
@@ -1190,14 +1214,18 @@ def _render(canvas, axes, context):
 
             if axes.x.label._text is not None:
                 x = (axes._xmin_range + axes._xmax_range) * 0.5
-                y = axes._ymax_range + axes._padding
+                dstyle = toyplot.style.combine(
+                    {
+                        "baseline-shift": label_baseline_shift_y,
+                    },
+                    axes.x.label.style,
+                )
                 xml.SubElement(
                     axes_xml,
                     "text",
                     x=repr(x),
-                    y=repr(y),
-                    style=_css_style(
-                        axes.x.label._style)).text = axes.x.label._text
+                    y=repr(label_y),
+                    style=_css_style(dstyle)).text = axes.x.label.text
 
         if axes.y._show:
             if axes.y.spine._show:
@@ -1246,13 +1274,13 @@ def _render(canvas, axes, context):
                         {
                             "text-anchor": "middle",
                             "alignment-baseline": "middle",
-                            "baseline-shift": "80%"},
+                            "baseline-shift": tick_labels_baseline_shift_x},
                         axes.y.ticks.labels._style,
                         label_style)
                     label_xml = xml.SubElement(
                         ticks_group,
                         "text",
-                        x=repr(x),
+                        x=repr(tick_labels_x),
                         y=repr(y),
                         style=_css_style(dstyle))
                     label_xml.text = label
@@ -1267,12 +1295,20 @@ def _render(canvas, axes, context):
                         xml.SubElement(label_xml, "title").text = str(title)
 
             if axes.y.label._text is not None:
-                x = axes._xmin_range - axes._padding
                 y = (axes._ymin_range + axes._ymax_range) * 0.5
+                dstyle = toyplot.style.combine(
+                    {
+                        "baseline-shift": label_baseline_shift_x,
+                    },
+                    axes.y.label.style,
+                    )
                 xml.SubElement(
-                    axes_xml, "text", x=repr(x), y=repr(y), transform="rotate(-90, %r, %r)" %
-                    (x, y), style=_css_style(
-                        axes.y.label._style)).text = axes.y.label._text
+                    axes_xml,
+                    "text",
+                    x=repr(label_x),
+                    y=repr(y),
+                    transform="rotate(-90, %r, %r)" % (label_x, y),
+                    style=_css_style(dstyle)).text = axes.y.label._text
 
         if axes.label._text is not None:
             x = (axes._xmin_range + axes._xmax_range) * 0.5

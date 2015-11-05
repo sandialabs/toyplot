@@ -469,7 +469,7 @@ def render(canvas, fobj=None, animation=False):
         width="%rpx" % canvas._width,
         height="%rpx" % canvas._height,
         viewBox="0 0 %r %r" % (canvas._width, canvas._height),
-        preserveAspectRatio="xMidyMid meet",
+        preserveAspectRatio="xMidYMid meet",
         style=_css_style( canvas._style),
         id=context.get_id(canvas))
     for child in canvas._children:

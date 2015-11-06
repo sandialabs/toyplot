@@ -115,8 +115,494 @@ class OrderedSet(collections.MutableSet):
             return len(self) == len(other) and list(self) == list(other)
         return set(self) == set(other)
 
-##########################################################################
-# Cartesian
+
+class Axis(object):
+    """One dimensional axis that can be used to create coordinate systems.
+    """
+    class DomainHelper(object):
+
+        def __init__(self, min, max):
+            self._min = min
+            self._max = max
+
+        @property
+        def min(self):
+            return self._min
+
+        @min.setter
+        def min(self, value):
+            self._min = value
+
+        @property
+        def max(self):
+            return self._max
+
+        @max.setter
+        def max(self, value):
+            self._max = value
+
+    class LabelHelper(object):
+
+        def __init__(self, label, style={}):
+            self._text = label
+            self._offset = 0
+            self._style = toyplot.style.combine(
+                {
+                    "font-weight": "bold",
+                    "stroke": "none",
+                    "text-anchor": "middle",
+                    "alignment-baseline": "middle",
+                },
+                toyplot.require.style(style))
+
+        @property
+        def text(self):
+            return self._text
+
+        @text.setter
+        def text(self, value):
+            self._text = value
+
+        @property
+        def offset(self):
+            return self._offset
+
+        @offset.setter
+        def offset(self, value):
+            self._offset = toyplot.units.convert(
+                value, target="px", default="px")
+
+        @property
+        def style(self):
+            return self._style
+
+        @style.setter
+        def style(self, value):
+            self._style = toyplot.style.combine(
+                self._style, toyplot.require.style(value))
+
+    class SpineHelper(object):
+
+        def __init__(self):
+            self._show = True
+            self._position = "low"
+            self._style = {}
+
+        @property
+        def show(self):
+            return self._show
+
+        @show.setter
+        def show(self, value):
+            self._show = value
+
+        @property
+        def position(self):
+            return self._position
+
+        @position.setter
+        def position(self, value):
+            self._position = value
+
+        @property
+        def style(self):
+            return self._style
+
+        @style.setter
+        def style(self, value):
+            self._style = toyplot.style.combine(
+                self._style, toyplot.require.style(value))
+
+    class PerTickHelper(object):
+
+        class TickProxy(object):
+
+            def __init__(self, tick):
+                self._tick = tick
+
+            @property
+            def style(self):
+                return self._tick.get("style", {})
+
+            @style.setter
+            def style(self, value):
+                self._tick["style"] = toyplot.style.combine(
+                    self._tick.get("style"), toyplot.require.style(value))
+
+        def __init__(self):
+            self._indices = collections.defaultdict(dict)
+            self._values = collections.defaultdict(dict)
+
+        def __call__(self, index=None, value=None):
+            if index is None and value is None:
+                raise ValueError("Must specify tick index or value.")
+            if index is not None and value is not None:
+                raise ValueError(
+                    "Must specify either index or value, not both.")
+            if index is not None:
+                return Axis.PerTickHelper.TickProxy(self._indices[index])
+            elif value is not None:
+                return Axis.PerTickHelper.TickProxy(self._values[value])
+
+        def styles(self, values):
+            results = [
+                self._indices[index].get(
+                    "style",
+                    None) if index in self._indices else None for index in range(
+                    len(values))]
+            for value in self._values:
+                deltas = numpy.abs(values - value)
+                results[numpy.argmin(deltas)] = self._values[
+                    value].get("style", None)
+            return results
+
+    class TicksHelper(object):
+
+        def __init__(self, locator, angle):
+            self._locator = locator
+            self._show = False
+            self._above = None
+            self._below = None
+            self._style = {}
+            self.labels = Axis.TickLabelsHelper(angle)
+            self.tick = Axis.PerTickHelper()
+
+        @property
+        def locator(self):
+            return self._locator
+
+        @locator.setter
+        def locator(self, value):
+            self._locator = value
+
+        @property
+        def show(self):
+            return self._show
+
+        @show.setter
+        def show(self, value):
+            self._show = value
+
+        @property
+        def above(self):
+            return self._above
+
+        @above.setter
+        def above(self, value):
+            if value is None:
+                self._above = None
+            else:
+                self._above = toyplot.units.convert(value, target="px", default="px")
+
+        @property
+        def below(self):
+            return self._below
+
+        @below.setter
+        def below(self, value):
+            if value is None:
+                self._below = None
+            else:
+                self._below = toyplot.units.convert(value, target="px", default="px")
+
+        @property
+        def style(self):
+            return self._style
+
+        @style.setter
+        def style(self, value):
+            self._style = toyplot.style.combine(
+                self._style, toyplot.require.style(value))
+
+    class TickLabelsHelper(object):
+
+        def __init__(self, angle):
+            self._show = True
+            self._offset = 0
+            self._angle = angle
+            self._style = {
+                "font-size": "10px", "font-weight": "normal", "stroke": "none"}
+            self.label = Axis.PerTickHelper()
+
+        @property
+        def show(self):
+            return self._show
+
+        @show.setter
+        def show(self, value):
+            self._show = value
+
+        @property
+        def offset(self):
+            return self._offset
+
+        @offset.setter
+        def offset(self, value):
+            self._offset = toyplot.units.convert(
+                value, target="px", default="px")
+
+        @property
+        def angle(self):
+            return self._angle
+
+        @angle.setter
+        def angle(self, value):
+            self._angle = value
+
+        @property
+        def style(self):
+            return self._style
+
+        @style.setter
+        def style(self, value):
+            self._style = toyplot.style.combine(
+                self._style, toyplot.require.style(value))
+
+    def __init__(
+            self,
+            x1,
+            y1,
+            x2,
+            y2,
+            label=None,
+            max=None,
+            min=None,
+            scale="linear",
+            show=True,
+            tick_angle=0,
+            tick_locator=None,
+            parent=None,
+            ):
+        self._parent = parent
+        self._scale = scale
+        self._show = show
+        self._tick_labels = []
+        self._tick_locations = []
+        self._tick_titles = []
+        self._x1 = x1
+        self._x2 = x2
+        self._y1 = y1
+        self._y2 = y2
+
+        self._min_data_domain_implicit = None
+        self._max_data_domain_implicit = None
+        self._min_display_domain_implicit = None
+        self._max_display_domain_implicit = None
+#        self._expand_domain_range_x = None
+#        self._expand_domain_range_y = None
+#        self._expand_domain_range_left = None
+#        self._expand_domain_range_right = None
+#        self._expand_domain_range_top = None
+#        self._expand_domain_range_bottom = None
+
+        self.domain = Axis.DomainHelper(min, max)
+        self.label = Axis.LabelHelper(label)
+        self.spine = Axis.SpineHelper()
+        self.ticks = Axis.TicksHelper(tick_locator, tick_angle)
+
+    @property
+    def show(self):
+        return self._show
+
+    @show.setter
+    def show(self, value):
+        self._show = value
+
+    @property
+    def scale(self):
+        return self._scale
+
+    @scale.setter
+    def scale(self, value):
+        if value == "linear":
+            self._scale = "linear"
+            return
+        elif value in ["log", "log10"]:
+            self._scale = ("log", 10)
+            return
+        elif value == "log2":
+            self._scale = ("log", 2)
+            return
+        elif isinstance(value, tuple) and len(value) == 2:
+            scale, base = value
+            if scale == "log":
+                self._scale = ("log", base)
+                return
+        raise ValueError(
+            """Scale must be "linear", "log", "log10", "log2" or a ("log", base) tuple.""")
+
+    @property
+    def x1(self):
+        return self._x1
+
+    @property
+    def x2(self):
+        return self._x2
+
+    @property
+    def y1(self):
+        return self._y1
+
+    @property
+    def y2(self):
+        return self._y2
+
+#        self._aspect = aspect
+
+#    @property
+#    def aspect(self):
+#        return self._aspect
+#
+#    @aspect.setter
+#    def aspect(self, value):
+#        if value not in [None, "fit-range"]:
+#            raise ValueError("Unknown aspect value: %s" % value)
+#        self._aspect = value
+#
+    def update_domain(self, values, display=True, data=True):
+        values = _flat_non_null(values)
+
+        if len(values) and display:
+            self._min_display_domain_implicit = _null_min(
+                values.min(), self._min_display_domain_implicit)
+            self._max_display_domain_implicit = _null_max(
+                values.max(), self._max_display_domain_implicit)
+
+        if len(values) and data:
+            self._min_data_domain_implicit = _null_min(
+                values.min(), self._min_data_domain_implicit)
+            self._max_data_domain_implicit = _null_max(
+                values.max(), self._max_data_domain_implicit)
+
+#    def _expand_domain_range(self, x, y, extents):
+#        left, right, top, bottom = extents
+#
+#        self._expand_domain_range_x = x if self._expand_domain_range_x is None else numpy.concatenate(
+#            (self._expand_domain_range_x, x))
+#        self._expand_domain_range_y = y if self._expand_domain_range_y is None else numpy.concatenate(
+#            (self._expand_domain_range_y, y))
+#        self._expand_domain_range_left = left if self._expand_domain_range_left is None else numpy.concatenate(
+#            (self._expand_domain_range_left, left))
+#        self._expand_domain_range_right = right if self._expand_domain_range_right is None else numpy.concatenate(
+#            (self._expand_domain_range_right, right))
+#        self._expand_domain_range_top = top if self._expand_domain_range_top is None else numpy.concatenate(
+#            (self._expand_domain_range_top, top))
+#        self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
+#            (self._expand_domain_range_bottom, bottom))
+
+    def _get_projection(self, min, max):
+        if self._scale == "linear":
+            projection = toyplot.projection.linear(
+                min,
+                max,
+                0.0,
+                1.0)
+        else:
+            scale, base = self._scale
+            if scale == "log":
+                projection = toyplot.projection.log(
+                    base,
+                    min,
+                    max,
+                    0.0,
+                    1.0)
+        return projection
+
+    def _finalize(self):
+        # Begin with the implicit domain defined by our data.
+        min = self._min_display_domain_implicit
+        max = self._max_display_domain_implicit
+
+        # If there is no implicit domain (we don't have any data), default
+        # to the origin.
+        if min is None:
+            min = 0
+        if max is None:
+            max = 0
+
+        # Ensure that the domain is never empty.
+        if min == max:
+            min -= 0.5
+            max += 0.5
+
+        # Optionally expand the domain in range-space (used to make room for
+        # text).
+#        if self._expand_domain_range_x is not None:
+#            x_projection, y_projection = self._get_projections(
+#                xmin, xmax, ymin, ymax)
+#
+#            range_x = x_projection(self._expand_domain_range_x)
+#            range_y = y_projection(self._expand_domain_range_y)
+#            range_left = range_x + self._expand_domain_range_left
+#            range_right = range_x + self._expand_domain_range_right
+#            range_top = range_y + self._expand_domain_range_top
+#            range_bottom = range_y + self._expand_domain_range_bottom
+#
+#            domain_left = x_projection.inverse(range_left)
+#            domain_right = x_projection.inverse(range_right)
+#            domain_top = y_projection.inverse(range_top)
+#            domain_bottom = y_projection.inverse(range_bottom)
+#
+#            xmin = _null_min(domain_left.min(), xmin)
+#            xmax = _null_max(domain_right.max(), xmax)
+#            ymin = _null_min(domain_bottom.min(), ymin)
+#            ymax = _null_max(domain_top.max(), ymax)
+
+        # Optionally expand the domain to match the aspect ratio of the range.
+#        if self._aspect == "fit-range":
+#            dwidth = (xmax - xmin)
+#            dheight = (ymax - ymin)
+#            daspect = dwidth / dheight
+#            raspect = (self._xmax_range - self._xmin_range) / (self._ymax_range - self._ymin_range)
+#
+#            if daspect < raspect:
+#                offset = ((dwidth * (raspect / daspect)) - dwidth) * 0.5
+#                xmin -= offset
+#                xmax += offset
+#            elif daspect > raspect:
+#                offset = ((dheight * (daspect / raspect)) - dheight) * 0.5
+#                ymin -= offset
+#                ymax += offset
+
+        # Allow users to override the domain.
+        if self.domain.min is not None:
+            min = self.domain.min
+        if self.domain.max is not None:
+            max = self.domain.max
+
+        # Ensure that the domain is never empty.
+        if min == max:
+            min -= 0.5
+            max += 0.5
+
+        def _get_locator(locator, scale):
+            if locator is not None:
+                return locator
+            if scale == "linear":
+                return toyplot.locator.Extended()
+            else:
+                scale, base = scale
+                if scale == "log":
+                    return toyplot.locator.Log(base=base)
+
+        # Calculate tick locations and labels.
+        if self.show:
+            locator = _get_locator(self.ticks.locator, self.scale)
+            self._tick_locations, self._tick_labels, self._tick_titles = locator.ticks(min, max)
+
+        # Allow tick locations to grow (never shrink) the domain.
+        if len(self._tick_locations):
+            min = numpy.amin((min, self._tick_locations[0]))
+            max = numpy.amax((max, self._tick_locations[-1]))
+
+        self._min_computed = min
+        self._max_computed = max
+
+        # Get the final projection for rendering.
+        self._projection = self._get_projection(min, max)
+
+    def _project(self, x):
+        return self._projection(x)
 
 
 class Cartesian(object):

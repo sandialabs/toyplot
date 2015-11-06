@@ -1027,6 +1027,110 @@ _render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<
     "^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
 
+@dispatch(toyplot.canvas.Canvas, toyplot.axes.Axis, _RenderContext)
+def _render(canvas, axis, context):
+    axis._finalize()
+
+    if axis.show:
+        p = numpy.row_stack(((axis.x1, axis.y1), (axis.x2, axis.y2)))
+        basis = p[1] - p[0]
+        length = numpy.linalg.norm(basis)
+        theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
+
+        axis_xml = xml.SubElement(
+            context.root,
+            "g",
+            id=context.get_id(axis),
+            transform="translate(%s,%s) rotate(%s)" % (p[0][0], p[0][1], theta),
+            attrib={"class": "toyplot-axes-Axis"},
+            )
+
+        if axis.spine.show:
+            x1 = 0
+            x2 = length
+            if axis._min_data_domain_implicit is not None:
+                x1 = max(
+                    x1, axis._project(axis._min_data_domain_implicit) * length)
+                x2 = min(
+                    x2, axis._project(axis._max_data_domain_implicit) * length)
+            xml.SubElement(
+                axis_xml,
+                "line",
+                x1=repr(x1),
+                y1=repr(0),
+                x2=repr(x2),
+                y2=repr(0),
+                style=_css_style(
+                    axis.spine._style))
+
+            if axis.ticks._show:
+                y1 = -5 if axis.ticks.above is None else -axis.ticks.above
+                y2 = 0 if axis.ticks.below is None else axis.ticks.below
+
+                ticks_group = xml.SubElement(axis_xml, "g")
+                for location, tick_style in zip(
+                    axis._tick_locations, axis.ticks.tick.styles(
+                        axis._tick_locations)):
+                    x = axis._project(location) * length
+                    xml.SubElement(
+                        ticks_group,
+                        "line",
+                        x1=repr(x),
+                        y1=repr(y1),
+                        x2=repr(x),
+                        y2=repr(y2),
+                        style=_css_style(
+                            axis.ticks._style,
+                            tick_style))
+
+            if axis.ticks.labels.show:
+                y = axis.ticks.labels.offset
+
+                ticks_group = xml.SubElement(axis_xml, "g")
+                for location, label, title, label_style in zip(
+                    axis._tick_locations, axis._tick_labels, axis._tick_titles, axis.ticks.labels.label.styles(
+                        axis._tick_locations)):
+                    x = axis._project(location) * length
+                    dstyle = toyplot.style.combine(
+                        {
+                            "text-anchor": "middle",
+                            "alignment-baseline": "middle",
+                            "baseline-shift": "-80%",
+                        },
+                        axis.ticks.labels.style,
+                        label_style)
+                    label_xml = xml.SubElement(
+                        ticks_group,
+                        "text",
+                        x=repr(x),
+                        y=repr(y),
+                        style=_css_style(dstyle))
+                    label_xml.text = label
+                    if axis.ticks.labels.angle:
+                        label_xml.set(
+                            "transform", "rotate(%r, %r, %r)" %
+                            (-axis.ticks.labels.angle, x, 0))
+                    if "-toyplot-anchor-shift" in dstyle:
+                        label_xml.set(
+                            "dx", str(dstyle["-toyplot-anchor-shift"]))
+                    if title is not None:
+                        xml.SubElement(label_xml, "title").text = str(title)
+
+            if axis.label.text is not None:
+                x = length * 0.5
+                dstyle = toyplot.style.combine(
+                    {
+                        "baseline-shift": "-200%",
+                    },
+                    axis.label.style,
+                )
+                xml.SubElement(
+                    axis_xml,
+                    "text",
+                    x=repr(x),
+                    y=repr(0),
+                    style=_css_style(dstyle)).text = axis.label.text
+
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Cartesian, _RenderContext)
 def _render(canvas, axes, context):
     axes._finalize_domain()

@@ -777,12 +777,14 @@ class _RenderContext(object):
             root=None,
             id_cache=None,
             data_tables=None,
-            cartesian_axes=None):
+            cartesian_axes=None,
+            rendered=None,
+            ):
         self._root = root
         self._id_cache = dict() if id_cache is None else id_cache
         self._data_tables = list() if data_tables is None else data_tables
-        self._cartesian_axes = dict(
-        ) if cartesian_axes is None else cartesian_axes
+        self._cartesian_axes = dict() if cartesian_axes is None else cartesian_axes
+        self._rendered = set() if rendered is None else rendered
 
     def add_data_table(self, mark, table, title, filename):
         self._data_tables.append(
@@ -791,12 +793,18 @@ class _RenderContext(object):
     def add_cartesian_axes(self, axes):
         self._cartesian_axes[self.get_id(axes)] = axes
 
+    @property
+    def rendered(self):
+        return self._rendered
+
     def push(self, root):
         return _RenderContext(
             root,
             self._id_cache,
             self._data_tables,
-            self._cartesian_axes)
+            self._cartesian_axes,
+            self._rendered,
+            )
 
     @property
     def root(self):
@@ -1040,6 +1048,11 @@ def _render_linear_axis(
         tick_labels_baseline_shift,
         label_baseline_shift,
         ):
+
+    if axis in context.rendered:
+        return
+    context.rendered.add(axis)
+
     axis._finalize()
 
     if axis.show:

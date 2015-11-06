@@ -1094,53 +1094,53 @@ def _render_linear_axis(
                             axis.ticks._style,
                             tick_style))
 
-            if axis.ticks.labels.show:
-                y = axis.ticks.labels.offset
+        if axis.ticks.labels.show:
+            y = axis.ticks.labels.offset
 
-                ticks_group = xml.SubElement(axis_xml, "g")
-                for location, label, title, label_style in zip(
-                    axis._tick_locations, axis._tick_labels, axis._tick_titles, axis.ticks.labels.label.styles(
-                        axis._tick_locations)):
-                    x = axis.project(location) * length
-                    dstyle = toyplot.style.combine(
-                        {
-                            "text-anchor": "middle",
-                            "alignment-baseline": "middle",
-                            "baseline-shift": tick_labels_baseline_shift,
-                        },
-                        axis.ticks.labels.style,
-                        label_style)
-                    label_xml = xml.SubElement(
-                        ticks_group,
-                        "text",
-                        x=repr(x),
-                        y=repr(y),
-                        style=_css_style(dstyle))
-                    label_xml.text = label
-                    if axis.ticks.labels.angle:
-                        label_xml.set(
-                            "transform", "rotate(%r, %r, %r)" %
-                            (-axis.ticks.labels.angle, x, 0))
-                    if "-toyplot-anchor-shift" in dstyle:
-                        label_xml.set(
-                            "dx", str(dstyle["-toyplot-anchor-shift"]))
-                    if title is not None:
-                        xml.SubElement(label_xml, "title").text = str(title)
-
-            if axis.label.text is not None:
-                x = length * 0.5
+            ticks_group = xml.SubElement(axis_xml, "g")
+            for location, label, title, label_style in zip(
+                axis._tick_locations, axis._tick_labels, axis._tick_titles, axis.ticks.labels.label.styles(
+                    axis._tick_locations)):
+                x = axis.project(location) * length
                 dstyle = toyplot.style.combine(
                     {
-                        "baseline-shift": label_baseline_shift,
+                        "text-anchor": "middle",
+                        "alignment-baseline": "middle",
+                        "baseline-shift": tick_labels_baseline_shift,
                     },
-                    axis.label.style,
-                )
-                xml.SubElement(
-                    axis_xml,
+                    axis.ticks.labels.style,
+                    label_style)
+                label_xml = xml.SubElement(
+                    ticks_group,
                     "text",
                     x=repr(x),
-                    y=repr(0),
-                    style=_css_style(dstyle)).text = axis.label.text
+                    y=repr(y),
+                    style=_css_style(dstyle))
+                label_xml.text = label
+                if axis.ticks.labels.angle:
+                    label_xml.set(
+                        "transform", "rotate(%r, %r, %r)" %
+                        (-axis.ticks.labels.angle, x, 0))
+                if "-toyplot-anchor-shift" in dstyle:
+                    label_xml.set(
+                        "dx", str(dstyle["-toyplot-anchor-shift"]))
+                if title is not None:
+                    xml.SubElement(label_xml, "title").text = str(title)
+
+        if axis.label.text is not None:
+            x = length * 0.5
+            dstyle = toyplot.style.combine(
+                {
+                    "baseline-shift": label_baseline_shift,
+                },
+                axis.label.style,
+            )
+            xml.SubElement(
+                axis_xml,
+                "text",
+                x=repr(x),
+                y=repr(0),
+                style=_css_style(dstyle)).text = axis.label.text
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.NumberLine, _RenderContext)

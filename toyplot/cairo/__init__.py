@@ -99,7 +99,7 @@ def render(svg, context):
                 for transformation in element.get("transform").split(")")[::-1]:
                     if transformation:
                         type, arguments = transformation.split("(")
-                        arguments = arguments[:-1].split(",")
+                        arguments = arguments.split(",")
                         if type == "translate":
                             if len(arguments) == 2:
                                 context.translate(float(arguments[0]), float(arguments[1]))

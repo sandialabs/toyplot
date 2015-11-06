@@ -580,7 +580,7 @@ def render(canvas, fobj=None, animation=False):
         for key, axes in context._cartesian_axes.items():
             cartesian_axes[key] = dict()
             cartesian_axes[key]["x"] = list()
-            for segment in axes._xprojection._segments:
+            for segment in axes.x._projection._segments:
                 cartesian_axes[key]["x"].append(
                     {
                         "scale": segment.scale,
@@ -597,7 +597,7 @@ def render(canvas, fobj=None, animation=False):
                                 "min": segment.range.bounds.min,
                                 "max": segment.range.bounds.max}}})
             cartesian_axes[key]["y"] = list()
-            for segment in axes._yprojection._segments:
+            for segment in axes.y._projection._segments:
                 cartesian_axes[key]["y"].append(
                     {
                         "scale": segment.scale, "domain": {
@@ -1050,9 +1050,9 @@ def _render(canvas, axis, context):
             x2 = length
             if axis._min_data_domain_implicit is not None:
                 x1 = max(
-                    x1, axis._project(axis._min_data_domain_implicit) * length)
+                    x1, axis.project(axis._min_data_domain_implicit) * length)
                 x2 = min(
-                    x2, axis._project(axis._max_data_domain_implicit) * length)
+                    x2, axis.project(axis._max_data_domain_implicit) * length)
             xml.SubElement(
                 axis_xml,
                 "line",
@@ -1071,7 +1071,7 @@ def _render(canvas, axis, context):
                 for location, tick_style in zip(
                     axis._tick_locations, axis.ticks.tick.styles(
                         axis._tick_locations)):
-                    x = axis._project(location) * length
+                    x = axis.project(location) * length
                     xml.SubElement(
                         ticks_group,
                         "line",
@@ -1090,7 +1090,7 @@ def _render(canvas, axis, context):
                 for location, label, title, label_style in zip(
                     axis._tick_locations, axis._tick_labels, axis._tick_titles, axis.ticks.labels.label.styles(
                         axis._tick_locations)):
-                    x = axis._project(location) * length
+                    x = axis.project(location) * length
                     dstyle = toyplot.style.combine(
                         {
                             "text-anchor": "middle",
@@ -1199,220 +1199,58 @@ def _render(canvas, axes, context):
                 axes.coordinates.label._style))
 
     if axes._show:
-        if axes.x.spine._position == "low":
-            spine_y = axes._ymax_range + axes._padding
-            ticks_y1 = spine_y - (5 if axes.x.ticks.above is None else axes.x.ticks.above)
-            ticks_y2 = spine_y + (0 if axes.x.ticks.below is None else axes.x.ticks.below)
-            tick_labels_y = spine_y + axes.x.ticks.labels.offset
-            tick_labels_baseline_shift_y = "-80%"
-            label_y = spine_y + axes.x.label.offset
-            label_baseline_shift_y = "-200%"
-        elif axes.x.spine._position == "high":
-            spine_y = axes._ymin_range - axes._padding
-            ticks_y1 = spine_y - (0 if axes.x.ticks.above is None else axes.x.ticks.above)
-            ticks_y2 = spine_y + (5 if axes.x.ticks.below is None else axes.x.ticks.below)
-            tick_labels_y = spine_y + axes.x.ticks.labels.offset
-            tick_labels_baseline_shift_y = "80%"
-            label_y = spine_y + axes.x.label.offset
-            label_baseline_shift_y = "200%"
-        else:
-            spine_y = axes._project_y(axes.x.spine._position)
-            ticks_y1 = spine_y - (5 if axes.x.ticks.above is None else axes.x.ticks.above)
-            ticks_y2 = spine_y + (5 if axes.x.ticks.below is None else axes.x.ticks.below)
-            tick_labels_y = spine_y + axes.x.ticks.labels.offset
-            tick_labels_baseline_shift_y = "-100%"
-            label_y = spine_y + axes.x.label.offset
-            label_baseline_shift_y = "-200%"
+#        if axes.x.spine._position == "low":
+#            spine_y = axes._ymax_range + axes._padding
+#            ticks_y1 = spine_y - (5 if axes.x.ticks.above is None else axes.x.ticks.above)
+#            ticks_y2 = spine_y + (0 if axes.x.ticks.below is None else axes.x.ticks.below)
+#            tick_labels_y = spine_y + axes.x.ticks.labels.offset
+#            tick_labels_baseline_shift_y = "-80%"
+#            label_y = spine_y + axes.x.label.offset
+#            label_baseline_shift_y = "-200%"
+#        elif axes.x.spine._position == "high":
+#            spine_y = axes._ymin_range - axes._padding
+#            ticks_y1 = spine_y - (0 if axes.x.ticks.above is None else axes.x.ticks.above)
+#            ticks_y2 = spine_y + (5 if axes.x.ticks.below is None else axes.x.ticks.below)
+#            tick_labels_y = spine_y + axes.x.ticks.labels.offset
+#            tick_labels_baseline_shift_y = "80%"
+#            label_y = spine_y + axes.x.label.offset
+#            label_baseline_shift_y = "200%"
+#        else:
+#            spine_y = axes._project_y(axes.x.spine._position)
+#            ticks_y1 = spine_y - (5 if axes.x.ticks.above is None else axes.x.ticks.above)
+#            ticks_y2 = spine_y + (5 if axes.x.ticks.below is None else axes.x.ticks.below)
+#            tick_labels_y = spine_y + axes.x.ticks.labels.offset
+#            tick_labels_baseline_shift_y = "-100%"
+#            label_y = spine_y + axes.x.label.offset
+#            label_baseline_shift_y = "-200%"
+#
+#        if axes.y.spine._position == "low":
+#            spine_x = axes._xmin_range - axes._padding
+#            ticks_x1 = spine_x + (5 if axes.y.ticks.above is None else axes.y.ticks.above)
+#            ticks_x2 = spine_x - (0 if axes.y.ticks.below is None else axes.y.ticks.below)
+#            tick_labels_x = spine_x + axes.y.ticks.labels.offset
+#            tick_labels_baseline_shift_x = "80%"
+#            label_x = spine_x + axes.y.label.offset
+#            label_baseline_shift_x = "200%"
+#        elif axes.y.spine._position == "high":
+#            spine_x = axes._xmax_range + axes._padding
+#            ticks_x1 = spine_x + (0 if axes.y.ticks.above is None else axes.y.ticks.above)
+#            ticks_x2 = spine_x - (5 if axes.y.ticks.below is None else axes.y.ticks.below)
+#            tick_labels_x = spine_x + axes.y.ticks.labels.offset
+#            tick_labels_baseline_shift_x = "-80%"
+#            label_x = spine_x + axes.y.label.offset
+#            label_baseline_shift_x = "-200%"
+#        else:
+#            spine_x = axes._project_x(axes.y.spine._position)
+#            ticks_x1 = spine_x + (5 if axes.y.ticks.above is None else axes.y.ticks.above)
+#            ticks_x2 = spine_x - (5 if axes.y.ticks.below is None else axes.y.ticks.below)
+#            tick_labels_x = spine_x + axes.y.ticks.labels.offset
+#            tick_labels_baseline_shift_x = "80%"
+#            label_x = spine_x + axes.y.label.offset
+#            label_baseline_shift_x = "200%"
 
-        if axes.y.spine._position == "low":
-            spine_x = axes._xmin_range - axes._padding
-            ticks_x1 = spine_x + (5 if axes.y.ticks.above is None else axes.y.ticks.above)
-            ticks_x2 = spine_x - (0 if axes.y.ticks.below is None else axes.y.ticks.below)
-            tick_labels_x = spine_x + axes.y.ticks.labels.offset
-            tick_labels_baseline_shift_x = "80%"
-            label_x = spine_x + axes.y.label.offset
-            label_baseline_shift_x = "200%"
-        elif axes.y.spine._position == "high":
-            spine_x = axes._xmax_range + axes._padding
-            ticks_x1 = spine_x + (0 if axes.y.ticks.above is None else axes.y.ticks.above)
-            ticks_x2 = spine_x - (5 if axes.y.ticks.below is None else axes.y.ticks.below)
-            tick_labels_x = spine_x + axes.y.ticks.labels.offset
-            tick_labels_baseline_shift_x = "-80%"
-            label_x = spine_x + axes.y.label.offset
-            label_baseline_shift_x = "-200%"
-        else:
-            spine_x = axes._project_x(axes.y.spine._position)
-            ticks_x1 = spine_x + (5 if axes.y.ticks.above is None else axes.y.ticks.above)
-            ticks_x2 = spine_x - (5 if axes.y.ticks.below is None else axes.y.ticks.below)
-            tick_labels_x = spine_x + axes.y.ticks.labels.offset
-            tick_labels_baseline_shift_x = "80%"
-            label_x = spine_x + axes.y.label.offset
-            label_baseline_shift_x = "200%"
-
-        if axes.x._show:
-            if axes.x.spine._show:
-                x1 = axes._xmin_range
-                x2 = axes._xmax_range
-                if axes._xmin_data_domain_implicit is not None:
-                    x1 = max(
-                        x1, axes._project_x(axes._xmin_data_domain_implicit))
-                    x2 = min(
-                        x2, axes._project_x(axes._xmax_data_domain_implicit))
-                xml.SubElement(
-                    axes_xml,
-                    "line",
-                    x1=repr(x1),
-                    y1=repr(spine_y),
-                    x2=repr(x2),
-                    y2=repr(spine_y),
-                    style=_css_style(
-                        axes.x.spine._style))
-
-            if axes.x.ticks._show:
-                ticks_group = xml.SubElement(axes_xml, "g")
-                for location, tick_style in zip(
-                    axes._xtick_locations, axes.x.ticks.tick.styles(
-                        axes._xtick_locations)):
-                    x = axes._project_x(location)
-                    xml.SubElement(
-                        ticks_group,
-                        "line",
-                        x1=repr(x),
-                        y1=repr(ticks_y1),
-                        x2=repr(x),
-                        y2=repr(ticks_y2),
-                        style=_css_style(
-                            axes.x.ticks._style,
-                            tick_style))
-
-            if axes.x.ticks.labels._show:
-                ticks_group = xml.SubElement(axes_xml, "g")
-                for location, label, title, label_style in zip(
-                    axes._xtick_locations, axes._xtick_labels, axes._xtick_titles, axes.x.ticks.labels.label.styles(
-                        axes._xtick_locations)):
-                    x = axes._project_x(location)
-                    dstyle = toyplot.style.combine(
-                        {
-                            "text-anchor": "middle",
-                            "alignment-baseline": "middle",
-                            "baseline-shift": tick_labels_baseline_shift_y,
-                        },
-                        axes.x.ticks.labels._style,
-                        label_style)
-                    label_xml = xml.SubElement(
-                        ticks_group,
-                        "text",
-                        x=repr(x),
-                        y=repr(tick_labels_y),
-                        style=_css_style(dstyle))
-                    label_xml.text = label
-                    if axes.x.ticks.labels._angle:
-                        label_xml.set(
-                            "transform", "rotate(%r, %r, %r)" %
-                            (-axes.x.ticks.labels._angle, x, y))
-                    if "-toyplot-anchor-shift" in dstyle:
-                        label_xml.set(
-                            "dx", str(dstyle["-toyplot-anchor-shift"]))
-                    if title is not None:
-                        xml.SubElement(label_xml, "title").text = str(title)
-
-            if axes.x.label._text is not None:
-                x = (axes._xmin_range + axes._xmax_range) * 0.5
-                dstyle = toyplot.style.combine(
-                    {
-                        "baseline-shift": label_baseline_shift_y,
-                    },
-                    axes.x.label.style,
-                )
-                xml.SubElement(
-                    axes_xml,
-                    "text",
-                    x=repr(x),
-                    y=repr(label_y),
-                    style=_css_style(dstyle)).text = axes.x.label.text
-
-        if axes.y._show:
-            if axes.y.spine._show:
-                y1 = axes._ymin_range
-                y2 = axes._ymax_range
-                if axes._ymin_data_domain_implicit is not None:
-                    y1 = max(
-                        y1, axes._project_y(axes._ymax_data_domain_implicit))
-                    y2 = min(
-                        y2, axes._project_y(axes._ymin_data_domain_implicit))
-                xml.SubElement(
-                    axes_xml,
-                    "line",
-                    x1=repr(spine_x),
-                    y1=repr(y1),
-                    x2=repr(spine_x),
-                    y2=repr(y2),
-                    style=_css_style(
-                        axes.y.spine._style))
-
-            if axes.y.ticks._show:
-                ticks_group = xml.SubElement(axes_xml, "g")
-                for location, tick_style in zip(
-                    axes._ytick_locations, axes.y.ticks.tick.styles(
-                        axes._ytick_locations)):
-                    y = axes._project_y(location)
-                    xml.SubElement(
-                        ticks_group,
-                        "line",
-                        x1=repr(ticks_x1),
-                        y1=repr(y),
-                        x2=repr(ticks_x2),
-                        y2=repr(y),
-                        style=_css_style(
-                            axes.y.ticks._style,
-                            tick_style))
-
-            if axes.y.ticks.labels._show:
-                ticks_group = xml.SubElement(axes_xml, "g")
-                for location, label, title, label_style in zip(
-                    axes._ytick_locations, axes._ytick_labels, axes._ytick_titles, axes.y.ticks.labels.label.styles(
-                        axes._ytick_locations)):
-                    x = spine_x - axes.y.ticks.labels._offset
-                    y = axes._project_y(location)
-                    dstyle = toyplot.style.combine(
-                        {
-                            "text-anchor": "middle",
-                            "alignment-baseline": "middle",
-                            "baseline-shift": tick_labels_baseline_shift_x},
-                        axes.y.ticks.labels._style,
-                        label_style)
-                    label_xml = xml.SubElement(
-                        ticks_group,
-                        "text",
-                        x=repr(tick_labels_x),
-                        y=repr(y),
-                        style=_css_style(dstyle))
-                    label_xml.text = label
-                    if axes.y.ticks.labels._angle:
-                        label_xml.set(
-                            "transform", "rotate(%r, %r, %r)" %
-                            (-axes.y.ticks.labels._angle, x, y))
-                    if "-toyplot-anchor-shift" in dstyle:
-                        label_xml.set(
-                            "dx", str(dstyle["-toyplot-anchor-shift"]))
-                    if title is not None:
-                        xml.SubElement(label_xml, "title").text = str(title)
-
-            if axes.y.label._text is not None:
-                y = (axes._ymin_range + axes._ymax_range) * 0.5
-                dstyle = toyplot.style.combine(
-                    {
-                        "baseline-shift": label_baseline_shift_x,
-                    },
-                    axes.y.label.style,
-                    )
-                xml.SubElement(
-                    axes_xml,
-                    "text",
-                    x=repr(label_x),
-                    y=repr(y),
-                    transform="rotate(-90, %r, %r)" % (label_x, y),
-                    style=_css_style(dstyle)).text = axes.y.label._text
+        _render(canvas, axes.x, context.push(axes_xml))
+        _render(canvas, axes.y, context.push(axes_xml))
 
         if axes.label._text is not None:
             x = (axes._xmin_range + axes._xmax_range) * 0.5

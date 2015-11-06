@@ -252,7 +252,7 @@ class Canvas(object):
             yscale="linear",
             palette=None,
             padding=10,
-            tick_length=5):
+            ):
         """Add a set of 2D axes to the canvas.
 
         Parameters
@@ -280,8 +280,6 @@ class Canvas(object):
         padding: number, string, or (number, string) tuple,  optional
           Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
           See :ref:`units` for details on how Toyplot handles real-world units.
-        tick_length: :ref:`units`, optional
-          Length of axes ticks, defaults to CSS pixel units.
 
         Returns
         -------
@@ -312,7 +310,6 @@ class Canvas(object):
                 yscale=yscale,
                 palette=palette,
                 padding=padding,
-                tick_length=tick_length,
                 parent=self))
         return self._children[-1]
 

@@ -1027,12 +1027,11 @@ _render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<
     "^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
 
-@dispatch(toyplot.canvas.Canvas, toyplot.axes.Axis, _RenderContext)
-def _render(canvas, axis, context):
+def _render_axis(canvas, axis, context, x1, y1, x2, y2):
     axis._finalize()
 
     if axis.show:
-        p = numpy.row_stack(((axis.x1, axis.y1), (axis.x2, axis.y2)))
+        p = numpy.row_stack(((x1, y1), (x2, y2)))
         basis = p[1] - p[0]
         length = numpy.linalg.norm(basis)
         theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
@@ -1131,9 +1130,30 @@ def _render(canvas, axis, context):
                     y=repr(0),
                     style=_css_style(dstyle)).text = axis.label.text
 
+
+@dispatch(toyplot.canvas.Canvas, toyplot.axes.NumberLine, _RenderContext)
+def _render(canvas, axes, context):
+    axes._finalize()
+
+    axes_xml = xml.SubElement(context.root, "g", id=context.get_id(
+        axes), attrib={"class": "toyplot-axes-NumberLine"})
+
+    children_xml = xml.SubElement(
+        axes_xml,
+        "g",
+        attrib={"class": "toyplot-coordinate-events"},
+        )
+
+    for child in axes._children:
+        _render(axes, child, context.push(children_xml))
+
+    if axes.axis.show:
+        _render_axis(canvas, axes.axis, context.push(axes_xml), axes._x1, axes._y1, axes._x2, axes._y2)
+
+
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Cartesian, _RenderContext)
 def _render(canvas, axes, context):
-    axes._finalize_domain()
+    axes._finalize()
 
     axes_xml = xml.SubElement(context.root, "g", id=context.get_id(
         axes), attrib={"class": "toyplot-axes-Cartesian"})
@@ -1249,8 +1269,8 @@ def _render(canvas, axes, context):
 #            label_x = spine_x + axes.y.label.offset
 #            label_baseline_shift_x = "200%"
 
-        _render(canvas, axes.x, context.push(axes_xml))
-        _render(canvas, axes.y, context.push(axes_xml))
+        _render_axis(canvas, axes.x, context.push(axes_xml), axes._xmin_range, axes._ymax_range, axes._xmax_range, axes._ymax_range)
+        _render_axis(canvas, axes.y, context.push(axes_xml), axes._xmin_range, axes._ymax_range, axes._xmin_range, axes._ymin_range)
 
         if axes.label._text is not None:
             x = (axes._xmin_range + axes._xmax_range) * 0.5

@@ -526,6 +526,71 @@ class Canvas(object):
         self._children.append(table)
         return table
 
+    def number_line(
+            self,
+            bounds=None,
+            rect=None,
+            corner=None,
+            grid=None,
+            gutter=50,
+            min=None,
+            max=None,
+            show=True,
+            label=None,
+            ticklocator=None,
+            scale="linear",
+            palette=None,
+            ):
+        """Add a 1D number line to the canvas.
+
+        Parameters
+        ----------
+        xmin, xmax, ymin, ymax: float, optional
+          Used to explicitly override the axis domain (normally, the domain is
+          implicitly defined by any marks added to the axes).
+        aspect: string, optional
+          Set to "fit-range" to automatically expand the domain so that its
+          aspect ratio matches the aspect ratio of the range.
+        show: bool, optional
+          Set to `False` to hide both axes (the axes contents will still be visible).
+        xshow, yshow: bool, optional
+          Set to `False` to hide either axis.
+        label: string, optional
+          Human-readable label placed above the axes.
+        xlabel, ylabel: string, optional
+          Human-readable axis label.
+        xticklocator, yticklocator: :class:`toyplot.locator.TickLocator`, optional
+          Controls the placement and formatting of axis ticks and tick labels.
+        xscale, yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
+          Specifies the mapping from data to canvas coordinates along an axis.
+        palette: :class:`toyplot.color.Palette`, optional
+          Color palette used to automatically select per-series colors for plotted data.
+        padding: number, string, or (number, string) tuple,  optional
+          Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
+          See :ref:`units` for details on how Toyplot handles real-world units.
+
+        Returns
+        -------
+        axes: :class:`toyplot.axes.Cartesian`
+        """
+        xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
+            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+        self._children.append(
+            toyplot.axes.NumberLine(
+                xmin_range,
+                0.5 * (ymin_range + ymax_range),
+                xmax_range,
+                0.5 * (ymin_range + ymax_range),
+                min=min,
+                max=max,
+                show=show,
+                label=label,
+                ticklocator=ticklocator,
+                scale=scale,
+                palette=palette,
+                parent=self))
+        return self._children[-1]
+
     def table(
             self,
             data=None,

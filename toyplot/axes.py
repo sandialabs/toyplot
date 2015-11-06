@@ -362,10 +362,6 @@ class Axis(object):
 
     def __init__(
             self,
-            x1,
-            y1,
-            x2,
-            y2,
             label=None,
             max=None,
             min=None,
@@ -381,10 +377,6 @@ class Axis(object):
         self._tick_labels = []
         self._tick_locations = []
         self._tick_titles = []
-        self._x1 = x1
-        self._x2 = x2
-        self._y1 = y1
-        self._y2 = y2
 
         self._min_data_domain_implicit = None
         self._max_data_domain_implicit = None
@@ -432,22 +424,6 @@ class Axis(object):
                 return
         raise ValueError(
             """Scale must be "linear", "log", "log10", "log2" or a ("log", base) tuple.""")
-
-    @property
-    def x1(self):
-        return self._x1
-
-    @property
-    def x2(self):
-        return self._x2
-
-    @property
-    def y1(self):
-        return self._y1
-
-    @property
-    def y2(self):
-        return self._y2
 
 #        self._aspect = aspect
 
@@ -596,6 +572,95 @@ class Axis(object):
         return self._projection(x)
 
 
+class NumberLine(object):
+    """Standard one-dimensional number line.
+
+    Do not create NumberLine instances directly.  Use factory methods such
+    as :meth:`toyplot.canvas.Canvas.number_line` instead.
+    """
+    def __init__(
+            self,
+            x1,
+            y1,
+            x2,
+            y2,
+            min,
+            max,
+            show,
+            label,
+            ticklocator,
+            scale,
+            palette,
+            parent,
+            ):
+        self._x1 = x1
+        self._x2 = x2
+        self._y1 = y1
+        self._y2 = y2
+
+
+        if palette is None:
+            palette = toyplot.color.Palette()
+        self._palette = palette
+#        self._bar_colors = itertools.cycle(palette)
+#        self._fill_colors = itertools.cycle(palette)
+#        self._graph_colors = itertools.cycle(palette)
+#        self._plot_colors = itertools.cycle(palette)
+#        self._scatterplot_colors = itertools.cycle(palette)
+#        self._rect_colors = itertools.cycle(palette)
+#        self._text_colors = itertools.cycle(palette)
+
+#        self.label = Axis.LabelHelper(
+#            label=label, style={"font-size": "14px", "baseline-shift": "100%"})
+
+        self.axis = Axis(
+            show=show,
+            label=label,
+            min=min,
+            max=max,
+            tick_locator=ticklocator,
+            tick_angle=0,
+            scale=scale,
+            )
+
+        self._parent = parent
+        self._children = []
+
+    @property
+    def show(self):
+        return self.axis.show
+
+    @show.setter
+    def show(self, value):
+        self.axis.show = value
+
+    def update_domain(self, values, display=True, data=True):
+        self.axis.update_domain(values, display=display, data=data)
+
+    def _expand_domain_range(self, values, extents):
+        pass
+#        left, right, top, bottom = extents
+#
+#        self._expand_domain_range_x = x if self._expand_domain_range_x is None else numpy.concatenate(
+#            (self._expand_domain_range_x, x))
+#        self._expand_domain_range_y = y if self._expand_domain_range_y is None else numpy.concatenate(
+#            (self._expand_domain_range_y, y))
+#        self._expand_domain_range_left = left if self._expand_domain_range_left is None else numpy.concatenate(
+#            (self._expand_domain_range_left, left))
+#        self._expand_domain_range_right = right if self._expand_domain_range_right is None else numpy.concatenate(
+#            (self._expand_domain_range_right, right))
+#        self._expand_domain_range_top = top if self._expand_domain_range_top is None else numpy.concatenate(
+#            (self._expand_domain_range_top, top))
+#        self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
+#            (self._expand_domain_range_bottom, bottom))
+
+    def _finalize(self):
+        self.axis._finalize()
+
+    def _project(self, x):
+        return _mix(self._xmin_range, self._xmax_range, self.x.project(x))
+
+
 class Cartesian(object):
 
     """Standard two-dimensional Cartesian coordinate system.
@@ -721,10 +786,6 @@ class Cartesian(object):
             label=label, style={"font-size": "14px", "baseline-shift": "100%"})
 
         self.x = Axis(
-            xmin_range,
-            ymax_range,
-            xmax_range,
-            ymax_range,
             show=xshow,
             label=xlabel,
             min=xmin,
@@ -735,10 +796,6 @@ class Cartesian(object):
             )
 
         self.y = Axis(
-            xmin_range,
-            ymax_range,
-            xmin_range,
-            ymin_range,
             show=yshow,
             label=ylabel,
             min=ymin,
@@ -798,7 +855,7 @@ class Cartesian(object):
 #        self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
 #            (self._expand_domain_range_bottom, bottom))
 
-    def _finalize_domain(self):
+    def _finalize(self):
         self.x._finalize()
         self.y._finalize()
 

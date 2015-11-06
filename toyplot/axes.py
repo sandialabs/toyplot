@@ -748,7 +748,9 @@ class Cartesian(object):
             yscale,
             palette,
             padding,
-            parent):
+            parent,
+            xaxis=None,
+            yaxis=None):
         self._xmin_range = xmin_range
         self._xmax_range = xmax_range
         self._ymin_range = ymin_range
@@ -785,7 +787,7 @@ class Cartesian(object):
         self.label = Axis.LabelHelper(
             label=label, style={"font-size": "14px", "baseline-shift": "100%"})
 
-        self.x = Axis(
+        self.x = xaxis if xaxis is not None else Axis(
             show=xshow,
             label=xlabel,
             min=xmin,
@@ -795,7 +797,7 @@ class Cartesian(object):
             scale=xscale,
             )
 
-        self.y = Axis(
+        self.y = yaxis if yaxis is not None else Axis(
             show=yshow,
             label=ylabel,
             min=ymin,
@@ -1992,6 +1994,8 @@ class Cartesian(object):
             self,
             axis="x",
             label=None,
+            min=None,
+            max=None,
             ):
 
         shared = Cartesian(
@@ -2000,10 +2004,10 @@ class Cartesian(object):
             ymin_range=self._ymin_range,
             ymax_range=self._ymax_range,
             aspect=self._aspect,
-            xmin=None,
-            xmax=None,
-            ymin=None,
-            ymax=None,
+            xmin=min if axis == "y" else None,
+            xmax=max if axis == "y" else None,
+            ymin=min if axis == "x" else None,
+            ymax=max if axis == "x" else None,
             show=True,
             xshow=axis == "y",
             yshow=axis == "x",
@@ -2016,8 +2020,10 @@ class Cartesian(object):
             yscale="linear",
             palette=None,
             padding=self._padding,
-            tick_length=5,
-            parent=self._parent)
+            parent=self._parent,
+            xaxis = self.x if axis == "x" else None,
+            yaxis = self.y if axis == "y" else None,
+            )
 
         shared.x.spine.position = "high" if axis == "y" else "low"
         shared.y.spine.position = "high" if axis == "x" else "low"

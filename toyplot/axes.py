@@ -2351,7 +2351,7 @@ class Table(object):
                 yscale="linear",
                 palette=None,
                 padding=5,
-                tick_length=5):
+                ):
             self._table._finalize()
             left = numpy.min([cell.left for cell in self._cells.flat])
             right = numpy.max([cell.right for cell in self._cells.flat])
@@ -2380,8 +2380,8 @@ class Table(object):
                 yscale=yscale,
                 palette=palette,
                 padding=padding,
-                tick_length=tick_length,
-                parent=self._table._parent)
+                parent=self._table._parent,
+                )
             axes.coordinates.show = False
             self._table._children.append(axes)
             return axes

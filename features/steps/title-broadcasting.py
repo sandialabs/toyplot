@@ -112,14 +112,14 @@ def step_impl(context):
 @then(u'text can be rendered with one explicit title')
 def step_impl(context):
     text = ["#"] * len(context.series)
-    context.axes.text(context.x, context.series[:,0], text, title="text")
+    context.axes.text(context.x, context.series[:,0], text, annotation=False, title="text")
     toyplot.testing.assert_canvas_equal(
         context.canvas, "title-broadcast-text-one-title")
 
 @then(u'text can be rendered with per-datum titles')
 def step_impl(context):
     text = ["#"] * len(context.series)
-    context.axes.text(context.x, context.series[:,0], text, title=context.datum_titles[:,0])
+    context.axes.text(context.x, context.series[:,0], text, annotation=False, title=context.datum_titles[:,0])
     toyplot.testing.assert_canvas_equal(
         context.canvas, "title-broadcast-text-per-datum-titles")
 

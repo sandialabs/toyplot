@@ -375,16 +375,10 @@ class Axis(object):
         self._tick_locations = []
         self._tick_titles = []
 
-        self._min_data_domain_implicit = None
-        self._max_data_domain_implicit = None
-        self._min_display_domain_implicit = None
-        self._max_display_domain_implicit = None
-#        self._expand_domain_range_x = None
-#        self._expand_domain_range_y = None
-#        self._expand_domain_range_left = None
-#        self._expand_domain_range_right = None
-#        self._expand_domain_range_top = None
-#        self._expand_domain_range_bottom = None
+        self._data_min = None
+        self._data_max = None
+        self._display_min = None
+        self._display_max = None
 
         self.domain = Axis.DomainHelper(min, max)
         self.label = Axis.LabelHelper(label)
@@ -426,38 +420,22 @@ class Axis(object):
         values = _flat_non_null(values)
 
         if len(values) and display:
-            self._min_display_domain_implicit = _null_min(
-                values.min(), self._min_display_domain_implicit)
-            self._max_display_domain_implicit = _null_max(
-                values.max(), self._max_display_domain_implicit)
+            self._display_min = _null_min(
+                values.min(), self._display_min)
+            self._display_max = _null_max(
+                values.max(), self._display_max)
 
         if len(values) and data:
-            self._min_data_domain_implicit = _null_min(
-                values.min(), self._min_data_domain_implicit)
-            self._max_data_domain_implicit = _null_max(
-                values.max(), self._max_data_domain_implicit)
-
-#    def _expand_domain_range(self, x, y, extents):
-#        left, right, top, bottom = extents
-#
-#        self._expand_domain_range_x = x if self._expand_domain_range_x is None else numpy.concatenate(
-#            (self._expand_domain_range_x, x))
-#        self._expand_domain_range_y = y if self._expand_domain_range_y is None else numpy.concatenate(
-#            (self._expand_domain_range_y, y))
-#        self._expand_domain_range_left = left if self._expand_domain_range_left is None else numpy.concatenate(
-#            (self._expand_domain_range_left, left))
-#        self._expand_domain_range_right = right if self._expand_domain_range_right is None else numpy.concatenate(
-#            (self._expand_domain_range_right, right))
-#        self._expand_domain_range_top = top if self._expand_domain_range_top is None else numpy.concatenate(
-#            (self._expand_domain_range_top, top))
-#        self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
-#            (self._expand_domain_range_bottom, bottom))
+            self._data_min = _null_min(
+                values.min(), self._data_min)
+            self._data_max = _null_max(
+                values.max(), self._data_max)
 
     def projection(self, domain_min=None, domain_max=None, range_min=None, range_max=None):
         if domain_min is None:
-            domain_min = self._min_computed
+            domain_min = self._domain_min
         if domain_max is None:
-            domain_max = self._max_computed
+            domain_max = self._domain_max
         if range_min is None:
             range_min = 0.0
         if range_max is None:
@@ -469,79 +447,24 @@ class Axis(object):
         scale, base = self._scale
         return toyplot.projection.log(base, domain_min, domain_max, range_min, range_max)
 
-    def _finalize(self):
-        # Begin with the implicit domain defined by our data.
-        min = self._min_display_domain_implicit
-        max = self._max_display_domain_implicit
+    def locator(self):
+        if self.ticks.locator is not None:
+            return self.ticks.locator
+        if self.scale == "linear":
+            return toyplot.locator.Extended()
+        else:
+            scale, base = self.scale
+            if scale == "log":
+                return toyplot.locator.Log(base=base)
+        raise RuntimeError("Unable to create an appropriate locator.")
 
-        # If there is no implicit domain (we don't have any data), default
-        # to the origin.
-        if min is None:
-            min = 0
-        if max is None:
-            max = 0
+    def _finalize(self, domain_min, domain_max, tick_locations, tick_labels, tick_titles):
+        self._domain_min = domain_min
+        self._domain_max = domain_max
+        self._tick_locations = tick_locations
+        self._tick_labels = tick_labels
+        self._tick_titles = tick_titles
 
-        # Ensure that the domain is never empty.
-        if min == max:
-            min -= 0.5
-            max += 0.5
-
-        # Optionally expand the domain in range-space (used to make room for
-        # text).
-#        if self._expand_domain_range_x is not None:
-#            x_projection, y_projection = self._get_projections(
-#                xmin, xmax, ymin, ymax)
-#
-#            range_x = x_projection(self._expand_domain_range_x)
-#            range_y = y_projection(self._expand_domain_range_y)
-#            range_left = range_x + self._expand_domain_range_left
-#            range_right = range_x + self._expand_domain_range_right
-#            range_top = range_y + self._expand_domain_range_top
-#            range_bottom = range_y + self._expand_domain_range_bottom
-#
-#            domain_left = x_projection.inverse(range_left)
-#            domain_right = x_projection.inverse(range_right)
-#            domain_top = y_projection.inverse(range_top)
-#            domain_bottom = y_projection.inverse(range_bottom)
-#
-#            xmin = _null_min(domain_left.min(), xmin)
-#            xmax = _null_max(domain_right.max(), xmax)
-#            ymin = _null_min(domain_bottom.min(), ymin)
-#            ymax = _null_max(domain_top.max(), ymax)
-
-        # Allow users to override the domain.
-        if self.domain.min is not None:
-            min = self.domain.min
-        if self.domain.max is not None:
-            max = self.domain.max
-
-        # Ensure that the domain is never empty.
-        if min == max:
-            min -= 0.5
-            max += 0.5
-
-        def _get_locator(locator, scale):
-            if locator is not None:
-                return locator
-            if scale == "linear":
-                return toyplot.locator.Extended()
-            else:
-                scale, base = scale
-                if scale == "log":
-                    return toyplot.locator.Log(base=base)
-
-        # Calculate tick locations and labels.
-        if self.show:
-            locator = _get_locator(self.ticks.locator, self.scale)
-            self._tick_locations, self._tick_labels, self._tick_titles = locator.ticks(min, max)
-
-        # Allow tick locations to grow (never shrink) the domain.
-        if len(self._tick_locations):
-            min = numpy.amin((min, self._tick_locations[0]))
-            max = numpy.amax((max, self._tick_locations[-1]))
-
-        self._min_computed = min
-        self._max_computed = max
 
 class NumberLine(object):
     """Standard one-dimensional number line.
@@ -608,28 +531,47 @@ class NumberLine(object):
     def update_domain(self, values, display=True, data=True):
         self.axis.update_domain(values, display=display, data=data)
 
-    def _expand_domain_range(self, values, extents):
-        pass
-#        left, right, top, bottom = extents
-#
-#        self._expand_domain_range_x = x if self._expand_domain_range_x is None else numpy.concatenate(
-#            (self._expand_domain_range_x, x))
-#        self._expand_domain_range_y = y if self._expand_domain_range_y is None else numpy.concatenate(
-#            (self._expand_domain_range_y, y))
-#        self._expand_domain_range_left = left if self._expand_domain_range_left is None else numpy.concatenate(
-#            (self._expand_domain_range_left, left))
-#        self._expand_domain_range_right = right if self._expand_domain_range_right is None else numpy.concatenate(
-#            (self._expand_domain_range_right, right))
-#        self._expand_domain_range_top = top if self._expand_domain_range_top is None else numpy.concatenate(
-#            (self._expand_domain_range_top, top))
-#        self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
-#            (self._expand_domain_range_bottom, bottom))
-
     def _finalize(self):
-        self.axis._finalize()
+        # Begin with the implicit domain defined by our data.
+        min = self.axis._display_min
+        max = self.axis._display_max
 
-    def _project(self, x):
-        return toyplot.projection.mix(self._xmin_range, self._xmax_range, self.x.project(x))
+        # If there is no implicit domain (we don't have any data), default
+        # to the origin.
+        if min is None:
+            min = 0
+        if max is None:
+            max = 0
+
+        # Ensure that the domain is never empty.
+        if min == max:
+            min -= 0.5
+            max += 0.5
+
+        # Allow users to override the domain.
+        if self.axis.domain.min is not None:
+            min = self.axis.domain.min
+        if self.axis.domain.max is not None:
+            max = self.axis.domain.max
+
+        # Ensure that the domain is never empty.
+        if min == max:
+            min -= 0.5
+            max += 0.5
+
+        # Calculate tick locations and labels.
+        tick_locations = []
+        tick_labels = []
+        tick_titles = []
+        if self.axis.show:
+            tick_locations, tick_labels, tick_titles = self.axis.locator().ticks(min, max)
+
+        # Allow tick locations to grow (never shrink) the domain.
+        if len(tick_locations):
+            min = numpy.amin((min, tick_locations[0]))
+            max = numpy.amax((max, tick_locations[-1]))
+
+        self.axis._finalize(min, max, tick_locations, tick_labels, tick_titles)
 
 
 class Cartesian(object):
@@ -649,11 +591,13 @@ class Cartesian(object):
                 ymin_range,
                 ymax_range,
                 style):
+
             self._show = show
             self._xmin_range = xmin_range
             self._xmax_range = xmax_range
             self._ymin_range = ymin_range
             self._ymax_range = ymax_range
+
             self._style = toyplot.style.combine(
                 {"stroke": "none", "fill": "white", "opacity": 0.75}, toyplot.require.style(style))
             self.label = Cartesian.CoordinatesLabelHelper(style={})
@@ -812,41 +756,135 @@ class Cartesian(object):
         self.y.update_domain(y, display=display, data=data)
 
     def _expand_domain_range(self, x, y, extents):
-        pass
-#        left, right, top, bottom = extents
-#
-#        self._expand_domain_range_x = x if self._expand_domain_range_x is None else numpy.concatenate(
-#            (self._expand_domain_range_x, x))
-#        self._expand_domain_range_y = y if self._expand_domain_range_y is None else numpy.concatenate(
-#            (self._expand_domain_range_y, y))
-#        self._expand_domain_range_left = left if self._expand_domain_range_left is None else numpy.concatenate(
-#            (self._expand_domain_range_left, left))
-#        self._expand_domain_range_right = right if self._expand_domain_range_right is None else numpy.concatenate(
-#            (self._expand_domain_range_right, right))
-#        self._expand_domain_range_top = top if self._expand_domain_range_top is None else numpy.concatenate(
-#            (self._expand_domain_range_top, top))
-#        self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
-#            (self._expand_domain_range_bottom, bottom))
+        left, right, top, bottom = extents
+
+        self._expand_domain_range_x = x if self._expand_domain_range_x is None else numpy.concatenate(
+            (self._expand_domain_range_x, x))
+        self._expand_domain_range_y = y if self._expand_domain_range_y is None else numpy.concatenate(
+            (self._expand_domain_range_y, y))
+        self._expand_domain_range_left = left if self._expand_domain_range_left is None else numpy.concatenate(
+            (self._expand_domain_range_left, left))
+        self._expand_domain_range_right = right if self._expand_domain_range_right is None else numpy.concatenate(
+            (self._expand_domain_range_right, right))
+        self._expand_domain_range_top = top if self._expand_domain_range_top is None else numpy.concatenate(
+            (self._expand_domain_range_top, top))
+        self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
+            (self._expand_domain_range_bottom, bottom))
 
     def _finalize(self):
+        # Begin with the implicit domain defined by our data.
+        xmin = self.x._display_min
+        xmax = self.x._display_max
+        ymin = self.y._display_min
+        ymax = self.y._display_max
+
+        # If there is no implicit domain (we don't have any data), default
+        # to the origin.
+        if xmin is None:
+            xmin = 0
+        if xmax is None:
+            xmax = 0
+        if ymin is None:
+            ymin = 0
+        if ymax is None:
+            ymax = 0
+
+        # Ensure that the domain is never empty.
+        if xmin == xmax:
+            xmin -= 0.5
+            xmax += 0.5
+        if ymin == ymax:
+            ymin -= 0.5
+            ymax += 0.5
+
+        # Optionally expand the domain in range-space (used to make room for text).
+        if self._expand_domain_range_x is not None:
+            x_projection = self.x.projection(
+                domain_min=xmin,
+                domain_max=xmax,
+                range_min=self._xmin_range,
+                range_max=self._xmax_range,
+                )
+            y_projection = self.y.projection(
+                domain_min=ymin,
+                domain_max=ymax,
+                range_min=self._ymax_range,
+                range_max=self._ymin_range,
+                )
+
+            range_x = x_projection(self._expand_domain_range_x)
+            range_y = y_projection(self._expand_domain_range_y)
+            range_left = range_x + self._expand_domain_range_left
+            range_right = range_x + self._expand_domain_range_right
+            range_top = range_y + self._expand_domain_range_top
+            range_bottom = range_y + self._expand_domain_range_bottom
+
+            domain_left = x_projection.inverse(range_left)
+            domain_right = x_projection.inverse(range_right)
+            domain_top = y_projection.inverse(range_top)
+            domain_bottom = y_projection.inverse(range_bottom)
+
+            xmin = _null_min(domain_left.min(), xmin)
+            xmax = _null_max(domain_right.max(), xmax)
+            ymin = _null_min(domain_bottom.min(), ymin)
+            ymax = _null_max(domain_top.max(), ymax)
+
         # Optionally expand the domain to match the aspect ratio of the range.
-        if self._aspect == "fit-range" and self.x._min_display_domain_implicit:
-            dwidth = (self.x._max_display_domain_implicit - self.x._min_display_domain_implicit)
-            dheight = (self.y._max_display_domain_implicit - self.y._min_display_domain_implicit)
+        if self._aspect == "fit-range":
+            dwidth = (xmax - xmin)
+            dheight = (ymax - ymin)
             daspect = dwidth / dheight
             raspect = (self._xmax_range - self._xmin_range) / (self._ymax_range - self._ymin_range)
 
             if daspect < raspect:
                 offset = ((dwidth * (raspect / daspect)) - dwidth) * 0.5
-                self.x._min_display_domain_implicit -= offset
-                self.x._max_display_domain_implicit += offset
+                xmin -= offset
+                xmax += offset
             elif daspect > raspect:
                 offset = ((dheight * (daspect / raspect)) - dheight) * 0.5
-                self.y._min_display_domain_implicit -= offset
-                self.y._max_display_domain_implicit += offset
+                ymin -= offset
+                ymax += offset
 
-        self.x._finalize()
-        self.y._finalize()
+        # Allow users to override the domain.
+        if self.x.domain.min is not None:
+            xmin = self.x.domain.min
+        if self.x.domain.max is not None:
+            xmax = self.x.domain.max
+        if self.y.domain.min is not None:
+            ymin = self.y.domain.min
+        if self.y.domain.max is not None:
+            ymax = self.y.domain.max
+
+        # Ensure that the domain is never empty.
+        if xmin == xmax:
+            xmin -= 0.5
+            xmax += 0.5
+        if ymin == ymax:
+            ymin -= 0.5
+            ymax += 0.5
+
+        # Calculate tick locations and labels.
+        xtick_locations = []
+        xtick_labels = []
+        xtick_titles = []
+        if self.x.show:
+            xtick_locations, xtick_labels, xtick_titles = self.x.locator().ticks(xmin, xmax)
+        ytick_locations = []
+        ytick_labels = []
+        ytick_titles = []
+        if self.y.show:
+            ytick_locations, ytick_labels, ytick_titles = self.y.locator().ticks(ymin, ymax)
+
+        # Allow tick locations to grow (never shrink) the domain.
+        if len(xtick_locations):
+            xmin = numpy.amin((xmin, xtick_locations[0]))
+            xmax = numpy.amax((xmax, xtick_locations[-1]))
+        if len(ytick_locations):
+            ymin = numpy.amin((ymin, ytick_locations[0]))
+            ymax = numpy.amax((ymax, ytick_locations[-1]))
+
+        self.x._finalize(xmin, xmax, xtick_locations, xtick_labels, xtick_titles)
+        self.y._finalize(ymin, ymax, ytick_locations, ytick_labels, ytick_titles)
 
         self._x_projection = self.x.projection(range_min=self._xmin_range, range_max=self._xmax_range)
         self._y_projection = self.y.projection(range_min=self._ymax_range, range_max=self._ymin_range)

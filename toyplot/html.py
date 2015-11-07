@@ -1059,8 +1059,6 @@ def _render_linear_axis(
         return
     context.rendered.add(axis)
 
-    axis._finalize()
-
     if axis.show:
         p = numpy.row_stack(((x1, y1), (x2, y2)))
         basis = p[1] - p[0]
@@ -1080,11 +1078,11 @@ def _render_linear_axis(
         if axis.spine.show:
             x1 = 0
             x2 = length
-            if axis._min_data_domain_implicit is not None:
+            if axis._data_min is not None and axis._data_max is not None:
                 x1 = max(
-                    x1, project(axis._min_data_domain_implicit))
+                    x1, project(axis._data_min))
                 x2 = min(
-                    x2, project(axis._max_data_domain_implicit))
+                    x2, project(axis._data_max))
             xml.SubElement(
                 axis_xml,
                 "line",

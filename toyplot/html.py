@@ -1200,30 +1200,32 @@ def _render(canvas, axes, context):
     xml.SubElement(
         clip_xml,
         "rect",
-        x=repr(
-            axes._xmin_range - axes.padding),
-        y=repr(
-            axes._ymin_range - axes.padding),
-        width=repr(
-            axes._xmax_range -
-            axes._xmin_range + axes.padding * 2),
-        height=repr(
-            axes._ymax_range -
-            axes._ymin_range + axes.padding * 2))
+        x=repr(axes._xmin_range - axes.padding),
+        y=repr(axes._ymin_range - axes.padding),
+        width=repr(axes._xmax_range - axes._xmin_range + axes.padding * 2),
+        height=repr(axes._ymax_range - axes._ymin_range + axes.padding * 2),
+        )
 
-    children_xml = xml.SubElement(axes_xml,
-                                  "g",
-                                  attrib={"class": "toyplot-coordinate-events",
-                                          "clip-path": "url(#%s)" % clip_xml.get("id")},
-                                  style=_css_style({"cursor": "crosshair"}))
-    xml.SubElement(children_xml,
-                   "rect",
-                   x=repr(axes._xmin_range),
-                   y=repr(axes._ymin_range),
-                   width=repr(axes._xmax_range - axes._xmin_range),
-                   height=repr(axes._ymax_range - axes._ymin_range),
-                   style=_css_style({"visibility": "hidden",
-                                     "pointer-events": "all"}))
+    children_xml = xml.SubElement(
+        axes_xml,
+        "g",
+        attrib={
+            "class" : "toyplot-coordinate-events",
+            "clip-path" : "url(#%s)" % clip_xml.get("id"),
+        },
+        style=_css_style({"cursor": "crosshair"}),
+        )
+
+    xml.SubElement(
+        children_xml,
+        "rect",
+        x=repr(axes._xmin_range - axes.padding),
+        y=repr(axes._ymin_range - axes.padding),
+        width=repr(axes._xmax_range - axes._xmin_range + axes.padding * 2),
+        height=repr(axes._ymax_range - axes._ymin_range + axes.padding * 2),
+        style=_css_style({"visibility": "hidden", "pointer-events": "all"}),
+        )
+
     for child in axes._children:
         _render(axes, child, context.push(children_xml))
 

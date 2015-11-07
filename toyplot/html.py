@@ -1126,14 +1126,15 @@ def _render_linear_axis(
                 label_xml = xml.SubElement(
                     ticks_group,
                     "text",
-                    x=repr(x),
-                    y=repr(y),
+                    x=repr(0),
+                    y=repr(0),
+                    transform="translate(%r,%r) rotate(%r)" % (x, y, -axis.ticks.labels.angle),
                     style=_css_style(dstyle))
                 label_xml.text = label
-                if axis.ticks.labels.angle:
-                    label_xml.set(
-                        "transform", "rotate(%r, %r, %r)" %
-                        (-axis.ticks.labels.angle, x, 0))
+#                if axis.ticks.labels.angle:
+#                    label_xml.set(
+#                        "transform", "rotate(%r, %r, %r)" %
+#                        (-axis.ticks.labels.angle, x, 0))
                 if "-toyplot-anchor-shift" in dstyle:
                     label_xml.set(
                         "dx", str(dstyle["-toyplot-anchor-shift"]))

@@ -2353,12 +2353,13 @@ class Table(object):
                 yscale="linear",
                 palette=None,
                 padding=5,
+                cell_padding=0,
                 ):
             self._table._finalize()
-            left = numpy.min([cell.left for cell in self._cells.flat])
-            right = numpy.max([cell.right for cell in self._cells.flat])
-            top = numpy.min([cell.top for cell in self._cells.flat])
-            bottom = numpy.max([cell.bottom for cell in self._cells.flat])
+            left = numpy.min([cell.left for cell in self._cells.flat]) + cell_padding
+            right = numpy.max([cell.right for cell in self._cells.flat]) - cell_padding
+            top = numpy.min([cell.top for cell in self._cells.flat]) + cell_padding
+            bottom = numpy.max([cell.bottom for cell in self._cells.flat]) - cell_padding
 
             axes = toyplot.axes.Cartesian(
                 left,

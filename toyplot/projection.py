@@ -7,7 +7,7 @@ from __future__ import division
 import numpy
 
 
-def _mix(a, b, amount):
+def mix(a, b, amount):
     return ((1.0 - amount) * a) + (amount * b)
 
 
@@ -72,7 +72,7 @@ class Piecewise(object):
             if segment.scale == "linear":
                 amount = (domain_values[
                           indices] - segment.domain.min) / (segment.domain.max - segment.domain.min)
-                range_values[indices] = _mix(
+                range_values[indices] = mix(
                     segment.range.min, segment.range.max, amount)
             else:
                 scale, base = segment.scale
@@ -82,7 +82,7 @@ class Piecewise(object):
                                                 base)) / (_log(segment.domain.max,
                                                                base) - _log(segment.domain.min,
                                                                             base))
-                    range_values[indices] = _mix(
+                    range_values[indices] = mix(
                         segment.range.min, segment.range.max, amount)
                 else:
                     raise Exception("Unknown scale: %s" % (scale,)) # pragma: no cover
@@ -103,7 +103,7 @@ class Piecewise(object):
             if segment.scale == "linear":
                 amount = (range_values[
                           indices] - segment.range.min) / (segment.range.max - segment.range.min)
-                domain_values[indices] = _mix(
+                domain_values[indices] = mix(
                     segment.domain.min, segment.domain.max, amount)
             else:
                 scale, base = segment.scale
@@ -112,7 +112,7 @@ class Piecewise(object):
                               indices] - segment.range.min) / (segment.range.max - segment.range.min)
                     domain_values[indices] = numpy.sign(
                         segment.domain.min) * numpy.power(
-                        base, _mix(
+                        base, mix(
                             _log(
                                 segment.domain.min, base), _log(
                                 segment.domain.max, base), amount))
@@ -192,8 +192,8 @@ def log(
 
     # Mixed negative / positive domain
     if domain_min < linear_domain_min and linear_domain_max < domain_max:
-        linear_range_min = _mix(range_min, range_max, 0.4)
-        linear_range_max = _mix(range_min, range_max, 0.6)
+        linear_range_min = mix(range_min, range_max, 0.4)
+        linear_range_max = mix(range_min, range_max, 0.6)
         return Piecewise([
             Piecewise.Segment(("log", base), domain_min, linear_domain_min, range_min,
                               linear_range_min, -numpy.inf, linear_domain_min, -numpy.inf, linear_range_min),
@@ -204,7 +204,7 @@ def log(
         ])
 
     if domain_min < linear_domain_min:
-        linear_range_min = _mix(range_min, range_max, 0.8)
+        linear_range_min = mix(range_min, range_max, 0.8)
         return Piecewise([
             Piecewise.Segment(("log", base), domain_min, linear_domain_min, range_min,
                               linear_range_min, -numpy.inf, linear_domain_min, -numpy.inf, linear_range_min),
@@ -213,7 +213,7 @@ def log(
         ])
 
     if linear_domain_max < domain_max:
-        linear_range_max = _mix(range_min, range_max, 0.2)
+        linear_range_max = mix(range_min, range_max, 0.2)
         return Piecewise([
             Piecewise.Segment("linear", domain_min, linear_domain_max, range_min,
                               linear_range_max, -numpy.inf, linear_domain_max, -numpy.inf, linear_range_max),

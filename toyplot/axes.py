@@ -22,9 +22,6 @@ import time
 ##########################################################################
 # Helpers
 
-def _mix(a, b, amount):
-    return ((1 - amount) * a) + (amount * b)
-
 def _null_min(a, b):
     """Return the minimum of two values, with special logic to handle None."""
     if a is None:
@@ -468,12 +465,21 @@ class Axis(object):
 #        self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
 #            (self._expand_domain_range_bottom, bottom))
 
-    def _get_projection(self, min, max):
+    def projection(self, domain_min=None, domain_max=None, range_min=None, range_max=None):
+        if domain_min is None:
+            domain_min = self._min_computed
+        if domain_max is None:
+            domain_max = self._max_computed
+        if range_min is None:
+            range_min = 0.0
+        if range_max is None:
+            range_max = 1.0
+
         if self._scale == "linear":
-            return toyplot.projection.linear(min, max, 0.0, 1.0)
+            return toyplot.projection.linear(domain_min, domain_max, range_min, range_max)
 
         scale, base = self._scale
-        return toyplot.projection.log(base, min, max, 0.0, 1.0)
+        return toyplot.projection.log(base, domain_min, domain_max, range_min, range_max)
 
     def _finalize(self):
         # Begin with the implicit domain defined by our data.
@@ -565,13 +571,6 @@ class Axis(object):
         self._min_computed = min
         self._max_computed = max
 
-        # Get the final projection for rendering.
-        self._projection = self._get_projection(min, max)
-
-    def project(self, x):
-        return self._projection(x)
-
-
 class NumberLine(object):
     """Standard one-dimensional number line.
 
@@ -658,7 +657,7 @@ class NumberLine(object):
         self.axis._finalize()
 
     def _project(self, x):
-        return _mix(self._xmin_range, self._xmax_range, self.x.project(x))
+        return toyplot.projection.mix(self._xmin_range, self._xmax_range, self.x.project(x))
 
 
 class Cartesian(object):
@@ -861,11 +860,14 @@ class Cartesian(object):
         self.x._finalize()
         self.y._finalize()
 
+        self._x_projection = self.x.projection(range_min=self._xmin_range, range_max=self._xmax_range)
+        self._y_projection = self.y.projection(range_min=self._ymax_range, range_max=self._ymin_range)
+
     def _project_x(self, x):
-        return _mix(self._xmin_range, self._xmax_range, self.x.project(x))
+        return self._x_projection(x)
 
     def _project_y(self, y):
-        return _mix(self._ymax_range, self._ymin_range, self.y.project(y))
+        return self._y_projection(y)
 
     def bars(
             self,

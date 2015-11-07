@@ -580,7 +580,7 @@ def render(canvas, fobj=None, animation=False):
         for key, axes in context._cartesian_axes.items():
             cartesian_axes[key] = dict()
             cartesian_axes[key]["x"] = list()
-            for segment in axes.x._projection._segments:
+            for segment in axes._x_projection._segments:
                 cartesian_axes[key]["x"].append(
                     {
                         "scale": segment.scale,
@@ -597,16 +597,22 @@ def render(canvas, fobj=None, animation=False):
                                 "min": segment.range.bounds.min,
                                 "max": segment.range.bounds.max}}})
             cartesian_axes[key]["y"] = list()
-            for segment in axes.y._projection._segments:
+            for segment in axes._y_projection._segments:
                 cartesian_axes[key]["y"].append(
                     {
-                        "scale": segment.scale, "domain": {
-                            "min": segment.domain.min, "max": segment.domain.max, "bounds": {
-                                "min": segment.domain.bounds.min, "max": segment.domain.bounds.max}}, "range": {
-                            "min": segment.range.min, "max": segment.range.max, "bounds": {
-                                "min": _flip_infinities(
-                                    segment.range.bounds.min), "max": _flip_infinities(
-                                    segment.range.bounds.max)}}})
+                        "scale": segment.scale,
+                        "domain": {
+                            "min": segment.domain.min,
+                            "max": segment.domain.max,
+                            "bounds": {
+                                "min": segment.domain.bounds.min,
+                                "max": segment.domain.bounds.max}},
+                            "range": {
+                                "min": segment.range.min,
+                                "max": segment.range.max,
+                                "bounds": {
+                                    "min": _flip_infinities(segment.range.bounds.min),
+                                    "max": _flip_infinities(segment.range.bounds.max)}}})
 
         xml.SubElement(
             controls,
@@ -1061,6 +1067,8 @@ def _render_linear_axis(
         length = numpy.linalg.norm(basis)
         theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
 
+        project = axis.projection(range_min=0.0, range_max=length)
+
         axis_xml = xml.SubElement(
             context.root,
             "g",
@@ -1074,9 +1082,9 @@ def _render_linear_axis(
             x2 = length
             if axis._min_data_domain_implicit is not None:
                 x1 = max(
-                    x1, axis.project(axis._min_data_domain_implicit) * length)
+                    x1, project(axis._min_data_domain_implicit))
                 x2 = min(
-                    x2, axis.project(axis._max_data_domain_implicit) * length)
+                    x2, project(axis._max_data_domain_implicit))
             xml.SubElement(
                 axis_xml,
                 "line",
@@ -1095,7 +1103,7 @@ def _render_linear_axis(
                 for location, tick_style in zip(
                     axis._tick_locations, axis.ticks.tick.styles(
                         axis._tick_locations)):
-                    x = axis.project(location) * length
+                    x = project(location)
                     xml.SubElement(
                         ticks_group,
                         "line",
@@ -1114,7 +1122,7 @@ def _render_linear_axis(
             for location, label, title, label_style in zip(
                 axis._tick_locations, axis._tick_labels, axis._tick_titles, axis.ticks.labels.label.styles(
                     axis._tick_locations)):
-                x = axis.project(location) * length
+                x = project(location)
                 dstyle = toyplot.style.combine(
                     {
                         "text-anchor": "middle",

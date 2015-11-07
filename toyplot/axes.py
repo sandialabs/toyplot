@@ -422,18 +422,6 @@ class Axis(object):
         raise ValueError(
             """Scale must be "linear", "log", "log10", "log2" or a ("log", base) tuple.""")
 
-#        self._aspect = aspect
-
-#    @property
-#    def aspect(self):
-#        return self._aspect
-#
-#    @aspect.setter
-#    def aspect(self, value):
-#        if value not in [None, "fit-range"]:
-#            raise ValueError("Unknown aspect value: %s" % value)
-#        self._aspect = value
-#
     def update_domain(self, values, display=True, data=True):
         values = _flat_non_null(values)
 
@@ -520,22 +508,6 @@ class Axis(object):
 #            xmax = _null_max(domain_right.max(), xmax)
 #            ymin = _null_min(domain_bottom.min(), ymin)
 #            ymax = _null_max(domain_top.max(), ymax)
-
-        # Optionally expand the domain to match the aspect ratio of the range.
-#        if self._aspect == "fit-range":
-#            dwidth = (xmax - xmin)
-#            dheight = (ymax - ymin)
-#            daspect = dwidth / dheight
-#            raspect = (self._xmax_range - self._xmin_range) / (self._ymax_range - self._ymin_range)
-#
-#            if daspect < raspect:
-#                offset = ((dwidth * (raspect / daspect)) - dwidth) * 0.5
-#                xmin -= offset
-#                xmax += offset
-#            elif daspect > raspect:
-#                offset = ((dheight * (daspect / raspect)) - dheight) * 0.5
-#                ymin -= offset
-#                ymax += offset
 
         # Allow users to override the domain.
         if self.domain.min is not None:
@@ -857,6 +829,22 @@ class Cartesian(object):
 #            (self._expand_domain_range_bottom, bottom))
 
     def _finalize(self):
+        # Optionally expand the domain to match the aspect ratio of the range.
+        if self._aspect == "fit-range" and self.x._min_display_domain_implicit:
+            dwidth = (self.x._max_display_domain_implicit - self.x._min_display_domain_implicit)
+            dheight = (self.y._max_display_domain_implicit - self.y._min_display_domain_implicit)
+            daspect = dwidth / dheight
+            raspect = (self._xmax_range - self._xmin_range) / (self._ymax_range - self._ymin_range)
+
+            if daspect < raspect:
+                offset = ((dwidth * (raspect / daspect)) - dwidth) * 0.5
+                self.x._min_display_domain_implicit -= offset
+                self.x._max_display_domain_implicit += offset
+            elif daspect > raspect:
+                offset = ((dheight * (daspect / raspect)) - dheight) * 0.5
+                self.y._min_display_domain_implicit -= offset
+                self.y._max_display_domain_implicit += offset
+
         self.x._finalize()
         self.y._finalize()
 

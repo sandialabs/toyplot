@@ -159,8 +159,8 @@ def step_impl(context):
 
 @then(u'the cartesian axes can be rendered with angled x tick labels')
 def step_impl(context):
-    context.axes.x.ticks.labels.angle = -45
-    nose.tools.assert_equal(context.axes.x.ticks.labels.angle, -45)
+    context.axes.x.ticks.labels.angle = 45
+    nose.tools.assert_equal(context.axes.x.ticks.labels.angle, 45)
     context.axes.x.ticks.show = True
     context.axes.x.ticks.labels.offset = 10
     context.axes.x.ticks.labels.style = {
@@ -342,7 +342,7 @@ def step_impl(context):
     context.axes.y.ticks.labels.angle = -45
     nose.tools.assert_equal(context.axes.y.ticks.labels.angle, -45)
     context.axes.y.ticks.show = True
-    context.axes.y.ticks.labels.offset = 10
+    context.axes.y.ticks.labels.offset = -10
     context.axes.y.ticks.labels.style = {
         "text-anchor": "middle", "baseline-shift": 0}
     nose.tools.assert_equal(

@@ -198,6 +198,8 @@ class Extended(TickLocator):
       Prioritized list of "nice" values to use for generating ticks.
     only_inside: boolean
       If set to `True`, only ticks inside the axis domain will be generated.
+    format : string, optional
+      Format string used to generate labels from tick locations.
     """
 
     def __init__(self, count=5, steps=None, weights=None, only_inside=False, format="{0:.{digits}f}"):
@@ -353,6 +355,8 @@ class Heckbert(TickLocator):
     Parameters
     ----------
     count: number of ticks to generate
+    format : string, optional
+      Format string used to generate labels from tick locations.
     """
 
     def __init__(self, count=5, format="{0:.{digits}f}"):

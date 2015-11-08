@@ -6,6 +6,9 @@
 # with specific versions (Qt 4.8.7 on a Mac) of QWebView.  Otherwise, the
 # functionality is equivalent.
 
+"""Support functions for rendering using Qt.
+"""
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtPrintSupport import *

@@ -2,12 +2,14 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Functionality for performing unit conversions.
+"""
+
 from __future__ import division
 
 import numbers
 import re
 import toyplot.compatibility
-
 
 def convert(value, target, default=None, reference=None):
     """Convert quantities using real-world units.
@@ -43,24 +45,23 @@ def convert(value, target, default=None, reference=None):
         if value == 0:
             return 0
         if default is None:
-            raise ValueError(
-                "Value doesn't contain units, and no default units specified.")
+            raise ValueError("Value doesn't contain units, and no default units specified.")
         value = (value, default)
     elif isinstance(value, toyplot.compatibility.string_type):
         if value == "0":
             return 0
         value, units = re.match(r"([^a-zA-Z%]+)([a-zA-Z%]+)\Z", value).groups()
         value = (float(value), units)
-    if not (
-        isinstance(
-            value,
-            tuple) and len(value) == 2 and isinstance(
-            value[0],
-            numbers.Number) and isinstance(
-                value[1],
-            toyplot.compatibility.string_type)):
-        raise ValueError(
-            "Value must be a number, string or (number, string) tuple.")
+
+    if not isinstance(value, tuple):
+        raise ValueError("Value must be a number, string or (number, string) tuple.")
+    if not len(value) == 2:
+        raise ValueError("Value must be a number, string or (number, string) tuple.")
+    if not isinstance(value[0], numbers.Number):
+        raise ValueError("Value must be a number, string or (number, string) tuple.")
+    if not isinstance(value[1], toyplot.compatibility.string_type):
+        raise ValueError("Value must be a number, string or (number, string) tuple.")
+
     value, units = value
     units = units.lower()
     if units == "%":

@@ -466,9 +466,9 @@ def render(canvas, fobj=None, animation=False):
         "svg",
         xmlns="http://www.w3.org/2000/svg",
         attrib={ "xmlns:toyplot": "http://www.sandia.gov/toyplot"},
-        width="%rpx" % canvas._width,
-        height="%rpx" % canvas._height,
-        viewBox="0 0 %r %r" % (canvas._width, canvas._height),
+        width="%rpx" % canvas.width,
+        height="%rpx" % canvas.height,
+        viewBox="0 0 %r %r" % (canvas.width, canvas.height),
         preserveAspectRatio="xMidYMid meet",
         style=_css_style( canvas._style),
         id=context.get_id(canvas))

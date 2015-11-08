@@ -168,6 +168,16 @@ class Canvas(object):
                 method="html"),
             encoding="utf-8")
 
+    @property
+    def width(self):
+        """Width of the canvas in CSS pixels."""
+        return self._width
+
+    @property
+    def height(self):
+        """Height of the canvas in CSS pixels."""
+        return self._height
+
     def animate(self, frames, callback=None):
         """Generate a collection of animation frames, calling a callback to store an explicit representation of what changes at each frame.
 
@@ -791,8 +801,26 @@ class Canvas(object):
             index = 0
         return AnimationFrame(index, begin, end, self._animation)
 
-    def _pixel_scale(self, width=None, height=None, scale=None):
-        """Return a scale factor to convert this canvas to a target width or height in pixels."""
+    def pixel_scale(self, width=None, height=None, scale=None):
+        """Return a scale factor to convert this canvas' dimensions to a target width or height.
+
+        Parameters
+        ----------
+        width: number, string, or (number, string) tuple, optional
+            Target width.  Assumes CSS pixels if units aren't provided.  See
+            :ref:`units` for details on how Toyplot handles real world units.
+        height: number, string, or (number, string) tuple, optional
+            Target height.  Assumes CSS pixels if units aren't provided.  See
+            :ref:`units` for details on how Toyplot handles real world units.
+        scale: number, optional
+            Scale factor.
+
+        Returns
+        -------
+        scale: float
+            Scale factor that can be applied to this canvas' width and height in CSS pixels to
+            produce the desired dimensions.
+        """
         if numpy.count_nonzero(
                 [width is not None, height is not None, scale is not None]) > 1:
             raise ValueError("Specify only one of width, height, or scale.")

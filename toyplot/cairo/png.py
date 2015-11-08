@@ -2,6 +2,9 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Render PNG images using Cairo.
+"""
+
 from __future__ import absolute_import
 from __future__ import division
 
@@ -45,16 +48,16 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
       `fobj` parameter.
     """
     svg = toyplot.svg.render(canvas)
-    scale = canvas._pixel_scale(width=width, height=height, scale=scale)
+    scale = canvas.pixel_scale(width=width, height=height, scale=scale)
     surface = cairo.ImageSurface(
-        cairo.FORMAT_ARGB32, int(scale * canvas._width), int(scale * canvas._height))
+        cairo.FORMAT_ARGB32, int(scale * canvas.width), int(scale * canvas.height))
     context = cairo.Context(surface)
     context.scale(scale, scale)
     toyplot.cairo.render(svg, context)
     if fobj is None:
-        buffer = StringIO.StringIO()
-        surface.write_to_png(buffer)
-        return buffer.getvalue()
+        stream = StringIO.StringIO()
+        surface.write_to_png(stream)
+        return stream.getvalue()
     else:
         surface.write_to_png(fobj)
 
@@ -89,11 +92,11 @@ def render_frames(canvas, width=None, height=None, scale=None):
     ...   open("frame-%s.png" % frame, "wb").write(png)
     """
     svg, svg_animation = toyplot.svg.render(canvas, animation=True)
-    scale = canvas._pixel_scale(width=width, height=height, scale=scale)
+    scale = canvas.pixel_scale(width=width, height=height, scale=scale)
     for time, changes in sorted(svg_animation.items()):
         toyplot.svg.apply_changes(svg, changes)
         surface = cairo.ImageSurface(
-            cairo.FORMAT_ARGB32, int(scale * canvas._width), int(scale * canvas._height))
+            cairo.FORMAT_ARGB32, int(scale * canvas.width), int(scale * canvas.height))
         context = cairo.Context(surface)
         context.scale(scale, scale)
         toyplot.cairo.render(svg, context)

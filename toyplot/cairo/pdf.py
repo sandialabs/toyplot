@@ -58,16 +58,16 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     svg = toyplot.svg.render(canvas)
     scale = canvas._point_scale(width=width, height=height, scale=scale)
     if fobj is None:
-        buffer = StringIO.StringIO()
+        stream = StringIO.StringIO()
         surface = cairo.PDFSurface(
-            buffer, scale * canvas._width, scale * canvas._height)
+            stream, scale * canvas.width, scale * canvas.height)
     else:
         surface = cairo.PDFSurface(
-            fobj, scale * canvas._width, scale * canvas._height)
+            fobj, scale * canvas.width, scale * canvas.height)
     context = cairo.Context(surface)
     context.scale(scale, scale)
     toyplot.cairo.render(svg, context)
     surface.flush()
     surface.finish()
     if fobj is None:
-        return buffer.getvalue()
+        return stream.getvalue()

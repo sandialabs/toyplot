@@ -2,6 +2,9 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Generates PNG images using Qt.
+"""
+
 from __future__ import absolute_import
 from __future__ import division
 
@@ -50,9 +53,9 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     """
     qapplication = toyplot.qt.application()
 
-    scale = canvas._pixel_scale(width=width, height=height, scale=scale)
-    width = canvas._width * scale
-    height = canvas._height * scale
+    scale = canvas.pixel_scale(width=width, height=height, scale=scale)
+    width = canvas.width * scale
+    height = canvas.height * scale
 
     svg = toyplot.svg.render(canvas)
 
@@ -70,9 +73,9 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
         image.save(fobj, "PNG")
     else:
         storage = toyplot.qt.QByteArray()
-        buffer = toyplot.qt.QBuffer(storage)
-        buffer.open(toyplot.qt.QIODevice.WriteOnly)
-        image.save(buffer, "PNG")
+        stream = toyplot.qt.QBuffer(storage)
+        stream.open(toyplot.qt.QIODevice.WriteOnly)
+        image.save(stream, "PNG")
         if fobj is None:
             return storage.data()
         else:

@@ -337,7 +337,7 @@ class Extended(TickLocator):
         lmin, lmax, lstep, q, k = extended(
             domain_min, domain_max, self._count - 1, self._steps, self._only_inside, self._weights)
         locations = numpy.arange(k) * lstep + lmin
-        digits = int(numpy.max(-numpy.floor(numpy.log10(lstep)), 0))
+        digits = max(0, int(numpy.max(-numpy.floor(numpy.log10(lstep)), 0)))
         labels = [self._format.format(location, digits=digits) for location in locations]
         titles = numpy.repeat(None, len(labels))
         return locations, labels, titles
@@ -403,7 +403,7 @@ class Heckbert(TickLocator):
         tick_min = numpy.floor(domain_min / tick_spacing) * tick_spacing
         tick_max = numpy.ceil(domain_max / tick_spacing) * tick_spacing
         locations = numpy.linspace(tick_min, tick_max, self._count)
-        digits = int(numpy.max(-numpy.floor(numpy.log10(tick_spacing)), 0))
+        digits = max(0, int(numpy.max(-numpy.floor(numpy.log10(tick_spacing)), 0)))
         labels = [self._format.format(location, digits=digits) for location in locations]
         titles = numpy.repeat(None, len(labels))
         return locations, labels, titles

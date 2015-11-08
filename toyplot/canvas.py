@@ -253,10 +253,40 @@ class Canvas(object):
             palette=None,
             padding=10,
             ):
-        """Add a set of 2D axes to the canvas.
+        """Add a set of Cartesian axes to the canvas.
 
         Parameters
         ----------
+        bounds: (xmin, xmax, ymin, ymax) tuple, optional
+          Use the bounds property to position / size the axes by specifying the
+          position of each of its boundaries.  Assumes CSS pixels if units
+          aren't provided, and supports all units described in :ref:`units`,
+          including percentage of the canvas width / height.
+        rect: (x, y, width, height) tuple, optional
+          Use the rect property to position / size the axes by specifying its
+          upper-left-hand corner, width, and height.  Assumes CSS pixels if
+          units aren't provided, and supports all units described in
+          :ref:`units`, including percentage of the canvas width / height.
+        corner: (corner, inset, width, height) tuple, optional
+          Use the corner property to position / size the axes by specifying its
+          width and height, plus an inset from a corner of the canvas.  Allowed
+          corner values are "top-left", "top", "top-right", "right",
+          "bottom-right", "bottom", "bottom-left", and "left".  The width and
+          height may be specified using absolute units as described in
+          :ref:`units`, or as a percentage of the canvas width / height.  The
+          inset only supports absolute drawing units.  All units default to CSS
+          pixels if unspecified.
+        grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
+          Use the grid property to position / size the axes using a collection of
+          grid cells filling the canvas.  Specify the number of rows and columns in
+          the grid, then specify either a zero-based cell index (which runs in
+          left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
+          a set of i, column-span, j, row-span coordinates so the legend can cover
+          more than one cell.
+        gutter: size of the gutter around grid cells, optional
+          Specifies the amount of empty space to leave between grid cells When using the
+          `grid` parameter for positioning.  Assumes CSS pixels by default, and supports
+          all of the absolute units described in :ref:`units`.
         xmin, xmax, ymin, ymax: float, optional
           Used to explicitly override the axis domain (normally, the domain is
           implicitly defined by any marks added to the axes).
@@ -264,13 +294,13 @@ class Canvas(object):
           Set to "fit-range" to automatically expand the domain so that its
           aspect ratio matches the aspect ratio of the range.
         show: bool, optional
-          Set to `False` to hide both axes (the axes contents will still be visible).
+          Set to `False` to hide the axes (the axes contents will still be visible).
         xshow, yshow: bool, optional
-          Set to `False` to hide either axis.
+          Set to `False` to hide individual axes.
         label: string, optional
-          Human-readable label placed above the axes.
+          Human-readable axes label.
         xlabel, ylabel: string, optional
-          Human-readable axis label.
+          Human-readable axis labels.
         xticklocator, yticklocator: :class:`toyplot.locator.TickLocator`, optional
           Controls the placement and formatting of axis ticks and tick labels.
         xscale, yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
@@ -311,6 +341,7 @@ class Canvas(object):
                 palette=palette,
                 padding=padding,
                 parent=self))
+
         return self._children[-1]
 
     def legend(

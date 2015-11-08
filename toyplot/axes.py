@@ -366,9 +366,7 @@ class Axis(object):
             show=True,
             tick_angle=0,
             tick_locator=None,
-            parent=None,
             ):
-        self._parent = parent
         self.scale = scale # This calls the property setter
         self._show = show
         self._tick_labels = []
@@ -702,25 +700,26 @@ class Cartesian(object):
         self.label = Axis.LabelHelper(
             label=label, style={"font-size": "14px", "baseline-shift": "100%"})
 
-        self.x = xaxis if xaxis is not None else Axis(
-            show=xshow,
-            label=xlabel,
-            min=xmin,
-            max=xmax,
-            tick_locator=xticklocator,
-            tick_angle=0,
-            scale=xscale,
-            )
+        if xaxis is None:
+            xaxis = Axis()
+        xaxis.show = xshow
+        xaxis.label.text = xlabel
+        xaxis.domain.min = xmin
+        xaxis.domain.max = xmax
+        xaxis.ticks.locator = xticklocator
+        xaxis.scale = xscale
 
-        self.y = yaxis if yaxis is not None else Axis(
-            show=yshow,
-            label=ylabel,
-            min=ymin,
-            max=ymax,
-            tick_locator=yticklocator,
-            tick_angle=0,
-            scale=yscale,
-            )
+        if yaxis is None:
+            yaxis = Axis()
+        yaxis.show = yshow
+        yaxis.label.text = ylabel
+        yaxis.domain.min = ymin
+        yaxis.domain.max = ymax
+        yaxis.ticks.locator = yticklocator
+        yaxis.scale = yscale
+
+        self.x = xaxis
+        self.y = yaxis
 
         self._parent = parent
         self._children = []
@@ -2021,10 +2020,46 @@ class Cartesian(object):
     def share(
             self,
             axis="x",
-            label=None,
-            min=None,
-            max=None,
+            xmin=None,
+            xmax=None,
+            ymin=None,
+            ymax=None,
+#            aspect=None,
+#            show=True,
+#            xshow=True,
+#            yshow=True,
+#            label=None,
+            xlabel=None,
+            ylabel=None,
+            xticklocator=None,
+            yticklocator=None,
+            xscale="linear",
+            yscale="linear",
+            palette=None,
+#            padding=10,
             ):
+        """Create a Cartesian coordinate system with a shared axis.
+
+        Parameters
+        ----------
+        axis: string, optional
+            The axis that will be shared.  Allowed values are "x" and "y". 
+        xmin, xmax, ymin, ymax: float, optional
+          Used to explicitly override the axis domain (normally, the domain is
+          implicitly defined by any marks added to the axes).
+        xlabel, ylabel: string, optional
+          Human-readable axis labels.
+        xticklocator, yticklocator: :class:`toyplot.locator.TickLocator`, optional
+          Controls the placement and formatting of axis ticks and tick labels.
+        xscale, yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
+          Specifies the mapping from data to canvas coordinates along an axis.
+        palette: :class:`toyplot.color.Palette`, optional
+          Color palette used to automatically select per-series colors for plotted data.
+
+        Returns
+        -------
+        axes: :class:`toyplot.axes.Cartesian`
+        """
 
         shared = Cartesian(
             xmin_range=self._xmin_range,
@@ -2032,21 +2067,21 @@ class Cartesian(object):
             ymin_range=self._ymin_range,
             ymax_range=self._ymax_range,
             aspect=self._aspect,
-            xmin=min if axis == "y" else None,
-            xmax=max if axis == "y" else None,
-            ymin=min if axis == "x" else None,
-            ymax=max if axis == "x" else None,
+            xmin=xmin,
+            xmax=xmax,
+            ymin=ymin,
+            ymax=ymax,
             show=True,
-            xshow=axis == "y",
-            yshow=axis == "x",
+            xshow=True,
+            yshow=True,
             label=None,
-            xlabel=label if axis == "y" else None,
-            ylabel=label if axis == "x" else None,
-            xticklocator=None,
-            yticklocator=None,
-            xscale="linear",
-            yscale="linear",
-            palette=None,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xticklocator=xticklocator,
+            yticklocator=yticklocator,
+            xscale=xscale,
+            yscale=yscale,
+            palette=palette,
             padding=self._padding,
             parent=self._parent,
             xaxis = self.x if axis == "x" else None,

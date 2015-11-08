@@ -200,12 +200,13 @@ class Extended(TickLocator):
       If set to `True`, only ticks inside the axis domain will be generated.
     """
 
-    def __init__(self, count=5, steps=None, weights=None, only_inside=False):
+    def __init__(self, count=5, steps=None, weights=None, only_inside=False, format="{0:.{digits}f}"):
         self._count = count
         self._steps = steps if steps is not None else [1, 5, 2, 2.5, 4, 3]
         self._weights = weigths if weights is not None else [
             0.25, 0.2, 0.5, 0.05]
         self._only_inside = only_inside
+        self._format = format
 
     def ticks(self, domain_min, domain_max):
         """Return a set of ticks for the given domain.
@@ -337,7 +338,7 @@ class Extended(TickLocator):
             domain_min, domain_max, self._count - 1, self._steps, self._only_inside, self._weights)
         locations = numpy.arange(k) * lstep + lmin
         digits = int(numpy.max(-numpy.floor(numpy.log10(lstep)), 0))
-        labels = ["%.*f" % (digits, location) for location in locations]
+        labels = [self._format.format(location, digits=digits) for location in locations]
         titles = numpy.repeat(None, len(labels))
         return locations, labels, titles
 
@@ -354,8 +355,9 @@ class Heckbert(TickLocator):
     count: number of ticks to generate
     """
 
-    def __init__(self, count=5):
+    def __init__(self, count=5, format="{0:.{digits}f}"):
         self._count = count
+        self._format = format
 
     def ticks(self, domain_min, domain_max):
         """Return a set of ticks for the given domain.
@@ -402,7 +404,7 @@ class Heckbert(TickLocator):
         tick_max = numpy.ceil(domain_max / tick_spacing) * tick_spacing
         locations = numpy.linspace(tick_min, tick_max, self._count)
         digits = int(numpy.max(-numpy.floor(numpy.log10(tick_spacing)), 0))
-        labels = ["%.*f" % (digits, location) for location in locations]
+        labels = [self._format.format(location, digits=digits) for location in locations]
         titles = numpy.repeat(None, len(labels))
         return locations, labels, titles
 

@@ -168,6 +168,16 @@ class Canvas(object):
                 method="html"),
             encoding="utf-8")
 
+    @property
+    def width(self):
+        """Width of the canvas in CSS pixels."""
+        return self._width
+
+    @property
+    def height(self):
+        """Height of the canvas in CSS pixels."""
+        return self._height
+
     def animate(self, frames, callback=None):
         """Generate a collection of animation frames, calling a callback to store an explicit representation of what changes at each frame.
 
@@ -252,11 +262,41 @@ class Canvas(object):
             yscale="linear",
             palette=None,
             padding=10,
-            tick_length=5):
-        """Add a set of 2D axes to the canvas.
+            ):
+        """Add a set of Cartesian axes to the canvas.
 
         Parameters
         ----------
+        bounds: (xmin, xmax, ymin, ymax) tuple, optional
+          Use the bounds property to position / size the axes by specifying the
+          position of each of its boundaries.  Assumes CSS pixels if units
+          aren't provided, and supports all units described in :ref:`units`,
+          including percentage of the canvas width / height.
+        rect: (x, y, width, height) tuple, optional
+          Use the rect property to position / size the axes by specifying its
+          upper-left-hand corner, width, and height.  Assumes CSS pixels if
+          units aren't provided, and supports all units described in
+          :ref:`units`, including percentage of the canvas width / height.
+        corner: (corner, inset, width, height) tuple, optional
+          Use the corner property to position / size the axes by specifying its
+          width and height, plus an inset from a corner of the canvas.  Allowed
+          corner values are "top-left", "top", "top-right", "right",
+          "bottom-right", "bottom", "bottom-left", and "left".  The width and
+          height may be specified using absolute units as described in
+          :ref:`units`, or as a percentage of the canvas width / height.  The
+          inset only supports absolute drawing units.  All units default to CSS
+          pixels if unspecified.
+        grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
+          Use the grid property to position / size the axes using a collection of
+          grid cells filling the canvas.  Specify the number of rows and columns in
+          the grid, then specify either a zero-based cell index (which runs in
+          left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
+          a set of i, column-span, j, row-span coordinates so the legend can cover
+          more than one cell.
+        gutter: size of the gutter around grid cells, optional
+          Specifies the amount of empty space to leave between grid cells When using the
+          `grid` parameter for positioning.  Assumes CSS pixels by default, and supports
+          all of the absolute units described in :ref:`units`.
         xmin, xmax, ymin, ymax: float, optional
           Used to explicitly override the axis domain (normally, the domain is
           implicitly defined by any marks added to the axes).
@@ -264,13 +304,13 @@ class Canvas(object):
           Set to "fit-range" to automatically expand the domain so that its
           aspect ratio matches the aspect ratio of the range.
         show: bool, optional
-          Set to `False` to hide both axes (the axes contents will still be visible).
+          Set to `False` to hide the axes (the axes contents will still be visible).
         xshow, yshow: bool, optional
-          Set to `False` to hide either axis.
+          Set to `False` to hide individual axes.
         label: string, optional
-          Human-readable label placed above the axes.
+          Human-readable axes label.
         xlabel, ylabel: string, optional
-          Human-readable axis label.
+          Human-readable axis labels.
         xticklocator, yticklocator: :class:`toyplot.locator.TickLocator`, optional
           Controls the placement and formatting of axis ticks and tick labels.
         xscale, yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
@@ -280,8 +320,6 @@ class Canvas(object):
         padding: number, string, or (number, string) tuple,  optional
           Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
           See :ref:`units` for details on how Toyplot handles real-world units.
-        tick_length: :ref:`units`, optional
-          Length of axes ticks, defaults to CSS pixel units.
 
         Returns
         -------
@@ -312,8 +350,8 @@ class Canvas(object):
                 yscale=yscale,
                 palette=palette,
                 padding=padding,
-                tick_length=tick_length,
                 parent=self))
+
         return self._children[-1]
 
     def legend(
@@ -529,6 +567,71 @@ class Canvas(object):
         self._children.append(table)
         return table
 
+    def number_line(
+            self,
+            bounds=None,
+            rect=None,
+            corner=None,
+            grid=None,
+            gutter=50,
+            min=None,
+            max=None,
+            show=True,
+            label=None,
+            ticklocator=None,
+            scale="linear",
+            palette=None,
+            ):
+        """Add a 1D number line to the canvas.
+
+        Parameters
+        ----------
+        xmin, xmax, ymin, ymax: float, optional
+          Used to explicitly override the axis domain (normally, the domain is
+          implicitly defined by any marks added to the axes).
+        aspect: string, optional
+          Set to "fit-range" to automatically expand the domain so that its
+          aspect ratio matches the aspect ratio of the range.
+        show: bool, optional
+          Set to `False` to hide both axes (the axes contents will still be visible).
+        xshow, yshow: bool, optional
+          Set to `False` to hide either axis.
+        label: string, optional
+          Human-readable label placed above the axes.
+        xlabel, ylabel: string, optional
+          Human-readable axis label.
+        xticklocator, yticklocator: :class:`toyplot.locator.TickLocator`, optional
+          Controls the placement and formatting of axis ticks and tick labels.
+        xscale, yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
+          Specifies the mapping from data to canvas coordinates along an axis.
+        palette: :class:`toyplot.color.Palette`, optional
+          Color palette used to automatically select per-series colors for plotted data.
+        padding: number, string, or (number, string) tuple,  optional
+          Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
+          See :ref:`units` for details on how Toyplot handles real-world units.
+
+        Returns
+        -------
+        axes: :class:`toyplot.axes.Cartesian`
+        """
+        xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
+            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+        self._children.append(
+            toyplot.axes.NumberLine(
+                xmin_range,
+                0.5 * (ymin_range + ymax_range),
+                xmax_range,
+                0.5 * (ymin_range + ymax_range),
+                min=min,
+                max=max,
+                show=show,
+                label=label,
+                ticklocator=ticklocator,
+                scale=scale,
+                palette=palette,
+                parent=self))
+        return self._children[-1]
+
     def table(
             self,
             data=None,
@@ -698,8 +801,26 @@ class Canvas(object):
             index = 0
         return AnimationFrame(index, begin, end, self._animation)
 
-    def _pixel_scale(self, width=None, height=None, scale=None):
-        """Return a scale factor to convert this canvas to a target width or height in pixels."""
+    def pixel_scale(self, width=None, height=None, scale=None):
+        """Return a scale factor to convert this canvas' dimensions to a target width or height.
+
+        Parameters
+        ----------
+        width: number, string, or (number, string) tuple, optional
+            Target width.  Assumes CSS pixels if units aren't provided.  See
+            :ref:`units` for details on how Toyplot handles real world units.
+        height: number, string, or (number, string) tuple, optional
+            Target height.  Assumes CSS pixels if units aren't provided.  See
+            :ref:`units` for details on how Toyplot handles real world units.
+        scale: number, optional
+            Scale factor.
+
+        Returns
+        -------
+        scale: float
+            Scale factor that can be applied to this canvas' width and height in CSS pixels to
+            produce the desired dimensions.
+        """
         if numpy.count_nonzero(
                 [width is not None, height is not None, scale is not None]) > 1:
             raise ValueError("Specify only one of width, height, or scale.")

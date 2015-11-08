@@ -44,8 +44,8 @@ def render(canvas, fobj=None, animation=False):
     svg = html.find("svg")
 
     if isinstance(fobj, toyplot.compatibility.string_type):
-        with open(fobj, "wb") as file:
-            file.write(xml.tostring(svg, method="xml"))
+        with open(fobj, "wb") as stream:
+            stream.write(xml.tostring(svg, method="xml"))
     elif fobj is not None:
         fobj.write(xml.tostring(svg, method="xml"))
     else:

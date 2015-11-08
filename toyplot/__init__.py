@@ -2,6 +2,10 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Provides the top-level :ref:`convenience-api`, which allows you to create
+many plots using a single compact statement.
+"""
+
 from __future__ import division
 
 __version__ = "0.9.0"
@@ -41,7 +45,9 @@ def bars(
         canvas_style=None):
     """Convenience function for creating a bar plot in a single call.
 
-    See :meth:`toyplot.axes.Cartesian.bars`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+    See :meth:`toyplot.axes.Cartesian.bars`,
+    :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
+    parameter descriptions.
 
     Returns
     -------
@@ -110,7 +116,9 @@ def fill(
         canvas_style=None):
     """Convenience function for creating a fill plot in a single call.
 
-    See :meth:`toyplot.axes.Cartesian.fill`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+    See :meth:`toyplot.axes.Cartesian.fill`,
+    :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
+    parameter descriptions.
 
     Returns
     -------
@@ -175,10 +183,12 @@ def graph(
         width=None,
         height=None,
         canvas_style=None,
-        ): # pragma: no cover
+    ): # pragma: no cover
     """Convenience function for creating a graph plot in a single call.
 
-    See :meth:`toyplot.axes.Cartesian.graph`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+    See :meth:`toyplot.axes.Cartesian.graph`,
+    :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
+    parameter descriptions.
 
     Returns
     -------
@@ -237,7 +247,8 @@ def matrix(
         canvas_style=None):
     """Convenience function to create a matrix visualization in a single call.
 
-    See :meth:`toyplot.canvas.Canvas.matrix`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+    See :meth:`toyplot.canvas.Canvas.matrix`, and
+    :class:`toyplot.canvas.Canvas` for parameter descriptions.
 
     Returns
     -------
@@ -247,7 +258,7 @@ def matrix(
       A new set of table axes that fill the canvas.
     """
     canvas = Canvas(width=width, height=height, style=canvas_style)
-    table = canvas.matrix(
+    axes = canvas.matrix(
         data=data,
         label=label,
         tlabel=tlabel,
@@ -263,7 +274,7 @@ def matrix(
         llocator=llocator,
         rlocator=rlocator,
         blocator=blocator)
-    return canvas, table
+    return canvas, axes
 
 
 def plot(
@@ -278,7 +289,7 @@ def plot(
         size=20,
         mfill=None,
         mopacity=1.0,
-        mtitle = None,
+        mtitle=None,
         style=None,
         mstyle=None,
         mlstyle=None,
@@ -301,7 +312,9 @@ def plot(
         canvas_style=None):
     """Convenience function for creating a line plot in a single call.
 
-    See :meth:`toyplot.axes.Cartesian.plot`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+    See :meth:`toyplot.axes.Cartesian.plot`,
+    :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
+    parameter descriptions.
 
     Returns
     -------
@@ -378,7 +391,9 @@ def scatterplot(
         canvas_style=None):
     """Convenience function for creating a scatter plot in a single call.
 
-    See :meth:`toyplot.axes.Cartesian.scatterplot`, :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+    See :meth:`toyplot.axes.Cartesian.scatterplot`,
+    :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
+    parameter descriptions.
 
     Returns
     -------
@@ -434,7 +449,8 @@ def table(
         canvas_style=None):
     """Convenience function to create a table visualization in a single call.
 
-    See :meth:`toyplot.canvas.Canvas.table`, and :class:`toyplot.canvas.Canvas` for parameter descriptions.
+    See :meth:`toyplot.canvas.Canvas.table`, and :class:`toyplot.canvas.Canvas`
+    for parameter descriptions.
 
     Returns
     -------
@@ -444,7 +460,7 @@ def table(
       A new set of table axes that fill the canvas.
     """
     canvas = Canvas(width=width, height=height, style=canvas_style)
-    table = canvas.table(
+    axes = canvas.table(
         data=data,
         rows=rows,
         columns=columns,
@@ -453,4 +469,4 @@ def table(
         lcols=lcols,
         rcols=rcols,
         label=label)
-    return canvas, table
+    return canvas, axes

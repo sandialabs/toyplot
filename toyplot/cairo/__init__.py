@@ -96,14 +96,20 @@ def render(svg, context):
         if current_style.get("visibility") != "hidden":
 
             if "transform" in element.attrib:
-                transform = element.get("transform")
-                type, value = transform.split("(")
-                value = value[:-1].split(",")
-                if type == "rotate":
-                    if len(value) == 3:
-                        context.translate(float(value[1]), float(value[2]))
-                        context.rotate(numpy.radians(float(value[0])))
-                        context.translate(-float(value[1]), -float(value[2]))
+                for transformation in element.get("transform").split(")")[::-1]:
+                    if transformation:
+                        type, arguments = transformation.split("(")
+                        arguments = arguments.split(",")
+                        if type == "translate":
+                            if len(arguments) == 2:
+                                context.translate(float(arguments[0]), float(arguments[1]))
+                        elif type == "rotate":
+                            if len(arguments) == 1:
+                                context.rotate(numpy.radians(float(arguments[0])))
+                            if len(arguments) == 3:
+                                context.translate(float(arguments[1]), float(arguments[2]))
+                                context.rotate(numpy.radians(float(arguments[0])))
+                                context.translate(-float(arguments[1]), -float(arguments[2]))
 
             if element.tag == "svg":
                 if "background-color" in current_style:

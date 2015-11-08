@@ -465,12 +465,12 @@ def render(canvas, fobj=None, animation=False):
     svg = xml.Element(
         "svg",
         xmlns="http://www.w3.org/2000/svg",
-        attrib={ "xmlns:toyplot": "http://www.sandia.gov/toyplot"},
-        width="%rpx" % canvas._width,
-        height="%rpx" % canvas._height,
-        viewBox="0 0 %r %r" % (canvas._width, canvas._height),
+        attrib={"xmlns:toyplot": "http://www.sandia.gov/toyplot"},
+        width="%rpx" % canvas.width,
+        height="%rpx" % canvas.height,
+        viewBox="0 0 %r %r" % (canvas.width, canvas.height),
         preserveAspectRatio="xMidYMid meet",
-        style=_css_style( canvas._style),
+        style=_css_style(canvas._style),
         id=context.get_id(canvas))
     for child in canvas._children:
         _render(canvas, child, context.push(svg))
@@ -580,7 +580,7 @@ def render(canvas, fobj=None, animation=False):
         for key, axes in context._cartesian_axes.items():
             cartesian_axes[key] = dict()
             cartesian_axes[key]["x"] = list()
-            for segment in axes._xprojection._segments:
+            for segment in axes._x_projection._segments:
                 cartesian_axes[key]["x"].append(
                     {
                         "scale": segment.scale,
@@ -597,16 +597,22 @@ def render(canvas, fobj=None, animation=False):
                                 "min": segment.range.bounds.min,
                                 "max": segment.range.bounds.max}}})
             cartesian_axes[key]["y"] = list()
-            for segment in axes._yprojection._segments:
+            for segment in axes._y_projection._segments:
                 cartesian_axes[key]["y"].append(
                     {
-                        "scale": segment.scale, "domain": {
-                            "min": segment.domain.min, "max": segment.domain.max, "bounds": {
-                                "min": segment.domain.bounds.min, "max": segment.domain.bounds.max}}, "range": {
-                            "min": segment.range.min, "max": segment.range.max, "bounds": {
-                                "min": _flip_infinities(
-                                    segment.range.bounds.min), "max": _flip_infinities(
-                                    segment.range.bounds.max)}}})
+                        "scale": segment.scale,
+                        "domain": {
+                            "min": segment.domain.min,
+                            "max": segment.domain.max,
+                            "bounds": {
+                                "min": segment.domain.bounds.min,
+                                "max": segment.domain.bounds.max}},
+                            "range": {
+                                "min": segment.range.min,
+                                "max": segment.range.max,
+                                "bounds": {
+                                    "min": _flip_infinities(segment.range.bounds.min),
+                                    "max": _flip_infinities(segment.range.bounds.max)}}})
 
         xml.SubElement(
             controls,
@@ -777,12 +783,14 @@ class _RenderContext(object):
             root=None,
             id_cache=None,
             data_tables=None,
-            cartesian_axes=None):
+            cartesian_axes=None,
+            rendered=None,
+            ):
         self._root = root
         self._id_cache = dict() if id_cache is None else id_cache
         self._data_tables = list() if data_tables is None else data_tables
-        self._cartesian_axes = dict(
-        ) if cartesian_axes is None else cartesian_axes
+        self._cartesian_axes = dict() if cartesian_axes is None else cartesian_axes
+        self._rendered = set() if rendered is None else rendered
 
     def add_data_table(self, mark, table, title, filename):
         self._data_tables.append(
@@ -791,12 +799,18 @@ class _RenderContext(object):
     def add_cartesian_axes(self, axes):
         self._cartesian_axes[self.get_id(axes)] = axes
 
+    @property
+    def rendered(self):
+        return self._rendered
+
     def push(self, root):
         return _RenderContext(
             root,
             self._id_cache,
             self._data_tables,
-            self._cartesian_axes)
+            self._cartesian_axes,
+            self._rendered,
+            )
 
     @property
     def root(self):
@@ -1027,9 +1041,163 @@ _render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<
     "^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
 
+def _render_linear_axis(
+        canvas,
+        axis,
+        context,
+        x1,
+        y1,
+        x2,
+        y2,
+        ticks_above,
+        ticks_below,
+        tick_labels_baseline_shift,
+        label_baseline_shift,
+        ):
+
+    if axis in context.rendered:
+        return
+    context.rendered.add(axis)
+
+    if axis.show:
+        p = numpy.row_stack(((x1, y1), (x2, y2)))
+        basis = p[1] - p[0]
+        length = numpy.linalg.norm(basis)
+        theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
+
+        project = axis.projection(range_min=0.0, range_max=length)
+
+        axis_xml = xml.SubElement(
+            context.root,
+            "g",
+            id=context.get_id(axis),
+            transform="translate(%s,%s) rotate(%s)" % (p[0][0], p[0][1], theta),
+            attrib={"class": "toyplot-axes-Axis"},
+            )
+
+        if axis.spine.show:
+            x1 = 0
+            x2 = length
+            if axis._data_min is not None and axis._data_max is not None:
+                x1 = max(
+                    x1, project(axis._data_min))
+                x2 = min(
+                    x2, project(axis._data_max))
+            xml.SubElement(
+                axis_xml,
+                "line",
+                x1=repr(x1),
+                y1=repr(0),
+                x2=repr(x2),
+                y2=repr(0),
+                style=_css_style(
+                    axis.spine._style))
+
+            if axis.ticks._show:
+                y1 = -ticks_above if axis.ticks.above is None else -axis.ticks.above
+                y2 = ticks_below if axis.ticks.below is None else axis.ticks.below
+
+                ticks_group = xml.SubElement(axis_xml, "g")
+                for location, tick_style in zip(
+                    axis._tick_locations, axis.ticks.tick.styles(
+                        axis._tick_locations)):
+                    x = project(location)
+                    xml.SubElement(
+                        ticks_group,
+                        "line",
+                        x1=repr(x),
+                        y1=repr(y1),
+                        x2=repr(x),
+                        y2=repr(y2),
+                        style=_css_style(
+                            axis.ticks._style,
+                            tick_style))
+
+        if axis.ticks.labels.show:
+            y = axis.ticks.labels.offset
+
+            ticks_group = xml.SubElement(axis_xml, "g")
+            for location, label, title, label_style in zip(
+                axis._tick_locations, axis._tick_labels, axis._tick_titles, axis.ticks.labels.label.styles(
+                    axis._tick_locations)):
+                x = project(location)
+                dstyle = toyplot.style.combine(
+                    {
+                        "text-anchor": "middle",
+                        "alignment-baseline": "middle",
+                        "baseline-shift": tick_labels_baseline_shift,
+                    },
+                    axis.ticks.labels.style,
+                    label_style)
+                label_xml = xml.SubElement(
+                    ticks_group,
+                    "text",
+                    x=repr(0),
+                    y=repr(0),
+                    transform="translate(%r,%r) rotate(%r)" % (x, y, -axis.ticks.labels.angle),
+                    style=_css_style(dstyle))
+                label_xml.text = label
+#                if axis.ticks.labels.angle:
+#                    label_xml.set(
+#                        "transform", "rotate(%r, %r, %r)" %
+#                        (-axis.ticks.labels.angle, x, 0))
+                if "-toyplot-anchor-shift" in dstyle:
+                    label_xml.set(
+                        "dx", str(dstyle["-toyplot-anchor-shift"]))
+                if title is not None:
+                    xml.SubElement(label_xml, "title").text = str(title)
+
+        if axis.label.text is not None:
+            x = length * 0.5
+            dstyle = toyplot.style.combine(
+                {
+                    "baseline-shift": label_baseline_shift,
+                },
+                axis.label.style,
+            )
+            xml.SubElement(
+                axis_xml,
+                "text",
+                x=repr(x),
+                y=repr(0),
+                style=_css_style(dstyle)).text = axis.label.text
+
+
+@dispatch(toyplot.canvas.Canvas, toyplot.axes.NumberLine, _RenderContext)
+def _render(canvas, axes, context):
+    axes._finalize()
+
+    axes_xml = xml.SubElement(context.root, "g", id=context.get_id(
+        axes), attrib={"class": "toyplot-axes-NumberLine"})
+
+    children_xml = xml.SubElement(
+        axes_xml,
+        "g",
+        attrib={"class": "toyplot-coordinate-events"},
+        )
+
+    for child in axes._children:
+        _render(axes, child, context.push(children_xml))
+
+    if axes.axis.show:
+        _render_linear_axis(
+            canvas,
+            axes.axis,
+            context.push(axes_xml),
+            x1=axes._x1,
+            y1=axes._y1,
+            x2=axes._x2,
+            y2=axes._y2,
+            ticks_above=3,
+            ticks_below=3,
+            tick_labels_baseline_shift="-100%",
+            label_baseline_shift="-200%",
+            )
+
+
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Cartesian, _RenderContext)
 def _render(canvas, axes, context):
-    axes._finalize_domain()
+    axes._finalize()
 
     axes_xml = xml.SubElement(context.root, "g", id=context.get_id(
         axes), attrib={"class": "toyplot-axes-Cartesian"})
@@ -1038,30 +1206,32 @@ def _render(canvas, axes, context):
     xml.SubElement(
         clip_xml,
         "rect",
-        x=repr(
-            axes._xmin_range),
-        y=repr(
-            axes._ymin_range),
-        width=repr(
-            axes._xmax_range -
-            axes._xmin_range),
-        height=repr(
-            axes._ymax_range -
-            axes._ymin_range))
+        x=repr(axes._xmin_range - axes.padding),
+        y=repr(axes._ymin_range - axes.padding),
+        width=repr(axes._xmax_range - axes._xmin_range + axes.padding * 2),
+        height=repr(axes._ymax_range - axes._ymin_range + axes.padding * 2),
+        )
 
-    children_xml = xml.SubElement(axes_xml,
-                                  "g",
-                                  attrib={"class": "toyplot-coordinate-events",
-                                          "clip-path": "url(#%s)" % clip_xml.get("id")},
-                                  style=_css_style({"cursor": "crosshair"}))
-    xml.SubElement(children_xml,
-                   "rect",
-                   x=repr(axes._xmin_range),
-                   y=repr(axes._ymin_range),
-                   width=repr(axes._xmax_range - axes._xmin_range),
-                   height=repr(axes._ymax_range - axes._ymin_range),
-                   style=_css_style({"visibility": "hidden",
-                                     "pointer-events": "all"}))
+    children_xml = xml.SubElement(
+        axes_xml,
+        "g",
+        attrib={
+            "class" : "toyplot-coordinate-events",
+            "clip-path" : "url(#%s)" % clip_xml.get("id"),
+        },
+        style=_css_style({"cursor": "crosshair"}),
+        )
+
+    xml.SubElement(
+        children_xml,
+        "rect",
+        x=repr(axes._xmin_range - axes.padding),
+        y=repr(axes._ymin_range - axes.padding),
+        width=repr(axes._xmax_range - axes._xmin_range + axes.padding * 2),
+        height=repr(axes._ymax_range - axes._ymin_range + axes.padding * 2),
+        style=_css_style({"visibility": "hidden", "pointer-events": "all"}),
+        )
+
     for child in axes._children:
         _render(axes, child, context.push(children_xml))
 
@@ -1095,176 +1265,71 @@ def _render(canvas, axes, context):
                 axes.coordinates.label._style))
 
     if axes._show:
-        if axes.x.spine._position == "low":
-            spine_y = axes._ymax_range
-        elif axes.x.spine._position == "high":
-            spine_y = axes._ymin_range
+        if axes.x.spine.position == "low":
+            x_spine_y = axes._ymax_range + axes._padding
+            x_ticks_above = 5
+            x_ticks_below = 0
+            x_tick_labels_baseline_shift = "-80%"
+            x_label_baseline_shift = "-200%"
+        elif axes.x.spine.position == "high":
+            x_spine_y = axes._ymin_range - axes._padding
+            x_ticks_above = 0
+            x_ticks_below = 5
+            x_tick_labels_baseline_shift = "80%"
+            x_label_baseline_shift = "200%"
         else:
-            spine_y = axes._project_y(axes.x.spine._position)
+            x_spine_y = axes._project_y(axes.x.spine.position)
+            x_ticks_above = 3
+            x_ticks_below = 3
+            x_tick_labels_baseline_shift = "-100%"
+            x_label_baseline_shift = "-200%"
 
         if axes.y.spine._position == "low":
-            spine_x = axes._xmin_range
+            y_spine_x = axes._xmin_range - axes._padding
+            y_ticks_above = 0
+            y_ticks_below = 5
+            y_tick_labels_baseline_shift = "80%"
+            y_label_baseline_shift = "200%"
         elif axes.y.spine._position == "high":
-            spine_x = axes._xmax_range
+            y_spine_x = axes._xmax_range + axes._padding
+            y_ticks_above = 5
+            y_ticks_below = 0
+            y_tick_labels_baseline_shift = "-80%"
+            y_label_baseline_shift = "-200%"
         else:
-            spine_x = axes._project_x(axes.y.spine._position)
+            y_spine_x = axes._project_x(axes.y.spine._position)
+            y_ticks_above = 3
+            y_ticks_below = 3
+            y_tick_labels_baseline_shift = "80%"
+            y_label_baseline_shift = "200%"
 
-        if axes.x._show:
-            if axes.x.spine._show:
-                x1 = axes._xmin_range
-                x2 = axes._xmax_range
-                if axes._xmin_data_domain_implicit is not None:
-                    x1 = max(
-                        x1, axes._project_x(axes._xmin_data_domain_implicit))
-                    x2 = min(
-                        x2, axes._project_x(axes._xmax_data_domain_implicit))
-                xml.SubElement(
-                    axes_xml,
-                    "line",
-                    x1=repr(x1),
-                    y1=repr(spine_y),
-                    x2=repr(x2),
-                    y2=repr(spine_y),
-                    style=_css_style(
-                        axes.x.spine._style))
+        _render_linear_axis(
+            canvas,
+            axes.x,
+            context.push(axes_xml),
+            x1=axes._xmin_range,
+            y1=x_spine_y,
+            x2=axes._xmax_range,
+            y2=x_spine_y,
+            ticks_above=x_ticks_above,
+            ticks_below=x_ticks_below,
+            tick_labels_baseline_shift=x_tick_labels_baseline_shift,
+            label_baseline_shift=x_label_baseline_shift,
+            )
 
-            if axes.x.ticks._show:
-                ticks_group = xml.SubElement(axes_xml, "g")
-                for location, tick_style in zip(
-                    axes._xtick_locations, axes.x.ticks.tick.styles(
-                        axes._xtick_locations)):
-                    x = axes._project_x(location)
-                    y1 = axes._ymax_range
-                    y2 = axes._ymax_range - axes.x.ticks._length
-                    xml.SubElement(
-                        ticks_group,
-                        "line",
-                        x1=repr(x),
-                        y1=repr(y1),
-                        x2=repr(x),
-                        y2=repr(y2),
-                        style=_css_style(
-                            axes.x.ticks._style,
-                            tick_style))
-
-            if axes.x.ticks.labels._show:
-                ticks_group = xml.SubElement(axes_xml, "g")
-                for location, label, title, label_style in zip(
-                    axes._xtick_locations, axes._xtick_labels, axes._xtick_titles, axes.x.ticks.labels.label.styles(
-                        axes._xtick_locations)):
-                    x = axes._project_x(location)
-                    y = axes._ymax_range + axes.x.ticks.labels._offset
-                    dstyle = toyplot.style.combine(
-                        {
-                            "text-anchor": "middle",
-                            "alignment-baseline": "middle",
-                            "baseline-shift": "-80%"},
-                        axes.x.ticks.labels._style,
-                        label_style)
-                    label_xml = xml.SubElement(
-                        ticks_group,
-                        "text",
-                        x=repr(x),
-                        y=repr(y),
-                        style=_css_style(dstyle))
-                    label_xml.text = label
-                    if axes.x.ticks.labels._angle:
-                        label_xml.set(
-                            "transform", "rotate(%r, %r, %r)" %
-                            (-axes.x.ticks.labels._angle, x, y))
-                    if "-toyplot-anchor-shift" in dstyle:
-                        label_xml.set(
-                            "dx", str(dstyle["-toyplot-anchor-shift"]))
-                    if title is not None:
-                        xml.SubElement(label_xml, "title").text = str(title)
-
-            if axes.x.label._text is not None:
-                x = (axes._xmin_range + axes._xmax_range) * 0.5
-                y = axes._ymax_range
-                xml.SubElement(
-                    axes_xml,
-                    "text",
-                    x=repr(x),
-                    y=repr(y),
-                    style=_css_style(
-                        axes.x.label._style)).text = axes.x.label._text
-
-        if axes.y._show:
-            if axes.y.spine._show:
-                y1 = axes._ymin_range
-                y2 = axes._ymax_range
-                if axes._ymin_data_domain_implicit is not None:
-                    y1 = max(
-                        y1, axes._project_y(axes._ymax_data_domain_implicit))
-                    y2 = min(
-                        y2, axes._project_y(axes._ymin_data_domain_implicit))
-                xml.SubElement(
-                    axes_xml,
-                    "line",
-                    x1=repr(spine_x),
-                    y1=repr(y1),
-                    x2=repr(spine_x),
-                    y2=repr(y2),
-                    style=_css_style(
-                        axes.y.spine._style))
-
-            if axes.y.ticks._show:
-                ticks_group = xml.SubElement(axes_xml, "g")
-                for location, tick_style in zip(
-                    axes._ytick_locations, axes.y.ticks.tick.styles(
-                        axes._ytick_locations)):
-                    y = axes._project_y(location)
-                    x1 = axes._xmin_range
-                    x2 = axes._xmin_range + axes.y.ticks._length
-                    xml.SubElement(
-                        ticks_group,
-                        "line",
-                        x1=repr(x1),
-                        y1=repr(y),
-                        x2=repr(x2),
-                        y2=repr(y),
-                        style=_css_style(
-                            axes.y.ticks._style,
-                            tick_style))
-
-            if axes.y.ticks.labels._show:
-                ticks_group = xml.SubElement(axes_xml, "g")
-                for location, label, title, label_style in zip(
-                    axes._ytick_locations, axes._ytick_labels, axes._ytick_titles, axes.y.ticks.labels.label.styles(
-                        axes._ytick_locations)):
-                    x = axes._xmin_range - axes.y.ticks.labels._offset
-                    y = axes._project_y(location)
-                    dstyle = toyplot.style.combine(
-                        {
-                            "text-anchor": "middle",
-                            "alignment-baseline": "middle",
-                            "baseline-shift": "80%"},
-                        axes.y.ticks.labels._style,
-                        label_style)
-                    label_xml = xml.SubElement(
-                        ticks_group,
-                        "text",
-                        x=repr(x),
-                        y=repr(y),
-                        style=_css_style(dstyle))
-                    label_xml.text = label
-                    if axes.y.ticks.labels._angle:
-                        label_xml.set(
-                            "transform", "rotate(%r, %r, %r)" %
-                            (-axes.y.ticks.labels._angle, x, y))
-                    if "-toyplot-anchor-shift" in dstyle:
-                        label_xml.set(
-                            "dx", str(dstyle["-toyplot-anchor-shift"]))
-                    if title is not None:
-                        xml.SubElement(label_xml, "title").text = str(title)
-
-            if axes.y.label._text is not None:
-                x = axes._xmin_range
-                y = (axes._ymin_range + axes._ymax_range) * 0.5
-                xml.SubElement(
-                    axes_xml, "text", x=repr(x), y=repr(y), transform="rotate(-90, %r, %r)" %
-                    (x, y), style=_css_style(
-                        axes.y.label._style)).text = axes.y.label._text
+        _render_linear_axis(
+            canvas,
+            axes.y,
+            context.push(axes_xml),
+            x1=y_spine_x,
+            y1=axes._ymax_range,
+            x2=y_spine_x,
+            y2=axes._ymin_range,
+            ticks_above=y_ticks_above,
+            ticks_below=y_ticks_below,
+            tick_labels_baseline_shift=y_tick_labels_baseline_shift,
+            label_baseline_shift=y_label_baseline_shift,
+            )
 
         if axes.label._text is not None:
             x = (axes._xmin_range + axes._xmax_range) * 0.5
@@ -1770,7 +1835,7 @@ def _render(axes, mark, context):
             xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
-@dispatch( (toyplot.canvas.Canvas, toyplot.axes.Cartesian), toyplot.mark.Legend, _RenderContext)
+@dispatch((toyplot.canvas.Canvas, toyplot.axes.Cartesian), toyplot.mark.Legend, _RenderContext)
 def _render(canvas, legend, context):
     x = legend._xmin
     y = legend._ymin

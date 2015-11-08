@@ -452,35 +452,35 @@ def step_impl(context):
 @then(u'text can be rendered with default colors')
 def step_impl(context):
     text = ["#"] * len(context.series)
-    context.axes.text(context.x, context.series[:,0], text)
+    context.axes.text(context.x, context.series[:,0], text, annotation=False)
     toyplot.testing.assert_canvas_equal(
         context.canvas, "color-broadcast-text-default")
 
 @then(u'text can be rendered with one explicit color')
 def step_impl(context):
     text = ["#"] * len(context.series)
-    context.axes.text(context.x, context.series[:,0], text, color="red")
+    context.axes.text(context.x, context.series[:,0], text, annotation=False, color="red")
     toyplot.testing.assert_canvas_equal(
         context.canvas, "color-broadcast-text-one-color")
 
 @then(u'text can be rendered with per-datum explicit colors')
 def step_impl(context):
     text = ["#"] * len(context.series)
-    context.axes.text(context.x, context.series[:,0], text, color=context.datum_colors[:,0])
+    context.axes.text(context.x, context.series[:,0], text, annotation=False, color=context.datum_colors[:,0])
     toyplot.testing.assert_canvas_equal(
         context.canvas, "color-broadcast-text-per-datum-colors")
 
 @then(u'text can be rendered with palette colors')
 def step_impl(context):
     text = ["#"] * len(context.series)
-    context.axes.text(context.x, context.series[:,0], text, color=toyplot.color.brewer("Set1"))
+    context.axes.text(context.x, context.series[:,0], text, annotation=False, color=toyplot.color.brewer("Set1"))
     toyplot.testing.assert_canvas_equal(
         context.canvas, "color-broadcast-text-palette")
 
 @then(u'text can be rendered with colormap colors')
 def step_impl(context):
     text = ["#"] * len(context.series)
-    context.axes.text(context.x, context.series[:,0], text, color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    context.axes.text(context.x, context.series[:,0], text, annotation=False, color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
     toyplot.testing.assert_canvas_equal(
         context.canvas, "color-broadcast-text-colormap")
 
@@ -488,7 +488,7 @@ def step_impl(context):
 def step_impl(context):
     text = ["#"] * len(context.series)
     datum_values = numpy.arange(len(context.series[:,0]))
-    context.axes.text(context.x, context.series[:,0], text, color=datum_values)
+    context.axes.text(context.x, context.series[:,0], text, annotation=False, color=datum_values)
     toyplot.testing.assert_canvas_equal(
         context.canvas, "color-broadcast-text-per-datum-values")
 
@@ -496,7 +496,7 @@ def step_impl(context):
 def step_impl(context):
     text = ["#"] * len(context.series)
     datum_values = numpy.arange(len(context.series[:,0]))
-    context.axes.text(context.x, context.series[:,0], text, color=(datum_values, toyplot.color.brewer("Reds")))
+    context.axes.text(context.x, context.series[:,0], text, annotation=False, color=(datum_values, toyplot.color.brewer("Reds")))
     toyplot.testing.assert_canvas_equal(
         context.canvas, "color-broadcast-text-per-datum-values-palette")
 
@@ -504,7 +504,7 @@ def step_impl(context):
 def step_impl(context):
     text = ["#"] * len(context.series)
     datum_values = numpy.arange(len(context.series[:,0]))
-    context.axes.text(context.x, context.series[:,0], text, color=(datum_values, toyplot.color.LinearMap()))
+    context.axes.text(context.x, context.series[:,0], text, annotation=False, color=(datum_values, toyplot.color.LinearMap()))
     toyplot.testing.assert_canvas_equal(
         context.canvas, "color-broadcast-text-per-datum-values-colormap")
 

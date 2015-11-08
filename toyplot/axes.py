@@ -22,7 +22,6 @@ import time
 ##########################################################################
 # Helpers
 
-
 def _null_min(a, b):
     """Return the minimum of two values, with special logic to handle None."""
     if a is None:
@@ -115,126 +114,10 @@ class OrderedSet(collections.MutableSet):
             return len(self) == len(other) and list(self) == list(other)
         return set(self) == set(other)
 
-##########################################################################
-# Cartesian
 
-
-class Cartesian(object):
-
-    """Standard two-dimensional Cartesian coordinate system.
-
-    Do not create Cartesian instances directly.  Use factory methods such
-    as :meth:`toyplot.canvas.Canvas.axes` instead.
+class Axis(object):
+    """One dimensional axis that can be used to create coordinate systems.
     """
-    class AxisHelper(object):
-
-        def __init__(
-                self,
-                show,
-                label,
-                label_style,
-                min,
-                max,
-                tick_length,
-                tick_locator,
-                tick_angle,
-                scale):
-            self.spine = Cartesian.SpineHelper()
-            self.ticks = Cartesian.TicksHelper(
-                tick_length, tick_locator, tick_angle)
-            self.label = Cartesian.LabelHelper(label, label_style)
-            self.domain = Cartesian.DomainHelper(min, max)
-            self._show = show
-            self.scale = scale
-
-        @property
-        def show(self):
-            return self._show
-
-        @show.setter
-        def show(self, value):
-            self._show = value
-
-        @property
-        def scale(self):
-            return self._scale
-
-        @scale.setter
-        def scale(self, value):
-            if value == "linear":
-                self._scale = "linear"
-                return
-            elif value in ["log", "log10"]:
-                self._scale = ("log", 10)
-                return
-            elif value == "log2":
-                self._scale = ("log", 2)
-                return
-            elif isinstance(value, tuple) and len(value) == 2:
-                scale, base = value
-                if scale == "log":
-                    self._scale = ("log", base)
-                    return
-            raise ValueError(
-                """Scale must be "linear", "log", "log10", "log2" or a ("log", base) tuple.""")
-
-    class CoordinatesHelper(object):
-
-        def __init__(
-                self,
-                show,
-                xmin_range,
-                xmax_range,
-                ymin_range,
-                ymax_range,
-                style):
-            self._show = show
-            self._xmin_range = xmin_range
-            self._xmax_range = xmax_range
-            self._ymin_range = ymin_range
-            self._ymax_range = ymax_range
-            self._style = toyplot.style.combine(
-                {"stroke": "none", "fill": "white", "opacity": 0.75}, toyplot.require.style(style))
-            self.label = Cartesian.CoordinatesLabelHelper(style={})
-
-        @property
-        def show(self):
-            return self._show
-
-        @show.setter
-        def show(self, value):
-            self._show = value
-
-        @property
-        def style(self):
-            return self._style
-
-        @style.setter
-        def style(self, value):
-            self._style = toyplot.style.combine(
-                self._style, toyplot.require.style(value))
-
-    class CoordinatesLabelHelper(object):
-
-        def __init__(self, style):
-            self._style = toyplot.style.combine(
-                {
-                    "font-size": "10px",
-                    "font-weight": "normal",
-                    "stroke": "none",
-                    "text-anchor": "middle",
-                    "alignment-baseline": "middle"},
-                toyplot.require.style(style))
-
-        @property
-        def style(self):
-            return self._style
-
-        @style.setter
-        def style(self, value):
-            self._style = toyplot.style.combine(
-                self._style, toyplot.require.style(value))
-
     class DomainHelper(object):
 
         def __init__(self, min, max):
@@ -259,14 +142,16 @@ class Cartesian(object):
 
     class LabelHelper(object):
 
-        def __init__(self, label, style):
+        def __init__(self, label, style={}):
             self._text = label
+            self._offset = 0
             self._style = toyplot.style.combine(
                 {
                     "font-weight": "bold",
                     "stroke": "none",
                     "text-anchor": "middle",
-                    "alignment-baseline": "middle"},
+                    "alignment-baseline": "middle",
+                },
                 toyplot.require.style(style))
 
         @property
@@ -276,6 +161,15 @@ class Cartesian(object):
         @text.setter
         def text(self, value):
             self._text = value
+
+        @property
+        def offset(self):
+            return self._offset
+
+        @offset.setter
+        def offset(self, value):
+            self._offset = toyplot.units.convert(
+                value, target="px", default="px")
 
         @property
         def style(self):
@@ -345,31 +239,27 @@ class Cartesian(object):
                 raise ValueError(
                     "Must specify either index or value, not both.")
             if index is not None:
-                return Cartesian.PerTickHelper.TickProxy(self._indices[index])
+                return Axis.PerTickHelper.TickProxy(self._indices[index])
             elif value is not None:
-                return Cartesian.PerTickHelper.TickProxy(self._values[value])
+                return Axis.PerTickHelper.TickProxy(self._values[value])
 
         def styles(self, values):
-            results = [
-                self._indices[index].get(
-                    "style",
-                    None) if index in self._indices else None for index in range(
-                    len(values))]
+            results = [self._indices[index].get("style", None) if index in self._indices else None for index in range(len(values))]
             for value in self._values:
                 deltas = numpy.abs(values - value)
-                results[numpy.argmin(deltas)] = self._values[
-                    value].get("style", None)
+                results[numpy.argmin(deltas)] = self._values[value].get("style", None)
             return results
 
     class TicksHelper(object):
 
-        def __init__(self, length, locator, angle):
+        def __init__(self, locator, angle):
             self._locator = locator
             self._show = False
-            self._length = length
+            self._above = None
+            self._below = None
             self._style = {}
-            self.labels = Cartesian.TickLabelsHelper(angle)
-            self.tick = Cartesian.PerTickHelper()
+            self.labels = Axis.TickLabelsHelper(angle)
+            self.tick = Axis.PerTickHelper()
 
         @property
         def locator(self):
@@ -388,13 +278,26 @@ class Cartesian(object):
             self._show = value
 
         @property
-        def length(self):
-            return self._length
+        def above(self):
+            return self._above
 
-        @length.setter
-        def length(self, value):
-            self._length = toyplot.units.convert(
-                value, target="px", default="px")
+        @above.setter
+        def above(self, value):
+            if value is None:
+                self._above = None
+            else:
+                self._above = toyplot.units.convert(value, target="px", default="px")
+
+        @property
+        def below(self):
+            return self._below
+
+        @below.setter
+        def below(self, value):
+            if value is None:
+                self._below = None
+            else:
+                self._below = toyplot.units.convert(value, target="px", default="px")
 
         @property
         def style(self):
@@ -413,7 +316,7 @@ class Cartesian(object):
             self._angle = angle
             self._style = {
                 "font-size": "10px", "font-weight": "normal", "stroke": "none"}
-            self.label = Cartesian.PerTickHelper()
+            self.label = Axis.PerTickHelper()
 
         @property
         def show(self):
@@ -451,6 +354,287 @@ class Cartesian(object):
 
     def __init__(
             self,
+            label=None,
+            max=None,
+            min=None,
+            scale="linear",
+            show=True,
+            tick_angle=0,
+            tick_locator=None,
+        ):
+        self.scale = scale # This calls the property setter
+        self._show = show
+        self._tick_labels = []
+        self._tick_locations = []
+        self._tick_titles = []
+
+        self._data_min = None
+        self._data_max = None
+        self._display_min = None
+        self._display_max = None
+
+        self.domain = Axis.DomainHelper(min, max)
+        self.label = Axis.LabelHelper(label)
+        self.spine = Axis.SpineHelper()
+        self.ticks = Axis.TicksHelper(tick_locator, tick_angle)
+
+    @property
+    def show(self):
+        return self._show
+
+    @show.setter
+    def show(self, value):
+        self._show = value
+
+    @property
+    def scale(self):
+        return self._scale
+
+    @scale.setter
+    def scale(self, value):
+        if value == "linear":
+            self._scale = "linear"
+            return
+        elif value in ["log", "log10"]:
+            self._scale = ("log", 10)
+            return
+        elif value == "log2":
+            self._scale = ("log", 2)
+            return
+        elif isinstance(value, tuple) and len(value) == 2:
+            scale, base = value
+            if scale == "log":
+                self._scale = ("log", base)
+                return
+        raise ValueError(
+            """Scale must be "linear", "log", "log10", "log2" or a ("log", base) tuple.""")
+
+    def update_domain(self, values, display=True, data=True):
+        values = _flat_non_null(values)
+
+        if len(values) and display:
+            self._display_min = _null_min(
+                values.min(), self._display_min)
+            self._display_max = _null_max(
+                values.max(), self._display_max)
+
+        if len(values) and data:
+            self._data_min = _null_min(
+                values.min(), self._data_min)
+            self._data_max = _null_max(
+                values.max(), self._data_max)
+
+    def projection(self, domain_min=None, domain_max=None, range_min=None, range_max=None):
+        if domain_min is None:
+            domain_min = self._domain_min
+        if domain_max is None:
+            domain_max = self._domain_max
+        if range_min is None:
+            range_min = 0.0
+        if range_max is None:
+            range_max = 1.0
+
+        if self._scale == "linear":
+            return toyplot.projection.linear(domain_min, domain_max, range_min, range_max)
+
+        scale, base = self._scale
+        return toyplot.projection.log(base, domain_min, domain_max, range_min, range_max)
+
+    def locator(self):
+        if self.ticks.locator is not None:
+            return self.ticks.locator
+        if self.scale == "linear":
+            return toyplot.locator.Extended()
+        else:
+            scale, base = self.scale
+            if scale == "log":
+                return toyplot.locator.Log(base=base)
+        raise RuntimeError("Unable to create an appropriate locator.")
+
+    def _finalize(self, domain_min, domain_max, tick_locations, tick_labels, tick_titles):
+        self._domain_min = domain_min
+        self._domain_max = domain_max
+        self._tick_locations = tick_locations
+        self._tick_labels = tick_labels
+        self._tick_titles = tick_titles
+
+
+class NumberLine(object):
+    """Standard one-dimensional number line.
+
+    Do not create NumberLine instances directly.  Use factory methods such
+    as :meth:`toyplot.canvas.Canvas.number_line` instead.
+    """
+    def __init__(
+            self,
+            x1,
+            y1,
+            x2,
+            y2,
+            min,
+            max,
+            show,
+            label,
+            ticklocator,
+            scale,
+            palette,
+            parent,
+        ):
+        self._x1 = x1
+        self._x2 = x2
+        self._y1 = y1
+        self._y2 = y2
+
+
+        if palette is None:
+            palette = toyplot.color.Palette()
+        self._palette = palette
+#        self._bar_colors = itertools.cycle(palette)
+#        self._fill_colors = itertools.cycle(palette)
+#        self._graph_colors = itertools.cycle(palette)
+#        self._plot_colors = itertools.cycle(palette)
+#        self._scatterplot_colors = itertools.cycle(palette)
+#        self._rect_colors = itertools.cycle(palette)
+#        self._text_colors = itertools.cycle(palette)
+
+#        self.label = Axis.LabelHelper(
+#            label=label, style={"font-size": "14px", "baseline-shift": "100%"})
+
+        self.axis = Axis(
+            show=show,
+            label=label,
+            min=min,
+            max=max,
+            tick_locator=ticklocator,
+            tick_angle=0,
+            scale=scale,
+            )
+
+        self._parent = parent
+        self._children = []
+
+    @property
+    def show(self):
+        return self.axis.show
+
+    @show.setter
+    def show(self, value):
+        self.axis.show = value
+
+    def update_domain(self, values, display=True, data=True):
+        self.axis.update_domain(values, display=display, data=data)
+
+    def _finalize(self):
+        # Begin with the implicit domain defined by our data.
+        min = self.axis._display_min
+        max = self.axis._display_max
+
+        # If there is no implicit domain (we don't have any data), default
+        # to the origin.
+        if min is None:
+            min = 0
+        if max is None:
+            max = 0
+
+        # Ensure that the domain is never empty.
+        if min == max:
+            min -= 0.5
+            max += 0.5
+
+        # Allow users to override the domain.
+        if self.axis.domain.min is not None:
+            min = self.axis.domain.min
+        if self.axis.domain.max is not None:
+            max = self.axis.domain.max
+
+        # Ensure that the domain is never empty.
+        if min == max:
+            min -= 0.5
+            max += 0.5
+
+        # Calculate tick locations and labels.
+        tick_locations = []
+        tick_labels = []
+        tick_titles = []
+        if self.axis.show:
+            tick_locations, tick_labels, tick_titles = self.axis.locator().ticks(min, max)
+
+        # Allow tick locations to grow (never shrink) the domain.
+        if len(tick_locations):
+            min = numpy.amin((min, tick_locations[0]))
+            max = numpy.amax((max, tick_locations[-1]))
+
+        self.axis._finalize(min, max, tick_locations, tick_labels, tick_titles)
+
+
+class Cartesian(object):
+
+    """Standard two-dimensional Cartesian coordinate system.
+
+    Do not create Cartesian instances directly.  Use factory methods such
+    as :meth:`toyplot.canvas.Canvas.axes` instead.
+    """
+    class CoordinatesHelper(object):
+
+        def __init__(
+                self,
+                show,
+                xmin_range,
+                xmax_range,
+                ymin_range,
+                ymax_range,
+                style):
+
+            self._show = show
+            self._xmin_range = xmin_range
+            self._xmax_range = xmax_range
+            self._ymin_range = ymin_range
+            self._ymax_range = ymax_range
+
+            self._style = toyplot.style.combine(
+                {"stroke": "none", "fill": "white", "opacity": 0.75}, toyplot.require.style(style))
+            self.label = Cartesian.CoordinatesLabelHelper(style={})
+
+        @property
+        def show(self):
+            return self._show
+
+        @show.setter
+        def show(self, value):
+            self._show = value
+
+        @property
+        def style(self):
+            return self._style
+
+        @style.setter
+        def style(self, value):
+            self._style = toyplot.style.combine(
+                self._style, toyplot.require.style(value))
+
+    class CoordinatesLabelHelper(object):
+
+        def __init__(self, style):
+            self._style = toyplot.style.combine(
+                {
+                    "font-size": "10px",
+                    "font-weight": "normal",
+                    "stroke": "none",
+                    "text-anchor": "middle",
+                    "alignment-baseline": "middle"},
+                toyplot.require.style(style))
+
+        @property
+        def style(self):
+            return self._style
+
+        @style.setter
+        def style(self, value):
+            self._style = toyplot.style.combine(
+                self._style, toyplot.require.style(value))
+
+    def __init__(
+            self,
             xmin_range,
             xmax_range,
             ymin_range,
@@ -472,32 +656,21 @@ class Cartesian(object):
             yscale,
             palette,
             padding,
-            tick_length,
-            parent):
+            parent,
+            xaxis=None,
+            yaxis=None):
         self._xmin_range = xmin_range
         self._xmax_range = xmax_range
         self._ymin_range = ymin_range
         self._ymax_range = ymax_range
         self._aspect = aspect
-        self._xmin_data_domain_implicit = None
-        self._xmax_data_domain_implicit = None
-        self._ymin_data_domain_implicit = None
-        self._ymax_data_domain_implicit = None
-        self._xmin_display_domain_implicit = None
-        self._xmax_display_domain_implicit = None
-        self._ymin_display_domain_implicit = None
-        self._ymax_display_domain_implicit = None
         self._expand_domain_range_x = None
         self._expand_domain_range_y = None
         self._expand_domain_range_left = None
         self._expand_domain_range_right = None
         self._expand_domain_range_top = None
         self._expand_domain_range_bottom = None
-        self._padding = toyplot.units.convert(
-            padding, target="px", default="px")
-
-        tick_length = toyplot.units.convert(
-            tick_length, target="px", default="px")
+        self._padding = toyplot.units.convert(padding, target="px", default="px")
 
         if palette is None:
             palette = toyplot.color.Palette()
@@ -519,40 +692,32 @@ class Cartesian(object):
             ymin_range=ymin_range + 10,
             ymax_range=ymin_range + 24,
             style={})
-        self.label = Cartesian.LabelHelper(
+        self.label = Axis.LabelHelper(
             label=label, style={"font-size": "14px", "baseline-shift": "100%"})
-        self.x = Cartesian.AxisHelper(
-            show=xshow,
-            label=xlabel,
-            label_style={
-                "baseline-shift": "-200%"},
-            min=xmin,
-            max=xmax,
-            tick_length=tick_length,
-            tick_locator=xticklocator,
-            tick_angle=0,
-            scale=xscale)
-        self.y = Cartesian.AxisHelper(
-            show=yshow,
-            label=ylabel,
-            label_style={
-                "baseline-shift": "200%"},
-            min=ymin,
-            max=ymax,
-            tick_length=tick_length,
-            tick_locator=yticklocator,
-            tick_angle=90,
-            scale=yscale)
+
+        if xaxis is None:
+            xaxis = Axis()
+        xaxis.show = xshow
+        xaxis.label.text = xlabel
+        xaxis.domain.min = xmin
+        xaxis.domain.max = xmax
+        xaxis.ticks.locator = xticklocator
+        xaxis.scale = xscale
+
+        if yaxis is None:
+            yaxis = Axis()
+        yaxis.show = yshow
+        yaxis.label.text = ylabel
+        yaxis.domain.min = ymin
+        yaxis.domain.max = ymax
+        yaxis.ticks.locator = yticklocator
+        yaxis.scale = yscale
+
+        self.x = xaxis
+        self.y = yaxis
 
         self._parent = parent
         self._children = []
-
-        self._xtick_locations = []
-        self._xtick_labels = []
-        self._xtick_titles = []
-        self._ytick_locations = []
-        self._ytick_labels = []
-        self._ytick_titles = []
 
     @property
     def aspect(self):
@@ -581,32 +746,8 @@ class Cartesian(object):
         self._padding = toyplot.units.convert(value, target="px", default="px")
 
     def _update_domain(self, x, y, display=True, data=True):
-        x = _flat_non_null(x)
-        y = _flat_non_null(y)
-
-        if len(x) and display:
-            self._xmin_display_domain_implicit = _null_min(
-                x.min(), self._xmin_display_domain_implicit)
-            self._xmax_display_domain_implicit = _null_max(
-                x.max(), self._xmax_display_domain_implicit)
-
-        if len(y) and display:
-            self._ymin_display_domain_implicit = _null_min(
-                y.min(), self._ymin_display_domain_implicit)
-            self._ymax_display_domain_implicit = _null_max(
-                y.max(), self._ymax_display_domain_implicit)
-
-        if len(x) and data:
-            self._xmin_data_domain_implicit = _null_min(
-                x.min(), self._xmin_data_domain_implicit)
-            self._xmax_data_domain_implicit = _null_max(
-                x.max(), self._xmax_data_domain_implicit)
-
-        if len(y) and data:
-            self._ymin_data_domain_implicit = _null_min(
-                y.min(), self._ymin_data_domain_implicit)
-            self._ymax_data_domain_implicit = _null_max(
-                y.max(), self._ymax_data_domain_implicit)
+        self.x.update_domain(x, display=display, data=data)
+        self.y.update_domain(y, display=display, data=data)
 
     def _expand_domain_range(self, x, y, extents):
         left, right, top, bottom = extents
@@ -624,57 +765,14 @@ class Cartesian(object):
         self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
             (self._expand_domain_range_bottom, bottom))
 
-    def _get_projections(self, xmin, xmax, ymin, ymax):
-        if self.x._scale == "linear":
-            xprojection = toyplot.projection.linear(
-                xmin,
-                xmax,
-                self._xmin_range +
-                self._padding,
-                self._xmax_range -
-                self._padding)
-        else:
-            scale, base = self.x._scale
-            if scale == "log":
-                xprojection = toyplot.projection.log(
-                    base,
-                    xmin,
-                    xmax,
-                    self._xmin_range +
-                    self._padding,
-                    self._xmax_range -
-                    self._padding)
+    def _finalize(self):
+        # Begin with the implicit domain defined by our data.
+        xmin = self.x._display_min
+        xmax = self.x._display_max
+        ymin = self.y._display_min
+        ymax = self.y._display_max
 
-        if self.y._scale == "linear":
-            yprojection = toyplot.projection.linear(
-                ymin,
-                ymax,
-                self._ymax_range -
-                self._padding,
-                self._ymin_range +
-                self._padding)
-        else:
-            scale, base = self.y._scale
-            if scale == "log":
-                yprojection = toyplot.projection.log(
-                    base,
-                    ymin,
-                    ymax,
-                    self._ymax_range -
-                    self._padding,
-                    self._ymin_range +
-                    self._padding)
-
-        return xprojection, yprojection
-
-    def _finalize_domain(self):
-        # Begin with the implicit domain defined by our children.
-        xmin = self._xmin_display_domain_implicit
-        xmax = self._xmax_display_domain_implicit
-        ymin = self._ymin_display_domain_implicit
-        ymax = self._ymax_display_domain_implicit
-
-        # If there is no implicit domain (we don't have any children), default
+        # If there is no implicit domain (we don't have any data), default
         # to the origin.
         if xmin is None:
             xmin = 0
@@ -689,16 +787,24 @@ class Cartesian(object):
         if xmin == xmax:
             xmin -= 0.5
             xmax += 0.5
-
         if ymin == ymax:
             ymin -= 0.5
             ymax += 0.5
 
-        # Optionally expand the domain in range-space (used to make room for
-        # text).
+        # Optionally expand the domain in range-space (used to make room for text).
         if self._expand_domain_range_x is not None:
-            x_projection, y_projection = self._get_projections(
-                xmin, xmax, ymin, ymax)
+            x_projection = self.x.projection(
+                domain_min=xmin,
+                domain_max=xmax,
+                range_min=self._xmin_range,
+                range_max=self._xmax_range,
+                )
+            y_projection = self.y.projection(
+                domain_min=ymin,
+                domain_max=ymax,
+                range_min=self._ymax_range,
+                range_max=self._ymin_range,
+                )
 
             range_x = x_projection(self._expand_domain_range_x)
             range_y = y_projection(self._expand_domain_range_y)
@@ -734,67 +840,54 @@ class Cartesian(object):
                 ymax += offset
 
         # Allow users to override the domain.
-        if self.x.domain._min is not None:
-            xmin = self.x.domain._min
-        if self.x.domain._max is not None:
-            xmax = self.x.domain._max
-        if self.y.domain._min is not None:
-            ymin = self.y.domain._min
-        if self.y.domain._max is not None:
-            ymax = self.y.domain._max
+        if self.x.domain.min is not None:
+            xmin = self.x.domain.min
+        if self.x.domain.max is not None:
+            xmax = self.x.domain.max
+        if self.y.domain.min is not None:
+            ymin = self.y.domain.min
+        if self.y.domain.max is not None:
+            ymax = self.y.domain.max
 
         # Ensure that the domain is never empty.
         if xmin == xmax:
             xmin -= 0.5
             xmax += 0.5
-
         if ymin == ymax:
             ymin -= 0.5
             ymax += 0.5
 
-        def _get_locator(locator, scale):
-            if locator is not None:
-                return locator
-            if scale == "linear":
-                return toyplot.locator.Extended()
-            else:
-                scale, base = scale
-                if scale == "log":
-                    return toyplot.locator.Log(base=base)
-
         # Calculate tick locations and labels.
-        if self.show and self.x.show:
-            xlocator = _get_locator(self.x.ticks._locator, self.x._scale)
-            self._xtick_locations, self._xtick_labels, self._xtick_titles = xlocator.ticks(
-                xmin, xmax)
-
-        if self.show and self.y.show:
-            ylocator = _get_locator(self.y.ticks._locator, self.y._scale)
-            self._ytick_locations, self._ytick_labels, self._ytick_titles = ylocator.ticks(
-                ymin, ymax)
+        xtick_locations = []
+        xtick_labels = []
+        xtick_titles = []
+        if self.x.show:
+            xtick_locations, xtick_labels, xtick_titles = self.x.locator().ticks(xmin, xmax)
+        ytick_locations = []
+        ytick_labels = []
+        ytick_titles = []
+        if self.y.show:
+            ytick_locations, ytick_labels, ytick_titles = self.y.locator().ticks(ymin, ymax)
 
         # Allow tick locations to grow (never shrink) the domain.
-        if len(self._xtick_locations):
-            xmin = min(xmin, self._xtick_locations[0])
-            xmax = max(xmax, self._xtick_locations[-1])
-        if len(self._ytick_locations):
-            ymin = min(ymin, self._ytick_locations[0])
-            ymax = max(ymax, self._ytick_locations[-1])
+        if len(xtick_locations):
+            xmin = numpy.amin((xmin, xtick_locations[0]))
+            xmax = numpy.amax((xmax, xtick_locations[-1]))
+        if len(ytick_locations):
+            ymin = numpy.amin((ymin, ytick_locations[0]))
+            ymax = numpy.amax((ymax, ytick_locations[-1]))
 
-        self._xmin_computed = xmin
-        self._xmax_computed = xmax
-        self._ymin_computed = ymin
-        self._ymax_computed = ymax
+        self.x._finalize(xmin, xmax, xtick_locations, xtick_labels, xtick_titles)
+        self.y._finalize(ymin, ymax, ytick_locations, ytick_labels, ytick_titles)
 
-        # Get the final projections for rendering.
-        self._xprojection, self._yprojection = self._get_projections(
-            xmin, xmax, ymin, ymax)
+        self._x_projection = self.x.projection(range_min=self._xmin_range, range_max=self._xmax_range)
+        self._y_projection = self.y.projection(range_min=self._ymax_range, range_max=self._ymin_range)
 
     def _project_x(self, x):
-        return self._xprojection(x)
+        return self._x_projection(x)
 
     def _project_y(self, y):
-        return self._yprojection(y)
+        return self._y_projection(y)
 
     def bars(
             self,
@@ -895,13 +988,7 @@ class Cartesian(object):
                         (numpy.repeat(0, len(a)), a))
                 elif a.ndim == 2:
                     series = toyplot.require.scalar_matrix(a)
-                position = numpy.ma.column_stack(
-                    (numpy.arange(
-                        series.shape[0]) -
-                        0.5,
-                        numpy.arange(
-                        series.shape[0]) +
-                        0.5))
+                position = numpy.ma.column_stack((numpy.arange(series.shape[0]) - 0.5, numpy.arange(series.shape[0]) + 0.5))
 
             default_color = [next(self._bar_colors)
                              for i in range(series.shape[1] - 1)]
@@ -988,24 +1075,14 @@ class Cartesian(object):
                 if isinstance(a, tuple) and len(a) == 2:
                     counts, edges = a
                     position = numpy.ma.column_stack((edges[:-1], edges[1:]))
-                    series = numpy.ma.column_stack(
-                        (toyplot.require.scalar_vector(
-                            counts,
-                            len(position)),
-                         ))
+                    series = numpy.ma.column_stack((toyplot.require.scalar_vector(counts, len(position)), ))
                 else:
                     a = toyplot.require.scalar_array(a)
                     if a.ndim == 1:
                         series = numpy.ma.column_stack((a,))
                     elif a.ndim == 2:
                         series = a
-                    position = numpy.ma.column_stack(
-                        (numpy.arange(
-                            series.shape[0]) -
-                            0.5,
-                            numpy.arange(
-                            series.shape[0]) +
-                            0.5))
+                    position = numpy.ma.column_stack((numpy.arange(series.shape[0]) - 0.5, numpy.arange(series.shape[0]) + 0.5))
 
             default_color = [next(self._bar_colors)
                              for i in range(series.shape[1])]
@@ -1321,7 +1398,7 @@ class Cartesian(object):
             ewidth=1.0,
             eopacity=1.0,
             estyle=None,
-            ): # pragma: no cover
+        ): # pragma: no cover
         """Add a graph plot to the axes.
 
         Parameters
@@ -1436,6 +1513,134 @@ class Cartesian(object):
                 ewidth=["width"],
                 eopacity=["opacity"],
                 estyle=estyle))
+        return self._children[-1]
+
+    def hlines(
+            self,
+            y,
+            color=None,
+            opacity=1.0,
+            title=None,
+            style=None,
+            annotation=True,
+        ):
+        """Add horizontal line(s) to the axes.
+
+        Horizontal lines are convenient because they're guaranteed to fill the axes from
+        left to right regardless of the axes size.
+
+        Parameters
+        ----------
+        y: array-like set of Y coordinates
+          One horizontal line will be drawn through each Y coordinate provided.
+        title: string, optional
+          Human-readable title for the mark.  The SVG / HTML backends render the
+          title as a tooltip.
+        style: dict, optional
+          Collection of CSS styles to apply to the mark.  See
+          :class:`toyplot.mark.AxisLines` for a list of useful styles.
+        annotation: boolean, optional
+          Set to True if this mark should be considered an annotation.
+
+        Returns
+        -------
+        hlines: :class:`toyplot.mark.AxisLines`
+        """
+        table = toyplot.data.Table()
+        table["y"] = toyplot.require.scalar_vector(y)
+        _mark_exportable(table, "y", not annotation)
+        color = toyplot.color.broadcast(
+            colors=color,
+            shape=(table.shape[0], 1),
+            default=toyplot.color.near_black,
+            )
+        table["color"] = color[:, 0]
+        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
+        table["title"] = toyplot.broadcast.object(title, table.shape[0])
+        style = toyplot.style.combine(toyplot.require.style(style))
+
+        self._update_domain(numpy.array([]), table["y"], display=True, data=not annotation)
+
+        self._children.append(
+            toyplot.mark.AxisLines(
+                coordinate_axes=["y"],
+                table=table,
+                coordinates=["y"],
+                stroke=["color"],
+                opacity=["opacity"],
+                title=["title"],
+                style=style))
+        return self._children[-1]
+
+    def legend(
+            self,
+            marks,
+            bounds=None,
+            rect=None,
+            corner=None,
+            grid=None,
+            gutter=50,
+            style=None,
+            label_style=None):
+        """Add a legend to the axes.
+
+        Parameters
+        ----------
+        marks: sequence of marks to add to the legend
+          Each mark to be displayed in the legend should be specified using either
+          a (label, mark) tuple or a (label, mark, style) tuple.  Each label should
+          be the human-readable text to be displayed next to the mark.  The mark
+          can be a string value "line" or "rect", a marker string "o", "s", "^",
+          or an actual intance of :class:`toyplot.mark.Mark`.
+        bounds: (xmin, xmax, ymin, ymax) tuple, optional
+          Use the bounds property to position / size the legend by specifying the
+          position of each of its boundaries.  The boundaries may be specified in
+          absolute drawing units, or as a percentage of the axes width / height
+          using strings that end with "%".
+        rect: (x, y, width, height) tuple, optional
+          Use the rect property to position / size the legend by specifying its
+          upper-left-hand corner, width, and height.  Each parameter may be specified
+          in absolute drawing units, or as a percentage of the axes width / height
+          using strings that end with "%".
+        corner: (corner, width, height, inset) tuple, optional
+          Use the corner property to position / size the legend by specifying its
+          width and height, plus an inset from a corner of the axes.  Allowed
+          corner values are "top-left", "top", "top-right", "right",
+          "bottom-right", "bottom", "bottom-left", and "left".  The width and
+          height may be specified in absolute drawing units, or as a percentage of
+          the axes width / height using strings that end with "%".  The inset is
+          specified in absolute drawing units.
+        grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
+          Use the grid property to position / size the legend using a collection of
+          grid cells filling the axes.  Specify the number of rows and columns in
+          the grid, then specify either a zero-based cell index (which runs in
+          left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
+          a set of i, column-span, j, row-span coordinates so the legend can cover
+          more than one cell.
+        gutter: size of the gutter around grid cells, optional
+          Specifies the amount of empty space to leave between grid cells When using the
+          `grid` parameter to position the legend.
+        style: dict, optional
+
+        Returns
+        -------
+        legend: :class:`toyplot.mark.Legend`
+        """
+        gutter = toyplot.require.scalar(gutter)
+        style = toyplot.style.combine(toyplot.require.style(style))
+        label_style = toyplot.style.combine(toyplot.require.style(label_style))
+
+        xmin, xmax, ymin, ymax = toyplot.layout.region(
+            self._xmin_range, self._xmax_range, self._ymin_range, self._ymax_range, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+        self._children.append(
+            toyplot.mark.Legend(
+                xmin,
+                xmax,
+                ymin,
+                ymax,
+                marks,
+                style,
+                label_style))
         return self._children[-1]
 
     def plot(
@@ -1607,6 +1812,65 @@ class Cartesian(object):
                 filename=filename))
         return self._children[-1]
 
+    def rects(
+            self,
+            a,
+            b,
+            c,
+            d,
+            along="x",
+            color=None,
+            opacity=1.0,
+            title=None,
+            style={"stroke": "none"},
+            filename=None,
+        ):
+        table = toyplot.data.Table()
+        table["left"] = toyplot.require.scalar_vector(a)
+        table["right"] = toyplot.require.scalar_vector(
+            b, length=table.shape[0])
+        table["top"] = toyplot.require.scalar_vector(c, length=table.shape[0])
+        table["bottom"] = toyplot.require.scalar_vector(
+            d, length=table.shape[0])
+        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
+        table["title"] = toyplot.broadcast.object(title, table.shape[0])
+        style = toyplot.style.combine(toyplot.require.style(style))
+
+        default_color = [next(self._rect_colors)]
+        table["toyplot:fill"] = toyplot.color.broadcast(
+            colors=color,
+            shape=(table.shape[0], 1),
+            default=default_color,
+            )[:, 0]
+
+        if along == "x":
+            coordinate_axes = ["x", "y"]
+            self._update_domain(
+                numpy.concatenate((table["left"], table["right"])),
+                numpy.concatenate((table["top"], table["bottom"])),
+            )
+        elif along == "y":
+            coordinate_axes = ["y", "x"]
+            self._update_domain(
+                numpy.concatenate((table["top"], table["bottom"])),
+                numpy.concatenate((table["left"], table["right"])),
+            )
+
+        self._children.append(
+            toyplot.mark.Rect(
+                coordinate_axes,
+                table=table,
+                left=["left"],
+                right=["right"],
+                top=["top"],
+                bottom=["bottom"],
+                fill=["toyplot:fill"],
+                opacity=["opacity"],
+                title=["title"],
+                style=style,
+                filename=filename))
+        return self._children[-1]
+
     def scatterplot(
             self,
             a,
@@ -1732,64 +1996,76 @@ class Cartesian(object):
                 filename=filename))
         return self._children[-1]
 
-    def rects(
+    def share(
             self,
-            a,
-            b,
-            c,
-            d,
-            along="x",
-            color=None,
-            opacity=1.0,
-            title=None,
-            style={
-            "stroke": "none"},
-            filename=None):
-        table = toyplot.data.Table()
-        table["left"] = toyplot.require.scalar_vector(a)
-        table["right"] = toyplot.require.scalar_vector(
-            b, length=table.shape[0])
-        table["top"] = toyplot.require.scalar_vector(c, length=table.shape[0])
-        table["bottom"] = toyplot.require.scalar_vector(
-            d, length=table.shape[0])
-        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
-        table["title"] = toyplot.broadcast.object(title, table.shape[0])
-        style = toyplot.style.combine(toyplot.require.style(style))
+            axis="x",
+            xmin=None,
+            xmax=None,
+            ymin=None,
+            ymax=None,
+            xlabel=None,
+            ylabel=None,
+            xticklocator=None,
+            yticklocator=None,
+            xscale="linear",
+            yscale="linear",
+            palette=None,
+        ):
+        """Create a Cartesian coordinate system with a shared axis.
 
-        default_color = [next(self._rect_colors)]
-        table["toyplot:fill"] = toyplot.color.broadcast(
-            colors=color,
-            shape=(table.shape[0], 1),
-            default=default_color,
-            )[:,0]
+        Parameters
+        ----------
+        axis: string, optional
+            The axis that will be shared.  Allowed values are "x" and "y".
+        xmin, xmax, ymin, ymax: float, optional
+          Used to explicitly override the axis domain (normally, the domain is
+          implicitly defined by any marks added to the axes).
+        xlabel, ylabel: string, optional
+          Human-readable axis labels.
+        xticklocator, yticklocator: :class:`toyplot.locator.TickLocator`, optional
+          Controls the placement and formatting of axis ticks and tick labels.
+        xscale, yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
+          Specifies the mapping from data to canvas coordinates along an axis.
+        palette: :class:`toyplot.color.Palette`, optional
+          Color palette used to automatically select per-series colors for plotted data.
 
-        if along == "x":
-            coordinate_axes = ["x", "y"]
-            self._update_domain(
-                numpy.concatenate(
-                    (table["left"], table["right"])), numpy.concatenate(
-                    (table["top"], table["bottom"])))
-        elif along == "y":
-            coordinate_axes = ["y", "x"]
-            self._update_domain(
-                numpy.concatenate(
-                    (table["top"], table["bottom"])), numpy.concatenate(
-                    (table["left"], table["right"])))
+        Returns
+        -------
+        axes: :class:`toyplot.axes.Cartesian`
+        """
 
-        self._children.append(
-            toyplot.mark.Rect(
-                coordinate_axes,
-                table=table,
-                left=["left"],
-                right=["right"],
-                top=["top"],
-                bottom=["bottom"],
-                fill=["toyplot:fill"],
-                opacity=["opacity"],
-                title=["title"],
-                style=style,
-                filename=filename))
-        return self._children[-1]
+        shared = Cartesian(
+            xmin_range=self._xmin_range,
+            xmax_range=self._xmax_range,
+            ymin_range=self._ymin_range,
+            ymax_range=self._ymax_range,
+            aspect=self._aspect,
+            xmin=xmin,
+            xmax=xmax,
+            ymin=ymin,
+            ymax=ymax,
+            show=True,
+            xshow=True,
+            yshow=True,
+            label=None,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xticklocator=xticklocator,
+            yticklocator=yticklocator,
+            xscale=xscale,
+            yscale=yscale,
+            palette=palette,
+            padding=self._padding,
+            parent=self._parent,
+            xaxis=self.x if axis == "x" else None,
+            yaxis=self.y if axis == "y" else None,
+            )
+
+        shared.x.spine.position = "high" if axis == "y" else "low"
+        shared.y.spine.position = "high" if axis == "x" else "low"
+
+        self._parent._children.append(shared)
+        return self._parent._children[-1]
 
     def text(
             self,
@@ -1848,7 +2124,7 @@ class Cartesian(object):
             shape=(table.shape[0], 1),
             default=default_color,
             )
-        table["fill"] = color[:,0]
+        table["fill"] = color[:, 0]
 
         self._update_domain(
             table["x"], table["y"], display=True, data=not annotation)
@@ -1869,63 +2145,6 @@ class Cartesian(object):
                 filename=filename))
         return self._children[-1]
 
-    def hlines(
-            self,
-            y,
-            color=None,
-            opacity=1.0,
-            title=None,
-            style=None,
-            annotation=True,
-            ):
-        """Add horizontal line(s) to the axes.
-
-        Horizontal lines are convenient because they're guaranteed to fill the axes from
-        left to right regardless of the axes size.
-
-        Parameters
-        ----------
-        y: array-like set of Y coordinates
-          One horizontal line will be drawn through each Y coordinate provided.
-        title: string, optional
-          Human-readable title for the mark.  The SVG / HTML backends render the
-          title as a tooltip.
-        style: dict, optional
-          Collection of CSS styles to apply to the mark.  See
-          :class:`toyplot.mark.AxisLines` for a list of useful styles.
-        annotation: boolean, optional
-          Set to True if this mark should be considered an annotation.
-
-        Returns
-        -------
-        hlines: :class:`toyplot.mark.AxisLines`
-        """
-        table = toyplot.data.Table()
-        table["y"] = toyplot.require.scalar_vector(y)
-        _mark_exportable(table, "y", not annotation)
-        color = toyplot.color.broadcast(
-            colors=color,
-            shape=(table.shape[0], 1),
-            default=toyplot.color.near_black,
-            )
-        table["color"] = color[:,0]
-        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
-        table["title"] = toyplot.broadcast.object(title, table.shape[0])
-        style = toyplot.style.combine(toyplot.require.style(style))
-
-        self._update_domain(numpy.array([]), table["y"], display=True, data=not annotation)
-
-        self._children.append(
-            toyplot.mark.AxisLines(
-                coordinate_axes=["y"],
-                table=table,
-                coordinates=["y"],
-                stroke=["color"],
-                opacity=["opacity"],
-                title=["title"],
-                style=style))
-        return self._children[-1]
-
     def vlines(
             self,
             x,
@@ -1934,7 +2153,7 @@ class Cartesian(object):
             title=None,
             style=None,
             annotation=True,
-            ):
+        ):
         """Add vertical line(s) to the axes.
 
         Vertical lines are convenient because they're guaranteed to fill the axes from
@@ -1965,7 +2184,7 @@ class Cartesian(object):
             shape=(table.shape[0], 1),
             default=toyplot.color.near_black,
             )
-        table["color"] = color[:,0]
+        table["color"] = color[:, 0]
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.style.combine(toyplot.require.style(style))
@@ -1981,77 +2200,6 @@ class Cartesian(object):
                 opacity=["opacity"],
                 title=["title"],
                 style=style))
-        return self._children[-1]
-
-    def legend(
-            self,
-            marks,
-            bounds=None,
-            rect=None,
-            corner=None,
-            grid=None,
-            gutter=50,
-            style=None,
-            label_style=None):
-        """Add a legend to the axes.
-
-        Parameters
-        ----------
-        marks: sequence of marks to add to the legend
-          Each mark to be displayed in the legend should be specified using either
-          a (label, mark) tuple or a (label, mark, style) tuple.  Each label should
-          be the human-readable text to be displayed next to the mark.  The mark
-          can be a string value "line" or "rect", a marker string "o", "s", "^",
-          or an actual intance of :class:`toyplot.mark.Mark`.
-        bounds: (xmin, xmax, ymin, ymax) tuple, optional
-          Use the bounds property to position / size the legend by specifying the
-          position of each of its boundaries.  The boundaries may be specified in
-          absolute drawing units, or as a percentage of the axes width / height
-          using strings that end with "%".
-        rect: (x, y, width, height) tuple, optional
-          Use the rect property to position / size the legend by specifying its
-          upper-left-hand corner, width, and height.  Each parameter may be specified
-          in absolute drawing units, or as a percentage of the axes width / height
-          using strings that end with "%".
-        corner: (corner, width, height, inset) tuple, optional
-          Use the corner property to position / size the legend by specifying its
-          width and height, plus an inset from a corner of the axes.  Allowed
-          corner values are "top-left", "top", "top-right", "right",
-          "bottom-right", "bottom", "bottom-left", and "left".  The width and
-          height may be specified in absolute drawing units, or as a percentage of
-          the axes width / height using strings that end with "%".  The inset is
-          specified in absolute drawing units.
-        grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
-          Use the grid property to position / size the legend using a collection of
-          grid cells filling the axes.  Specify the number of rows and columns in
-          the grid, then specify either a zero-based cell index (which runs in
-          left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
-          a set of i, column-span, j, row-span coordinates so the legend can cover
-          more than one cell.
-        gutter: size of the gutter around grid cells, optional
-          Specifies the amount of empty space to leave between grid cells When using the
-          `grid` parameter to position the legend.
-        style: dict, optional
-
-        Returns
-        -------
-        legend: :class:`toyplot.mark.Legend`
-        """
-        gutter = toyplot.require.scalar(gutter)
-        style = toyplot.style.combine(toyplot.require.style(style))
-        label_style = toyplot.style.combine(toyplot.require.style(label_style))
-
-        xmin, xmax, ymin, ymax = toyplot.layout.region(
-            self._xmin_range, self._xmax_range, self._ymin_range, self._ymax_range, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-        self._children.append(
-            toyplot.mark.Legend(
-                xmin,
-                xmax,
-                ymin,
-                ymax,
-                marks,
-                style,
-                label_style))
         return self._children[-1]
 
 ##########################################################################
@@ -2239,12 +2387,13 @@ class Table(object):
                 yscale="linear",
                 palette=None,
                 padding=5,
-                tick_length=5):
+                cell_padding=0,
+            ):
             self._table._finalize()
-            left = numpy.min([cell.left for cell in self._cells.flat])
-            right = numpy.max([cell.right for cell in self._cells.flat])
-            top = numpy.min([cell.top for cell in self._cells.flat])
-            bottom = numpy.max([cell.bottom for cell in self._cells.flat])
+            left = numpy.min([cell.left for cell in self._cells.flat]) + cell_padding
+            right = numpy.max([cell.right for cell in self._cells.flat]) - cell_padding
+            top = numpy.min([cell.top for cell in self._cells.flat]) + cell_padding
+            bottom = numpy.max([cell.bottom for cell in self._cells.flat]) - cell_padding
 
             axes = toyplot.axes.Cartesian(
                 left,
@@ -2268,8 +2417,8 @@ class Table(object):
                 yscale=yscale,
                 palette=palette,
                 padding=padding,
-                tick_length=tick_length,
-                parent=self._table._parent)
+                parent=self._table._parent,
+                )
             axes.coordinates.show = False
             self._table._children.append(axes)
             return axes

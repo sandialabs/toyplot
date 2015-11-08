@@ -2,10 +2,12 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Generates PDF documents using Qt.
+"""
+
 from __future__ import absolute_import
 from __future__ import division
 
-import tempfile
 import toyplot.compatibility
 import toyplot.qt
 import toyplot.svg
@@ -51,11 +53,9 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     """
     qapplication = toyplot.qt.application()
 
-    scale = canvas._pixel_scale(width=width, height=height, scale=scale)
-    width = canvas._width * scale
-    height = canvas._height * scale
-
-    svg = toyplot.svg.render(canvas)
+    scale = canvas.pixel_scale(width=width, height=height, scale=scale)
+    width = canvas.width * scale
+    height = canvas.height * scale
 
     page = toyplot.qt.QWebPage()
     page.mainFrame().setContent(xml.tostring(toyplot.svg.render(canvas)), "image/svg+xml")
@@ -78,9 +78,9 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
         pdf = toyplot.qt.QPdfWriter(fobj)
     else:
         storage = toyplot.qt.QByteArray()
-        buffer = toyplot.qt.QBuffer(storage)
-        buffer.open(toyplot.qt.QIODevice.WriteOnly)
-        pdf = toyplot.qt.QPdfWriter(buffer)
+        stream = toyplot.qt.QBuffer(storage)
+        stream.open(toyplot.qt.QIODevice.WriteOnly)
+        pdf = toyplot.qt.QPdfWriter(stream)
 
     pdf.setPageLayout(page_layout)
     pdf.setResolution(96) # CSS pixels per inch

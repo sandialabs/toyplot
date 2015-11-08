@@ -244,15 +244,10 @@ class Axis(object):
                 return Axis.PerTickHelper.TickProxy(self._values[value])
 
         def styles(self, values):
-            results = [
-                self._indices[index].get(
-                    "style",
-                    None) if index in self._indices else None for index in range(
-                    len(values))]
+            results = [self._indices[index].get("style", None) if index in self._indices else None for index in range(len(values))]
             for value in self._values:
                 deltas = numpy.abs(values - value)
-                results[numpy.argmin(deltas)] = self._values[
-                    value].get("style", None)
+                results[numpy.argmin(deltas)] = self._values[value].get("style", None)
             return results
 
     class TicksHelper(object):
@@ -366,7 +361,7 @@ class Axis(object):
             show=True,
             tick_angle=0,
             tick_locator=None,
-            ):
+        ):
         self.scale = scale # This calls the property setter
         self._show = show
         self._tick_labels = []
@@ -484,7 +479,7 @@ class NumberLine(object):
             scale,
             palette,
             parent,
-            ):
+        ):
         self._x1 = x1
         self._x2 = x2
         self._y1 = y1
@@ -993,13 +988,7 @@ class Cartesian(object):
                         (numpy.repeat(0, len(a)), a))
                 elif a.ndim == 2:
                     series = toyplot.require.scalar_matrix(a)
-                position = numpy.ma.column_stack(
-                    (numpy.arange(
-                        series.shape[0]) -
-                        0.5,
-                        numpy.arange(
-                        series.shape[0]) +
-                        0.5))
+                position = numpy.ma.column_stack((numpy.arange(series.shape[0]) - 0.5, numpy.arange(series.shape[0]) + 0.5))
 
             default_color = [next(self._bar_colors)
                              for i in range(series.shape[1] - 1)]
@@ -1086,24 +1075,14 @@ class Cartesian(object):
                 if isinstance(a, tuple) and len(a) == 2:
                     counts, edges = a
                     position = numpy.ma.column_stack((edges[:-1], edges[1:]))
-                    series = numpy.ma.column_stack(
-                        (toyplot.require.scalar_vector(
-                            counts,
-                            len(position)),
-                         ))
+                    series = numpy.ma.column_stack((toyplot.require.scalar_vector(counts, len(position)), ))
                 else:
                     a = toyplot.require.scalar_array(a)
                     if a.ndim == 1:
                         series = numpy.ma.column_stack((a,))
                     elif a.ndim == 2:
                         series = a
-                    position = numpy.ma.column_stack(
-                        (numpy.arange(
-                            series.shape[0]) -
-                            0.5,
-                            numpy.arange(
-                            series.shape[0]) +
-                            0.5))
+                    position = numpy.ma.column_stack((numpy.arange(series.shape[0]) - 0.5, numpy.arange(series.shape[0]) + 0.5))
 
             default_color = [next(self._bar_colors)
                              for i in range(series.shape[1])]
@@ -1419,7 +1398,7 @@ class Cartesian(object):
             ewidth=1.0,
             eopacity=1.0,
             estyle=None,
-            ): # pragma: no cover
+        ): # pragma: no cover
         """Add a graph plot to the axes.
 
         Parameters
@@ -1544,7 +1523,7 @@ class Cartesian(object):
             title=None,
             style=None,
             annotation=True,
-            ):
+        ):
         """Add horizontal line(s) to the axes.
 
         Horizontal lines are convenient because they're guaranteed to fill the axes from
@@ -1575,7 +1554,7 @@ class Cartesian(object):
             shape=(table.shape[0], 1),
             default=toyplot.color.near_black,
             )
-        table["color"] = color[:,0]
+        table["color"] = color[:, 0]
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.style.combine(toyplot.require.style(style))
@@ -1843,9 +1822,9 @@ class Cartesian(object):
             color=None,
             opacity=1.0,
             title=None,
-            style={
-            "stroke": "none"},
-            filename=None):
+            style={"stroke": "none"},
+            filename=None,
+        ):
         table = toyplot.data.Table()
         table["left"] = toyplot.require.scalar_vector(a)
         table["right"] = toyplot.require.scalar_vector(
@@ -1862,20 +1841,20 @@ class Cartesian(object):
             colors=color,
             shape=(table.shape[0], 1),
             default=default_color,
-            )[:,0]
+            )[:, 0]
 
         if along == "x":
             coordinate_axes = ["x", "y"]
             self._update_domain(
-                numpy.concatenate(
-                    (table["left"], table["right"])), numpy.concatenate(
-                    (table["top"], table["bottom"])))
+                numpy.concatenate((table["left"], table["right"])),
+                numpy.concatenate((table["top"], table["bottom"])),
+            )
         elif along == "y":
             coordinate_axes = ["y", "x"]
             self._update_domain(
-                numpy.concatenate(
-                    (table["top"], table["bottom"])), numpy.concatenate(
-                    (table["left"], table["right"])))
+                numpy.concatenate((table["top"], table["bottom"])),
+                numpy.concatenate((table["left"], table["right"])),
+            )
 
         self._children.append(
             toyplot.mark.Rect(
@@ -2024,11 +2003,6 @@ class Cartesian(object):
             xmax=None,
             ymin=None,
             ymax=None,
-#            aspect=None,
-#            show=True,
-#            xshow=True,
-#            yshow=True,
-#            label=None,
             xlabel=None,
             ylabel=None,
             xticklocator=None,
@@ -2036,14 +2010,13 @@ class Cartesian(object):
             xscale="linear",
             yscale="linear",
             palette=None,
-#            padding=10,
-            ):
+        ):
         """Create a Cartesian coordinate system with a shared axis.
 
         Parameters
         ----------
         axis: string, optional
-            The axis that will be shared.  Allowed values are "x" and "y". 
+            The axis that will be shared.  Allowed values are "x" and "y".
         xmin, xmax, ymin, ymax: float, optional
           Used to explicitly override the axis domain (normally, the domain is
           implicitly defined by any marks added to the axes).
@@ -2084,8 +2057,8 @@ class Cartesian(object):
             palette=palette,
             padding=self._padding,
             parent=self._parent,
-            xaxis = self.x if axis == "x" else None,
-            yaxis = self.y if axis == "y" else None,
+            xaxis=self.x if axis == "x" else None,
+            yaxis=self.y if axis == "y" else None,
             )
 
         shared.x.spine.position = "high" if axis == "y" else "low"
@@ -2151,7 +2124,7 @@ class Cartesian(object):
             shape=(table.shape[0], 1),
             default=default_color,
             )
-        table["fill"] = color[:,0]
+        table["fill"] = color[:, 0]
 
         self._update_domain(
             table["x"], table["y"], display=True, data=not annotation)
@@ -2180,7 +2153,7 @@ class Cartesian(object):
             title=None,
             style=None,
             annotation=True,
-            ):
+        ):
         """Add vertical line(s) to the axes.
 
         Vertical lines are convenient because they're guaranteed to fill the axes from
@@ -2211,7 +2184,7 @@ class Cartesian(object):
             shape=(table.shape[0], 1),
             default=toyplot.color.near_black,
             )
-        table["color"] = color[:,0]
+        table["color"] = color[:, 0]
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.style.combine(toyplot.require.style(style))
@@ -2415,7 +2388,7 @@ class Table(object):
                 palette=None,
                 padding=5,
                 cell_padding=0,
-                ):
+            ):
             self._table._finalize()
             left = numpy.min([cell.left for cell in self._cells.flat]) + cell_padding
             right = numpy.max([cell.right for cell in self._cells.flat]) - cell_padding

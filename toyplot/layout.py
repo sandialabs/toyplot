@@ -337,8 +337,8 @@ def _floyd_warshall_shortest_path(vcount, edges):
     for k in numpy.arange(vcount):
         for i in numpy.arange(vcount):
             for j in numpy.arange(vcount):
-                if distance[i,j] > distance[i,k] + distance[k,j]:
-                    distance[i,j] = distance[i,k] + distance[k,j]
+                if distance[i, j] > distance[i, k] + distance[k, j]:
+                    distance[i, j] = distance[i, k] + distance[k, j]
 
     return distance
 
@@ -563,7 +563,7 @@ class Eades(GraphLayout):
             a = vcoordinates[vertices.T[0]]
             b = vcoordinates[vertices.T[1]]
             delta = a - b
-            distance = numpy.linalg.norm(delta, axis=1)[:,None]
+            distance = numpy.linalg.norm(delta, axis=1)[:, None]
             delta /= distance
             force = self._c3 / numpy.square(distance)
             delta *= force
@@ -574,7 +574,7 @@ class Eades(GraphLayout):
             a = vcoordinates[edges.T[0]]
             b = vcoordinates[edges.T[1]]
             delta = b - a
-            distance = numpy.linalg.norm(delta, axis=1)[:,None]
+            distance = numpy.linalg.norm(delta, axis=1)[:, None]
             delta /= distance
             force = self._c1 * numpy.log(distance / self._c2)
             delta *= force
@@ -629,7 +629,7 @@ class FruchtermanReingold(GraphLayout):
             a = vcoordinates[vertices.T[0]]
             b = vcoordinates[vertices.T[1]]
             delta = a - b
-            distance = numpy.linalg.norm(delta, axis=1)[:,None]
+            distance = numpy.linalg.norm(delta, axis=1)[:, None]
             delta /= distance
             force = numpy.square(k) / distance
             delta *= force
@@ -640,7 +640,7 @@ class FruchtermanReingold(GraphLayout):
             a = vcoordinates[edges.T[0]]
             b = vcoordinates[edges.T[1]]
             delta = b - a
-            distance = numpy.linalg.norm(delta, axis=1)[:,None]
+            distance = numpy.linalg.norm(delta, axis=1)[:, None]
             delta /= distance
             force = numpy.square(distance) / k
             delta *= force
@@ -649,8 +649,8 @@ class FruchtermanReingold(GraphLayout):
 
             # Limit offsets to the temperature
             distance = numpy.linalg.norm(offsets, axis=1)
-            offsets /= distance[:,None]
-            offsets *= numpy.minimum(temperature, distance)[:,None]
+            offsets /= distance[:, None]
+            offsets *= numpy.minimum(temperature, distance)[:, None]
 
             # Sum offsets
             vcoordinates = numpy.ma.where(mask, vcoordinates + offsets, vcoordinates)

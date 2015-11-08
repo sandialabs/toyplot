@@ -35,5 +35,5 @@ def object(value, shape):
             shape) == 2 and array.shape[0] == shape[0] and shape[1] == 1:
         return numpy.reshape(array, shape)
     result = numpy.empty(shape, dtype="object")
-    result.flat = [u for u,v in numpy.broadcast(array, result)]
+    result.flat = [u for u, v in numpy.broadcast(array, result)]
     return result

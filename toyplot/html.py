@@ -465,12 +465,12 @@ def render(canvas, fobj=None, animation=False):
     svg = xml.Element(
         "svg",
         xmlns="http://www.w3.org/2000/svg",
-        attrib={ "xmlns:toyplot": "http://www.sandia.gov/toyplot"},
+        attrib={"xmlns:toyplot": "http://www.sandia.gov/toyplot"},
         width="%rpx" % canvas.width,
         height="%rpx" % canvas.height,
         viewBox="0 0 %r %r" % (canvas.width, canvas.height),
         preserveAspectRatio="xMidYMid meet",
-        style=_css_style( canvas._style),
+        style=_css_style(canvas._style),
         id=context.get_id(canvas))
     for child in canvas._children:
         _render(canvas, child, context.push(svg))
@@ -1184,14 +1184,14 @@ def _render(canvas, axes, context):
             canvas,
             axes.axis,
             context.push(axes_xml),
-            x1 = axes._x1,
-            y1 = axes._y1,
-            x2 = axes._x2,
-            y2 = axes._y2,
-            ticks_above = 3,
-            ticks_below = 3,
-            tick_labels_baseline_shift = "-100%",
-            label_baseline_shift = "-200%",
+            x1=axes._x1,
+            y1=axes._y1,
+            x2=axes._x2,
+            y2=axes._y2,
+            ticks_above=3,
+            ticks_below=3,
+            tick_labels_baseline_shift="-100%",
+            label_baseline_shift="-200%",
             )
 
 
@@ -1307,28 +1307,28 @@ def _render(canvas, axes, context):
             canvas,
             axes.x,
             context.push(axes_xml),
-            x1 = axes._xmin_range,
-            y1 = x_spine_y,
-            x2 = axes._xmax_range,
-            y2 = x_spine_y,
-            ticks_above = x_ticks_above,
-            ticks_below = x_ticks_below,
-            tick_labels_baseline_shift = x_tick_labels_baseline_shift,
-            label_baseline_shift = x_label_baseline_shift,
+            x1=axes._xmin_range,
+            y1=x_spine_y,
+            x2=axes._xmax_range,
+            y2=x_spine_y,
+            ticks_above=x_ticks_above,
+            ticks_below=x_ticks_below,
+            tick_labels_baseline_shift=x_tick_labels_baseline_shift,
+            label_baseline_shift=x_label_baseline_shift,
             )
 
         _render_linear_axis(
             canvas,
             axes.y,
             context.push(axes_xml),
-            x1 = y_spine_x,
-            y1 = axes._ymax_range,
-            x2 = y_spine_x,
-            y2 = axes._ymin_range,
-            ticks_above = y_ticks_above,
-            ticks_below = y_ticks_below,
-            tick_labels_baseline_shift = y_tick_labels_baseline_shift,
-            label_baseline_shift = y_label_baseline_shift,
+            x1=y_spine_x,
+            y1=axes._ymax_range,
+            x2=y_spine_x,
+            y2=axes._ymin_range,
+            ticks_above=y_ticks_above,
+            ticks_below=y_ticks_below,
+            tick_labels_baseline_shift=y_tick_labels_baseline_shift,
+            label_baseline_shift=y_label_baseline_shift,
             )
 
         if axes.label._text is not None:
@@ -1835,7 +1835,7 @@ def _render(axes, mark, context):
             xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
-@dispatch( (toyplot.canvas.Canvas, toyplot.axes.Cartesian), toyplot.mark.Legend, _RenderContext)
+@dispatch((toyplot.canvas.Canvas, toyplot.axes.Cartesian), toyplot.mark.Legend, _RenderContext)
 def _render(canvas, legend, context):
     x = legend._xmin
     y = legend._ymin

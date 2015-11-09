@@ -499,22 +499,27 @@ def render(canvas, fobj=None, animation=False):
 
     # Add HTML controls.
     controls = xml.SubElement(
-        root, "div", attrib={"class": "toyplot-controls"})
-    mark_popup = xml.SubElement(controls,
-                                "ul",
-                                attrib={"class": "toyplot-mark-popup"},
-                                onmouseleave="this.style.visibility='hidden'",
-                                style=_css_style({"background": "rgba(0%,0%,0%,0.75)",
-                                                  "border": "0",
-                                                  "border-radius": "6px",
-                                                  "color": "white",
-                                                  "cursor": "default",
-                                                  "list-style": "none",
-                                                  "margin": "0",
-                                                  "padding": "5px",
-                                                  "position": "fixed",
-                                                  "visibility": "hidden",
-                                                  }))
+        root,
+        "div",
+        attrib={"class": "toyplot-controls"},
+        )
+    mark_popup = xml.SubElement(
+        controls,
+        "ul",
+        attrib={"class": "toyplot-mark-popup"},
+        onmouseleave="this.style.visibility='hidden'",
+        style=_css_style({
+            "background": "rgba(0%,0%,0%,0.75)",
+            "border": "0",
+            "border-radius": "6px",
+            "color": "white",
+            "cursor": "default",
+            "list-style": "none",
+            "margin": "0",
+            "padding": "5px",
+            "position": "fixed",
+            "visibility": "hidden",
+        }))
     xml.SubElement(
         mark_popup,
         "li",
@@ -532,10 +537,7 @@ def render(canvas, fobj=None, animation=False):
 
     # Add a workaround for browsers that don't support CSS alignment-baseline.
     if svg.find(".//text") is not None:
-        xml.SubElement(
-            controls,
-            "script").text = _alignment_baseline_workaround.substitute(
-            root_id=root.get("id"))
+        xml.SubElement(controls, "script").text = _alignment_baseline_workaround.substitute(root_id=root.get("id"))
 
     # Allow users to export embedded table data.
     if context._data_tables:
@@ -563,11 +565,7 @@ def render(canvas, fobj=None, animation=False):
                 data_tables.append(
                     {"id": context.get_id(mark), "filename": filename, "title": title, "names": names, "data": data})
 
-        xml.SubElement(
-            controls,
-            "script").text = _export_data_tables.substitute(
-            root_id=root.get("id"),
-            data_tables=json.dumps(data_tables))
+        xml.SubElement(controls, "script").text = _export_data_tables.substitute(root_id=root.get("id"), data_tables=json.dumps(data_tables))
 
     # Provide interactive mouse coordinates.
     def _flip_infinities(value):

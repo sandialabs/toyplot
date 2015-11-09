@@ -39,11 +39,11 @@ class Table(object):
 
         if data is not None:
             # Input data for which an explicit column ordering is known.
-            if isinstance(
-                data,
-                (collections.OrderedDict,
-                 toyplot.data.Table,
-                 numpy.lib.npyio.NpzFile)):
+            if isinstance(data, (
+                    collections.OrderedDict,
+                    toyplot.data.Table,
+                    numpy.lib.npyio.NpzFile,
+                )):
                 for key in data.keys():
                     self[key] = data[key]
             # Input data for which an explicit column ordering is not known.
@@ -93,9 +93,7 @@ class Table(object):
         return self._columns.__delitem__(key)
 
     def __len__(self):
-        return list(
-            self._columns.values())[0].shape[0] if len(
-            self._columns) else 0
+        return list(self._columns.values())[0].shape[0] if len(self._columns) else 0
 
     def _repr_html_(self):
         root_xml = xml.Element(
@@ -137,10 +135,9 @@ class Table(object):
         shape: (number of rows, number of columns) tuple.
         """
         return (
-            list(
-                self._columns.values())[0].shape[0] if len(
-                self._columns) else 0, len(
-                self._columns))
+            list(self._columns.values())[0].shape[0] if len(self._columns) else 0,
+            len(self._columns),
+        )
 
     def items(self):
         """Return the table names and columns, in column order.

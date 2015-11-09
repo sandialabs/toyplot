@@ -76,7 +76,7 @@ def render(
         stderr=subprocess.PIPE)
     for frame, png in enumerate(
             toyplot.png.render_frames(
-            canvas=canvas, width=width, height=height, scale=scale)):
+                canvas=canvas, width=width, height=height, scale=scale)):
         if progress is not None:
             progress(frame)
         ffmpeg.stdin.write(png)

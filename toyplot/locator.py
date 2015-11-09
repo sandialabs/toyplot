@@ -323,9 +323,7 @@ class Extended(TickLocator):
                                 score = w[0] * s + w[1] * \
                                     c + w[2] * d + w[3] * l
 
-                                if score > best_score and (
-                                    not only_inside or (
-                                        lmin >= dmin and lmax <= dmax)):
+                                if score > best_score and (not only_inside or (lmin >= dmin and lmax <= dmax)):
                                     best_score = score
                                     best = (lmin, lmax, lstep, q, k)
                             z = z + 1
@@ -502,13 +500,8 @@ class Log(TickLocator):
         """
         if domain_min < 0 and domain_max < 0:
             negative_exponents = numpy.arange(
-                numpy.ceil(
-                    numpy.log10(
-                        numpy.abs(domain_min)) / numpy.log10(
-                        self._base)), numpy.floor(
-                    numpy.log10(
-                        numpy.abs(domain_max)) / numpy.log10(
-                            self._base)) - 1, -1)
+                numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)),
+                numpy.floor(numpy.log10(numpy.abs(domain_max)) / numpy.log10(self._base)) - 1, -1)
         elif domain_min < 0:
             negative_exponents = numpy.arange(
                 numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)), -1, -1)

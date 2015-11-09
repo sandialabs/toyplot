@@ -60,11 +60,11 @@ def region(
     if bounds is not None:
         if isinstance(bounds, tuple) and len(bounds) == 4:
             return (
-                convert(
-                    xmin, xmax, bounds[0]), convert(
-                    xmin, xmax, bounds[1]), convert(
-                    ymin, ymax, bounds[2]), convert(
-                    ymin, ymax, bounds[3]))
+                convert(xmin, xmax, bounds[0]),
+                convert(xmin, xmax, bounds[1]),
+                convert(ymin, ymax, bounds[2]),
+                convert(ymin, ymax, bounds[3]),
+            )
         raise TypeError(
             "bounds parameter must be an (xmin, xmax, ymin, ymax) tuple.")
     # Specify an explicit rectangle for the region

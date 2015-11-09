@@ -503,11 +503,11 @@ class DivergingMap(Map):
             attrib={
                 "class": "toyplot-color-DivergingMap"})
         for color in self.colors(
-            numpy.linspace(
-                domain_min,
-                domain_max,
-                100,
-                endpoint=True)):
+                numpy.linspace(
+                    domain_min,
+                    domain_max,
+                    100,
+                    endpoint=True)):
             xml.SubElement(
                 root_xml,
                 "div",
@@ -608,11 +608,11 @@ class LinearMap(Map):
         sample_count = 100
         sample_width = len(self._palette) * 20.0 / sample_count
         for color in self.colors(
-            numpy.linspace(
-                domain_min,
-                domain_max,
-                sample_count,
-                endpoint=True)):
+                numpy.linspace(
+                    domain_min,
+                    domain_max,
+                    sample_count,
+                    endpoint=True)):
             xml.SubElement(
                 root_xml,
                 "div",

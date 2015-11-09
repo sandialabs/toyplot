@@ -77,13 +77,13 @@ class AnimationFrame(object):
         index: zero-based index of the datum to modify
         style: dict containing CSS style information
         """
-        if not isinstance(
-            mark,
-            (toyplot.mark.BarBoundaries,
-             toyplot.mark.BarMagnitudes,
-             toyplot.mark.Plot,
-             toyplot.mark.Scatterplot,
-             toyplot.mark.Text)):
+        if not isinstance(mark, (
+                toyplot.mark.BarBoundaries,
+                toyplot.mark.BarMagnitudes,
+                toyplot.mark.Plot,
+                toyplot.mark.Scatterplot,
+                toyplot.mark.Text,
+            )):
             raise ValueError("Cannot set datum style for %s." % type(mark))
         self._changes[self._begin][
             "set-datum-style"].append((mark, series, datum, style))
@@ -262,7 +262,7 @@ class Canvas(object):
             yscale="linear",
             palette=None,
             padding=10,
-            ):
+        ):
         """Add a set of Cartesian axes to the canvas.
 
         Parameters
@@ -581,7 +581,7 @@ class Canvas(object):
             ticklocator=None,
             scale="linear",
             palette=None,
-            ):
+        ):
         """Add a 1D number line to the canvas.
 
         Parameters

@@ -70,8 +70,7 @@ class Piecewise(object):
                 domain_values,
                 segment.domain.bounds.max)
             if segment.scale == "linear":
-                amount = (domain_values[
-                          indices] - segment.domain.min) / (segment.domain.max - segment.domain.min)
+                amount = (domain_values[indices] - segment.domain.min) / (segment.domain.max - segment.domain.min)
                 range_values[indices] = mix(
                     segment.range.min, segment.range.max, amount)
             else:
@@ -101,21 +100,18 @@ class Piecewise(object):
                 range_values,
                 segment.range.bounds.max)
             if segment.scale == "linear":
-                amount = (range_values[
-                          indices] - segment.range.min) / (segment.range.max - segment.range.min)
+                amount = (range_values[indices] - segment.range.min) / (segment.range.max - segment.range.min)
                 domain_values[indices] = mix(
                     segment.domain.min, segment.domain.max, amount)
             else:
                 scale, base = segment.scale
                 if scale == "log":
-                    amount = (range_values[
-                              indices] - segment.range.min) / (segment.range.max - segment.range.min)
+                    amount = (range_values[indices] - segment.range.min) / (segment.range.max - segment.range.min)
                     domain_values[indices] = numpy.sign(
-                        segment.domain.min) * numpy.power(
-                        base, mix(
-                            _log(
-                                segment.domain.min, base), _log(
-                                segment.domain.max, base), amount))
+                        segment.domain.min) * numpy.power(base, mix(
+                            _log(segment.domain.min, base),
+                            _log(segment.domain.max, base),
+                            amount))
                 else:
                     raise Exception("Unknown scale: %s" % (scale,)) # pragma: no cover
 

@@ -38,7 +38,7 @@ class AxisLines(Mark):
             opacity,
             title,
             style,
-            ):
+        ):
         Mark.__init__(self)
 
         # 1 axis identifier
@@ -78,7 +78,7 @@ class BarBoundaries(Mark):
             title,
             style,
             filename,
-            ):
+        ):
         Mark.__init__(self)
 
         # 2 axis identifiers
@@ -125,7 +125,7 @@ class BarMagnitudes(Mark):
             title,
             style,
             filename,
-            ):
+        ):
         Mark.__init__(self)
 
         # 2 axis identifiers
@@ -171,7 +171,7 @@ class FillBoundaries(Mark):
             title,
             style,
             filename,
-            ):
+        ):
         Mark.__init__(self)
 
         # 2 axis identifiers
@@ -215,7 +215,7 @@ class FillMagnitudes(Mark):
             title,
             style,
             filename,
-            ):
+        ):
         Mark.__init__(self)
 
         # 2 axis identifiers
@@ -274,7 +274,7 @@ class Graph(Mark): # pragma: no cover
             ewidth,
             eopacity,
             estyle,
-            ):
+        ):
         Mark.__init__(self)
 
         # D axis identifiers
@@ -409,7 +409,7 @@ class Plot(Mark):
             mstyle,
             mlstyle,
             filename,
-            ):
+        ):
         Mark.__init__(self)
 
         # 2 axis identifiers
@@ -472,7 +472,7 @@ class Rect(Mark):
             title,
             style,
             filename,
-            ):
+        ):
         Mark.__init__(self)
 
         # 2 axis identifiers
@@ -525,7 +525,7 @@ class Scatterplot(Mark):
             mstyle,
             mlstyle,
             filename,
-            ):
+        ):
         Mark.__init__(self)
 
         # 2 axis identifiers
@@ -579,7 +579,7 @@ class Text(Mark):
             title,
             style,
             filename,
-            ):
+        ):
         Mark.__init__(self)
 
         # D axis identifiers
@@ -602,8 +602,6 @@ class Text(Mark):
         self._style = toyplot.require.style(style)
         # Export filename
         self._filename = toyplot.require.filename(filename)
-
-
 
 ##########################################################################
 # More specialized marks
@@ -723,11 +721,7 @@ class VColorBar(Mark):
                 return VColorBar.PerTickHelper.TickProxy(self._values[value])
 
         def styles(self, values):
-            results = [
-                self._indices[index].get(
-                    "style",
-                    None) if index in self._indices else None for index in range(
-                    len(values))]
+            results = [self._indices[index].get("style", None) if index in self._indices else None for index in range(len(values))]
             for value in self._values:
                 deltas = numpy.abs(values - value)
                 results[numpy.argmin(deltas)] = self._values[
@@ -886,8 +880,7 @@ class VColorBar(Mark):
 
         def linear_projection(domain_min, domain_max, range_min, range_max):
             def implementation(x):
-                return (1 - ((x - domain_min) / (domain_max - domain_min))
-                        ) * (range_max - range_min) + range_min
+                return (1 - ((x - domain_min) / (domain_max - domain_min))) * (range_max - range_min) + range_min
             return implementation
 
         if self._scale == "linear":

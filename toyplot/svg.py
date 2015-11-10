@@ -2,6 +2,9 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Generates SVG images.
+"""
+
 from __future__ import division
 
 import toyplot.html
@@ -10,6 +13,7 @@ import xml.etree.ElementTree as xml
 
 
 def apply_changes(svg, changes):
+    """Modify the SVG DOM representation of a canvas with the given changes."""
     toyplot.html.apply_changes(svg, changes)
 
 

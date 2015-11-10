@@ -2,11 +2,21 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-from __future__ import division
+"""Functionality for working with CSS style information."""
 
+from __future__ import division
 
 def combine(*styles):
     """Combine multiple style specifications into one.
+
+    Parameters
+    ----------
+    styles: sequence of dicts
+        A collection of dicts containing CSS-compatible name-value pairs.
+
+    Returns
+    -------
+    styles: dict containing CSS-compatible name-value pairs.
     """
     computed_style = {}
     for style in styles:

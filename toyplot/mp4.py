@@ -2,6 +2,8 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Generate MPEG-4 videos."""
+
 from __future__ import absolute_import
 from __future__ import division
 

@@ -2,7 +2,7 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-"""Generates PNG images using Qt.
+"""Generate PNG images using Qt.
 """
 
 from __future__ import absolute_import

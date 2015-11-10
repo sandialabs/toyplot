@@ -2,7 +2,7 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-"""Generates PDF documents using Qt.
+"""Generate PDF documents using Qt.
 """
 
 from __future__ import absolute_import

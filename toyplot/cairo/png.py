@@ -2,7 +2,7 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-"""Render PNG images using Cairo.
+"""Generate PNG images using Cairo.
 """
 
 from __future__ import absolute_import

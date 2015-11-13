@@ -46,24 +46,37 @@ class Table(object):
                 )):
                 for key in data.keys():
                     self[key] = data[key]
+                return
             # Input data for which an explicit column ordering is not known.
-            elif isinstance(data, (dict, collections.Mapping)):
+            if isinstance(data, (dict, collections.Mapping)):
                 for key in sorted(data.keys()):
                     self[key] = data[key]
+                return
             # Input data based on sequences.
-            elif isinstance(data, (list, collections.Sequence)):
+            if isinstance(data, (list, collections.Sequence)):
                 for key, values in data:
                     self[key] = values
+                return
             # Input data based on numpy arrays.
-            elif isinstance(data, numpy.ndarray):
+            if isinstance(data, numpy.ndarray):
                 if data.ndim == 2:
                     for column_index in numpy.arange(data.shape[1]):
                         self["C%s" % column_index] = data[:, column_index]
                 else:
                     raise ValueError(
                         "Only two-dimensional arrays are allowed.")
-            else:
-                raise ValueError("Unsupported data type: %s" % type(data))
+                return
+            # Input data based on Pandas data structures.
+            try:
+                import pandas
+                if isinstance(data, pandas.DataFrame):
+                    for key in data.keys():
+                        self[key] = data[key]
+                    return
+            except:
+                pass
+
+            raise ValueError("Unsupported data type: %s" % type(data))
 
     def __getitem__(self, index):
         # Return a single column by name

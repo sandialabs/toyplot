@@ -97,14 +97,14 @@ def render(svg, context):
         if current_style.get("visibility") != "hidden":
 
             if "transform" in element.attrib:
-                for transformation in element.get("transform").split(")")[::-1]:
+                for transformation in element.get("transform").split(")")[::1]:
                     if transformation:
                         type, arguments = transformation.split("(")
                         arguments = arguments.split(",")
-                        if type == "translate":
+                        if type.strip() == "translate":
                             if len(arguments) == 2:
                                 context.translate(float(arguments[0]), float(arguments[1]))
-                        elif type == "rotate":
+                        elif type.strip() == "rotate":
                             if len(arguments) == 1:
                                 context.rotate(numpy.radians(float(arguments[0])))
                             if len(arguments) == 3:

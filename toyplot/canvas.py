@@ -144,7 +144,7 @@ class Canvas(object):
                 "background-color": "transparent",
                 "fill": toyplot.color.near_black,
                 "fill-opacity": 1.0,
-                "font-family": "helvetica",
+                "font-family": "Helvetica",
                 "font-size": "12px",
                 "opacity": 1.0,
                 "stroke": toyplot.color.near_black,

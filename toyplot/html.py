@@ -1957,7 +1957,7 @@ def _render(axes, mark, context): # pragma: no cover
 
     coordinate_index = 0
     edge_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Edges"})
-    for esource, etarget, eshape, ecolor, ewidth, eopacity in itertools.izip(
+    for esource, etarget, eshape, ecolor, ewidth, eopacity in zip(
             mark._etable[mark._esource[0]],
             mark._etable[mark._etarget[0]],
             mark._etable[mark._eshape[0]],
@@ -2005,7 +2005,7 @@ def _render(axes, mark, context): # pragma: no cover
             y = axes._project_y(mark._vtable[mark._vcoordinates[i]])
 
     vertex_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Vertices"})
-    for vx, vy, vmarker, vsize, vcolor, vopacity, vtitle in itertools.izip(
+    for vx, vy, vmarker, vsize, vcolor, vopacity, vtitle in zip(
             x,
             y,
             mark._vtable[mark._vmarker[0]],
@@ -2036,7 +2036,7 @@ def _render(axes, mark, context): # pragma: no cover
     # Render vertex labels
     if mark._vlshow:
         vlabel_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Labels"})
-        for dx, dy, dtext in itertools.izip(
+        for dx, dy, dtext in zip(
                 x,
                 y,
                 mark._vtable[mark._vlabel[0]],

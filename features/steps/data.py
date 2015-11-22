@@ -235,6 +235,20 @@ def step_impl(context):
     nose.tools.assert_equal(context.data.shape, (362, 6))
     nose.tools.assert_equal(list(context.data.keys()), ['STATION', 'STATION_NAME', 'DATE', 'TMAX', 'TMIN', 'TOBS'])
 
+@when(u'toyplot.data.Table is initialized with a pandas dataframe')
+def step_impl(context):
+    try:
+        import pandas
+    except:
+        context.scenario.skip(reason="The pandas library is not available.")
+        return
+    context.data = toyplot.data.Table(pandas.read_csv("docs/temperatures.csv"))
+
+@then(u'the toyplot.data.Table contains the data frame columns')
+def step_impl(context):
+    nose.tools.assert_equal(context.data.shape, (362, 6))
+    nose.tools.assert_equal(list(context.data.keys()), ['STATION', 'STATION_NAME', 'DATE', 'TMAX', 'TMIN', 'TOBS'])
+
 @then(u'the table can be rendered as format ipython html string')
 def step_impl(context):
     html = context.data._repr_html_()

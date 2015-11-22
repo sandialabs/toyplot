@@ -29,6 +29,7 @@ Feature: Data tables
       | an array                          | raises ValueError                   |
       | an integer                        | raises ValueError                   |
       | a csv file                        | contains the csv file columns       |
+      | a pandas dataframe                | contains the data frame columns     |
 
   Scenario Outline: Data table rendering
     Given a toyplot.data.table with some data

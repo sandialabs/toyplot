@@ -53,7 +53,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     svg = toyplot.svg.render(canvas)
     scale = canvas._point_scale(width=width, height=height, scale=scale)
     if fobj is None:
-        stream = io.StringIO()
+        stream = io.BytesIO()
         surface = reportlab.pdfgen.canvas.Canvas(
             stream, pagesize=(scale * canvas.width, scale * canvas.height))
     else:

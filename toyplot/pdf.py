@@ -64,7 +64,8 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
     Notes
     -----
-    The output PDF is currently rendered using
-    :func:`toyplot.cairo.pdf.render()`.  This may change in the future.
+    The output PDF is currently rendered using (in order of preference)
+    :func:`toyplot.reportlab.pdf.render()`, :func:`toyplot.qt.pdf.render()`, or
+    :func:`toyplot.cairo.pdf.render()`.
     """
     return implementation.render(canvas, fobj, width, height, scale)

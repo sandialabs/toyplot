@@ -34,6 +34,8 @@ Contents:
    toyplot.qt.rst
    toyplot.qt.pdf.rst
    toyplot.qt.png.rst
+   toyplot.reportlab.rst
+   toyplot.reportlab.pdf.rst
    toyplot.require.rst
    toyplot.style.rst
    toyplot.svg.rst

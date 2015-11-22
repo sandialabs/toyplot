@@ -7,15 +7,29 @@
 Dependencies
 ============
 
-To use Toyplot with its default functionality, you'll need the following:
+Required
+--------
+
+To use Toyplot you'll need the following:
 
 * Python 2.7 / Python 3 - http://python.org
 * colormath - https://github.com/gtaylor/python-colormath
 * multipledispatch - https://github.com/mrocklin/multipledispatch
 * numpy - http://numpy.org
 
-If you intend to generate static versions of your Toyplot figures such as PDF or PNG,
-you'll need one of the following:
+PDF Export
+----------
+
+If you intend to generate static PDF versions of your Toyplot figures, you'll need
+the following:
+
+* ReportLab - open source PDF toolkit - http://www.reportlab.com/opensource/
+
+PNG Export
+----------
+
+To generate static PNG versions of your Toyplot figures,
+you'll need either of the following:
 
 * PyQt5 - https://pypi.python.org/pypi/PyQt5
 
@@ -24,15 +38,24 @@ or
 * pycairo - http://cairographics.org/pycairo
 * python pango bindings - typically distributed as part of pygtk - http://www.pygtk.org
 
-If you plan to render animated Toyplot figures as MP4 or WebM videos, you'll need
-ffmpeg:
+MP4 / WebM Export
+-----------------
+
+If you plan to render animated Toyplot figures as MP4 or WebM videos, you'll either of
+the above options for exporting PNG files, plus ffmpeg:
 
 * ffmpeg - https://www.ffmpeg.org
+
+Source Installation
+-------------------
 
 If you're installing Toyplot from source, you'll need setuptools to run the
 Toyplot setup.py script:
 
 * setuptools - http://pythonhosted.org//setuptools
+
+Regression Testing
+------------------
 
 The following are required to run Toyplot's regression tests and view
 code coverage:
@@ -43,6 +66,9 @@ code coverage:
 * nose - unit test framework - https://nose.readthedocs.org/en/latest
 * nose-exclude - a nose plugin to simplify excluding directories - https://pypi.python.org/pypi/nose-exclude
 
+Generating Documentation
+------------------------
+
 And you'll need to following to generate this documentation:
 
 * Sphinx - documentation builder - http://sphinx-doc.org
@@ -50,3 +76,4 @@ And you'll need to following to generate this documentation:
 * napoleon - http://sphinxcontrib-napoleon.readthedocs.org/en/latest/
 * Jupyter - http://ipython.org
 * Pandoc - http://johnmacfarlane.net/pandoc
+

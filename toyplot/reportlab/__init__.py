@@ -2,7 +2,7 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-"""Support functions for rendering using Cairo."""
+"""Support functions for rendering using ReportLab."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -15,7 +15,7 @@ import toyplot.units
 
 
 def render(svg, canvas):
-    """Render the SVG representation of a canvas to a Cairo canvas.
+    """Render the SVG representation of a toyplot canvas to a ReportLab canvas.
 
     Parameters
     ----------
@@ -23,8 +23,8 @@ def render(svg, canvas):
       SVG representation of a :class:`toyplot.canvas.Canvas` returned by
       :func:`toyplot.svg.render()`.
 
-    canvas: cairo.Context
-      Cairo canvas that will be used to render the plot.
+    canvas: reportlab.pdfgen.canvas.Canvas
+      ReportLab canvas that will be used to render the plot.
     """
     def get_fill(style):
         if "fill" not in style:

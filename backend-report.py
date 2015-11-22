@@ -1,6 +1,5 @@
 import importlib
 import sys
-import traceback
 
 def print_report(module):
     try:
@@ -8,9 +7,8 @@ def print_report(module):
         importlib.import_module(module)
         sys.stdout.write("ok\n")
     except Exception as e:
-        sys.stdout.write("failed\n\n")
-        traceback.print_exc()
-        sys.stdout.write("%s\n\n" % e)
+        sys.stdout.write("failed\n")
+        sys.stdout.write("  %s\n" % e)
 
 
 for module in [

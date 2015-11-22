@@ -18,15 +18,15 @@ Feature: Backends
       | toyplot.html             | an html file                    |
       | toyplot.html             | an html buffer                  |
       | toyplot.html             | a returned html dom             |
-      | toyplot.reportlab.pdf    | a pdf file                      |
-      | toyplot.reportlab.pdf    | a pdf buffer                    |
-      | toyplot.reportlab.pdf    | a returned pdf document         |
       | toyplot.qt.pdf           | a pdf file                      |
       | toyplot.qt.pdf           | a pdf buffer                    |
       | toyplot.qt.pdf           | a returned pdf document         |
       | toyplot.qt.png           | a png file                      |
       | toyplot.qt.png           | a png buffer                    |
       | toyplot.qt.png           | a returned png document         |
+      | toyplot.reportlab.pdf    | a pdf file                      |
+      | toyplot.reportlab.pdf    | a pdf buffer                    |
+      | toyplot.reportlab.pdf    | a returned pdf document         |
       | toyplot.svg              | an svg file                     |
       | toyplot.svg              | an svg buffer                   |
       | toyplot.svg              | a returned svg dom              |

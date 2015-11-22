@@ -7,15 +7,10 @@
 from __future__ import absolute_import
 from __future__ import division
 
+import io
 import reportlab.pdfgen.canvas
 import toyplot.svg
 import toyplot.reportlab
-
-
-try:
-    import cStringIO as StringIO
-except:  # pragma: no cover
-    import StringIO
 
 
 def render(canvas, fobj=None, width=None, height=None, scale=None):
@@ -58,7 +53,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     svg = toyplot.svg.render(canvas)
     scale = canvas._point_scale(width=width, height=height, scale=scale)
     if fobj is None:
-        stream = StringIO.StringIO()
+        stream = io.StringIO()
         surface = reportlab.pdfgen.canvas.Canvas(
             stream, pagesize=(scale * canvas.width, scale * canvas.height))
     else:

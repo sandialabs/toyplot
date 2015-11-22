@@ -65,8 +65,7 @@ def region(
                 convert(ymin, ymax, bounds[2]),
                 convert(ymin, ymax, bounds[3]),
             )
-        raise TypeError(
-            "bounds parameter must be an (xmin, xmax, ymin, ymax) tuple.")
+        raise TypeError("bounds parameter must be an (xmin, xmax, ymin, ymax) tuple.") # pragma: no cover
     # Specify an explicit rectangle for the region
     if rect is not None:
         if isinstance(rect, tuple) and len(rect) == 4:
@@ -77,7 +76,7 @@ def region(
             height = toyplot.units.convert(
                 rect[3], "px", default="px", reference=ymax - ymin)
             return (x, x + width, y, y + height)
-        raise ValueError("Unrecognized rect type")
+        raise ValueError("Unrecognized rect type") # pragma: no cover
     # Offset a rectangle from a corner
     if corner is not None:
         if isinstance(corner, tuple) and len(corner) == 4:
@@ -88,7 +87,7 @@ def region(
             height = toyplot.units.convert(
                 corner[3], "px", default="px", reference=ymax - ymin)
         else:
-            raise ValueError("Unrecognized corner type")
+            raise ValueError("corner parameter must be a (corner, inset, width, height) tuple.") # pragma: no cover
         if position == "top":
             return ((xmin + xmax - width) / 2,
                     (xmin + xmax + width) / 2,
@@ -160,7 +159,8 @@ def region(
                 inset +
                 height)
         else:
-            raise ValueError("Unrecognized corner")
+            raise ValueError("Unrecognized corner") # pragma: no cover
+
     # Choose a cell from an MxN grid, with optional column/row spanning.
     if grid is not None:
         # Cell n (in left-to-right, top-to-bottom order) of an M x N grid

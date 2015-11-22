@@ -73,7 +73,7 @@ class Table(object):
                     for key in data.keys():
                         self[key] = data[key]
                     return
-            except:
+            except: # pragma: no cover
                 pass
 
             raise ValueError("Unsupported data type: %s" % type(data))

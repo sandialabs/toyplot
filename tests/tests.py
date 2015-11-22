@@ -1246,11 +1246,6 @@ def test_animation_frame_sanity_checks():
         frame.set_datum_text(None, 0, 0, "")
 
 
-def test_canvas_defaults():
-    canvas = toyplot.Canvas()
-    assert_canvas_matches(canvas, "canvas-defaults")
-
-
 def test_canvas_time():
     canvas = toyplot.Canvas()
     frame = canvas.time(0.3, 0.4)
@@ -1442,69 +1437,3 @@ def test_legend():
     assert_canvas_matches(canvas, "legend")
 
 
-def test_bounds_placement():
-    style = {"stroke": toyplot.color.near_black}
-    canvas = toyplot.Canvas(
-        800, 600, style={"border": "1px solid %s" % toyplot.color.near_black})
-    canvas.legend([], style=style, bounds=(400 - 100, 400 + 100, 20, 50))
-    canvas.legend([], style=style, bounds=("25%", 400 + 100, 80, 110))
-    canvas.legend([], style=style, bounds=(400 - 100, "75%", 140, 170))
-    canvas.legend([], style=style, bounds=("33%", "66%", 200, 230))
-    canvas.legend([], style=style, bounds=(20, 50, 450 - 20, 450 + 20))
-    canvas.legend([], style=style, bounds=(80, 110, "50%", 450 + 20))
-    canvas.legend([], style=style, bounds=(140, 170, 450 - 20, "90%"))
-    canvas.legend([], style=style, bounds=(200, 230, "50%", "90%"))
-    canvas.legend([], style=style, bounds=("66%", "90%", "66%", "90%"))
-    assert_canvas_matches(canvas, "bounds-placement")
-
-
-def test_corner_placement():
-    style = {"stroke": toyplot.color.near_black}
-    canvas = toyplot.Canvas(
-        800, 600, style={"border": "1px solid %s" % toyplot.color.near_black})
-    canvas.legend([("top", "^")], style=style, corner=("top", 10, 100, 30))
-    canvas.legend(
-        [("top-right", "^")], style=style, corner=("top-right", 10, 100, 30))
-    canvas.legend([("right", "^")], style=style, corner=("right", 10, 100, 30))
-    canvas.legend(
-        [("bottom-right", "^")], style=style, corner=("bottom-right", 10, 150, 30))
-    canvas.legend(
-        [("bottom", "^")], style=style, corner=("bottom", 10, 100, 30))
-    canvas.legend(
-        [("bottom-left", "^")], style=style, corner=("bottom-left", 10, 100, 30))
-    canvas.legend([("left", "^")], style=style, corner=("left", 10, 100, 30))
-    canvas.legend(
-        [("top-left", "^")], style=style, corner=("top-left", 10, 100, 30))
-    canvas.legend(
-        [("top-left", "^")], style=style, corner=("top-left", 50, 100, 30))
-    canvas.legend(
-        [("top-left", "^")], style=style, corner=("top-left", 100, "20%", "10%"))
-    assert_canvas_matches(canvas, "corner-placement")
-
-
-def test_grid_placement():
-    x = numpy.linspace(0, 2 * numpy.pi, 1000)
-    canvas = toyplot.Canvas(
-        800, 600, style={"border": "1px solid %s" % toyplot.color.near_black})
-    inset = canvas.axes(grid=(3, 3, 0), label="3x3 Grid")
-    inset.plot(x, numpy.sin(x))
-    inset = canvas.axes(grid=(3, 3, 0, 1, 1, 2), label="3x3 Grid colspan=2")
-    inset.plot(x, numpy.sin(x))
-    inset = canvas.axes(
-        grid=(3, 3, 1, 0), gutter=20, label="3x3 Grid gutter=20")
-    inset.plot(x, numpy.sin(x))
-    inset = canvas.axes(
-        grid=(3, 3, 1, 1), gutter=20, label="3x3 Grid gutter=20")
-    inset.plot(x, numpy.sin(x))
-    inset = canvas.axes(
-        grid=(
-            3,
-            3,
-            1,
-            2,
-            2,
-            1),
-        gutter=20,
-        label="3x3 Grid gutter=20 rowspan=2")
-    inset.plot(x, numpy.sin(x))
-    assert_canvas_matches(canvas, "grid-placement")

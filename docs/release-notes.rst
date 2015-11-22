@@ -7,6 +7,22 @@
 Release Notes
 =============
 
+Toyplot 0.9.0 - November 22, 2015
+---------------------------------
+
+* Documented installation for Anaconda and FreeBSD.
+* Experimental support for graph visualization, with flexible layout algorithms, shared layouts and node "pinning".
+* Allow cartesian axes to fill the available range while maintaining their aspect ratio.
+* Axis ticks can extend above or below the axis spine.
+* Positioning an axis spine positions its ticks and tick labels as well.
+* Added support for shared axes / multiple axes, to display multiple overlapping domains in a single plot.
+* Format specifiers are available for the Extended and Heckbert tick locators, courtesy of Johann du Toit.
+* Began using pylint as a regular code quality check.
+* Pandas data frames are automatically converted when creating data tables / table axes.
+* Created a new default PDF backend using the ReportLab library.
+* Switched to toyplot.qt.png as the default PNG backend.
+* Provide better feedback when using the toyplot.pdf and toyplot.png meta backends.
+
 Toyplot 0.8.0 - September 7, 2015
 ---------------------------------
 

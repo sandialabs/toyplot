@@ -21,6 +21,9 @@ Feature: Backends
       | toyplot.pdf              | a pdf file                      |
       | toyplot.pdf              | a pdf buffer                    |
       | toyplot.pdf              | a returned pdf document         |
+      | toyplot.png              | a png file                      |
+      | toyplot.png              | a png buffer                    |
+      | toyplot.png              | a returned png document         |
       | toyplot.qt.pdf           | a pdf file                      |
       | toyplot.qt.pdf           | a pdf buffer                    |
       | toyplot.qt.pdf           | a returned pdf document         |

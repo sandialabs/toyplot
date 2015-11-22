@@ -7,8 +7,17 @@
 from __future__ import absolute_import
 from __future__ import division
 
+import toyplot
 
-import toyplot.cairo.png
+try:
+    import toyplot.qt.png as implementation
+except:
+    try:
+        import toyplot.cairo.png as implementation
+        toyplot.log.warning("Couldn't load toyplot.qt.png (preferred), using toyplot.cairo.png (deprecated).")
+    except:
+        toyplot.log.error("Couldn't load a PNG backend.  Try installing PyQt 5 (preferred), or pango / cairo.")
+        raise
 
 
 def render(canvas, fobj=None, width=None, height=None, scale=None):
@@ -44,7 +53,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     The output PNG is currently rendered using
     :func:`toyplot.cairo.png.render()`.  This may change in the future.
     """
-    return toyplot.cairo.png.render(canvas, fobj, width, height, scale)
+    return implementation.render(canvas, fobj, width, height, scale)
 
 
 def render_frames(canvas, width=None, height=None, scale=None):
@@ -81,5 +90,5 @@ def render_frames(canvas, width=None, height=None, scale=None):
     >>> for frame, png in enumerate(toyplot.cairo.render_png_frames(canvas)):
     ...   open("frame-%s.png" % frame, "wb").write(png)
     """
-    return toyplot.cairo.png.render_frames(canvas, width, height, scale)
+    return implementation.render_frames(canvas, width, height, scale)
 

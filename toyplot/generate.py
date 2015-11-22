@@ -13,7 +13,7 @@ def prufer_tree(sequence):
         sequence = toyplot.require.integer_vector(sequence)
         n = len(sequence)
         if numpy.any(sequence < 0) or numpy.any(sequence >= n+2):
-            raise ValueError("Sequence values must be in the range [0, %s)" % n+2)
+            raise ValueError("Sequence values must be in the range [0, %s)" % n+2) # pragma: no cover
 
         sources = []
         targets = []

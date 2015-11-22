@@ -368,14 +368,14 @@ def _require_tree(children):
     """
     roots = numpy.setdiff1d(numpy.arange(len(children)), numpy.concatenate(children))
     if len(roots) != 1:
-        raise ValueError("Not a tree.")
+        raise ValueError("Not a tree.") # pragma: no cover
     root = roots[0]
 
     depth = []
     visited = numpy.zeros(len(children), dtype=bool)
     def mark_visited(vertex, vdepth=0):
         if visited[vertex]:
-            raise ValueError("Not a tree.")
+            raise ValueError("Not a tree.") # pragma: no cover
         depth.append(vdepth)
         visited[vertex] = True
         for child in children[vertex]:
@@ -413,7 +413,7 @@ class EdgeLayout(object):
         ecoordinates : matrix containing two columns
             Contains coordinates for each of the edge shape strings, in drawing-code order.
         """
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
 
 class StraightEdges(EdgeLayout):
@@ -496,7 +496,7 @@ class GraphLayout(object):
         ecoordinates : matrix containing two columns
             Contains coordinates for each of the edge shape strings, in drawing-code order.
         """
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover 
 
 
 class Random(GraphLayout):
@@ -825,7 +825,7 @@ class GraphViz(GraphLayout):
         stdout, stderr = graphviz.communicate(dotfile.getvalue())
 
         if stderr:
-            toyplot.log.error(stderr)
+            toyplot.log.error(stderr) # pragma: no cover
 
         vertices = []
         edges = []

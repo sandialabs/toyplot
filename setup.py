@@ -25,6 +25,7 @@ setup(
         "colormath",
         "multipledispatch",
         "numpy>=1.7",
+        "reportlab",
     ],
     long_description="""Toyplot is the kid-sized plotting toolkit for Python with grownup-sized goals:
   * Develop beautiful interactive, animated plots that embrace the unique capabilities of electronic publishing and support repoducibility.

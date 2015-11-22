@@ -27,8 +27,8 @@ Documentation
    ethos.rst
    features.rst
    compatibility.rst
-   dependencies.rst
    installation.rst
+   dependencies.rst
    tutorial.rst
    user-guide.rst
    contributing.rst

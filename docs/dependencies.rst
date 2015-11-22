@@ -10,7 +10,9 @@ Dependencies
 Required
 --------
 
-To use Toyplot you'll need the following:
+To use Toyplot you'll need the following (if you install Toyplot using pip,
+these are automatically installed for you):
+
 
 * Python 2.7 / Python 3 - http://python.org
 * colormath - https://github.com/gtaylor/python-colormath
@@ -20,8 +22,9 @@ To use Toyplot you'll need the following:
 PDF Export
 ----------
 
-If you intend to generate static PDF versions of your Toyplot figures, you'll need
-the following:
+To generate static PDF versions of your Toyplot figures, the following is
+required (if you install Toyplot using pip, it's automatically installed for
+you):
 
 * ReportLab - open source PDF toolkit - http://www.reportlab.com/opensource/
 

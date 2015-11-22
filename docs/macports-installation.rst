@@ -16,15 +16,16 @@ Toyplot using pip::
     $ sudo port install py27-colormath
     $ sudo port install py27-multipledispatch
     $ sudo port install py27-numpy
+    $ sudo port install py27-reportlab
     $ sudo port install py27-pip
     $ sudo port select --set pip pip27
     $ sudo pip install toyplot
 
-If you want to generate PDF / PNG files using PyQt5::
+If you want to generate PNG files using PyQt5::
 
     $ sudo port install py27-pyqt5
 
-If you want to generate PDF / PNG files using cairo::
+If you want to generate PNG files using cairo::
 
     $ sudo port install py27-pygtk
 

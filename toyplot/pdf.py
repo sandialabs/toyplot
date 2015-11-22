@@ -8,10 +8,24 @@ from __future__ import absolute_import
 from __future__ import division
 
 
-import toyplot.cairo.pdf
+import toyplot
+
+try:
+    import toyplot.reportlab.pdf as implementation
+except:
+    try:
+        import toyplot.qt.pdf as implementation
+        toyplot.log.warning("Couldn't load toyplot.reportlab.pdf (preferred), using toyplot.qt.pdf (deprecated).")
+    except:
+        try:
+            import toyplot.cairo.pdf as implementation
+            toyplot.log.warning("Couldn't load toyplot.reportlab.pdf (preferred), using toyplot.cairo.pdf (deprecated).")
+        except:
+            toyplot.log.error("Couldn't load a PDF backend.  Try installing reportlab (preferred), PyQt 5, or pango / cairo.")
+            raise
 
 
-def render(canvas, fobj, width=None, height=None, scale=None):
+def render(canvas, fobj=None, width=None, height=None, scale=None):
     """Render the PDF representation of a canvas.
 
     Because the canvas dimensions are specified explicitly at creation time, they
@@ -22,7 +36,7 @@ def render(canvas, fobj, width=None, height=None, scale=None):
     ----------
     canvas: :class:`toyplot.canvas.Canvas`
       Canvas to be rendered.
-    fobj: file-like object or string
+    fobj: file-like object, string, or None
       The file to write.  Use a string filepath to write data directly to disk.
       If `None` (the default), the PDF data will be returned to the caller
       instead.
@@ -53,4 +67,4 @@ def render(canvas, fobj, width=None, height=None, scale=None):
     The output PDF is currently rendered using
     :func:`toyplot.cairo.pdf.render()`.  This may change in the future.
     """
-    return toyplot.cairo.pdf.render(canvas, fobj, width, height, scale)
+    return implementation.render(canvas, fobj, width, height, scale)

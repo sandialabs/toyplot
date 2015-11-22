@@ -18,6 +18,9 @@ Feature: Backends
       | toyplot.html             | an html file                    |
       | toyplot.html             | an html buffer                  |
       | toyplot.html             | a returned html dom             |
+      | toyplot.pdf              | a pdf file                      |
+      | toyplot.pdf              | a pdf buffer                    |
+      | toyplot.pdf              | a returned pdf document         |
       | toyplot.qt.pdf           | a pdf file                      |
       | toyplot.qt.pdf           | a pdf buffer                    |
       | toyplot.qt.pdf           | a returned pdf document         |

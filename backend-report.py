@@ -1,5 +1,8 @@
 import importlib
+import logging
 import sys
+
+logging.basicConfig()
 
 def print_report(module):
     try:

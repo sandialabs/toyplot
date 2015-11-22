@@ -26,6 +26,7 @@ for module in [
     "toyplot.qt",
     "toyplot.qt.pdf",
     "toyplot.qt.png",
+    "toyplot.reportlab.pdf",
     "toyplot.svg",
     "toyplot.webm",
     ]:

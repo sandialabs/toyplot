@@ -16,7 +16,7 @@ install:
     - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION graphviz mock multipledispatch networkx numpy pandas pip reportlab
     - source activate test-environment
     - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-        conda install pyqt5;
+        #conda install pyqt5;
         sudo apt-get update -qq;
         sudo apt-get install -y python-gtk2 wget;
         export SITE_PACKAGES="$HOME/miniconda/envs/test-environment/lib/python$TRAVIS_PYTHON_VERSION/site-packages/";
@@ -32,8 +32,8 @@ install:
     - tar xf ffmpeg-release-64bit-static.tar.xz --strip-components 1 -C ffmpeg
     - export PATH=$TRAVIS_BUILD_DIR/ffmpeg:$PATH
 script:
-    - coverage run --source toyplot --omit toyplot/testing.py -m nose --exclude-dir toyplot
-    - coverage run --append --source toyplot --omit toyplot/testing.py -m behave
+    - coverage run --source toyplot --omit toyplot/testing.py --omit toyplot/qt -m nose --exclude-dir toyplot
+    - coverage run --append --source toyplot --omit toyplot/testing.py --omit toyplot/qt -m behave
     - coverage report
     - python backend-report.py
 after_script:

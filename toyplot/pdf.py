@@ -12,7 +12,7 @@ import toyplot
 
 try:
     import toyplot.reportlab.pdf as implementation
-except:
+except: # pragma: no cover
     try:
         import toyplot.qt.pdf as implementation
         toyplot.log.warning("Couldn't load toyplot.reportlab.pdf (preferred), using toyplot.qt.pdf (deprecated).")

@@ -16,7 +16,6 @@ install:
     - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION graphviz mock multipledispatch networkx numpy pandas pip reportlab
     - source activate test-environment
     - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-        #conda install pyqt5;
         sudo apt-get update -qq;
         sudo apt-get install -y python-gtk2 wget;
         export SITE_PACKAGES="$HOME/miniconda/envs/test-environment/lib/python$TRAVIS_PYTHON_VERSION/site-packages/";

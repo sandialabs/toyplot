@@ -7,45 +7,35 @@
 MacPorts Installation
 =====================
 
-There isn't a MacPorts port for Toyplot yet, but you can still use MacPorts
-to install Toyplot's :ref:`dependencies` before installing
-Toyplot using pip::
+Required
+--------
 
-    $ sudo port install python27
-    $ sudo port select --set python python27
-    $ sudo port install py27-colormath
-    $ sudo port install py27-multipledispatch
-    $ sudo port install py27-numpy
-    $ sudo port install py27-reportlab
-    $ sudo port install py27-pip
+There isn't a MacPorts package for Toyplot yet, but you can still use MacPorts
+to install its :ref:`dependencies` before installing Toyplot using pip::
+
+    $ sudo port install py-pip py-colormath py-multipledispatch py-numpy py-reportlab
     $ sudo port select --set pip pip27
     $ sudo pip install toyplot
 
-If you want to generate PNG files using PyQt5::
+PNG Export
+----------
 
-    $ sudo port install py27-pyqt5
+To generate static PNG versions of your Toyplot figures,
+you'll need either of the following:
 
-If you want to generate PNG files using cairo::
+To generate PNG files using PyQt5::
 
-    $ sudo port install py27-pygtk
+    $ sudo port install py-pyqt5
 
-If you want to generate MP4 / WebM files::
+To generate PNG files using cairo::
+
+    $ sudo port install py-pygtk
+
+MP4 / WebM Export
+-----------------
+
+If you plan to render animated Toyplot figures as  MP4 / WebM files, you'll
+need either of the above options for exporting PNG images, plus ffmpeg::
 
     $ sudo port install ffmpeg
-
-If you want to run regression tests / view test coverage::
-
-    $ sudo port install py27-nose
-    $ sudo port install py27-coverage
-    $ sudo pip install nose-exclude
-    $ sudo pip install behave
-
-If you want to generate documentation::
-
-    $ sudo port install py27-ipython +notebook
-    $ sudo port select --set sphinx py27-sphinx
-    $ sudo port select --set ipython ipython27
-    $ sudo port install pandoc
-    $ sudo pip install sphinx_rtd_theme
-    $ sudo pip install sphinxcontrib-napoleon
 

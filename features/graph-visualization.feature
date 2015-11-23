@@ -11,10 +11,10 @@ Feature: Graph visualization
       | prufer tree             | eades                           | graph-prufer-tree-eades-layout |
       | prufer tree             | fruchterman-reingold            | graph-prufer-tree-fruchterman-reingold-layout |
       | prufer tree             | buchheim                        | graph-prufer-tree-buchheim-layout |
-      | prufer tree             | graphviz                        | graph-prufer-tree-graphviz-layout |
+#      | prufer tree             | graphviz                        | graph-prufer-tree-graphviz-layout |
       | ba graph                | default                         | graph-ba-graph-default-layout |
       | ba graph                | random                          | graph-ba-graph-random-layout |
       | ba graph                | eades                           | graph-ba-graph-eades-layout |
       | ba graph                | fruchterman-reingold            | graph-ba-graph-fruchterman-reingold-layout |
-      | ba graph                | graphviz                        | graph-ba-graph-graphviz-layout |
+#      | ba graph                | graphviz                        | graph-ba-graph-graphviz-layout |
 

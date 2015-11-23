@@ -13,7 +13,11 @@ Required
 There isn't a MacPorts package for Toyplot yet, but you can still use MacPorts
 to install its :ref:`dependencies` before installing Toyplot using pip::
 
-    $ sudo port install py-pip py-colormath py-multipledispatch py-numpy py-reportlab
+    $ sudo port install py-colormath
+    $ sudo port install py-multipledispatch
+    $ sudo port install py-numpy
+    $ sudo port install py-pip
+    $ sudo port install py-reportlab
     $ sudo port select --set pip pip27
     $ sudo pip install toyplot
 

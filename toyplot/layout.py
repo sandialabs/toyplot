@@ -296,7 +296,7 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
     toyplot.log.info("Graph layout time: %s ms" % ((time.time() - start) * 1000))
 
     if numpy.ma.is_masked(vcoordinates):
-        raise RuntimeError("Graph layout cannot return masked vertex coordinates.")
+        raise RuntimeError("Graph layout cannot return masked vertex coordinates.") # pragma: no cover
 
     return Graph(vids, vcoordinates, edges, eshapes, ecoordinates)
 
@@ -310,37 +310,37 @@ def _add_at(target, target_indices, source):
     if getattr(numpy.add, "at", None) is not None:
         numpy.add.at(target, target_indices, source)
     else: # Shim for numpy < 1.8
-        for source_index, target_index in enumerate(target_indices):
+        for source_index, target_index in enumerate(target_indices): # pragma: no cover
             target[target_index] += source[source_index]
 
 
-def _floyd_warshall_shortest_path(vcount, edges):
-    """Compute the (directed) shortest paths between every pair of vertices in a graph, using the Floyd-Warshall algorithm.
-
-    Floyd-Warshall is a good choice for computing paths between all pairs of
-    vertices in dense graphs.
-
-    Note that this algorithm is directed, i.e. a path from i -> j doesn't imply
-    a path from j -> i.  The results will contain numpy.inf for vertices that
-    have no path.
-
-    Returns
-    -------
-    shortest_paths: :math:`V \\times V matrix`
-        A matrix where element :math:`E_ij` contains the shortest path distance
-        between vertex :math:`i` and vertex :math:`j`.
-    """
-    distance = numpy.empty((vcount, vcount))
-    distance[...] = numpy.inf
-    distance[numpy.diag_indices_from(distance)] = 0
-    distance[edges.T[0], edges.T[1]] = 1
-    for k in numpy.arange(vcount):
-        for i in numpy.arange(vcount):
-            for j in numpy.arange(vcount):
-                if distance[i, j] > distance[i, k] + distance[k, j]:
-                    distance[i, j] = distance[i, k] + distance[k, j]
-
-    return distance
+#def _floyd_warshall_shortest_path(vcount, edges):
+#    """Compute the (directed) shortest paths between every pair of vertices in a graph, using the Floyd-Warshall algorithm.
+#
+#    Floyd-Warshall is a good choice for computing paths between all pairs of
+#    vertices in dense graphs.
+#
+#    Note that this algorithm is directed, i.e. a path from i -> j doesn't imply
+#    a path from j -> i.  The results will contain numpy.inf for vertices that
+#    have no path.
+#
+#    Returns
+#    -------
+#    shortest_paths: :math:`V \\times V matrix`
+#        A matrix where element :math:`E_ij` contains the shortest path distance
+#        between vertex :math:`i` and vertex :math:`j`.
+#    """
+#    distance = numpy.empty((vcount, vcount))
+#    distance[...] = numpy.inf
+#    distance[numpy.diag_indices_from(distance)] = 0
+#    distance[edges.T[0], edges.T[1]] = 1
+#    for k in numpy.arange(vcount):
+#        for i in numpy.arange(vcount):
+#            for j in numpy.arange(vcount):
+#                if distance[i, j] > distance[i, k] + distance[k, j]:
+#                    distance[i, j] = distance[i, k] + distance[k, j]
+#
+#    return distance
 
 
 def _adjacency_list(vcount, edges):

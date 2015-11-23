@@ -92,4 +92,18 @@ def step_impl(context):
     with nose.tools.assert_raises(ValueError):
         toyplot.units.convert("1in", "furlong")
 
+@when(u'converting [] to in the response should be raise ValueError')
+def step_impl(context):
+    with nose.tools.assert_raises(ValueError):
+        toyplot.units.convert([], "in")
+
+@when(u'converting ("1","cm") to in the response should be raise ValueError')
+def step_impl(context):
+    with nose.tools.assert_raises(ValueError):
+        toyplot.units.convert(("1", "cm"), "in")
+
+@when(u'converting (1,2) to in the response should be raise ValueError')
+def step_impl(context):
+    with nose.tools.assert_raises(ValueError):
+        toyplot.units.convert((1, 2), "in")
 

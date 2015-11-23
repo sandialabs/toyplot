@@ -41,7 +41,7 @@ def barabasi_albert_graph(n=300, m=2, seed=1234):
     """Generate a graph using the preferential attachment model of Barabasi and Albert.
     """
     if m < 1 or m >= n:
-        raise ValueError()
+        raise ValueError("m must be in the range [1, n].") # pragma: no cover
 
     generator = numpy.random.RandomState(seed=seed)
 

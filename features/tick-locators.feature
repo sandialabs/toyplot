@@ -12,4 +12,5 @@ Feature: Tick locators
       | with explicit labels                         |
       | with ticks identified by heckbert            |
       | with ticks identified by optimization        |
+      | without ticks                                |
 

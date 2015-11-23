@@ -663,7 +663,7 @@ class Canvas(object):
                 columns, data.shape[1])
             if hrows is None:
                 hrows = 1
-        if rows is None or columns is None:
+        if rows is None or columns is None: # pragma: no cover
             raise ValueError("You must specify data, or rows and columns.")
         if hrows is None:
             hrows = 0
@@ -823,7 +823,7 @@ class Canvas(object):
         """
         if numpy.count_nonzero(
                 [width is not None, height is not None, scale is not None]) > 1:
-            raise ValueError("Specify only one of width, height, or scale.")
+            raise ValueError("Specify only one of width, height, or scale.") # pragma: no cover
         if width is not None:
             scale = toyplot.units.convert(width, "px") / self._width
         elif height is not None:
@@ -836,7 +836,7 @@ class Canvas(object):
         """Return a scale factor to convert this canvas to a target width or height in points."""
         if numpy.count_nonzero(
                 [width is not None, height is not None, scale is not None]) > 1:
-            raise ValueError("Specify only one of width, height, or scale.")
+            raise ValueError("Specify only one of width, height, or scale.") # pragma: no cover
 
         if width is not None:
             scale = toyplot.units.convert(

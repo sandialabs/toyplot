@@ -25,14 +25,14 @@ PNG Export
 ----------
 
 To generate static PNG versions of your Toyplot figures,
-you'll need either of the following:
+you'll need either of the following::
 
-To generate PNG files using PyQt5::
-
+    # Generate PNG files using PyQt5
     $ sudo port install py-pyqt5
 
-To generate PNG files using cairo::
+or::
 
+    # Generate PNG files using Cairo
     $ sudo port install py-pygtk
 
 MP4 / WebM Export

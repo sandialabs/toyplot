@@ -17,4 +17,5 @@ Feature: Graph visualization
       | ba graph                | eades                           | graph-ba-graph-eades-layout |
       | ba graph                | fruchterman-reingold            | graph-ba-graph-fruchterman-reingold-layout |
 #      | ba graph                | graphviz                        | graph-ba-graph-graphviz-layout |
+      | ba graph                | fruchterman-reingold-curved-edges | graph-ba-graph-fruchterman-reingold-curved-edges-layout |
 

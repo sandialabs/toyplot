@@ -38,6 +38,10 @@ def step_impl(context):
 def step_impl(context):
     context.layout = toyplot.layout.GraphViz()
 
+@given(u'a fruchterman-reingold-curved-edges layout.')
+def step_impl(context):
+    context.layout = toyplot.layout.FruchtermanReingold(edges=toyplot.layout.CurvedEdges())
+
 @then(u'the rendered graph should match the {reference} reference.')
 def step_impl(context, reference):
     canvas, axes, mark = toyplot.graph(context.graph, layout=context.layout)

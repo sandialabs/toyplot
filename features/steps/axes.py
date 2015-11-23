@@ -1023,14 +1023,32 @@ def step_impl(context):
 @then(u'a default matrix visualization can be created with the convenience API')
 def step_impl(context):
     canvas, table = toyplot.matrix(context.matrix)
-    toyplot.testing.assert_canvas_equal(
-        canvas, "matrix-default")
+    toyplot.testing.assert_canvas_equal(canvas, "matrix-default")
 
 @then(u'a default matrix visualization can be created with the standard API')
 def step_impl(context):
     canvas = toyplot.Canvas()
     table = canvas.matrix(context.matrix)
-    toyplot.testing.assert_canvas_equal(
-        canvas, "matrix-default")
+    toyplot.testing.assert_canvas_equal(canvas, "matrix-default")
 
+@then(u'a matrix visualization can be created with a custom palette')
+def step_impl(context):
+    palette = toyplot.color.brewer("BlueGreenBrown")
+    canvas = toyplot.Canvas()
+    table = canvas.matrix((context.matrix, palette))
+    toyplot.testing.assert_canvas_equal(canvas, "matrix-custom-palette")
+
+@then(u'a matrix visualization can be created with a custom colormap')
+def step_impl(context):
+    palette = toyplot.color.brewer("BlueGreenBrown")
+    colormap = toyplot.color.LinearMap(palette, domain_min=-1, domain_max=1)
+    canvas = toyplot.Canvas()
+    table = canvas.matrix((context.matrix, colormap))
+    toyplot.testing.assert_canvas_equal(canvas, "matrix-custom-colormap")
+
+@then(u'a matrix visualization can be created with custom labels')
+def step_impl(context):
+    canvas = toyplot.Canvas()
+    table = canvas.matrix(context.matrix, tlabel="Top", blabel="Bottom", llabel="Left", rlabel="Right", rshow=True, bshow=True)
+    toyplot.testing.assert_canvas_equal(canvas, "matrix-custom-labels")
 

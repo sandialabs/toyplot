@@ -533,13 +533,6 @@ class ColorScale(object):
         min = self._colormap.domain.min
         max = self._colormap.domain.max
 
-        # If there is no implicit domain, default
-        # to the origin.
-        if min is None:
-            min = 0
-        if max is None:
-            max = 0
-
         # Ensure that the domain is never empty.
         if min == max:
             min -= 0.5

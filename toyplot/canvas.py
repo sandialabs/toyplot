@@ -589,17 +589,12 @@ class Canvas(object):
     def color_scale(
             self,
             colormap,
-            x1=None,
-            y1=None,
-            x2=None,
-            y2=None,
+            x1,
+            y1,
+            x2,
+            y2,
             width=10,
             padding=5,
-            bounds=None,
-            rect=None,
-            corner=None,
-            grid=None,
-            gutter=50,
             show=True,
             label=None,
             ticklocator=None,
@@ -626,17 +621,18 @@ class Canvas(object):
         -------
         axes: :class:`toyplot.axes.ColorMap`
         """
-        xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
-            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-
-        if x1 is None:
-            x1 = xmin_range
-        if y1 is None:
-            y1 = 0.5 * (ymin_range + ymax_range)
-        if x2 is None:
-            x2 = xmax_range
-        if y2 is None:
-            y2 = 0.5 * (ymin_range + ymax_range)
+        x1 = toyplot.units.convert(x1, target="px", default="px", reference=self._width)
+        if x1 < 0:
+            x1 = self._width + x1
+        y1 = toyplot.units.convert(y1, target="px", default="px", reference=self._height)
+        if y1 < 0:
+            y1 = self._height + y1
+        x2 = toyplot.units.convert(x2, target="px", default="px", reference=self._width)
+        if x2 < 0:
+            x2 = self._width + x2
+        y2 = toyplot.units.convert(y2, target="px", default="px", reference=self._height)
+        if y2 < 0:
+            y2 = self._height + y2
 
         self._children.append(
             toyplot.axes.ColorScale(

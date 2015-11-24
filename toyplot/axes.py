@@ -355,8 +355,8 @@ class Axis(object):
     def __init__(
             self,
             label=None,
-            max=None,
-            min=None,
+            domain_min=None,
+            domain_max=None,
             scale="linear",
             show=True,
             tick_angle=0,
@@ -373,7 +373,7 @@ class Axis(object):
         self._display_min = None
         self._display_max = None
 
-        self.domain = Axis.DomainHelper(min, max)
+        self.domain = Axis.DomainHelper(domain_min, domain_max)
         self.label = Axis.LabelHelper(label)
         self.spine = Axis.SpineHelper()
         self.ticks = Axis.TicksHelper(tick_locator, tick_angle)
@@ -471,8 +471,8 @@ class ColorScale(object):
             y1,
             x2,
             y2,
-            min,
-            max,
+            width,
+            padding,
             show,
             label,
             ticklocator,
@@ -480,19 +480,18 @@ class ColorScale(object):
             colormap,
             parent,
         ):
+
         self._x1 = x1
         self._x2 = x2
         self._y1 = y1
         self._y2 = y2
-
-
+        self._width = width
+        self._padding = padding
         self._colormap = colormap
 
         self.axis = Axis(
             show=show,
             label=label,
-            min=min,
-            max=max,
             tick_locator=ticklocator,
             tick_angle=0,
             scale=scale,
@@ -508,15 +507,35 @@ class ColorScale(object):
     def show(self, value):
         self.axis.show = value
 
-    def update_domain(self, values, display=True, data=True):
-        self.axis.update_domain(values, display=display, data=data)
+    @property
+    def width(self):
+        return self._width
+
+    @width.setter
+    def width(self, value):
+        self._width = value
+
+    @property
+    def padding(self):
+        return self._padding
+
+    @padding.setter
+    def padding(self, value):
+        self._padding = value
+
+#    def update_domain(self, values, display=True, data=True):
+#        self.axis.update_domain(values, display=display, data=data)
 
     def _finalize(self):
-        # Begin with the implicit domain defined by our data.
-        min = self.axis._display_min
-        max = self.axis._display_max
+        # Begin with the implicit domain defined by our colormap.
+        min = self._colormap.domain.min
+        max = self._colormap.domain.max
 
-        # If there is no implicit domain (we don't have any data), default
+        # Begin with the implicit domain defined by our data.
+#        min = self.axis._display_min
+#        max = self.axis._display_max
+
+        # If there is no implicit domain, default
         # to the origin.
         if min is None:
             min = 0
@@ -597,8 +616,8 @@ class NumberLine(object):
         self.axis = Axis(
             show=show,
             label=label,
-            min=min,
-            max=max,
+            domain_min=min,
+            domain_max=max,
             tick_locator=ticklocator,
             tick_angle=0,
             scale=scale,
@@ -1255,12 +1274,10 @@ class Cartesian(object):
             palette=None,
             colormap=None,
             label=None,
-            min=None,
-            max=None,
             tick_length=5,
             tick_locator=None,
-            offset=0,
             width=10,
+            padding=5,
             style=None):
         if colormap is None:
             if palette is None:
@@ -1269,21 +1286,18 @@ class Cartesian(object):
         style = toyplot.require.style(style)
 
         axes = toyplot.axes.ColorScale(
-            x1=self._xmax_range + offset,
-            x2=self._xmax_range + offset,
+            x1=self._xmax_range + width + self._padding,
+            x2=self._xmax_range + width + self._padding,
             y1=self._ymax_range,
             y2=self._ymin_range,
-            min=min,
-            max=max,
+            width=width,
+            padding=padding,
             show=True,
             label=label,
             ticklocator=tick_locator,
             scale="linear",
             colormap=colormap,
             parent=self._parent,
-            #padding=self._padding,
-            #tick_length=tick_length,
-            #style=style,
             )
         if values is not None:
             axes._update_domain(numpy.min(values), numpy.max(values))

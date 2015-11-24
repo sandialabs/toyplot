@@ -443,6 +443,7 @@ class Canvas(object):
             llocator=None,
             rlocator=None,
             blocator=None,
+            scale=False,
             bounds=None,
             rect=None,
             corner=None,
@@ -565,6 +566,24 @@ class Canvas(object):
                 cell.title = value
 
         self._children.append(table)
+
+        if scale:
+            color_scale = toyplot.axes.ColorScale(
+                colormap=colormap,
+                x1=xmax_range,
+                y1=ymax_range,
+                x2=xmax_range,
+                y2=ymin_range,
+                width=10,
+                padding=5,
+                show=True,
+                label="",
+                ticklocator=None,
+                scale="linear",
+                parent=self,
+                )
+            self._children.append(color_scale)
+
         return table
 
     def color_scale(
@@ -574,13 +593,13 @@ class Canvas(object):
             y1=None,
             x2=None,
             y2=None,
+            width=10,
+            padding=5,
             bounds=None,
             rect=None,
             corner=None,
             grid=None,
             gutter=50,
-            min=None,
-            max=None,
             show=True,
             label=None,
             ticklocator=None,
@@ -632,8 +651,8 @@ class Canvas(object):
                 y1=y1,
                 x2=x2,
                 y2=y2,
-                min=min,
-                max=max,
+                width=width,
+                padding=padding,
                 show=show,
                 label=label,
                 ticklocator=ticklocator,

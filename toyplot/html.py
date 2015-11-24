@@ -1190,7 +1190,7 @@ def _render(canvas, axes, context):
             y1=axes._y1,
             x2=axes._x2,
             y2=axes._y2,
-            offset=axes._padding,
+            offset=axes.padding,
             ticks_above=3,
             ticks_below=3,
             tick_labels_baseline_shift="-100%",
@@ -1326,18 +1326,21 @@ def _render(canvas, axes, context):
 
     if axes._show:
         if axes.x.spine.position == "low":
-            x_spine_y = axes._ymax_range + axes._padding
+            x_offset = axes.padding
+            x_spine_y = axes._ymax_range
             x_ticks_above = 5
             x_ticks_below = 0
             x_tick_labels_baseline_shift = "-80%"
             x_label_baseline_shift = "-200%"
         elif axes.x.spine.position == "high":
-            x_spine_y = axes._ymin_range - axes._padding
+            x_offset = -axes.padding
+            x_spine_y = axes._ymin_range
             x_ticks_above = 0
             x_ticks_below = 5
             x_tick_labels_baseline_shift = "80%"
             x_label_baseline_shift = "200%"
         else:
+            x_offset = 0
             x_spine_y = axes._project_y(axes.x.spine.position)
             x_ticks_above = 3
             x_ticks_below = 3
@@ -1345,18 +1348,21 @@ def _render(canvas, axes, context):
             x_label_baseline_shift = "-200%"
 
         if axes.y.spine._position == "low":
-            y_spine_x = axes._xmin_range - axes._padding
+            y_offset = -axes.padding
+            y_spine_x = axes._xmin_range
             y_ticks_above = 0
             y_ticks_below = 5
             y_tick_labels_baseline_shift = "80%"
             y_label_baseline_shift = "200%"
         elif axes.y.spine._position == "high":
-            y_spine_x = axes._xmax_range + axes._padding
+            y_offset = axes.padding
+            y_spine_x = axes._xmax_range
             y_ticks_above = 5
             y_ticks_below = 0
             y_tick_labels_baseline_shift = "-80%"
             y_label_baseline_shift = "-200%"
         else:
+            y_offset = 0
             y_spine_x = axes._project_x(axes.y.spine._position)
             y_ticks_above = 3
             y_ticks_below = 3
@@ -1371,7 +1377,7 @@ def _render(canvas, axes, context):
             y1=x_spine_y,
             x2=axes._xmax_range,
             y2=x_spine_y,
-            offset=0,
+            offset=x_offset,
             ticks_above=x_ticks_above,
             ticks_below=x_ticks_below,
             tick_labels_baseline_shift=x_tick_labels_baseline_shift,
@@ -1386,7 +1392,7 @@ def _render(canvas, axes, context):
             y1=axes._ymax_range,
             x2=y_spine_x,
             y2=axes._ymin_range,
-            offset=0,
+            offset=y_offset,
             ticks_above=y_ticks_above,
             ticks_below=y_ticks_below,
             tick_labels_baseline_shift=y_tick_labels_baseline_shift,

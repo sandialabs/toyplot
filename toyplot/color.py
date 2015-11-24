@@ -280,7 +280,33 @@ def lighten(color, count=5, amount=0.9, reverse=False):
 
 
 class Map(object):
-    pass
+    class DomainHelper(object):
+        def __init__(self, min, max):
+            self._min = min
+            self._max = max
+
+        @property
+        def min(self):
+            return self._min
+
+        @min.setter
+        def min(self, value):
+            self._min = value
+
+        @property
+        def max(self):
+            return self._max
+
+        @max.setter
+        def max(self, value):
+            self._max = value
+
+    def __init__(self, domain_min, domain_max):
+        self._domain = toyplot.color.Map.DomainHelper(domain_min, domain_max)
+
+    @property
+    def domain(self):
+        return self._domain
 
 class CategoricalMap(Map):
 
@@ -301,6 +327,7 @@ class CategoricalMap(Map):
         if palette is None:
             palette = Palette()
         self._palette = palette
+        toyplot.color.Map.__init__(self, domain_min=0, domain_max=len(palette))
 
     def colors(self, values, domain_min=None, domain_max=None):
         """Convert a sequence of categorical (nonnegative integer) values to colors.
@@ -400,6 +427,8 @@ class DivergingMap(Map):
     """
 
     def __init__(self, low=None, high=None, domain_min=None, domain_max=None):
+        toyplot.color.Map.__init__(self, domain_min=domain_min, domain_max=domain_max)
+
         def middle(original):
             m, s, h = 88, 0, original[2]
             if m > original[0]:
@@ -419,8 +448,6 @@ class DivergingMap(Map):
         self._high = _lab_to_msh(*to_lab(high))
         self._mid_low = middle(self._low)
         self._mid_high = middle(self._high)
-        self._domain_min = domain_min
-        self._domain_max = domain_max
 
     def colors(self, values, domain_min=None, domain_max=None):
         """Convert an array-like collection of values to colors.
@@ -435,8 +462,8 @@ class DivergingMap(Map):
         """
 
         values = numpy.array(values)
-        domain_min = domain_min if domain_min is not None else self._domain_min if self._domain_min is not None else values.min()
-        domain_max = domain_max if domain_max is not None else self._domain_max if self._domain_max is not None else values.max()
+        domain_min = domain_min if domain_min is not None else self.domain.min if self.domain.min is not None else values.min()
+        domain_max = domain_max if domain_max is not None else self.domain.max if self.domain.max is not None else values.max()
 
         flat = numpy.clip(numpy.ravel(values), domain_min, domain_max)
         flat = (flat - domain_min) / (domain_max - domain_min) if (domain_max - \
@@ -495,8 +522,8 @@ class DivergingMap(Map):
         return to_css(self.colors(value, domain_min, domain_max))
 
     def _repr_html_(self):
-        domain_min = self._domain_min if self._domain_min is not None else 0
-        domain_max = self._domain_max if self._domain_max is not None else 1
+        domain_min = self.domain.min if self.domain.min is not None else 0
+        domain_max = self.domain.max if self.domain.max is not None else 1
         root_xml = xml.Element(
             "div",
             style="overflow:hidden; height:auto",
@@ -542,9 +569,8 @@ class LinearMap(Map):
     """
 
     def __init__(self, palette=None, domain_min=None, domain_max=None):
+        toyplot.color.Map.__init__(self, domain_min=domain_min, domain_max=domain_max)
         self._palette = palette if palette is not None else brewer("Blues")
-        self._domain_min = domain_min
-        self._domain_max = domain_max
 
     def colors(self, values, domain_min=None, domain_max=None):
         """Convert an array-like collection of values to colors.
@@ -558,8 +584,8 @@ class LinearMap(Map):
         colors: array of Toyplot colors with the same shape as `values`.
         """
         values = numpy.array(values)
-        domain_min = domain_min if domain_min is not None else self._domain_min if self._domain_min is not None else values.min()
-        domain_max = domain_max if domain_max is not None else self._domain_max if self._domain_max is not None else values.max()
+        domain_min = domain_min if domain_min is not None else self.domain.min if self.domain.min is not None else values.min()
+        domain_max = domain_max if domain_max is not None else self.domain.max if self.domain.max is not None else values.max()
         domain = numpy.linspace(
             domain_min, domain_max, len(self._palette._colors), endpoint=True)
 
@@ -598,8 +624,8 @@ class LinearMap(Map):
         return to_css(self.colors(value, domain_min, domain_max))
 
     def _repr_html_(self):
-        domain_min = self._domain_min if self._domain_min is not None else 0
-        domain_max = self._domain_max if self._domain_max is not None else 1
+        domain_min = self.domain.min if self.domain.min is not None else 0
+        domain_max = self.domain.max if self.domain.max is not None else 1
         root_xml = xml.Element(
             "div",
             style="overflow:hidden; height:auto",

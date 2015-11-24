@@ -1249,7 +1249,7 @@ class Cartesian(object):
                     filename=filename))
             return self._children[-1]
 
-    def colorbar(
+    def color_scale(
             self,
             values=None,
             palette=None,
@@ -1268,26 +1268,27 @@ class Cartesian(object):
             colormap = toyplot.color.LinearMap(palette=palette)
         style = toyplot.require.style(style)
 
-        mark = toyplot.mark.VColorBar(
-            xmin_range=self._xmax_range +
-            offset,
-            xmax_range=self._xmax_range +
-            offset +
-            width,
-            ymin_range=self._ymin_range,
-            ymax_range=self._ymax_range,
-            label=label,
-            colormap=colormap,
-            padding=self._padding,
-            tick_length=tick_length,
+        axes = toyplot.axes.ColorScale(
+            x1=self._xmax_range + offset,
+            x2=self._xmax_range + offset,
+            y1=self._ymax_range,
+            y2=self._ymin_range,
             min=min,
             max=max,
-            tick_locator=tick_locator,
-            style=style)
+            show=True,
+            label=label,
+            ticklocator=tick_locator,
+            scale="linear",
+            colormap=colormap,
+            parent=self._parent,
+            #padding=self._padding,
+            #tick_length=tick_length,
+            #style=style,
+            )
         if values is not None:
-            mark._update_domain(numpy.min(values), numpy.max(values))
-        self._parent._children.append(mark)
-        return mark
+            axes._update_domain(numpy.min(values), numpy.max(values))
+        self._parent._children.append(axes)
+        return axes
 
     def fill(
             self,

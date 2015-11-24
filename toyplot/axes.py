@@ -481,6 +481,11 @@ class ColorScale(object):
             parent,
         ):
 
+        if not isinstance(colormap, toyplot.color.Map):
+            raise ValueError("A toyplot.color.Map instance is required.")
+        if colormap.domain.min is None or colormap.domain.max is None:
+            raise ValueError("Cannot create color scale without explicit colormap domain.")
+
         self._x1 = x1
         self._x2 = x2
         self._y1 = y1
@@ -523,17 +528,10 @@ class ColorScale(object):
     def padding(self, value):
         self._padding = value
 
-#    def update_domain(self, values, display=True, data=True):
-#        self.axis.update_domain(values, display=display, data=data)
-
     def _finalize(self):
         # Begin with the implicit domain defined by our colormap.
         min = self._colormap.domain.min
         max = self._colormap.domain.max
-
-        # Begin with the implicit domain defined by our data.
-#        min = self.axis._display_min
-#        max = self.axis._display_max
 
         # If there is no implicit domain, default
         # to the origin.
@@ -1270,20 +1268,14 @@ class Cartesian(object):
 
     def color_scale(
             self,
+            colormap,
             values=None,
-            palette=None,
-            colormap=None,
             label=None,
             tick_length=5,
             tick_locator=None,
             width=10,
             padding=5,
-            style=None):
-        if colormap is None:
-            if palette is None:
-                palette = toyplot.color.brewer("BlueGreen")
-            colormap = toyplot.color.LinearMap(palette=palette)
-        style = toyplot.require.style(style)
+            ):
 
         axes = toyplot.axes.ColorScale(
             x1=self._xmax_range + width + self._padding,

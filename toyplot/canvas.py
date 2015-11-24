@@ -588,7 +588,7 @@ class Canvas(object):
 
     def color_scale(
             self,
-            color,
+            colormap,
             x1=None,
             y1=None,
             x2=None,
@@ -609,8 +609,8 @@ class Canvas(object):
 
         Parameters
         ----------
-        color: :class:`toyplot.color.Map` or :class:`toyplot.color.Palette`, required
-          Colors to be displayed.
+        colormap: :class:`toyplot.color.Map`, required
+          Colormap to be displayed.
         min, max: float, optional
           Used to explicitly specify the axis domain.
         show: bool, optional
@@ -626,12 +626,6 @@ class Canvas(object):
         -------
         axes: :class:`toyplot.axes.ColorMap`
         """
-        if not isinstance(color, (toyplot.color.Map, toyplot.color.Palette)):
-            raise ValueError("An instance of toyplot.color.Map or toyplot.color.Palette is required.")
-
-        if isinstance(color, toyplot.color.Palette):
-            color = toyplot.color.LinearMap(palette=color)
-
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
 
@@ -646,7 +640,7 @@ class Canvas(object):
 
         self._children.append(
             toyplot.axes.ColorScale(
-                colormap=color,
+                colormap=colormap,
                 x1=x1,
                 y1=y1,
                 x2=x2,

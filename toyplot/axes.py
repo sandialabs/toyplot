@@ -459,6 +459,100 @@ class Axis(object):
         self._tick_titles = tick_titles
 
 
+class ColorScale(object):
+    """Standard one-dimensional number line.
+
+    Do not create ColorScale instances directly.  Use factory methods such
+    as :meth:`toyplot.canvas.Canvas.color_scale` instead.
+    """
+    def __init__(
+            self,
+            x1,
+            y1,
+            x2,
+            y2,
+            min,
+            max,
+            show,
+            label,
+            ticklocator,
+            scale,
+            colormap,
+            parent,
+        ):
+        self._x1 = x1
+        self._x2 = x2
+        self._y1 = y1
+        self._y2 = y2
+
+
+        self._colormap = colormap
+
+        self.axis = Axis(
+            show=show,
+            label=label,
+            min=min,
+            max=max,
+            tick_locator=ticklocator,
+            tick_angle=0,
+            scale=scale,
+            )
+
+        self._parent = parent
+
+    @property
+    def show(self):
+        return self.axis.show
+
+    @show.setter
+    def show(self, value):
+        self.axis.show = value
+
+    def update_domain(self, values, display=True, data=True):
+        self.axis.update_domain(values, display=display, data=data)
+
+    def _finalize(self):
+        # Begin with the implicit domain defined by our data.
+        min = self.axis._display_min
+        max = self.axis._display_max
+
+        # If there is no implicit domain (we don't have any data), default
+        # to the origin.
+        if min is None:
+            min = 0
+        if max is None:
+            max = 0
+
+        # Ensure that the domain is never empty.
+        if min == max:
+            min -= 0.5
+            max += 0.5
+
+        # Allow users to override the domain.
+        if self.axis.domain.min is not None:
+            min = self.axis.domain.min
+        if self.axis.domain.max is not None:
+            max = self.axis.domain.max
+
+        # Ensure that the domain is never empty.
+        if min == max:
+            min -= 0.5
+            max += 0.5
+
+        # Calculate tick locations and labels.
+        tick_locations = []
+        tick_labels = []
+        tick_titles = []
+        if self.axis.show:
+            tick_locations, tick_labels, tick_titles = self.axis.locator().ticks(min, max)
+
+        # Allow tick locations to grow (never shrink) the domain.
+        if len(tick_locations):
+            min = numpy.amin((min, tick_locations[0]))
+            max = numpy.amax((max, tick_locations[-1]))
+
+        self.axis._finalize(min, max, tick_locations, tick_labels, tick_titles)
+
 class NumberLine(object):
     """Standard one-dimensional number line.
 

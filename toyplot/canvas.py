@@ -567,8 +567,86 @@ class Canvas(object):
         self._children.append(table)
         return table
 
+    def color_scale(
+            self,
+            color,
+            x1=None,
+            y1=None,
+            x2=None,
+            y2=None,
+            bounds=None,
+            rect=None,
+            corner=None,
+            grid=None,
+            gutter=50,
+            min=None,
+            max=None,
+            show=True,
+            label=None,
+            ticklocator=None,
+            scale="linear",
+        ):
+        """Add a 1D color scale to the canvas.
+
+        Parameters
+        ----------
+        color: :class:`toyplot.color.Map` or :class:`toyplot.color.Palette`, required
+          Colors to be displayed.
+        min, max: float, optional
+          Used to explicitly specify the axis domain.
+        show: bool, optional
+          Set to `False` to hide the axis (the color bar will still be visible).
+        label: string, optional
+          Human-readable label placed below the axis.
+        ticklocator: :class:`toyplot.locator.TickLocator`, optional
+          Controls the placement and formatting of axis ticks and tick labels.
+        scale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
+          Specifies the mapping from data to canvas coordinates along an axis.
+
+        Returns
+        -------
+        axes: :class:`toyplot.axes.ColorMap`
+        """
+        if not isinstance(color, (toyplot.color.Map, toyplot.color.Palette)):
+            raise ValueError("An instance of toyplot.color.Map or toyplot.color.Palette is required.")
+
+        if isinstance(color, toyplot.color.Palette):
+            color = toyplot.color.LinearMap(palette=color)
+
+        xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
+            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+
+        if x1 is None:
+            x1 = xmin_range
+        if y1 is None:
+            y1 = 0.5 * (ymin_range + ymax_range)
+        if x2 is None:
+            x2 = xmax_range
+        if y2 is None:
+            y2 = 0.5 * (ymin_range + ymax_range)
+
+        self._children.append(
+            toyplot.axes.ColorScale(
+                colormap=color,
+                x1=x1,
+                y1=y1,
+                x2=x2,
+                y2=y2,
+                min=min,
+                max=max,
+                show=show,
+                label=label,
+                ticklocator=ticklocator,
+                scale=scale,
+                parent=self))
+        return self._children[-1]
+
     def number_line(
             self,
+            x1=None,
+            y1=None,
+            x2=None,
+            y2=None,
             bounds=None,
             rect=None,
             corner=None,
@@ -616,12 +694,22 @@ class Canvas(object):
         """
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+
+        if x1 is None:
+            x1 = xmin_range
+        if y1 is None:
+            y1 = 0.5 * (ymin_range + ymax_range)
+        if x2 is None:
+            x2 = xmax_range
+        if y2 is None:
+            y2 = 0.5 * (ymin_range + ymax_range)
+
         self._children.append(
             toyplot.axes.NumberLine(
-                xmin_range,
-                0.5 * (ymin_range + ymax_range),
-                xmax_range,
-                0.5 * (ymin_range + ymax_range),
+                x1,
+                y1,
+                x2,
+                y2,
                 min=min,
                 max=max,
                 show=show,

@@ -1024,6 +1024,29 @@ _render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<
     "^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
 
+def _render_rotated_frame(
+    canvas,
+    context,
+    x1,
+    y1,
+    x2,
+    y2,
+    ):
+
+    p = numpy.row_stack(((x1, y1), (x2, y2)))
+    basis = p[1] - p[0]
+    length = numpy.linalg.norm(basis)
+    theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
+
+    frame_xml = xml.SubElement(
+        context.root,
+        "g",
+        transform="translate(%s,%s) rotate(%s)" % (p[0][0], p[0][1], theta),
+        )
+
+    return frame_xml, length
+
+
 def _render_linear_axis(
         canvas,
         axis,
@@ -1149,6 +1172,53 @@ def _render_linear_axis(
                 y=repr(0),
                 style=_css_style(dstyle)).text = axis.label.text
 
+
+@dispatch(toyplot.canvas.Canvas, toyplot.axes.ColorScale, _RenderContext)
+def _render(canvas, axes, context):
+    axes._finalize()
+
+    axes_xml = xml.SubElement(context.root, "g", id=context.get_id(
+        axes), attrib={"class": "toyplot-axes-ColorScale"})
+
+    if axes.axis.show:
+        _render_linear_axis(
+            canvas,
+            axes.axis,
+            context.push(axes_xml),
+            x1=axes._x1,
+            y1=axes._y1,
+            x2=axes._x2,
+            y2=axes._y2,
+            ticks_above=3,
+            ticks_below=3,
+            tick_labels_baseline_shift="-100%",
+            label_baseline_shift="-200%",
+            )
+
+    container_xml, length = _render_rotated_frame(
+        canvas,
+        context.push(axes_xml),
+        x1=axes._x1,
+        y1=axes._y1,
+        x2=axes._x2,
+        y2=axes._y2,
+        )
+
+    projection = axes.axis.projection(range_min=0, range_max=length)
+    samples = numpy.linspace(axes.axis._domain_min, axes.axis._domain_max, 256, endpoint=True)
+    projected = projection(samples)
+
+    for sample1, sample2, x1, x2, in zip(samples[:-1], samples[1:], projected[:-1], projected[1:]):
+        color = axes._colormap.colors(sample1, axes.axis._domain_min, axes.axis._domain_max)
+        xml.SubElement(
+            container_xml,
+            "rect",
+            x=repr(x1),
+            y=repr(-15),
+            width=repr(x2 - x1),
+            height=repr(10),
+            style=_css_style({"stroke": "none", "fill": toyplot.color.to_css(color)}),
+            )
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.NumberLine, _RenderContext)
 def _render(canvas, axes, context):
@@ -2326,92 +2396,3 @@ def _render(parent, mark, context):
             xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
-@dispatch(toyplot.canvas.Canvas, toyplot.mark.VColorBar, _RenderContext)
-def _render(canvas, mark, context):
-    mark._finalize_domain()
-
-    xmin = mark._xmin_range
-    xmax = mark._xmax_range
-
-    ymin = mark._project_y(mark._vmax_computed)
-    ymax = mark._project_y(mark._vmin_computed)
-    samples = numpy.linspace(
-        mark._vmax_computed, mark._vmin_computed, 256, endpoint=True)
-    swatch_size = (ymax - ymin) / (len(samples) - 1)
-    swatches = numpy.linspace(ymin - (swatch_size / 2),
-                              ymax + (swatch_size / 2),
-                              len(samples) + 1,
-                              endpoint=True)
-
-    mark_xml = xml.SubElement(
-        context.root,
-        "g",
-        style=_css_style(
-            mark._style),
-        id=context.get_id(mark),
-        attrib={
-            "class": "toyplot-mark-VColorBar"})
-    for sample, y1, y2 in zip(samples, swatches[:-1], swatches[1:]):
-        color = mark._project_color(sample)
-        xml.SubElement(mark_xml,
-                       "rect",
-                       x=repr(xmin),
-                       y=repr(y1),
-                       width=repr(xmax - xmin),
-                       height=repr((y2 - y1) + (swatch_size / 2)),
-                       style=_css_style({"stroke": "none",
-                                         "fill": toyplot.color.to_css(color)}))
-
-    if mark.ticks._show:
-        ticks_group = xml.SubElement(mark_xml, "g")
-        for location, tick_style in zip(
-                mark._tick_locations,
-                mark.ticks.tick.styles(mark._tick_locations),
-            ):
-            y = mark._project_y(location)
-            x1 = mark._xmax_range
-            x2 = mark._xmax_range + mark.ticks._length
-            xml.SubElement(
-                ticks_group,
-                "line",
-                x1=repr(x1),
-                y1=repr(y),
-                x2=repr(x2),
-                y2=repr(y),
-                style=_css_style(
-                    mark.ticks._style,
-                    tick_style))
-
-    if mark.ticks.labels._show:
-        ticks_group = xml.SubElement(mark_xml, "g")
-        for location, label, title, label_style in zip(
-                mark._tick_locations,
-                mark._tick_labels,
-                mark._tick_titles,
-                mark.ticks.labels.label.styles(mark._tick_locations),
-            ):
-            x = mark._xmax_range + \
-                (mark.ticks._length if mark.ticks._show else 0)
-            y = mark._project_y(location)
-            label_xml = xml.SubElement(ticks_group,
-                                       "text",
-                                       x=repr(x),
-                                       y=repr(y),
-                                       transform="rotate(-90, %r, %r)" % (x,
-                                                                          y),
-                                       style=_css_style({"text-anchor": "middle",
-                                                         "alignment-baseline": "middle",
-                                                         "baseline-shift": "-80%"},
-                                                        mark.ticks.labels._style,
-                                                        label_style))
-            label_xml.text = label
-            if title is not None:
-                xml.SubElement(label_xml, "title").text = str(title)
-
-    if mark.label._text is not None:
-        x = mark._xmax_range + (mark.ticks._length if mark.ticks._show else 0)
-        y = (mark._ymin_range + mark._ymax_range) * 0.5
-        xml.SubElement(
-            mark_xml, "text", x=repr(x), y=repr(y), transform="rotate(-90, %r, %r)" %
-            (x, y), style=_css_style(
-                mark.label._style)).text = mark.label._text

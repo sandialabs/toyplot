@@ -64,11 +64,6 @@ def assert_color_equal(a, b):
         (a["r"], a["g"], a["b"], a["a"]), b)
 
 
-def assert_colors_equal(a, b):
-    for j, k in zip(a, b):
-        assert_color_equal(j, k)
-
-
 def assert_masked_array(a, dtype, b, mask):
     nose.tools.assert_is_instance(a, numpy.ma.MaskedArray)
     nose.tools.assert_equal(a.dtype, dtype)
@@ -1192,74 +1187,6 @@ def test_cairo_small_font():
 
 ##########################################################################
 # High-level tests that combine multiple API calls into whole figures.
-
-
-def test_basic_api():
-    numpy.random.seed(1234)
-    x = numpy.linspace(0, 1, 100)
-    y = x + (0.1 * x * numpy.random.random(len(x)))
-
-    canvas = toyplot.Canvas()
-    axes = canvas.axes(grid=(2, 2, 0, 1, 0, 2))
-    axes.plot(
-        x, y, style={"stroke": "steelblue", "stroke-width": 1.0}, marker="o")
-    axes.x.label.text = "1st Axis"
-    axes.y.label.text = "2nd Axis"
-
-    axes = canvas.axes(grid=(2, 2, 2), label="2nd Axes")
-    axes.plot(x, y, style={"stroke": "red"})
-
-    axes = canvas.axes(grid=(2, 2, 3), label="3rd Axes")
-    axes.plot(x, y, style={"stroke": "green"})
-
-    canvas.text(
-        300,
-        30,
-        "Plot Title",
-        style={
-            "font-size": "16px",
-            "font-weight": "bold",
-            "text-anchor": "middle"},
-        title="The plot's title")
-
-    assert_canvas_matches(canvas, "basic-api")
-
-
-def test_axes_clipping():
-    x = numpy.linspace(0, 2 * numpy.pi, 100)
-    canvas = toyplot.Canvas()
-    axes = canvas.axes(xmin=0.5, xmax=4.5, ymin=-0.5, ymax=0.5)
-    axes.plot(x, numpy.sin(x))
-    axes.plot(x, numpy.cos(x))
-    assert_canvas_matches(canvas, "axes-clipping")
-
-
-def test_axes():
-    x = numpy.linspace(0, 2 * numpy.pi, 200)
-    canvas = toyplot.Canvas(800, 400)
-    axes = canvas.axes(xlabel="Time", ylabel="Value")
-    axes.hlines(0, style={"stroke-dasharray": "5,5"}, title="y = 0")
-    axes.vlines(0, style={"stroke-dasharray": "5,5"}, title="x = 0")
-    for i in numpy.linspace(1, 2, 7):
-        axes.plot(x, 0.5 * i * numpy.sin(x * i),
-                  title="%s * sin(x * %s)" % (0.5 * i, i))
-    assert_canvas_matches(canvas, "axes")
-
-
-def test_axes_layout():
-    canvas = toyplot.Canvas()
-    axes = canvas.axes(label="Title", xlabel="X Label",
-                       ylabel="Y Label", xmin=0, xmax=1, ymin=0, ymax=1)
-    axes.text(
-        0.5,
-        0.5,
-        "Axes Region",
-        style={
-            "fill": toyplot.color.near_black,
-            "text-anchor": "middle",
-            "alignment-baseline": "middle"})
-    assert_canvas_matches(canvas, "axes-layout")
-
 
 def test_legend():
     x = numpy.linspace(0, 2 * numpy.pi, 200)

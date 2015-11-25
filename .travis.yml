@@ -25,7 +25,7 @@ install:
         ln -s /usr/lib/python2.7/dist-packages/pygtk.pth $SITE_PACKAGES;
         ln -s /usr/lib/python2.7/dist-packages/cairo $SITE_PACKAGES;
       fi
-    - pip install behave "colormath>=2.1.0" coverage coveralls nose-exclude
+    - pip install arrow behave "colormath>=2.1.0" coverage coveralls nose-exclude
     - wget http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
     - mkdir ffmpeg
     - tar xf ffmpeg-release-64bit-static.tar.xz --strip-components 1 -C ffmpeg

@@ -4,6 +4,7 @@
 
 from __future__ import division
 
+import datetime
 import numpy
 import toyplot.broadcast
 
@@ -572,3 +573,108 @@ class Log(TickLocator):
         labels = negative_labels + linear_labels + positive_labels
         titles = numpy.repeat(None, len(labels))
         return locations, labels, titles
+
+
+def _timestamp(value):
+    return (value - datetime.datetime(1970, 1, 1)).total_seconds()
+
+
+def _year_generator(domain_min, domain_max):
+    for year in numpy.arange(domain_min.year, domain_max.year + 1):
+        value = datetime.datetime(year, 1, 1)
+        if value >= domain_min and value <= domain_max:
+            yield _timestamp(value)
+
+def _quarter_generator(domain_min, domain_max):
+    for year in numpy.arange(domain_min.year, domain_max.year + 1):
+        for month in numpy.arange(0, 12, 3):
+            value = datetime.datetime(year, month + 1, 1)
+            if value >= domain_min and value <= domain_max:
+                yield _timestamp(value)
+
+def _month_generator(domain_min, domain_max):
+    for year in numpy.arange(domain_min.year, domain_max.year + 1):
+        for month in numpy.arange(12):
+            value = datetime.datetime(year, month + 1, 1)
+            if value >= domain_min and value <= domain_max:
+                yield _timestamp(value)
+
+def _week_generator(domain_min, domain_max):
+    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
+    while value <= domain_max:
+        if value >= domain_min:
+            yield _timestamp(value)
+        value += datetime.timedelta(days=7)
+
+def _day_generator(domain_min, domain_max):
+    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
+    while value <= domain_max:
+        if value >= domain_min:
+            yield _timestamp(value)
+        value += datetime.timedelta(days=1)
+
+class Timestamp(TickLocator):
+    """Generate ticks when the domain consists of Unix timestamps.
+
+    Parameters
+    ----------
+    """
+
+    def __init__(self, count=5, format=None):
+        self._count = count
+        self._format = format
+
+    def ticks(self, domain_min, domain_max):
+        """Return a set of ticks for the given domain.
+
+        Parameters
+        ----------
+        domain_min, domain_max: number
+
+        Returns
+        -------
+        locations : sequence of numbers
+          The axis locations where ticks should be positioned.
+        labels : sequence of strings
+          Labels for each tick location.
+        titles : sequence of strings
+          Titles for each tick location.  Typically, backends render titles as tooltips.
+        """
+        # Find the time interval that yields the number of locations closest to the requested count
+        closest_interval = None
+        closest_difference = None
+
+        for interval in [
+            (datetime.timedelta(days=365), _year_generator, "{dt.year}"),
+            (datetime.timedelta(days=90), _quarter_generator, "{dt:%B} {dt.year}"),
+            (datetime.timedelta(days=30), _month_generator, "{dt:%B} {dt.year}"),
+            (datetime.timedelta(days=7), _week_generator, "{dt:%a}, {dt:%b} {dt.day}, {dt.year}"),
+            (datetime.timedelta(days=1), _day_generator, "{dt:%a}, {dt:%b} {dt.day}"),
+#            (datetime.timedelta(hours=4), format, generator),
+#            (datetime.timedelta(hours=1), format, generator),
+#            (datetime.timedelta(minutes=15), format, generator),
+#            (datetime.timedelta(minutes=10), format, generator),
+#            (datetime.timedelta(minutes=5), format, generator),
+#            (datetime.timedelta(minutes=1), format, generator),
+#            (datetime.timedelta(seconds=15), format, generator),
+#            (datetime.timedelta(seconds=10), format, generator),
+#            (datetime.timedelta(seconds=5), format, generator),
+#            (datetime.timedelta(seconds=1), format, generator),
+            ]:
+            count = (domain_max - domain_min) / interval[0].total_seconds()
+            difference = numpy.abs(self._count - count)
+
+            if (closest_difference is None) or (difference < closest_difference):
+                closest_interval = interval
+                closest_difference = difference
+
+        locations = [location for location in closest_interval[1](
+            datetime.datetime.utcfromtimestamp(domain_min),
+            datetime.datetime.utcfromtimestamp(domain_max),
+            )]
+
+        label_format = closest_interval[2] if self._format is None else self._format
+        labels = [label_format.format(dt=datetime.datetime.utcfromtimestamp(location)) for location in locations]
+        titles = numpy.repeat(None, len(labels))
+        return locations, labels, titles
+

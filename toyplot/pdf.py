@@ -9,20 +9,7 @@ from __future__ import division
 
 
 import toyplot
-
-try:
-    import toyplot.reportlab.pdf as implementation
-except: # pragma: no cover
-    try:
-        import toyplot.qt.pdf as implementation
-        toyplot.log.warning("Couldn't load toyplot.reportlab.pdf (preferred), using toyplot.qt.pdf (deprecated).")
-    except:
-        try:
-            import toyplot.cairo.pdf as implementation
-            toyplot.log.warning("Couldn't load toyplot.reportlab.pdf (preferred), using toyplot.cairo.pdf (deprecated).")
-        except:
-            toyplot.log.error("Couldn't load a PDF backend.  Try installing reportlab (preferred), PyQt 5, or pango / cairo.")
-            raise
+import toyplot.reportlab.pdf as implementation
 
 
 def render(canvas, fobj=None, width=None, height=None, scale=None):
@@ -64,8 +51,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
     Notes
     -----
-    The output PDF is currently rendered using (in order of preference)
-    :func:`toyplot.reportlab.pdf.render()`, :func:`toyplot.qt.pdf.render()`, or
-    :func:`toyplot.cairo.pdf.render()`.
+    The output PDF is currently rendered using
+    :func:`toyplot.reportlab.pdf.render()`.
     """
     return implementation.render(canvas, fobj, width, height, scale)

@@ -31,22 +31,12 @@ except:
     pass
 
 try:
-    import toyplot.cairo.pdf
-except:
-    pass
-
-try:
     import toyplot.cairo.png
 except:
     pass
 
 try:
     import toyplot.reportlab.pdf
-except:
-    pass
-
-try:
-    import toyplot.qt.pdf
 except:
     pass
 
@@ -203,7 +193,7 @@ def assert_canvas_equal(canvas, name):
     svg = io.BytesIO()
     toyplot.svg.render(canvas, svg)
 
-    for module in ["toyplot.pdf", "toyplot.png", "toyplot.cairo.eps", "toyplot.cairo.pdf", "toyplot.cairo.png", "toyplot.reportlab.pdf", "toyplot.qt.pdf", "toyplot.qt.png"]:
+    for module in ["toyplot.pdf", "toyplot.png", "toyplot.cairo.eps", "toyplot.cairo.png", "toyplot.reportlab.pdf", "toyplot.qt.png"]:
         if module in sys.modules:
             buffer = io.BytesIO()
             sys.modules[module].render(canvas, buffer)

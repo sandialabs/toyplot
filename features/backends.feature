@@ -9,9 +9,6 @@ Feature: Backends
       | toyplot.cairo.eps        | an eps file                     |
       | toyplot.cairo.eps        | an eps buffer                   |
       | toyplot.cairo.eps        | a returned eps document         |
-      | toyplot.cairo.pdf        | a pdf file                      |
-      | toyplot.cairo.pdf        | a pdf buffer                    |
-      | toyplot.cairo.pdf        | a returned pdf document         |
       | toyplot.cairo.png        | a png file                      |
       | toyplot.cairo.png        | a png buffer                    |
       | toyplot.cairo.png        | a returned png document         |
@@ -24,9 +21,6 @@ Feature: Backends
       | toyplot.png              | a png file                      |
       | toyplot.png              | a png buffer                    |
       | toyplot.png              | a returned png document         |
-      | toyplot.qt.pdf           | a pdf file                      |
-      | toyplot.qt.pdf           | a pdf buffer                    |
-      | toyplot.qt.pdf           | a returned pdf document         |
       | toyplot.qt.png           | a png file                      |
       | toyplot.qt.png           | a png buffer                    |
       | toyplot.qt.png           | a returned png document         |

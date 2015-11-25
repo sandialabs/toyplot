@@ -63,6 +63,7 @@ Regression Testing
 The following are required to run Toyplot's regression tests and view
 code coverage:
 
+* arrow - Better dates and times for Python - http://arrow.readthedocs.org
 * behave - BDD test framework - http://pythonhosted.org/behave
 * coverage - code coverage module - http://nedbatchelder.com/code/coverage
 * mock - mocking and testing library - http://www.voidspace.org.uk/python/mock

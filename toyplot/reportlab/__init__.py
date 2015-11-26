@@ -28,11 +28,11 @@ def render(svg, canvas):
     """
     def get_fill(style):
         if "fill" not in style:
-            return None
+            return None # pragma: no cover
 
         color = toyplot.color.css(style["fill"])
         if color is None:
-            return color
+            return None
 
         fill_opacity = float(style.get("fill-opacity", 1.0))
         opacity = float(style.get("opacity", 1.0))
@@ -45,7 +45,7 @@ def render(svg, canvas):
 
     def get_stroke(style):
         if "stroke" not in style:
-            return None
+            return None # pragma: no cover
 
         color = toyplot.color.css(style["stroke"])
         if color is None:

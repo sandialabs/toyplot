@@ -34,10 +34,6 @@ def step_impl(context):
 def step_impl(context):
     context.layout = toyplot.layout.Buchheim()
 
-@given(u'a graphviz graph layout')
-def step_impl(context):
-    context.layout = toyplot.layout.GraphViz()
-
 @given(u'a fruchterman-reingold-curved-edge graph layout')
 def step_impl(context):
     context.layout = toyplot.layout.FruchtermanReingold(edges=toyplot.layout.CurvedEdges())

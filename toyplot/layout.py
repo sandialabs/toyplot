@@ -804,14 +804,14 @@ class GraphViz(GraphLayout):
     Note: this layout currently ignores preexisting vertex coordinates.
     """
     def graph(self, vcoordinates, edges):
-        dotfile = io.BytesIO()
-        dotfile.write("digraph {\n")
-        dotfile.write("node [fixedsize = shape; width=0; height=0;]\n")
+        dotfile = io.StringIO()
+        dotfile.write(u"digraph {\n")
+        dotfile.write(u"node [fixedsize = shape; width=0; height=0;]\n")
         for vertex in numpy.arange(len(vcoordinates)):
-            dotfile.write("""%s\n""" % vertex)
+            dotfile.write(u"""%s\n""" % vertex)
         for source, target in edges:
-            dotfile.write("%s -> %s\n" % (source, target))
-        dotfile.write("}\n")
+            dotfile.write(u"%s -> %s\n" % (source, target))
+        dotfile.write(u"}\n")
 
         command = [
             "dot",
@@ -822,14 +822,14 @@ class GraphViz(GraphLayout):
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        stdout, stderr = graphviz.communicate(dotfile.getvalue())
+        stdout, stderr = graphviz.communicate(dotfile.getvalue().encode())
 
         if stderr:
             toyplot.log.error(stderr) # pragma: no cover
 
         vertices = []
         edges = []
-        for line in io.BytesIO(stdout):
+        for line in io.StringIO(stdout.decode()):
             if line.startswith("node"):
                 vertices.append(line.split())
             elif line.startswith("edge"):

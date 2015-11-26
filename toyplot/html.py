@@ -1023,6 +1023,13 @@ def _render_marker(
 _render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<": (
     "^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
+def _rotated_frame(x1, y1, x2, y2):
+    p = numpy.row_stack(((x1, y1), (x2, y2)))
+    basis = p[1] - p[0]
+    length = numpy.linalg.norm(basis)
+    theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
+    transform="translate(%s,%s) rotate(%s)" % (p[0][0], p[0][1], theta)
+    return transform, length
 
 def _render_rotated_frame(
     canvas,
@@ -1174,54 +1181,6 @@ def _render_linear_axis(
                 style=_css_style(dstyle)).text = axis.label.text
 
 
-@dispatch(toyplot.canvas.Canvas, toyplot.axes.ColorScale, _RenderContext)
-def _render(canvas, axes, context):
-    axes._finalize()
-
-    axes_xml = xml.SubElement(context.root, "g", id=context.get_id(
-        axes), attrib={"class": "toyplot-axes-ColorScale"})
-
-    if axes.axis.show:
-        _render_linear_axis(
-            canvas,
-            axes.axis,
-            context.push(axes_xml),
-            x1=axes._x1,
-            y1=axes._y1,
-            x2=axes._x2,
-            y2=axes._y2,
-            offset=axes.padding,
-            ticks_above=3,
-            ticks_below=3,
-            tick_labels_baseline_shift="-100%",
-            label_baseline_shift="-200%",
-            )
-
-    container_xml, length = _render_rotated_frame(
-        canvas,
-        context.push(axes_xml),
-        x1=axes._x1,
-        y1=axes._y1,
-        x2=axes._x2,
-        y2=axes._y2,
-        )
-
-    projection = axes.axis.projection(range_min=0, range_max=length)
-    samples = numpy.linspace(axes.axis._domain_min, axes.axis._domain_max, 256, endpoint=True)
-    projected = projection(samples)
-
-    for sample1, sample2, x1, x2, in zip(samples[:-1], samples[1:], projected[:-1], projected[1:]):
-        color = axes._colormap.colors(sample1, axes.axis._domain_min, axes.axis._domain_max)
-        xml.SubElement(
-            container_xml,
-            "rect",
-            x=repr(x1),
-            y=repr(-axes._width),
-            width=repr(x2 - x1),
-            height=repr(axes._width),
-            style=_css_style({"stroke": "none", "fill": toyplot.color.to_css(color)}),
-            )
-
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.NumberLine, _RenderContext)
 def _render(canvas, axes, context):
     axes._finalize()
@@ -1247,11 +1206,39 @@ def _render(canvas, axes, context):
             y1=axes._y1,
             x2=axes._x2,
             y2=axes._y2,
-            offset=0,
+            offset=axes.padding,
             ticks_above=3,
             ticks_below=3,
             tick_labels_baseline_shift="-100%",
             label_baseline_shift="-200%",
+            )
+
+@dispatch(toyplot.axes.NumberLine, toyplot.color.Map, _RenderContext)
+def _render(axes, colormap, context):
+
+    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2)
+
+    mark_xml = xml.SubElement(
+        context.root,
+        "g", id=context.get_id(colormap),
+        attrib={"class": "toyplot-color-LinearMap"},
+        transform=transform,
+        )
+
+    projection = axes.axis.projection(range_min=0, range_max=length)
+    samples = numpy.linspace(colormap.domain.min, colormap.domain.max, 256, endpoint=True)
+    projected = projection(samples)
+
+    for sample1, sample2, x1, x2, in zip(samples[:-1], samples[1:], projected[:-1], projected[1:]):
+        color = colormap.colors(sample1, axes.axis._domain_min, axes.axis._domain_max)
+        xml.SubElement(
+            mark_xml,
+            "rect",
+            x=repr(x1),
+            y=repr(-10),
+            width=repr(x2 - x1),
+            height=repr(10),
+            style=_css_style({"stroke": "none", "fill": toyplot.color.to_css(color)}),
             )
 
 
@@ -2298,11 +2285,10 @@ def _render(axes, mark, context):
     mark_xml = xml.SubElement(
         context.root,
         "g",
-        style=_css_style(
-            mark._style),
+        style=_css_style(mark._style),
         id=context.get_id(mark),
-        attrib={
-            "class": "toyplot-mark-Scatterplot"})
+        attrib={"class": "toyplot-mark-Scatterplot"},
+        )
     context.add_data_table(mark, mark._table, title="Scatterplot Data", filename=mark._filename)
 
     for series, marker, msize, mfill, mstroke, mopacity, mtitle in zip(

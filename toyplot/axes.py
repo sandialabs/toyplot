@@ -459,110 +459,6 @@ class Axis(object):
         self._tick_titles = tick_titles
 
 
-class ColorScale(object):
-    """Standard one-dimensional number line.
-
-    Do not create ColorScale instances directly.  Use factory methods such
-    as :meth:`toyplot.canvas.Canvas.color_scale` instead.
-    """
-    def __init__(
-            self,
-            x1,
-            y1,
-            x2,
-            y2,
-            width,
-            padding,
-            show,
-            label,
-            ticklocator,
-            scale,
-            colormap,
-            parent,
-        ):
-
-        if not isinstance(colormap, toyplot.color.Map):
-            raise ValueError("A toyplot.color.Map instance is required.")
-        if colormap.domain.min is None or colormap.domain.max is None:
-            raise ValueError("Cannot create color scale without explicit colormap domain.")
-
-        self._x1 = x1
-        self._x2 = x2
-        self._y1 = y1
-        self._y2 = y2
-        self._width = width
-        self._padding = padding
-        self._colormap = colormap
-
-        self.axis = Axis(
-            show=show,
-            label=label,
-            tick_locator=ticklocator,
-            tick_angle=0,
-            scale=scale,
-            )
-
-        self._parent = parent
-
-    @property
-    def show(self):
-        return self.axis.show
-
-    @show.setter
-    def show(self, value):
-        self.axis.show = value
-
-    @property
-    def width(self):
-        return self._width
-
-    @width.setter
-    def width(self, value):
-        self._width = value
-
-    @property
-    def padding(self):
-        return self._padding
-
-    @padding.setter
-    def padding(self, value):
-        self._padding = value
-
-    def _finalize(self):
-        # Begin with the implicit domain defined by our colormap.
-        min = self._colormap.domain.min
-        max = self._colormap.domain.max
-
-        # Ensure that the domain is never empty.
-        if min == max:
-            min -= 0.5
-            max += 0.5
-
-        # Allow users to override the domain.
-        if self.axis.domain.min is not None:
-            min = self.axis.domain.min
-        if self.axis.domain.max is not None:
-            max = self.axis.domain.max
-
-        # Ensure that the domain is never empty.
-        if min == max:
-            min -= 0.5
-            max += 0.5
-
-        # Calculate tick locations and labels.
-        tick_locations = []
-        tick_labels = []
-        tick_titles = []
-        if self.axis.show:
-            tick_locations, tick_labels, tick_titles = self.axis.locator().ticks(min, max)
-
-        # Allow tick locations to grow (never shrink) the domain.
-        if len(tick_locations):
-            min = numpy.amin((min, tick_locations[0]))
-            max = numpy.amax((max, tick_locations[-1]))
-
-        self.axis._finalize(min, max, tick_locations, tick_labels, tick_titles)
-
 class NumberLine(object):
     """Standard one-dimensional number line.
 
@@ -575,6 +471,7 @@ class NumberLine(object):
             y1,
             x2,
             y2,
+            padding,
             min,
             max,
             show,
@@ -584,11 +481,12 @@ class NumberLine(object):
             palette,
             parent,
         ):
+
         self._x1 = x1
         self._x2 = x2
         self._y1 = y1
         self._y2 = y2
-
+        self._padding = padding
 
         if palette is None:
             palette = toyplot.color.Palette()
@@ -625,8 +523,25 @@ class NumberLine(object):
     def show(self, value):
         self.axis.show = value
 
+    @property
+    def padding(self):
+        return self._padding
+
+    @padding.setter
+    def padding(self, value):
+        self._padding = value
+
     def update_domain(self, values, display=True, data=True):
         self.axis.update_domain(values, display=display, data=data)
+
+    def add_colormap(self, colormap):
+        if not isinstance(colormap, toyplot.color.Map):
+            raise ValueError("A toyplot.color.Map instance is required.")
+        if colormap.domain.min is None or colormap.domain.max is None:
+            raise ValueError("Cannot create color scale without explicit colormap domain.")
+
+        self.update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=False)
+        self._children.append(colormap)
 
     def _finalize(self):
         # Begin with the implicit domain defined by our data.
@@ -1262,15 +1177,14 @@ class Cartesian(object):
     def color_scale(
             self,
             colormap,
-            values=None,
             label=None,
-            tick_length=5,
             tick_locator=None,
             width=10,
             padding=5,
             ):
 
-        axes = toyplot.axes.ColorScale(
+        axis = self._parent.color_scale(
+            colormap=colormap,
             x1=self._xmax_range + width + self._padding,
             x2=self._xmax_range + width + self._padding,
             y1=self._ymax_range,
@@ -1281,13 +1195,8 @@ class Cartesian(object):
             label=label,
             ticklocator=tick_locator,
             scale="linear",
-            colormap=colormap,
-            parent=self._parent,
             )
-        if values is not None:
-            axes._update_domain(numpy.min(values), numpy.max(values))
-        self._parent._children.append(axes)
-        return axes
+        return axis
 
     def fill(
             self,

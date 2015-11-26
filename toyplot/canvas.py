@@ -568,7 +568,7 @@ class Canvas(object):
         self._children.append(table)
 
         if scale:
-            color_scale = toyplot.axes.ColorScale(
+            axis = self.color_scale(
                 colormap=colormap,
                 x1=xmax_range,
                 y1=ymax_range,
@@ -580,25 +580,31 @@ class Canvas(object):
                 label="",
                 ticklocator=None,
                 scale="linear",
-                parent=self,
                 )
-            self._children.append(color_scale)
 
         return table
 
     def color_scale(
             self,
             colormap,
-            x1,
-            y1,
-            x2,
-            y2,
+            x1=None,
+            y1=None,
+            x2=None,
+            y2=None,
             width=10,
-            padding=5,
+            bounds=None,
+            rect=None,
+            corner=None,
+            grid=None,
+            gutter=50,
+            min=None,
+            max=None,
             show=True,
             label=None,
             ticklocator=None,
             scale="linear",
+            palette=None,
+            padding=5,
         ):
         """Add a 1D color scale to the canvas.
 
@@ -619,36 +625,31 @@ class Canvas(object):
 
         Returns
         -------
-        axes: :class:`toyplot.axes.ColorMap`
+        axes: :class:`toyplot.axes.NumberLine`
         """
-        x1 = toyplot.units.convert(x1, target="px", default="px", reference=self._width)
-        if x1 < 0:
-            x1 = self._width + x1
-        y1 = toyplot.units.convert(y1, target="px", default="px", reference=self._height)
-        if y1 < 0:
-            y1 = self._height + y1
-        x2 = toyplot.units.convert(x2, target="px", default="px", reference=self._width)
-        if x2 < 0:
-            x2 = self._width + x2
-        y2 = toyplot.units.convert(y2, target="px", default="px", reference=self._height)
-        if y2 < 0:
-            y2 = self._height + y2
+        axes = self.number_line(
+            x1=x1,
+            y1=y1,
+            x2=x2,
+            y2=y2,
+            bounds=bounds,
+            rect=rect,
+            corner=corner,
+            grid=grid,
+            gutter=gutter,
+            min=min,
+            max=max,
+            show=show,
+            label=label,
+            ticklocator=ticklocator,
+            scale=scale,
+            palette=palette,
+            padding=padding,
+            )
 
-        self._children.append(
-            toyplot.axes.ColorScale(
-                colormap=colormap,
-                x1=x1,
-                y1=y1,
-                x2=x2,
-                y2=y2,
-                width=width,
-                padding=padding,
-                show=show,
-                label=label,
-                ticklocator=ticklocator,
-                scale=scale,
-                parent=self))
-        return self._children[-1]
+        axes.add_colormap(colormap)
+
+        return axes
 
     def number_line(
             self,
@@ -668,6 +669,7 @@ class Canvas(object):
             ticklocator=None,
             scale="linear",
             palette=None,
+            padding=5,
         ):
         """Add a 1D number line to the canvas.
 
@@ -676,20 +678,13 @@ class Canvas(object):
         xmin, xmax, ymin, ymax: float, optional
           Used to explicitly override the axis domain (normally, the domain is
           implicitly defined by any marks added to the axes).
-        aspect: string, optional
-          Set to "fit-range" to automatically expand the domain so that its
-          aspect ratio matches the aspect ratio of the range.
         show: bool, optional
           Set to `False` to hide both axes (the axes contents will still be visible).
-        xshow, yshow: bool, optional
-          Set to `False` to hide either axis.
         label: string, optional
           Human-readable label placed above the axes.
-        xlabel, ylabel: string, optional
-          Human-readable axis label.
-        xticklocator, yticklocator: :class:`toyplot.locator.TickLocator`, optional
+        ticklocator: :class:`toyplot.locator.TickLocator`, optional
           Controls the placement and formatting of axis ticks and tick labels.
-        xscale, yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
+        scale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
           Specifies the mapping from data to canvas coordinates along an axis.
         palette: :class:`toyplot.color.Palette`, optional
           Color palette used to automatically select per-series colors for plotted data.
@@ -706,28 +701,48 @@ class Canvas(object):
 
         if x1 is None:
             x1 = xmin_range
+        else:
+            x1 = toyplot.units.convert(x1, target="px", default="px", reference=self._width)
+            if x1 < 0:
+                x1 = self._width + x1
+
         if y1 is None:
             y1 = 0.5 * (ymin_range + ymax_range)
+        else:
+            y1 = toyplot.units.convert(y1, target="px", default="px", reference=self._height)
+            if y1 < 0:
+                y1 = self._height + y1
+
         if x2 is None:
             x2 = xmax_range
+        else:
+            x2 = toyplot.units.convert(x2, target="px", default="px", reference=self._width)
+            if x2 < 0:
+                x2 = self._width + x2
+
         if y2 is None:
             y2 = 0.5 * (ymin_range + ymax_range)
+        else:
+            y2 = toyplot.units.convert(y2, target="px", default="px", reference=self._height)
+            if y2 < 0:
+                y2 = self._height + y2
 
-        self._children.append(
-            toyplot.axes.NumberLine(
-                x1,
-                y1,
-                x2,
-                y2,
-                min=min,
-                max=max,
-                show=show,
-                label=label,
-                ticklocator=ticklocator,
-                scale=scale,
-                palette=palette,
-                parent=self))
-        return self._children[-1]
+        axes = toyplot.axes.NumberLine(
+            x1=x1,
+            y1=y1,
+            x2=x2,
+            y2=y2,
+            padding=padding,
+            min=min,
+            max=max,
+            show=show,
+            label=label,
+            ticklocator=ticklocator,
+            scale=scale,
+            palette=palette,
+            parent=self)
+        self._children.append(axes)
+        return axes
 
     def table(
             self,

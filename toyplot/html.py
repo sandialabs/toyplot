@@ -1213,6 +1213,35 @@ def _render(canvas, axes, context):
             label_baseline_shift="-200%",
             )
 
+
+@dispatch(toyplot.axes.NumberLine, toyplot.color.CategoricalMap, _RenderContext)
+def _render(axes, colormap, context):
+    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2)
+
+    mark_xml = xml.SubElement(
+        context.root,
+        "g", id=context.get_id(colormap),
+        attrib={"class": "toyplot-color-CategoricalMap"},
+        transform=transform,
+        )
+
+    projection = axes.axis.projection(range_min=0, range_max=length)
+    samples = numpy.linspace(colormap.domain.min, colormap.domain.max, len(colormap._palette), endpoint=True)
+    projected = projection(samples)
+
+    for index, (x1, x2), in enumerate(zip(projected[:-1], projected[1:])):
+        color = colormap._palette[index]
+        xml.SubElement(
+            mark_xml,
+            "rect",
+            x=repr(x1),
+            y=repr(-10),
+            width=repr(x2 - x1),
+            height=repr(10),
+            style=_css_style({"stroke": "none", "fill": toyplot.color.to_css(color)}),
+            )
+
+
 @dispatch(toyplot.axes.NumberLine, toyplot.color.Map, _RenderContext)
 def _render(axes, colormap, context):
 
@@ -1221,7 +1250,7 @@ def _render(axes, colormap, context):
     mark_xml = xml.SubElement(
         context.root,
         "g", id=context.get_id(colormap),
-        attrib={"class": "toyplot-color-LinearMap"},
+        attrib={"class": "toyplot-color-Map"},
         transform=transform,
         )
 

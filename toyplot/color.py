@@ -39,9 +39,9 @@ try:
 except:
     pass
 
-def array(values):
-    """Construct an array of Toyplot color values."""
-    return numpy.array(values, dtype=dtype)
+#def array(values):
+#    """Construct an array of Toyplot color values."""
+#    return numpy.array(values, dtype=dtype)
 
 def rgb(r, g, b):
     """Construct a Toyplot color from RGB values."""
@@ -214,7 +214,7 @@ class Palette(object):
         if colors is None:
             colors = numpy.array(brewer._data["Set2"][8]) / 255.0
 
-        self._colors = numpy.array([_require_color(color) for color in colors])
+        self._colors = numpy.array([_require_color(color) for color in colors], dtype=dtype)
 
         if reverse:
             self._colors = self._colors[::-1]
@@ -223,11 +223,11 @@ class Palette(object):
         return len(self._colors)
 
     def __getitem__(self, index):
-        return self._colors[int(index)]
+        return numpy.array(self._colors[int(index)], dtype=dtype)
 
     def __iter__(self):
         for color in self._colors:
-            yield color
+            yield numpy.array(color, dtype=dtype)
 
     def _repr_html_(self):
         root_xml = xml.Element(
@@ -268,7 +268,7 @@ class Palette(object):
         -------
         color: Toyplot color.
         """
-        return self._colors[int(index)]
+        return self.__getitem__(index)
 
     def css(self, index):
         """Return the CSS representation of one color from the palette.

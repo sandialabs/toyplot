@@ -1,5 +1,5 @@
 Feature: Graph visualization
-  Scenario Outline: Render a graph with a layout
+  Scenario Outline: Render a graph
     Given a <graph>
     And a <layout> graph layout
     When the graph and layout are combined
@@ -20,6 +20,15 @@ Feature: Graph visualization
 #      | ba graph                | graphviz                        | graph-ba-graph-graphviz-layout |
       | ba graph                | fruchterman-reingold-curved-edge | graph-ba-graph-fruchterman-reingold-curved-edges-layout |
 
-  Scenario: Explicit graph edges
-    When a graph visualization is constructed from explicit source and target edge arrays
-    Then the visualization should match the graph-source-target-array reference image
+  Scenario Outline: Render a graph from source and target arrays
+    Given <graph>
+    And a <layout> graph layout
+    When the source and target arrays and layout are combined
+    Then the visualization should match the <reference> reference image
+
+    Examples:
+      | graph                                        | layout                            | reference                        |
+      | explicit source and target arrays            | default                           | graph-source-target-array |
+      | explicit source and target arrays with loops | fruchterman-reingold              | graph-source-target-array-loop |
+      | explicit source and target arrays with loops | fruchterman-reingold-curved-edge  | graph-source-target-array-loop-curved |
+

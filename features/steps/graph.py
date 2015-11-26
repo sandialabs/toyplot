@@ -53,3 +53,19 @@ def step_impl(context):
     targets = numpy.random.choice(8, 10)
     context.canvas, axes, mark = toyplot.graph(sources, targets)
 
+@given(u'explicit source and target arrays')
+def step_impl(context):
+    numpy.random.seed(1234)
+    context.sources = numpy.random.choice(8, 10)
+    context.targets = numpy.random.choice(8, 10)
+
+@when(u'the source and target arrays and layout are combined')
+def step_impl(context):
+    context.canvas, axes, mark = toyplot.graph(context.sources, context.targets, layout=context.layout)
+
+@given(u'explicit source and target arrays with loops')
+def step_impl(context):
+    numpy.random.seed(1234)
+    context.sources = numpy.concatenate((numpy.random.choice(8, 10), [1, 3]))
+    context.targets = numpy.concatenate((numpy.random.choice(8, 10), [1, 3]))
+

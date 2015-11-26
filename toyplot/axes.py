@@ -65,7 +65,7 @@ class OrderedSet(collections.MutableSet):
         if iterable is not None:
             self |= iterable
 
-    def __len__(self):
+    def __len__(self): # pragma: no cover
         return len(self.map)
 
     def __contains__(self, key):
@@ -90,26 +90,26 @@ class OrderedSet(collections.MutableSet):
             yield curr[0]
             curr = curr[2]
 
-    def __reversed__(self):
+    def __reversed__(self): # pragma: no cover
         end = self.end
         curr = end[1]
         while curr is not end:
             yield curr[0]
             curr = curr[1]
 
-    def pop(self, last=True):
+    def pop(self, last=True): # pragma: no cover
         if not self:
             raise KeyError('set is empty')
         key = self.end[1][0] if last else self.end[2][0]
         self.discard(key)
         return key
 
-    def __repr__(self):
+    def __repr__(self): # pragma: no cover
         if not self:
             return '%s()' % (self.__class__.__name__,)
         return '%s(%r)' % (self.__class__.__name__, list(self))
 
-    def __eq__(self, other):
+    def __eq__(self, other): # pragma: no cover
         if isinstance(other, OrderedSet):
             return len(self) == len(other) and list(self) == list(other)
         return set(self) == set(other)
@@ -449,7 +449,7 @@ class Axis(object):
             scale, base = self.scale
             if scale == "log":
                 return toyplot.locator.Log(base=base)
-        raise RuntimeError("Unable to create an appropriate locator.")
+        raise RuntimeError("Unable to create an appropriate locator.") # pragma: no cover 
 
     def _finalize(self, domain_min, domain_max, tick_locations, tick_labels, tick_titles):
         self._domain_min = domain_min

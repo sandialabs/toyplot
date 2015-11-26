@@ -53,13 +53,13 @@ def render(svg, context):
 
     def get_color_rgba(style, name):
         if name not in style:
-            return None
+            return None # pramga: no cover
         color = toyplot.color.css(style[name])
         return (color["r"], color["g"], color["b"], color["a"])
 
     def get_fill(style):
         if "fill" not in style:
-            return None
+            return None # pramga: no cover
         color = toyplot.color.css(style["fill"])
         if color is None:
             return color
@@ -76,7 +76,7 @@ def render(svg, context):
 
     def get_stroke(style):
         if "stroke" not in style:
-            return None
+            return None # pramga: no cover
         color = toyplot.color.css(style["stroke"])
         if color is None:
             return color

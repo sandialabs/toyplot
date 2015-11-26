@@ -1,8 +1,9 @@
 Feature: Graph visualization
   Scenario Outline: Render a graph with a layout
-    Given a <graph>.
-    And a <layout> layout.
-    Then the rendered graph should match the <reference> reference.
+    Given a <graph>
+    And a <layout> graph layout
+    When the graph and layout are combined
+    Then the visualization should match the <reference> reference image
 
     Examples:
       | graph                   | layout                          | reference                        |
@@ -17,5 +18,8 @@ Feature: Graph visualization
       | ba graph                | eades                           | graph-ba-graph-eades-layout |
       | ba graph                | fruchterman-reingold            | graph-ba-graph-fruchterman-reingold-layout |
 #      | ba graph                | graphviz                        | graph-ba-graph-graphviz-layout |
-      | ba graph                | fruchterman-reingold-curved-edges | graph-ba-graph-fruchterman-reingold-curved-edges-layout |
+      | ba graph                | fruchterman-reingold-curved-edge | graph-ba-graph-fruchterman-reingold-curved-edges-layout |
 
+  Scenario: Explicit graph edges
+    When a graph visualization is constructed from explicit source and target edge arrays
+    Then the visualization should match the graph-source-target-array reference image

@@ -7,17 +7,9 @@
 from __future__ import absolute_import
 from __future__ import division
 
-import toyplot
 
-try:
-    import toyplot.qt.png as implementation
-except:
-    try:
-        import toyplot.cairo.png as implementation
-        toyplot.log.warning("Couldn't load toyplot.qt.png (preferred), using toyplot.cairo.png (deprecated).")
-    except:
-        toyplot.log.error("Couldn't load a PNG backend.  Try installing PyQt 5 (preferred), or pango / cairo.")
-        raise
+import toyplot
+import toyplot.reportlab.png as implementation
 
 
 def render(canvas, fobj=None, width=None, height=None, scale=None):
@@ -50,8 +42,8 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
     Notes
     -----
-    The output PNG is currently rendered using
-    :func:`toyplot.cairo.png.render()`.  This may change in the future.
+    The output PNG is rendered using :func:`toyplot.reportlab.png.render()`.
+    This is subject to change.
     """
     return implementation.render(canvas, fobj, width, height, scale)
 

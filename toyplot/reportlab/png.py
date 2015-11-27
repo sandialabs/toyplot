@@ -2,25 +2,30 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-"""Generate PNG images using Cairo.
+"""Generate PNG images using Ghostscript.
 """
 
 from __future__ import absolute_import
 from __future__ import division
 
 
-import cairo
-import toyplot.cairo
+import io
+import os.path
+import reportlab.pdfgen.canvas
+import subprocess
+import toyplot.reportlab
 import toyplot.svg
 
-try:
-    import cStringIO as StringIO
-except:  # pragma: no cover
-    import StringIO
+
+for path in os.environ["PATH"].split(os.pathsep):
+    if os.path.exists(os.path.join(path, "gs")):
+        break
+else:
+    raise Exception("The gs executable is required.")  # pragma: no cover
 
 
 def render(canvas, fobj=None, width=None, height=None, scale=None):
-    """Render the PNG bitmap representation of a canvas using Cairo.
+    """Render the PNG bitmap representation of a canvas using ReportLab and Ghostscript.
 
     By default, canvas dimensions in CSS pixels are mapped directly to pixels in
     the output PNG image.  Use one of `width`, `height`, or `scale` to override
@@ -48,18 +53,42 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
       `fobj` parameter.
     """
     svg = toyplot.svg.render(canvas)
-    scale = canvas.pixel_scale(width=width, height=height, scale=scale)
-    surface = cairo.ImageSurface(
-        cairo.FORMAT_ARGB32, int(scale * canvas.width), int(scale * canvas.height))
-    context = cairo.Context(surface)
-    context.scale(scale, scale)
-    toyplot.cairo.render(svg, context)
+    scale = canvas._point_scale(width=width, height=height, scale=scale)
+    pdf = io.BytesIO()
+    surface = reportlab.pdfgen.canvas.Canvas(pdf, pagesize=(scale * canvas.width, scale * canvas.height))
+    surface.translate(0, scale * canvas.height)
+    surface.scale(1, -1)
+    surface.scale(scale, scale)
+    toyplot.reportlab.render(svg, surface)
+    surface.showPage()
+    surface.save()
+
+    command = [
+        "gs",
+        "-dNOPAUSE",
+        "-dBATCH",
+        "-dQUIET",
+        "-dMaxBitmap=2147483647",
+        "-sDEVICE=pngalpha",
+        "-r%s" % 96,
+        "-sOutputFile=-",
+        "-",
+        ]
+
+    gs = subprocess.Popen(
+        command,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    stdout, stderr = gs.communicate(pdf.getvalue())
+
     if fobj is None:
-        stream = StringIO.StringIO()
-        surface.write_to_png(stream)
-        return stream.getvalue()
+        return stdout
+    elif isinstance(fobj, toyplot.compatibility.string_type):
+        with open(fobj, "wb") as stream:
+            stream.write(stdout)
     else:
-        surface.write_to_png(fobj)
+        fobj.write(stdout)
 
 
 def render_frames(canvas, width=None, height=None, scale=None):
@@ -92,14 +121,37 @@ def render_frames(canvas, width=None, height=None, scale=None):
     ...   open("frame-%s.png" % frame, "wb").write(png)
     """
     svg, svg_animation = toyplot.svg.render(canvas, animation=True)
-    scale = canvas.pixel_scale(width=width, height=height, scale=scale)
+    scale = canvas._point_scale(width=width, height=height, scale=scale)
+
     for time, changes in sorted(svg_animation.items()):
         toyplot.svg.apply_changes(svg, changes)
-        surface = cairo.ImageSurface(
-            cairo.FORMAT_ARGB32, int(scale * canvas.width), int(scale * canvas.height))
-        context = cairo.Context(surface)
-        context.scale(scale, scale)
-        toyplot.cairo.render(svg, context)
-        fobj = StringIO.StringIO()
-        surface.write_to_png(fobj)
-        yield fobj.getvalue()
+
+        pdf = io.BytesIO()
+        surface = reportlab.pdfgen.canvas.Canvas(pdf, pagesize=(scale * canvas.width, scale * canvas.height))
+        surface.translate(0, scale * canvas.height)
+        surface.scale(1, -1)
+        surface.scale(scale, scale)
+        toyplot.reportlab.render(svg, surface)
+        surface.showPage()
+        surface.save()
+
+        command = [
+            "gs",
+            "-dNOPAUSE",
+            "-dBATCH",
+            "-dQUIET",
+            "-dMaxBitmap=2147483647",
+            "-sDEVICE=pngalpha",
+            "-r%s" % 96,
+            "-sOutputFile=-",
+            "-",
+            ]
+
+        gs = subprocess.Popen(
+            command,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        stdout, stderr = gs.communicate(pdf.getvalue())
+        yield stdout
+

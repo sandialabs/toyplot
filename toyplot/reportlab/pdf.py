@@ -7,10 +7,11 @@
 from __future__ import absolute_import
 from __future__ import division
 
+
 import io
 import reportlab.pdfgen.canvas
-import toyplot.svg
 import toyplot.reportlab
+import toyplot.svg
 
 
 def render(canvas, fobj=None, width=None, height=None, scale=None):

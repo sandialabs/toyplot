@@ -1145,35 +1145,6 @@ def test_html_ipython_html():
     canvas.axes()
     canvas._repr_html_()
 
-##########################################################################
-# toyplot.png
-
-
-def test_png_render_frames():
-    if hasattr(toyplot, "png"):
-        canvas = toyplot.Canvas()
-        axes = canvas.axes()
-        text = canvas.text(100, 100, "")
-        scatterplot = axes.scatterplot(numpy.arange(10))
-
-        def callback(frame):
-            frame.set_mark_style(text, {"fill-opacity": frame.time()})
-            frame.set_datum_text(text, 0, 0, "frame %s" % frame.index())
-            frame.set_datum_style(
-                scatterplot, 0, frame.index(), {"stroke": "none"})
-        canvas.animate(10, callback)
-        for frame in toyplot.png.render_frames(canvas):
-            nose.tools.assert_is_instance(
-                frame, toyplot.compatibility.string_type)
-            nose.tools.assert_equal(frame[1:4], "PNG")
-
-
-def test_cairo_small_font():
-    if hasattr(toyplot, "png"):
-        canvas = toyplot.Canvas()
-        axes = canvas.axes(label="Small Text!")
-        axes.label.style = {"font-size": "8px"}
-        toyplot.png.render(canvas)
 
 ##########################################################################
 # High-level tests that combine multiple API calls into whole figures.

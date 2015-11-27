@@ -1,5 +1,6 @@
 from behave import *
 
+import PIL.Image
 import importlib
 import io
 import nose.tools
@@ -86,20 +87,23 @@ def step_impl(context):
 def step_impl(context):
     target = os.path.join(toyplot.testing.backend_dir, "%s.png" % context.name)
     context.backend.render(context.canvas, target)
-    nose.tools.assert_equal(open(target, "r").read()[1:4], "PNG")
+    image = PIL.Image.open(target)
+    nose.tools.assert_equal(image.format, "PNG")
 
 
 @then(u'the canvas can be rendered to a png buffer')
 def step_impl(context):
-    buffer = io.BytesIO()
-    context.backend.render(context.canvas, buffer)
-    nose.tools.assert_equal(buffer.getvalue()[1:4], "PNG")
+    stream = io.BytesIO()
+    context.backend.render(context.canvas, stream)
+    image = PIL.Image.open(stream)
+    nose.tools.assert_equal(image.format, "PNG")
 
 
 @then(u'the canvas can be rendered to a returned png document')
 def step_impl(context):
     png = context.backend.render(context.canvas)
-    nose.tools.assert_equal(png[1:4], "PNG")
+    image = PIL.Image.open(io.BytesIO(png))
+    nose.tools.assert_equal(image.format, "PNG")
 
 
 @then(u'the canvas can be rendered to an svg file')

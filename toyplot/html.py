@@ -701,10 +701,13 @@ def render(canvas, fobj=None, animation=False):
                     """<svg width="20" height="20"><polygon points="0,5 10,10 0,15" stroke="none" fill="{near_black}"/><polygon points="10,5 20,10 10,15" stroke="none" fill="{near_black}"/></svg>""".format(
                         near_black=toyplot.color.near_black)))
 
+        import pickle
+        pickle.dump(changes, open("test.pickle", "wb"))
+
         xml.SubElement(controls, "script").text = _animation_controls.substitute(
             root_id=root.get("id"),
             frame_durations=json.dumps(durations.tolist()),
-            state_changes=json.dumps(changes))
+            state_changes=json.dumps(changes, cls=_NumpyJSONEncoder))
 
     if isinstance(fobj, toyplot.compatibility.string_type):
         with open(fobj, "wb") as file:

@@ -1,6 +1,7 @@
 from behave import *
 import nose.tools
 
+import io
 import json
 import numpy
 import os
@@ -8,9 +9,15 @@ import subprocess
 import sys
 import tempfile
 import toyplot
+import PIL.Image
 
 try:
     import toyplot.mp4
+except:
+    pass
+
+try:
+    import toyplot.png
 except:
     pass
 
@@ -53,7 +60,7 @@ def step_impl(context, type):
     ffprobe = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ffprobe.communicate()
-    video_metadata = json.loads(stdout)
+    video_metadata = json.loads(stdout.decode())
     video_format = video_metadata["format"]
     nose.tools.assert_equal(video_format["nb_streams"], 1)
     nose.tools.assert_in(type, video_format["format_name"])
@@ -64,4 +71,10 @@ def step_impl(context, type):
     nose.tools.assert_equal(video_stream["width"], 600)
     nose.tools.assert_equal(video_stream["height"], 600)
     nose.tools.assert_equal(video_stream["nb_read_frames"], "11")
+
+@then(u'the canvas can be rendered as png frames')
+def step_impl(context):
+    for frame in toyplot.png.render_frames(context.canvas):
+        image = PIL.Image.open(io.BytesIO(frame))
+        nose.tools.assert_equal(image.format, "PNG")
 

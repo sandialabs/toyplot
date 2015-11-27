@@ -313,7 +313,7 @@ def render(svg, context):
                         context.set_source_rgba(*stroke)
                         context.stroke()
                     context.new_path()
-            elif element.tag in ["title"]:
+            elif element.tag in ["defs", "title"]:
                 pass
             else:
                 raise Exception("unhandled tag: %s" % element.tag) # pragma: no cover

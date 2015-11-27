@@ -111,6 +111,9 @@ def _xml_comparison_string(element):
         for key, value in element.items():
             if key in ["id", "clip-path"]:
                 continue
+            if key == "style":
+                value = re.sub("fill:url[(]#.*[)]", "fill:url(#)", value)
+
             if key == "d" and element.tag == "{http://www.w3.org/2000/svg}path":
                 buffer.write(
                     u" %s='%s'" % (key, " ".join([format_value(d) for d in value.split(" ")])))

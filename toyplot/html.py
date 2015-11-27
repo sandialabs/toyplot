@@ -1254,21 +1254,48 @@ def _render(axes, colormap, context):
         transform=transform,
         )
 
-    projection = axes.axis.projection(range_min=0, range_max=length)
-    samples = numpy.linspace(colormap.domain.min, colormap.domain.max, 256, endpoint=True)
-    projected = projection(samples)
+    defs_xml = xml.SubElement(
+        mark_xml,
+        "defs",
+        )
 
-    for sample1, sample2, x1, x2, in zip(samples[:-1], samples[1:], projected[:-1], projected[1:]):
-        color = colormap.colors(sample1, axes.axis._domain_min, axes.axis._domain_max)
+    gradient_xml = xml.SubElement(
+        defs_xml,
+        "linearGradient",
+        id="t" + uuid.uuid4().hex,
+        x1=repr(0),
+        x2=repr(length),
+        y1=repr(0),
+        y2=repr(0),
+        gradientUnits="userSpaceOnUse",
+        )
+
+    samples = numpy.linspace(0, 1, 64, endpoint=True)
+    for sample in samples:
+        color = colormap.colors(((colormap.domain.max - colormap.domain.min) * sample) + colormap.domain.min)
         xml.SubElement(
-            mark_xml,
-            "rect",
-            x=repr(x1),
-            y=repr(-10),
-            width=repr(x2 - x1),
-            height=repr(10),
-            style=_css_style({"stroke": "none", "fill": toyplot.color.to_css(color)}),
+            gradient_xml,
+            "stop",
+            offset="%s" % sample,
+            attrib={
+                "stop-color": "rgb(%.3g%%,%.3g%%,%.3g%%)" % (color["r"] * 100, color["g"] * 100, color["b"] * 100),
+                "stop-opacity": str(color["a"]),
+                },
             )
+
+
+
+    projection = axes.axis.projection(range_min=0, range_max=length)
+    projected = projection([colormap.domain.min, colormap.domain.max])
+    xml.SubElement(
+        mark_xml,
+        "rect",
+        x=repr(projected[0]),
+        y=repr(-10),
+        width=repr(projected[1] - projected[0]),
+        height=repr(10),
+        style=_css_style({"stroke": "none", "fill": "url(#%s)" % gradient_xml.get("id")}),
+        )
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Cartesian, _RenderContext)

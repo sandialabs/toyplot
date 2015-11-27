@@ -8,6 +8,7 @@ from __future__ import absolute_import
 from __future__ import division
 
 import numpy
+import re
 import reportlab.pdfgen.canvas
 import reportlab.pdfbase
 import toyplot.color
@@ -26,22 +27,33 @@ def render(svg, canvas):
     canvas: reportlab.pdfgen.canvas.Canvas
       ReportLab canvas that will be used to render the plot.
     """
-    def get_fill(style):
+    def get_fill(root, style):
         if "fill" not in style:
-            return None # pragma: no cover
+            return None, None # pragma: no cover
+
+        gradient_id = re.match("^url[(]#(.*)[)]$", style["fill"])
+        if gradient_id:
+            gradient_id = gradient_id.group(1)
+            gradient_xml = root.find(".//*[@id='%s']" % gradient_id)
+            if gradient_xml.tag != "linearGradient":
+                raise NotImplementedError("Only linear gradients are implemented.")
+            if gradient_xml.get("gradientUnits") != "userSpaceOnUse":
+                raise NotImplementedError("Only userSpaceOnUse gradients are implemented.")
+            return None, gradient_xml
 
         color = toyplot.color.css(style["fill"])
         if color is None:
-            return None
+            return None, None
 
         fill_opacity = float(style.get("fill-opacity", 1.0))
         opacity = float(style.get("opacity", 1.0))
-        return toyplot.color.rgba(
+        fill = toyplot.color.rgba(
             color["r"],
             color["g"],
             color["b"],
             color["a"] * fill_opacity * opacity,
             )
+        return fill, None
 
     def get_stroke(style):
         if "stroke" not in style:
@@ -169,7 +181,9 @@ def render(svg, canvas):
                                 float(commands.pop(0)), float(commands.pop(0)))
                     canvas.drawPath(path)
             elif element.tag == "polygon":
-                fill = get_fill(current_style)
+                fill, fill_gradient = get_fill(root, current_style)
+                if fill_gradient is not None:
+                    raise NotImplementedError("Gradient <polygon> not implemented.")
                 if fill is not None:
                     set_fill_color(canvas, fill)
                 stroke = get_stroke(current_style)
@@ -185,7 +199,7 @@ def render(svg, canvas):
                 path.close()
                 canvas.drawPath(path, stroke=stroke is not None, fill=fill is not None)
             elif element.tag == "rect":
-                fill = get_fill(current_style)
+                fill, fill_gradient = get_fill(root, current_style)
                 if fill is not None:
                     set_fill_color(canvas, fill)
                 stroke = get_stroke(current_style)
@@ -196,9 +210,41 @@ def render(svg, canvas):
                 y = float(element.get("y"))
                 width = float(element.get("width"))
                 height = float(element.get("height"))
-                canvas.rect(x, y, width, height, stroke=stroke is not None, fill=fill is not None)
+
+                path = canvas.beginPath()
+                path.moveTo(x, y)
+                path.lineTo(x + width, y)
+                path.lineTo(x + width, y + height)
+                path.lineTo(x, y + height)
+                path.close()
+
+                if fill_gradient is not None:
+                    pdf_colors = []
+                    pdf_offsets = []
+                    for stop in fill_gradient:
+                        offset = float(stop.get("offset"))
+                        color = toyplot.color.css(stop.get("stop-color"))
+                        opacity = float(stop.get("stop-opacity"))
+                        pdf_colors.append(reportlab.lib.colors.Color(color["r"], color["g"], color["b"], color["a"]))
+                        pdf_offsets.append(offset)
+                    canvas.saveState()
+                    canvas.clipPath(path, stroke=0, fill=1)
+                    canvas.setFillAlpha(1)
+                    canvas.linearGradient(
+                        float(fill_gradient.get("x1")),
+                        float(fill_gradient.get("y1")),
+                        float(fill_gradient.get("x2")),
+                        float(fill_gradient.get("y2")),
+                        pdf_colors,
+                        pdf_offsets,
+                        )
+                    canvas.restoreState()
+
+                canvas.drawPath(path, stroke=stroke is not None, fill=fill is not None)
             elif element.tag == "circle":
-                fill = get_fill(current_style)
+                fill, fill_gradient = get_fill(root, current_style)
+                if fill_gradient is not None:
+                    raise NotImplementedError("Gradient <circle> not implemented.")
                 if fill is not None:
                     set_fill_color(canvas, fill)
                 stroke = get_stroke(current_style)
@@ -257,7 +303,7 @@ def render(svg, canvas):
                     baseline_shift = toyplot.units.convert(baseline_shift, "px", "px", ascent - descent)
                     y -= baseline_shift
 
-                    fill = get_fill(current_style)
+                    fill, fill_gradient = get_fill(root, current_style)
                     if fill is not None:
                         set_fill_color(canvas, fill)
                     stroke = get_stroke(current_style)
@@ -268,8 +314,9 @@ def render(svg, canvas):
                     canvas.scale(1, -1)
                     canvas.drawString(0, 0, element.text)
 
-            elif element.tag in ["title"]:
+            elif element.tag in ["defs", "title"]:
                 pass
+
             else:
                 raise Exception("unhandled tag: %s" % element.tag) # pragma: no cover
 

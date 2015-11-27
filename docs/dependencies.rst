@@ -32,22 +32,25 @@ PNG Export
 ----------
 
 To generate static PNG versions of your Toyplot figures,
-you'll need either of the following:
+you'll need the above dependency to generate PDF files, plus Ghostscript:
 
-* PyQt5 - https://pypi.python.org/pypi/PyQt5
-
-or
-
-* pycairo - http://cairographics.org/pycairo
-* python pango bindings - typically distributed as part of pygtk - http://www.pygtk.org
+* Ghostscript - http://www.ghostscript.com
 
 MP4 / WebM Export
 -----------------
 
-If you plan to render animated Toyplot figures as MP4 or WebM videos, you'll either of
-the above options for exporting PNG files, plus ffmpeg:
+If you plan to render animated Toyplot figures as MP4 or WebM videos, you'll need
+the above dependencies for exporting PNG files, plus ffmpeg:
 
 * ffmpeg - https://www.ffmpeg.org
+
+Qt Interactive Display
+----------------------
+
+If you want to display interactive Toyplot figures in a window implemented with
+the Qt graphical user interface toolkit, you'll need the following:
+
+* PyQt5 - https://pypi.python.org/pypi/PyQt5
 
 Source Installation
 -------------------
@@ -69,6 +72,7 @@ code coverage:
 * mock - mocking and testing library - http://www.voidspace.org.uk/python/mock
 * nose - unit test framework - https://nose.readthedocs.org/en/latest
 * nose-exclude - a nose plugin to simplify excluding directories - https://pypi.python.org/pypi/nose-exclude
+* pillow - the friendly Python Imaging Library fork - http://pillow.readthedocs.org/en/3.0.x/
 
 Generating Documentation
 ------------------------

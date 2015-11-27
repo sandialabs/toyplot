@@ -12,13 +12,13 @@ If you haven't already, you'll want to get familiar with the Toyplot repository
 at http://github.com/sandialabs/toyplot ... there, you'll find the Toyplot
 sources, issue tracker, and wiki.
 
-Next, you'll need to install Toyplot's
-:ref:`dependencies`.  Then, you'll be ready to install
-Toyplot - but as a convenience, you'll want to use "develop mode".  Develop
-mode is a a feature provided by setuptools that links the Toyplot source code
-to the install directory instead of copying it ... that way you can edit the
-source code in your git sandbox, and you don't have to re-install it to test
-your changes::
+Next, you'll need to install Toyplot's :ref:`dependencies`.  Then, you'll be
+ready to get Toyplot's source code and use setuptools to install it. To do
+this, you'll almost certainly want to use "develop mode".  Develop mode is a a
+feature provided by setuptools that links the Toyplot source code into the
+install directory instead of copying it ... that way you can edit the source
+code in your git sandbox, and you don't have to re-install it to test your
+changes::
 
     $ git clone https://github.com/sandialabs/toyplot.git
     $ cd toyplot
@@ -50,8 +50,8 @@ Writing Regression Tests
 
 .. note::
 
-  Toyplot is in the midst of a transition from `nose <https://nose.readthedocs.org/en/latest/>`_
-  to `behave <http://pythonhosted.org/behave>`_ for running regression tests.  New tests should
+  Toyplot has been gradually transitioning from `nose <https://nose.readthedocs.org/en/latest/>`_
+  to `behave <http://pythonhosted.org/behave>`_ for implementing regression tests.  New tests should
   be added to the `features` directory using behave.  The following outlines how the old tests
   were written, and will remain as a reference until they are all replaced.
 

@@ -16,9 +16,6 @@ def print_report(module):
 
 for module in [
     "toyplot.browser",
-    "toyplot.cairo",
-    "toyplot.cairo.eps",
-    "toyplot.cairo.png",
     "toyplot.html",
     "toyplot.mp4",
     "toyplot.pdf",

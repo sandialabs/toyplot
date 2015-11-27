@@ -74,12 +74,12 @@ def render_frames(canvas, width=None, height=None, scale=None):
 
     Notes
     -----
-    The output PNG images are currently rendered using
-    :func:`toyplot.cairo.png.render_frames()`.  This may change in the future.
+    The output PNG images are rendered using
+    :func:`toyplot.reportlab.png.render_frames()`.  This is subject to change.
 
     Examples
     --------
-    >>> for frame, png in enumerate(toyplot.cairo.render_png_frames(canvas)):
+    >>> for frame, png in enumerate(toyplot.png.render_frames(canvas)):
     ...   open("frame-%s.png" % frame, "wb").write(png)
     """
     return implementation.render_frames(canvas, width, height, scale)

@@ -11,7 +11,7 @@ Required
 --------
 
 There isn't a MacPorts package for Toyplot yet, but you can still use MacPorts
-to install its :ref:`dependencies` before installing Toyplot using pip::
+to install the :ref:`dependencies` before installing Toyplot using pip::
 
     $ sudo port install py-colormath
     $ sudo port install py-multipledispatch
@@ -25,21 +25,15 @@ PNG Export
 ----------
 
 To generate static PNG versions of your Toyplot figures,
-you'll need either of the following::
+you'll need Ghostscript::
 
-    # Generate PNG files using PyQt5
-    $ sudo port install py-pyqt5
-
-or::
-
-    # Generate PNG files using Cairo
-    $ sudo port install py-pygtk
+    $ sudo port install ghostscript
 
 MP4 / WebM Export
 -----------------
 
 If you plan to render animated Toyplot figures as  MP4 / WebM files, you'll
-need either of the above options for exporting PNG images, plus ffmpeg::
+need all the above for exporting PNG images, plus ffmpeg::
 
     $ sudo port install ffmpeg
 

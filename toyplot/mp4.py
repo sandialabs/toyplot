@@ -51,9 +51,8 @@ def render(
 
     Notes
     -----
-    Currently, the output video frames are rendered using PNG representations
-    of the canvas generated with :func:`toyplot.cairo.png.render_frames()`.  This may
-    change in the future.
+    The individual video frames are rendered using PNG representations
+    of the canvas generated with :func:`toyplot.png.render_frames()`.
 
     Examples
     --------

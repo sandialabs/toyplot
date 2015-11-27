@@ -44,12 +44,9 @@ class module_proxy(object):
             return module_proxy()
 
 for module_name in [
-        "cairo",
         "numpy",
         "numpy.ma",
         "numpy.testing",
-        "pango",
-        "pangocairo",
         "PyQt5",
         "PyQt5.QtCore",
         "PyQt5.QtGui",

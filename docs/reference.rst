@@ -14,10 +14,6 @@ Contents:
    toyplot.axes.rst
    toyplot.broadcast.rst
    toyplot.browser.rst
-   toyplot.cairo.rst
-   toyplot.cairo.eps.rst
-   toyplot.cairo.pdf.rst
-   toyplot.cairo.png.rst
    toyplot.canvas.rst
    toyplot.color.rst
    toyplot.compatibility.rst
@@ -32,10 +28,9 @@ Contents:
    toyplot.png.rst
    toyplot.projection.rst
    toyplot.qt.rst
-   toyplot.qt.pdf.rst
-   toyplot.qt.png.rst
    toyplot.reportlab.rst
    toyplot.reportlab.pdf.rst
+   toyplot.reportlab.png.rst
    toyplot.require.rst
    toyplot.style.rst
    toyplot.svg.rst

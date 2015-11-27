@@ -36,9 +36,9 @@ def render(svg, canvas):
             gradient_id = gradient_id.group(1)
             gradient_xml = root.find(".//*[@id='%s']" % gradient_id)
             if gradient_xml.tag != "linearGradient":
-                raise NotImplementedError("Only linear gradients are implemented.")
+                raise NotImplementedError("Only linear gradients are implemented.") # pragma: no cover
             if gradient_xml.get("gradientUnits") != "userSpaceOnUse":
-                raise NotImplementedError("Only userSpaceOnUse gradients are implemented.")
+                raise NotImplementedError("Only userSpaceOnUse gradients are implemented.") # pragma: no cover
             return None, gradient_xml
 
         color = toyplot.color.css(style["fill"])
@@ -183,7 +183,7 @@ def render(svg, canvas):
             elif element.tag == "polygon":
                 fill, fill_gradient = get_fill(root, current_style)
                 if fill_gradient is not None:
-                    raise NotImplementedError("Gradient <polygon> not implemented.")
+                    raise NotImplementedError("Gradient <polygon> not implemented.") # pragma: no cover
                 if fill is not None:
                     set_fill_color(canvas, fill)
                 stroke = get_stroke(current_style)
@@ -244,7 +244,7 @@ def render(svg, canvas):
             elif element.tag == "circle":
                 fill, fill_gradient = get_fill(root, current_style)
                 if fill_gradient is not None:
-                    raise NotImplementedError("Gradient <circle> not implemented.")
+                    raise NotImplementedError("Gradient <circle> not implemented.") # pragma: no cover
                 if fill is not None:
                     set_fill_color(canvas, fill)
                 stroke = get_stroke(current_style)

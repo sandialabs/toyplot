@@ -289,14 +289,13 @@ def _mix(a, b, amount):
     return (a * (1 - amount)) + (b * (amount))
 
 
-def lighten(color, count=5, amount=0.9, reverse=False):
-    """Create a palette by progressively lightening an initial color."""
+def spread(color, count=5, lightness=0.9, reverse=False):
+    """Create a palette by progressively altering an initial color."""
     color = _require_color(color)
+    h, l, s = colorsys.rgb_to_hls(color["r"], color["g"], color["b"])
     results = []
     for i in range(count):
-        h, l, s = colorsys.rgb_to_hls(color["r"], color["g"], color["b"])
-        l = _mix(l, amount, i / (count - 1.0))
-        r, g, b = colorsys.hls_to_rgb(h, l, s)
+        r, g, b = colorsys.hls_to_rgb(h, _mix(l, lightness, i / (count-1)), s)
         results.append(rgba(r, g, b, color["a"]))
     return Palette(numpy.array(results), reverse=reverse)
 

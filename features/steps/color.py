@@ -188,8 +188,8 @@ def step_impl(context):
 
 @then(u'the color can be used to generate a palette of lighter shades')
 def step_impl(context):
-    palette = toyplot.color.lighten(context.color)
-    toyplot.testing.assert_html_equal(palette._repr_html_(), "color-lighten")
+    palette = toyplot.color.spread(context.color)
+    toyplot.testing.assert_html_equal(palette._repr_html_(), "color-spread")
 
 
 @given(u'two color palettes')

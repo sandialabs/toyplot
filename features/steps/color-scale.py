@@ -30,7 +30,7 @@ def step_impl(context):
 def step_impl(context):
     numpy.random.seed(1234)
     values = numpy.random.normal(size=(10, 10))
-    context.canvas.matrix(values, scale=True)
+    context.canvas.matrix(values, colorshow=True)
     toyplot.testing.assert_canvas_equal(context.canvas, "color-scale-matrix-default")
 
 @then(u'a color scale with explicit colormap can be added to a matrix visualization')
@@ -38,7 +38,7 @@ def step_impl(context):
     numpy.random.seed(1234)
     values = numpy.random.normal(size=(10, 10))
     colormap = toyplot.color.LinearMap(toyplot.color.brewer("BlueGreenBrown"), domain_min=-2, domain_max=2)
-    context.canvas.matrix((values, colormap), scale=True)
+    context.canvas.matrix((values, colormap), colorshow=True)
     toyplot.testing.assert_canvas_equal(context.canvas, "color-scale-matrix-explicit")
 
 

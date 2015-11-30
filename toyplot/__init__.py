@@ -242,6 +242,7 @@ def matrix(
         llocator=None,
         rlocator=None,
         blocator=None,
+        colorshow=False,
         width=None,
         height=None,
         canvas_style=None):
@@ -273,7 +274,9 @@ def matrix(
         tlocator=tlocator,
         llocator=llocator,
         rlocator=rlocator,
-        blocator=blocator)
+        blocator=blocator,
+        colorshow=colorshow,
+        )
     return canvas, axes
 
 

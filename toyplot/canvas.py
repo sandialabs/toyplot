@@ -443,7 +443,7 @@ class Canvas(object):
             llocator=None,
             rlocator=None,
             blocator=None,
-            scale=False,
+            colorshow=False,
             bounds=None,
             rect=None,
             corner=None,
@@ -567,7 +567,7 @@ class Canvas(object):
 
         self._children.append(table)
 
-        if scale:
+        if colorshow:
             axis = self.color_scale(
                 colormap=colormap,
                 x1=xmax_range,

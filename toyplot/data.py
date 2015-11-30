@@ -240,13 +240,15 @@ class Table(object):
         return numpy.ma.column_stack(list(self._columns.values()))
 
 
-def read_csv(fobj):
+def read_csv(fobj, convert=False):
     """Load a CSV (delimited text) file.
 
     Parameters
     ----------
     fobj: file-like object or string, required
-      The file to read.  Use a string filepath, an open file, or a file-like object.
+        The file to read.  Use a string filepath, an open file, or a file-like object.
+    convert: boolean, optional
+        If True, convert column types from string to float where possible.
 
     Returns
     -------
@@ -263,5 +265,16 @@ def read_csv(fobj):
         fobj = open(fobj, "r")
     rows = [row for row in csv.reader(fobj)]
     columns = zip(*rows)
-    return Table(collections.OrderedDict(
+
+    result = Table(collections.OrderedDict(
         [(column[0], column[1:]) for column in columns]))
+
+    if convert:
+        for name in result.keys():
+            try:
+                result[name] = result[name].astype("float64")
+            except:
+                pass
+
+    return result
+

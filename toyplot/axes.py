@@ -53,7 +53,7 @@ def _mark_exportable(table, column, exportable=True):
     table.metadata(column)["toyplot:exportable"] = exportable
 
 
-class OrderedSet(collections.MutableSet):
+class _ordered_set(collections.MutableSet):
 
     """Python recipe from http://code.activestate.com/recipes/576694-orderedset
     """
@@ -110,10 +110,13 @@ class OrderedSet(collections.MutableSet):
         return '%s(%r)' % (self.__class__.__name__, list(self))
 
     def __eq__(self, other): # pragma: no cover
-        if isinstance(other, OrderedSet):
+        if isinstance(other, _ordered_set):
             return len(self) == len(other) and list(self) == list(other)
         return set(self) == set(other)
 
+
+##########################################################################
+# Axis
 
 class Axis(object):
     """One dimensional axis that can be used to create coordinate systems.
@@ -459,132 +462,8 @@ class Axis(object):
         self._tick_titles = tick_titles
 
 
-class NumberLine(object):
-    """Standard one-dimensional number line.
-
-    Do not create NumberLine instances directly.  Use factory methods such
-    as :meth:`toyplot.canvas.Canvas.number_line` instead.
-    """
-    def __init__(
-            self,
-            x1,
-            y1,
-            x2,
-            y2,
-            padding,
-            min,
-            max,
-            show,
-            label,
-            ticklocator,
-            scale,
-            palette,
-            parent,
-        ):
-
-        self._x1 = x1
-        self._x2 = x2
-        self._y1 = y1
-        self._y2 = y2
-        self._padding = padding
-
-        if palette is None:
-            palette = toyplot.color.Palette()
-        self._palette = palette
-#        self._bar_colors = itertools.cycle(palette)
-#        self._fill_colors = itertools.cycle(palette)
-#        self._graph_colors = itertools.cycle(palette)
-#        self._plot_colors = itertools.cycle(palette)
-#        self._scatterplot_colors = itertools.cycle(palette)
-#        self._rect_colors = itertools.cycle(palette)
-#        self._text_colors = itertools.cycle(palette)
-
-#        self.label = Axis.LabelHelper(
-#            label=label, style={"font-size": "14px", "baseline-shift": "100%"})
-
-        self.axis = Axis(
-            show=show,
-            label=label,
-            domain_min=min,
-            domain_max=max,
-            tick_locator=ticklocator,
-            tick_angle=0,
-            scale=scale,
-            )
-
-        self._parent = parent
-        self._children = []
-
-    @property
-    def show(self):
-        return self.axis.show
-
-    @show.setter
-    def show(self, value):
-        self.axis.show = value
-
-    @property
-    def padding(self):
-        return self._padding
-
-    @padding.setter
-    def padding(self, value):
-        self._padding = value
-
-    def update_domain(self, values, display=True, data=True):
-        self.axis.update_domain(values, display=display, data=data)
-
-    def add_colormap(self, colormap):
-        if not isinstance(colormap, toyplot.color.Map):
-            raise ValueError("A toyplot.color.Map instance is required.")
-        if colormap.domain.min is None or colormap.domain.max is None:
-            raise ValueError("Cannot create color scale without explicit colormap domain.")
-
-        self.update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=False)
-        self._children.append(colormap)
-
-    def _finalize(self):
-        # Begin with the implicit domain defined by our data.
-        min = self.axis._display_min
-        max = self.axis._display_max
-
-        # If there is no implicit domain (we don't have any data), default
-        # to the origin.
-        if min is None:
-            min = 0
-        if max is None:
-            max = 0
-
-        # Ensure that the domain is never empty.
-        if min == max:
-            min -= 0.5
-            max += 0.5
-
-        # Allow users to override the domain.
-        if self.axis.domain.min is not None:
-            min = self.axis.domain.min
-        if self.axis.domain.max is not None:
-            max = self.axis.domain.max
-
-        # Ensure that the domain is never empty.
-        if min == max:
-            min -= 0.5
-            max += 0.5
-
-        # Calculate tick locations and labels.
-        tick_locations = []
-        tick_labels = []
-        tick_titles = []
-        if self.axis.show:
-            tick_locations, tick_labels, tick_titles = self.axis.locator().ticks(min, max)
-
-        # Allow tick locations to grow (never shrink) the domain.
-        if len(tick_locations):
-            min = numpy.amin((min, tick_locations[0]))
-            max = numpy.amax((max, tick_locations[-1]))
-
-        self.axis._finalize(min, max, tick_locations, tick_labels, tick_titles)
-
+##########################################################################
+# Cartesian
 
 class Cartesian(object):
 
@@ -740,6 +619,14 @@ class Cartesian(object):
 
     @property
     def aspect(self):
+        """Control the mapping from domains to ranges.
+
+        By default, each axis maps its domain to its range separately, which is
+        what is usually expected from a plot.  Sometimes, both axes have the same
+        domain.  In this case, it is desirable that both axes are mapped to a consistent
+        range to avoid "squashing" or "stretching" the data.  To do so, set `aspect`
+        to "fit-range".
+        """
         return self._aspect
 
     @aspect.setter
@@ -750,6 +637,12 @@ class Cartesian(object):
 
     @property
     def show(self):
+        """Control axis visibility.
+
+        Use the `show` property to hide all visible parts of the axes: labels,
+        spines, ticks, tick labels, etc.  Note that this does not affect
+        visibility of the axes contents, just the axes themselves.
+        """
         return self._show
 
     @show.setter
@@ -758,6 +651,13 @@ class Cartesian(object):
 
     @property
     def padding(self):
+        """Control the default distance between axis spines and data.
+
+        By default, axis spines are offset slightly from the data, to avoid
+        visual clutter and overlap.  Use `padding` to change this offset.
+        The default units are CSS pixels, but you may specify the padding
+        using any :ref:`units` you like.
+        """
         return self._padding
 
     @padding.setter
@@ -1182,6 +1082,26 @@ class Cartesian(object):
             width=10,
             padding=5,
             ):
+        """Add a color scale to the axes.
+
+        The color scale displays a mapping from scalar values to colors, for
+        the given colormap.  Note that the supplied colormap must have an
+        explicitly defined domain (specified when the colormap was created),
+        otherwise the mapping would be undefined.
+
+        Parameters
+        ----------
+        colormap: :class:`toyplot.color.Map`, required
+          Colormap to be displayed.
+        label: string, optional
+          Human-readable label placed below the axis.
+        ticklocator: :class:`toyplot.locator.TickLocator`, optional
+          Controls the placement and formatting of axis ticks and tick labels.
+
+        Returns
+        -------
+        axes: :class:`toyplot.axes.NumberLine`
+        """
 
         axis = self._parent.color_scale(
             colormap=colormap,
@@ -2205,6 +2125,150 @@ class Cartesian(object):
                 style=style))
         return self._children[-1]
 
+
+##########################################################################
+# NumberLine
+
+class NumberLine(object):
+    """Standard one-dimensional coordinate system / number line.
+
+    Do not create NumberLine instances directly.  Use factory methods such
+    as :meth:`toyplot.canvas.Canvas.number_line` instead.
+    """
+    def __init__(
+            self,
+            x1,
+            y1,
+            x2,
+            y2,
+            padding,
+            min,
+            max,
+            show,
+            label,
+            ticklocator,
+            scale,
+            palette,
+            parent,
+        ):
+
+        self._x1 = x1
+        self._x2 = x2
+        self._y1 = y1
+        self._y2 = y2
+        self._padding = padding
+
+        if palette is None:
+            palette = toyplot.color.Palette()
+        self._palette = palette
+#        self._bar_colors = itertools.cycle(palette)
+#        self._fill_colors = itertools.cycle(palette)
+#        self._graph_colors = itertools.cycle(palette)
+#        self._plot_colors = itertools.cycle(palette)
+#        self._scatterplot_colors = itertools.cycle(palette)
+#        self._rect_colors = itertools.cycle(palette)
+#        self._text_colors = itertools.cycle(palette)
+
+#        self.label = Axis.LabelHelper(
+#            label=label, style={"font-size": "14px", "baseline-shift": "100%"})
+
+        self.axis = Axis(
+            show=show,
+            label=label,
+            domain_min=min,
+            domain_max=max,
+            tick_locator=ticklocator,
+            tick_angle=0,
+            scale=scale,
+            )
+
+        self._parent = parent
+        self._children = []
+
+    @property
+    def show(self):
+        """Control axis visibility.
+
+        Use the `show` property to hide all visible parts of the axis: label,
+        spine, ticks, tick labels, etc.  Note that this does not affect
+        visibility of the number line contents, just the axis.
+        """
+        return self.axis.show
+
+    @show.setter
+    def show(self, value):
+        self.axis.show = value
+
+    @property
+    def padding(self):
+        """Control the default distance between the axis spine and data.
+
+        By default, the axis spine is offset slightly from the data, to avoid
+        visual clutter and overlap.  Use `padding` to change this offset.
+        The default units are CSS pixels, but you may specify the padding
+        using any :ref:`units` you like.
+        """
+        return self._padding
+
+    @padding.setter
+    def padding(self, value):
+        self._padding = toyplot.units.convert(value, target="px", default="px")
+
+    def update_domain(self, values, display=True, data=True):
+        self.axis.update_domain(values, display=display, data=data)
+
+    def add_colormap(self, colormap):
+        if not isinstance(colormap, toyplot.color.Map):
+            raise ValueError("A toyplot.color.Map instance is required.")
+        if colormap.domain.min is None or colormap.domain.max is None:
+            raise ValueError("Cannot create color scale without explicit colormap domain.")
+
+        self.update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=False)
+        self._children.append(colormap)
+
+    def _finalize(self):
+        # Begin with the implicit domain defined by our data.
+        min = self.axis._display_min
+        max = self.axis._display_max
+
+        # If there is no implicit domain (we don't have any data), default
+        # to the origin.
+        if min is None:
+            min = 0
+        if max is None:
+            max = 0
+
+        # Ensure that the domain is never empty.
+        if min == max:
+            min -= 0.5
+            max += 0.5
+
+        # Allow users to override the domain.
+        if self.axis.domain.min is not None:
+            min = self.axis.domain.min
+        if self.axis.domain.max is not None:
+            max = self.axis.domain.max
+
+        # Ensure that the domain is never empty.
+        if min == max:
+            min -= 0.5
+            max += 0.5
+
+        # Calculate tick locations and labels.
+        tick_locations = []
+        tick_labels = []
+        tick_titles = []
+        if self.axis.show:
+            tick_locations, tick_labels, tick_titles = self.axis.locator().ticks(min, max)
+
+        # Allow tick locations to grow (never shrink) the domain.
+        if len(tick_locations):
+            min = numpy.amin((min, tick_locations[0]))
+            max = numpy.amax((max, tick_locations[-1]))
+
+        self.axis._finalize(min, max, tick_locations, tick_labels, tick_titles)
+
+
 ##########################################################################
 # Table
 
@@ -2637,7 +2701,7 @@ class Table(object):
                     self._cells[row, column] = Table.Cell(
                         row, column, "left", style)
 
-        self._visible_cells = OrderedSet(numpy.ravel(self._cells))
+        self._visible_cells = _ordered_set(numpy.ravel(self._cells))
 
         self._finalized = False
 

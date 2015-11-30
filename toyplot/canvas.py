@@ -606,14 +606,19 @@ class Canvas(object):
             palette=None,
             padding=5,
         ):
-        """Add a 1D color scale to the canvas.
+        """Add a color scale to the canvas.
+
+        The color scale displays a mapping from scalar values to colors, for
+        the given colormap.  Note that the supplied colormap must have an
+        explicitly defined domain (specified when the colormap was created),
+        otherwise the mapping would be undefined.
 
         Parameters
         ----------
         colormap: :class:`toyplot.color.Map`, required
           Colormap to be displayed.
         min, max: float, optional
-          Used to explicitly specify the axis domain.
+          Used to explicitly override the domain that will be shown.
         show: bool, optional
           Set to `False` to hide the axis (the color bar will still be visible).
         label: string, optional

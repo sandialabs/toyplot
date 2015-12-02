@@ -1026,12 +1026,12 @@ def _render_marker(
 _render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<": (
     "^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
-def _rotated_frame(x1, y1, x2, y2):
+def _rotated_frame(x1, y1, x2, y2, offset):
     p = numpy.row_stack(((x1, y1), (x2, y2)))
     basis = p[1] - p[0]
     length = numpy.linalg.norm(basis)
     theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
-    transform="translate(%s,%s) rotate(%s)" % (p[0][0], p[0][1], theta)
+    transform="translate(%s,%s) rotate(%s) translate(0,%s)" % (p[0][0], p[0][1], theta, offset)
     return transform, length
 
 def _render_rotated_frame(
@@ -1219,7 +1219,7 @@ def _render(canvas, axes, context):
 
 @dispatch(toyplot.axes.NumberLine, toyplot.color.CategoricalMap, _RenderContext)
 def _render(axes, colormap, context):
-    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2)
+    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2, 0)
 
     mark_xml = xml.SubElement(
         context.root,
@@ -1248,7 +1248,7 @@ def _render(axes, colormap, context):
 @dispatch(toyplot.axes.NumberLine, toyplot.color.Map, _RenderContext)
 def _render(axes, colormap, context):
 
-    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2)
+    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2, 0)
 
     mark_xml = xml.SubElement(
         context.root,
@@ -1303,7 +1303,7 @@ def _render(axes, colormap, context):
 
 @dispatch(toyplot.axes.NumberLine, toyplot.mark.Scatterplot, _RenderContext)
 def _render(axes, mark, context):
-    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2)
+    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2, -mark._extra["offset"])
     mark_xml = xml.SubElement(
         context.root,
         "g",

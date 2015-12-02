@@ -2176,6 +2176,8 @@ class NumberLine(object):
             scale=scale,
             )
 
+        self._default_offset = 10
+
         self._parent = parent
         self._children = []
 
@@ -2211,18 +2213,24 @@ class NumberLine(object):
     def update_domain(self, values, display=True, data=True):
         self.axis.update_domain(values, display=display, data=data)
 
-    def add_colormap(self, colormap):
+    def add_colormap(self, colormap, offset=None, width=10):
         if not isinstance(colormap, toyplot.color.Map):
             raise ValueError("A toyplot.color.Map instance is required.")
         if colormap.domain.min is None or colormap.domain.max is None:
             raise ValueError("Cannot create color scale without explicit colormap domain.")
 
+        if offset is None:
+            offset = len(self._children) * self._default_offset
+
         self.update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=False)
         self._children.append(colormap)
+        #self._offsets.append(offset)
+
 
     def scatterplot(
             self,
             coordinates,
+            offset=None,
             color=None,
             marker="o",
             size=20,
@@ -2300,22 +2308,29 @@ class NumberLine(object):
             table[mopacity_keys[-1]] = mopacity_column
             table[mtitle_keys[-1]] = mtitle_column
 
-        self._children.append(
-            toyplot.mark.Scatterplot(
-                table=table,
-                coordinate_axes=coordinate_axes,
-                coordinates=coordinate_keys,
-                marker=marker_keys,
-                msize=msize_keys,
-                mfill=mfill_keys,
-                mstroke=mstroke_keys,
-                mopacity=mopacity_keys,
-                mtitle=mtitle_keys,
-                style=style,
-                mstyle=mstyle,
-                mlstyle=mlstyle,
-                filename=filename))
-        return self._children[-1]
+        if offset is None:
+            offset = len(self._children) * self._default_offset
+
+        mark = toyplot.mark.Scatterplot(
+            table=table,
+            coordinate_axes=coordinate_axes,
+            coordinates=coordinate_keys,
+            marker=marker_keys,
+            msize=msize_keys,
+            mfill=mfill_keys,
+            mstroke=mstroke_keys,
+            mopacity=mopacity_keys,
+            mtitle=mtitle_keys,
+            style=style,
+            mstyle=mstyle,
+            mlstyle=mlstyle,
+            filename=filename,
+            extra={"offset":offset},
+            )
+
+        self._children.append(mark)
+
+        return mark
 
     def _finalize(self):
         # Begin with the implicit domain defined by our data.

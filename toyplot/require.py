@@ -32,8 +32,8 @@ def value_in(value, choices):
     return value
 
 
-def table_keys(table, keys, length=None, min_length=None):
-    keys = string_vector(keys, length=length, min_length=min_length)
+def table_keys(table, keys, length=None, min_length=None, modulus=None):
+    keys = string_vector(keys, length=length, min_length=min_length, modulus=modulus)
     allowed = list(table.keys())
     for key in keys:
         if key not in allowed:
@@ -121,7 +121,7 @@ def string(value):
     return value
 
 
-def string_vector(value, length=None, min_length=None):
+def string_vector(value, length=None, min_length=None, modulus=None):
     if isinstance(value, (toyplot.compatibility.string_type)):
         value = [value]
     array = numpy.ma.array(value).astype("unicode")
@@ -136,6 +136,11 @@ def string_vector(value, length=None, min_length=None):
             raise ValueError(
                 "Expected %s or more values, received %s" %
                 (min_length, len(array)))
+    if modulus is not None:
+        if len(array) % modulus != 0:
+            raise ValueError(
+                "Expected a multiple of %s values, received %s" %
+                (modulus, len(array)))
     return array
 
 

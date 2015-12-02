@@ -2331,15 +2331,15 @@ def _render(axes, mark, context):
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Scatterplot, _RenderContext)
 def _render(axes, mark, context):
-    position = mark._table[mark._coordinates[0]]
-    series = numpy.ma.column_stack([mark._table[key] for key in mark._series])
+    dimension1 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates[0::2]])
+    dimension2 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates[1::2]])
 
     if mark._coordinate_axes[0] == "x":
-        position = axes._project_x(position)
-        series = axes._project_y(series)
+        X = axes._project_x(dimension1)
+        Y = axes._project_y(dimension2)
     elif mark._coordinate_axes[0] == "y":
-        position = axes._project_y(position)
-        series = axes._project_x(series)
+        X = axes._project_x(dimension2)
+        Y = axes._project_y(dimension1)
 
     mark_xml = xml.SubElement(
         context.root,
@@ -2350,8 +2350,9 @@ def _render(axes, mark, context):
         )
     context.add_data_table(mark, mark._table, title="Scatterplot Data", filename=mark._filename)
 
-    for series, marker, msize, mfill, mstroke, mopacity, mtitle in zip(
-            series.T,
+    for x, y, marker, msize, mfill, mstroke, mopacity, mtitle in zip(
+            X.T,
+            Y.T,
             [mark._table[key] for key in mark._marker],
             [mark._table[key] for key in mark._msize],
             [mark._table[key] for key in mark._mfill],
@@ -2360,15 +2361,9 @@ def _render(axes, mark, context):
             [mark._table[key] for key in mark._mtitle],
         ):
         not_null = numpy.invert(numpy.logical_or(
-            numpy.ma.getmaskarray(position), numpy.ma.getmaskarray(series)))
+            numpy.ma.getmaskarray(x), numpy.ma.getmaskarray(y)))
 
         msize = numpy.sqrt(msize)
-        if mark._coordinate_axes[0] == "x":
-            x = position
-            y = series
-        elif mark._coordinate_axes[0] == "y":
-            x = series
-            y = position
         series_xml = xml.SubElement(
             mark_xml, "g", attrib={"class": "toyplot-Series"})
         for dx, dy, dmarker, dsize, dfill, dstroke, dopacity, dtitle in zip(

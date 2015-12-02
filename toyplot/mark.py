@@ -502,7 +502,7 @@ class Rect(Mark):
 
 class Scatterplot(Mark):
 
-    """Plot multiple bivariate data series using markers.
+    """Plot multivariate data series using markers.
 
     Do not create Scatterplot instances directly.  Use factory methods such as
     :func:`toyplot.scatterplot` and :meth:`toyplot.axes.Cartesian.scatterplot`
@@ -514,7 +514,6 @@ class Scatterplot(Mark):
             coordinate_axes,
             table,
             coordinates,
-            series,
             marker,
             msize,
             mfill,
@@ -528,27 +527,28 @@ class Scatterplot(Mark):
         ):
         Mark.__init__(self)
 
-        # 2 axis identifiers
-        self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=2)
+        # D axis identifiers
+        self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, min_length=1)
+        D = len(self._coordinate_axes)
 
         self._table = toyplot.require.instance(table, toyplot.data.Table)
 
-        # 1 coordinate column
-        self._coordinates = toyplot.require.table_keys(table, coordinates, length=1)
-        # N coordinate columns
-        self._series = toyplot.require.table_keys(table, series, min_length=1)
+        # D * N coordinate columns
+        self._coordinates = toyplot.require.table_keys(table, coordinates, modulus=D)
+        N = len(self._coordinates) / D
+
         # N marker columns
-        self._marker = toyplot.require.table_keys(table, marker, length=len(series))
+        self._marker = toyplot.require.table_keys(table, marker, length=N)
         # N marker size columns
-        self._msize = toyplot.require.table_keys(table, msize, length=len(series))
+        self._msize = toyplot.require.table_keys(table, msize, length=N)
         # N marker fill color columns
-        self._mfill = toyplot.require.table_keys(table, mfill, length=len(series))
+        self._mfill = toyplot.require.table_keys(table, mfill, length=N)
         # N marker stroke color columns
-        self._mstroke = toyplot.require.table_keys(table, mstroke, length=len(series))
+        self._mstroke = toyplot.require.table_keys(table, mstroke, length=N)
         # N marker opacity columns
-        self._mopacity = toyplot.require.table_keys(table, mopacity, length=len(series))
+        self._mopacity = toyplot.require.table_keys(table, mopacity, length=N)
         # N marker title columns
-        self._mtitle = toyplot.require.table_keys(table, mtitle, length=len(series))
+        self._mtitle = toyplot.require.table_keys(table, mtitle, length=N)
         # Global style
         self._style = toyplot.require.style(style)
         # Marker style

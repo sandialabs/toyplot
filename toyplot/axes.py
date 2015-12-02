@@ -1876,7 +1876,7 @@ class Cartesian(object):
         table = toyplot.data.Table()
         table[coordinate_axes[0]] = position
         _mark_exportable(table, coordinate_axes[0])
-        series_keys = []
+        coordinate_keys = []
         marker_keys = []
         msize_keys = []
         mfill_keys = []
@@ -1885,15 +1885,16 @@ class Cartesian(object):
         mtitle_keys = []
         for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column, mtitle_column) in enumerate(
                 zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T, mtitle.T)):
-            series_keys.append(coordinate_axes[1] + str(index))
+            coordinate_keys.append(coordinate_axes[0])
+            coordinate_keys.append(coordinate_axes[1] + str(index))
             marker_keys.append("marker" + str(index))
             msize_keys.append("size" + str(index))
             mfill_keys.append("fill" + str(index))
             mstroke_keys.append("stroke" + str(index))
             mopacity_keys.append("opacity" + str(index))
             mtitle_keys.append("title" + str(index))
-            table[series_keys[-1]] = series_column
-            _mark_exportable(table, series_keys[-1])
+            table[coordinate_keys[-1]] = series_column
+            _mark_exportable(table, coordinate_keys[-1])
             table[marker_keys[-1]] = marker_column
             table[msize_keys[-1]] = msize_column
             table[mfill_keys[-1]] = mfill_column
@@ -1905,8 +1906,7 @@ class Cartesian(object):
             toyplot.mark.Scatterplot(
                 table=table,
                 coordinate_axes=coordinate_axes,
-                coordinates=[coordinate_axes[0]],
-                series=series_keys,
+                coordinates=coordinate_keys,
                 marker=marker_keys,
                 msize=msize_keys,
                 mfill=mfill_keys,

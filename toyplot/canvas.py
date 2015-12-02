@@ -575,7 +575,7 @@ class Canvas(object):
                 x2=xmax_range,
                 y2=ymin_range,
                 width=10,
-                padding=5,
+                padding=10,
                 show=True,
                 label="",
                 ticklocator=None,

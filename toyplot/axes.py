@@ -2227,7 +2227,7 @@ class NumberLine(object):
         self.update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=False)
         self._children.append(colormap)
         self._offset[colormap] = offset
-        self._width[colormap] = 10
+        self._width[colormap] = width
 
 
     def scatterplot(

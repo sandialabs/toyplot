@@ -1080,7 +1080,7 @@ class Cartesian(object):
             label=None,
             tick_locator=None,
             width=10,
-            padding=5,
+            padding=10,
             ):
         """Add a color scale to the axes.
 
@@ -2176,10 +2176,12 @@ class NumberLine(object):
             scale=scale,
             )
 
-        self._default_offset = 10
+        self._default_offset = 20
 
         self._parent = parent
         self._children = []
+        self._offset = {}
+        self._width = {}
 
     @property
     def show(self):
@@ -2224,7 +2226,8 @@ class NumberLine(object):
 
         self.update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=False)
         self._children.append(colormap)
-        #self._offsets.append(offset)
+        self._offset[colormap] = offset
+        self._width[colormap] = 10
 
 
     def scatterplot(
@@ -2325,10 +2328,10 @@ class NumberLine(object):
             mstyle=mstyle,
             mlstyle=mlstyle,
             filename=filename,
-            extra={"offset":offset},
             )
 
         self._children.append(mark)
+        self._offset[mark] = offset
 
         return mark
 

@@ -604,7 +604,7 @@ class Canvas(object):
             ticklocator=None,
             scale="linear",
             palette=None,
-            padding=5,
+            padding=10,
         ):
         """Add a color scale to the canvas.
 
@@ -674,7 +674,7 @@ class Canvas(object):
             ticklocator=None,
             scale="linear",
             palette=None,
-            padding=5,
+            padding=10,
         ):
         """Add a 1D number line to the canvas.
 

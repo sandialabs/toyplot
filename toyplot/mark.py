@@ -524,7 +524,6 @@ class Scatterplot(Mark):
             mstyle,
             mlstyle,
             filename,
-            extra=None,
         ):
         Mark.__init__(self)
 
@@ -558,8 +557,6 @@ class Scatterplot(Mark):
         self._mlstyle = toyplot.require.style(mlstyle)
         # Export filename
         self._filename = toyplot.require.filename(filename)
-        # Optional extra data for use by the parent
-        self._extra = extra
 
 class Text(Mark):
 

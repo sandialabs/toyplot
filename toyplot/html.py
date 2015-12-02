@@ -1219,7 +1219,10 @@ def _render(canvas, axes, context):
 
 @dispatch(toyplot.axes.NumberLine, toyplot.color.CategoricalMap, _RenderContext)
 def _render(axes, colormap, context):
-    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2, 0)
+    offset = axes._offset[colormap]
+    width = axes._width[colormap]
+
+    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2, -offset)
 
     mark_xml = xml.SubElement(
         context.root,
@@ -1238,17 +1241,19 @@ def _render(axes, colormap, context):
             mark_xml,
             "rect",
             x=repr(x1),
-            y=repr(-10),
+            y=repr(-width * 0.5),
             width=repr(x2 - x1),
-            height=repr(10),
+            height=repr(width),
             style=_css_style({"stroke": "none", "fill": toyplot.color.to_css(color)}),
             )
 
 
 @dispatch(toyplot.axes.NumberLine, toyplot.color.Map, _RenderContext)
 def _render(axes, colormap, context):
+    offset = axes._offset[colormap]
+    width = axes._width[colormap]
 
-    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2, 0)
+    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2, -offset)
 
     mark_xml = xml.SubElement(
         context.root,
@@ -1286,24 +1291,22 @@ def _render(axes, colormap, context):
                 },
             )
 
-
-
     projection = axes.axis.projection(range_min=0, range_max=length)
     projected = projection([colormap.domain.min, colormap.domain.max])
     xml.SubElement(
         mark_xml,
         "rect",
         x=repr(projected[0]),
-        y=repr(-10),
+        y=repr(-width * 0.5),
         width=repr(projected[1] - projected[0]),
-        height=repr(10),
+        height=repr(width),
         style=_css_style({"stroke": "none", "fill": "url(#%s)" % gradient_xml.get("id")}),
         )
 
 
 @dispatch(toyplot.axes.NumberLine, toyplot.mark.Scatterplot, _RenderContext)
 def _render(axes, mark, context):
-    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2, -mark._extra["offset"])
+    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2, -axes._offset[mark])
     mark_xml = xml.SubElement(
         context.root,
         "g",

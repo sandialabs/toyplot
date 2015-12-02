@@ -2161,13 +2161,7 @@ class NumberLine(object):
         if palette is None:
             palette = toyplot.color.Palette()
         self._palette = palette
-#        self._bar_colors = itertools.cycle(palette)
-#        self._fill_colors = itertools.cycle(palette)
-#        self._graph_colors = itertools.cycle(palette)
-#        self._plot_colors = itertools.cycle(palette)
-#        self._scatterplot_colors = itertools.cycle(palette)
-#        self._rect_colors = itertools.cycle(palette)
-#        self._text_colors = itertools.cycle(palette)
+        self._scatterplot_colors = itertools.cycle(palette)
 
 #        self.label = Axis.LabelHelper(
 #            label=label, style={"font-size": "14px", "baseline-shift": "100%"})
@@ -2225,6 +2219,103 @@ class NumberLine(object):
 
         self.update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=False)
         self._children.append(colormap)
+
+    def scatterplot(
+            self,
+            coordinates,
+            color=None,
+            marker="o",
+            size=20,
+            opacity=1.0,
+            title=None,
+            style=None,
+            mstyle=None,
+            mlstyle=None,
+            filename=None):
+        """Add a univariate plot to the axes.
+
+        Parameters
+        ----------
+        coordinate: array-like one-dimensional coordinates
+        title: string, optional
+          Human-readable title for the mark.  The SVG / HTML backends render the
+          title as a tooltip.
+        style: dict, optional
+          Collection of CSS styles to apply across all datums.  See
+          :class:`toyplot.toyplot.Plot` for a list of useful styles.
+
+        Returns
+        -------
+        plot: :class:`toyplot.mark.Plot`
+        """
+        coordinates = numpy.ma.array(coordinates).astype("float64")
+        if coordinates.ndim == 1:
+            coordinates = numpy.ma.column_stack((coordinates,))
+        elif coordinates.ndim == 2:
+            pass
+
+        default_color = [next(self._scatterplot_colors)
+                         for i in range(coordinates.shape[1])]
+        mfill = toyplot.color.broadcast(
+            colors=color,
+            shape=coordinates.shape,
+            default=default_color,
+            )
+        marker = toyplot.broadcast.object(marker, coordinates.shape)
+        msize = toyplot.broadcast.scalar(size, coordinates.shape)
+        mstroke = toyplot.color.broadcast(colors=mfill, shape=coordinates.shape)
+        mopacity = toyplot.broadcast.scalar(opacity, coordinates.shape)
+        mtitle = toyplot.broadcast.object(title, coordinates.shape)
+        style = toyplot.style.combine(
+            {"stroke": "none"}, toyplot.require.style(style))
+        mstyle = toyplot.style.combine({}, toyplot.require.style(mstyle))
+        mlstyle = toyplot.style.combine(toyplot.require.style(mlstyle))
+
+        self.update_domain(coordinates)
+        coordinate_axes = ["x"]
+
+        table = toyplot.data.Table()
+        coordinate_keys = []
+        marker_keys = []
+        msize_keys = []
+        mfill_keys = []
+        mstroke_keys = []
+        mopacity_keys = []
+        mtitle_keys = []
+        for index, (coordinate_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column, mtitle_column) in enumerate(
+                zip(coordinates.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T, mtitle.T)):
+            coordinate_keys.append(coordinate_axes[0] + str(index))
+            marker_keys.append("marker" + str(index))
+            msize_keys.append("size" + str(index))
+            mfill_keys.append("fill" + str(index))
+            mstroke_keys.append("stroke" + str(index))
+            mopacity_keys.append("opacity" + str(index))
+            mtitle_keys.append("title" + str(index))
+            table[coordinate_keys[-1]] = coordinate_column
+            _mark_exportable(table, coordinate_keys[-1])
+            table[marker_keys[-1]] = marker_column
+            table[msize_keys[-1]] = msize_column
+            table[mfill_keys[-1]] = mfill_column
+            table[mstroke_keys[-1]] = mstroke_column
+            table[mopacity_keys[-1]] = mopacity_column
+            table[mtitle_keys[-1]] = mtitle_column
+
+        self._children.append(
+            toyplot.mark.Scatterplot(
+                table=table,
+                coordinate_axes=coordinate_axes,
+                coordinates=coordinate_keys,
+                marker=marker_keys,
+                msize=msize_keys,
+                mfill=mfill_keys,
+                mstroke=mstroke_keys,
+                mopacity=mopacity_keys,
+                mtitle=mtitle_keys,
+                style=style,
+                mstyle=mstyle,
+                mlstyle=mlstyle,
+                filename=filename))
+        return self._children[-1]
 
     def _finalize(self):
         # Begin with the implicit domain defined by our data.

@@ -1301,6 +1301,65 @@ def _render(axes, colormap, context):
         )
 
 
+@dispatch(toyplot.axes.NumberLine, toyplot.mark.Scatterplot, _RenderContext)
+def _render(axes, mark, context):
+    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2)
+    mark_xml = xml.SubElement(
+        context.root,
+        "g",
+        style=_css_style(mark._style),
+        id=context.get_id(mark),
+        attrib={"class": "toyplot-mark-Scatterplot"},
+        transform=transform,
+        )
+    context.add_data_table(mark, mark._table, title="Scatterplot Data", filename=mark._filename)
+
+    dimension1 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates])
+    projection = axes.axis.projection(range_min=0, range_max=length)
+    X = projection(dimension1)
+    for x, marker, msize, mfill, mstroke, mopacity, mtitle in zip(
+            X.T,
+            [mark._table[key] for key in mark._marker],
+            [mark._table[key] for key in mark._msize],
+            [mark._table[key] for key in mark._mfill],
+            [mark._table[key] for key in mark._mstroke],
+            [mark._table[key] for key in mark._mopacity],
+            [mark._table[key] for key in mark._mtitle],
+        ):
+        not_null = numpy.invert(numpy.ma.getmaskarray(x))
+
+        msize = numpy.sqrt(msize)
+        series_xml = xml.SubElement(
+            mark_xml, "g", attrib={"class": "toyplot-Series"})
+        for dx, dmarker, dsize, dfill, dstroke, dopacity, dtitle in zip(
+                x[not_null],
+                marker[not_null],
+                msize[not_null],
+                mfill[not_null],
+                mstroke[not_null],
+                mopacity[not_null],
+                mtitle[not_null],
+            ):
+            dstyle = toyplot.style.combine(
+                {
+                    "fill": toyplot.color.to_css(dfill),
+                    "stroke": toyplot.color.to_css(dstroke),
+                    "opacity": dopacity,
+                },
+                mark._mstyle)
+            datum_xml = _render_marker(
+                series_xml,
+                dx,
+                0,
+                dsize,
+                dmarker,
+                dstyle,
+                mark._mlstyle,
+                extra_class="toyplot-Datum",
+                title=dtitle,
+                )
+
+
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Cartesian, _RenderContext)
 def _render(canvas, axes, context):
     axes._finalize()

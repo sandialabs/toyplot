@@ -1218,11 +1218,11 @@ def _render(canvas, axes, context):
 
 
 @dispatch(toyplot.axes.NumberLine, toyplot.color.CategoricalMap, _RenderContext)
-def _render(axes, colormap, context):
-    offset = axes._offset[colormap]
-    width = axes._width[colormap]
+def _render(numberline, colormap, context):
+    offset = numberline._offset[colormap]
+    width = numberline._width[colormap]
 
-    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2, -offset)
+    transform, length = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
 
     mark_xml = xml.SubElement(
         context.root,
@@ -1231,7 +1231,7 @@ def _render(axes, colormap, context):
         transform=transform,
         )
 
-    projection = axes.axis.projection(range_min=0, range_max=length)
+    projection = numberline.axis.projection(range_min=0, range_max=length)
     samples = numpy.linspace(colormap.domain.min, colormap.domain.max, len(colormap._palette), endpoint=True)
     projected = projection(samples)
 
@@ -1249,11 +1249,12 @@ def _render(axes, colormap, context):
 
 
 @dispatch(toyplot.axes.NumberLine, toyplot.color.Map, _RenderContext)
-def _render(axes, colormap, context):
-    offset = axes._offset[colormap]
-    width = axes._width[colormap]
-
-    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2, -offset)
+def _render(numberline, colormap, context):
+    offset = numberline._offset[colormap]
+    width = numberline._width[colormap]
+    transform, length = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
+    projection = numberline.axis.projection(range_min=0, range_max=length)
+    projected = projection([colormap.domain.min, colormap.domain.max])
 
     mark_xml = xml.SubElement(
         context.root,
@@ -1271,8 +1272,8 @@ def _render(axes, colormap, context):
         defs_xml,
         "linearGradient",
         id="t" + uuid.uuid4().hex,
-        x1=repr(0),
-        x2=repr(length),
+        x1=repr(projected[0]),
+        x2=repr(projected[1]),
         y1=repr(0),
         y2=repr(0),
         gradientUnits="userSpaceOnUse",
@@ -1291,8 +1292,6 @@ def _render(axes, colormap, context):
                 },
             )
 
-    projection = axes.axis.projection(range_min=0, range_max=length)
-    projected = projection([colormap.domain.min, colormap.domain.max])
     xml.SubElement(
         mark_xml,
         "rect",
@@ -1305,8 +1304,8 @@ def _render(axes, colormap, context):
 
 
 @dispatch(toyplot.axes.NumberLine, toyplot.mark.Scatterplot, _RenderContext)
-def _render(axes, mark, context):
-    transform, length = _rotated_frame(axes._x1, axes._y1, axes._x2, axes._y2, -axes._offset[mark])
+def _render(numberline, mark, context):
+    transform, length = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -numberline._offset[mark])
     mark_xml = xml.SubElement(
         context.root,
         "g",
@@ -1318,7 +1317,7 @@ def _render(axes, mark, context):
     context.add_data_table(mark, mark._table, title="Scatterplot Data", filename=mark._filename)
 
     dimension1 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates])
-    projection = axes.axis.projection(range_min=0, range_max=length)
+    projection = numberline.axis.projection(range_min=0, range_max=length)
     X = projection(dimension1)
     for x, marker, msize, mfill, mstroke, mopacity, mtitle in zip(
             X.T,

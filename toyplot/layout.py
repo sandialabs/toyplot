@@ -291,7 +291,12 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
     # Apply the layout algorithm to whatever's left.
     start = time.time()
     if layout is None:
-        layout = toyplot.layout.FruchtermanReingold()
+        # If there are unspecified coordinates, use a force-directed layout.
+        if numpy.ma.is_masked(vcoordinates):
+            layout = toyplot.layout.FruchtermanReingold()
+        else:
+            # Otherwise, we can ignore the vertices and just create edges.
+            layout = toyplot.layout.IgnoreVertices()
     vcoordinates, eshapes, ecoordinates = layout.graph(ivcoordinates, edges)
     toyplot.log.info("Graph layout time: %s ms" % ((time.time() - start) * 1000))
 
@@ -497,6 +502,25 @@ class GraphLayout(object):
             Contains coordinates for each of the edge shape strings, in drawing-code order.
         """
         raise NotImplementedError() # pragma: no cover 
+
+
+class IgnoreVertices(GraphLayout):
+    """Do-nothing graph layout for use when all vertices are already specified.
+
+    Parameters
+    ----------
+    edges: :class:`toyplot.layout.EdgeLayout` instance, optional
+        The default will generate straight edges.
+    """
+    def __init__(self, edges=None):
+        if edges is None:
+            edges = StraightEdges()
+
+        self._edges = edges
+
+    def graph(self, vcoordinates, edges):
+        eshapes, ecoordinates = self._edges.edges(vcoordinates, edges)
+        return vcoordinates, eshapes, ecoordinates
 
 
 class Random(GraphLayout):

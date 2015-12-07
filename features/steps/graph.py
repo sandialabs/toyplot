@@ -3,7 +3,6 @@ from behave import *
 import numpy
 import toyplot.generate
 import toyplot.layout
-import toyplot.testing
 
 @given(u'a prufer tree')
 def step_impl(context):

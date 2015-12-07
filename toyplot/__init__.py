@@ -297,6 +297,7 @@ def plot(
         mstyle=None,
         mlstyle=None,
         filename=None,
+        aspect=None,
         xmin=None,
         xmax=None,
         ymin=None,
@@ -330,6 +331,7 @@ def plot(
     """
     canvas = Canvas(width=width, height=height, style=canvas_style)
     axes = canvas.axes(
+        aspect=aspect,
         xmin=xmin,
         xmax=xmax,
         ymin=ymin,
@@ -376,6 +378,7 @@ def scatterplot(
         mstyle=None,
         mlstyle=None,
         filename=None,
+        aspect=None,
         xmin=None,
         xmax=None,
         ymin=None,
@@ -409,6 +412,7 @@ def scatterplot(
     """
     canvas = Canvas(width=width, height=height, style=canvas_style)
     axes = canvas.axes(
+        aspect=aspect,
         xmin=xmin,
         xmax=xmax,
         ymin=ymin,

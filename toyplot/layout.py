@@ -292,7 +292,7 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
     start = time.time()
     if layout is None:
         # If there are unspecified coordinates, use a force-directed layout.
-        if numpy.ma.is_masked(vcoordinates):
+        if numpy.ma.is_masked(ivcoordinates):
             layout = toyplot.layout.FruchtermanReingold()
         else:
             # Otherwise, we can ignore the vertices and just create edges.

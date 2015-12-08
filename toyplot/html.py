@@ -1248,13 +1248,13 @@ def _render(numberline, colormap, context):
             )
 
 
-@dispatch(toyplot.axes.NumberLine, toyplot.color.Map, _RenderContext)
+@dispatch(toyplot.axes.NumberLine, toyplot.color.LinearMap, _RenderContext)
 def _render(numberline, colormap, context):
     offset = numberline._offset[colormap]
     width = numberline._width[colormap]
     transform, length = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
     projection = numberline.axis.projection(range_min=0, range_max=length)
-    projected = projection([colormap.domain.min, colormap.domain.max])
+    colormap_range_min, colormap_range_max = projection([colormap.domain.min, colormap.domain.max])
 
     mark_xml = xml.SubElement(
         context.root,
@@ -1272,20 +1272,22 @@ def _render(numberline, colormap, context):
         defs_xml,
         "linearGradient",
         id="t" + uuid.uuid4().hex,
-        x1=repr(projected[0]),
-        x2=repr(projected[1]),
+        x1=repr(colormap_range_min),
+        x2=repr(colormap_range_max),
         y1=repr(0),
         y2=repr(0),
         gradientUnits="userSpaceOnUse",
         )
 
-    samples = numpy.linspace(0, 1, 64, endpoint=True)
+    samples = numpy.linspace(colormap.domain.min, colormap.domain.max, 64, endpoint=True)
     for sample in samples:
-        color = colormap.colors(((colormap.domain.max - colormap.domain.min) * sample) + colormap.domain.min)
+        color = colormap.colors(sample)
+        psample = projection(sample)
+        offset = (psample - colormap_range_min) / (colormap_range_max - colormap_range_min)
         xml.SubElement(
             gradient_xml,
             "stop",
-            offset="%s" % sample,
+            offset="%s" % offset,
             attrib={
                 "stop-color": "rgb(%.3g%%,%.3g%%,%.3g%%)" % (color["r"] * 100, color["g"] * 100, color["b"] * 100),
                 "stop-opacity": str(color["a"]),
@@ -1295,9 +1297,9 @@ def _render(numberline, colormap, context):
     xml.SubElement(
         mark_xml,
         "rect",
-        x=repr(projected[0]),
+        x=repr(colormap_range_min),
         y=repr(-width * 0.5),
-        width=repr(projected[1] - projected[0]),
+        width=repr(colormap_range_max - colormap_range_min),
         height=repr(width),
         style=_css_style({"stroke": "none", "fill": "url(#%s)" % gradient_xml.get("id")}),
         )
@@ -2457,11 +2459,7 @@ def _render(axes, mark, context):
                 )
 
 
-@dispatch(
-    (toyplot.canvas.Canvas,
-     toyplot.axes.Cartesian),
-    toyplot.mark.Text,
-    _RenderContext)
+@dispatch((toyplot.canvas.Canvas, toyplot.axes.Cartesian), toyplot.mark.Text, _RenderContext)
 def _render(parent, mark, context):
     x = mark._table[mark._coordinates[numpy.where(mark._coordinate_axes == "x")[0][0]]]
     y = mark._table[mark._coordinates[numpy.where(mark._coordinate_axes == "y")[0][0]]]

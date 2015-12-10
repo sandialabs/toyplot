@@ -21,11 +21,6 @@ def step_impl(context, name):
         context.scenario.skip(reason="The %s backend is not available." % name)
 
 
-@given(u'a sample canvas to be rendered')
-def step_impl(context):
-    context.canvas, axes, mark = toyplot.plot(numpy.linspace(0, 1) ** 2)
-
-
 @then(u'the canvas can be rendered to an eps file')
 def step_impl(context):
     target = os.path.join(toyplot.testing.backend_dir, "%s.eps" % context.name)

@@ -1,7 +1,7 @@
 Feature: Cartesian axes
   Scenario Outline: Cartesian axes API
     Given a set of cartesian axes
-    And a default plot
+    And a sample plot
     Then the cartesian axes can be rendered <phrase>
 
     Examples:

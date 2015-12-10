@@ -14,7 +14,7 @@ Feature: Tick locators
             | with ticks identified by optimization        |
             | without ticks                                |
 
-    Scenario Outline: Tick locators
+    Scenario Outline: Timestamp tick locators
         Given <period> of timestamp data
         And a visualization using the timestamp locator
         Then the generated figure will match <reference>

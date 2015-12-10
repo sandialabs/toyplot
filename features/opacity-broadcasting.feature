@@ -5,24 +5,25 @@ Feature: Opacity Broadcasting
         And a set of per-series opacity values
         And a set of per-datum opacity values
         Then <mark> can be rendered with <opacity>
+        And the generated figure will match <reference>
 
         Examples:
-            | mark                         | opacity                                              |
-            | bars                         | one explicit opacity                                 |
-            | bars                         | per-series opacities                                 |
-            | bars                         | per-datum opacities                                  |
-            | fills                        | one explicit opacity                                 |
-            | fills                        | per-series opacities                                 |
-            | hlines                       | one explicit opacity                                 |
-            | hlines                       | per-datum opacities                                  |
-            | plots                        | one explicit opacity                                 |
-            | plots                        | per-series opacities                                 |
-            | rects                        | one explicit opacity                                 |
-            | rects                        | per-datum opacities                                  |
-            | scatterplots                 | one explicit opacity                                 |
-            | scatterplots                 | per-series opacities                                 |
-            | scatterplots                 | per-datum opacities                                  |
-            | text                         | one explicit opacity                                 |
-            | text                         | per-datum opacities                                  |
-            | vlines                       | one explicit opacity                                 |
-            | vlines                       | per-datum opacities                                  |
+            | mark                         | opacity               | reference |
+            | bars                         | one explicit opacity  | opacity-broadcast-bars-one-opacity |
+            | bars                         | per-series opacities  | opacity-broadcast-bars-per-series-opacities |
+            | bars                         | per-datum opacities   | opacity-broadcast-bars-per-datum-opacities |
+            | fills                        | one explicit opacity  | opacity-broadcast-fills-one-opacity |
+            | fills                        | per-series opacities  | opacity-broadcast-fills-per-series-opacities |
+            | hlines                       | one explicit opacity  | opacity-broadcast-hlines-one-opacity |
+            | hlines                       | per-datum opacities   | opacity-broadcast-hlines-per-datum-opacities |
+            | plots                        | one explicit opacity  | opacity-broadcast-plots-one-opacity |
+            | plots                        | per-series opacities  | opacity-broadcast-plots-per-series-opacities |
+            | rects                        | one explicit opacity  | opacity-broadcast-rects-one-opacity |
+            | rects                        | per-datum opacities   | opacity-broadcast-rects-per-datum-opacities |
+            | scatterplots                 | one explicit opacity  | opacity-broadcast-scatterplots-one-opacity |
+            | scatterplots                 | per-series opacities  | opacity-broadcast-scatterplots-per-series-opacities |
+            | scatterplots                 | per-datum opacities   | opacity-broadcast-scatterplots-per-datum-opacities |
+            | text                         | one explicit opacity  | opacity-broadcast-text-one-opacity |
+            | text                         | per-datum opacities   | opacity-broadcast-text-per-datum-opacities |
+            | vlines                       | one explicit opacity  | opacity-broadcast-vlines-one-opacity |
+            | vlines                       | per-datum opacities   | opacity-broadcast-vlines-per-datum-opacities |

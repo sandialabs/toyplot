@@ -6,17 +6,6 @@ import toyplot.data
 import toyplot.testing
 
 
-@given(u'a set of cartesian axes')
-def step_impl(context):
-    context.canvas = toyplot.Canvas()
-    context.axes = context.canvas.axes()
-
-
-@given(u'a default plot')
-def step_impl(context):
-    context.axes.plot(numpy.sin(numpy.linspace(0, 10)))
-
-
 @then(u'the cartesian axes can be rendered with defaults')
 def step_impl(context):
     toyplot.testing.assert_canvas_equal(

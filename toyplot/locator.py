@@ -7,6 +7,7 @@ from __future__ import division
 import datetime
 import numpy
 import toyplot.broadcast
+import toyplot.compatibility
 
 
 def _log_format(base, exponent, location, format):
@@ -545,9 +546,6 @@ class Log(TickLocator):
             positive_exponents = []
         positive_locations = numpy.power(self._base, positive_exponents)
 
-        # print domain_min, negative_exponents, linear_locations,
-        # positive_exponents, domain_max
-
         negative_labels = [
             "-" +
             _log_format(
@@ -640,40 +638,104 @@ def _second_generator(interval):
 
 
 _intervals = [
-    (datetime.timedelta(days=365 * 1000), _year_generator(1000), "{dt.year}"),
-    (datetime.timedelta(days=365 * 100), _year_generator(100), "{dt.year}"),
-    (datetime.timedelta(days=365 * 10), _year_generator(10), "{dt.year}"),
-    (datetime.timedelta(days=365 * 5), _year_generator(5), "{dt.year}"),
-    (datetime.timedelta(days=365), _year_generator(1), "{dt.year}"),
-    (datetime.timedelta(days=90), _month_generator(3), "{dt:%B} {dt.year}"),
-    (datetime.timedelta(days=30), _month_generator(1), "{dt:%B} {dt.year}"),
-    (datetime.timedelta(days=7), _day_generator(7), "{dt:%a}, {dt:%b} {dt.day}, {dt.year}"),
-    (datetime.timedelta(days=1), _day_generator(1), "{dt:%a}, {dt:%b} {dt.day}"),
-    (datetime.timedelta(hours=12), _hour_generator(12), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-    (datetime.timedelta(hours=6), _hour_generator(6), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-    (datetime.timedelta(hours=4), _hour_generator(4), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-    (datetime.timedelta(hours=1), _hour_generator(1), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-    (datetime.timedelta(minutes=15), _minute_generator(15), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-    (datetime.timedelta(minutes=10), _minute_generator(10), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-    (datetime.timedelta(minutes=5), _minute_generator(5), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-    (datetime.timedelta(minutes=1), _minute_generator(1), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-    (datetime.timedelta(seconds=15), _second_generator(15), "{dt:%H}:{dt:%M}:{dt:%S}"),
-    (datetime.timedelta(seconds=10), _second_generator(10), "{dt:%H}:{dt:%M}:{dt:%S}"),
-    (datetime.timedelta(seconds=5), _second_generator(5), "{dt:%H}:{dt:%M}:{dt:%S}"),
-    (datetime.timedelta(seconds=1), _second_generator(1), "{dt:%H}:{dt:%M}:{dt:%S}"),
+    dict(interval=datetime.timedelta(days=365 * 1000), generator=_year_generator(1000), format="{0.year}"),
+    dict(interval=datetime.timedelta(days=365 * 100), generator=_year_generator(100), format="{0.year}"),
+    dict(interval=datetime.timedelta(days=365 * 10), generator=_year_generator(10), format="{0.year}"),
+    dict(interval=datetime.timedelta(days=365 * 5), generator=_year_generator(5), format="{0.year}"),
+    dict(interval=datetime.timedelta(days=365), generator=_year_generator(1), format="{0.year}"),
+    dict(interval=datetime.timedelta(days=90), generator=_month_generator(3), format="{0:%B} {0.year}"),
+    dict(interval=datetime.timedelta(days=30), generator=_month_generator(1), format="{0:%B} {0.year}"),
+    dict(interval=datetime.timedelta(days=7), generator=_day_generator(7), format="{0:%a}, {0:%b} {0.day}, {0.year}"),
+    dict(interval=datetime.timedelta(days=1), generator=_day_generator(1), format="{0:%a}, {0:%b} {0.day}"),
+    dict(interval=datetime.timedelta(hours=12), generator=_hour_generator(12), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(hours=6), generator=_hour_generator(6), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(hours=4), generator=_hour_generator(4), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(hours=1), generator=_hour_generator(1), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(minutes=15), generator=_minute_generator(15), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(minutes=10), generator=_minute_generator(10), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(minutes=5), generator=_minute_generator(5), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(minutes=1), generator=_minute_generator(1), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(seconds=15), generator=_second_generator(15), format="{0:%H}:{0:%M}:{0:%S}"),
+    dict(interval=datetime.timedelta(seconds=10), generator=_second_generator(10), format="{0:%H}:{0:%M}:{0:%S}"),
+    dict(interval=datetime.timedelta(seconds=5), generator=_second_generator(5), format="{0:%H}:{0:%M}:{0:%S}"),
+    dict(interval=datetime.timedelta(seconds=1), generator=_second_generator(1), format="{0:%H}:{0:%M}:{0:%S}"),
     ]
 
 
 class Timestamp(TickLocator):
-    """Generate ticks when the domain is UTC timestamps with the Unix epoch.
+    """Generate ticks when the domain is UTC timestamps relative to the Unix epoch.
+
+    Callers may explicitly specify the desired time interval as a string:
+
+    >>> toyplot.locator.Timestamp(interval="hours")
+
+    or as a tuple containing a quantity of units:
+
+    >>> toyplot.locator.Timestamp(interval=(3, "days"))
+
+    Instead of specifying an interval, the caller may supply the desired number
+    of ticks, and the interval that produces the closest number of ticks will
+    be used (note that the number of ticks produced may not match exactly):
+
+    >>> toyplot.locator.Timestamp(count=4)
+
+    If the count is not specified, it defaults to `7`.
 
     Parameters
     ----------
+    count: number, optional
+        Specifies the desired number of ticks.
+    interval: string or (integer, string) tuple, optional
+        Specifies the desired tick interval in anthropomorphic time units.
+        Allowed units are "millenium", "millenia", "century", "centuries",
+        "decade", "decades", "year", "years", "quarter", "quarters", "month",
+        "months", "week", "weeks", "day", "days", "hour", "hours", "minute",
+        "minutes", "second", and "seconds".
+    format: string, optional
+        Format string used to generate labels from tick locations.  The
+        formatted value will be a datetime.datetime object, so any of the
+        attributes and percent formatting code of a datetime may be used in the
+        format.  For example, to display the full day of the week, month, day
+        of the month without zero padding, and year, you could use::
+
+            {0:%A}, {0:%B} {0.day}, {0.year}
     """
 
-    def __init__(self, count=5, format=None):
+    def __init__(self, count=None, interval=None, format=None):
+        if interval is not None:
+            if isinstance(interval, toyplot.compatibility.string_type):
+                interval = (1, interval)
+            interval = (int(interval[0]), interval[1].lower())
+
+            amount, units = interval
+
+            if units in ["millenium", "millenia"]:
+                interval = dict(interval=datetime.timedelta(days=365 * 1000 * amount), generator=_year_generator(1000 * amount), format="{0.year}")
+            elif units in ["century", "centuries"]:
+                interval = dict(interval=datetime.timedelta(days=365 * 100 * amount), generator=_year_generator(100 * amount), format="{0.year}")
+            elif units in ["decade", "decades"]:
+                interval = dict(interval=datetime.timedelta(days=365 * 10 * amount), generator=_year_generator(10 * amount), format="{0.year}")
+            elif units in ["year", "years"]:
+                interval = dict(interval=datetime.timedelta(days=365 * amount), generator=_year_generator(amount), format="{0.year}")
+            elif units in ["quarter", "quarters"]:
+                interval = dict(interval=datetime.timedelta(days=90 * amount), generator=_month_generator(3 * amount), format="{0:%B} {0.year}")
+            elif units in ["month", "months"]:
+                interval = dict(interval=datetime.timedelta(days=30 * amount), generator=_month_generator(amount), format="{0:%B} {0.year}")
+            elif units in ["week", "weeks"]:
+                interval = dict(interval=datetime.timedelta(days=7 * amount), generator=_day_generator(7 * amount), format="{0:%a}, {0:%b} {0.day}, {0.year}")
+            elif units in ["day", "days"]:
+                interval = dict(interval=datetime.timedelta(days=amount), generator=_day_generator(amount), format="{0:%a}, {0:%b} {0.day}")
+            elif units in ["hour", "hours"]:
+                interval = dict(interval=datetime.timedelta(hours=amount), generator=_hour_generator(amount), format="{0:%m}/{0:%d} {0:%H}:{0:%M}")
+            elif units in ["minute", "minutes"]:
+                interval = dict(interval=datetime.timedelta(minutes=amount), generator=_minute_generator(amount), format="{0:%m}/{0:%d} {0:%H}:{0:%M}")
+            elif units in ["second", "seconds"]:
+                interval = dict(interval=datetime.timedelta(seconds=amount), generator=_second_generator(amount), format="{0:%H}:{0:%M}:{0:%S}")
+
         self._count = count
+        self._interval = interval
         self._format = format
+
 
     def ticks(self, domain_min, domain_max):
         """Return a set of ticks for the given domain.
@@ -691,25 +753,29 @@ class Timestamp(TickLocator):
         titles : sequence of strings
           Titles for each tick location.  Typically, backends render titles as tooltips.
         """
-        # Find the time interval that yields the number of locations closest to the requested count
-        closest_interval = None
-        closest_difference = None
+        # If the caller didn't specify an interval, find one that yields the number of locations closest to the requested count
+        if self._interval is None:
+            if self._count is None:
+                self._count = 7
 
-        for interval in _intervals:
-            count = (domain_max - domain_min) / interval[0].total_seconds()
-            difference = numpy.abs(self._count - count)
+            closest_difference = None
 
-            if (closest_difference is None) or (difference < closest_difference):
-                closest_interval = interval
-                closest_difference = difference
+            for match in _intervals:
+                count = (domain_max - domain_min) / match["interval"].total_seconds()
+                difference = numpy.abs(self._count - count)
 
-        locations = [location for location in closest_interval[1](
+                if (closest_difference is None) or (difference < closest_difference):
+                    self._interval = match
+                    closest_difference = difference
+
+        # Generate ticks
+        locations = [location for location in self._interval["generator"](
             datetime.datetime.utcfromtimestamp(domain_min),
             datetime.datetime.utcfromtimestamp(domain_max),
             )]
 
-        label_format = closest_interval[2] if self._format is None else self._format
-        labels = [label_format.format(dt=datetime.datetime.utcfromtimestamp(location)) for location in locations]
+        label_format = self._interval["format"] if self._format is None else self._format
+        labels = [label_format.format(datetime.datetime.utcfromtimestamp(location)) for location in locations]
         titles = numpy.repeat(None, len(labels))
         return locations, labels, titles
 

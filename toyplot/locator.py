@@ -61,6 +61,7 @@ class Null(TickLocator):
     def ticks(self, domain_min, domain_max):
         return [], [], []
 
+
 class Basic(TickLocator):
 
     """Generate N evenly spaced ticks that include the minimum and maximum values of a domain.
@@ -579,112 +580,92 @@ def _timestamp(value):
     return (value - datetime.datetime(1970, 1, 1)).total_seconds()
 
 
-def _year_generator(domain_min, domain_max):
-    for year in numpy.arange(domain_min.year, domain_max.year + 1):
-        value = datetime.datetime(year, 1, 1)
-        if value >= domain_min and value <= domain_max:
-            yield _timestamp(value)
-
-def _quarter_generator(domain_min, domain_max):
-    for year in numpy.arange(domain_min.year, domain_max.year + 1):
-        for month in numpy.arange(0, 12, 3):
-            value = datetime.datetime(year, month + 1, 1)
+def _year_generator(interval):
+    def implementation(domain_min, domain_max):
+        for year in numpy.arange(domain_min.year - (domain_min.year % interval), domain_max.year + 1, interval):
+            value = datetime.datetime(year, 1, 1)
             if value >= domain_min and value <= domain_max:
                 yield _timestamp(value)
+    return implementation
 
-def _month_generator(domain_min, domain_max):
-    for year in numpy.arange(domain_min.year, domain_max.year + 1):
-        for month in numpy.arange(12):
-            value = datetime.datetime(year, month + 1, 1)
-            if value >= domain_min and value <= domain_max:
+
+def _month_generator(interval):
+    def implementation(domain_min, domain_max):
+        for year in numpy.arange(domain_min.year, domain_max.year + 1):
+            for month in numpy.arange(0, 12, interval):
+                value = datetime.datetime(year, month + 1, 1)
+                if value >= domain_min and value <= domain_max:
+                    yield _timestamp(value)
+    return implementation
+
+
+def _day_generator(interval):
+    def implementation(domain_min, domain_max):
+        value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
+        while value <= domain_max:
+            if value >= domain_min:
                 yield _timestamp(value)
+            value += datetime.timedelta(days=interval)
+    return implementation
 
-def _week_generator(domain_min, domain_max):
-    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
-    while value <= domain_max:
-        if value >= domain_min:
-            yield _timestamp(value)
-        value += datetime.timedelta(days=7)
 
-def _day_generator(domain_min, domain_max):
-    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
-    while value <= domain_max:
-        if value >= domain_min:
-            yield _timestamp(value)
-        value += datetime.timedelta(days=1)
+def _hour_generator(interval):
+    def implementation(domain_min, domain_max):
+        value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
+        while value <= domain_max:
+            if value >= domain_min:
+                yield _timestamp(value)
+            value += datetime.timedelta(hours=interval)
+    return implementation
 
-def _4hour_generator(domain_min, domain_max):
-    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
-    while value <= domain_max:
-        if value >= domain_min:
-            yield _timestamp(value)
-        value += datetime.timedelta(hours=4)
 
-def _hour_generator(domain_min, domain_max):
-    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
-    while value <= domain_max:
-        if value >= domain_min:
-            yield _timestamp(value)
-        value += datetime.timedelta(hours=1)
+def _minute_generator(interval):
+    def implementation(domain_min, domain_max):
+        value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
+        while value <= domain_max:
+            if value >= domain_min:
+                yield _timestamp(value)
+            value += datetime.timedelta(minutes=interval)
+    return implementation
 
-def _15minute_generator(domain_min, domain_max):
-    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
-    while value <= domain_max:
-        if value >= domain_min:
-            yield _timestamp(value)
-        value += datetime.timedelta(minutes=15)
 
-def _10minute_generator(domain_min, domain_max):
-    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
-    while value <= domain_max:
-        if value >= domain_min:
-            yield _timestamp(value)
-        value += datetime.timedelta(minutes=10)
+def _second_generator(interval):
+    def implementation(domain_min, domain_max):
+        value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
+        while value <= domain_max:
+            if value >= domain_min:
+                yield _timestamp(value)
+            value += datetime.timedelta(seconds=interval)
+    return implementation
 
-def _5minute_generator(domain_min, domain_max):
-    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
-    while value <= domain_max:
-        if value >= domain_min:
-            yield _timestamp(value)
-        value += datetime.timedelta(minutes=5)
 
-def _1minute_generator(domain_min, domain_max):
-    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
-    while value <= domain_max:
-        if value >= domain_min:
-            yield _timestamp(value)
-        value += datetime.timedelta(minutes=1)
+_intervals = [
+    (datetime.timedelta(days=365 * 1000), _year_generator(1000), "{dt.year}"),
+    (datetime.timedelta(days=365 * 100), _year_generator(100), "{dt.year}"),
+    (datetime.timedelta(days=365 * 10), _year_generator(10), "{dt.year}"),
+    (datetime.timedelta(days=365 * 5), _year_generator(5), "{dt.year}"),
+    (datetime.timedelta(days=365), _year_generator(1), "{dt.year}"),
+    (datetime.timedelta(days=90), _month_generator(3), "{dt:%B} {dt.year}"),
+    (datetime.timedelta(days=30), _month_generator(1), "{dt:%B} {dt.year}"),
+    (datetime.timedelta(days=7), _day_generator(7), "{dt:%a}, {dt:%b} {dt.day}, {dt.year}"),
+    (datetime.timedelta(days=1), _day_generator(1), "{dt:%a}, {dt:%b} {dt.day}"),
+    (datetime.timedelta(hours=12), _hour_generator(12), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
+    (datetime.timedelta(hours=6), _hour_generator(6), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
+    (datetime.timedelta(hours=4), _hour_generator(4), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
+    (datetime.timedelta(hours=1), _hour_generator(1), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
+    (datetime.timedelta(minutes=15), _minute_generator(15), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
+    (datetime.timedelta(minutes=10), _minute_generator(10), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
+    (datetime.timedelta(minutes=5), _minute_generator(5), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
+    (datetime.timedelta(minutes=1), _minute_generator(1), "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
+    (datetime.timedelta(seconds=15), _second_generator(15), "{dt:%H}:{dt:%M}:{dt:%S}"),
+    (datetime.timedelta(seconds=10), _second_generator(10), "{dt:%H}:{dt:%M}:{dt:%S}"),
+    (datetime.timedelta(seconds=5), _second_generator(5), "{dt:%H}:{dt:%M}:{dt:%S}"),
+    (datetime.timedelta(seconds=1), _second_generator(1), "{dt:%H}:{dt:%M}:{dt:%S}"),
+    ]
 
-def _15second_generator(domain_min, domain_max):
-    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
-    while value <= domain_max:
-        if value >= domain_min:
-            yield _timestamp(value)
-        value += datetime.timedelta(seconds=15)
-
-def _10second_generator(domain_min, domain_max):
-    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
-    while value <= domain_max:
-        if value >= domain_min:
-            yield _timestamp(value)
-        value += datetime.timedelta(seconds=10)
-
-def _5second_generator(domain_min, domain_max):
-    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
-    while value <= domain_max:
-        if value >= domain_min:
-            yield _timestamp(value)
-        value += datetime.timedelta(seconds=5)
-
-def _1second_generator(domain_min, domain_max):
-    value = datetime.datetime(domain_min.year, domain_min.month, domain_min.day)
-    while value <= domain_max:
-        if value >= domain_min:
-            yield _timestamp(value)
-        value += datetime.timedelta(seconds=1)
 
 class Timestamp(TickLocator):
-    """Generate ticks when the domain consists of Unix timestamps.
+    """Generate ticks when the domain is UTC timestamps with the Unix epoch.
 
     Parameters
     ----------
@@ -714,23 +695,7 @@ class Timestamp(TickLocator):
         closest_interval = None
         closest_difference = None
 
-        for interval in [
-            (datetime.timedelta(days=365), _year_generator, "{dt.year}"),
-            (datetime.timedelta(days=90), _quarter_generator, "{dt:%B} {dt.year}"),
-            (datetime.timedelta(days=30), _month_generator, "{dt:%B} {dt.year}"),
-            (datetime.timedelta(days=7), _week_generator, "{dt:%a}, {dt:%b} {dt.day}, {dt.year}"),
-            (datetime.timedelta(days=1), _day_generator, "{dt:%a}, {dt:%b} {dt.day}"),
-            (datetime.timedelta(hours=4), _4hour_generator, "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-            (datetime.timedelta(hours=1), _hour_generator, "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-            (datetime.timedelta(minutes=15), _15minute_generator, "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-            (datetime.timedelta(minutes=10), _10minute_generator, "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-            (datetime.timedelta(minutes=5), _5minute_generator, "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-            (datetime.timedelta(minutes=1), _1minute_generator, "{dt:%m}/{dt:%d} {dt:%H}:{dt:%M}"),
-            (datetime.timedelta(seconds=15), _15second_generator, "{dt:%H}:{dt:%M}:{dt:%S}"),
-            (datetime.timedelta(seconds=10), _10second_generator, "{dt:%H}:{dt:%M}:{dt:%S}"),
-            (datetime.timedelta(seconds=5), _5second_generator, "{dt:%H}:{dt:%M}:{dt:%S}"),
-            (datetime.timedelta(seconds=1), _1second_generator, "{dt:%H}:{dt:%M}:{dt:%S}"),
-            ]:
+        for interval in _intervals:
             count = (domain_max - domain_min) / interval[0].total_seconds()
             difference = numpy.abs(self._count - count)
 

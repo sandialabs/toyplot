@@ -42,7 +42,7 @@ def bars(
         padding=10,
         width=None,
         height=None,
-        canvas_style=None):
+        ):
     """Convenience function for creating a bar plot in a single call.
 
     See :meth:`toyplot.axes.Cartesian.bars`,
@@ -58,7 +58,7 @@ def bars(
     mark: :class:`toyplot.mark.BarMagnitudes` or :class:`toyplot.mark.BarBoundaries`
       The new bar mark.
     """
-    canvas = Canvas(width=width, height=height, style=canvas_style)
+    canvas = Canvas(width=width, height=height)
     axes = canvas.axes(
         xmin=xmin,
         xmax=xmax,
@@ -113,7 +113,7 @@ def fill(
         padding=10,
         width=None,
         height=None,
-        canvas_style=None):
+        ):
     """Convenience function for creating a fill plot in a single call.
 
     See :meth:`toyplot.axes.Cartesian.fill`,
@@ -129,7 +129,7 @@ def fill(
     mark: :class:`toyplot.mark.FillBoundaries` or :class:`toyplot.mark.FillMagnitudes`
       The new bar mark.
     """
-    canvas = Canvas(width=width, height=height, style=canvas_style)
+    canvas = Canvas(width=width, height=height)
     axes = canvas.axes(
         xmin=xmin,
         xmax=xmax,
@@ -182,8 +182,7 @@ def graph(
         estyle=None,
         width=None,
         height=None,
-        canvas_style=None,
-    ): # pragma: no cover
+        ): # pragma: no cover
     """Convenience function for creating a graph plot in a single call.
 
     See :meth:`toyplot.axes.Cartesian.graph`,
@@ -199,7 +198,7 @@ def graph(
     mark: :class:`toyplot.mark.Graph`
         The new graph mark.
     """
-    canvas = Canvas(width=width, height=height, style=canvas_style)
+    canvas = Canvas(width=width, height=height)
     axes = canvas.axes(aspect="fit-range", show=False)
     mark = axes.graph(
         a=a,
@@ -245,7 +244,7 @@ def matrix(
         colorshow=False,
         width=None,
         height=None,
-        canvas_style=None):
+        ):
     """Convenience function to create a matrix visualization in a single call.
 
     See :meth:`toyplot.canvas.Canvas.matrix`, and
@@ -258,7 +257,7 @@ def matrix(
     table: :class:`toyplot.axes.Table`
       A new set of table axes that fill the canvas.
     """
-    canvas = Canvas(width=width, height=height, style=canvas_style)
+    canvas = Canvas(width=width, height=height)
     axes = canvas.matrix(
         data=data,
         label=label,
@@ -313,7 +312,7 @@ def plot(
         padding=10,
         width=None,
         height=None,
-        canvas_style=None):
+        ):
     """Convenience function for creating a line plot in a single call.
 
     See :meth:`toyplot.axes.Cartesian.plot`,
@@ -329,7 +328,7 @@ def plot(
     mark: :class:`toyplot.mark.Plot`
       The new plot mark.
     """
-    canvas = Canvas(width=width, height=height, style=canvas_style)
+    canvas = Canvas(width=width, height=height)
     axes = canvas.axes(
         aspect=aspect,
         xmin=xmin,
@@ -394,7 +393,7 @@ def scatterplot(
         padding=10,
         width=None,
         height=None,
-        canvas_style=None):
+        ):
     """Convenience function for creating a scatter plot in a single call.
 
     See :meth:`toyplot.axes.Cartesian.scatterplot`,
@@ -410,7 +409,7 @@ def scatterplot(
     mark: :class:`toyplot.mark.Plot`
       The new scatter plot mark.
     """
-    canvas = Canvas(width=width, height=height, style=canvas_style)
+    canvas = Canvas(width=width, height=height)
     axes = canvas.axes(
         aspect=aspect,
         xmin=xmin,
@@ -453,7 +452,7 @@ def table(
         label=None,
         width=None,
         height=None,
-        canvas_style=None):
+        ):
     """Convenience function to create a table visualization in a single call.
 
     See :meth:`toyplot.canvas.Canvas.table`, and :class:`toyplot.canvas.Canvas`
@@ -466,7 +465,7 @@ def table(
     table: :class:`toyplot.axes.Table`
       A new set of table axes that fill the canvas.
     """
-    canvas = Canvas(width=width, height=height, style=canvas_style)
+    canvas = Canvas(width=width, height=height)
     axes = canvas.table(
         data=data,
         rows=rows,

@@ -86,6 +86,7 @@ notebooks = [
         "markers",
         "matrix-visualization",
         "null-data",
+        "number-lines",
         "rendering",
         "table-axes",
         "text",

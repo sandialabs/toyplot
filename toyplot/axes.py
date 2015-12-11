@@ -1348,12 +1348,12 @@ class Cartesian(object):
         vmarker = toyplot.broadcast.object(vmarker, layout.vcount)
 
         if varea is None and vsize is None:
-            vsize = numpy.sqrt(toyplot.broadcast.scalar(20, layout.vcount))
+            vsize = toyplot.broadcast.scalar(4, layout.vcount)
         elif varea is None and vsize is not None:
             vsize = toyplot.broadcast.scalar(vsize, layout.vcount)
         elif varea is not None and vsize is None:
             vsize = numpy.sqrt(toyplot.broadcast.scalar(varea, layout.vcount))
-        elif varea is not None and vsize is not None:
+        else:
             toyplot.log.warning("Graph vsize parameter overrides varea.")
             vsize = toyplot.broadcast.scalar(vsize, layout.vcount)
 
@@ -1576,7 +1576,8 @@ class Cartesian(object):
             opacity=1.0,
             title=None,
             marker=None,
-            size=20,
+            area=None,
+            size=None,
             mfill=None,
             mopacity=1.0,
             mtitle=None,
@@ -1664,7 +1665,17 @@ class Cartesian(object):
             opacity, series.shape[1])
         stroke_title = toyplot.broadcast.object(title, series.shape[1])
         marker = toyplot.broadcast.object(marker, series.shape)
-        msize = toyplot.broadcast.scalar(size, series.shape)
+
+        if area is None and size is None:
+            msize = toyplot.broadcast.scalar(4, series.shape)
+        elif area is None and size is not None:
+            msize = toyplot.broadcast.scalar(size, series.shape)
+        elif area is not None and size is None:
+            msize = numpy.sqrt(toyplot.broadcast.scalar(area, series.shape))
+        else:
+            toyplot.log.warning("Plot size parameter overrides area.")
+            msize = toyplot.broadcast.scalar(size, coordinates.shape)
+
         mfill = toyplot.color.broadcast(
             colors=mfill,
             shape=series.shape,
@@ -1801,7 +1812,8 @@ class Cartesian(object):
             along="x",
             color=None,
             marker="o",
-            size=20,
+            area=None,
+            size=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -1857,7 +1869,17 @@ class Cartesian(object):
             default=default_color,
             )
         marker = toyplot.broadcast.object(marker, series.shape)
-        msize = toyplot.broadcast.scalar(size, series.shape)
+
+        if area is None and size is None:
+            msize = toyplot.broadcast.scalar(4, series.shape)
+        elif area is None and size is not None:
+            msize = toyplot.broadcast.scalar(size, series.shape)
+        elif area is not None and size is None:
+            msize = numpy.sqrt(toyplot.broadcast.scalar(area, series.shape))
+        else:
+            toyplot.log.warning("Scatterplot size parameter overrides area.")
+            msize = toyplot.broadcast.scalar(size, coordinates.shape)
+
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
         mtitle = toyplot.broadcast.object(title, series.shape)
@@ -2250,7 +2272,8 @@ class NumberLine(object):
             offset=None,
             color=None,
             marker="o",
-            size=20,
+            area=None,
+            size=None,
             opacity=1.0,
             title=None,
             style=None,
@@ -2287,7 +2310,17 @@ class NumberLine(object):
             default=default_color,
             )
         marker = toyplot.broadcast.object(marker, coordinates.shape)
-        msize = toyplot.broadcast.scalar(size, coordinates.shape)
+
+        if area is None and size is None:
+            msize = toyplot.broadcast.scalar(4, coordinates.shape)
+        elif area is None and size is not None:
+            msize = toyplot.broadcast.scalar(size, coordinates.shape)
+        elif area is not None and size is None:
+            msize = numpy.sqrt(toyplot.broadcast.scalar(area, coordinates.shape))
+        else:
+            toyplot.log.warning("Scatterplot size parameter overrides area.")
+            msize = toyplot.broadcast.scalar(size, coordinates.shape)
+
         mstroke = toyplot.color.broadcast(colors=mfill, shape=coordinates.shape)
         mopacity = toyplot.broadcast.scalar(opacity, coordinates.shape)
         mtitle = toyplot.broadcast.object(title, coordinates.shape)

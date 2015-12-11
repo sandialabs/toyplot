@@ -1329,7 +1329,6 @@ def _render(numberline, mark, context):
         ):
         not_null = numpy.invert(numpy.ma.getmaskarray(x))
 
-        msize = numpy.sqrt(msize)
         series_xml = xml.SubElement(
             mark_xml, "g", attrib={"class": "toyplot-Series"})
         for dx, dmarker, dsize, dfill, dstroke, dopacity, dtitle in zip(
@@ -2281,7 +2280,6 @@ def _render(axes, mark, context):
             numpy.ma.getmaskarray(position), numpy.ma.getmaskarray(series)))
         segments = _flat_contiguous(not_null)
 
-        msize = numpy.sqrt(msize)
         stroke_style = toyplot.style.combine(
             {
                 "stroke": toyplot.color.to_css(stroke),
@@ -2423,7 +2421,6 @@ def _render(axes, mark, context):
         not_null = numpy.invert(numpy.logical_or(
             numpy.ma.getmaskarray(x), numpy.ma.getmaskarray(y)))
 
-        msize = numpy.sqrt(msize)
         series_xml = xml.SubElement(
             mark_xml, "g", attrib={"class": "toyplot-Series"})
         for dx, dy, dmarker, dsize, dfill, dstroke, dopacity, dtitle in zip(

@@ -647,14 +647,14 @@ _intervals = [
     dict(interval=datetime.timedelta(days=30), generator=_month_generator(1), format="{0:%B} {0.year}"),
     dict(interval=datetime.timedelta(days=7), generator=_day_generator(7), format="{0:%a}, {0:%b} {0.day}, {0.year}"),
     dict(interval=datetime.timedelta(days=1), generator=_day_generator(1), format="{0:%a}, {0:%b} {0.day}"),
-    dict(interval=datetime.timedelta(hours=12), generator=_hour_generator(12), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
-    dict(interval=datetime.timedelta(hours=6), generator=_hour_generator(6), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
-    dict(interval=datetime.timedelta(hours=4), generator=_hour_generator(4), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
-    dict(interval=datetime.timedelta(hours=1), generator=_hour_generator(1), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
-    dict(interval=datetime.timedelta(minutes=15), generator=_minute_generator(15), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
-    dict(interval=datetime.timedelta(minutes=10), generator=_minute_generator(10), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
-    dict(interval=datetime.timedelta(minutes=5), generator=_minute_generator(5), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
-    dict(interval=datetime.timedelta(minutes=1), generator=_minute_generator(1), format="{0:%m}/{0:%d} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(hours=12), generator=_hour_generator(12), format="{0.month}/{0.day} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(hours=6), generator=_hour_generator(6), format="{0.month}/{0.day} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(hours=4), generator=_hour_generator(4), format="{0.month}/{0.day} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(hours=1), generator=_hour_generator(1), format="{0.month}/{0.day} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(minutes=15), generator=_minute_generator(15), format="{0.month}/{0.day} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(minutes=10), generator=_minute_generator(10), format="{0.month}/{0.day} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(minutes=5), generator=_minute_generator(5), format="{0.month}/{0.day} {0:%H}:{0:%M}"),
+    dict(interval=datetime.timedelta(minutes=1), generator=_minute_generator(1), format="{0.month}/{0.day} {0:%H}:{0:%M}"),
     dict(interval=datetime.timedelta(seconds=15), generator=_second_generator(15), format="{0:%H}:{0:%M}:{0:%S}"),
     dict(interval=datetime.timedelta(seconds=10), generator=_second_generator(10), format="{0:%H}:{0:%M}:{0:%S}"),
     dict(interval=datetime.timedelta(seconds=5), generator=_second_generator(5), format="{0:%H}:{0:%M}:{0:%S}"),
@@ -726,9 +726,9 @@ class Timestamp(TickLocator):
             elif units in ["day", "days"]:
                 interval = dict(interval=datetime.timedelta(days=amount), generator=_day_generator(amount), format="{0:%a}, {0:%b} {0.day}")
             elif units in ["hour", "hours"]:
-                interval = dict(interval=datetime.timedelta(hours=amount), generator=_hour_generator(amount), format="{0:%m}/{0:%d} {0:%H}:{0:%M}")
+                interval = dict(interval=datetime.timedelta(hours=amount), generator=_hour_generator(amount), format="{0.month}/{0.day} {0:%H}:{0:%M}")
             elif units in ["minute", "minutes"]:
-                interval = dict(interval=datetime.timedelta(minutes=amount), generator=_minute_generator(amount), format="{0:%m}/{0:%d} {0:%H}:{0:%M}")
+                interval = dict(interval=datetime.timedelta(minutes=amount), generator=_minute_generator(amount), format="{0.month}/{0.day} {0:%H}:{0:%M}")
             elif units in ["second", "seconds"]:
                 interval = dict(interval=datetime.timedelta(seconds=amount), generator=_second_generator(amount), format="{0:%H}:{0:%M}:{0:%S}")
 

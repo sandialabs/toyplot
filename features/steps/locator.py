@@ -170,13 +170,13 @@ def step_impl(context):
 @given(u'a visualization using the timestamp locator')
 def step_impl(context):
     numpy.random.seed(1234)
-    timestamps = numpy.random.uniform(context.timestamp_begin, context.timestamp_end, size=100)
+    timestamps = numpy.random.uniform(context.timestamp_begin, context.timestamp_end, size=10)
 
     context.canvas = toyplot.Canvas(width=800, height=200)
-    axes = context.canvas.axes(xmin=context.timestamp_begin, xmax=context.timestamp_end, yshow=False)
-    axes.x.ticks.locator = toyplot.locator.Timestamp(count=7)
-    axes.x.ticks.show = True
-    axes.scatterplot(timestamps, numpy.zeros_like(timestamps), marker="|", size=200)
+    numberline = context.canvas.numberline(min=context.timestamp_begin, max=context.timestamp_end)
+    numberline.axis.ticks.locator = toyplot.locator.Timestamp(count=7)
+    numberline.axis.ticks.show = True
+    numberline.scatterplot(timestamps, marker="|", size=15)
 
 @then(u'the generated figure will match {reference}')
 def step_impl(context, reference):

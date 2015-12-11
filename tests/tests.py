@@ -796,7 +796,7 @@ def test_axes_plot_masked_nan():
     y[8:18, 0] = numpy.nan
     y[33:43, 1] = numpy.ma.masked
 
-    canvas, axes, mark = toyplot.plot(x, y, marker="o", size="64")
+    canvas, axes, mark = toyplot.plot(x, y, marker="o")
     assert_canvas_matches(canvas, "axes-plot-masked-nan")
 
 
@@ -987,7 +987,7 @@ def test_axes_scatterplot_markers():
             len(markers)),
         color="steelblue",
         marker=markers,
-        size=100,
+        size=10,
         mstyle=marker_style,
         mlstyle=label_style)
     assert_canvas_matches(canvas, "axes-scatterplot-markers")

@@ -8,7 +8,7 @@ import toyplot.testing
 @then(u'text can be aligned with default alignment')
 def step_impl(context):
     context.axes.text(0, 0, "Text!", style={"font-size": "24px"})
-    context.axes.scatterplot(0, 0, color="black", size=7)
+    context.axes.scatterplot(0, 0, color="black")
     toyplot.testing.assert_canvas_equal(context.canvas, "text-anchor-default")
 
 
@@ -16,7 +16,7 @@ def step_impl(context):
 def step_impl(context):
     context.axes.text(
         0, 0, "Text!", style={"font-size": "24px", "text-anchor": "start"})
-    context.axes.scatterplot(0, 0, color="black", size=7)
+    context.axes.scatterplot(0, 0, color="black")
     toyplot.testing.assert_canvas_equal(context.canvas, "text-anchor-start")
 
 
@@ -24,7 +24,7 @@ def step_impl(context):
 def step_impl(context):
     context.axes.text(
         0, 0, "Text!", style={"font-size": "24px", "text-anchor": "middle"})
-    context.axes.scatterplot(0, 0, color="black", size=7)
+    context.axes.scatterplot(0, 0, color="black")
     toyplot.testing.assert_canvas_equal(context.canvas, "text-anchor-middle")
 
 
@@ -32,7 +32,7 @@ def step_impl(context):
 def step_impl(context):
     context.axes.text(
         0, 0, "Text!", style={"font-size": "24px", "text-anchor": "end"})
-    context.axes.scatterplot(0, 0, color="black", size=7)
+    context.axes.scatterplot(0, 0, color="black")
     toyplot.testing.assert_canvas_equal(context.canvas, "text-anchor-end")
 
 
@@ -46,7 +46,7 @@ def step_impl(context):
             "font-size": "24px",
             "text-anchor": "middle",
             "-toyplot-anchor-shift": "10px"})
-    context.axes.scatterplot(0, 0, color="black", size=7)
+    context.axes.scatterplot(0, 0, color="black")
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-anchor-shift-positive")
 
@@ -61,7 +61,7 @@ def step_impl(context):
             "font-size": "24px",
             "text-anchor": "middle",
             "-toyplot-anchor-shift": "-10px"})
-    context.axes.scatterplot(0, 0, color="black", size=7)
+    context.axes.scatterplot(0, 0, color="black")
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-anchor-shift-negative")
 
@@ -75,7 +75,7 @@ def step_impl(context):
         style={
             "font-size": "24px",
             "alignment-baseline": "hanging"})
-    context.axes.scatterplot(0, 0, color="black", size=7)
+    context.axes.scatterplot(0, 0, color="black")
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-alignment-baseline-hanging")
 
@@ -89,7 +89,7 @@ def step_impl(context):
         style={
             "font-size": "24px",
             "alignment-baseline": "central"})
-    context.axes.scatterplot(0, 0, color="black", size=7)
+    context.axes.scatterplot(0, 0, color="black")
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-alignment-baseline-central")
 
@@ -103,7 +103,7 @@ def step_impl(context):
         style={
             "font-size": "24px",
             "alignment-baseline": "middle"})
-    context.axes.scatterplot(0, 0, color="black", size=7)
+    context.axes.scatterplot(0, 0, color="black")
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-alignment-baseline-middle")
 
@@ -117,7 +117,7 @@ def step_impl(context):
         style={
             "font-size": "24px",
             "alignment-baseline": "alphabetic"})
-    context.axes.scatterplot(0, 0, color="black", size=7)
+    context.axes.scatterplot(0, 0, color="black")
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-alignment-baseline-alphabetic")
 
@@ -126,7 +126,7 @@ def step_impl(context):
 def step_impl(context):
     context.axes.text(
         0, 0, "Text!", style={"font-size": "24px", "baseline-shift": "100%"})
-    context.axes.scatterplot(0, 0, color="black", size=7)
+    context.axes.scatterplot(0, 0, color="black")
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-baseline-shift-positive")
 
@@ -135,7 +135,7 @@ def step_impl(context):
 def step_impl(context):
     context.axes.text(
         0, 0, "Text!", style={"font-size": "24px", "baseline-shift": "-100%"})
-    context.axes.scatterplot(0, 0, color="black", size=7)
+    context.axes.scatterplot(0, 0, color="black")
     toyplot.testing.assert_canvas_equal(
         context.canvas, "text-baseline-shift-negative")
 

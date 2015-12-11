@@ -632,7 +632,7 @@ class Canvas(object):
         -------
         axes: :class:`toyplot.axes.NumberLine`
         """
-        axes = self.number_line(
+        axes = self.numberline(
             x1=x1,
             y1=y1,
             x2=x2,
@@ -656,7 +656,7 @@ class Canvas(object):
 
         return axes
 
-    def number_line(
+    def numberline(
             self,
             x1=None,
             y1=None,
@@ -674,7 +674,8 @@ class Canvas(object):
             ticklocator=None,
             scale="linear",
             palette=None,
-            padding=10,
+            spacing=None,
+            padding=None,
         ):
         """Add a 1D number line to the canvas.
 
@@ -693,9 +694,13 @@ class Canvas(object):
           Specifies the mapping from data to canvas coordinates along an axis.
         palette: :class:`toyplot.color.Palette`, optional
           Color palette used to automatically select per-series colors for plotted data.
-        padding: number, string, or (number, string) tuple,  optional
+        spacing: number, string, or (number, string) tuple,  optional
           Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
           See :ref:`units` for details on how Toyplot handles real-world units.
+        padding: number, string, or (number, string) tuple,  optional
+          Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
+          See :ref:`units` for details on how Toyplot handles real-world units.  Defaults to the
+          same value as `spacing`.
 
         Returns
         -------
@@ -732,12 +737,19 @@ class Canvas(object):
             if y2 < 0:
                 y2 = self._height + y2
 
+        if spacing is None:
+            spacing = 20
+
+        if padding is None:
+            padding = spacing
+
         axes = toyplot.axes.NumberLine(
             x1=x1,
             y1=y1,
             x2=x2,
             y2=y2,
             padding=padding,
+            spacing=spacing,
             min=min,
             max=max,
             show=show,

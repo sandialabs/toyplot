@@ -2133,7 +2133,7 @@ class NumberLine(object):
     """Standard one-dimensional coordinate system / number line.
 
     Do not create NumberLine instances directly.  Use factory methods such
-    as :meth:`toyplot.canvas.Canvas.number_line` instead.
+    as :meth:`toyplot.canvas.Canvas.numberline` instead.
     """
     def __init__(
             self,
@@ -2142,6 +2142,7 @@ class NumberLine(object):
             x2,
             y2,
             padding,
+            spacing,
             min,
             max,
             show,
@@ -2156,7 +2157,9 @@ class NumberLine(object):
         self._x2 = x2
         self._y1 = y1
         self._y2 = y2
-        self._padding = padding
+
+        self.padding = padding
+        self.spacing = spacing
 
         if palette is None:
             palette = toyplot.color.Palette()
@@ -2175,8 +2178,6 @@ class NumberLine(object):
             tick_angle=0,
             scale=scale,
             )
-
-        self._default_offset = 20
 
         self._parent = parent
         self._children = []
@@ -2212,6 +2213,19 @@ class NumberLine(object):
     def padding(self, value):
         self._padding = toyplot.units.convert(value, target="px", default="px")
 
+    @property
+    def spacing(self):
+        """Control the default distance between data added to the number line.
+
+        The default units are CSS pixels, but you may specify the spacing
+        using any :ref:`units` you like.
+        """
+        return self._spacing
+
+    @spacing.setter
+    def spacing(self, value):
+        self._spacing = toyplot.units.convert(value, target="px", default="px")
+
     def update_domain(self, values, display=True, data=True):
         self.axis.update_domain(values, display=display, data=data)
 
@@ -2222,7 +2236,7 @@ class NumberLine(object):
             raise ValueError("Cannot create color scale without explicit colormap domain.")
 
         if offset is None:
-            offset = len(self._children) * self._default_offset
+            offset = len(self._children) * self._spacing
 
         self.update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=False)
         self._children.append(colormap)
@@ -2312,7 +2326,7 @@ class NumberLine(object):
             table[mtitle_keys[-1]] = mtitle_column
 
         if offset is None:
-            offset = len(self._children) * self._default_offset
+            offset = len(self._children) * self._spacing
 
         mark = toyplot.mark.Scatterplot(
             table=table,

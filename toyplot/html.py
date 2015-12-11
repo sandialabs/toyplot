@@ -1245,7 +1245,7 @@ def _render(numberline, colormap, context):
             )
 
 
-@dispatch(toyplot.axes.NumberLine, toyplot.color.LinearMap, _RenderContext)
+@dispatch(toyplot.axes.NumberLine, toyplot.color.Map, _RenderContext)
 def _render(numberline, colormap, context):
     offset = numberline._offset[colormap]
     width = numberline._width[colormap]

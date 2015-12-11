@@ -2238,7 +2238,7 @@ class NumberLine(object):
         if offset is None:
             offset = len(self._children) * self._spacing
 
-        self.update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=False)
+        self.update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=True)
         self._children.append(colormap)
         self._offset[colormap] = offset
         self._width[colormap] = width

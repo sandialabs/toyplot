@@ -15,6 +15,7 @@ these are automatically installed for you):
 
 
 * Python 2.7 / Python 3 - http://python.org
+* arrow - http://arrow.readthedocs.org
 * colormath - https://github.com/gtaylor/python-colormath
 * multipledispatch - https://github.com/mrocklin/multipledispatch
 * numpy - http://numpy.org

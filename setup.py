@@ -22,6 +22,7 @@ setup(
     ],
     description="A modern plotting toolkit supporting electronic publishing and reproducibility.",
     install_requires=[
+        "arrow",
         "colormath",
         "multipledispatch",
         "numpy>=1.7",

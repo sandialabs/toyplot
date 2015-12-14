@@ -20,6 +20,7 @@ Contents:
   embedding.rst
   interaction.rst
   labels-and-legends.rst
+  log-scales.rst
   markers.rst
   matrix-visualization.rst
   number-lines.rst

@@ -83,6 +83,7 @@ notebooks = [
         "data-tables",
         "interaction",
         "labels-and-legends",
+        "log-scales",
         "markers",
         "matrix-visualization",
         "null-data",

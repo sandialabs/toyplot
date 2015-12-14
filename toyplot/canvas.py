@@ -674,24 +674,26 @@ class Canvas(object):
 
         Parameters
         ----------
-        xmin, xmax, ymin, ymax: float, optional
-          Used to explicitly override the axis domain (normally, the domain is
-          implicitly defined by any marks added to the axes).
+        min, max: float, optional
+          Used to explicitly override the numberline domain (normally, the domain is
+          implicitly defined by any marks added to the numberline).
         show: bool, optional
-          Set to `False` to hide both axes (the axes contents will still be visible).
+          Set to `False` to hide the numberline (the numberline contents will still be visible).
         label: string, optional
-          Human-readable label placed above the axes.
+          Human-readable label placed below the numberline axis.
         ticklocator: :class:`toyplot.locator.TickLocator`, optional
-          Controls the placement and formatting of axis ticks and tick labels.
+          Controls the placement and formatting of axis ticks and tick labels.  See :ref:`tick-locators`.
         scale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
-          Specifies the mapping from data to canvas coordinates along an axis.
+          Specifies the mapping from data to canvas coordinates along the axis.  See :ref:`log-scales`.
         spacing: number, string, or (number, string) tuple,  optional
-          Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
-          See :ref:`units` for details on how Toyplot handles real-world units.
+          Distance between plotted data added to the numberline.  Assumes CSS
+          pixels if units aren't provided.  See :ref:`units` for details on how
+          Toyplot handles real-world units.
         padding: number, string, or (number, string) tuple,  optional
-          Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
-          See :ref:`units` for details on how Toyplot handles real-world units.  Defaults to the
-          same value as `spacing`.
+          Distance between the numberline axis and plotted data.  Assumes CSS
+          pixels if units aren't provided.  See :ref:`units` for details on how
+          Toyplot handles real-world units.  Defaults to the same value as
+          `spacing`.
 
         Returns
         -------

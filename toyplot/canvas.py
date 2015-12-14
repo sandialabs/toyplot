@@ -260,7 +260,6 @@ class Canvas(object):
             yticklocator=None,
             xscale="linear",
             yscale="linear",
-            palette=None,
             padding=10,
         ):
         """Add a set of Cartesian axes to the canvas.
@@ -315,8 +314,6 @@ class Canvas(object):
           Controls the placement and formatting of axis ticks and tick labels.
         xscale, yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
           Specifies the mapping from data to canvas coordinates along an axis.
-        palette: :class:`toyplot.color.Palette`, optional
-          Color palette used to automatically select per-series colors for plotted data.
         padding: number, string, or (number, string) tuple,  optional
           Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
           See :ref:`units` for details on how Toyplot handles real-world units.
@@ -348,7 +345,6 @@ class Canvas(object):
                 yticklocator=yticklocator,
                 xscale=xscale,
                 yscale=yscale,
-                palette=palette,
                 padding=padding,
                 parent=self))
 
@@ -603,7 +599,6 @@ class Canvas(object):
             label=None,
             ticklocator=None,
             scale="linear",
-            palette=None,
             padding=10,
         ):
         """Add a color scale to the canvas.
@@ -648,7 +643,6 @@ class Canvas(object):
             label=label,
             ticklocator=ticklocator,
             scale=scale,
-            palette=palette,
             padding=padding,
             )
 
@@ -673,7 +667,6 @@ class Canvas(object):
             label=None,
             ticklocator=None,
             scale="linear",
-            palette=None,
             spacing=None,
             padding=None,
         ):
@@ -692,8 +685,6 @@ class Canvas(object):
           Controls the placement and formatting of axis ticks and tick labels.
         scale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
           Specifies the mapping from data to canvas coordinates along an axis.
-        palette: :class:`toyplot.color.Palette`, optional
-          Color palette used to automatically select per-series colors for plotted data.
         spacing: number, string, or (number, string) tuple,  optional
           Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
           See :ref:`units` for details on how Toyplot handles real-world units.
@@ -756,7 +747,6 @@ class Canvas(object):
             label=label,
             ticklocator=ticklocator,
             scale=scale,
-            palette=palette,
             parent=self)
         self._children.append(axes)
         return axes

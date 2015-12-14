@@ -552,7 +552,6 @@ class Cartesian(object):
             yticklocator,
             xscale,
             yscale,
-            palette,
             padding,
             parent,
             xaxis=None,
@@ -570,16 +569,14 @@ class Cartesian(object):
         self._expand_domain_range_bottom = None
         self._padding = toyplot.units.convert(padding, target="px", default="px")
 
-        if palette is None:
-            palette = toyplot.color.Palette()
-        self._palette = palette
-        self._bar_colors = itertools.cycle(palette)
-        self._fill_colors = itertools.cycle(palette)
-        self._graph_colors = itertools.cycle(palette)
-        self._plot_colors = itertools.cycle(palette)
-        self._scatterplot_colors = itertools.cycle(palette)
-        self._rect_colors = itertools.cycle(palette)
-        self._text_colors = itertools.cycle(palette)
+        self._palette = toyplot.color.Palette()
+        self._bar_colors = itertools.cycle(self._palette)
+        self._fill_colors = itertools.cycle(self._palette)
+        self._graph_colors = itertools.cycle(self._palette)
+        self._plot_colors = itertools.cycle(self._palette)
+        self._scatterplot_colors = itertools.cycle(self._palette)
+        self._rect_colors = itertools.cycle(self._palette)
+        self._text_colors = itertools.cycle(self._palette)
 
         self._show = show
 
@@ -1954,7 +1951,6 @@ class Cartesian(object):
             yticklocator=None,
             xscale="linear",
             yscale="linear",
-            palette=None,
         ):
         """Create a Cartesian coordinate system with a shared axis.
 
@@ -1971,8 +1967,6 @@ class Cartesian(object):
           Controls the placement and formatting of axis ticks and tick labels.
         xscale, yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
           Specifies the mapping from data to canvas coordinates along an axis.
-        palette: :class:`toyplot.color.Palette`, optional
-          Color palette used to automatically select per-series colors for plotted data.
 
         Returns
         -------
@@ -1999,7 +1993,6 @@ class Cartesian(object):
             yticklocator=yticklocator,
             xscale=xscale,
             yscale=yscale,
-            palette=palette,
             padding=self._padding,
             parent=self._parent,
             xaxis=self.x if axis == "x" else None,
@@ -2171,7 +2164,6 @@ class NumberLine(object):
             label,
             ticklocator,
             scale,
-            palette,
             parent,
         ):
 
@@ -2183,10 +2175,8 @@ class NumberLine(object):
         self.padding = padding
         self.spacing = spacing
 
-        if palette is None:
-            palette = toyplot.color.Palette()
-        self._palette = palette
-        self._scatterplot_colors = itertools.cycle(palette)
+        self._palette = toyplot.color.Palette()
+        self._scatterplot_colors = itertools.cycle(self._palette)
 
 #        self.label = Axis.LabelHelper(
 #            label=label, style={"font-size": "14px", "baseline-shift": "100%"})
@@ -2608,7 +2598,6 @@ class Table(object):
                 yticklocator=None,
                 xscale="linear",
                 yscale="linear",
-                palette=None,
                 padding=5,
                 cell_padding=0,
             ):
@@ -2638,7 +2627,6 @@ class Table(object):
                 yticklocator=yticklocator,
                 xscale=xscale,
                 yscale=yscale,
-                palette=palette,
                 padding=padding,
                 parent=self._table._parent,
                 )

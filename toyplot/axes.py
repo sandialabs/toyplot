@@ -2195,6 +2195,7 @@ class NumberLine(object):
         self._children = []
         self._offset = {}
         self._width = {}
+        self._style = {}
 
     @property
     def show(self):
@@ -2241,7 +2242,7 @@ class NumberLine(object):
     def update_domain(self, values, display=True, data=True):
         self.axis.update_domain(values, display=display, data=data)
 
-    def add_colormap(self, colormap, offset=None, width=10):
+    def colormap(self, colormap, offset=None, width=10, style=None):
         if not isinstance(colormap, toyplot.color.Map):
             raise ValueError("A toyplot.color.Map instance is required.")
         if colormap.domain.min is None or colormap.domain.max is None:
@@ -2254,6 +2255,7 @@ class NumberLine(object):
         self._children.append(colormap)
         self._offset[colormap] = offset
         self._width[colormap] = width
+        self._style[colormap] = style
 
 
     def scatterplot(

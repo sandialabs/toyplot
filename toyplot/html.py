@@ -1218,6 +1218,7 @@ def _render(canvas, axes, context):
 def _render(numberline, colormap, context):
     offset = numberline._offset[colormap]
     width = numberline._width[colormap]
+    style = numberline._style[colormap]
 
     transform, length = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
 
@@ -1231,6 +1232,7 @@ def _render(numberline, colormap, context):
     projection = numberline.axis.projection(range_min=0, range_max=length)
     samples = numpy.linspace(colormap.domain.min, colormap.domain.max, len(colormap._palette), endpoint=True)
     projected = projection(samples)
+    colormap_range_min, colormap_range_max = projection([colormap.domain.min, colormap.domain.max])
 
     for index, (x1, x2), in enumerate(zip(projected[:-1], projected[1:])):
         color = colormap._palette[index]
@@ -1244,11 +1246,27 @@ def _render(numberline, colormap, context):
             style=_css_style({"stroke": "none", "fill": toyplot.color.to_css(color)}),
             )
 
+    style = toyplot.style.combine(
+        {"stroke": "none", "stroke-width":1.0, "fill": "none"},
+        style,
+        )
+
+    xml.SubElement(
+        mark_xml,
+        "rect",
+        x=repr(colormap_range_min),
+        y=repr(-width * 0.5),
+        width=repr(colormap_range_max - colormap_range_min),
+        height=repr(width),
+        style=_css_style(style),
+        )
 
 @dispatch(toyplot.axes.NumberLine, toyplot.color.Map, _RenderContext)
 def _render(numberline, colormap, context):
     offset = numberline._offset[colormap]
     width = numberline._width[colormap]
+    style = numberline._style[colormap]
+
     transform, length = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
     projection = numberline.axis.projection(range_min=0, range_max=length)
     colormap_range_min, colormap_range_max = projection([colormap.domain.min, colormap.domain.max])
@@ -1291,6 +1309,11 @@ def _render(numberline, colormap, context):
                 },
             )
 
+    style = toyplot.style.combine(
+        {"stroke": "none", "stroke-width":1.0, "fill": "url(#%s)" % gradient_xml.get("id")},
+        style,
+        )
+
     xml.SubElement(
         mark_xml,
         "rect",
@@ -1298,7 +1321,7 @@ def _render(numberline, colormap, context):
         y=repr(-width * 0.5),
         width=repr(colormap_range_max - colormap_range_min),
         height=repr(width),
-        style=_css_style({"stroke": "none", "fill": "url(#%s)" % gradient_xml.get("id")}),
+        style=_css_style(style),
         )
 
 

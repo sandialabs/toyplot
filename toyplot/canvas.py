@@ -646,7 +646,7 @@ class Canvas(object):
             padding=padding,
             )
 
-        axes.add_colormap(colormap)
+        axes.colormap(colormap)
 
         return axes
 

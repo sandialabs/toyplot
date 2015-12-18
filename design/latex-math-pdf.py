@@ -4,12 +4,14 @@ import pdfrw.toreportlab
 import reportlab.pdfgen.canvas
 import subprocess
 
+equation = "E=\\frac{m_1v^2}{2}"
+
 equation_tex = """
     \documentclass{standalone}
     \\begin{document}
-    $E=\\frac{m_1v^2}{2}$
+    $%s$
     \end{document}
-"""
+""" % equation
 
 pdflatex = subprocess.Popen(["pdflatex"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 stdout, stderr = pdflatex.communicate(equation_tex)

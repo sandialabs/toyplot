@@ -95,6 +95,7 @@ svg = xml.SubElement(
 
 draw_text(parent=svg, markup=markup, ax=200, ay=200, angle=angle, align=align, ashift=ashift, bshift=bshift)
 draw_text(parent=svg, markup="<p>0.3<br></br><span style='font-size:75%'>(0.8, 0.6, 0.2)</span></p>", ax=200, ay=300)
+draw_text(parent=svg, markup="<a href='http://toyplot.readthedocs.org'>Go Toyplot!</a>", ax=200, ay=100)
 
 with open("latex-math-html.html", "wb") as stream:
     stream.write(xml.tostring(root, method="html"))

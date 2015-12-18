@@ -4,17 +4,17 @@ import pdfrw.toreportlab
 import reportlab.pdfgen.canvas
 import subprocess
 
-equation = "E=\\frac{m_1v^2}{2}"
+markup = "The answer is: $E=\\frac{m_1v^2}{2}$"
 
-equation_tex = """
+markup_tex = """
     \documentclass{standalone}
     \\begin{document}
-    $%s$
+    %s
     \end{document}
-""" % equation
+""" % markup
 
 pdflatex = subprocess.Popen(["pdflatex"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-stdout, stderr = pdflatex.communicate(equation_tex)
+stdout, stderr = pdflatex.communicate(markup_tex)
 if pdflatex.returncode:
     print stdout, stderr
 

@@ -1,6 +1,3 @@
 test*
-equation.aux
-equation.log
-equation.dvi
-equation.pdf
-equation.ps
+texput.*
+latex-math-pdf.pdf

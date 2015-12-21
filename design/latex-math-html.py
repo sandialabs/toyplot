@@ -1,10 +1,6 @@
 import xml.etree.ElementTree as xml
 
 markup = "The answer is: \\(E=\\frac{m_1v^2}{2}\\)"
-angle = -30
-align = None
-ashift = None
-bshift = -16
 
 def draw_text(parent, markup, ax, ay, angle=None, align=None, ashift=None, bshift=None, twidth=None, theight=None):
     if angle is None:
@@ -30,10 +26,10 @@ def draw_text(parent, markup, ax, ay, angle=None, align=None, ashift=None, bshif
         bshift = 0
 
     if twidth is None:
-        twidth = 200
+        twidth = 400
 
     if theight is None:
-        theight = 200
+        theight = 400
 
     if align == "left":
         x = ax
@@ -93,9 +89,9 @@ svg = xml.SubElement(
     preserveAspectRatio="xMidYMid meet",
     )
 
-draw_text(parent=svg, markup=markup, ax=200, ay=200, angle=angle, align=align, ashift=ashift, bshift=bshift)
-draw_text(parent=svg, markup="<p>0.3<br></br><span style='font-size:75%'>(0.8, 0.6, 0.2)</span></p>", ax=200, ay=300)
 draw_text(parent=svg, markup="<a href='http://toyplot.readthedocs.org'>Go Toyplot!</a>", ax=200, ay=100)
+draw_text(parent=svg, markup="<p>0.3<br></br><span style='font-size:75%'>(0.8, 0.6, 0.2)</span></p>", ax=200, ay=200)
+draw_text(parent=svg, markup=markup, ax=200, ay=300)
 
 with open("latex-math-html.html", "wb") as stream:
     stream.write(xml.tostring(root, method="html"))

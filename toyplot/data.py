@@ -29,8 +29,21 @@ def contiguous(a):
 
 
 class Table(object):
-
     """Encapsulates an ordered, heterogeneous collection of labelled data series.
+
+    Parameters
+    ----------
+    data: (data series, optional)
+        You may initialize a toyplot.data.Table with any of the following:
+
+        * None (the default) - creates an empty table (a table without any columns).
+        * :class:`toyplot.data.Table` - creates a copy of the given table.
+        * :class:`collections.OrderedDict` - creates a column for each key-value pair in the input, in the same order.  Each value must be implicitly convertable to a numpy masked array, and every value must contain the same number of items.
+        * :class:`numpy.lib.npyio.NpzFile` - creates a column for each key-value pair in the given file, in the same order.  Each array in the input file must contain the same number of items.
+        * :class:`dict` / :class:`collections.Mapping` - creates a column for each key-value pair in the input, sorted by key in lexicographical order.  Each value must be implicitly convertable to a numpy masked array, and every value must contain the same number of items.
+        * :class:`list` / :class:`collections.Sequence` - creates a column for each key-value tuple in the input sequence, in the same order.  Each value must be implicitly convertable to a numpy masked array, and every value must contain the same number of items.
+        * :class:`numpy.ndarray` - creates a column for each column in a numpy matrix (2D array).  The order of the columns is maintained, and each column is assigned a unique name.
+        * :class:`pandas.DataFrame` - creates a column for each column in a `Pandas <http://pandas.pydata.org>`_ data frame.  The order of the columns is maintained.
     """
 
     def __init__(self, data=None):

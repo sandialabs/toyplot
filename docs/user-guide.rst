@@ -18,6 +18,7 @@ Contents:
   convenience-api.rst
   data-tables.rst
   embedding.rst
+  graph-visualization.rst
   interaction.rst
   labels-and-legends.rst
   log-scales.rst

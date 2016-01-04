@@ -81,6 +81,7 @@ notebooks = [
         "color",
         "convenience-api",
         "data-tables",
+        "graph-visualization",
         "interaction",
         "labels-and-legends",
         "log-scales",

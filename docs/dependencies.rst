@@ -7,18 +7,26 @@
 Dependencies
 ============
 
-Required
---------
+Minimum Requirements
+--------------------
 
-To use Toyplot you'll need the following (if you install Toyplot using pip,
-these are automatically installed for you):
+To use Toyplot you'll need the following at a minimum (if you install Toyplot
+using pip, these are automatically installed for you):
 
 
 * Python 2.7 / Python 3 - http://python.org
-* arrow - http://arrow.readthedocs.org
 * colormath - https://github.com/gtaylor/python-colormath
 * multipledispatch - https://github.com/mrocklin/multipledispatch
 * numpy - http://numpy.org
+
+Timestamp Labels
+----------------
+
+If you are displaying datetime information using the
+:class:`toyplot.locator.Timestamp` locator, the following is required (if you
+install Toyplot using pip, it's automatically installed for you):
+
+* arrow - Better dates and times for Python - http://arrow.readthedocs.org
 
 PDF Export
 ----------
@@ -35,7 +43,7 @@ PNG Export
 To generate static PNG versions of your Toyplot figures,
 you'll need the above dependency to generate PDF files, plus Ghostscript:
 
-* Ghostscript - http://www.ghostscript.com
+* Ghostscript - Postscript / PDF interpreter - http://www.ghostscript.com
 
 MP4 / WebM Export
 -----------------
@@ -43,7 +51,7 @@ MP4 / WebM Export
 If you plan to render animated Toyplot figures as MP4 or WebM videos, you'll need
 the above dependencies for exporting PNG files, plus ffmpeg:
 
-* ffmpeg - https://www.ffmpeg.org
+* ffmpeg - cross-platform video conversion - https://www.ffmpeg.org
 
 Qt Interactive Display
 ----------------------
@@ -67,7 +75,6 @@ Regression Testing
 The following are required to run Toyplot's regression tests and view
 code coverage:
 
-* arrow - Better dates and times for Python - http://arrow.readthedocs.org
 * behave - BDD test framework - http://pythonhosted.org/behave
 * coverage - code coverage module - http://nedbatchelder.com/code/coverage
 * mock - mocking and testing library - http://www.voidspace.org.uk/python/mock

@@ -14,7 +14,7 @@ from toyplot.canvas import Canvas
 import logging
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
+log.setLevel(logging.WARNING)
 
 def bars(
         a,
@@ -180,6 +180,7 @@ def graph(
         ewidth=1.0,
         eopacity=1.0,
         estyle=None,
+        padding=20,
         width=None,
         height=None,
         ): # pragma: no cover
@@ -199,7 +200,7 @@ def graph(
         The new graph mark.
     """
     canvas = Canvas(width=width, height=height)
-    axes = canvas.axes(aspect="fit-range", show=False)
+    axes = canvas.axes(aspect="fit-range", show=False, padding=padding)
     mark = axes.graph(
         a=a,
         b=b,

@@ -37,7 +37,7 @@ def prufer_tree(sequence):
 
         return numpy.column_stack((sources, targets))
 
-def barabasi_albert_graph(n=300, m=2, seed=1234):
+def barabasi_albert_graph(n=30, m=2, seed=1234):
     """Generate a graph using the preferential attachment model of Barabasi and Albert.
     """
     if m < 1 or m >= n:

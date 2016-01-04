@@ -38,8 +38,8 @@ def convert_notebook(name):
                            "python",
                            source,
                            "--output",
-                           os.path.join(test_dir,
-                                        name)])
+                           os.path.join(test_dir, name),
+                           ])
 
     subprocess.check_call(["python", os.path.join(test_dir, "%s.py" % name)])
 
@@ -52,15 +52,15 @@ def convert_notebook(name):
                            "rst",
                            source,
                            "--output",
-                           os.path.join(docs_dir,
-                                        name)])
+                           name,
+                           ])
 
     # Unmangle Sphinx cross-references in the tutorial that get mangled by
     # markdown.
     with open(target, "r") as file:
         content = file.read()
         content = re.sub(":([^:]+):``([^`]+)``", ":\\1:`\\2`", content)
-        content = re.sub("[.][.].*(_[^:]+):", ".. \\1:", content)
+        content = re.sub("[.][.].*\\\\(_[^:]+):", ".. \\1:", content)
 
         content = """
   .. image:: ../artwork/toyplot.png
@@ -99,7 +99,8 @@ notebooks = [
 # Clean the build.
 if arguments.command == "clean":
     for name in notebooks:
-        os.remove("%s.rst" % name)
+        if os.path.exists("%s.rst" % name):
+            os.remove("%s.rst" % name)
 
 # Generate the HTML documentation.
 if arguments.command == "build":

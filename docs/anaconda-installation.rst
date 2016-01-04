@@ -17,9 +17,10 @@ With Anaconda installed, do the following to install Toyplot::
     $ conda install pip numpy multipledispatch reportlab
     $ pip install toyplot
 
-Note that there is a Conda package for Toyplot, but (as of this writing) it's fairly
-out of date ... see the package information at
+Note that there is a Conda package for Toyplot, but as with all packaged software
+installations, it may or may not be up-to-date ... see the package information at
 
 https://binstar.org/melund/toyplot
 
-and (in the nicest way possible) let the Anaconda maintainers know you're using Toyplot!
+and be sure to let the Anaconda maintainers know (in the nicest way possible)
+that you're using Toyplot!

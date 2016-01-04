@@ -7,8 +7,10 @@
 FreeBSD Installation
 =====================
 
-There is a FreeBSD port for Toyplot, but (as of this writing) it's fairly out of date ... see the port information at
+There is a FreeBSD port for Toyplot, but as with any packaged software it
+may-or-may-not be up-to-date ... see the port information at
 
 http://www.freshports.org/graphics/py-toyplot/
 
-and (in the nicest way possible) let the FreeBSD maintainers know you're using Toyplot!
+and be sure to let the FreeBSD maintainers know (in the nicest way possible)
+that you're using Toyplot!

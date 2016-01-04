@@ -134,7 +134,7 @@ class Canvas(object):
     >>> canvas = toyplot.Canvas("8in", "6in", style={"background-color":"yellow"})
     """
 
-    def __init__(self, width=None, height=None, style=None, autorender=None):
+    def __init__(self, width=None, height=None, style=None, autorender=None, autoformat=None):
         self._width = toyplot.units.convert(
             width, "px", default="px") if width is not None else 600
         self._height = toyplot.units.convert(
@@ -154,9 +154,7 @@ class Canvas(object):
         self._animation = collections.defaultdict(
             lambda: collections.defaultdict(list))
         self._children = []
-
-        self.autorender(
-            autorender if autorender is not None else toyplot.config.autorender)
+        self.autorender(autorender, autoformat)
 
     def _repr_html_(self):
         import toyplot.html
@@ -167,6 +165,10 @@ class Canvas(object):
                 encoding="utf-8",
                 method="html"),
             encoding="utf-8")
+
+    def _repr_png_(self):
+        import toyplot.png
+        return toyplot.png.render(self)
 
     @property
     def width(self):
@@ -215,7 +217,7 @@ class Canvas(object):
         # frame durations.
         self._animation[frames[-1]]
 
-    def autorender(self, enable):
+    def autorender(self, enable=None, autoformat=None):
         """Enable / disable canvas autorendering.
 
         Autorendering - which is enabled by default when a canvas is created -
@@ -228,15 +230,19 @@ class Canvas(object):
 
         Parameters
         ----------
-        enable: boolean
-          Turn autorendering on / off.
+        enable: boolean, optional
+            Turn autorendering on / off.  Defaults to the value at toyplot.config.autorender.
+        format: string, optional
+            Specify the format ("html" or "png") to be used for autorendering.  Defaults to the value at toyplot.config.autoformat.
         """
+        if enable is None:
+            enable = toyplot.config.autorender
+        if autoformat is None:
+            autoformat = toyplot.config.autoformat
+
+        Canvas._autorender = [entry for entry in Canvas._autorender if entry[0] != self]
         if enable:
-            if self not in Canvas._autorender_list:
-                Canvas._autorender_list.append(self)
-        else:
-            if self in Canvas._autorender_list:
-                Canvas._autorender_list.remove(self)
+            Canvas._autorender.append((self, autoformat))
 
     def axes(
             self,
@@ -974,8 +980,11 @@ class Canvas(object):
     def _ipython_post_execute():  # pragma: no cover
         try:
             import IPython.display
-            for canvas in [canvas for canvas in Canvas._autorender_list]:
-                IPython.display.display(canvas)
+            for canvas, autoformat in Canvas._autorender:
+                if autoformat == "html":
+                    IPython.display.display_html(canvas)
+                elif autoformat == "png":
+                    IPython.display.display_png(canvas)
         except:
             pass
 
@@ -989,5 +998,5 @@ class Canvas(object):
         except:
             pass
 
-Canvas._autorender_list = []
+Canvas._autorender = []
 Canvas._ipython_register()

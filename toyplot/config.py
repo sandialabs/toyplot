@@ -5,5 +5,8 @@
 """Provides global configuration for toyplot figures."""
 
 from __future__ import division
+import os
 
 autorender = True
+autoformat = os.environ.get("TOYPLOT_AUTOFORMAT", "html")
+

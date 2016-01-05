@@ -9,7 +9,7 @@ import shutil
 import subprocess
 
 parser = argparse.ArgumentParser()
-parser.add_argument("command", nargs="?", default="build", choices=["build", "clean"], help="Command to run.")
+parser.add_argument("command", nargs="?", default="html", choices=["clean", "html", "latex"], help="Command to run.")
 arguments = parser.parse_args()
 
 root_dir = os.path.abspath(os.path.join(__file__, "..", ".."))
@@ -45,6 +45,12 @@ def convert_notebook(name):
 
     # Convert the notebook into restructured text suitable for the
     # documentation.
+
+    env = dict()
+    env.update(os.environ)
+    if arguments.command == "latex":
+        env["TOYPLOT_AUTOFORMAT"] = "png"
+
     subprocess.check_call(["ipython",
                            "nbconvert",
                            "--execute",
@@ -53,7 +59,7 @@ def convert_notebook(name):
                            source,
                            "--output",
                            name,
-                           ])
+                           ], env=env)
 
     # Unmangle Sphinx cross-references in the tutorial that get mangled by
     # markdown.
@@ -62,7 +68,8 @@ def convert_notebook(name):
         content = re.sub(":([^:]+):``([^`]+)``", ":\\1:`\\2`", content)
         content = re.sub("[.][.].*\\\\(_[^:]+):", ".. \\1:", content)
 
-        content = """
+        if arguments.command != "latex":
+            content = """
   .. image:: ../artwork/toyplot.png
     :width: 200px
     :align: right
@@ -103,7 +110,8 @@ if arguments.command == "clean":
             os.remove("%s.rst" % name)
 
 # Generate the HTML documentation.
-if arguments.command == "build":
+if arguments.command in ["html", "latex"]:
     for name in notebooks:
         convert_notebook(name)
-    subprocess.check_call(["make", "html"], cwd=docs_dir)
+    subprocess.check_call(["make", arguments.command], cwd=docs_dir)
+

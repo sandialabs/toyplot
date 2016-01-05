@@ -13,24 +13,24 @@ The Toyplot Ethos
     | *Play well with others.*
     | *Never tell a lie.*
 
-What began as a quick workaround to reduce the size of animated figures in
-Jupyter notebooks quickly grew into Toyplot, "the kid-sized plotting toolkit with
+What began as a quick workaround to produce better figures for some experiments
+in machine learning has quickly grown into Toyplot, "the kid-sized plotting toolkit with
 grownup-sized goals".  In a nutshell, we think that scientists and engineers
 should expect more from their plots, from explicit support for
 reproducibility and open science to greater clarity and better aesthetics.
 
 We especially feel that, in an age of ubiquitous electronic media and the web,
 it makes little sense to publish using media (like PDF) designed to mimic
-the limitations of static paper.  Toyplot embraces the standards of the internet - SVG,
-HTML, and Javascript - as its primary medium, so we can make useful new
+the limitations of static paper.  Toyplot embraces the standards of the internet - HTML,
+SVG, and Javascript - as its primary medium, so we can make useful new
 interactions part of the everyday experiences of data graphic users.  Because
-we're passionate about publishing and sharing results, Toyplot graphics are
+we're passionate about publishing and sharing results, Toyplot graphics will always be
 completely self-contained and embeddable, without the need for a server.  All
 of the Toyplot graphics you will see in this documentation are live and
 interactive, despite the fact that they were created offline in a Jupyter
 notebook and passed through several publishing steps on the way to becoming our
 documentation.  Of course, we provide backends to publish Toyplot figures to
-legacy formats including PNG, PDF, Encapsulated Postscript, and MP4 *(Play well with others)*.
+legacy formats including PDF, PNG, and MP4 *(Play well with others)*.
 
 With most toolkits, interactivity means throwaway features like pan-and-zoom.  For
 Toyplot, we're exploring simple-but-effective ideas to address the questions a

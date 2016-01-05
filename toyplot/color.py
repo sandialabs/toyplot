@@ -1006,8 +1006,11 @@ brewer.palettes = {name: palettes.keys()
                    for name, palettes in brewer._data.items()}
 
 
-def _brewer_names():
-    return [name for name in sorted(brewer._data.keys())]
+def _brewer_names(category=None):
+    names = [name for name in sorted(brewer._data.keys())]
+    if category is not None:
+        names = [name for name in names if _brewer_category(name) == category]
+    return names
 brewer.names = _brewer_names
 
 

@@ -763,7 +763,6 @@ def render(canvas, fobj=None, animation=False):
         return root
 
 
-import sys
 def _color_fixup(styles):
     """It turns-out that many applications and libraries (Inkscape, Adobe Illustrator, Qt)
     don't handle CSS rgba() colors correctly.  So convert them to CSS rgb colors and use
@@ -775,11 +774,7 @@ def _color_fixup(styles):
             opacity = float(styles.get("fill-opacity", 1.0))
             styles["fill"] = "rgb(%.3g%%,%.3g%%,%.3g%%)" % (
                 color["r"] * 100, color["g"] * 100, color["b"] * 100)
-            try:
-                styles["fill-opacity"] = str(color["a"] * opacity)
-            except:
-                sys.stderr.write("%s\n" % styles)
-                sys.stderr.flush()
+            styles["fill-opacity"] = str(color["a"] * opacity)
     if "stroke" in styles:
         color = toyplot.color.css(styles["stroke"])
         if color is not None:

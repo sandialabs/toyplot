@@ -811,6 +811,28 @@ def _flat_contiguous(a):
     return result
 
 
+import HTMLParser
+
+class _HTMLParser(HTMLParser.HTMLParser):
+    def __init__(self, element):
+        HTMLParser.HTMLParser.__init__(self)
+        self._element_stack = [element]
+        element.text = ""
+
+    def handle_starttag(self, tag, attrs):
+        print "start:", tag
+        self._element_stack.append(xml.SubElement(self._element_stack[-1], "tspan", dy="0"))
+        self._element_stack[-1].text = ""
+
+    def handle_endtag(self, tag):
+        print "end:", tag
+        self._element_stack.pop()
+
+    def handle_data(self, text):
+        print "text:", text
+        self._element_stack[-1].text += text
+
+
 def _draw_text(
         root,
         text,
@@ -839,7 +861,12 @@ def _draw_text(
         text_xml.set("transform", transform)
     if title is not None:
         xml.SubElement(text_xml, "title").text = str(title)
-    text_xml.text = text
+
+    parser = _HTMLParser(text_xml)
+    parser.feed(text)
+    parser.close()
+
+    #text_xml.text = text
 
 
 def _draw_marker(

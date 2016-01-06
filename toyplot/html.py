@@ -6,6 +6,7 @@ from __future__ import division
 
 from multipledispatch import dispatch
 import collections
+import copy
 import itertools
 import json
 import numbers
@@ -389,6 +390,51 @@ _animation_controls = string.Template("""
 """)
 
 
+class _RenderContext(object):
+    def __init__(self, **kwargs):
+        self.root = None
+        self._id_cache = dict()
+        self._data_tables = list()
+        self._cartesian_axes = dict()
+        self.rendered = set()
+
+        for name in kwargs:
+            setattr(self, name, kwargs[name])
+
+    def __contains__(self, key):
+        return key in self.__dict__
+
+    def __repr__(self):
+        type_name = type(self).__name__
+        arg_strings = []
+        for name, value in sorted(self.__dict__.items()):
+            arg_strings.append('%s=%r' % (name, value))
+        return '%s(%s)' % (type_name, ', '.join(arg_strings))
+
+    def add_cartesian_axes(self, axes):
+        self._cartesian_axes[self.get_id(axes)] = axes
+
+    def add_data_table(self, mark, table, title, filename):
+        self._data_tables.append({
+            "mark": mark,
+            "title": title,
+            "table": table,
+            "filename": filename,
+            })
+
+    def get_id(self, obj):
+        python_id = id(obj)
+        if python_id not in self._id_cache:
+            self._id_cache[python_id] = "t" + uuid.uuid4().hex
+        return self._id_cache[python_id]
+
+    def copy(self, **kwargs):
+        result = copy.copy(self)
+        for name in kwargs:
+            setattr(result, name, kwargs[name])
+        return result
+
+
 def apply_changes(html, changes):
     for change_type, instructions in changes.items():
         if change_type == "set-mark-style":
@@ -473,7 +519,7 @@ def render(canvas, fobj=None, animation=False):
         style=_css_style(canvas._style),
         id=context.get_id(canvas))
     for child in canvas._children:
-        _render(canvas, child, context.push(svg))
+        _render(canvas, child, context.copy(root=svg))
 
     # Collect animation data.
     svg_animation = collections.defaultdict(
@@ -759,53 +805,6 @@ def _css_attrib(*styles):
     return attrib
 
 
-class _RenderContext(object):
-
-    def __init__(
-            self,
-            root=None,
-            id_cache=None,
-            data_tables=None,
-            cartesian_axes=None,
-            rendered=None,
-        ):
-        self._root = root
-        self._id_cache = dict() if id_cache is None else id_cache
-        self._data_tables = list() if data_tables is None else data_tables
-        self._cartesian_axes = dict() if cartesian_axes is None else cartesian_axes
-        self._rendered = set() if rendered is None else rendered
-
-    def add_data_table(self, mark, table, title, filename):
-        self._data_tables.append(
-            {"mark": mark, "title": title, "table": table, "filename": filename})
-
-    def add_cartesian_axes(self, axes):
-        self._cartesian_axes[self.get_id(axes)] = axes
-
-    @property
-    def rendered(self):
-        return self._rendered
-
-    def push(self, root):
-        return _RenderContext(
-            root,
-            self._id_cache,
-            self._data_tables,
-            self._cartesian_axes,
-            self._rendered,
-            )
-
-    @property
-    def root(self):
-        return self._root
-
-    def get_id(self, obj):
-        python_id = id(obj)
-        if python_id not in self._id_cache:
-            self._id_cache[python_id] = "t" + uuid.uuid4().hex
-        return self._id_cache[python_id]
-
-
 def _flat_contiguous(a):
     i = 0
     result = []
@@ -817,7 +816,7 @@ def _flat_contiguous(a):
     return result
 
 
-def _render_marker(
+def _draw_marker(
         root,
         cx,
         cy,
@@ -837,8 +836,8 @@ def _render_marker(
     shape_label = marker.get("label", None)
     shape_label_style = marker.get("lstyle", None)
 
-    if shape in _render_marker.variations:
-        variation = _render_marker.variations[shape]
+    if shape in _draw_marker.variations:
+        variation = _draw_marker.variations[shape]
         shape = variation[0]
         shape_angle += variation[1]
 
@@ -1020,7 +1019,7 @@ def _render_marker(
                                           shape_label_style)).text = shape_label
     return marker_xml
 
-_render_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<": (
+_draw_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<": (
     "^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
 def _rotated_frame(x1, y1, x2, y2, offset):
@@ -1031,50 +1030,15 @@ def _rotated_frame(x1, y1, x2, y2, offset):
     transform="translate(%s,%s) rotate(%s) translate(0,%s)" % (p[0][0], p[0][1], theta, offset)
     return transform, length
 
-def _render_rotated_frame(
-    canvas,
-    context,
-    x1,
-    y1,
-    x2,
-    y2,
-    ):
 
-    p = numpy.row_stack(((x1, y1), (x2, y2)))
-    basis = p[1] - p[0]
-    length = numpy.linalg.norm(basis)
-    theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
-
-    frame_xml = xml.SubElement(
-        context.root,
-        "g",
-        transform="translate(%s,%s) rotate(%s)" % (p[0][0], p[0][1], theta),
-        )
-
-    return frame_xml, length
-
-
-def _render_linear_axis(
-        canvas,
-        axis,
-        context,
-        x1,
-        y1,
-        x2,
-        y2,
-        offset,
-        ticks_above,
-        ticks_below,
-        tick_labels_baseline_shift,
-        label_baseline_shift,
-    ):
-
+@dispatch(toyplot.canvas.Canvas, toyplot.axes.Axis, _RenderContext)
+def _render(canvas, axis, context):
     if axis in context.rendered:
         return
     context.rendered.add(axis)
 
     if axis.show:
-        p = numpy.row_stack(((x1, y1), (x2, y2)))
+        p = numpy.row_stack(((context.x1, context.y1), (context.x2, context.y2)))
         basis = p[1] - p[0]
         length = numpy.linalg.norm(basis)
         theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
@@ -1085,7 +1049,7 @@ def _render_linear_axis(
             context.root,
             "g",
             id=context.get_id(axis),
-            transform="translate(%s,%s) rotate(%s) translate(%s,%s)" % (p[0][0], p[0][1], theta, 0, offset),
+            transform="translate(%s,%s) rotate(%s) translate(%s,%s)" % (p[0][0], p[0][1], theta, 0, context.offset),
             attrib={"class": "toyplot-axes-Axis"},
             )
 
@@ -1108,8 +1072,8 @@ def _render_linear_axis(
                     axis.spine._style))
 
             if axis.ticks._show:
-                y1 = -ticks_above if axis.ticks.above is None else -axis.ticks.above
-                y2 = ticks_below if axis.ticks.below is None else axis.ticks.below
+                y1 = -context.ticks_above if axis.ticks.above is None else -axis.ticks.above
+                y2 = context.ticks_below if axis.ticks.below is None else axis.ticks.below
 
                 ticks_group = xml.SubElement(axis_xml, "g")
                 for location, tick_style in zip(
@@ -1143,7 +1107,7 @@ def _render_linear_axis(
                     {
                         "text-anchor": "middle",
                         "alignment-baseline": "middle",
-                        "baseline-shift": tick_labels_baseline_shift,
+                        "baseline-shift": context.tick_labels_baseline_shift,
                     },
                     axis.ticks.labels.style,
                     label_style)
@@ -1169,7 +1133,7 @@ def _render_linear_axis(
             x = length * 0.5
             dstyle = toyplot.style.combine(
                 {
-                    "baseline-shift": label_baseline_shift,
+                    "baseline-shift": context.label_baseline_shift,
                 },
                 axis.label.style,
             )
@@ -1195,23 +1159,20 @@ def _render(canvas, axes, context):
         )
 
     for child in axes._children:
-        _render(axes, child, context.push(children_xml))
+        _render(axes, child, context.copy(root=children_xml))
 
-    if axes.axis.show:
-        _render_linear_axis(
-            canvas,
-            axes.axis,
-            context.push(axes_xml),
-            x1=axes._x1,
-            y1=axes._y1,
-            x2=axes._x2,
-            y2=axes._y2,
-            offset=axes.padding,
-            ticks_above=3,
-            ticks_below=3,
-            tick_labels_baseline_shift="-100%",
-            label_baseline_shift="-200%",
-            )
+    _render(canvas, axes.axis, context.copy(
+        root=axes_xml,
+        x1=axes._x1,
+        y1=axes._y1,
+        x2=axes._x2,
+        y2=axes._y2,
+        offset=axes.padding,
+        ticks_above=3,
+        ticks_below=3,
+        tick_labels_baseline_shift="-100%",
+        label_baseline_shift="-200%",
+        ))
 
 
 @dispatch(toyplot.axes.NumberLine, toyplot.color.CategoricalMap, _RenderContext)
@@ -1370,7 +1331,7 @@ def _render(numberline, mark, context):
                     "opacity": dopacity,
                 },
                 mark._mstyle)
-            datum_xml = _render_marker(
+            datum_xml = _draw_marker(
                 series_xml,
                 dx,
                 0,
@@ -1421,7 +1382,7 @@ def _render(canvas, axes, context):
         )
 
     for child in axes._children:
-        _render(axes, child, context.push(children_xml))
+        _render(axes, child, context.copy(root=children_xml))
 
     if axes.coordinates._show:
         context.add_cartesian_axes(axes)
@@ -1497,10 +1458,8 @@ def _render(canvas, axes, context):
             y_tick_labels_baseline_shift = "80%"
             y_label_baseline_shift = "200%"
 
-        _render_linear_axis(
-            canvas,
-            axes.x,
-            context.push(axes_xml),
+        _render(canvas, axes.x, context.copy(
+            root=axes_xml,
             x1=axes._xmin_range,
             y1=x_spine_y,
             x2=axes._xmax_range,
@@ -1510,12 +1469,10 @@ def _render(canvas, axes, context):
             ticks_below=x_ticks_below,
             tick_labels_baseline_shift=x_tick_labels_baseline_shift,
             label_baseline_shift=x_label_baseline_shift,
-            )
+            ))
 
-        _render_linear_axis(
-            canvas,
-            axes.y,
-            context.push(axes_xml),
+        _render(canvas, axes.y, context.copy(
+            root=axes_xml,
             x1=y_spine_x,
             y1=axes._ymax_range,
             x2=y_spine_x,
@@ -1525,7 +1482,7 @@ def _render(canvas, axes, context):
             ticks_below=y_ticks_below,
             tick_labels_baseline_shift=y_tick_labels_baseline_shift,
             label_baseline_shift=y_label_baseline_shift,
-            )
+            ))
 
         if axes.label._text is not None:
             x = (axes._xmin_range + axes._xmax_range) * 0.5
@@ -1555,7 +1512,7 @@ def _render(canvas, axes, context):
 
     # Render children.
     for child in axes._children:
-        _render(axes._parent, child, context.push(axes_xml))
+        _render(axes._parent, child, context.copy(root=axes_xml))
 
     # Render visible cells.
     for cell in axes._visible_cells:
@@ -2104,7 +2061,7 @@ def _render(canvas, legend, context):
                         "opacity": mark._table[mark._mopacity[0]][0],
                     },
                     mark_style)
-                _render_marker(
+                _draw_marker(
                     context.root,
                     mark_x + (mark_width / 2),
                     mark_y + (mark_height / 2),
@@ -2129,7 +2086,7 @@ def _render(canvas, legend, context):
             else:
                 computed_style = toyplot.style.combine(
                     {"stroke": toyplot.color.near_black, "fill": "none"}, mark_style)
-                _render_marker(
+                _draw_marker(
                     context.root,
                     mark_x + (mark_width / 2),
                     mark_y + (mark_height / 2),
@@ -2230,7 +2187,7 @@ def _render(axes, mark, context): # pragma: no cover
                 "opacity": vopacity,
             },
             mark._vstyle)
-        _render_marker(
+        _draw_marker(
             vertex_xml,
             vx,
             vy,
@@ -2348,7 +2305,7 @@ def _render(axes, mark, context):
                     "stroke": toyplot.color.to_css(dstroke),
                     "opacity": dopacity},
                 mark._mstyle)
-            datum_xml = _render_marker(
+            datum_xml = _draw_marker(
                 series_xml,
                 dx,
                 dy,
@@ -2463,7 +2420,7 @@ def _render(axes, mark, context):
                     "opacity": dopacity,
                 },
                 mark._mstyle)
-            datum_xml = _render_marker(
+            datum_xml = _draw_marker(
                 series_xml,
                 dx,
                 dy,

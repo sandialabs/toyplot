@@ -811,6 +811,37 @@ def _flat_contiguous(a):
     return result
 
 
+def _draw_text(
+        root,
+        text,
+        x=0,
+        y=0,
+        style=None,
+        transform=None,
+        title=None,
+        attributes={},
+        ):
+
+    if not text:
+        return
+
+    text_xml = xml.SubElement(
+        root,
+        "text",
+        x=repr(x),
+        y=repr(y),
+        style=_css_style(style),
+        attrib=attributes,
+        )
+    if "-toyplot-anchor-shift" in style:
+        text_xml.set("dx", str(style["-toyplot-anchor-shift"]))
+    if transform is not None:
+        text_xml.set("transform", transform)
+    if title is not None:
+        xml.SubElement(text_xml, "title").text = str(title)
+    text_xml.text = text
+
+
 def _draw_marker(
         root,
         cx,
@@ -1000,22 +1031,28 @@ def _draw_marker(
             marker_xml, "path", transform="translate(%r, %r) scale(%r) translate(%r, %r)" %
             (cx, cy, size, -cx, -cy), d="M " + repr(cx) + " " + repr(cy) + shape_path)
 
-    if shape_label is not None:
-        xml.SubElement(marker_xml,
-                       "text",
-                       x=repr(cx),
-                       y=repr(cy),
-                       attrib=_css_attrib({"stroke": "none",
-                                           "fill": toyplot.color.near_black,
-                                           "text-anchor": "middle",
-                                           "alignment-baseline": "middle",
-                                           "font-size": "%rpx" % (size * 0.75)},
-                                          label_style,
-                                          shape_label_style)).text = shape_label
+    if shape_label: # Not technically necessary, but we should avoid computing the style for every marker if we don't have to.
+        _draw_text(
+            root=marker_xml,
+            text=shape_label,
+            x=cx,
+            y=cy,
+            style = toyplot.style.combine(
+                {
+                    "stroke": "none",
+                    "fill": toyplot.color.near_black,
+                    "text-anchor": "middle",
+                    "alignment-baseline": "middle",
+                    "font-size": "%rpx" % (size * 0.75),
+                },
+                label_style,
+                shape_label_style),
+            )
     return marker_xml
 
 _draw_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<": (
     "^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
+
 
 def _rotated_frame(x1, y1, x2, y2, offset):
     p = numpy.row_stack(((x1, y1), (x2, y2)))
@@ -1098,46 +1135,30 @@ def _render(canvas, axis, context):
                     axis.ticks.labels.label.styles(axis._tick_locations),
                 ):
                 x = project(location)
-                dstyle = toyplot.style.combine(
-                    {
-                        "text-anchor": "middle",
-                        "alignment-baseline": "middle",
-                        "baseline-shift": context.tick_labels_baseline_shift,
-                    },
-                    axis.ticks.labels.style,
-                    label_style)
-                label_xml = xml.SubElement(
-                    ticks_group,
-                    "text",
-                    x=repr(0),
-                    y=repr(0),
-                    transform="translate(%r,%r) rotate(%r)" % (x, y, -axis.ticks.labels.angle),
-                    style=_css_style(dstyle))
-                label_xml.text = label
-#                if axis.ticks.labels.angle:
-#                    label_xml.set(
-#                        "transform", "rotate(%r, %r, %r)" %
-#                        (-axis.ticks.labels.angle, x, 0))
-                if "-toyplot-anchor-shift" in dstyle:
-                    label_xml.set(
-                        "dx", str(dstyle["-toyplot-anchor-shift"]))
-                if title is not None:
-                    xml.SubElement(label_xml, "title").text = str(title)
 
-        if axis.label.text is not None:
-            x = length * 0.5
-            dstyle = toyplot.style.combine(
-                {
-                    "baseline-shift": context.label_baseline_shift,
-                },
-                axis.label.style,
+                _draw_text(
+                    root=ticks_group,
+                    text=label,
+                    style=toyplot.style.combine(
+                        {
+                            "text-anchor": "middle",
+                            "alignment-baseline": "middle",
+                            "baseline-shift": context.tick_labels_baseline_shift,
+                        },
+                        axis.ticks.labels.style,
+                        label_style,
+                        ),
+                    transform="translate(%r,%r) rotate(%r)" % (x, y, -axis.ticks.labels.angle),
+                    title=title,
+                    )
+
+        _draw_text(
+            root=axis_xml,
+            text=axis.label.text,
+            x=length * 0.5,
+            y=0,
+            style=toyplot.style.combine({"baseline-shift": context.label_baseline_shift}, axis.label.style),
             )
-            xml.SubElement(
-                axis_xml,
-                "text",
-                x=repr(x),
-                y=repr(0),
-                style=_css_style(dstyle)).text = axis.label.text
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.NumberLine, _RenderContext)
@@ -1479,16 +1500,13 @@ def _render(canvas, axes, context):
             label_baseline_shift=y_label_baseline_shift,
             ))
 
-        if axes.label._text is not None:
-            x = (axes._xmin_range + axes._xmax_range) * 0.5
-            y = axes._ymin_range
-            xml.SubElement(
-                axes_xml,
-                "text",
-                x=repr(x),
-                y=repr(y),
-                style=_css_style(
-                    axes.label._style)).text = axes.label._text
+        _draw_text(
+            root=axes_xml,
+            text=axes.label._text,
+            x=(axes._xmin_range + axes._xmax_range) * 0.5,
+            y=axes._ymin_range,
+            style=axes.label._style,
+            )
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Table, _RenderContext)
@@ -1499,11 +1517,13 @@ def _render(canvas, axes, context):
         axes), attrib={"class": "toyplot-axes-Table"})
 
     # Render title
-    if axes._label._text is not None:
-        x = (axes._xmin_range + axes._xmax_range) * 0.5
-        y = axes._ymin_range
-        xml.SubElement(axes_xml, "text", x=repr(x), y=repr(
-            y), style=_css_style(axes._label._style)).text = axes._label._text
+    _draw_text(
+        root=axes_xml,
+        text=axes._label._text,
+        x=(axes._xmin_range + axes._xmax_range) * 0.5,
+        y=axes._ymin_range,
+        style=axes._label._style,
+        )
 
     # Render children.
     for child in axes._children:
@@ -1549,50 +1569,55 @@ def _render(canvas, axes, context):
 
         if cell._align == "left":
             x = column_left + cell._column_offset
-            xml.SubElement(
-                axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(
-                    toyplot.style.combine(
-                        cell._style, {
-                            "text-anchor": "begin"}))).text = prefix + separator + suffix
+            _draw_text(
+                root=axes_xml,
+                x=x,
+                y=y,
+                style=toyplot.style.combine(cell._style, {"text-anchor": "begin"}),
+                text=prefix + separator + suffix,
+                )
         elif cell._align == "center":
             x = column_center + cell._column_offset
-            xml.SubElement(
-                axes_xml,
-                "text",
-                x=repr(x),
-                y=repr(y),
+            _draw_text(
+                root=axes_xml,
+                x=x,
+                y=y,
                 transform="rotate(%r,%r,%r)" % (-cell._angle, x, y),
-                style=_css_style(
-                    toyplot.style.combine(
-                        cell._style, {
-                            "text-anchor": "middle"}))).text = prefix + separator + suffix
+                style=toyplot.style.combine(cell._style, {"text-anchor": "middle"}),
+                text=prefix + separator + suffix,
+                )
         elif cell._align == "right":
             x = column_right + cell._column_offset
-            xml.SubElement(
-                axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(
-                    toyplot.style.combine(
-                        cell._style, {
-                            "text-anchor": "end"}))).text = prefix + separator + suffix
+            _draw_text(
+                root=axes_xml,
+                x=x,
+                y=y,
+                style=toyplot.style.combine(cell._style, {"text-anchor": "end"}),
+                text=prefix + separator + suffix,
+                )
         elif cell._align is "separator":
             x = column_center + cell._column_offset
-
-            xml.SubElement(axes_xml,
-                           "text",
-                           x=repr(x - 2),
-                           y=repr(y),
-                           style=_css_style(toyplot.style.combine(cell._style,
-                                                                  {"text-anchor": "end"}))).text = prefix
-            xml.SubElement(
-                axes_xml, "text", x=repr(x), y=repr(y), style=_css_style(
-                    toyplot.style.combine(
-                        cell._style, {
-                            "text-anchor": "middle"}))).text = separator
-            xml.SubElement(axes_xml,
-                           "text",
-                           x=repr(x + 2),
-                           y=repr(y),
-                           style=_css_style(toyplot.style.combine(cell._style,
-                                                                  {"text-anchor": "begin"}))).text = suffix
+            _draw_text(
+                root=axes_xml,
+                x=x - 2,
+                y=y,
+                style=toyplot.style.combine(cell._style, {"text-anchor": "end"}),
+                text=prefix,
+                )
+            _draw_text(
+                root=axes_xml,
+                x=x,
+                y=y,
+                style=toyplot.style.combine(cell._style, {"text-anchor": "middle"}),
+                text=separator,
+                )
+            _draw_text(
+                root=axes_xml,
+                x=x + 2,
+                y=y,
+                style=toyplot.style.combine(cell._style, {"text-anchor": "begin"}),
+                text=suffix,
+                )
 
     # Render grid lines.
     column_boundaries = axes._column_boundaries
@@ -2091,16 +2116,13 @@ def _render(canvas, legend, context):
                     {},
                     )
 
-            label_x = x + mark_width + (2 * mark_gutter)
-            label_y = y + ((i + 1) * mark_gutter) + \
-                (i * mark_height) + (mark_height / 2)
-            xml.SubElement(context.root,
-                           "text",
-                           x=repr(label_x),
-                           y=repr(label_y),
-                           style=_css_style({"alignment-baseline": "middle",
-                                             "stroke": "none"},
-                                            legend._lstyle)).text = mark_label
+            _draw_text(
+                root=context.root,
+                text=mark_label,
+                x=x + mark_width + (2 * mark_gutter),
+                y=y + ((i + 1) * mark_gutter) +  (i * mark_height) + (mark_height / 2),
+                style=toyplot.style.combine({"alignment-baseline": "middle", "stroke": "none"}, legend._lstyle),
+                )
 
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Graph, _RenderContext)
@@ -2197,24 +2219,16 @@ def _render(axes, mark, context): # pragma: no cover
     # Render vertex labels
     if mark._vlshow:
         vlabel_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Labels"})
-        for dx, dy, dtext in zip(
-                x,
-                y,
-                mark._vtable[mark._vlabel[0]],
-            ):
-            dstyle = toyplot.style.combine({}, mark._vlstyle)
-            datum_xml = xml.SubElement(
-                vlabel_xml,
-                "text",
-                attrib={"class": "toyplot-Datum"},
-                x=repr(dx),
-                y=repr(dy),
-                #transform="rotate(%r, %r, %r)" % (-dangle, dx, dy),
-                style=_css_style(dstyle))
-            if "-toyplot-anchor-shift" in dstyle:
-                datum_xml.set("dx", str(dstyle["-toyplot-anchor-shift"]))
-            if dtext is not None:
-                datum_xml.text = toyplot.compatibility.unicode_type(dtext)
+        for dx, dy, dtext in zip(x, y, mark._vtable[mark._vlabel[0]]):
+            _draw_text(
+                root=vlabel_xml,
+                text=toyplot.compatibility.unicode_type(dtext),
+                x=dx,
+                y=dy,
+                style=mark._vlstyle,
+                attributes={"class": "toyplot-Datum"},
+                )
+
 
 @dispatch(toyplot.axes.Cartesian, toyplot.mark.Plot, _RenderContext)
 def _render(axes, mark, context):
@@ -2457,21 +2471,15 @@ def _render(parent, mark, context):
             mark._table[mark._opacity[0]],
             mark._table[mark._title[0]],
         ):
-        dstyle = toyplot.style.combine(
-            {"fill": toyplot.color.to_css(dfill), "opacity": dopacity}, mark._style)
-        datum_xml = xml.SubElement(
-            series_xml,
-            "text",
-            attrib={"class": "toyplot-Datum"},
-            x=repr(dx),
-            y=repr(dy),
-            transform="rotate(%r, %r, %r)" % (-dangle, dx, dy),
-            style=_css_style(dstyle))
-        if "-toyplot-anchor-shift" in dstyle:
-            datum_xml.set("dx", str(dstyle["-toyplot-anchor-shift"]))
-        if dtext is not None:
-            datum_xml.text = toyplot.compatibility.unicode_type(dtext)
-        if dtitle is not None:
-            xml.SubElement(datum_xml, "title").text = str(dtitle)
 
+        _draw_text(
+            root=series_xml,
+            text=toyplot.compatibility.unicode_type(dtext),
+            x=dx,
+            y=dy,
+            transform="rotate(%r, %r, %r)" % (-dangle, dx, dy),
+            attributes={"class": "toyplot-Datum"},
+            style=toyplot.style.combine({"fill": toyplot.color.to_css(dfill), "opacity": dopacity}, mark._style),
+            title=dtitle,
+            )
 

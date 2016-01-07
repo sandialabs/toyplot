@@ -814,24 +814,46 @@ def _flat_contiguous(a):
 import HTMLParser
 
 class _HTMLParser(HTMLParser.HTMLParser):
-    def __init__(self, element):
+    def __init__(self, element, x):
         HTMLParser.HTMLParser.__init__(self)
-        self._element_stack = [element]
-        element.text = ""
+        self._element = element
+        self._x = x
+        self._state = [{}]
+        self._spans = [self._state[-1]]
 
     def handle_starttag(self, tag, attrs):
-        print "start:", tag
-        self._element_stack.append(xml.SubElement(self._element_stack[-1], "tspan", dy="0"))
-        self._element_stack[-1].text = ""
+        if tag == "br":
+            self._spans.append(dict(x=repr(self._x), dy=repr(20)))
+        elif tag == "i":
+            state = copy.copy(self._state[-1])
+            state.update({"font-style":"italic"})
+            self._state.append(state)
+            self._spans.append(self._state[-1])
+        else:
+            toyplot.log.warning("Ignoring unknown <%s> tag." % tag)
 
     def handle_endtag(self, tag):
-        print "end:", tag
-        self._element_stack.pop()
+        if tag in ["br"]:
+            toyplot.log.warning("%s must not have an end tag." % tag)
+        elif tag == "i":
+            self._state.pop()
+            self._spans.append(self._state[-1])
+        else:
+            toyplot.log.warning("Ignoring unknown </%s> tag." % tag)
 
     def handle_data(self, text):
-        print "text:", text
-        self._element_stack[-1].text += text
+        self._spans.append(text)
 
+    def close(self):
+        HTMLParser.HTMLParser.close(self)
+        print self._spans
+        self._element.text = "".join([text for text in self._spans if not isinstance(text, dict)])
+#        tspan = None
+#        for item in self._spans:
+#            if isinstance(item, dict):
+#                tspan = xml.SubElement(self._element, "tspan", attrib=item)
+#            else:
+#                tspan.text = item
 
 def _draw_text(
         root,
@@ -862,7 +884,7 @@ def _draw_text(
     if title is not None:
         xml.SubElement(text_xml, "title").text = str(title)
 
-    parser = _HTMLParser(text_xml)
+    parser = _HTMLParser(text_xml, x)
     parser.feed(text)
     parser.close()
 

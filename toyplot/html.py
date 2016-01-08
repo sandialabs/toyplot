@@ -829,13 +829,16 @@ def indent(elem, level=0):
             elem.tail = i
 
 class _HTMLParser(HTMLParser.HTMLParser):
-    def __init__(self, element, x):
+    def __init__(self, element, x, y, font_size):
         HTMLParser.HTMLParser.__init__(self)
         self._element = element
         self._x = x
+        self._y = y
+        self._font_size = font_size
         self._root_node = xml.Element("root")
         self._current_node = self._root_node
         self._parent_map = {self._root_node: self._root_node}
+        self._last_y = y
 
     def push_node(self, tag, **kwargs):
         node = xml.SubElement(self._current_node, tag, **kwargs)
@@ -850,37 +853,44 @@ class _HTMLParser(HTMLParser.HTMLParser):
             if self._current_node.tag != "br":
                 break
 
-    def walk_tree(self, node, state={}, br={}):
-        print node, state, br
+    def walk_tree(self, node, attributes, state, tspan_state):
+        print node.tag, node.text, self._last_y, attributes, state, tspan_state
         if node.tag == "text":
-            state = copy.copy(state)
-            state.update(br)
-            for key in br.keys():
-                del br[key]
-            xml.SubElement(self._element, "tspan", **state).text = node.text
+            attributes = copy.copy(attributes)
+            x = tspan_state.pop("x", None)
+            if x is not None:
+                attributes["x"] = x
+            if state["y"] != self._last_y:
+                attributes["dy"] = state["y"] - self._last_y
+                self._last_y = state["y"]
+            xml.SubElement(self._element, "tspan", {k:str(v) for k, v in attributes.items()}).text = node.text
         else:
+            attributes = copy.copy(attributes)
             state = copy.copy(state)
             if node.tag in ["b", "strong"]:
-                state["font-weight"] = "bold"
+                attributes["font-weight"] = "bold"
             elif node.tag == "br":
-                br["x"] = node.get("x")
-                br["dy"] = node.get("dy")
+                font_size = attributes.get("font-size", self._font_size)
+                tspan_state["x"] = self._x
+                state["y"] += font_size * 1.2
             elif node.tag == "code":
-                state["font-family"] = "monospace"
+                attributes["font-family"] = "monospace"
             elif node.tag in ["em", "i"]:
-                state["font-style"] = "italic"
+                attributes["font-style"] = "italic"
             elif node.tag == "sub":
-                state["font-size"] = "70%"
-                state["baseline-shift"] = "-60%"
+                font_size = attributes.get("font-size", self._font_size)
+                attributes["font-size"] = font_size * 0.7
+                state["y"] += font_size * 0.2
             elif node.tag == "sup":
-                state["font-size"] = "70%"
-                state["baseline-shift"] = "60%"
+                font_size = attributes.get("font-size", self._font_size)
+                attributes["font-size"] = font_size * 0.7
+                state["y"] -= font_size * 0.4
             for child in node:
-                self.walk_tree(child, state)
+                self.walk_tree(child, attributes, state, tspan_state)
 
     def handle_starttag(self, tag, attrs):
         if tag == "br":
-            self.push_node("br", x=repr(self._x), dy=repr(20))
+            self.push_node("br")
         elif tag in ["b", "code", "em", "i", "strong", "sub", "sup"]:
             self.push_node(tag)
         else:
@@ -899,9 +909,9 @@ class _HTMLParser(HTMLParser.HTMLParser):
 
     def close(self):
         HTMLParser.HTMLParser.close(self)
-        self.walk_tree(self._root_node)
-        #indent(self._root_node)
-        #print xml.tostring(self._root_node)
+        self.walk_tree(self._root_node, attributes={}, state={"y":self._y}, tspan_state={"x":self._x})
+        indent(self._root_node)
+        print xml.tostring(self._root_node)
 
 
 def _draw_text(
@@ -921,7 +931,6 @@ def _draw_text(
     text_xml = xml.SubElement(
         root,
         "text",
-        x=repr(x),
         y=repr(y),
         style=_css_style(style),
         attrib=attributes,
@@ -933,11 +942,9 @@ def _draw_text(
     if title is not None:
         xml.SubElement(text_xml, "title").text = str(title)
 
-    parser = _HTMLParser(text_xml, x)
+    parser = _HTMLParser(text_xml, x, y, float(style.get("font-size")[:-2]))
     parser.feed(text)
     parser.close()
-
-    #text_xml.text = text
 
 
 def _draw_marker(

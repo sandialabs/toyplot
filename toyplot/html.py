@@ -838,7 +838,6 @@ class _HTMLParser(HTMLParser.HTMLParser):
         self._root_node = xml.Element("root")
         self._current_node = self._root_node
         self._parent_map = {self._root_node: self._root_node}
-        self._last_y = y
 
     def push_node(self, tag, **kwargs):
         node = xml.SubElement(self._current_node, tag, **kwargs)
@@ -853,45 +852,49 @@ class _HTMLParser(HTMLParser.HTMLParser):
             if self._current_node.tag != "br":
                 break
 
-    def walk_tree(self, node, attributes, state, tspan_state):
-        print node.tag, node.text, self._last_y, attributes, state, tspan_state
+    def walk_tree(self, node, attributes, stack_state, global_state):
+#        print node.tag, node.text, attributes, stack_state, global_state
         if node.tag == "text":
             attributes = copy.copy(attributes)
-            x = tspan_state.pop("x", None)
+            x = global_state.pop("x", None)
             if x is not None:
                 attributes["x"] = x
-            if state["y"] != self._last_y:
-                attributes["dy"] = state["y"] - self._last_y
-                self._last_y = state["y"]
+            new_y = global_state["line-y"] + stack_state["dy"]
+            if new_y != global_state["current-y"]:
+                attributes["dy"] = new_y - global_state["current-y"]
+                global_state["current-y"] = new_y
             xml.SubElement(self._element, "tspan", {k:str(v) for k, v in attributes.items()}).text = node.text
         else:
             attributes = copy.copy(attributes)
-            state = copy.copy(state)
+            stack_state = copy.copy(stack_state)
             if node.tag in ["b", "strong"]:
                 attributes["font-weight"] = "bold"
             elif node.tag == "br":
                 font_size = attributes.get("font-size", self._font_size)
-                tspan_state["x"] = self._x
-                state["y"] += font_size * 1.2
+                global_state["x"] = self._x
+                global_state["line-y"] += font_size * 1.2
             elif node.tag == "code":
                 attributes["font-family"] = "monospace"
             elif node.tag in ["em", "i"]:
                 attributes["font-style"] = "italic"
+            elif node.tag == "small":
+                font_size = attributes.get("font-size", self._font_size)
+                attributes["font-size"] = font_size * 0.8
             elif node.tag == "sub":
                 font_size = attributes.get("font-size", self._font_size)
                 attributes["font-size"] = font_size * 0.7
-                state["y"] += font_size * 0.2
+                stack_state["dy"] += font_size * 0.2
             elif node.tag == "sup":
                 font_size = attributes.get("font-size", self._font_size)
                 attributes["font-size"] = font_size * 0.7
-                state["y"] -= font_size * 0.4
+                stack_state["dy"] -= font_size * 0.4
             for child in node:
-                self.walk_tree(child, attributes, state, tspan_state)
+                self.walk_tree(child, attributes, stack_state, global_state)
 
     def handle_starttag(self, tag, attrs):
         if tag == "br":
             self.push_node("br")
-        elif tag in ["b", "code", "em", "i", "strong", "sub", "sup"]:
+        elif tag in ["b", "code", "em", "i", "small", "strong", "sub", "sup"]:
             self.push_node(tag)
         else:
             toyplot.log.warning("Ignoring unknown <%s> tag." % tag)
@@ -899,7 +902,7 @@ class _HTMLParser(HTMLParser.HTMLParser):
     def handle_endtag(self, tag):
         if tag in ["br"]:
             toyplot.log.warning("%s must not have an end tag." % tag)
-        elif tag in ["b", "code", "em", "i", "strong", "sub", "sup"]:
+        elif tag in ["b", "code", "em", "i", "small", "strong", "sub", "sup"]:
             self.pop_node()
         else:
             toyplot.log.warning("Ignoring unknown </%s> tag." % tag)
@@ -909,9 +912,9 @@ class _HTMLParser(HTMLParser.HTMLParser):
 
     def close(self):
         HTMLParser.HTMLParser.close(self)
-        self.walk_tree(self._root_node, attributes={}, state={"y":self._y}, tspan_state={"x":self._x})
-        indent(self._root_node)
-        print xml.tostring(self._root_node)
+        self.walk_tree(self._root_node, attributes={}, stack_state={"dy":0}, global_state={"line-y":self._y, "current-y":self._y})
+#        indent(self._root_node)
+#        print xml.tostring(self._root_node)
 
 
 def _draw_text(
@@ -931,6 +934,7 @@ def _draw_text(
     text_xml = xml.SubElement(
         root,
         "text",
+        x=repr(x),
         y=repr(y),
         style=_css_style(style),
         attrib=attributes,

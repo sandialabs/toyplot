@@ -813,47 +813,96 @@ def _flat_contiguous(a):
 
 import HTMLParser
 
+def indent(elem, level=0):
+    i = "\n" + level*"  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+        for elem in elem:
+            indent(elem, level+1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
+
 class _HTMLParser(HTMLParser.HTMLParser):
     def __init__(self, element, x):
         HTMLParser.HTMLParser.__init__(self)
         self._element = element
         self._x = x
-        self._state = [{}]
-        self._spans = [self._state[-1]]
+        self._root_node = xml.Element("root")
+        self._current_node = self._root_node
+        self._parent_map = {self._root_node: self._root_node}
+
+    def push_node(self, tag, **kwargs):
+        node = xml.SubElement(self._current_node, tag, **kwargs)
+        self._parent_map[node] = self._current_node
+        self._current_node = node
+
+    def pop_node(self):
+        while self._current_node.tag == "br":
+            self._current_node = self._parent_map[self._current_node]
+        while True:
+            self._current_node = self._parent_map[self._current_node]
+            if self._current_node.tag != "br":
+                break
+
+    def walk_tree(self, node, state={}, br={}):
+        print node, state, br
+        if node.tag == "text":
+            state = copy.copy(state)
+            state.update(br)
+            for key in br.keys():
+                del br[key]
+            xml.SubElement(self._element, "tspan", **state).text = node.text
+        else:
+            state = copy.copy(state)
+            if node.tag in ["b", "strong"]:
+                state["font-weight"] = "bold"
+            elif node.tag == "br":
+                br["x"] = node.get("x")
+                br["dy"] = node.get("dy")
+            elif node.tag == "code":
+                state["font-family"] = "monospace"
+            elif node.tag in ["em", "i"]:
+                state["font-style"] = "italic"
+            elif node.tag == "sub":
+                state["font-size"] = "70%"
+                state["baseline-shift"] = "-60%"
+            elif node.tag == "sup":
+                state["font-size"] = "70%"
+                state["baseline-shift"] = "60%"
+            for child in node:
+                self.walk_tree(child, state)
 
     def handle_starttag(self, tag, attrs):
         if tag == "br":
-            self._spans.append(dict(x=repr(self._x), dy=repr(20)))
-        elif tag == "i":
-            state = copy.copy(self._state[-1])
-            state.update({"font-style":"italic"})
-            self._state.append(state)
-            self._spans.append(self._state[-1])
+            self.push_node("br", x=repr(self._x), dy=repr(20))
+        elif tag in ["b", "code", "em", "i", "strong", "sub", "sup"]:
+            self.push_node(tag)
         else:
             toyplot.log.warning("Ignoring unknown <%s> tag." % tag)
 
     def handle_endtag(self, tag):
         if tag in ["br"]:
             toyplot.log.warning("%s must not have an end tag." % tag)
-        elif tag == "i":
-            self._state.pop()
-            self._spans.append(self._state[-1])
+        elif tag in ["b", "code", "em", "i", "strong", "sub", "sup"]:
+            self.pop_node()
         else:
             toyplot.log.warning("Ignoring unknown </%s> tag." % tag)
 
     def handle_data(self, text):
-        self._spans.append(text)
+        xml.SubElement(self._current_node, "text").text = text
 
     def close(self):
         HTMLParser.HTMLParser.close(self)
-        print self._spans
-        self._element.text = "".join([text for text in self._spans if not isinstance(text, dict)])
-#        tspan = None
-#        for item in self._spans:
-#            if isinstance(item, dict):
-#                tspan = xml.SubElement(self._element, "tspan", attrib=item)
-#            else:
-#                tspan.text = item
+        self.walk_tree(self._root_node)
+        #indent(self._root_node)
+        #print xml.tostring(self._root_node)
+
 
 def _draw_text(
         root,

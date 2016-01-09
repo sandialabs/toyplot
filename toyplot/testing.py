@@ -192,10 +192,6 @@ def assert_canvas_equal(canvas, name):
             sys.modules[module].render(canvas, buffer)
 
     # Get rid of any past failures ...
-#  if os.path.exists("tests/diffs/%s.svg" % name):
-#    os.remove("tests/diffs/%s.svg" % name)
-#  if os.path.exists("tests/diffs/%s.reference.svg" % name):
-#    os.remove("tests/diffs/%s.reference.svg" % name)
     if os.path.exists(test_file):
         os.remove(test_file)
 
@@ -226,12 +222,6 @@ def assert_canvas_equal(canvas, name):
                             fromfile="test svg",
                             tofile="reference svg"))))
     except Exception as e:
-        #    if not os.path.exists("tests/diffs"):
-        #      os.mkdir("tests/diffs")
-        #    with open("tests/diffs/%s.svg" % name, "wb") as file:
-        #      file.write(svg_string)
-        #    with open("tests/diffs/%s.reference.svg" % name, "wb") as file:
-        #      file.write(reference_string)
         if not os.path.exists(failed_dir):
             os.mkdir(failed_dir)
         with open(test_file, "wb") as file:

@@ -31,7 +31,7 @@ def convert(value, target, default=None, reference=None):
       Unit of measure to convert to.
     default: optional string
       Default unit of measure to use when `value` is a plain number, or when
-      `relative` has been specified.
+      `reference` has been specified.
     reference: optional number
       When the caller specifies a relative measure using % as the unit abbreviation,
       the returned value will equal `value` * 0.01 * `reference`.  Note that the

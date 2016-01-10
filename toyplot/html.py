@@ -2245,8 +2245,7 @@ def _render(axes, mark, context):
     mark_xml = xml.SubElement(
         context.root,
         "g",
-        style=_css_style(
-            mark._style),
+        style=_css_style(toyplot.style.combine({"fill":"none"}, mark._style)),
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-Plot"})

@@ -149,8 +149,10 @@ class Canvas(object):
                 "opacity": 1.0,
                 "stroke": toyplot.color.near_black,
                 "stroke-opacity": 1.0,
-                "stroke-width": 1.0},
-            style)
+                "stroke-width": 1.0,
+            },
+            toyplot.require.style(style, allowed=set(["background-color", "border"])),
+            )
         self._animation = collections.defaultdict(
             lambda: collections.defaultdict(list))
         self._children = []
@@ -412,8 +414,8 @@ class Canvas(object):
         legend: :class:`toyplot.mark.Legend`
         """
         gutter = toyplot.require.scalar(gutter)
-        style = toyplot.style.combine(toyplot.require.style(style))
-        label_style = toyplot.style.combine(toyplot.require.style(label_style))
+        style = toyplot.require.style(style, allowed=toyplot.require.style.fill)
+        label_style = toyplot.require.style(label_style, allowed=toyplot.require.style.text)
 
         xmin, xmax, ymin, ymax = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
@@ -889,8 +891,10 @@ class Canvas(object):
                 "font-weight": "normal",
                 "stroke": "none",
                 "text-anchor": "middle",
-                "alignment-baseline": "middle"},
-            toyplot.require.style(style))
+                "alignment-baseline": "middle"
+            },
+            toyplot.require.style(style, allowed=toyplot.require.style.text),
+            )
 
         self._children.append(
             toyplot.mark.Text(

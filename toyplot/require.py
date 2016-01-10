@@ -8,14 +8,63 @@ import numbers
 import numpy
 import toyplot.compatibility
 
+def style(style, allowed):
+    if style is None:
+        return style
 
-def style(style):
     """Verify that the given object is usable as a style."""
-    if not isinstance(style, (dict, type(None))):
+    if not isinstance(style, dict):
         raise ValueError(
             "Expected a dictionary of CSS styles or None, received %s." %
             style)
+
+    for key in style:
+        if key not in allowed:
+            raise ValueError("Not an allowed CSS style: %s" % key)
+
     return style
+
+style.fill = set([
+    "fill",
+    "fill-opacity",
+    "opacity",
+    "stroke",
+    "stroke-dasharray",
+    "stroke-opacity",
+    "stroke-width",
+    ])
+
+style.line = set([
+    "opacity",
+    "stroke",
+    "stroke-dasharray",
+    "stroke-opacity",
+    "stroke-width",
+    ])
+
+style.marker = set([
+    "fill",
+    "fill-opacity",
+    "opacity",
+    "stroke",
+    "stroke-opacity",
+    "stroke-width",
+    ])
+
+style.text = set([
+    "alignment-baseline",
+    "baseline-shift",
+    "fill",
+    "fill-opacity",
+    "font-size",
+    "font-weight",
+    "opacity",
+    "stroke",
+    "stroke-opacity",
+    "stroke-width",
+    "text-anchor",
+    "-toyplot-anchor-shift",
+    ])
 
 
 def instance(value, types):

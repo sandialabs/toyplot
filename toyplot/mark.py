@@ -54,7 +54,7 @@ class AxisLines(Mark):
         # 1 title column
         self._title = toyplot.require.table_keys(table, title, length=1)
         # Line style
-        self._style = toyplot.require.style(style)
+        self._style = toyplot.require.style(style, allowed=toyplot.require.style.line)
 
 
 
@@ -99,7 +99,7 @@ class BarBoundaries(Mark):
         # N-1 title columns
         self._title = toyplot.require.table_keys(table, title, length=len(boundaries) - 1)
         # Bar style
-        self._style = toyplot.style.combine({"stroke": "none"}, toyplot.require.style(style))
+        self._style = toyplot.require.style(style, allowed=toyplot.require.style.fill)
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
@@ -147,7 +147,7 @@ class BarMagnitudes(Mark):
         # N title columns
         self._title = toyplot.require.table_keys(table, title, length=len(magnitudes))
         # Bar style
-        self._style = toyplot.style.combine({"stroke": "none"}, toyplot.require.style(style))
+        self._style = toyplot.require.style(style, allowed=toyplot.require.style.fill)
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
@@ -190,7 +190,7 @@ class FillBoundaries(Mark):
         #self._title = toyplot.require.object_vector(title, length=len(boundaries) - 1)
         self._title = title
         # Fill style
-        self._style = toyplot.require.style(style)
+        self._style = toyplot.require.style(style, allowed=toyplot.require.style.fill)
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
@@ -237,7 +237,7 @@ class FillMagnitudes(Mark):
         #self._title = toyplot.require.object_vector(title, length=len(magnitudes))
         self._title = title
         # Fill style
-        self._style = toyplot.require.style(style)
+        self._style = toyplot.require.style(style, allowed=toyplot.require.style.fill)
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
@@ -298,9 +298,9 @@ class Graph(Mark): # pragma: no cover
         # 1 vertex titles column
         self._vtitle = toyplot.require.table_keys(vtable, vtitle, length=1)
         # Vertex marker style
-        self._vstyle = toyplot.require.style(vstyle)
+        self._vstyle = toyplot.require.style(vstyle, allowed=toyplot.require.style.marker)
         # Vertex marker label style
-        self._vlstyle = toyplot.require.style(vlstyle)
+        self._vlstyle = toyplot.require.style(vlstyle, allowed=toyplot.require.style.text)
         # Draw vertex labels
         self._vlshow = vlshow
 
@@ -336,7 +336,7 @@ class Graph(Mark): # pragma: no cover
         # 1 edge opacity column
         self._eopacity = toyplot.require.table_keys(etable, eopacity, length=1)
         # Edge style
-        self._estyle = toyplot.require.style(estyle)
+        self._estyle = toyplot.require.style(estyle, allowed=toyplot.require.style.line)
 
     @property
     def vcount(self):
@@ -442,11 +442,11 @@ class Plot(Mark):
         # N marker title columns
         self._mtitle = toyplot.require.table_keys(table, mtitle, length=len(series))
         # Line style
-        self._style = toyplot.require.style(style)
+        self._style = toyplot.require.style(style, allowed=toyplot.require.style.line)
         # Marker style
-        self._mstyle = toyplot.require.style(mstyle)
+        self._mstyle = toyplot.require.style(mstyle, allowed=toyplot.require.style.marker)
         # Marker label style
-        self._mlstyle = toyplot.require.style(mlstyle)
+        self._mlstyle = toyplot.require.style(mlstyle, allowed=toyplot.require.style.text)
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
@@ -495,7 +495,7 @@ class Rect(Mark):
         # 1 title column
         self._title = toyplot.require.table_keys(table, title, length=1)
         # Rectangle style
-        self._style = toyplot.require.style(style)
+        self._style = toyplot.require.style(style, allowed=toyplot.require.style.fill)
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
@@ -550,11 +550,11 @@ class Scatterplot(Mark):
         # N marker title columns
         self._mtitle = toyplot.require.table_keys(table, mtitle, length=N)
         # Global style
-        self._style = toyplot.require.style(style)
+        self._style = toyplot.require.style(style, allowed=set())
         # Marker style
-        self._mstyle = toyplot.require.style(mstyle)
+        self._mstyle = toyplot.require.style(mstyle, allowed=toyplot.require.style.marker)
         # Marker label style
-        self._mlstyle = toyplot.require.style(mlstyle)
+        self._mlstyle = toyplot.require.style(mlstyle, allowed=toyplot.require.style.text)
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
@@ -598,7 +598,7 @@ class Text(Mark):
         # 1 title column
         self._title = toyplot.require.table_keys(table, title, length=1)
         # Text style
-        self._style = toyplot.require.style(style)
+        self._style = toyplot.require.style(style, allowed=toyplot.require.style.text)
         # Export filename
         self._filename = toyplot.require.filename(filename)
 

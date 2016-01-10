@@ -3,13 +3,13 @@
 # rights in this software.
 
 import collections
-import difflib
 import io
 import json
 import os
 import numbers
 import numpy.testing
 import re
+import subprocess
 import sys
 import toyplot.html
 import toyplot.svg
@@ -210,22 +210,17 @@ def assert_canvas_equal(canvas, name):
     svg_string = _xml_comparison_string(svg_dom)
     reference_string = _xml_comparison_string(reference_dom)
 
-    try:
-        if svg_string != reference_string:
-            raise Exception(
-                "\n".join(
-                    list(
-                        difflib.context_diff(
-                            svg_string.split("\n"),
-                            reference_string.split("\n"),
-                            lineterm="",
-                            fromfile="test svg",
-                            tofile="reference svg"))))
-    except Exception as e:
+    if svg_string != reference_string:
         if not os.path.exists(failed_dir):
             os.mkdir(failed_dir)
         with open(test_file, "wb") as file:
             file.write(svg.getvalue())
-        raise AssertionError(
-            "Test output %s doesn't match %s:\n%s" %
-            (test_file, reference_file, e))
+        reference = subprocess.Popen(["xmldiff", reference_file, test_file], stdout=subprocess.PIPE)
+        test = subprocess.Popen(["xmldiff", test_file, reference_file], stdout=subprocess.PIPE)
+        message = "Test output %s doesn't match %s:\n\n*** Reference ***\n%s\n*** Test ***\n%s\n" % (
+            test_file,
+            reference_file,
+            reference.communicate()[0],
+            test.communicate()[0],
+            )
+        raise AssertionError(message)

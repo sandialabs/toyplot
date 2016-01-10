@@ -5,6 +5,7 @@
 from __future__ import division
 
 from multipledispatch import dispatch
+import HTMLParser
 import collections
 import copy
 import itertools
@@ -761,22 +762,20 @@ def _flat_contiguous(a):
     return result
 
 
-import HTMLParser
-
-def indent(elem, level=0):
-    i = "\n" + level*"  "
-    if len(elem):
-        if not elem.text or not elem.text.strip():
-            elem.text = i + "  "
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-        for elem in elem:
-            indent(elem, level+1)
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-    else:
-        if level and (not elem.tail or not elem.tail.strip()):
-            elem.tail = i
+#def indent(elem, level=0):
+#    i = "\n" + level*"  "
+#    if len(elem):
+#        if not elem.text or not elem.text.strip():
+#            elem.text = i + "  "
+#        if not elem.tail or not elem.tail.strip():
+#            elem.tail = i
+#        for elem in elem:
+#            indent(elem, level+1)
+#        if not elem.tail or not elem.tail.strip():
+#            elem.tail = i
+#    else:
+#        if level and (not elem.tail or not elem.tail.strip()):
+#            elem.tail = i
 
 class _HTMLParser(HTMLParser.HTMLParser):
     def __init__(self, element, font_size):
@@ -801,9 +800,9 @@ class _HTMLParser(HTMLParser.HTMLParser):
                 break
 
     def walk_tree(self, node, attributes, stack_state, global_state):
-#        print node.tag, node.text, attributes, stack_state, global_state
         if node.tag == "text":
             attributes = copy.copy(attributes)
+            attributes["dominant-baseline"] = "inherit"
             x = global_state.pop("x", None)
             if x is not None:
                 attributes["x"] = x
@@ -880,15 +879,10 @@ def _draw_text(
         return
 
     font_size = toyplot.units.convert(style["font-size"], target="px", default="px")
+    style["dominant-baseline"] = style.pop("alignment-baseline", "middle")
 
     baseline_shift = 0
     baseline_shift -= toyplot.units.convert(style.pop("baseline-shift", 0), target="px", default="px", reference=font_size)
-
-    alignment_baseline = style.pop("alignment-baseline", "alphabetic")
-    if alignment_baseline == "middle":
-        baseline_shift += font_size * 0.5
-    elif alignment_baseline == "hanging":
-        baseline_shift += font_size
 
     x += style.pop("-toyplot-anchor-shift", 0)
 

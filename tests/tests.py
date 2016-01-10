@@ -246,14 +246,17 @@ def test_xml_comparison_string():
 
 
 def test_require_style():
-    nose.tools.assert_equal(toyplot.require.style(None), None)
-    nose.tools.assert_equal(toyplot.require.style({}), {})
-    nose.tools.assert_equal(toyplot.require.style(
-        {"stroke": toyplot.color.near_black}), {"stroke": toyplot.color.near_black})
+    nose.tools.assert_equal(toyplot.require.style(None, set()), None)
+    nose.tools.assert_equal(toyplot.require.style({}, set()), {})
+    nose.tools.assert_equal(
+        toyplot.require.style({"stroke": "none"}, set(["stroke"])),
+        {"stroke": "none"})
     with nose.tools.assert_raises(ValueError):
-        toyplot.require.style([])
+        toyplot.require.style([], set())
     with nose.tools.assert_raises(ValueError):
-        toyplot.require.style("")
+        toyplot.require.style("", set())
+    with nose.tools.assert_raises(ValueError):
+        toyplot.require.style({"foo":"bar"}, set(["stroke"]))
 
 
 def test_style_combine():

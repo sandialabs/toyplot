@@ -829,11 +829,9 @@ def indent(elem, level=0):
             elem.tail = i
 
 class _HTMLParser(HTMLParser.HTMLParser):
-    def __init__(self, element, x, y, font_size):
+    def __init__(self, element, font_size):
         HTMLParser.HTMLParser.__init__(self)
         self._element = element
-        self._x = x
-        self._y = y
         self._font_size = font_size
         self._root_node = xml.Element("root")
         self._current_node = self._root_node
@@ -871,7 +869,7 @@ class _HTMLParser(HTMLParser.HTMLParser):
                 attributes["font-weight"] = "bold"
             elif node.tag == "br":
                 font_size = attributes.get("font-size", self._font_size)
-                global_state["x"] = self._x
+                global_state["x"] = 0
                 global_state["line-y"] += font_size * 1.2
             elif node.tag == "code":
                 attributes["font-family"] = "monospace"
@@ -912,7 +910,7 @@ class _HTMLParser(HTMLParser.HTMLParser):
 
     def close(self):
         HTMLParser.HTMLParser.close(self)
-        self.walk_tree(self._root_node, attributes={}, stack_state={"dy":0}, global_state={"line-y":self._y, "current-y":self._y})
+        self.walk_tree(self._root_node, attributes={}, stack_state={"dy":0}, global_state={"line-y":0, "current-y":0})
 #        indent(self._root_node)
 #        print xml.tostring(self._root_node)
 
@@ -931,22 +929,22 @@ def _draw_text(
     if not text:
         return
 
+    if "-toyplot-anchor-shift" in style:
+        x += style["-toyplot-anchor-shift"]
+
+    transform = "translate(%r,%r)" % (x, y) + (transform if transform is not None else "")
+
     text_xml = xml.SubElement(
         root,
         "text",
-        x=repr(x),
-        y=repr(y),
+        transform=transform,
         style=_css_style(style),
         attrib=attributes,
         )
-    if "-toyplot-anchor-shift" in style:
-        text_xml.set("dx", str(style["-toyplot-anchor-shift"]))
-    if transform is not None:
-        text_xml.set("transform", transform)
     if title is not None:
         xml.SubElement(text_xml, "title").text = str(title)
 
-    parser = _HTMLParser(text_xml, x, y, float(style.get("font-size")[:-2]))
+    parser = _HTMLParser(text_xml, float(style.get("font-size")[:-2]))
     parser.feed(text)
     parser.close()
 
@@ -1248,6 +1246,8 @@ def _render(canvas, axis, context):
                 _draw_text(
                     root=ticks_group,
                     text=label,
+                    x=x,
+                    y=y,
                     style=toyplot.style.combine(
                         {
                             "text-anchor": "middle",
@@ -1257,7 +1257,7 @@ def _render(canvas, axis, context):
                         axis.ticks.labels.style,
                         label_style,
                         ),
-                    transform="translate(%r,%r) rotate(%r)" % (x, y, -axis.ticks.labels.angle),
+                    transform=("rotate(%r)" % (-axis.ticks.labels.angle)) if axis.ticks.labels.angle else None,
                     title=title,
                     )
 
@@ -1691,7 +1691,7 @@ def _render(canvas, axes, context):
                 root=axes_xml,
                 x=x,
                 y=y,
-                transform="rotate(%r,%r,%r)" % (-cell._angle, x, y),
+                transform=("rotate(%r)" % (-cell._angle)) if cell._angle else None,
                 style=toyplot.style.combine(cell._style, {"text-anchor": "middle"}),
                 text=prefix + separator + suffix,
                 )
@@ -2585,7 +2585,7 @@ def _render(parent, mark, context):
             text=toyplot.compatibility.unicode_type(dtext),
             x=dx,
             y=dy,
-            transform="rotate(%r, %r, %r)" % (-dangle, dx, dy),
+            transform=("rotate(%r)" % (-dangle)) if dangle else None,
             attributes={"class": "toyplot-Datum"},
             style=toyplot.style.combine({"fill": toyplot.color.to_css(dfill), "opacity": dopacity}, mark._style),
             title=dtitle,

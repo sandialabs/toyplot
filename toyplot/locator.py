@@ -11,30 +11,6 @@ import toyplot.broadcast
 import toyplot.compatibility
 
 
-def _log_format(base, exponent, location, format):
-    if format is not None:
-        return format.format(location, base=base, exponent=exponent)
-
-    exponent_str = "".join(
-        [_log_format.superscript[character] for character in str(int(exponent))])
-    result = u"%s\u200a%s" % (base, exponent_str)
-    return result
-
-_log_format.superscript = {
-    "-": u"\u207b\u200a",
-    "0": u"\u2070",
-    "1": u"\u00b9",
-    "2": u"\u00b2",
-    "3": u"\u00b3",
-    "4": u"\u2074",
-    "5": u"\u2075",
-    "6": u"\u2076",
-    "7": u"\u2077",
-    "8": u"\u2078",
-    "9": u"\u2079",
-}
-
-
 class TickLocator(object):
 
     """Base class for tick locators - objects that compute the position and format of axis tick labels."""
@@ -488,7 +464,7 @@ class Log(TickLocator):
 
     """
 
-    def __init__(self, base=10, format=None):
+    def __init__(self, base=10, format="{base}<sup> {exponent}</sup>"):
         self._base = base
         self._format = format
 
@@ -547,26 +523,19 @@ class Log(TickLocator):
             positive_exponents = []
         positive_locations = numpy.power(self._base, positive_exponents)
 
-        negative_labels = [
-            "-" +
-            _log_format(
-                self._base,
-                int(exponent),
-                location,
-                self._format) for exponent,
-            location in zip(
-                negative_exponents,
-                negative_locations)]
+        negative_labels = []
+        for exponent, location in zip(negative_exponents, negative_locations):
+            negative_labels.append(
+                "-" + self._format.format(location, base=self._base, exponent=int(exponent))
+                )
+
         linear_labels = [str(location) for location in linear_locations]
-        positive_labels = [
-            _log_format(
-                self._base,
-                int(exponent),
-                location,
-                self._format) for exponent,
-            location in zip(
-                positive_exponents,
-                positive_locations)]
+
+        positive_labels = []
+        for exponent, location in zip(positive_exponents, positive_locations):
+            positive_labels.append(
+                self._format.format(location, base=self._base, exponent=int(exponent))
+                )
 
         locations = numpy.concatenate(
             (negative_locations, linear_locations, positive_locations))

@@ -834,7 +834,7 @@ class _HTMLParser(HTMLParser.HTMLParser):
             elif node.tag == "sup":
                 font_size = attributes.get("font-size", self._font_size)
                 attributes["font-size"] = font_size * 0.7
-                stack_state["dy"] -= font_size * 0.4
+                stack_state["dy"] -= font_size * 0.3
             for child in node:
                 self.walk_tree(child, attributes, stack_state, global_state)
 

@@ -28,52 +28,6 @@ class _NumpyJSONEncoder(json.JSONEncoder):
             return numpy.asscalar(obj)
         return json.JSONEncoder.default(self, obj)
 
-_alignment_baseline_workaround = string.Template("""
-(function()
-{
-  if(window.CSS !== undefined && window.CSS.supports !== undefined)
-  {
-    if(!window.CSS.supports("alignment-baseline", "middle"))
-    {
-      var re = /\s*alignment-baseline\s*:\s*([^;\s]*)\s*/;
-      var text = document.querySelectorAll("#$root_id text");
-      for(var i = 0; i != text.length; ++i)
-      {
-        var match = re.exec(text[i].attributes.style.value);
-        if(match)
-        {
-          if(match[1] == "middle")
-          {
-            var style = getComputedStyle(text[i]);
-            var font_size = style.fontSize.substr(0, style.fontSize.length - 2);
-            var dy = text[i].dy.baseVal.length ? text[i].dy.baseVal[0].value : 0;
-            dy += 0.4 * font_size;
-            text[i].setAttribute("dy", dy);
-          }
-        }
-      }
-    }
-    if(!window.CSS.supports("baseline-shift", "0"))
-    {
-      var re = /\s*baseline-shift\s*:\s*([^;\s]*)\s*/;
-      var text = document.querySelectorAll("#$root_id text");
-      for(var i = 0; i != text.length; ++i)
-      {
-        var match = re.exec(text[i].attributes.style.value);
-        if(match)
-        {
-          var style = getComputedStyle(text[i]);
-          var font_size = style.fontSize.substr(0, style.fontSize.length - 2);
-          var percent = 0.01 * match[1].substr(0, match[1].length-1);
-          var dy = text[i].dy.baseVal.length ? text[i].dy.baseVal[0].value : 0;
-          dy -= percent * font_size
-          text[i].setAttribute("dy", dy);
-        }
-      }
-    }
-  }
-})();
-""")
 
 _export_data_tables = string.Template("""
 (function()
@@ -581,10 +535,6 @@ def render(canvas, fobj=None, animation=False):
         onmouseover="this.style.color='steelblue';this.style.background='white'",
         onmouseout="this.style.color='white';this.style.background='steelblue'").text = "Save as .csv"
 
-    # Add a workaround for browsers that don't support CSS alignment-baseline.
-    if svg.find(".//text") is not None:
-        xml.SubElement(controls, "script").text = _alignment_baseline_workaround.substitute(root_id=root.get("id"))
-
     # Allow users to export embedded table data.
     if context._data_tables:
         data_tables = list()
@@ -921,7 +871,7 @@ def _draw_text(
         x=0,
         y=0,
         style=None,
-        transform=None,
+        angle=None,
         title=None,
         attributes={},
         ):
@@ -929,10 +879,24 @@ def _draw_text(
     if not text:
         return
 
-    if "-toyplot-anchor-shift" in style:
-        x += style["-toyplot-anchor-shift"]
+    font_size = toyplot.units.convert(style["font-size"], target="px", default="px")
 
-    transform = "translate(%r,%r)" % (x, y) + (transform if transform is not None else "")
+    baseline_shift = 0
+    baseline_shift -= toyplot.units.convert(style.pop("baseline-shift", 0), target="px", default="px", reference=font_size)
+
+    alignment_baseline = style.pop("alignment-baseline", "alphabetic")
+    if alignment_baseline == "middle":
+        baseline_shift += font_size * 0.5
+    elif alignment_baseline == "hanging":
+        baseline_shift += font_size
+
+    x += style.pop("-toyplot-anchor-shift", 0)
+
+    transform = "translate(%r,%r)" % (x, y)
+    if angle:
+        transform += "rotate(%r)" % angle
+    if baseline_shift:
+        transform += "translate(0,%r)" % baseline_shift
 
     text_xml = xml.SubElement(
         root,
@@ -944,7 +908,7 @@ def _draw_text(
     if title is not None:
         xml.SubElement(text_xml, "title").text = str(title)
 
-    parser = _HTMLParser(text_xml, float(style.get("font-size")[:-2]))
+    parser = _HTMLParser(text_xml, font_size)
     parser.feed(text)
     parser.close()
 
@@ -1257,7 +1221,7 @@ def _render(canvas, axis, context):
                         axis.ticks.labels.style,
                         label_style,
                         ),
-                    transform=("rotate(%r)" % (-axis.ticks.labels.angle)) if axis.ticks.labels.angle else None,
+                    angle=-axis.ticks.labels.angle,
                     title=title,
                     )
 
@@ -1691,7 +1655,7 @@ def _render(canvas, axes, context):
                 root=axes_xml,
                 x=x,
                 y=y,
-                transform=("rotate(%r)" % (-cell._angle)) if cell._angle else None,
+                angle=-cell._angle,
                 style=toyplot.style.combine(cell._style, {"text-anchor": "middle"}),
                 text=prefix + separator + suffix,
                 )
@@ -2585,7 +2549,7 @@ def _render(parent, mark, context):
             text=toyplot.compatibility.unicode_type(dtext),
             x=dx,
             y=dy,
-            transform=("rotate(%r)" % (-dangle)) if dangle else None,
+            angle=-dangle,
             attributes={"class": "toyplot-Datum"},
             style=toyplot.style.combine({"fill": toyplot.color.to_css(dfill), "opacity": dopacity}, mark._style),
             title=dtitle,

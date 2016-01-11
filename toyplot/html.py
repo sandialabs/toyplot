@@ -5,7 +5,6 @@
 from __future__ import division
 
 from multipledispatch import dispatch
-import HTMLParser
 import collections
 import copy
 import itertools

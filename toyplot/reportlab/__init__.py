@@ -80,15 +80,19 @@ def render(svg, canvas):
         canvas.setStrokeColorRGB(color["r"], color["g"], color["b"])
         canvas.setStrokeAlpha(numpy.asscalar(color["a"]))
 
-    def render_element(root, element, canvas, styles):
+    def render_element(root, element, canvas, styles, text_state=None):
         canvas.saveState()
 
         current_style = {}
         if len(styles):
             current_style.update(styles[-1])
-
-        current_style.update(dict(
-            [declaration.split(":") for declaration in element.get("style", "").split(";") if declaration != ""]))
+        for declaration in element.get("style", "").split(";"):
+            if declaration == "":
+                continue
+            key, value = declaration.split(":")
+            if key == "dominant-baseline" and value == "inherit":
+                continue
+            current_style[key] = value
         styles.append(current_style)
 
         if "stroke-width" in current_style:
@@ -256,63 +260,73 @@ def render(svg, canvas):
                 r = float(element.get("r"))
                 canvas.circle(cx, cy, r, stroke=stroke is not None, fill=fill is not None)
             elif element.tag == "text":
-                if element.text is not None and element.text != "":
-
-#                    if "font-family" in current_style:
-#                        font_description.set_family(
-#                            current_style["font-family"])
-#                    if "font-weight" in current_style:
-#                        font_description.set_weight(
-#                            pango.WEIGHT_BOLD if current_style["font-weight"] == "bold" else pango.WEIGHT_NORMAL)
-#                    if "font-size" in current_style:
-                    font_family = current_style["font-family"]
-                    font_size = toyplot.units.convert(current_style["font-size"].strip(), "px")
-                    canvas.setFont(font_family, font_size)
-
-                    string_width = reportlab.pdfbase.pdfmetrics.stringWidth(element.text, canvas._fontname, canvas._fontsize)
-                    ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(canvas._fontname, canvas._fontsize)
-
-                    x = float(element.get("x"))
-                    y = float(element.get("y"))
+                text_state = {"x": 0, "y": 0, "chunks": [[]]}
+                for child in element:
+                    render_element(root, child, canvas, styles, text_state)
+                for chunk in text_state["chunks"]:
+                    width = sum([span[7] for span in chunk])
 
                     text_anchor = current_style.get("text-anchor", "start")
                     if text_anchor == "start":
-                        pass
+                        dx = 0
                     elif text_anchor == "middle":
-                        x -= string_width * 0.5
+                        dx = -width * 0.5
                     elif text_anchor == "end":
-                        x -= string_width
+                        dx = -string_width
 
-                    dx = toyplot.units.convert(
-                        element.get("dx", 0), "px", default="px")
-                    x += dx
+                    for x, y, fill, stroke, font_family, font_size, text, width in chunk:
+                        canvas.saveState()
+                        canvas.setFont(font_family, font_size)
+                        if fill is not None:
+                            set_fill_color(canvas, fill)
+                        if stroke is not None:
+                            set_stroke_color(canvas, stroke)
+                        canvas.translate(x + dx, y)
+                        canvas.scale(1, -1)
+                        canvas.drawString(0, 0, text)
+                        canvas.restoreState()
 
-                    alignment_baseline = current_style.get("alignment-baseline", "middle")
-                    if alignment_baseline == "hanging":
-                        y += ascent
-                    elif alignment_baseline == "central":
-                        y += ascent * 0.5
-                    elif alignment_baseline == "middle":
-                        y += (ascent + descent) * 0.5
-                    elif alignment_baseline == "alphabetic":
-                        pass
-                    else:
-                        raise ValueError("Unsupported alignment-baseline: %s" % alignment_baseline) # pragma: no cover
+            elif element.tag == "tspan":
+#                    if "font-weight" in current_style:
+#                        font_description.set_weight(
+#                            pango.WEIGHT_BOLD if current_style["font-weight"] == "bold" else pango.WEIGHT_NORMAL)
+                font_family = current_style["font-family"]
+                font_size = toyplot.units.convert(current_style["font-size"].strip(), "px")
 
-                    baseline_shift = current_style.get("baseline-shift", "0").strip()
-                    baseline_shift = toyplot.units.convert(baseline_shift, "px", "px", ascent - descent)
-                    y -= baseline_shift
+                string_width = reportlab.pdfbase.pdfmetrics.stringWidth(element.text, font_family, font_size)
+                ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(font_family, font_size)
 
-                    fill, fill_gradient = get_fill(root, current_style)
-                    if fill is not None:
-                        set_fill_color(canvas, fill)
-                    stroke = get_stroke(current_style)
-                    if stroke is not None:
-                        set_stroke_color(canvas, stroke)
+                if "x" in element.attrib:
+                    text_state["x"] = float(element.get("x"))
+                    text_state["chunks"].append([])
 
-                    canvas.translate(x, y)
-                    canvas.scale(1, -1)
-                    canvas.drawString(0, 0, element.text)
+                if "dy" in element.attrib:
+                    text_state["y"] += float(element.get("dy"))
+
+                x = text_state["x"]
+                y = text_state["y"]
+
+                alignment_baseline = current_style.get("alignment-baseline", "middle")
+                if alignment_baseline == "hanging":
+                    y += ascent
+                elif alignment_baseline == "central":
+                    y += ascent * 0.5
+                elif alignment_baseline == "middle":
+                    y += (ascent + descent) * 0.5
+                elif alignment_baseline == "alphabetic":
+                    pass
+                else:
+                    raise ValueError("Unsupported alignment-baseline: %s" % alignment_baseline) # pragma: no cover
+
+                baseline_shift = current_style.get("baseline-shift", "0").strip()
+                baseline_shift = toyplot.units.convert(baseline_shift, "px", "px", ascent - descent)
+                y -= baseline_shift
+
+                fill, fill_gradient = get_fill(root, current_style)
+                stroke = get_stroke(current_style)
+
+                text_state["chunks"][-1].append((x, y, fill, stroke, font_family, font_size, element.text, string_width))
+                text_state["x"] += string_width
 
             elif element.tag in ["defs", "title"]:
                 pass

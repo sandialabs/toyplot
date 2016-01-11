@@ -72,6 +72,44 @@ def render(svg, canvas):
             color["a"] * stroke_opacity * opacity,
             )
 
+    def get_font_family(style):
+        if "font-family" not in style:
+            return None
+
+        bold = True if style.get("font-weight", "") == "bold" else False
+        italic = True if style.get("font-style", "") == "italic" else False
+        for font_family in style["font-family"].split(","):
+            font_family = font_family.lower()
+            if font_family in get_font_family.substitutions:
+                font_family = get_font_family.substitutions[font_family]
+                return get_font_family.font_table[(font_family, bold, italic)]
+
+        raise ValueError("Unknown font family: %s" % style["font-family"])
+
+    get_font_family.font_table = {
+        ("courier", False, False): "Courier",
+        ("courier", True, False): "Courier-Bold",
+        ("courier", False, True): "Courier-Oblique",
+        ("courier", True, True): "Courier-BoldOblique",
+        ("helvetica", False, False): "Helvetica",
+        ("helvetica", True, False): "Helvetica-Bold",
+        ("helvetica", False, True): "Helvetica-Oblique",
+        ("helvetica", True, True): "Helvetica-BoldOblique",
+        ("times", False, False): "Times-Roman",
+        ("times", True, False): "Times-Bold",
+        ("times", False, True): "Times-Italic",
+        ("times", True, True): "Times-BoldItalic",
+        }
+
+    get_font_family.substitutions = {
+        "courier": "courier",
+        "helvetica": "helvetica",
+        "monospace": "courier",
+        "sans-serif": "helvetica",
+        "serif": "times",
+        "times": "times",
+        }
+
     def set_fill_color(canvas, color):
         canvas.setFillColorRGB(color["r"], color["g"], color["b"])
         canvas.setFillAlpha(numpy.asscalar(color["a"]))
@@ -289,7 +327,7 @@ def render(svg, canvas):
 #                    if "font-weight" in current_style:
 #                        font_description.set_weight(
 #                            pango.WEIGHT_BOLD if current_style["font-weight"] == "bold" else pango.WEIGHT_NORMAL)
-                font_family = current_style["font-family"]
+                font_family = get_font_family(current_style)
                 font_size = toyplot.units.convert(current_style["font-size"].strip(), "px")
 
                 string_width = reportlab.pdfbase.pdfmetrics.stringWidth(element.text, font_family, font_size)

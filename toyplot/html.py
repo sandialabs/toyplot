@@ -21,6 +21,10 @@ import toyplot.mark
 import uuid
 import xml.etree.ElementTree as xml
 
+try:
+    import HTMLParser
+except:
+    import html.parser as HTMLParser
 
 class _NumpyJSONEncoder(json.JSONEncoder):
 

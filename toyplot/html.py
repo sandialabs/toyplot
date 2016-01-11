@@ -799,10 +799,11 @@ class _HTMLParser(HTMLParser.HTMLParser):
             if self._current_node.tag != "br":
                 break
 
-    def walk_tree(self, node, attributes, stack_state, global_state):
+    def walk_tree(self, node, attributes, style, stack_state, global_state):
         if node.tag == "text":
             attributes = copy.copy(attributes)
-            attributes["dominant-baseline"] = "inherit"
+            style = copy.copy(style)
+            style["dominant-baseline"] = "inherit"
             x = global_state.pop("x", None)
             if x is not None:
                 attributes["x"] = x
@@ -810,33 +811,41 @@ class _HTMLParser(HTMLParser.HTMLParser):
             if new_y != global_state["current-y"]:
                 attributes["dy"] = new_y - global_state["current-y"]
                 global_state["current-y"] = new_y
-            xml.SubElement(self._element, "tspan", {k:str(v) for k, v in attributes.items()}).text = node.text
+            tspan = xml.SubElement(self._element, "tspan")
+            for key, value in attributes.items():
+                tspan.set(key, str(value))
+            tspan.set("style", _css_style(style))
+            tspan.text = node.text
         else:
             attributes = copy.copy(attributes)
+            style = copy.copy(style)
             stack_state = copy.copy(stack_state)
             if node.tag in ["b", "strong"]:
-                attributes["font-weight"] = "bold"
+                style["font-weight"] = "bold"
             elif node.tag == "br":
-                font_size = attributes.get("font-size", self._font_size)
+                font_size = stack_state["font-size"]
                 global_state["x"] = 0
                 global_state["line-y"] += font_size * 1.2
             elif node.tag == "code":
-                attributes["font-family"] = "monospace"
+                style["font-family"] = "monospace"
             elif node.tag in ["em", "i"]:
-                attributes["font-style"] = "italic"
+                style["font-style"] = "italic"
             elif node.tag == "small":
-                font_size = attributes.get("font-size", self._font_size)
-                attributes["font-size"] = font_size * 0.8
+                font_size = stack_state["font-size"]
+                stack_state["font-size"] = font_size * 0.8
+                style["font-size"] = "%spx" % (font_size * 0.8)
             elif node.tag == "sub":
-                font_size = attributes.get("font-size", self._font_size)
-                attributes["font-size"] = font_size * 0.7
+                font_size = stack_state["font-size"]
+                stack_state["font-size"] = font_size * 0.7
+                style["font-size"] = "%spx" % (font_size * 0.7)
                 stack_state["dy"] += font_size * 0.2
             elif node.tag == "sup":
-                font_size = attributes.get("font-size", self._font_size)
-                attributes["font-size"] = font_size * 0.7
+                font_size = stack_state["font-size"]
+                stack_state["font-size"] = font_size * 0.7
+                style["font-size"] = "%spx" % (font_size * 0.7)
                 stack_state["dy"] -= font_size * 0.3
             for child in node:
-                self.walk_tree(child, attributes, stack_state, global_state)
+                self.walk_tree(child, attributes, style, stack_state, global_state)
 
     def handle_starttag(self, tag, attrs):
         if tag == "br":
@@ -859,7 +868,7 @@ class _HTMLParser(HTMLParser.HTMLParser):
 
     def close(self):
         HTMLParser.HTMLParser.close(self)
-        self.walk_tree(self._root_node, attributes={}, stack_state={"dy":0}, global_state={"line-y":0, "current-y":0})
+        self.walk_tree(self._root_node, attributes={}, style={}, stack_state={"dy":0,"font-size":self._font_size}, global_state={"line-y":0, "current-y":0})
 #        indent(self._root_node)
 #        print xml.tostring(self._root_node)
 

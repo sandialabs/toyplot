@@ -878,6 +878,8 @@ def _draw_text(
     if not text:
         return
 
+    style = copy.copy(style)
+
     font_size = toyplot.units.convert(style["font-size"], target="px", default="px")
     style["dominant-baseline"] = style.pop("alignment-baseline", "middle")
 

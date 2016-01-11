@@ -272,7 +272,7 @@ def render(svg, canvas):
                     elif text_anchor == "middle":
                         dx = -width * 0.5
                     elif text_anchor == "end":
-                        dx = -string_width
+                        dx = -width
 
                     for x, y, fill, stroke, font_family, font_size, text, width in chunk:
                         canvas.saveState()

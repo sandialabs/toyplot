@@ -266,10 +266,9 @@ def render(svg, canvas):
                 for chunk in text_state["chunks"]:
                     width = sum([span[7] for span in chunk])
 
+                    dx = 0
                     text_anchor = current_style.get("text-anchor", "start")
-                    if text_anchor == "start":
-                        dx = 0
-                    elif text_anchor == "middle":
+                    if text_anchor == "middle":
                         dx = -width * 0.5
                     elif text_anchor == "end":
                         dx = -width

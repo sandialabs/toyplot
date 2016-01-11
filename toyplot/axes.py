@@ -151,10 +151,11 @@ class Axis(object):
 
             self._style = {}
             self.style = {
+                "alignment-baseline": "middle",
+                "font-size": "12px",
                 "font-weight": "bold",
                 "stroke": "none",
                 "text-anchor": "middle",
-                "alignment-baseline": "middle",
                 }
             self.style = style
 
@@ -2080,11 +2081,11 @@ class Cartesian(object):
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.style.combine(
             {
+                "alignment-baseline": "middle",
                 "font-size": "12px",
                 "font-weight": "normal",
                 "stroke": "none",
                 "text-anchor": "middle",
-                "alignment-baseline": "middle",
             },
             toyplot.require.style(style, allowed=toyplot.require.style.text),
             )
@@ -2211,9 +2212,6 @@ class NumberLine(object):
 
         self._palette = toyplot.color.Palette()
         self._scatterplot_colors = itertools.cycle(self._palette)
-
-#        self.label = Axis.LabelHelper(
-#            label=label, style={"font-size": "14px", "baseline-shift": "100%"})
 
         self.axis = Axis(
             show=show,

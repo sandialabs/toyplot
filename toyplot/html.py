@@ -886,7 +886,7 @@ def _draw_text(
     baseline_shift = 0
     baseline_shift -= toyplot.units.convert(style.pop("baseline-shift", 0), target="px", default="px", reference=font_size)
 
-    x += style.pop("-toyplot-anchor-shift", 0)
+    x += toyplot.units.convert(style.pop("-toyplot-anchor-shift", 0), target="px", default="px")
 
     transform = "translate(%r,%r)" % (x, y)
     if angle:
@@ -2190,7 +2190,7 @@ def _render(canvas, legend, context):
                 text=mark_label,
                 x=x + mark_width + (2 * mark_gutter),
                 y=y + ((i + 1) * mark_gutter) +  (i * mark_height) + (mark_height / 2),
-                style=toyplot.style.combine({"alignment-baseline": "middle", "stroke": "none"}, legend._lstyle),
+                style=legend._lstyle,
                 )
 
 

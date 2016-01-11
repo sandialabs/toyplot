@@ -598,7 +598,16 @@ class Text(Mark):
         # 1 title column
         self._title = toyplot.require.table_keys(table, title, length=1)
         # Text style
-        self._style = toyplot.require.style(style, allowed=toyplot.require.style.text)
+        self._style = toyplot.style.combine(
+            {
+                "alignment-baseline": "middle",
+                "font-size": "12px",
+                "font-weight": "normal",
+                "stroke": "none",
+                "text-anchor": "middle",
+            },
+            toyplot.require.style(style, allowed=toyplot.require.style.text),
+            )
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
@@ -624,7 +633,20 @@ class Legend(Mark):
         self._marks = marks
         # Styles the box surrounding the legend
         self._style = toyplot.style.combine(
-            {"fill": "none", "stroke": "none"}, style)
-        self._lstyle = lstyle  # Styles the legend labels
+            {
+                "fill": "none",
+                "stroke": "none",
+            },
+            toyplot.require.style(style, allowed=toyplot.require.style.fill),
+            )
+        # Styles the legend labels
+        self._lstyle = toyplot.style.combine(
+            {
+                "alignment-baseline": "middle",
+                "font-size":"12px",
+                "stroke":"none",
+            },
+            toyplot.require.style(lstyle, allowed=toyplot.require.style.text),
+            )
 
 

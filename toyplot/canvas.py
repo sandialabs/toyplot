@@ -886,15 +886,7 @@ class Canvas(object):
             )
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
-        style = toyplot.style.combine(
-            {
-                "font-weight": "normal",
-                "stroke": "none",
-                "text-anchor": "middle",
-                "alignment-baseline": "middle"
-            },
-            toyplot.require.style(style, allowed=toyplot.require.style.text),
-            )
+        style = toyplot.require.style(style, allowed=toyplot.require.style.text)
 
         self._children.append(
             toyplot.mark.Text(

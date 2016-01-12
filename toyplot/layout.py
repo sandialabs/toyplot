@@ -538,11 +538,12 @@ class Random(GraphLayout):
             edges = StraightEdges()
 
         self._edges = edges
-        self._generator = numpy.random.RandomState(seed=seed)
+        self._seed = seed
 
     def graph(self, vcoordinates, edges):
+        generator = numpy.random.RandomState(seed=self._seed)
         mask = numpy.ma.getmaskarray(vcoordinates)
-        vcoordinates = numpy.ma.where(mask, self._generator.uniform(-1, 1, size=vcoordinates.shape), vcoordinates)
+        vcoordinates = numpy.ma.where(mask, generator.uniform(-1, 1, size=vcoordinates.shape), vcoordinates)
         eshapes, ecoordinates = self._edges.edges(vcoordinates, edges)
         return vcoordinates, eshapes, ecoordinates
 
@@ -571,12 +572,13 @@ class Eades(GraphLayout):
         self._c3 = c3
         self._c4 = c4
         self._M = M
-        self._generator = numpy.random.RandomState(seed=seed)
+        self._seed = seed
 
     def graph(self, vcoordinates, edges):
+        generator = numpy.random.RandomState(seed=self._seed)
         # Initialize coordinates
         mask = numpy.ma.getmaskarray(vcoordinates)
-        vcoordinates = numpy.ma.where(mask, self._generator.uniform(-1, 1, size=vcoordinates.shape), vcoordinates)
+        vcoordinates = numpy.ma.where(mask, generator.uniform(-1, 1, size=vcoordinates.shape), vcoordinates)
 
         # Repeatedly apply attract / repel forces to the vertices
         vertices = numpy.column_stack(numpy.triu_indices(n=len(vcoordinates), k=1))
@@ -634,15 +636,16 @@ class FruchtermanReingold(GraphLayout):
         self._area = area
         self._temperature = temperature
         self._M = M
-        self._generator = numpy.random.RandomState(seed=seed)
+        self._seed = seed
 
     def graph(self, vcoordinates, edges):
+        generator = numpy.random.RandomState(seed=self._seed)
         # Setup parameters
         k = numpy.sqrt(self._area / len(vcoordinates))
 
         # Initialize coordinates
         mask = numpy.ma.getmaskarray(vcoordinates)
-        vcoordinates = numpy.ma.where(mask, self._generator.uniform(-1, 1, size=vcoordinates.shape), vcoordinates)
+        vcoordinates = numpy.ma.where(mask, generator.uniform(-1, 1, size=vcoordinates.shape), vcoordinates)
 
         # Repeatedly apply attract / repel forces to the vertices
         vertices = numpy.column_stack(numpy.triu_indices(n=len(vcoordinates), k=1))

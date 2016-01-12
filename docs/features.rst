@@ -8,7 +8,7 @@ Features
 ========
 
 * Plot types: bar plots, filled region plots, graph visualizations, line plots, matrix plots, scatter plots, tabular plots, text plots.
-* Styling: standard CSS.
+* Styling: standard CSS, rich text with HTML markup.
 * Integrates with Jupyter without any need for plugins, magics, etc.
 * Interaction types: display interactive mouse coordinates, export figure data to CSV.
 * Interactive output formats: Embeddable, self-contained HTML.

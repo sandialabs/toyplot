@@ -7,6 +7,31 @@
 Release Notes
 =============
 
+Toyplot 0.10.0 - January 12, 2016
+---------------------------------
+
+* Added rich text support, using a limited subset of HTML markup.
+* Added a tick locator for displaying timestamp data with properly formatted times.
+* Created a new, pure-Python PDF backend using ReportLab.
+* Created a new PNG backend that renders by rasterizing PDFs with Ghostscript.
+* Removed deprecated PDF and PNG backends.
+* Added numberline axes, for displaying one-dimensional data.
+* Refactored the scatterplot mark to support data with any number of dimensions.
+* Added one-dimensional scatterplot support to numberlines.
+* Completely redesigned the color scale implementation to use numberlines.
+* Added API for easily adding color scales to axes and matrix visualizations.
+* Provided both size and area parameters to specify marker sizes.
+* Moved log scales to a dedicated section of the user guide.
+* Optimized graph layout when every vertex already has a position.
+* Removed the GraphViz graph layout strategy.
+* Use consistent naming for matrix visualization parameters.
+* toyplot.data.read_csv() can optionally convert string values to numeric values.
+* Replaced toyplot.color.lighten() with toyplot.color.spread(), which is more flexible.
+* Display toyplot color values as swatches in Jupyter notebooks.
+* Expanded the color documentation in the user guide.
+* Reduced regression test boilerplate code.
+* Test coverage improvements.
+
 Toyplot 0.9.0 - November 22, 2015
 ---------------------------------
 

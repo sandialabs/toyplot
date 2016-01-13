@@ -92,14 +92,64 @@ class Table(object):
             raise ValueError("Unsupported data type: %s" % type(data))
 
     def __getitem__(self, index):
-        # Return a single column by name
+        column = None
+        column_slice = None
+
+        # Cases that return a column (array):
+
+        # table["a"]
         if isinstance(index, toyplot.compatibility.string_type):
-            return self._columns[index]
-        # Return a single row by index
+            column = index
+            column_slice = slice(None, None, None)
+        elif isinstance(index, tuple) and isinstance(index[0], toyplot.compatibility.string_type):
+            column = index[0]
+            # table["a", 10]
+            if isinstance(index[1], numbers.Integral):
+                column_slice = slice(index[1], index[1] + 1)
+            # table["a", 10:20], table["a", [10, 12, 18]], etc.
+            else:
+                column_slice = index[1]
+
+        if column is not None and column_slice is not None:
+            return self._columns[column][column_slice]
+
+        row_slice = None
+        columns = None
+
+        # table[10]
         if isinstance(index, numbers.Integral):
-            index = slice(index, index + 1)
-        return Table(collections.OrderedDict(
-            [(key, self._columns[key][index]) for key in self._columns.keys()]))
+            row_slice = slice(index, index + 1)
+            columns = self._columns.keys()
+        # table[10:20]
+        elif isinstance(index, slice):
+            row_slice = index
+            columns = self._columns.keys()
+        elif isinstance(index, tuple):
+            # table[10, ]
+            if isinstance(index[0], numbers.Integral):
+                row_slice = slice(index[0], index[0] + 1)
+            # table[10:20, ], table[[10, 12, 18], ], etc.
+            else:
+                row_slice = index[0]
+
+            # table[, "a"]
+            if isinstance(index[1], toyplot.compatibility.string_type):
+                columns = [index[1]]
+            # table[, ["a", "b", "c"]], etc.
+            else:
+                columns = index[1]
+        else:
+            index = numpy.array(index)
+            if issubclass(index.dtype.type, numpy.character):
+                columns = index
+                row_slice = slice(None, None, None)
+            else:
+                row_slice = index
+                columns = self._columns.keys()
+
+        if row_slice is not None and columns is not None:
+            return Table([(column, self._columns[column][row_slice]) for column in columns])
+
 
     def __setitem__(self, key, value):
         if not isinstance(key, toyplot.compatibility.string_type):
@@ -203,8 +253,8 @@ class Table(object):
         -------
         table: :class:`toyplot.data.Table` containing the requested columns.
         """
-        return Table(
-            collections.OrderedDict([(key, self._columns[key]) for key in keys]))
+        toyplot.log.warning("toyplot.data.Table.columns() is deprecated, use the [] operator instead.")
+        return Table([(key, self._columns[key]) for key in keys])
 
     def metadata(self, column):
         """Return metadata for one of the table's columns.
@@ -233,10 +283,10 @@ class Table(object):
         -------
         table: :class:`toyplot.data.Table` containing the requested rows.
         """
+        toyplot.log.warning("toyplot.data.Table.rows() is deprecated, use the [] operator instead.")
         if isinstance(index, numbers.Integral):
             index = slice(index, index + 1)
-        return Table(collections.OrderedDict(
-            [(key, self._columns[key][index]) for key in self._columns.keys()]))
+        return Table([(key, self._columns[key][index]) for key in self._columns.keys()])
 
     def matrix(self):
         """Convert the table to a matrix (2D numpy array).
@@ -279,8 +329,7 @@ def read_csv(fobj, convert=False):
     rows = [row for row in csv.reader(fobj)]
     columns = zip(*rows)
 
-    result = Table(collections.OrderedDict(
-        [(column[0], column[1:]) for column in columns]))
+    result = Table([(column[0], column[1:]) for column in columns])
 
     if convert:
         for name in result.keys():

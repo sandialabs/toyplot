@@ -23,7 +23,7 @@ import xml.etree.ElementTree as xml
 try:
     import HTMLParser
 except:
-    import html.parser as HTMLParser
+    import html.parser as HTMLParser # pragma: no cover
 
 class _NumpyJSONEncoder(json.JSONEncoder):
 

@@ -856,15 +856,15 @@ class _HTMLParser(HTMLParser.HTMLParser):
         elif tag in ["b", "code", "em", "i", "small", "strong", "sub", "sup"]:
             self.push_node(tag)
         else:
-            toyplot.log.warning("Ignoring unknown <%s> tag." % tag)
+            toyplot.log.warning("Ignoring unknown <%s> tag." % tag) # pragma: no cover
 
     def handle_endtag(self, tag):
         if tag in ["br"]:
-            toyplot.log.warning("%s must not have an end tag." % tag)
+            toyplot.log.warning("%s must not have an end tag." % tag) # pragma: no cover
         elif tag in ["b", "code", "em", "i", "small", "strong", "sub", "sup"]:
             self.pop_node()
         else:
-            toyplot.log.warning("Ignoring unknown </%s> tag." % tag)
+            toyplot.log.warning("Ignoring unknown </%s> tag." % tag) # pragma: no cover
 
     def handle_data(self, text):
         xml.SubElement(self._current_node, "text").text = text

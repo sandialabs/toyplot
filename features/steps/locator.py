@@ -92,6 +92,21 @@ def step_impl(context):
     axes.plot(context.x, context.y)
     toyplot.testing.assert_canvas_equal(canvas, "tick-locator-null")
 
+@given(u'seven thousand years of timestamp data')
+def step_impl(context):
+    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+    context.timestamp_end = arrow.get(9016, 1, 1).timestamp
+
+@given(u'one thousand years of timestamp data')
+def step_impl(context):
+    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+    context.timestamp_end = arrow.get(3016, 1, 1).timestamp
+
+@given(u'one hundred years of timestamp data')
+def step_impl(context):
+    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+    context.timestamp_end = arrow.get(2116, 1, 1).timestamp
+
 @given(u'five years of timestamp data')
 def step_impl(context):
     context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
@@ -167,6 +182,18 @@ def step_impl(context):
     context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
     context.timestamp_end = arrow.get(2016, 1, 1, 0, 0, 5).timestamp
 
+@given(u'a default interval')
+def step_impl(context):
+    context.timestamp_interval = None
+
+@given(u'a {count} {units} interval')
+def step_impl(context, count, units):
+    context.timestamp_interval = (float(count), units)
+
+@given(u'an interval of days')
+def step_impl(context):
+    context.timestamp_interval = "days"
+
 @given(u'a visualization using the timestamp locator')
 def step_impl(context):
     numpy.random.seed(1234)
@@ -174,7 +201,7 @@ def step_impl(context):
 
     context.canvas = toyplot.Canvas(width=800, height=200)
     numberline = context.canvas.numberline(min=context.timestamp_begin, max=context.timestamp_end)
-    numberline.axis.ticks.locator = toyplot.locator.Timestamp(count=7)
+    numberline.axis.ticks.locator = toyplot.locator.Timestamp(interval=context.timestamp_interval)
     numberline.axis.ticks.show = True
     numberline.scatterplot(timestamps, marker="|", size=15)
 

@@ -74,7 +74,7 @@ def render(svg, canvas):
 
     def get_font_family(style):
         if "font-family" not in style:
-            return None
+            return None # pragma: no cover
 
         bold = True if style.get("font-weight", "") == "bold" else False
         italic = True if style.get("font-style", "") == "italic" else False
@@ -84,7 +84,7 @@ def render(svg, canvas):
                 font_family = get_font_family.substitutions[font_family]
                 return get_font_family.font_table[(font_family, bold, italic)]
 
-        raise ValueError("Unknown font family: %s" % style["font-family"])
+        raise ValueError("Unknown font family: %s" % style["font-family"]) # pragma: no cover
 
     get_font_family.font_table = {
         ("courier", False, False): "Courier",

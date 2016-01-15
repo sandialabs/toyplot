@@ -247,6 +247,16 @@ def step_impl(context):
     nose.tools.assert_equal(context.color_map.css(2), "rgba(0%,0%,100%,1)")
 
 
+@then(u'the color map domain can be changed')
+def step_impl(context):
+    nose.tools.assert_equal(context.color_map.domain.min, 0)
+    nose.tools.assert_equal(context.color_map.domain.max, 1)
+    context.color_map.domain.min = -1
+    context.color_map.domain.max = 2
+    nose.tools.assert_equal(context.color_map.domain.min, -1)
+    nose.tools.assert_equal(context.color_map.domain.max, 2)
+
+
 @given(u'a starting color')
 def step_impl(context):
     context.color = toyplot.color.Palette().color(0)

@@ -29,6 +29,7 @@ Feature: Data tables
       | an array                          | raises ValueError                   |
       | an integer                        | raises ValueError                   |
       | a csv file                        | contains the csv file columns       |
+      | a csv file and conversion         | contains the csv file columns with numeric type       |
       | a pandas dataframe                | contains the data frame columns     |
 
   Scenario Outline: Data table rendering

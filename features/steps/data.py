@@ -235,6 +235,17 @@ def step_impl(context):
     nose.tools.assert_equal(context.data.shape, (362, 6))
     nose.tools.assert_equal(list(context.data.keys()), ['STATION', 'STATION_NAME', 'DATE', 'TMAX', 'TMIN', 'TOBS'])
 
+@when(u'toyplot.data.Table is initialized with a csv file and conversion')
+def step_impl(context):
+    context.data = toyplot.data.read_csv("docs/temperatures.csv", convert=True)
+
+@then(u'the toyplot.data.Table contains the csv file columns with numeric type')
+def step_impl(context):
+    nose.tools.assert_equal(context.data.shape, (362, 6))
+    nose.tools.assert_equal(list(context.data.keys()), ['STATION', 'STATION_NAME', 'DATE', 'TMAX', 'TMIN', 'TOBS'])
+    nose.tools.assert_true(issubclass(context.data['STATION'].dtype.type, numpy.character))
+    nose.tools.assert_true(issubclass(context.data['TMAX'].dtype.type, numpy.number))
+
 @when(u'toyplot.data.Table is initialized with a pandas dataframe')
 def step_impl(context):
     try:

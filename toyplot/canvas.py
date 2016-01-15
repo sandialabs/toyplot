@@ -924,37 +924,6 @@ class Canvas(object):
             index = 0
         return AnimationFrame(index, begin, end, self._animation)
 
-    def pixel_scale(self, width=None, height=None, scale=None):
-        """Return a scale factor to convert this canvas' dimensions to a target width or height.
-
-        Parameters
-        ----------
-        width: number, string, or (number, string) tuple, optional
-            Target width.  Assumes CSS pixels if units aren't provided.  See
-            :ref:`units` for details on how Toyplot handles real world units.
-        height: number, string, or (number, string) tuple, optional
-            Target height.  Assumes CSS pixels if units aren't provided.  See
-            :ref:`units` for details on how Toyplot handles real world units.
-        scale: number, optional
-            Scale factor.
-
-        Returns
-        -------
-        scale: float
-            Scale factor that can be applied to this canvas' width and height in CSS pixels to
-            produce the desired dimensions.
-        """
-        if numpy.count_nonzero(
-                [width is not None, height is not None, scale is not None]) > 1:
-            raise ValueError("Specify only one of width, height, or scale.") # pragma: no cover
-        if width is not None:
-            scale = toyplot.units.convert(width, "px") / self._width
-        elif height is not None:
-            scale = toyplot.units.convert(height, "px") / self._height
-        elif scale is None:
-            scale = 1.0
-        return scale
-
     def _point_scale(self, width=None, height=None, scale=None):
         """Return a scale factor to convert this canvas to a target width or height in points."""
         if numpy.count_nonzero(

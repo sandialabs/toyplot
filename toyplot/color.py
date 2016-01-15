@@ -29,9 +29,9 @@ def _color_swatch(color):
             "div",
             style="float:left;width:20px;height:20px;background-color:%s" % toyplot.color.to_css(color))
         return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
-    return None
+    return None # pragma: no cover
 
-try: #pragma: no cover
+try: # pragma: no cover
     import IPython
     ip = IPython.get_ipython()
     html_formatter = ip.display_formatter.formatters['text/html']
@@ -177,7 +177,7 @@ def broadcast(colors, shape, default=None):
 
     # Sanity-check to ensure that per-datum colors aren't broadcasted as a per-series shape
     if colors.ndim > len(shape):
-        raise ValueError("Per-datum colors aren't allowed here - expecting per-series colors.")
+        raise ValueError("Per-datum colors aren't allowed here - expecting per-series colors.") # pragma: no cover
 
     # As a special-case, allow a vector with shape M to be matched-up with an
     # M x 1 matrix.
@@ -245,12 +245,12 @@ class Palette(object):
 
     def __add__(self, other):
         if not isinstance(other, Palette):
-            raise NotImplementedError("Only toyplot.color.Palette instances can be added together.") #pragma: no cover
+            raise NotImplementedError("Only toyplot.color.Palette instances can be added together.") # pragma: no cover
         return Palette(numpy.concatenate((self._colors, other._colors)))
 
     def __iadd__(self, other):
         if not isinstance(other, Palette):
-            raise NotImplementedError("Only toyplot.color.Palette instances can be added together.") #pragma: no cover
+            raise NotImplementedError("Only toyplot.color.Palette instances can be added together.") # pragma: no cover
         self._colors = numpy.concatenate((self._colors, other._colors))
         return self
 

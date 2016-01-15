@@ -49,8 +49,17 @@ Feature: Color palettes
         Given a color palette
         Then another palette can be appended
 
-    Scenario: Color palette CSS names
-        Given a collection of CSS color names, a color palette can be created
+    Scenario: Color palette from CSS list
+        Given a list of CSS colors, a color palette can be created
+
+    Scenario: Color palette from CSS array
+        Given an array of CSS colors, a color palette can be created
+
+    Scenario: Color palette from RGB tuples
+        Given a list of RGB tuples, a color palette can be created
+
+    Scenario: Color palette from RGBA tuples
+        Given a list of RGBA tuples, a color palette can be created
 
     Scenario: Color palette getitem
         Given a color palette, colors can be retrieved using item notation

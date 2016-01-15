@@ -319,10 +319,29 @@ def step_impl(context):
     toyplot.testing.assert_html_equal(
         context.palette._repr_html_(), "color-palette-reverse")
 
-@given(u'a collection of CSS color names, a color palette can be created')
+@given(u'a list of CSS colors, a color palette can be created')
 def step_impl(context):
-    palette = toyplot.color.Palette(["red", "green", "blue", (1, 1, 0)])
-    toyplot.testing.assert_html_equal(palette._repr_html_(), "color-palette-css-names")
+    colors = ["red", "green", "blue", "black"]
+    palette = toyplot.color.Palette(colors)
+    toyplot.testing.assert_html_equal(palette._repr_html_(), "color-palette-css-list")
+
+@given(u'an array of CSS colors, a color palette can be created')
+def step_impl(context):
+    colors = numpy.array(["red", "green", "blue", "black"])
+    palette = toyplot.color.Palette(colors)
+    toyplot.testing.assert_html_equal(palette._repr_html_(), "color-palette-css-array")
+
+@given(u'a list of RGB tuples, a color palette can be created')
+def step_impl(context):
+    colors = [(1, 0, 0), (0, 1, 0), (0, 0, 1), (0, 0, 0)]
+    palette = toyplot.color.Palette(colors)
+    toyplot.testing.assert_html_equal(palette._repr_html_(), "color-palette-rgb-tuples")
+
+@given(u'a list of RGBA tuples, a color palette can be created')
+def step_impl(context):
+    colors = [(1, 0, 0, 1), (0, 1, 0, 1), (0, 0, 1, 1), (0, 0, 0, 0.5)]
+    palette = toyplot.color.Palette(colors)
+    toyplot.testing.assert_html_equal(palette._repr_html_(), "color-palette-rgba-tuples")
 
 @given(u'a color palette, colors can be retrieved using item notation')
 def step_impl(context):

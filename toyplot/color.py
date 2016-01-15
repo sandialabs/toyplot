@@ -87,8 +87,9 @@ def _msh_to_lab(M, s, h):
 def _require_color(color):
     if isinstance(color, toyplot.compatibility.string_type):
         return css(color)
-    elif isinstance(color, numpy.ndarray) and color.ndim == 0 and issubclass(color.dtype.type, numpy.character):
-        return css(str(color))
+# I'm having a tough time creating a test that will exercise this, which is good sign we don't need it.
+#    elif isinstance(color, numpy.ndarray) and color.ndim == 0 and issubclass(color.dtype.type, numpy.character):
+#        return css(str(color))
     elif isinstance(color, (numpy.void, numpy.ndarray)) and color.dtype == dtype:
         return color
     elif isinstance(color, (tuple, list, numpy.ndarray)) and len(color) == 3:

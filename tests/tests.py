@@ -1111,22 +1111,6 @@ def test_explicit_tick_locator_failure():
 # toyplot.html
 
 
-def test_color_require_color():
-    assert_color_equal(toyplot.color._require_color("red"), (1, 0, 0, 1))
-    assert_color_equal(
-        toyplot.color._require_color(toyplot.color.rgb(1, 1, 0)), (1, 1, 0, 1))
-    assert_color_equal(toyplot.color._require_color(
-        toyplot.color.rgba(1, 1, 0, 0.5)), (1, 1, 0, 0.5))
-    assert_color_equal(toyplot.color._require_color((1, 1, 0)), (1, 1, 0, 1))
-    assert_color_equal(
-        toyplot.color._require_color((1, 1, 0, 0.5)), (1, 1, 0, 0.5))
-    with nose.tools.assert_raises(ValueError):
-        toyplot.color._require_color(5)
-
-##########################################################################
-# toyplot.html
-
-
 def test_html_render_animation():
     canvas = toyplot.Canvas()
     axes = canvas.axes()

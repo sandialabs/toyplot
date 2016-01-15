@@ -31,7 +31,7 @@ def _color_swatch(color):
         return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
     return None
 
-try:
+try: #pragma: no cover
     import IPython
     ip = IPython.get_ipython()
     html_formatter = ip.display_formatter.formatters['text/html']
@@ -116,13 +116,13 @@ def broadcast(colors, shape, default=None):
     colors : numpy.ndarray containing RGBA colors.
     """
     if colors is None and default is None:
-        raise ValueError("Must supply colors or default.")
+        raise ValueError("Must supply colors or default.") # pragma: no cover
     if not isinstance(shape, tuple):
         shape = (shape,)
     if not isinstance(shape, tuple):
-        raise ValueError("Shape parameter must be a tuple with length 1 or 2.")
+        raise ValueError("Shape parameter must be a tuple with length 1 or 2.") # pragma: no cover
     if not 0 < len(shape) < 3:
-        raise ValueError("Shape parameter must be a tuple with length 1 or 2.")
+        raise ValueError("Shape parameter must be a tuple with length 1 or 2.") # pragma: no cover
 
     per_series = len(shape) == 1
     per_datum = len(shape) == 2
@@ -245,14 +245,12 @@ class Palette(object):
 
     def __add__(self, other):
         if not isinstance(other, Palette):
-            raise NotImplementedError(
-                "Only toyplot.color.Palette instances can be added together.")
+            raise NotImplementedError("Only toyplot.color.Palette instances can be added together.") #pragma: no cover
         return Palette(numpy.concatenate((self._colors, other._colors)))
 
     def __iadd__(self, other):
         if not isinstance(other, Palette):
-            raise NotImplementedError(
-                "Only toyplot.color.Palette instances can be added together.")
+            raise NotImplementedError("Only toyplot.color.Palette instances can be added together.") #pragma: no cover
         self._colors = numpy.concatenate((self._colors, other._colors))
         return self
 

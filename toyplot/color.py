@@ -97,8 +97,7 @@ def _require_color(color):
     elif isinstance(color, (tuple, list, numpy.ndarray)) and len(color) == 4:
         return rgba(color[0], color[1], color[2], color[3])
     else:
-        raise ValueError(
-            "Expected a CSS color string or a Toyplot.color.value.")
+        raise ValueError("Expected a CSS color string or a Toyplot.color.value.") # pragma: no cover
 
 
 def broadcast(colors, shape, default=None):

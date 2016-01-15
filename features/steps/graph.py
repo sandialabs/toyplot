@@ -56,7 +56,7 @@ def step_impl(context):
 
 @when(u'the source and target arrays and layout are combined')
 def step_impl(context):
-    context.canvas, axes, mark = toyplot.graph(context.sources, context.targets, layout=context.layout)
+    context.canvas, context.axes, context.mark = toyplot.graph(context.sources, context.targets, layout=context.layout)
 
 @given(u'explicit source and target arrays with loops')
 def step_impl(context):

@@ -36,18 +36,76 @@ def step_impl(context):
     context.data["b"] = context.data["a"] ** 2
     nose.tools.assert_equal(list(context.data.keys()), ["a", "b"])
     nose.tools.assert_equal(context.data.shape, (10, 2))
-    numpy.testing.assert_array_equal(
-        context.data["b"], [0, 1, 4, 9, 16, 25, 36, 49, 64, 81])
 
     context.data["c"] = numpy.zeros(10)
     nose.tools.assert_equal(list(context.data.keys()), ["a", "b", "c"])
     nose.tools.assert_equal(context.data.shape, (10, 3))
-    numpy.testing.assert_array_equal(context.data["c"], [0] * 10)
 
 
-@then(u'extracting columns should return a new table')
+@then(u'columns can be retrieved by name')
 def step_impl(context):
-    table = context.data.columns(["b", "a"])
+    numpy.testing.assert_array_equal(context.data["a"], numpy.arange(10))
+
+
+@then(u'partial columns can be retrieved by name and index')
+def step_impl(context):
+    numpy.testing.assert_array_equal(context.data["a", 5], [5])
+
+
+@then(u'partial columns can be retrieved by name and slice')
+def step_impl(context):
+    numpy.testing.assert_array_equal(context.data["a", 5:7], [5, 6])
+
+
+@then(u'partial tables can be retrieved by row index')
+def step_impl(context):
+    table = context.data[5]
+    nose.tools.assert_equal(list(table.keys()), ["a", "b", "c"])
+    nose.tools.assert_equal(table.shape, (1, 3))
+    numpy.testing.assert_array_equal(table["a"], [5])
+
+@then(u'partial tables can be retrieved by row slice')
+def step_impl(context):
+    table = context.data[5:7]
+    nose.tools.assert_equal(list(table.keys()), ["a", "b", "c"])
+    nose.tools.assert_equal(table.shape, (2, 3))
+    numpy.testing.assert_array_equal(table["a"], [5,6])
+
+@then(u'partial tables can be retrieved by row index and column name')
+def step_impl(context):
+    table = context.data[5, "b"]
+    nose.tools.assert_equal(list(table.keys()), ["b"])
+    nose.tools.assert_equal(table.shape, (1, 1))
+    numpy.testing.assert_array_equal(table["b"], [25])
+
+
+@then(u'partial tables can be retrieved by row slice and column name')
+def step_impl(context):
+    table = context.data[5:7, "b"]
+    nose.tools.assert_equal(list(table.keys()), ["b"])
+    nose.tools.assert_equal(table.shape, (2, 1))
+    numpy.testing.assert_array_equal(table["b"], [25,36])
+
+
+@then(u'partial tables can be retrieved by row index and column names')
+def step_impl(context):
+    table = context.data[5, ["b", "a"]]
+    nose.tools.assert_equal(list(table.keys()), ["b", "a"])
+    nose.tools.assert_equal(table.shape, (1, 2))
+    numpy.testing.assert_array_equal(table["a"], [5])
+
+
+@then(u'partial tables can be retrieved by row slice and column names')
+def step_impl(context):
+    table = context.data[5:7, ["b", "a"]]
+    nose.tools.assert_equal(list(table.keys()), ["b", "a"])
+    nose.tools.assert_equal(table.shape, (2, 2))
+    numpy.testing.assert_array_equal(table["a"], [5,6])
+
+
+@then(u'partial tables can be retrieved by column names')
+def step_impl(context):
+    table = context.data[["b", "a"]]
     nose.tools.assert_equal(list(table.keys()), ["b", "a"])
     nose.tools.assert_equal(table.shape, (10, 2))
 
@@ -57,39 +115,6 @@ def step_impl(context):
     del context.data["c"]
     nose.tools.assert_equal(list(context.data.keys()), ["a", "b"])
     nose.tools.assert_equal(context.data.shape, (10, 2))
-
-
-@then(u'indexing should return a new table with one row')
-def step_impl(context):
-    table = context.data[5]
-    nose.tools.assert_equal(list(table.keys()), ["a", "b"])
-    nose.tools.assert_equal(table.shape, (1, 2))
-    numpy.testing.assert_array_equal(table["a"], [5])
-
-
-@then(u'slicing should return a new table with a range of rows')
-def step_impl(context):
-    table = context.data[slice(0, 6, 2)]
-    nose.tools.assert_equal(list(table.keys()), ["a", "b"])
-    nose.tools.assert_equal(table.shape, (3, 2))
-    numpy.testing.assert_array_equal(table["a"], [0, 2, 4])
-
-
-@then(u'extracting rows by index should return a new table with one row')
-def step_impl(context):
-    table = context.data.rows(8)
-    nose.tools.assert_equal(list(table.keys()), ["a", "b"])
-    nose.tools.assert_equal(table.shape, (1, 2))
-    numpy.testing.assert_array_equal(table["a"], [8])
-
-
-@then(
-    u'extracting rows using multiple indices should return a new table with the specified rows')
-def step_impl(context):
-    table = context.data.rows([1, 2, 3])
-    nose.tools.assert_equal(list(table.keys()), ["a", "b"])
-    nose.tools.assert_equal(table.shape, (3, 2))
-    numpy.testing.assert_array_equal(table["a"], [1, 2, 3])
 
 
 @then(u'new columns must have a string name')

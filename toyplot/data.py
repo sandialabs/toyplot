@@ -242,7 +242,7 @@ class Table(object):
         """
         return self._columns.values()
 
-    def columns(self, keys):
+    def columns(self, keys): #pragma: no cover
         """Return a subset of the table's columns.
 
         Parameters
@@ -272,7 +272,7 @@ class Table(object):
             raise ValueError("Unknown column name '%s'" % column)
         return self._metadata[column]
 
-    def rows(self, index):
+    def rows(self, index): #pragma: no cover
         """Return a subset of the table's rows.
 
         Parameters

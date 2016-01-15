@@ -110,6 +110,14 @@ def step_impl(context):
     nose.tools.assert_equal(table.shape, (10, 2))
 
 
+@then(u'partial tables can be retrieved by row indices')
+def step_impl(context):
+    table = context.data[[5, 7]]
+    nose.tools.assert_equal(list(table.keys()), ["a", "b", "c"])
+    nose.tools.assert_equal(table.shape, (2, 3))
+    numpy.testing.assert_array_equal(table["a"], [5, 7])
+
+
 @then(u'deleting columns should change the table')
 def step_impl(context):
     del context.data["c"]

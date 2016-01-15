@@ -13,6 +13,7 @@ Feature: Data tables
     And partial tables can be retrieved by row index and column names
     And partial tables can be retrieved by row slice and column names
     And partial tables can be retrieved by column names
+    And partial tables can be retrieved by row indices
     And deleting columns should change the table
     And new columns must have a string name
     And new columns must have the same number of rows as existing columns

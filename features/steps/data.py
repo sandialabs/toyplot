@@ -22,9 +22,9 @@ def step_impl(context):
 def step_impl(context):
     nose.tools.assert_equal(len(context.data), 0)
     nose.tools.assert_equal(context.data.shape, (0, 0))
-    nose.tools.assert_equal(context.data.items(), [])
+    nose.tools.assert_equal(list(context.data.items()), [])
     nose.tools.assert_equal(list(context.data.keys()), [])
-    nose.tools.assert_equal(context.data.values(), [])
+    nose.tools.assert_equal(list(context.data.values()), [])
 
 
 @then(u'adding columns should change the table')

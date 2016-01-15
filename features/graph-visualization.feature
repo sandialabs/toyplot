@@ -13,6 +13,7 @@ Feature: Graph visualization
         | prufer tree             | fruchterman-reingold            | graph-prufer-tree-fruchterman-reingold-layout |
         | prufer tree             | buchheim                        | graph-prufer-tree-buchheim-layout |
         | ba graph                | default                         | graph-ba-graph-default-layout |
+        | ba graph                | explicit coordinates            | graph-ba-graph-explicit-coordinates |
         | ba graph                | random                          | graph-ba-graph-random-layout |
         | ba graph                | eades                           | graph-ba-graph-eades-layout |
         | ba graph                | fruchterman-reingold            | graph-ba-graph-fruchterman-reingold-layout |

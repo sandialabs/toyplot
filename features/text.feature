@@ -36,13 +36,14 @@ Feature: Text
         Then the generated figure will match <reference>
 
         Examples:
-          | markup                       | reference                          |
-          | 10<sup>awesome!</sup>        | text-rich-text-superscript         |
-          | H<sub>2</sub>O               | text-rich-text-subscript           |
-          | Hello<br>World!              | text-rich-text-line-break          |
-          | normal <b>bold</b>           | text-rich-text-bold                |
-          | normal <i>italic</i>           | text-rich-text-italic                |
-          | normal <b><i>bold italic</i></b>   | text-rich-text-bold-italic                |
-          | normal <code>code</code>           | text-rich-text-code                |
-          | normal <small>small</small>           | text-rich-text-small                |
+          | markup                                | reference                          |
+          | 10<sup>awesome!</sup>                 | text-rich-text-superscript         |
+          | H<sub>2</sub>O                        | text-rich-text-subscript           |
+          | Hello<br>World!                       | text-rich-text-line-break          |
+          | normal <b>bold</b>                    | text-rich-text-bold                |
+          | normal <i>italic</i>                  | text-rich-text-italic              |
+          | normal <b><i>bold italic</i></b>      | text-rich-text-bold-italic         |
+          | normal <code>code</code>              | text-rich-text-code                |
+          | normal <small>small</small>           | text-rich-text-small               |
+          | foo <strong>bar<br>baz</strong> blah  | text-rich-text-nested-break        |
 

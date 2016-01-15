@@ -222,16 +222,6 @@ class Graph(object):
         return len(self._edges)
 
     @property
-    def esources(self):
-        """Return a vector of :math:`E` integer edge vertex indices."""
-        return self._edges.T[0]
-
-    @property
-    def etargets(self):
-        """Return a vector of :math:`E` integer edge vertex indices."""
-        return self._edges.T[1]
-
-    @property
     def eshapes(self):
         """Return a vector of :math:`E` string edge shapes."""
         return self._eshapes

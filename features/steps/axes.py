@@ -309,6 +309,13 @@ def step_impl(context):
     nose.tools.assert_equal(context.axes.y.domain.max, 1)
 
 
+@given(u'a shared axis')
+def step_impl(context):
+    context.shared_axes = context.axes.share("x")
+
+
+
+
 @given(u'a sample toyplot.data.Table')
 def step_impl(context):
     numpy.random.seed(1324)

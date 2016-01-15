@@ -22,8 +22,8 @@ import xml.etree.ElementTree as xml
 
 try:
     import HTMLParser
-except:
-    import html.parser as HTMLParser # pragma: no cover
+except: # pragma: no cover
+    import html.parser as HTMLParser
 
 class _NumpyJSONEncoder(json.JSONEncoder):
 
@@ -554,10 +554,11 @@ def render(canvas, fobj=None, animation=False):
                 if "toyplot:exportable" in table.metadata(
                         name) and table.metadata(name)["toyplot:exportable"]:
                     if column.dtype == toyplot.color.dtype:
-                        for suffix, channel in zip(
-                                [":red", ":green", ":blue", ":alpha"], ["r", "g", "b", "a"]):
-                            names.append(name + suffix)
-                            data.append(column[channel].tolist())
+                        raise ValueError("Color column table export isn't supported.") # pragma: no cover
+#                        for suffix, channel in zip(
+#                                [":red", ":green", ":blue", ":alpha"], ["r", "g", "b", "a"]):
+#                            names.append(name + suffix)
+#                            data.append(column[channel].tolist())
                     else:
                         names.append(name)
                         data.append(column.tolist())
@@ -1104,11 +1105,12 @@ def _draw_marker(
                        x2=repr(cx),
                        y1=repr(cy - (size / 2)),
                        y2=repr(cy + (size / 2)))
-    elif shape == "path":
-        shape_path = marker.get("path")
-        xml.SubElement(
-            marker_xml, "path", transform="translate(%r, %r) scale(%r) translate(%r, %r)" %
-            (cx, cy, size, -cx, -cy), d="M " + repr(cx) + " " + repr(cy) + shape_path)
+# Removing support for custom shapes
+#    elif shape == "path":
+#        shape_path = marker.get("path")
+#        xml.SubElement(
+#            marker_xml, "path", transform="translate(%r, %r) scale(%r) translate(%r, %r)" %
+#            (cx, cy, size, -cx, -cy), d="M " + repr(cx) + " " + repr(cy) + shape_path)
 
     if shape_label: # Not technically necessary, but we should avoid computing the style for every marker if we don't have to.
         _draw_text(

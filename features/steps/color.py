@@ -30,6 +30,17 @@ def step_impl(context, value):
     nose.tools.assert_equal(toyplot.color.to_css(context.value), value)
 
 
+@given(u'a color value')
+def step_impl(context):
+    context.value = toyplot.color.css("red")
+
+
+@then(u'the color value can be rendered as ipython html')
+def step_impl(context):
+    toyplot.testing.assert_html_equal(
+        toyplot.color._color_swatch(context.value), "color-swatch")
+
+
 @given(u'a collection of Color Brewer palettes')
 def step_impl(context):
     context.palettes = {
@@ -41,6 +52,61 @@ def step_impl(context):
     for name, palette in context.palettes.items():
         toyplot.testing.assert_html_equal(
             palette._repr_html_(), "color-brewer-%s" % name)
+
+
+@given(u'a color brewer category, the palette names for that category can be retrieved.')
+def step_impl(context):
+    nose.tools.assert_equal(toyplot.color.brewer.names("sequential"), [
+        'BlueGreen',
+        'BlueGreenYellow',
+        'BluePurple',
+        'Blues',
+        'BrownOrangeYellow',
+        'GreenBlue',
+        'GreenBluePurple',
+        'GreenYellow',
+        'Greens',
+        'Greys',
+        'Oranges',
+        'PurpleBlue',
+        'PurpleRed',
+        'Purples',
+        'RedOrange',
+        'RedOrangeYellow',
+        'RedPurple',
+        'Reds',
+    ])
+    nose.tools.assert_equal(toyplot.color.brewer.names("diverging"), [
+      'BlueGreenBrown',
+      'BlueRed',
+      'BlueYellowRed',
+      'GrayRed',
+      'GreenYellowRed',
+      'PinkGreen',
+      'PurpleGreen',
+      'PurpleOrange',
+      'Spectral',
+    ])
+    nose.tools.assert_equal(toyplot.color.brewer.names("qualitative"), [
+        'Accent',
+        'Dark2',
+        'Paired',
+        'Pastel1',
+        'Pastel2',
+        'Set1',
+        'Set2',
+        'Set3',
+    ])
+
+
+@given(u'a color brewer palette name, the color counts for that palette  can be retrieved.')
+def step_impl(context):
+    nose.tools.assert_equal(toyplot.color.brewer.counts("BlueRed"), [3, 4, 5, 6, 7, 8, 9, 10, 11])
+
+
+@given(u'a color brewer palette name, the category for that palette  can be retrieved.')
+def step_impl(context):
+    nose.tools.assert_equal(toyplot.color.brewer.category("BlueRed"), "diverging")
 
 
 @when(u'the user creates a Color Brewer palette')
@@ -181,6 +247,16 @@ def step_impl(context):
     nose.tools.assert_equal(context.color_map.css(2), "rgba(0%,0%,100%,1)")
 
 
+@then(u'the color map domain can be changed')
+def step_impl(context):
+    nose.tools.assert_equal(context.color_map.domain.min, 0)
+    nose.tools.assert_equal(context.color_map.domain.max, 1)
+    context.color_map.domain.min = -1
+    context.color_map.domain.max = 2
+    nose.tools.assert_equal(context.color_map.domain.min, -1)
+    nose.tools.assert_equal(context.color_map.domain.max, 2)
+
+
 @given(u'a starting color')
 def step_impl(context):
     context.color = toyplot.color.Palette().color(0)
@@ -243,10 +319,29 @@ def step_impl(context):
     toyplot.testing.assert_html_equal(
         context.palette._repr_html_(), "color-palette-reverse")
 
-@given(u'a collection of CSS color names, a color palette can be created')
+@given(u'a list of CSS colors, a color palette can be created')
 def step_impl(context):
-    palette = toyplot.color.Palette(["red", "green", "blue", (1, 1, 0)])
-    toyplot.testing.assert_html_equal(palette._repr_html_(), "color-palette-css-names")
+    colors = ["red", "green", "blue", "black"]
+    palette = toyplot.color.Palette(colors)
+    toyplot.testing.assert_html_equal(palette._repr_html_(), "color-palette-css-list")
+
+@given(u'an array of CSS colors, a color palette can be created')
+def step_impl(context):
+    colors = numpy.array(["red", "green", "blue", "black"])
+    palette = toyplot.color.Palette(colors)
+    toyplot.testing.assert_html_equal(palette._repr_html_(), "color-palette-css-array")
+
+@given(u'a list of RGB tuples, a color palette can be created')
+def step_impl(context):
+    colors = [(1, 0, 0), (0, 1, 0), (0, 0, 1), (0, 0, 0)]
+    palette = toyplot.color.Palette(colors)
+    toyplot.testing.assert_html_equal(palette._repr_html_(), "color-palette-rgb-tuples")
+
+@given(u'a list of RGBA tuples, a color palette can be created')
+def step_impl(context):
+    colors = [(1, 0, 0, 1), (0, 1, 0, 1), (0, 0, 1, 1), (0, 0, 0, 0.5)]
+    palette = toyplot.color.Palette(colors)
+    toyplot.testing.assert_html_equal(palette._repr_html_(), "color-palette-rgba-tuples")
 
 @given(u'a color palette, colors can be retrieved using item notation')
 def step_impl(context):

@@ -393,4 +393,9 @@ def step_impl(context):
     datum_values = numpy.arange(len(context.series[:,0]))
     context.axes.vlines(context.series[:,0], color=(datum_values, toyplot.color.LinearMap()))
 
+@then(u'bars can be rendered with an array of CSS colors')
+def step_impl(context):
+    color = numpy.array(["red", "#3f2", "rgb(10%, 20%, 90%)", "rgba(0%, 0%, 0%, 0.5)"])
+    context.axes.bars(context.series, baseline="symmetric", color=color)
+
 

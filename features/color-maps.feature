@@ -5,6 +5,7 @@ Feature: Color maps
     Then the linear color map can be rendered as ipython html
     And the linear color map can map scalar values to toyplot colors
     And the linear color map can map scalar values to css colors
+    And the color map domain can be changed
 
   Scenario: Diverging color maps
     Given a collection of diverging color maps

@@ -29,9 +29,9 @@ def _color_swatch(color):
             "div",
             style="float:left;width:20px;height:20px;background-color:%s" % toyplot.color.to_css(color))
         return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
-    return None
+    return None # pragma: no cover
 
-try:
+try: # pragma: no cover
     import IPython
     ip = IPython.get_ipython()
     html_formatter = ip.display_formatter.formatters['text/html']
@@ -87,8 +87,9 @@ def _msh_to_lab(M, s, h):
 def _require_color(color):
     if isinstance(color, toyplot.compatibility.string_type):
         return css(color)
-    elif isinstance(color, numpy.ndarray) and color.ndim == 0 and issubclass(color.dtype.type, numpy.character):
-        return css(str(color))
+# I'm having a tough time creating a test that will exercise this, which is good sign we don't need it.
+#    elif isinstance(color, numpy.ndarray) and color.ndim == 0 and issubclass(color.dtype.type, numpy.character):
+#        return css(str(color))
     elif isinstance(color, (numpy.void, numpy.ndarray)) and color.dtype == dtype:
         return color
     elif isinstance(color, (tuple, list, numpy.ndarray)) and len(color) == 3:
@@ -96,8 +97,7 @@ def _require_color(color):
     elif isinstance(color, (tuple, list, numpy.ndarray)) and len(color) == 4:
         return rgba(color[0], color[1], color[2], color[3])
     else:
-        raise ValueError(
-            "Expected a CSS color string or a Toyplot.color.value.")
+        raise ValueError("Expected a CSS color string or a Toyplot.color.value.") # pragma: no cover
 
 
 def broadcast(colors, shape, default=None):
@@ -116,13 +116,13 @@ def broadcast(colors, shape, default=None):
     colors : numpy.ndarray containing RGBA colors.
     """
     if colors is None and default is None:
-        raise ValueError("Must supply colors or default.")
+        raise ValueError("Must supply colors or default.") # pragma: no cover
     if not isinstance(shape, tuple):
         shape = (shape,)
     if not isinstance(shape, tuple):
-        raise ValueError("Shape parameter must be a tuple with length 1 or 2.")
+        raise ValueError("Shape parameter must be a tuple with length 1 or 2.") # pragma: no cover
     if not 0 < len(shape) < 3:
-        raise ValueError("Shape parameter must be a tuple with length 1 or 2.")
+        raise ValueError("Shape parameter must be a tuple with length 1 or 2.") # pragma: no cover
 
     per_series = len(shape) == 1
     per_datum = len(shape) == 2
@@ -177,7 +177,7 @@ def broadcast(colors, shape, default=None):
 
     # Sanity-check to ensure that per-datum colors aren't broadcasted as a per-series shape
     if colors.ndim > len(shape):
-        raise ValueError("Per-datum colors aren't allowed here - expecting per-series colors.")
+        raise ValueError("Per-datum colors aren't allowed here - expecting per-series colors.") # pragma: no cover
 
     # As a special-case, allow a vector with shape M to be matched-up with an
     # M x 1 matrix.
@@ -245,14 +245,12 @@ class Palette(object):
 
     def __add__(self, other):
         if not isinstance(other, Palette):
-            raise NotImplementedError(
-                "Only toyplot.color.Palette instances can be added together.")
+            raise NotImplementedError("Only toyplot.color.Palette instances can be added together.") # pragma: no cover
         return Palette(numpy.concatenate((self._colors, other._colors)))
 
     def __iadd__(self, other):
         if not isinstance(other, Palette):
-            raise NotImplementedError(
-                "Only toyplot.color.Palette instances can be added together.")
+            raise NotImplementedError("Only toyplot.color.Palette instances can be added together.") # pragma: no cover
         self._colors = numpy.concatenate((self._colors, other._colors))
         return self
 

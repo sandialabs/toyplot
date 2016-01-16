@@ -38,3 +38,13 @@ Feature: Graph visualization
         When the graph and layout are combined
         Then the visualization should match the graph-ba-graph-disconnected-vertices-fruchterman-reingold-layout reference image
 
+    Scenario: Render subgraph with shared layout
+        Given a graph and a subgraph
+        Then the subgraph can be rendered with the graph layout
+        And the visualization should match the graph-shared-layout-subgraph reference image
+
+    Scenario: Render graph with shared layout
+        Given a graph and a subgraph
+        Then the graph can be rendered with the subgraph layout
+        And the visualization should match the graph-shared-layout-graph reference image
+

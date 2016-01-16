@@ -83,3 +83,59 @@ def step_impl(context):
     context.sources = numpy.concatenate((numpy.random.choice(8, 10), [1, 3]))
     context.targets = numpy.concatenate((numpy.random.choice(8, 10), [1, 3]))
 
+@given(u'a graph and a subgraph')
+def step_impl(context):
+    numpy.random.seed(1234)
+    context.graph = toyplot.generate.prufer_tree(numpy.random.choice(4, 12))
+    context.subgraph = context.graph[:-4]
+
+@then(u'the subgraph can be rendered with the graph layout')
+def step_impl(context):
+    context.canvas = toyplot.Canvas(width=1000, height=500)
+    axes = context.canvas.axes(grid=(1, 2, 0), show=False)
+    axes.aspect = "fit-range"
+    mark = axes.graph(
+        context.graph,
+        vcolor="white",
+        vstyle={"stroke":"black"},
+        vsize=20,
+        ecolor="black",
+        eopacity=0.2,
+        )
+    axes = context.canvas.axes(grid=(1, 2, 1), show=False)
+    axes.aspect = "fit-range"
+    mark = axes.graph(
+        context.subgraph,
+        olayout = mark,
+        vcolor="white",
+        vstyle={"stroke":"black"},
+        vsize=20,
+        ecolor="black",
+        eopacity=0.2,
+        )
+
+@then(u'the graph can be rendered with the subgraph layout')
+def step_impl(context):
+    context.canvas = toyplot.Canvas(width=1000, height=500)
+    axes = context.canvas.axes(grid=(1, 2, 0), show=False)
+    axes.aspect = "fit-range"
+    mark = axes.graph(
+        context.subgraph,
+        vcolor="white",
+        vstyle={"stroke":"black"},
+        vsize=20,
+        ecolor="black",
+        eopacity=0.2,
+        )
+    axes = context.canvas.axes(grid=(1, 2, 1), show=False)
+    axes.aspect = "fit-range"
+    mark = axes.graph(
+        context.graph,
+        olayout = mark,
+        vcolor="white",
+        vstyle={"stroke":"black"},
+        vsize=20,
+        ecolor="black",
+        eopacity=0.2,
+        )
+

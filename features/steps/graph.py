@@ -8,12 +8,19 @@ import toyplot.layout
 def step_impl(context):
     numpy.random.seed(1234)
     context.graph = toyplot.generate.prufer_tree(numpy.random.choice(4, 12))
+    context.disconnected_vertices = None
     context.vcoordinates = None
 
 @given(u'a ba graph')
 def step_impl(context):
     context.graph = toyplot.generate.barabasi_albert_graph(n=20)
+    context.disconnected_vertices = None
     context.vcoordinates = None
+
+@given(u'disconnected vertices')
+def step_impl(context):
+    vcount = len(numpy.unique(context.graph))
+    context.disconnected_vertices = numpy.arange(vcount, vcount + 5)
 
 @given(u'a default graph layout')
 def step_impl(context):
@@ -48,7 +55,10 @@ def step_impl(context):
 
 @when(u'the graph and layout are combined')
 def step_impl(context):
-    context.canvas, axes, mark = toyplot.graph(context.graph, layout=context.layout, vcoordinates=context.vcoordinates)
+    if context.disconnected_vertices is not None:
+        context.canvas, axes, mark = toyplot.graph(context.graph, context.disconnected_vertices, layout=context.layout, vcoordinates=context.vcoordinates)
+    else:
+        context.canvas, axes, mark = toyplot.graph(context.graph, layout=context.layout, vcoordinates=context.vcoordinates)
 
 @when(u'a graph visualization is constructed from explicit source and target edge arrays')
 def step_impl(context):

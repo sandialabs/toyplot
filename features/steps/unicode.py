@@ -3,11 +3,6 @@ from behave import *
 import toyplot.testing
 
 
-@given(u'a default canvas')
-def step_impl(context):
-    context.canvas = toyplot.Canvas()
-
-
 @when(
     u'creating a plot with unicode text in a cartesian axes x label, the plot will match unicode-cartesian-x-label')
 def step_impl(context):

@@ -4,6 +4,11 @@ import numpy
 import toyplot.testing
 
 
+@given(u'a default canvas')
+def step_impl(context):
+    context.canvas = toyplot.Canvas()
+
+
 @given(u'a set of cartesian axes')
 def step_impl(context):
     context.canvas = toyplot.Canvas()

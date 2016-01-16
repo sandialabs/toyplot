@@ -923,16 +923,6 @@ def test_canvas_time():
     nose.tools.assert_equal(frame.index(), 5)
 
 
-def test_canvas_repr_html():
-    canvas = toyplot.Canvas(autorender="html")
-    html = canvas._repr_html_()
-    nose.tools.assert_is_instance(html, toyplot.compatibility.unicode_type)
-
-
-def test_explicit_tick_locator_failure():
-    with nose.tools.assert_raises(ValueError):
-        toyplot.locator.Explicit()
-
 ##########################################################################
 # toyplot.html
 
@@ -951,12 +941,6 @@ def test_html_render_animation():
             scatterplot, 0, frame.index(), {"stroke": "none"})
     canvas.animate(10, callback)
     dom = toyplot.html.render(canvas)
-
-
-def test_html_ipython_html():
-    canvas = toyplot.Canvas()
-    canvas.axes()
-    canvas._repr_html_()
 
 
 ##########################################################################

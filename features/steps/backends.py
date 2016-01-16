@@ -21,23 +21,6 @@ def step_impl(context, name):
         context.scenario.skip(reason="The %s backend is not available." % name)
 
 
-@then(u'the canvas can be rendered to an eps file')
-def step_impl(context):
-    target = os.path.join(toyplot.testing.backend_dir, "%s.eps" % context.name)
-    context.backend.render(context.canvas, target)
-
-
-@then(u'the canvas can be rendered to an eps buffer')
-def step_impl(context):
-    buffer = io.BytesIO()
-    context.backend.render(context.canvas, buffer)
-
-
-@then(u'the canvas can be rendered to a returned eps document')
-def step_impl(context):
-    eps = context.backend.render(context.canvas)
-
-
 @then(u'the canvas can be rendered to an html file')
 def step_impl(context):
     target = os.path.join(toyplot.testing.backend_dir, "%s.html" % context.name)

@@ -84,6 +84,28 @@ def step_impl(context):
     nose.tools.assert_equal(image.format, "PNG")
 
 
+@then(u'the canvas can be rendered to a 200 pixel wide png document')
+def step_impl(context):
+    png = context.backend.render(context.canvas, width="200px")
+    image = PIL.Image.open(io.BytesIO(png))
+    nose.tools.assert_equal(image.format, "PNG")
+    nose.tools.assert_equal(image.size, (200, 200))
+
+@then(u'the canvas can be rendered to a 150 pixel high png document')
+def step_impl(context):
+    png = context.backend.render(context.canvas, height="150px")
+    image = PIL.Image.open(io.BytesIO(png))
+    nose.tools.assert_equal(image.format, "PNG")
+    nose.tools.assert_equal(image.size, (150, 150))
+
+@then(u'the canvas can be rendered to a half scale png document')
+def step_impl(context):
+    png = context.backend.render(context.canvas, scale=0.5)
+    image = PIL.Image.open(io.BytesIO(png))
+    nose.tools.assert_equal(image.format, "PNG")
+    nose.tools.assert_equal(image.size, (300, 300))
+
+
 @then(u'the canvas can be rendered to an svg file')
 def step_impl(context):
     target = os.path.join(toyplot.testing.backend_dir, "%s.svg" % context.name)

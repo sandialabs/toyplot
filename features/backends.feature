@@ -16,6 +16,9 @@ Feature: Backends
       | toyplot.png              | a png file                      |
       | toyplot.png              | a png buffer                    |
       | toyplot.png              | a returned png document         |
+      | toyplot.png              | a 200 pixel wide png document   |
+      | toyplot.png              | a 150 pixel high png document   |
+      | toyplot.png              | a half scale png document       |
       | toyplot.reportlab.pdf    | a pdf file                      |
       | toyplot.reportlab.pdf    | a pdf buffer                    |
       | toyplot.reportlab.pdf    | a returned pdf document         |

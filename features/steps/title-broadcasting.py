@@ -24,6 +24,13 @@ def step_impl(context):
 def step_impl(context):
     context.axes.bars(context.series, baseline="symmetric", title=context.datum_titles)
 
+@then(u'bars can be rendered with a single series and per-datum titles')
+def step_impl(context):
+    context.x = numpy.linspace(0, 1)
+    context.series = context.x ** 2
+    context.series_titles = numpy.array(["S%s" % series for series in numpy.arange(context.series.shape[0])])
+    context.axes.bars(context.series, title=context.series_titles)
+
 @then(u'fills can be rendered with one explicit title')
 def step_impl(context):
     context.axes.fill(context.series, title="fill")

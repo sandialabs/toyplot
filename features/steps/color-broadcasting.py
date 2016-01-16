@@ -5,6 +5,7 @@ from behave import *
 import numpy
 import toyplot.color
 
+
 @given(u'a set of diverging series')
 def step_impl(context):
     context.x = numpy.linspace(0, 1)

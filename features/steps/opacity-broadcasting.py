@@ -25,6 +25,13 @@ def step_impl(context):
 def step_impl(context):
     context.axes.bars(context.series, baseline="symmetric", opacity=context.datum_opacities)
 
+@then(u'bars can be rendered with a single series and per-datum opacities')
+def step_impl(context):
+    context.x = numpy.linspace(0, 1)
+    context.series = context.x ** 2
+    context.datum_opacities = numpy.linspace(1, 0.1, context.series.shape[0])
+    context.axes.bars(context.series, opacity=context.datum_opacities)
+
 @then(u'fills can be rendered with one explicit opacity')
 def step_impl(context):
     context.axes.fill(context.series, opacity=0.2)

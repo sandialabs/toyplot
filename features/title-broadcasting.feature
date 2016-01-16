@@ -29,3 +29,9 @@ Feature: Title Broadcasting
             | text                         | per-datum titles                 | title-broadcast-text-per-datum-titles |
             | vlines                       | one explicit title               | title-broadcast-vlines-one-title |
             | vlines                       | per-datum titles                 | title-broadcast-vlines-per-datum-titles |
+
+    Scenario: Per-datum title broadcasting with one series
+        Given a set of cartesian axes
+        Then bars can be rendered with a single series and per-datum titles
+        And the generated figure will match title-broadcast-bars-single-series-per-datum-titles
+

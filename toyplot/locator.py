@@ -109,7 +109,9 @@ class Explicit(TickLocator):
             format="{:g}"):
         if locations is not None and labels is not None:
             locations = numpy.array(locations).astype("float64")
-            labels = toyplot.broadcast.string(labels, len(locations))
+            labels = numpy.array(labels).astype("unicode")
+            if len(locations) != len(labels):
+                raise ValueError("Location and label counts must match.")
         elif locations is not None:
             locations = numpy.array(locations).astype("float64")
             labels = [format.format(location) for location in locations]

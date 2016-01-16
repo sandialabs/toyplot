@@ -111,7 +111,7 @@ class Explicit(TickLocator):
             locations = numpy.array(locations).astype("float64")
             labels = numpy.array(labels).astype("unicode")
             if len(locations) != len(labels):
-                raise ValueError("Location and label counts must match.")
+                raise ValueError("Location and label counts must match.") # pragma: no cover
         elif locations is not None:
             locations = numpy.array(locations).astype("float64")
             labels = [format.format(location) for location in locations]

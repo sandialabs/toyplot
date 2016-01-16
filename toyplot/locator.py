@@ -119,7 +119,7 @@ class Explicit(TickLocator):
             labels = numpy.array(labels).astype("str")
             locations = numpy.arange(len(labels))
         else:
-            raise ValueError("Must supply locations, labels, or both.")
+            raise ValueError("Must supply locations, labels, or both.") # pragma: no cover
         titles = toyplot.broadcast.object(titles, len(locations))
 
         self._locations = locations

@@ -86,10 +86,6 @@ def table_keys(table, keys, length=None, min_length=None, modulus=None):
             raise ValueError( "Table key must match one of %s, received %s." % (", ".join(allowed), key)) # pragma: no cover
     return keys
 
-#def integer(value):
-#    if not isinstance(value, numbers.Integral):
-#        raise ValueError("Expected an integer, received %s." % value) # pragma: no cover
-#    return value
 
 def scalar(value):
     if not isinstance(value, numbers.Number):
@@ -103,28 +99,7 @@ def scalar_array(value):
     return array
 
 
-def scalar_vector(value, length=None):
-    array = scalar_array(value)
-    if array.shape == ():
-        array = numpy.ma.repeat(array, 1)
-    if array.ndim != 1:
-        raise ValueError("Expected a vector.") # pragma: no cover
-    if length is not None:
-        if len(array) != length:
-            raise ValueError( "Expected %s values, received %s." % (length, len(array))) # pragma: no cover
-    return array
-
-
-#def integer_array(value):
-#    array = numpy.ma.array(value).astype("int64")
-#    return array
-
-
-def integer_vector(value, length=None, min_length=None):
-    return vector(value, length=length, min_length=min_length).astype("int64")
-
-
-def vector(value, length=None, min_length=None):
+def vector(value, length=None, min_length=None, modulus=None):
     array = numpy.ma.array(value)
     if array.shape == ():
         array = numpy.ma.repeat(array, 1)
@@ -136,7 +111,22 @@ def vector(value, length=None, min_length=None):
     if min_length is not None:
         if len(array) < min_length:
             raise ValueError( "Expected %s or more values, received %s" % (min_length, len(array))) # pragma: no cover
+    if modulus is not None:
+        if len(array) % modulus != 0:
+            raise ValueError( "Expected a multiple of %s values, received %s" % (modulus, len(array))) # pragma: no cover
     return array
+
+
+def integer_vector(value, length=None, min_length=None, modulus=None):
+    return vector(value, length=length, min_length=min_length, modulus=modulus).astype("int64")
+
+
+def scalar_vector(value, length=None, min_length=None, modulus=None):
+    return vector(value, length=length, min_length=min_length, modulus=modulus).astype("float64")
+
+
+def string_vector(value, length=None, min_length=None, modulus=None):
+    return vector(value, length=length, min_length=min_length, modulus=modulus).astype("unicode")
 
 
 def scalar_matrix(value, rows=None, columns=None):
@@ -149,30 +139,6 @@ def scalar_matrix(value, rows=None, columns=None):
     if columns is not None:
         if array.shape[1] != columns:
             raise ValueError( "Expected %s columns, received %s." % (columns, array.shape[1])) # pragma: no cover
-    return array
-
-
-#def string(value):
-#    if not isinstance(value, toyplot.compatibility.string_type):
-#        raise ValueError("Expected a string, received %s." % value) # pragma: no cover
-#    return value
-
-
-def string_vector(value, length=None, min_length=None, modulus=None):
-    if isinstance(value, (toyplot.compatibility.string_type)):
-        value = [value]
-    array = numpy.ma.array(value).astype("unicode")
-    if array.ndim != 1:
-        raise ValueError("Expected a vector.") # pragma: no cover
-    if length is not None:
-        if len(array) != length:
-            raise ValueError( "Expected %s values, received %s" % (length, len(array))) # pragma: no cover
-    if min_length is not None:
-        if len(array) < min_length:
-            raise ValueError( "Expected %s or more values, received %s" % (min_length, len(array))) # pragma: no cover
-    if modulus is not None:
-        if len(array) % modulus != 0:
-            raise ValueError( "Expected a multiple of %s values, received %s" % (modulus, len(array))) # pragma: no cover
     return array
 
 

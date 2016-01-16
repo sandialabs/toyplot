@@ -36,10 +36,6 @@ class AnimationFrame(object):
         self._changes[self._begin]
         self._changes[self._end]
 
-    def __repr__(self):
-        return "<toyplot.canvas.AnimationFrame %s %.2f %.2f>" % (
-            self._index, self._begin, self._end)
-
     def index(self):
         """Return the current animation frame index.
         """

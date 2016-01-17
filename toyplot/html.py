@@ -25,12 +25,12 @@ try:
 except: # pragma: no cover
     import html.parser as HTMLParser
 
-class _NumpyJSONEncoder(json.JSONEncoder):
-
-    def default(self, obj):
-        if isinstance(obj, numpy.generic):
-            return numpy.asscalar(obj)
-        return json.JSONEncoder.default(self, obj)
+#class _NumpyJSONEncoder(json.JSONEncoder):
+#
+#    def default(self, obj):
+#        if isinstance(obj, numpy.generic):
+#            return numpy.asscalar(obj)
+#        return json.JSONEncoder.default(self, obj)
 
 
 _export_data_tables = string.Template("""
@@ -349,25 +349,25 @@ _animation_controls = string.Template("""
 
 
 class _RenderContext(object):
-    def __init__(self, **kwargs):
+    def __init__(self):
         self.root = None
         self._id_cache = dict()
         self._data_tables = list()
         self._cartesian_axes = dict()
         self.rendered = set()
 
-        for name in kwargs:
-            setattr(self, name, kwargs[name])
+#        for name in kwargs:
+#            setattr(self, name, kwargs[name])
 
-    def __contains__(self, key):
-        return key in self.__dict__
+#    def __contains__(self, key):
+#        return key in self.__dict__
 
-    def __repr__(self):
-        type_name = type(self).__name__
-        arg_strings = []
-        for name, value in sorted(self.__dict__.items()):
-            arg_strings.append('%s=%r' % (name, value))
-        return '%s(%s)' % (type_name, ', '.join(arg_strings))
+#    def __repr__(self):
+#        type_name = type(self).__name__
+#        arg_strings = []
+#        for name, value in sorted(self.__dict__.items()):
+#            arg_strings.append('%s=%r' % (name, value))
+#        return '%s(%s)' % (type_name, ', '.join(arg_strings))
 
     def add_cartesian_axes(self, axes):
         self._cartesian_axes[self.get_id(axes)] = axes
@@ -615,7 +615,7 @@ def render(canvas, fobj=None, animation=False):
 
         xml.SubElement(controls, "script").text = _show_mouse_coordinates.substitute(
             root_id=root.get("id"),
-            cartesian_axes=json.dumps(cartesian_axes, cls=_NumpyJSONEncoder, sort_keys=True))
+            cartesian_axes=json.dumps(cartesian_axes, sort_keys=True))
 
     # Provide VCR controls.
     if len(svg_animation) > 1:
@@ -705,7 +705,7 @@ def render(canvas, fobj=None, animation=False):
         xml.SubElement(controls, "script").text = _animation_controls.substitute(
             root_id=root.get("id"),
             frame_durations=json.dumps(durations.tolist()),
-            state_changes=json.dumps(changes, cls=_NumpyJSONEncoder))
+            state_changes=json.dumps(changes))
 
     if isinstance(fobj, toyplot.compatibility.string_type):
         with open(fobj, "wb") as file:

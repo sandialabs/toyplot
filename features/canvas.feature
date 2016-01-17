@@ -22,3 +22,7 @@ Feature: Canvas
         And a sample plot
         Then the canvas can be rendered in Jupyter as a PNG image
 
+    Scenario: Canvas numberline layout
+        Given a canvas with a border
+        Then numberlines can be added to the canvas using relative coordinates
+        And the visualization should match the canvas-layout-numberline-relative reference image

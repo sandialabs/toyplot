@@ -71,3 +71,7 @@ def step_impl(context):
     image = PIL.Image.open(io.BytesIO(png))
     nose.tools.assert_equal(image.format, "PNG")
 
+@then(u'numberlines can be added to the canvas using relative coordinates')
+def step_impl(context):
+    context.canvas.numberline(-400, -400, -100, -100)
+

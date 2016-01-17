@@ -25,12 +25,12 @@ try:
 except: # pragma: no cover
     import html.parser as HTMLParser
 
-#class _NumpyJSONEncoder(json.JSONEncoder):
-#
-#    def default(self, obj):
-#        if isinstance(obj, numpy.generic):
-#            return numpy.asscalar(obj)
-#        return json.JSONEncoder.default(self, obj)
+class _NumpyJSONEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, numpy.generic):
+            return numpy.asscalar(obj) # pragma: no cover
+        return json.JSONEncoder.default(self, obj)
 
 
 _export_data_tables = string.Template("""
@@ -356,19 +356,6 @@ class _RenderContext(object):
         self._cartesian_axes = dict()
         self.rendered = set()
 
-#        for name in kwargs:
-#            setattr(self, name, kwargs[name])
-
-#    def __contains__(self, key):
-#        return key in self.__dict__
-
-#    def __repr__(self):
-#        type_name = type(self).__name__
-#        arg_strings = []
-#        for name, value in sorted(self.__dict__.items()):
-#            arg_strings.append('%s=%r' % (name, value))
-#        return '%s(%s)' % (type_name, ', '.join(arg_strings))
-
     def add_cartesian_axes(self, axes):
         self._cartesian_axes[self.get_id(axes)] = axes
 
@@ -615,7 +602,7 @@ def render(canvas, fobj=None, animation=False):
 
         xml.SubElement(controls, "script").text = _show_mouse_coordinates.substitute(
             root_id=root.get("id"),
-            cartesian_axes=json.dumps(cartesian_axes, sort_keys=True))
+            cartesian_axes=json.dumps(cartesian_axes, cls=_NumpyJSONEncoder, sort_keys=True))
 
     # Provide VCR controls.
     if len(svg_animation) > 1:
@@ -705,7 +692,7 @@ def render(canvas, fobj=None, animation=False):
         xml.SubElement(controls, "script").text = _animation_controls.substitute(
             root_id=root.get("id"),
             frame_durations=json.dumps(durations.tolist()),
-            state_changes=json.dumps(changes))
+            state_changes=json.dumps(changes, cls=_NumpyJSONEncoder))
 
     if isinstance(fobj, toyplot.compatibility.string_type):
         with open(fobj, "wb") as file:
@@ -765,21 +752,6 @@ def _flat_contiguous(a):
         i += n
     return result
 
-
-#def indent(elem, level=0):
-#    i = "\n" + level*"  "
-#    if len(elem):
-#        if not elem.text or not elem.text.strip():
-#            elem.text = i + "  "
-#        if not elem.tail or not elem.tail.strip():
-#            elem.tail = i
-#        for elem in elem:
-#            indent(elem, level+1)
-#        if not elem.tail or not elem.tail.strip():
-#            elem.tail = i
-#    else:
-#        if level and (not elem.tail or not elem.tail.strip()):
-#            elem.tail = i
 
 class _HTMLParser(HTMLParser.HTMLParser):
     def __init__(self, element, font_size):
@@ -873,8 +845,6 @@ class _HTMLParser(HTMLParser.HTMLParser):
     def close(self):
         HTMLParser.HTMLParser.close(self)
         self.walk_tree(self._root_node, attributes={}, style={}, stack_state={"dy":0,"font-size":self._font_size}, global_state={"line-y":0, "current-y":0})
-#        indent(self._root_node)
-#        print xml.tostring(self._root_node)
 
 
 def _draw_text(
@@ -1105,12 +1075,6 @@ def _draw_marker(
                        x2=repr(cx),
                        y1=repr(cy - (size / 2)),
                        y2=repr(cy + (size / 2)))
-# Removing support for custom shapes
-#    elif shape == "path":
-#        shape_path = marker.get("path")
-#        xml.SubElement(
-#            marker_xml, "path", transform="translate(%r, %r) scale(%r) translate(%r, %r)" %
-#            (cx, cy, size, -cx, -cy), d="M " + repr(cx) + " " + repr(cy) + shape_path)
 
     if shape_label: # Not technically necessary, but we should avoid computing the style for every marker if we don't have to.
         _draw_text(

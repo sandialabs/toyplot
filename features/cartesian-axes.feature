@@ -27,6 +27,7 @@ Feature: Cartesian axes
         | with x axis per-tick styles identified by value       | axes-cartesian-x-ticks-tick-value-style |
         | with hidden x tick labels                             | axes-cartesian-x-ticks-labels-show |
         | with angled x tick labels                             | axes-cartesian-x-ticks-labels-angle |
+        | with offset x tick labels                             | axes-cartesian-x-ticks-labels-offset |
         | with styled x tick labels                             | axes-cartesian-x-ticks-labels-style |
         | with x axis per-tick-label styles identified by index | axes-cartesian-x-ticks-labels-label-index-style |
         | with x axis per-tick-label styles identified by value | axes-cartesian-x-ticks-labels-label-value-style |
@@ -49,6 +50,7 @@ Feature: Cartesian axes
         | with y axis per-tick styles identified by value       | axes-cartesian-y-ticks-tick-value-style |
         | with hidden y tick labels                             | axes-cartesian-y-ticks-labels-show |
         | with angled y tick labels                             | axes-cartesian-y-ticks-labels-angle |
+        | with offset y tick labels                             | axes-cartesian-y-ticks-labels-offset |
         | with styled y tick labels                             | axes-cartesian-y-ticks-labels-style |
         | with y axis per-tick-label styles identified by index | axes-cartesian-y-ticks-labels-label-index-style |
         | with y axis per-tick-label styles identified by value | axes-cartesian-y-ticks-labels-label-value-style |

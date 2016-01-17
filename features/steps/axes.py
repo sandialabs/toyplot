@@ -128,6 +128,11 @@ def step_impl(context):
     nose.tools.assert_equal(
         context.axes.x.ticks.labels.style["text-anchor"], "middle")
 
+@then(u'the cartesian axes can be rendered with offset x tick labels')
+def step_impl(context):
+    context.axes.x.ticks.labels.offset = "0.125in"
+    nose.tools.assert_equal(context.axes.x.ticks.labels.offset, 12)
+
 
 @then(u'the cartesian axes can be rendered with styled x tick labels')
 def step_impl(context):
@@ -270,6 +275,11 @@ def step_impl(context):
     nose.tools.assert_equal(
         context.axes.y.ticks.labels.style["text-anchor"], "middle")
 
+
+@then(u'the cartesian axes can be rendered with offset y tick labels')
+def step_impl(context):
+    context.axes.y.ticks.labels.offset = "16px"
+    nose.tools.assert_equal(context.axes.y.ticks.labels.offset, 16)
 
 @then(u'the cartesian axes can be rendered with styled y tick labels')
 def step_impl(context):

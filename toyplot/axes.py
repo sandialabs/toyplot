@@ -25,7 +25,7 @@ import time
 def _null_min(a, b):
     """Return the minimum of two values, with special logic to handle None."""
     if a is None:
-        return b
+        return b # pragma: no cover
     if b is None:
         return a
     return min(a, b)
@@ -34,7 +34,7 @@ def _null_min(a, b):
 def _null_max(a, b):
     """Return the maximum of two values, with special logic to handle None."""
     if a is None:
-        return b
+        return b # pragma: no cover
     if b is None:
         return a
     return max(a, b)
@@ -247,10 +247,9 @@ class Axis(object):
 
         def __call__(self, index=None, value=None):
             if index is None and value is None:
-                raise ValueError("Must specify tick index or value.")
+                raise ValueError("Must specify tick index or value.") # pragma: no cover
             if index is not None and value is not None:
-                raise ValueError(
-                    "Must specify either index or value, not both.")
+                raise ValueError("Must specify either index or value, not both.") # pragma: no cover
             if index is not None:
                 return Axis.PerTickHelper.TickProxy(self._indices[index], self._allowed)
             elif value is not None:

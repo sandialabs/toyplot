@@ -27,9 +27,9 @@ except: # pragma: no cover
 
 class _NumpyJSONEncoder(json.JSONEncoder):
 
-    def default(self, obj):
+    def default(self, obj): # pragma: no cover
         if isinstance(obj, numpy.generic):
-            return numpy.asscalar(obj) # pragma: no cover
+            return numpy.asscalar(obj)
         return json.JSONEncoder.default(self, obj)
 
 

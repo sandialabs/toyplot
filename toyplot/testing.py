@@ -215,9 +215,9 @@ def assert_canvas_equal(canvas, name):
             os.mkdir(failed_dir)
         with open(test_file, "wb") as file:
             file.write(svg.getvalue())
-        reference = subprocess.Popen(["xmldiff", reference_file, test_file], stdout=subprocess.PIPE)
-        test = subprocess.Popen(["xmldiff", test_file, reference_file], stdout=subprocess.PIPE)
-        message = "Test output %s doesn't match %s:\n\n*** Reference ***\n%s\n*** Test ***\n%s\n" % (
+        reference = subprocess.Popen(["xmldiff", test_file, reference_file], stdout=subprocess.PIPE)
+        test = subprocess.Popen(["xmldiff", reference_file, test_file], stdout=subprocess.PIPE)
+        message = "Test output %s doesn't match %s:\n\n*** Test -> Reference ***\n%s\n*** Reference -> Test ***\n%s\n" % (
             test_file,
             reference_file,
             reference.communicate()[0],

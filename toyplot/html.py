@@ -866,16 +866,14 @@ def _draw_text(
     font_size = toyplot.units.convert(style["font-size"], target="px", default="px")
     style["dominant-baseline"] = style.pop("alignment-baseline", "middle")
 
-    baseline_shift = 0
-    baseline_shift -= toyplot.units.convert(style.pop("baseline-shift", 0), target="px", default="px", reference=font_size)
-
-    x += toyplot.units.convert(style.pop("-toyplot-anchor-shift", 0), target="px", default="px")
+    baseline_shift = -toyplot.units.convert(style.pop("baseline-shift", 0), target="px", default="px", reference=font_size)
+    anchor_shift = toyplot.units.convert(style.pop("-toyplot-anchor-shift", 0), target="px", default="px", reference=font_size)
 
     transform = "translate(%r,%r)" % (x, y)
     if angle:
         transform += "rotate(%r)" % angle
-    if baseline_shift:
-        transform += "translate(0,%r)" % baseline_shift
+    if baseline_shift or anchor_shift:
+        transform += "translate(%r,%r)" % (anchor_shift, baseline_shift)
 
     text_xml = xml.SubElement(
         root,

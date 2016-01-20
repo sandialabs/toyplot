@@ -56,6 +56,17 @@ def step_impl(context):
             "-toyplot-anchor-shift": "-10px"})
     context.axes.scatterplot(0, 0, color="black")
 
+@given(u'text with angled anchor shift')
+def step_impl(context):
+    context.axes.text(
+        0,
+        0,
+        "+++",
+        angle=30,
+        style={
+            "font-size": "32px",
+            "-toyplot-anchor-shift": "10px"})
+    context.axes.scatterplot(0, 0, color="black")
 
 @given(u'text with hanging alignment')
 def step_impl(context):
@@ -117,6 +128,13 @@ def step_impl(context):
     context.axes.text(
         0, 0, "Text!", style={"font-size": "24px", "baseline-shift": "-100%"})
     context.axes.scatterplot(0, 0, color="black")
+
+@given(u'text with angled baseline shift')
+def step_impl(context):
+    context.axes.text(
+        0, 0, "+++", angle=30, style={"font-size": "32px", "baseline-shift": "10px"})
+    context.axes.scatterplot(0, 0, color="black")
+
 
 @when(u'text is aligned with an unknown text-anchor value, an exception is raised.')
 def step_impl(context):

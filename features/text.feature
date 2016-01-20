@@ -12,6 +12,7 @@ Feature: Text
           | right alignment              | text-anchor-end                    |
           | positive anchor shift        | text-anchor-shift-positive         |
           | negative anchor shift        | text-anchor-shift-negative         |
+          | angled anchor shift          | text-anchor-shift-angled           |
 
         Examples: Vertical Alignment
           | phrase                       | reference                          |
@@ -21,6 +22,7 @@ Feature: Text
           | alphabetic alignment         | text-alignment-baseline-alphabetic |
           | positive baseline shift      | text-baseline-shift-positive       |
           | negative baseline shift      | text-baseline-shift-negative       |
+          | angled baseline shift        | text-baseline-shift-angled         |
 
     Scenario: Unknown text-anchor value
         Given a set of cartesian axes

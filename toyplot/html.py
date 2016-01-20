@@ -871,7 +871,7 @@ def _draw_text(
 
     transform = "translate(%r,%r)" % (x, y)
     if angle:
-        transform += "rotate(%r)" % angle
+        transform += "rotate(%r)" % (-angle)
     if baseline_shift or anchor_shift:
         transform += "translate(%r,%r)" % (anchor_shift, baseline_shift)
 
@@ -1193,7 +1193,7 @@ def _render(canvas, axis, context):
                         axis.ticks.labels.style,
                         label_style,
                         ),
-                    angle=-axis.ticks.labels.angle,
+                    angle=axis.ticks.labels.angle,
                     title=title,
                     )
 
@@ -1627,7 +1627,7 @@ def _render(canvas, axes, context):
                 root=axes_xml,
                 x=x,
                 y=y,
-                angle=-cell._angle,
+                angle=cell._angle,
                 style=toyplot.style.combine(cell._style, {"text-anchor": "middle"}),
                 text=prefix + separator + suffix,
                 )
@@ -2521,7 +2521,7 @@ def _render(parent, mark, context):
             text=toyplot.compatibility.unicode_type(dtext),
             x=dx,
             y=dy,
-            angle=-dangle,
+            angle=dangle,
             attributes={"class": "toyplot-Datum"},
             style=toyplot.style.combine({"fill": toyplot.color.to_css(dfill), "opacity": dopacity}, mark._style),
             title=dtitle,

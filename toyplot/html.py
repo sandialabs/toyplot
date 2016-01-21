@@ -1173,13 +1173,12 @@ def _render(canvas, axis, context):
             if axis.ticks.labels.location is not None:
                 location = axis.ticks.labels.location
 
+            offset = 6
+            if axis.ticks.labels.offset is not None:
+                offset = axis.ticks.labels.offset
 
             if axis.ticks.labels.angle:
                 alignment_baseline = "central"
-
-                offset = -12 if location == "above" else 12
-                if axis.ticks.labels.offset is not None:
-                    offset = axis.ticks.labels.offset
 
                 if location == "above":
                     text_anchor = "start" if axis.ticks.labels.angle > 0 else "end"
@@ -1187,14 +1186,9 @@ def _render(canvas, axis, context):
                     text_anchor = "end" if axis.ticks.labels.angle > 0 else "start"
             else:
                 alignment_baseline = "alphabetic" if location == "above" else "hanging"
-
-                offset = -5 if location == "above" else 5
-                if axis.ticks.labels.offset is not None:
-                    offset = axis.ticks.labels.offset
-
                 text_anchor = "middle"
 
-            y = offset
+            y = offset if location == "below" else -offset
 
             ticks_group = xml.SubElement(axis_xml, "g")
             for location, label, title, label_style in zip(

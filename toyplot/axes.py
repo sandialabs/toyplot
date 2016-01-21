@@ -326,8 +326,11 @@ class Axis(object):
 
         def __init__(self, angle):
             self._show = True
-            self._offset = 0
+
+            self._offset = None
+
             self._angle = angle
+
             self._style = {}
             self.style = {
                 "font-size": "10px",

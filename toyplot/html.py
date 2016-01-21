@@ -1168,7 +1168,33 @@ def _render(canvas, axis, context):
                             tick_style))
 
         if axis.ticks.labels.show:
-            y = context.ticks_labels_offset
+
+            location = context.ticks_labels_location
+            if axis.ticks.labels.location is not None:
+                location = axis.ticks.labels.location
+
+
+            if axis.ticks.labels.angle:
+                alignment_baseline = "central"
+
+                offset = -12 if location == "above" else 12
+                if axis.ticks.labels.offset is not None:
+                    offset = axis.ticks.labels.offset
+
+                if location == "above":
+                    text_anchor = "start" if axis.ticks.labels.angle > 0 else "end"
+                elif location == "below":
+                    text_anchor = "end" if axis.ticks.labels.angle > 0 else "start"
+            else:
+                alignment_baseline = "alphabetic" if location == "above" else "hanging"
+
+                offset = -5 if location == "above" else 5
+                if axis.ticks.labels.offset is not None:
+                    offset = axis.ticks.labels.offset
+
+                text_anchor = "middle"
+
+            y = offset
 
             ticks_group = xml.SubElement(axis_xml, "g")
             for location, label, title, label_style in zip(
@@ -1181,8 +1207,8 @@ def _render(canvas, axis, context):
 
                 style=toyplot.style.combine(
                     {
-                        "alignment-baseline": context.ticks_labels_alignment_baseline,
-                        "text-anchor": context.ticks_labels_text_anchor,
+                        "alignment-baseline": alignment_baseline,
+                        "text-anchor": text_anchor,
                     },
                     axis.ticks.labels.style,
                     label_style,
@@ -1223,16 +1249,6 @@ def _render(canvas, numberline, context):
     for child in numberline._children:
         _render(numberline, child, context.copy(root=children_xml))
 
-    ticks_labels_offset = 5
-    if numberline.axis.ticks.labels.offset is not None:
-        ticks_labels_offset = numberline.axis.ticks.labels.offset
-
-    text_anchor = "middle"
-    if numberline.axis.ticks.labels.angle > 0:
-        text_anchor = "end"
-    elif numberline.axis.ticks.labels.angle < 0:
-        text_anchor = "start"
-
     _render(canvas, numberline.axis, context.copy(
         root=numberline_xml,
         x1=numberline._x1,
@@ -1242,9 +1258,7 @@ def _render(canvas, numberline, context):
         offset=numberline.padding,
         ticks_above=3,
         ticks_below=3,
-        ticks_labels_offset=ticks_labels_offset,
-        ticks_labels_alignment_baseline="hanging",
-        ticks_labels_text_anchor=text_anchor,
+        ticks_labels_location="below",
         label_baseline_shift="-200%",
         ))
 
@@ -1493,24 +1507,21 @@ def _render(canvas, axes, context):
             x_spine_y = axes._ymax_range
             x_ticks_above = 5
             x_ticks_below = 0
-            x_ticks_labels_offset = 5
-            x_ticks_labels_alignment_baseline = "hanging"
+            x_ticks_labels_location = "below"
             x_label_baseline_shift = "-200%"
         elif axes.x.spine.position == "high":
             x_offset = -axes.padding
             x_spine_y = axes._ymin_range
             x_ticks_above = 0
             x_ticks_below = 5
-            x_ticks_labels_offset = -5
-            x_ticks_labels_alignment_baseline = "alphabetic"
+            x_ticks_labels_location = "above"
             x_label_baseline_shift = "200%"
         else:
             x_offset = 0
             x_spine_y = axes._project_y(axes.x.spine.position)
             x_ticks_above = 3
             x_ticks_below = 3
-            x_ticks_labels_offset = 5
-            x_ticks_labels_alignment_baseline = "hanging"
+            x_ticks_labels_location = "below"
             x_label_baseline_shift = "-200%"
 
         if axes.y.spine._position == "low":
@@ -1518,24 +1529,21 @@ def _render(canvas, axes, context):
             y_spine_x = axes._xmin_range
             y_ticks_above = 0
             y_ticks_below = 5
-            y_ticks_labels_offset = -5
-            y_ticks_labels_alignment_baseline = "alphabetic"
+            y_ticks_labels_location = "above"
             y_label_baseline_shift = "200%"
         elif axes.y.spine._position == "high":
             y_offset = axes.padding
             y_spine_x = axes._xmax_range
             y_ticks_above = 5
             y_ticks_below = 0
-            y_ticks_labels_offset = 5
-            y_ticks_labels_alignment_baseline = "hanging"
+            y_ticks_labels_location = "below"
             y_label_baseline_shift = "-200%"
         else:
             y_offset = 0
             y_spine_x = axes._project_x(axes.y.spine._position)
             y_ticks_above = 3
             y_ticks_below = 3
-            y_ticks_labels_offset = 5
-            y_ticks_labels_alignment_baseline = "hanging"
+            y_ticks_labels_location = "below"
             y_label_baseline_shift = "200%"
 
         _render(canvas, axes.x, context.copy(
@@ -1547,8 +1555,7 @@ def _render(canvas, axes, context):
             offset=x_offset,
             ticks_above=x_ticks_above,
             ticks_below=x_ticks_below,
-            ticks_labels_offset=x_ticks_labels_offset,
-            ticks_labels_alignment_baseline = x_ticks_labels_alignment_baseline,
+            ticks_labels_location=x_ticks_labels_location,
             label_baseline_shift=x_label_baseline_shift,
             ))
 
@@ -1561,8 +1568,7 @@ def _render(canvas, axes, context):
             offset=y_offset,
             ticks_above=y_ticks_above,
             ticks_below=y_ticks_below,
-            ticks_labels_offset=y_ticks_labels_offset,
-            ticks_labels_alignment_baseline = y_ticks_labels_alignment_baseline,
+            ticks_labels_location=y_ticks_labels_location,
             label_baseline_shift=y_label_baseline_shift,
             ))
 

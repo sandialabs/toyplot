@@ -327,6 +327,8 @@ class Axis(object):
         def __init__(self, angle):
             self._show = True
 
+            self._location = None
+
             self._offset = None
 
             self._angle = angle
@@ -348,11 +350,23 @@ class Axis(object):
             self._show = value
 
         @property
+        def location(self):
+            return self._location
+
+        @location.setter
+        def location(self, value):
+            self._location = toyplot.require.value_in(value, [None, "above", "below"])
+
+        @property
         def offset(self):
             return self._offset
 
         @offset.setter
         def offset(self, value):
+            if value is None:
+                self._offset = value
+                return
+
             self._offset = toyplot.units.convert(
                 value, target="px", default="px")
 

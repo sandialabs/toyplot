@@ -819,12 +819,12 @@ class Cartesian(object):
         xtick_locations = []
         xtick_labels = []
         xtick_titles = []
-        if self.x.show:
+        if self.show and self.x.show:
             xtick_locations, xtick_labels, xtick_titles = self.x.locator().ticks(xmin, xmax)
         ytick_locations = []
         ytick_labels = []
         ytick_titles = []
-        if self.y.show:
+        if self.show and self.y.show:
             ytick_locations, ytick_labels, ytick_titles = self.y.locator().ticks(ymin, ymax)
 
         # Allow tick locations to grow (never shrink) the domain.

@@ -132,18 +132,15 @@ def broadcast(colors, shape, default=None):
         colors = default
 
     # Next, extract the user's choice of custom palette / colormap.
-    palette = None
     colormap = None
     if isinstance(colors, toyplot.color.Palette):
+        colormap = toyplot.color.CategoricalMap(colors)
         if per_series:
-            colormap = toyplot.color.CategoricalMap(colors)
             colors = numpy.arange(shape[0])
         if per_datum:
             if shape[1] > 1: # More than one series, so generate M categorical values
-                colormap = toyplot.color.CategoricalMap(colors)
                 colors = numpy.arange(shape[1])
             else: # Just one series, so generate N linear values
-                colormap = toyplot.color.LinearMap(colors)
                 colors = numpy.arange(shape[0])
     elif isinstance(colors, toyplot.color.Map):
         colormap = colors
@@ -156,6 +153,7 @@ def broadcast(colors, shape, default=None):
                 colors = numpy.arange(shape[0])
     elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Palette):
         colors, palette = colors
+        colormap = toyplot.color.CategoricalMap(palette)
     elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Map):
         colors, colormap = colors
 
@@ -165,9 +163,8 @@ def broadcast(colors, shape, default=None):
     elif isinstance(colors, numpy.ndarray) and issubclass(colors.dtype.type, numpy.character):
         colors = numpy.array([_require_color(color) for color in colors.flat], dtype=dtype).reshape(colors.shape)
     elif isinstance(colors, numpy.ndarray) and issubclass(colors.dtype.type, numpy.number):
-        if palette is None:
-            palette = toyplot.color.brewer("BlueGreen")
         if colormap is None:
+            palette = toyplot.color.brewer("BlueRed")
             colormap = LinearMap(palette, colors.min(), colors.max())
         colors = colormap.colors(colors)
     elif isinstance(colors, list):

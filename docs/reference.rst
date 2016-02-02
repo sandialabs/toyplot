@@ -10,7 +10,6 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   toyplot.rst
    toyplot.axes.rst
    toyplot.broadcast.rst
    toyplot.browser.rst
@@ -19,6 +18,8 @@ Contents:
    toyplot.compatibility.rst
    toyplot.config.rst
    toyplot.data.rst
+   toyplot.format.rst
+   toyplot.generate.rst
    toyplot.html.rst
    toyplot.layout.rst
    toyplot.locator.rst
@@ -28,13 +29,16 @@ Contents:
    toyplot.png.rst
    toyplot.projection.rst
    toyplot.qt.rst
-   toyplot.reportlab.rst
    toyplot.reportlab.pdf.rst
    toyplot.reportlab.png.rst
+   toyplot.reportlab.rst
    toyplot.require.rst
+   toyplot.rst
    toyplot.style.rst
    toyplot.svg.rst
    toyplot.testing.rst
+   toyplot.text.rst
+   toyplot.transform.rst
    toyplot.units.rst
    toyplot.webm.rst
 

@@ -38,6 +38,7 @@ Feature: Data tables
       | a csv file                        | contains the csv file columns                   |
       | a csv file and conversion         | contains the csv file columns with numeric type |
       | a pandas dataframe                | contains the data frame columns                 |
+      | a pandas dataframe with duplicate column names | contains the data frame columns with uniqified column names |
 
   Scenario Outline: Data table rendering
     Given a toyplot.data.table with some data

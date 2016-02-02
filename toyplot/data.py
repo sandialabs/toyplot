@@ -8,9 +8,15 @@ import collections
 import itertools
 import numbers
 import numpy
+import sys
 import toyplot.color
 import toyplot.compatibility
 import xml.etree.ElementTree as xml
+
+try:
+    import pandas
+except: # pragma: no cover
+    pass
 
 
 def contiguous(a):
@@ -51,45 +57,68 @@ class Table(object):
         self._metadata = collections.defaultdict(dict)
 
         if data is not None:
+            keys = None
+            values = None
+
             # Input data for which an explicit column ordering is known.
             if isinstance(data, (
                     collections.OrderedDict,
                     toyplot.data.Table,
                     numpy.lib.npyio.NpzFile,
                 )):
-                for key in data.keys():
-                    self[key] = data[key]
-                return
+                keys = [key for key in data.keys()]
+                values = [data[key] for key in keys]
             # Input data for which an explicit column ordering is not known.
-            if isinstance(data, (dict, collections.Mapping)):
-                for key in sorted(data.keys()):
-                    self[key] = data[key]
-                return
+            elif isinstance(data, (dict, collections.Mapping)):
+                keys = [key for key in sorted(data.keys())]
+                values = [data[key] for key in keys]
             # Input data based on sequences.
-            if isinstance(data, (list, collections.Sequence)):
-                for key, values in data:
-                    self[key] = values
-                return
+            elif isinstance(data, (list, collections.Sequence)):
+                keys = [key for key, value in data]
+                values = [value for key, value in data]
             # Input data based on numpy arrays.
-            if isinstance(data, numpy.ndarray):
-                if data.ndim == 2:
-                    for column_index in numpy.arange(data.shape[1]):
-                        self["C%s" % column_index] = data[:, column_index]
-                else:
+            elif isinstance(data, numpy.ndarray):
+                if data.ndim != 2:
                     raise ValueError(
                         "Only two-dimensional arrays are allowed.")
-                return
+                keys = [str(index) for index in numpy.arange(data.shape[1])]
+                values = [data[:, index] for index in numpy.arange(data.shape[1])]
             # Input data based on Pandas data structures.
-            try:
-                import pandas
-                if isinstance(data, pandas.DataFrame):
-                    for key in data.keys():
-                        self[key] = data[key]
-                    return
-            except: # pragma: no cover
-                pass
+            elif "pandas" in sys.modules and isinstance(data, pandas.DataFrame):
+                    keys = [data.ix[:,index].name for index in range(data.shape[1])]
+                    values = [data.ix[:,index] for index in range(data.shape[1])]
+            else:
+                raise ValueError("Can't create a toyplot.data.Table from an instance of %s" % type(data))
 
-            raise ValueError("Unsupported data type: %s" % type(data))
+            # Get the set of unique keys, so we can see if there are any duplicates.
+            keys = numpy.array(keys, dtype="object")
+            key_dictionary, key_counts = numpy.unique(keys, return_counts=True)
+
+            if numpy.any(key_counts > 1):
+                toyplot.log.warn("Altering duplicate column names to make them unique.")
+
+            # "Reserve" all of the keys that aren't duplicated.
+            reserved_keys = set([key for key, count in zip(key_dictionary, key_counts) if count == 1])
+            # Now, iterate through the keys that do contain duplicates, altering them to make them unique,
+            # while ensuring that the unique versions don't conflict with reserved keys.
+            for key, count in zip(key_dictionary, key_counts):
+                if count == 1:
+                    continue
+
+                suffix = 1
+                for index in numpy.flatnonzero(keys == key):
+                    if key not in reserved_keys:
+                        reserved_keys.add(key)
+                        continue
+                    while "%s-%s" % (key, suffix) in reserved_keys:
+                        suffix += 1
+                    keys[index] = "%s-%s" % (key, suffix)
+                    reserved_keys.add(keys[index])
+
+            # Store the data.
+            for key, value in zip(keys, values):
+                self[key] = value
+
 
     def __getitem__(self, index):
         column = None
@@ -157,7 +186,7 @@ class Table(object):
         key = toyplot.compatibility.unicode_type(key)
         value = numpy.ma.array(value)
         if value.ndim != 1:
-            raise ValueError("Only 1D arrays are allowed.")
+            raise ValueError("Can't assign %s-dimensional array to the '%s' column." % (value.ndim, key))
         for column in self._columns.values():
             if column.shape != value.shape:
                 raise ValueError(

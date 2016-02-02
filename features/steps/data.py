@@ -227,15 +227,15 @@ def step_impl(context):
 @then(u'the toyplot.data.Table contains the matrix columns with generated keys')
 def step_impl(context):
     table = toyplot.data.Table(context.data)
-    nose.tools.assert_equal(list(table.keys()), ["C0", "C1", "C2", "C3"])
+    nose.tools.assert_equal(list(table.keys()), ["0", "1", "2", "3"])
     numpy.testing.assert_array_equal(
-        table["C0"], [0, 4, 8, 12])
+        table["0"], [0, 4, 8, 12])
     numpy.testing.assert_array_equal(
-        table["C1"], [1, 5, 9, 13])
+        table["1"], [1, 5, 9, 13])
     numpy.testing.assert_array_equal(
-        table["C2"], [2, 6, 10, 14])
+        table["2"], [2, 6, 10, 14])
     numpy.testing.assert_array_equal(
-        table["C3"], [3, 7, 11, 15])
+        table["3"], [3, 7, 11, 15])
 
 
 @when(u'toyplot.data.Table is initialized with an array')
@@ -263,18 +263,22 @@ def step_impl(context):
     context.data["baz"] = numpy.random.choice(
         ["red", "green", "blue"], size=10)
 
+
 @when(u'toyplot.data.Table is initialized with a csv file')
 def step_impl(context):
     context.data = toyplot.data.read_csv("docs/temperatures.csv")
+
 
 @then(u'the toyplot.data.Table contains the csv file columns')
 def step_impl(context):
     nose.tools.assert_equal(context.data.shape, (362, 6))
     nose.tools.assert_equal(list(context.data.keys()), ['STATION', 'STATION_NAME', 'DATE', 'TMAX', 'TMIN', 'TOBS'])
 
+
 @when(u'toyplot.data.Table is initialized with a csv file and conversion')
 def step_impl(context):
     context.data = toyplot.data.read_csv("docs/temperatures.csv", convert=True)
+
 
 @then(u'the toyplot.data.Table contains the csv file columns with numeric type')
 def step_impl(context):
@@ -282,6 +286,7 @@ def step_impl(context):
     nose.tools.assert_equal(list(context.data.keys()), ['STATION', 'STATION_NAME', 'DATE', 'TMAX', 'TMIN', 'TOBS'])
     nose.tools.assert_true(issubclass(context.data['STATION'].dtype.type, numpy.character))
     nose.tools.assert_true(issubclass(context.data['TMAX'].dtype.type, numpy.number))
+
 
 @when(u'toyplot.data.Table is initialized with a pandas dataframe')
 def step_impl(context):
@@ -292,10 +297,27 @@ def step_impl(context):
         return
     context.data = toyplot.data.Table(pandas.read_csv("docs/temperatures.csv"))
 
+
 @then(u'the toyplot.data.Table contains the data frame columns')
 def step_impl(context):
     nose.tools.assert_equal(context.data.shape, (362, 6))
     nose.tools.assert_equal(list(context.data.keys()), ['STATION', 'STATION_NAME', 'DATE', 'TMAX', 'TMIN', 'TOBS'])
+
+
+@when(u'toyplot.data.Table is initialized with a pandas dataframe with duplicate column names')
+def step_impl(context):
+    try:
+        import pandas
+    except:
+        context.scenario.skip(reason="The pandas library is not available.")
+        return
+    context.data = toyplot.data.Table(pandas.read_csv("docs/temperatures.csv")[["STATION", "DATE", "STATION", "DATE", "DATE"]])
+
+
+@then(u'the toyplot.data.Table contains the data frame columns with uniqified column names')
+def step_impl(context):
+    nose.tools.assert_equal(list(context.data.keys()), ['STATION', 'DATE', 'STATION-1', 'DATE-1', 'DATE-2'])
+
 
 @then(u'the table can be rendered as format ipython html string')
 def step_impl(context):

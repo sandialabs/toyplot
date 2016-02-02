@@ -132,47 +132,34 @@ def broadcast(colors, shape, default=None):
         colors = default
 
     # Next, extract the user's choice of custom palette / colormap.
-    palette = None
     colormap = None
-    if isinstance(colors, toyplot.color.Palette):
-        if per_series:
+    if isinstance(colors, (toyplot.color.Palette, toyplot.color.Map)):
+        if isinstance(colors, toyplot.color.Palette):
             colormap = toyplot.color.CategoricalMap(colors)
-            colors = numpy.arange(shape[0])
-        if per_datum:
-            if shape[1] > 1: # More than one series, so generate M categorical values
-                colormap = toyplot.color.CategoricalMap(colors)
-                colors = numpy.arange(shape[1])
-            else: # Just one series, so generate N linear values
-                colormap = toyplot.color.LinearMap(colors)
-                colors = numpy.arange(shape[0])
-    elif isinstance(colors, toyplot.color.Map):
-        colormap = colors
-        if per_series:
-            colors = numpy.arange(shape[0])
-        if per_datum:
-            if shape[1] > 1: # More than one series, so generate M values
-                colors = numpy.arange(shape[1])
-            else: # Just one series, so generate N values
-                colors = numpy.arange(shape[0])
+        elif isinstance(colors, toyplot.color.Map):
+            colormap = colors
+        colors = numpy.arange(shape[0]) # By default, generate [0, M) per-datum values
+        if per_datum and shape[1] > 1:
+            colors = numpy.arange(shape[1]) # More than one series, so generate [0, N) per-series values
     elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Palette):
         colors, palette = colors
+        colormap = toyplot.color.CategoricalMap(palette)
     elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Map):
         colors, colormap = colors
 
     # Next, convert the supplied colors into a toyplot color array.
-    if isinstance(colors, numpy.ndarray) and colors.dtype == dtype:
+    if isinstance(colors, numpy.ndarray) and colors.dtype == dtype: # Already an array of colors
         pass
-    elif isinstance(colors, numpy.ndarray) and issubclass(colors.dtype.type, numpy.character):
+    elif isinstance(colors, numpy.ndarray) and issubclass(colors.dtype.type, numpy.character): # Array of strings, so convert to colors
         colors = numpy.array([_require_color(color) for color in colors.flat], dtype=dtype).reshape(colors.shape)
-    elif isinstance(colors, numpy.ndarray) and issubclass(colors.dtype.type, numpy.number):
-        if palette is None:
-            palette = toyplot.color.brewer("BlueGreen")
+    elif isinstance(colors, numpy.ndarray) and issubclass(colors.dtype.type, numpy.number): # Array of numeric values, so map values to colors
         if colormap is None:
+            palette = toyplot.color.brewer("BlueRed")
             colormap = LinearMap(palette, colors.min(), colors.max())
         colors = colormap.colors(colors)
-    elif isinstance(colors, list):
+    elif isinstance(colors, list): # Arbitrary Python sequence, so convert to colors
         colors = numpy.array([_require_color(color) for color in colors], dtype=dtype)
-    else:
+    else: # A single value, so convert to a color
         colors = _require_color(colors)
 
     # Sanity-check to ensure that per-datum colors aren't broadcasted as a per-series shape
@@ -589,7 +576,7 @@ class LinearMap(Map):
 
     def __init__(self, palette=None, domain_min=None, domain_max=None):
         toyplot.color.Map.__init__(self, domain_min=domain_min, domain_max=domain_max)
-        self._palette = palette if palette is not None else brewer("Blues")
+        self._palette = palette if palette is not None else brewer("BlueRed")
 
     def colors(self, values, domain_min=None, domain_max=None):
         """Convert an array-like collection of values to colors.

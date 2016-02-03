@@ -122,6 +122,51 @@ def step_impl(context):
     numpy.testing.assert_array_equal(table["a"], [5, 7])
 
 
+@then(u'columns can be replaced by name')
+def step_impl(context):
+    context.data["c"] = numpy.ones(10)
+    nose.tools.assert_equal(list(context.data.keys()), ["a", "b", "c"])
+    nose.tools.assert_equal(context.data.shape, (10, 3))
+    numpy.testing.assert_array_equal(context.data["c"], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+
+
+@then(u'partial columns can be modified by name and separate index')
+def step_impl(context):
+    context.data["c"][0] = 0
+    numpy.testing.assert_array_equal(context.data["c"], [0, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+
+
+@then(u'partial columns can be modified by name and separate slice')
+def step_impl(context):
+    context.data["c"][1:4] = [1, 2, 3]
+    numpy.testing.assert_array_equal(context.data["c"], [0, 1, 2, 3, 1, 1, 1, 1, 1, 1])
+
+
+@then(u'partial columns can be modified by name and index')
+def step_impl(context):
+    context.data["c", 4] = 4
+    numpy.testing.assert_array_equal(context.data["c"], [0, 1, 2, 3, 4, 1, 1, 1, 1, 1])
+
+
+@then(u'partial columns can be modified by name and slice')
+def step_impl(context):
+    context.data["c", 5:8] = [5, 6, 7]
+    numpy.testing.assert_array_equal(context.data["c"], [0, 1, 2, 3, 4, 5, 6, 7, 1, 1])
+
+
+@then(u'partial columns can be masked by name and index')
+def step_impl(context):
+    context.data["c", 3] = numpy.ma.masked
+    nose.tools.assert_is(context.data["c"][3], numpy.ma.masked)
+
+
+@then(u'partial columns can be masked by name and slice')
+def step_impl(context):
+    context.data["c", 8:10] = numpy.ma.masked
+    nose.tools.assert_is(context.data["c"][8], numpy.ma.masked)
+    nose.tools.assert_is(context.data["c"][9], numpy.ma.masked)
+
+
 @then(u'deleting columns should change the table')
 def step_impl(context):
     del context.data["c"]

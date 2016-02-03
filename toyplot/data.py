@@ -180,19 +180,25 @@ class Table(object):
             return Table([(column, self._columns[column][row_slice]) for column in columns])
 
 
-    def __setitem__(self, key, value):
-        if not isinstance(key, toyplot.compatibility.string_type):
-            raise ValueError("Column name '%s' must be a string." % key)
-        key = toyplot.compatibility.unicode_type(key)
-        value = numpy.ma.array(value)
-        if value.ndim != 1:
-            raise ValueError("Can't assign %s-dimensional array to the '%s' column." % (value.ndim, key))
-        for column in self._columns.values():
-            if column.shape != value.shape:
-                raise ValueError(
-                    "Expected %s values, received %s." %
-                    (column.shape[0], value.shape[0]))
-        self._columns[key] = value
+    def __setitem__(self, index, value):
+        if isinstance(index, toyplot.compatibility.string_type):
+            value = numpy.ma.array(value)
+            if value.ndim != 1:
+                raise ValueError("Can't assign %s-dimensional array to the '%s' column." % (value.ndim, index))
+            for column in self._columns.values():
+                if column.shape != value.shape:
+                    raise ValueError("Expected %s values, received %s." % (column.shape[0], value.shape[0]))
+            column = toyplot.compatibility.unicode_type(index)
+            self._columns[column] = value
+            return
+
+        if isinstance(index, tuple):
+            if isinstance(index[0], toyplot.compatibility.string_type) and isinstance(index[1], (int, slice)):
+                column, column_slice = index
+                self._columns[column][column_slice] = value
+                return
+
+        raise ValueError("Unsupported key for assignment: %s" % (index,))
 
     def __delitem__(self, key):
         return self._columns.__delitem__(key)

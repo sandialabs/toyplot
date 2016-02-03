@@ -8,7 +8,6 @@ import numpy
 
 
 class Formatter(object):
-
     """Base class for formatters - objects that compute text representations from data."""
 
     def format(self, value):
@@ -31,20 +30,31 @@ class Formatter(object):
 
 
 class DefaultFormatter(Formatter):
-
+    """Formats data using its default string representation."""
     def format(self, value):
         return "%s" % value, "", ""
 
 
 class FloatFormatter(Formatter):
+    """Formats floating-point values with aligned decimal points.
 
-    def __init__(self, format="{:.6g}"):
+    Parameters
+    ----------
+    format: format string, optional
+        Uses standard Python Format String Syntax.
+    nanshow: bool, optional
+        Set to `False` to hide NaN values.
+    """
+    def __init__(self, format="{:.6g}", nanshow=True):
         self._format = format
+        self._nanshow = nanshow
 
     def format(self, value):
         try:
             formatted = self._format.format(value).split(".")
             if len(formatted) == 1:
+                if formatted[0] == "nan" and not self._nanshow:
+                    return "", "", ""
                 return formatted[0], "", ""
             return formatted[0], ".", formatted[1]
         except:

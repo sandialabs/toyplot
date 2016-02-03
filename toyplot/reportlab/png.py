@@ -92,7 +92,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
 
 def render_frames(canvas, width=None, height=None, scale=None):
-    """Render a canvas as a sequence of PNG images using Cairo.
+    """Render a canvas as a sequence of PNG images using ReportLab and Ghostscript.
 
     By default, canvas dimensions in CSS pixels are mapped directly to pixels in
     the output PNG images.  Use one of `width`, `height`, or `scale` to override

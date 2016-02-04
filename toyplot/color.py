@@ -1039,7 +1039,7 @@ class _Diverging(object):
 diverging = _Diverging()
 
 def blackbody():
-    """Construct a :class:`toyplot.color.LinearMap` based on colors from black-body radiation.
+    """Construct a :class:`toyplot.color.LinearMap` based on colors from black body radiation.
 
     Although the map colors are inspired by the wavelengths of light from black
     body radiation, the actual colors used are designed to be perceptually uniform.
@@ -1122,10 +1122,12 @@ blackbody._data = [
     ]
 
 def extended_blackbody():
-    """Construct a :class:`toyplot.color.LinearMap` based on colors from black-body radiation.
+    """Construct a :class:`toyplot.color.LinearMap` based on colors from black body radiation.
 
-    Although the map colors are inspired by the wavelengths of light from black
-    body radiation, the actual colors used are designed to be perceptually uniform.
+    Adds blue and purple hues to the colors normally associated with black body
+    radiation, for a more colorful display.  Although the map colors are
+    inspired by the wavelengths of light from black body radiation, the actual
+    colors used are designed to be perceptually uniform.
 
     See http://www.kennethmoreland.com/color-advice for details.
 
@@ -1205,10 +1207,9 @@ extended_blackbody._data = [
     ]
 
 def kindlmann():
-    """Construct a :class:`toyplot.color.LinearMap` based on colors from black-body radiation.
+    """Construct a :class:`toyplot.color.LinearMap` based on http://www.cs.utah.edu/~gk/papers/vis02.
 
-    Although the map colors are inspired by the wavelengths of light from black
-    body radiation, the actual colors used are designed to be perceptually uniform.
+    The Kindlmann color map adjusts a rainbox color map for perceptual linearity.
 
     See http://www.kennethmoreland.com/color-advice for details.
 
@@ -1288,10 +1289,10 @@ kindlmann._data = [
     ]
 
 def extended_kindlmann():
-    """Construct a :class:`toyplot.color.LinearMap` based on colors from black-body radiation.
+    """Construct a :class:`toyplot.color.LinearMap` based on http://www.cs.utah.edu/~gk/papers/vis02.
 
-    Although the map colors are inspired by the wavelengths of light from black
-    body radiation, the actual colors used are designed to be perceptually uniform.
+    The extended version of the Kindlmann color map adds additional hues while
+    maintaining perceptual linearity.
 
     See http://www.kennethmoreland.com/color-advice for details.
 

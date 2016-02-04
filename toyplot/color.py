@@ -164,7 +164,7 @@ def broadcast(colors, shape, default=None):
         colors = numpy.array([_require_color(color) for color in colors.flat], dtype=dtype).reshape(colors.shape)
     elif isinstance(colors, numpy.ndarray) and issubclass(colors.dtype.type, numpy.number): # Array of numeric values, so map values to colors
         if colormap is None:
-            palette = toyplot.color.brewer("BlueRed")
+            palette = toyplot.color.brewer.palette("BlueRed")
             colormap = LinearMap(palette=palette, domain_min=colors.min(), domain_max=colors.max())
         colors = colormap.colors(colors)
     elif isinstance(colors, list): # Arbitrary Python sequence, so convert to colors
@@ -518,22 +518,22 @@ class DivergingMap(Map):
     def _repr_html_(self):
         domain_min = self.domain.min if self.domain.min is not None else 0
         domain_max = self.domain.max if self.domain.max is not None else 1
+        stops = numpy.linspace(domain_min, domain_max, 64, endpoint=True)
+        colors = self.colors(stops)
+
+        gradient_stops = ",".join([to_css(color) + " %.1f%%" % (position * 100.0) for color,position in zip(colors, stops)])
+
         root_xml = xml.Element(
             "div",
             style="overflow:hidden; height:auto",
-            attrib={
-                "class": "toyplot-color-DivergingMap"})
-        for color in self.colors(
-                numpy.linspace(
-                    domain_min,
-                    domain_max,
-                    100,
-                    endpoint=True)):
-            xml.SubElement(
-                root_xml,
-                "div",
-                style="float:left;width:1px;height:20px;background-color:%s" %
-                to_css(color))
+            attrib={"class": "toyplot-color-DivergingMap"},
+            )
+
+        xml.SubElement(
+            root_xml,
+            "div",
+            style="float:left;width:200px;height:20px;background:linear-gradient(to right,%s)" % (gradient_stops),
+            )
         return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
 
@@ -569,7 +569,7 @@ class LinearMap(Map):
         toyplot.color.Map.__init__(self, domain_min=domain_min, domain_max=domain_max)
 
         if palette is None:
-            palette = brewer("BlueRed")
+            palette = brewer.palette("BlueRed")
         if stops is None:
             stops = numpy.linspace(0, 1, len(palette), endpoint=True)
         stops = numpy.array(stops)
@@ -653,8 +653,23 @@ class LinearMap(Map):
         return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
 
-class _Brewer(object):
-    def __call__(self, name, count=None, reverse=False):
+class BrewerFactory(object):
+    def names(self, category=None):
+        """Return a list of available palette names."""
+        names = [name for name in sorted(self._data.keys())]
+        if category is not None:
+            names = [name for name in names if self.category(name) == category]
+        return names
+
+    def category(self, name):
+        """Return the category for the given palette."""
+        return self._type_map[self._data[name]["type"]]
+
+    def counts(self, name):
+        """Return a list of available palette sizes."""
+        return sorted([count for count in self._data[name].keys() if count not in["type", "reverse"]])
+
+    def palette(self, name, count=None, reverse=False):
         """Construct a :py:class:`toyplot.color.Palette` instance from a ColorBrewer 2.0 palette.
 
         Note that some of the sequential palettes have been renamed / reversed
@@ -679,25 +694,55 @@ class _Brewer(object):
         """
         if count is None:
             count = max(self.counts(name))
-        data = numpy.array(_Brewer._data[name][count]) / 255.0
-        if _Brewer._data[name].get("reverse", False):
+        data = numpy.array(self._data[name][count]) / 255.0
+        if self._data[name].get("reverse", False):
             data = data[::-1]
         return Palette(data, reverse=reverse)
 
-    def names(self, category=None):
-        names = [name for name in sorted(brewer._data.keys())]
-        if category is not None:
-            names = [name for name in names if self.category(name) == category]
-        return names
-
     def palettes(self, category=None):
-        return [(name, self(name)) for name in self.names(category)]
+        """Return a (name, palette) tuple for every Color Brewer 2.0 palette.
 
-    def counts(self, name):
-        return sorted([count for count in brewer._data[name].keys() if count not in["type", "reverse"]])
+        Parameters
+        ----------
+        category: string, optional
+            If specified, only return palettes from the given category.
 
-    def category(self, name):
-        return _Brewer._type_map[_Brewer._data[name]["type"]]
+        Returns
+        -------
+        palettes: sequence of (string, :class:`toyplot.color.Palette`) tuples.
+        """
+        return [(name, self.palette(name)) for name in self.names(category)]
+
+    def map(self, name, count=None, reverse=False):
+        """Return a color map that uses the given Color Brewer 2.0 palette.
+
+        Returns
+        -------
+        colormap: :class:`toyplot.color.LinearMap` or :class:`toyplot.color.CategoricalMap`, depending on the palette category.
+        """
+        if self.category(name) == "qualitative":
+            return CategoricalMap(self.palette(name=name, count=count, reverse=reverse))
+        return LinearMap(self.palette(name=name, count=count, reverse=reverse))
+
+    def maps(self, category=None):
+        """Return a (name, colormap) tuple for every Color Brewer 2.0 palette.
+
+        The type of the returned colormaps will be chosen based on the category of each palette.
+
+        Parameters
+        ----------
+        category: string, optional
+            If specified, only return palettes from the given category.
+
+        Returns
+        -------
+        palettes: sequence of (string, :class:`toyplot.color.Map`) tuples.
+        """
+        return [(name, self.map(name)) for name in self.names(category)]
+
+    def __call__(self, name, count=None, reverse=False):
+        toyplot.log.warn("toyplot.color.brewer() is deprecated, use toyplot.color.brewer.palette() instead.")
+        return self.palette(name=name, count=count, reverse=reverse)
 
     _type_map = {"div": "diverging", "qual": "qualitative", "seq": "sequential"}
 
@@ -1004,23 +1049,40 @@ class _Brewer(object):
         (255, 247, 251), (236, 226, 240), (208, 209, 230), (166, 189, 219), (103, 169, 207), (54, 144, 192), (2, 129, 138), (1, 108, 89), (1, 70, 54)], "type": "seq", "reverse": True}, }
 
 
-brewer = _Brewer()
+brewer = BrewerFactory()
 
-class _Diverging(object):
-    def __call__(self, name, domain_min=None, domain_max=None):
+class DivergingFactory(object):
+    def names(self):
+        """Return a list of available map names."""
+        return [name for name in sorted(self._data.keys())]
+
+    def map(self, name, domain_min=None, domain_max=None):
         """Construct a named :py:class:`toyplot.color.DivergingMap` instance.
 
         Parameters
         ----------
         name: string
-          The name of the map.  Use :py:func:`toyplot.color.diverging.names` to retrieve a list of available names.
+          The name of the map.  Use :py:meth:`toyplot.color.DivergingFactory.names` to retrieve a list of available names.
 
         Returns
         -------
         map: :class:`toyplot.color.DivergingMap`
         """
-        low, high = _Diverging._data[name]
+        low, high = self._data[name]
         return DivergingMap(low, high, domain_min, domain_max)
+
+    def maps(self):
+        """Return a (name, colormap) tuple for every map in the collection.
+
+        Returns
+        -------
+        palettes: sequence of (string, :class:`toyplot.color.DivergingMap`) tuples.
+        """
+        return [(name, self.map(name)) for name in self.names()]
+
+    def __call__(self, name, domain_min=None, domain_max=None):
+        toyplot.log.warn("toyplot.color.diverging() is deprecated, use toyplot.color.divering.map() instead.")
+        return self.map(name=name, domain_min=domain_min, domain_max=domain_max)
 
     _data = {
         "BlueBrown": (rgb(0.217, 0.525, 0.910), rgb(0.677, 0.492, 0.093)),
@@ -1030,13 +1092,7 @@ class _Diverging(object):
         "PurpleOrange": (rgb(0.436, 0.308, 0.631), rgb(0.759, 0.334, 0.046)),
     }
 
-    def names(self):
-        return [name for name in sorted(_Diverging._data.keys())]
-
-    def maps(self):
-        return [(name, self(name)) for name in self.names()]
-
-diverging = _Diverging()
+diverging = DivergingFactory()
 
 def blackbody():
     """Construct a :class:`toyplot.color.LinearMap` based on colors from black body radiation.

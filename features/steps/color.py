@@ -42,7 +42,7 @@ def step_impl(context):
 @then(u'the color value can be rendered as ipython html')
 def step_impl(context):
     toyplot.testing.assert_html_equal(
-        toyplot.color._color_swatch(context.value), "color-swatch")
+        toyplot.color._jupyter_color_swatches(context.value), "color-swatch")
 
 
 @given(u'a collection of Color Brewer palettes')

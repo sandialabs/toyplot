@@ -18,30 +18,40 @@ dtype = {"names": ["r", "g", "b", "a"], "formats": [
     "float64", "float64", "float64", "float64"]}
 
 
-def _color_swatch(color):
-    if isinstance(color, numpy.ndarray) and color.shape == () and color.dtype == dtype:
-        root_xml = xml.Element(
-            "div",
-            style="overflow:hidden; height:auto",
-            attrib={"class": "toyplot-color-Swatch"})
+def _html_color_swatches(colors, css_class):
+    root_xml = xml.Element(
+        "div",
+        style="overflow:hidden; height:auto",
+        attrib={"class": css_class})
+    for color in colors:
         xml.SubElement(
             root_xml,
             "div",
             style="float:left;width:20px;height:20px;background-color:%s" % toyplot.color.to_css(color))
-        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
+    return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
+
+
+def _jupyter_color_swatches(colors):
+    if isinstance(colors, numpy.ndarray) and colors.shape == () and colors.dtype == dtype:
+        return _html_color_swatches([colors], "toyplot-color-Swatch")
+    elif isinstance(colors, numpy.ndarray) and colors.ndim == 1 and colors.dtype == dtype:
+        return _html_color_swatches(colors, "toyplot-color-Swatches")
     return None # pragma: no cover
+
 
 try: # pragma: no cover
     import IPython
     ip = IPython.get_ipython()
     html_formatter = ip.display_formatter.formatters['text/html']
-    html_formatter.for_type_by_name('numpy', 'ndarray', _color_swatch)
+    html_formatter.for_type_by_name('numpy', 'ndarray', _jupyter_color_swatches)
 except:
     pass
+
 
 #def array(values):
 #    """Construct an array of Toyplot color values."""
 #    return numpy.array(values, dtype=dtype)
+
 
 def rgb(r, g, b):
     """Construct a Toyplot color from RGB values."""
@@ -217,18 +227,7 @@ class Palette(object):
             yield numpy.array(color, dtype=dtype)
 
     def _repr_html_(self):
-        root_xml = xml.Element(
-            "div",
-            style="overflow:hidden; height:auto",
-            attrib={
-                "class": "toyplot-color-Palette"})
-        for color in self._colors:
-            xml.SubElement(
-                root_xml,
-                "div",
-                style="float:left;width:20px;height:20px;background-color:%s" %
-                to_css(color))
-        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
+        return _html_color_swatches(self._colors, "toyplot-color-Palette")
 
     def __add__(self, other):
         if not isinstance(other, Palette):
@@ -388,18 +387,7 @@ class CategoricalMap(Map):
         return to_css(self.colors(index, domain_min, domain_max))
 
     def _repr_html_(self):
-        root_xml = xml.Element(
-            "div",
-            style="overflow:hidden; height:auto",
-            attrib={
-                "class": "toyplot-color-CategoricalMap"})
-        for color in self._palette._colors:
-            xml.SubElement(
-                root_xml,
-                "div",
-                style="float:left;width:20px;height:20px;background-color:%s" %
-                to_css(color))
-        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
+        return _html_color_swatches(self._palette._colors, "toyplot-color-CategoricalMap")
 
 
 class DivergingMap(Map):

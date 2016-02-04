@@ -165,7 +165,7 @@ def broadcast(colors, shape, default=None):
     elif isinstance(colors, numpy.ndarray) and issubclass(colors.dtype.type, numpy.number): # Array of numeric values, so map values to colors
         if colormap is None:
             palette = toyplot.color.brewer("BlueRed")
-            colormap = LinearMap(palette, colors.min(), colors.max())
+            colormap = LinearMap(palette=palette, domain_min=colors.min(), domain_max=colors.max())
         colors = colormap.colors(colors)
     elif isinstance(colors, list): # Arbitrary Python sequence, so convert to colors
         colors = numpy.array([_require_color(color) for color in colors], dtype=dtype)
@@ -551,10 +551,9 @@ class LinearMap(Map):
     ----------
     palette: :class:`toyplot.color.Palette`
         Specify the set of colors used by the map.
-    positions: sequence of scalars, one per palette color, optional
-        Specify the distance between each palette color, for linear
-        interpolation.  By default each color is evenly spaced along the map
-        domain.
+    stops: sequence of scalars, one per palette color, optional
+        Specify a "stop" for each palette color.  By default each color is
+        evenly spaced.
 
     domain_min: scalar, optional
 
@@ -566,16 +565,20 @@ class LinearMap(Map):
     a Jupyter notebook.
     """
 
-    def __init__(self, palette=None, positions=None, domain_min=None, domain_max=None):
+    def __init__(self, palette=None, stops=None, domain_min=None, domain_max=None):
         toyplot.color.Map.__init__(self, domain_min=domain_min, domain_max=domain_max)
 
         if palette is None:
             palette = brewer("BlueRed")
-        if positions is None:
-            positions = numpy.linspace(0, 1, len(palette), endpoint=True)
+        if stops is None:
+            stops = numpy.linspace(0, 1, len(palette), endpoint=True)
+        stops = numpy.array(stops)
+
+        if stops.shape != palette._colors.shape:
+            raise ValueError("Number of stops must match palette length.")
 
         self._palette = palette
-        self._positions = positions
+        self._stops = stops
 
 
     def colors(self, values, domain_min=None, domain_max=None):
@@ -592,7 +595,7 @@ class LinearMap(Map):
         values = numpy.array(values)
         domain_min = domain_min if domain_min is not None else self.domain.min if self.domain.min is not None else values.min()
         domain_max = domain_max if domain_max is not None else self.domain.max if self.domain.max is not None else values.max()
-        domain = (self._positions * (domain_max - domain_min)) + domain_min
+        domain = (self._stops * (domain_max - domain_min)) + domain_min
 
         flat = numpy.ravel(values)
         result = numpy.empty(flat.shape, dtype=dtype)
@@ -631,10 +634,10 @@ class LinearMap(Map):
     def _repr_html_(self):
         domain_min = self.domain.min if self.domain.min is not None else 0
         domain_max = self.domain.max if self.domain.max is not None else 1
-        positions = numpy.linspace(domain_min, domain_max, 64, endpoint=True)
-        colors = self.colors(positions)
+        stops = numpy.linspace(domain_min, domain_max, 64, endpoint=True)
+        colors = self.colors(stops)
 
-        gradient_stops = ",".join([to_css(color) + " %.1f%%" % (position * 100.0) for color,position in zip(colors, positions)])
+        gradient_stops = ",".join([to_css(color) + " %.1f%%" % (position * 100.0) for color,position in zip(colors, stops)])
 
         root_xml = xml.Element(
             "div",
@@ -1048,8 +1051,8 @@ def blackbody():
     map: :class:`toyplot.color.LinearMap`
     """
     palette = Palette([rgb(red, green, blue) for position, red, green, blue in blackbody._data])
-    positions = [position for position, red, green, blue in blackbody._data]
-    return LinearMap(palette, positions)
+    stops = [position for position, red, green, blue in blackbody._data]
+    return LinearMap(palette=palette, stops=stops)
 
 blackbody._data = [
     (0.0,0.0,0.0,0.0),
@@ -1131,8 +1134,8 @@ def extended_blackbody():
     map: :class:`toyplot.color.LinearMap`
     """
     palette = Palette([rgb(red, green, blue) for position, red, green, blue in extended_blackbody._data])
-    positions = [position for position, red, green, blue in extended_blackbody._data]
-    return LinearMap(palette, positions)
+    stops = [position for position, red, green, blue in extended_blackbody._data]
+    return LinearMap(palette=palette, stops=stops)
 
 extended_blackbody._data = [
     (0.0,0.0,0.0,0.0),
@@ -1214,8 +1217,8 @@ def kindlmann():
     map: :class:`toyplot.color.LinearMap`
     """
     palette = Palette([rgb(red, green, blue) for position, red, green, blue in kindlmann._data])
-    positions = [position for position, red, green, blue in kindlmann._data]
-    return LinearMap(palette, positions)
+    stops = [position for position, red, green, blue in kindlmann._data]
+    return LinearMap(palette=palette, stops=stops)
 
 kindlmann._data = [
     (0.0,0.0,0.0,0.0),
@@ -1297,8 +1300,8 @@ def extended_kindlmann():
     map: :class:`toyplot.color.LinearMap`
     """
     palette = Palette([rgb(red, green, blue) for position, red, green, blue in extended_kindlmann._data])
-    positions = [position for position, red, green, blue in extended_kindlmann._data]
-    return LinearMap(palette, positions)
+    stops = [position for position, red, green, blue in extended_kindlmann._data]
+    return LinearMap(palette=palette, stops=stops)
 
 extended_kindlmann._data = [
     (0.0,0.0,0.0,0.0),
@@ -1379,8 +1382,7 @@ def to_css(color):
     -------
     css: string
       """
-    return "rgba(%.3g%%,%.3g%%,%.3g%%,%.3g)" % (
-        color["r"] * 100.0, color["g"] * 100.0, color["b"] * 100.0, color["a"])
+    return "rgba(%.1f%%,%.1f%%,%.1f%%,%.3f)" % (color["r"] * 100, color["g"] * 100, color["b"] * 100, color["a"])
 
 
 def css(value):

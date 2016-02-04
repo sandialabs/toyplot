@@ -5,7 +5,12 @@
 import numpy
 import toyplot.color
 
-def plot_luma(colormaps):
+def plot_luma(a, b=None):
+    if b is not None:
+        colormaps = [(a, b)]
+    else:
+        colormaps = a
+
     grid_n = 4.0
     grid_m = numpy.ceil(len(colormaps) / grid_n)
     canvas = toyplot.Canvas(grid_n * 150, grid_m * 150)

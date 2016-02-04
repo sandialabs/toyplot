@@ -474,7 +474,10 @@ class Canvas(object):
             if palette is None:
                 palette = toyplot.color.brewer("BlueRed")
             colormap = toyplot.color.LinearMap(
-                palette, matrix.min(), matrix.max())
+                palette=palette,
+                domain_min=matrix.min(),
+                domain_max=matrix.max(),
+                )
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)

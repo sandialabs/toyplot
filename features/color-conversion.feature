@@ -30,5 +30,5 @@ Feature: Color conversion
     Then toyplot.color.to_css should return <output>
 
     Examples:
-      | input                            | output                  |
-      | toyplot.color.rgba(1, .5, .4, 1) | rgba(100%,50%,40%,1)    |
+      | input                            | output                          |
+      | toyplot.color.rgba(1, .5, .4, 1) | rgba(100.0%,50.0%,40.0%,1.000)  |

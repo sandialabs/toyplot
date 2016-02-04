@@ -205,15 +205,15 @@ def step_impl(context):
     u'individual values can be mapped to css colors by the diverging color map')
 def step_impl(context):
     nose.tools.assert_equal(
-        context.color_map.css(-1), "rgba(33.5%,28.3%,75.6%,1)")
+        context.color_map.css(-1), "rgba(33.5%,28.3%,75.6%,1.000)")
     nose.tools.assert_equal(
-        context.color_map.css(0), "rgba(33.5%,28.3%,75.6%,1)")
+        context.color_map.css(0), "rgba(33.5%,28.3%,75.6%,1.000)")
     nose.tools.assert_equal(
-        context.color_map.css(0.5), "rgba(86.5%,86.5%,86.5%,1)")
+        context.color_map.css(0.5), "rgba(86.5%,86.5%,86.5%,1.000)")
     nose.tools.assert_equal(
-        context.color_map.css(1), "rgba(69.5%,0.296%,15.5%,1)")
+        context.color_map.css(1), "rgba(69.5%,0.3%,15.5%,1.000)")
     nose.tools.assert_equal(
-        context.color_map.css(2), "rgba(69.5%,0.296%,15.5%,1)")
+        context.color_map.css(2), "rgba(69.5%,0.3%,15.5%,1.000)")
 
 
 @given(u'a linear color map')
@@ -244,11 +244,11 @@ def step_impl(context):
 
 @then(u'the linear color map can map scalar values to css colors')
 def step_impl(context):
-    nose.tools.assert_equal(context.color_map.css(-1), "rgba(100%,0%,0%,1)")
-    nose.tools.assert_equal(context.color_map.css(0), "rgba(100%,0%,0%,1)")
-    nose.tools.assert_equal(context.color_map.css(0.5), "rgba(50%,0%,50%,1)")
-    nose.tools.assert_equal(context.color_map.css(1), "rgba(0%,0%,100%,1)")
-    nose.tools.assert_equal(context.color_map.css(2), "rgba(0%,0%,100%,1)")
+    nose.tools.assert_equal(context.color_map.css(-1), "rgba(100.0%,0.0%,0.0%,1.000)")
+    nose.tools.assert_equal(context.color_map.css(0), "rgba(100.0%,0.0%,0.0%,1.000)")
+    nose.tools.assert_equal(context.color_map.css(0.5), "rgba(50.0%,0.0%,50.0%,1.000)")
+    nose.tools.assert_equal(context.color_map.css(1), "rgba(0.0%,0.0%,100.0%,1.000)")
+    nose.tools.assert_equal(context.color_map.css(2), "rgba(0.0%,0.0%,100.0%,1.000)")
 
 
 @then(u'the color map domain can be changed')
@@ -377,8 +377,8 @@ def step_impl(context):
 @given(u'a color palette, colors can retrieve css colors by index')
 def step_impl(context):
     palette = toyplot.color.Palette([(1, 0, 0), (0, 1, 0), (0, 0, 1)])
-    nose.tools.assert_equal(palette.css(0), "rgba(100%,0%,0%,1)")
-    nose.tools.assert_equal(palette.css(-1), "rgba(0%,0%,100%,1)")
+    nose.tools.assert_equal(palette.css(0), "rgba(100.0%,0.0%,0.0%,1.000)")
+    nose.tools.assert_equal(palette.css(-1), "rgba(0.0%,0.0%,100.0%,1.000)")
 
 @given(u'a categorical color map, the map can be rendered as ipython html')
 def step_impl(context):
@@ -404,6 +404,6 @@ def step_impl(context):
 def step_impl(context):
     colormap = toyplot.color.CategoricalMap(
         toyplot.color.Palette(["red", "lime", "blue", (1, 1, 1)]))
-    nose.tools.assert_equal(colormap.css(0), "rgba(100%,0%,0%,1)")
-    nose.tools.assert_equal(colormap.css(-1), "rgba(100%,100%,100%,1)")
+    nose.tools.assert_equal(colormap.css(0), "rgba(100.0%,0.0%,0.0%,1.000)")
+    nose.tools.assert_equal(colormap.css(-1), "rgba(100.0%,100.0%,100.0%,1.000)")
 

@@ -148,8 +148,7 @@ def step_impl(context):
 
 @given(u'a collection of diverging color maps')
 def step_impl(context):
-    context.color_maps = [(name, toyplot.color.diverging(name))
-                          for name in toyplot.color.diverging.names()]
+    context.color_maps = toyplot.color.diverging.maps()
 
 
 @then(u'each diverging color map can be rendered as ipython html')

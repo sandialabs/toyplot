@@ -18,6 +18,7 @@ Contents:
    toyplot.compatibility.rst
    toyplot.config.rst
    toyplot.data.rst
+   toyplot.docs.rst
    toyplot.format.rst
    toyplot.generate.rst
    toyplot.html.rst

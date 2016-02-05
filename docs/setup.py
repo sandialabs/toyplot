@@ -85,7 +85,8 @@ if os.path.exists(build_dir):
 notebooks = [
         "canvas-layout",
         "cartesian-axes",
-        "color",
+        "colors",
+        "color-mapping",
         "convenience-api",
         "data-tables",
         "graph-visualization",

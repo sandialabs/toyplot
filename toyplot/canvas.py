@@ -472,7 +472,7 @@ class Canvas(object):
 
         if colormap is None:
             if palette is None:
-                palette = toyplot.color.brewer("BlueRed")
+                palette = toyplot.color.brewer.palette("BlueRed")
             colormap = toyplot.color.LinearMap(
                 palette=palette,
                 domain_min=matrix.min(),

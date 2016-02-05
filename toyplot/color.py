@@ -714,7 +714,7 @@ class BrewerFactory(object):
         """
         return [(name, self.palette(name)) for name in self.names(category)]
 
-    def map(self, name, count=None, reverse=False):
+    def map(self, name, count=None, reverse=False, domain_min=None, domain_max=None):
         """Return a color map that uses the given Color Brewer 2.0 palette.
 
         Returns
@@ -722,8 +722,15 @@ class BrewerFactory(object):
         colormap: :class:`toyplot.color.LinearMap` or :class:`toyplot.color.CategoricalMap`, depending on the palette category.
         """
         if self.category(name) == "qualitative":
-            return CategoricalMap(self.palette(name=name, count=count, reverse=reverse))
-        return LinearMap(self.palette(name=name, count=count, reverse=reverse))
+            return CategoricalMap(
+                palette=self.palette(name=name, count=count, reverse=reverse),
+                )
+
+        return LinearMap(
+            palette=self.palette(name=name, count=count, reverse=reverse),
+            domain_min=domain_min,
+            domain_max=domain_max,
+            )
 
     def maps(self, category=None):
         """Return a (name, colormap) tuple for every Color Brewer 2.0 palette.

@@ -19,7 +19,7 @@ dtype = {"names": ["r", "g", "b", "a"], "formats": [
     "float64", "float64", "float64", "float64"]}
 
 
-def _html_color_swatches(colors, css_class):
+def _html_color_swatches(colors, css_class, margin=0):
     root_xml = xml.Element(
         "div",
         style="overflow:hidden; height:auto",
@@ -28,7 +28,7 @@ def _html_color_swatches(colors, css_class):
         xml.SubElement(
             root_xml,
             "div",
-            style="float:left;width:20px;height:20px;background-color:%s" % toyplot.color.to_css(color))
+            style="float:left;width:20px;height:20px;margin-right:%spx;background-color:%s" % (margin, toyplot.color.to_css(color)))
     return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
 
@@ -36,7 +36,7 @@ def _jupyter_color_swatches(colors):
     if isinstance(colors, numpy.ndarray) and colors.shape == () and colors.dtype == dtype:
         return _html_color_swatches([colors], "toyplot-color-Swatch")
     elif isinstance(colors, numpy.ndarray) and colors.ndim == 1 and colors.dtype == dtype:
-        return _html_color_swatches(colors, "toyplot-color-Swatches")
+        return _html_color_swatches(colors, "toyplot-color-Swatches", margin=5)
     return None # pragma: no cover
 
 

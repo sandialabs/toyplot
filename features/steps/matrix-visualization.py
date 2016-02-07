@@ -23,13 +23,13 @@ def step_impl(context):
 
 @given(u'a matrix visualization created with a custom palette')
 def step_impl(context):
-    palette = toyplot.color.brewer("BlueGreenBrown")
+    palette = toyplot.color.brewer.palette("BlueGreenBrown")
     context.canvas = toyplot.Canvas()
     table = context.canvas.matrix((context.matrix, palette))
 
 @given(u'a matrix visualization created with a custom colormap')
 def step_impl(context):
-    palette = toyplot.color.brewer("BlueGreenBrown")
+    palette = toyplot.color.brewer.palette("BlueGreenBrown")
     colormap = toyplot.color.LinearMap(palette, domain_min=-1, domain_max=1)
     context.canvas = toyplot.Canvas()
     table = context.canvas.matrix((context.matrix, colormap))

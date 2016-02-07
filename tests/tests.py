@@ -843,7 +843,7 @@ def test_axes_rect():
     y2 = x1 ** 1.5
     color = x1
     title = x1
-    palette = toyplot.color.brewer("BlueRed")
+    palette = toyplot.color.brewer.palette("BlueRed")
 
     canvas = toyplot.Canvas()
     axes = canvas.axes()

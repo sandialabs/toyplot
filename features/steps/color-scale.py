@@ -9,7 +9,7 @@ import toyplot.color
 
 @given(u'a linear colormap')
 def step_impl(context):
-    context.colormap = toyplot.color.LinearMap(toyplot.color.brewer("BlueRed"), domain_min=0, domain_max=1)
+    context.colormap = toyplot.color.brewer.map("BlueRed", domain_min=0, domain_max=1)
 
 @given(u'a categorical colormap')
 def step_impl(context):
@@ -41,6 +41,6 @@ def step_impl(context):
 def step_impl(context):
     numpy.random.seed(1234)
     values = numpy.random.normal(size=(10, 10))
-    colormap = toyplot.color.LinearMap(toyplot.color.brewer("BlueGreenBrown"), domain_min=-2, domain_max=2)
+    colormap = toyplot.color.brewer.map("BlueGreenBrown", domain_min=-2, domain_max=2)
     context.canvas.matrix((values, colormap), colorshow=True)
 

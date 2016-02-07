@@ -53,11 +53,11 @@ def step_impl(context):
 
 @then(u'bars can be rendered with palette colors')
 def step_impl(context):
-    context.axes.bars(context.series, baseline="symmetric", color=toyplot.color.brewer("Set1"))
+    context.axes.bars(context.series, baseline="symmetric", color=toyplot.color.brewer.palette("Set1"))
 
 @then(u'bars can be rendered with colormap colors')
 def step_impl(context):
-    context.axes.bars(context.series, baseline="symmetric", color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    context.axes.bars(context.series, baseline="symmetric", color=toyplot.color.LinearMap(toyplot.color.brewer.palette("Set1")))
 
 @then(u'bars can be rendered with per-series value colors')
 def step_impl(context):
@@ -65,7 +65,7 @@ def step_impl(context):
 
 @then(u'bars can be rendered with per-series value + palette colors')
 def step_impl(context):
-    context.axes.bars(context.series, baseline="symmetric", color=(context.series_values, toyplot.color.brewer("BlueRed")))
+    context.axes.bars(context.series, baseline="symmetric", color=(context.series_values, toyplot.color.brewer.palette("BlueRed")))
 
 @then(u'bars can be rendered with per-series value + colormap colors')
 def step_impl(context):
@@ -77,7 +77,7 @@ def step_impl(context):
 
 @then(u'bars can be rendered with per-datum value + palette colors')
 def step_impl(context):
-    context.axes.bars(context.series, baseline="symmetric", color=(context.datum_values, toyplot.color.brewer("BlueRed")))
+    context.axes.bars(context.series, baseline="symmetric", color=(context.datum_values, toyplot.color.brewer.palette("BlueRed")))
 
 @then(u'bars can be rendered with per-datum value + colormap colors')
 def step_impl(context):
@@ -98,11 +98,11 @@ def step_impl(context):
 
 @then(u'fills can be rendered with palette colors')
 def step_impl(context):
-    context.axes.fill(context.series, baseline="symmetric", color=toyplot.color.brewer("Set1"))
+    context.axes.fill(context.series, baseline="symmetric", color=toyplot.color.brewer.palette("Set1"))
 
 @then(u'fills can be rendered with colormap colors')
 def step_impl(context):
-    context.axes.fill(context.series, baseline="symmetric", color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    context.axes.fill(context.series, baseline="symmetric", color=toyplot.color.LinearMap(toyplot.color.brewer.palette("Set1")))
 
 @then(u'fills can be rendered with per-series value colors')
 def step_impl(context):
@@ -110,7 +110,7 @@ def step_impl(context):
 
 @then(u'fills can be rendered with per-series value + palette colors')
 def step_impl(context):
-    context.axes.fill(context.series, baseline="symmetric", color=(context.series_values, toyplot.color.brewer("BlueRed")))
+    context.axes.fill(context.series, baseline="symmetric", color=(context.series_values, toyplot.color.brewer.palette("BlueRed")))
 
 @then(u'fills can be rendered with per-series value + colormap colors')
 def step_impl(context):
@@ -132,11 +132,11 @@ def step_impl(context):
 
 @then(u'hlines can be rendered with palette colors')
 def step_impl(context):
-    context.axes.hlines(context.series[:,0], color=toyplot.color.brewer("Set1"))
+    context.axes.hlines(context.series[:,0], color=toyplot.color.brewer.palette("Set1"))
 
 @then(u'hlines can be rendered with colormap colors')
 def step_impl(context):
-    context.axes.hlines(context.series[:,0], color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    context.axes.hlines(context.series[:,0], color=toyplot.color.LinearMap(toyplot.color.brewer.palette("Set1")))
 
 @then(u'hlines can be rendered with per-datum value colors')
 def step_impl(context):
@@ -146,7 +146,7 @@ def step_impl(context):
 @then(u'hlines can be rendered with per-datum value + palette colors')
 def step_impl(context):
     datum_values = numpy.arange(len(context.series[:,0]))
-    context.axes.hlines(context.series[:,0], color=(datum_values, toyplot.color.brewer("BlueRed")))
+    context.axes.hlines(context.series[:,0], color=(datum_values, toyplot.color.brewer.palette("BlueRed")))
 
 @then(u'hlines can be rendered with per-datum value + colormap colors')
 def step_impl(context):
@@ -167,11 +167,11 @@ def step_impl(context):
 
 @then(u'plots can be rendered with palette colors')
 def step_impl(context):
-    context.axes.plot(context.series, color=toyplot.color.brewer("Set1"))
+    context.axes.plot(context.series, color=toyplot.color.brewer.palette("Set1"))
 
 @then(u'plots can be rendered with colormap colors')
 def step_impl(context):
-    context.axes.plot(context.series, color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    context.axes.plot(context.series, color=toyplot.color.LinearMap(toyplot.color.brewer.palette("Set1")))
 
 @then(u'plots can be rendered with per-series value colors')
 def step_impl(context):
@@ -179,7 +179,7 @@ def step_impl(context):
 
 @then(u'plots can be rendered with per-series value + palette colors')
 def step_impl(context):
-    context.axes.plot(context.series, color=(context.series_values, toyplot.color.brewer("BlueRed")))
+    context.axes.plot(context.series, color=(context.series_values, toyplot.color.brewer.palette("BlueRed")))
 
 @then(u'plots can be rendered with per-series value + colormap colors')
 def step_impl(context):
@@ -199,11 +199,11 @@ def step_impl(context):
 
 @then(u'plots can be rendered with palette marker colors')
 def step_impl(context):
-    context.axes.plot(context.series, marker="o", mfill=toyplot.color.brewer("Set1"))
+    context.axes.plot(context.series, marker="o", mfill=toyplot.color.brewer.palette("Set1"))
 
 @then(u'plots can be rendered with colormap marker colors')
 def step_impl(context):
-    context.axes.plot(context.series, marker="o", mfill=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    context.axes.plot(context.series, marker="o", mfill=toyplot.color.LinearMap(toyplot.color.brewer.palette("Set1")))
 
 @then(u'plots can be rendered with per-series value marker colors')
 def step_impl(context):
@@ -211,7 +211,7 @@ def step_impl(context):
 
 @then(u'plots can be rendered with per-series value + palette marker colors')
 def step_impl(context):
-    context.axes.plot(context.series, marker="o", mfill=(context.series_values, toyplot.color.brewer("BlueRed")))
+    context.axes.plot(context.series, marker="o", mfill=(context.series_values, toyplot.color.brewer.palette("BlueRed")))
 
 @then(u'plots can be rendered with per-series value + colormap marker colors')
 def step_impl(context):
@@ -223,7 +223,7 @@ def step_impl(context):
 
 @then(u'plots can be rendered with per-datum value + palette marker colors')
 def step_impl(context):
-    context.axes.plot(context.series, marker="o", mfill=(context.datum_values, toyplot.color.brewer("BlueRed")))
+    context.axes.plot(context.series, marker="o", mfill=(context.datum_values, toyplot.color.brewer.palette("BlueRed")))
 
 @then(u'plots can be rendered with per-datum value + colormap marker colors')
 def step_impl(context):
@@ -244,11 +244,11 @@ def step_impl(context):
 
 @then(u'rects can be rendered with palette colors')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=toyplot.color.brewer("Set1"))
+    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=toyplot.color.brewer.palette("Set1"))
 
 @then(u'rects can be rendered with colormap colors')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=toyplot.color.LinearMap(toyplot.color.brewer.palette("Set1")))
 
 @then(u'rects can be rendered with per-datum value colors')
 def step_impl(context):
@@ -256,7 +256,7 @@ def step_impl(context):
 
 @then(u'rects can be rendered with per-datum value + palette colors')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=(context.datum_values[:-1,0], toyplot.color.brewer("BlueRed")))
+    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=(context.datum_values[:-1,0], toyplot.color.brewer.palette("BlueRed")))
 
 @then(u'rects can be rendered with per-datum value + colormap colors')
 def step_impl(context):
@@ -282,11 +282,11 @@ def step_impl(context):
 
 @then(u'scatterplots can be rendered with palette colors')
 def step_impl(context):
-    context.axes.scatterplot(context.series, color=toyplot.color.brewer("Set1"))
+    context.axes.scatterplot(context.series, color=toyplot.color.brewer.palette("Set1"))
 
 @then(u'scatterplots can be rendered with colormap colors')
 def step_impl(context):
-    context.axes.scatterplot(context.series, color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    context.axes.scatterplot(context.series, color=toyplot.color.LinearMap(toyplot.color.brewer.palette("Set1")))
 
 @then(u'scatterplots can be rendered with per-series value colors')
 def step_impl(context):
@@ -294,7 +294,7 @@ def step_impl(context):
 
 @then(u'scatterplots can be rendered with per-series value + palette colors')
 def step_impl(context):
-    context.axes.scatterplot(context.series, color=(context.series_values, toyplot.color.brewer("BlueRed")))
+    context.axes.scatterplot(context.series, color=(context.series_values, toyplot.color.brewer.palette("BlueRed")))
 
 @then(u'scatterplots can be rendered with per-series value + colormap colors')
 def step_impl(context):
@@ -306,7 +306,7 @@ def step_impl(context):
 
 @then(u'scatterplots can be rendered with per-datum value + palette colors')
 def step_impl(context):
-    context.axes.scatterplot(context.series, color=(context.datum_values, toyplot.color.brewer("BlueRed")))
+    context.axes.scatterplot(context.series, color=(context.datum_values, toyplot.color.brewer.palette("BlueRed")))
 
 @then(u'scatterplots can be rendered with per-datum value + colormap colors')
 def step_impl(context):
@@ -331,12 +331,12 @@ def step_impl(context):
 @then(u'text can be rendered with palette colors')
 def step_impl(context):
     text = ["#"] * len(context.series)
-    context.axes.text(context.x, context.series[:,0], text, annotation=False, color=toyplot.color.brewer("Set1"))
+    context.axes.text(context.x, context.series[:,0], text, annotation=False, color=toyplot.color.brewer.palette("Set1"))
 
 @then(u'text can be rendered with colormap colors')
 def step_impl(context):
     text = ["#"] * len(context.series)
-    context.axes.text(context.x, context.series[:,0], text, annotation=False, color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    context.axes.text(context.x, context.series[:,0], text, annotation=False, color=toyplot.color.LinearMap(toyplot.color.brewer.palette("Set1")))
 
 @then(u'text can be rendered with per-datum value colors')
 def step_impl(context):
@@ -348,7 +348,7 @@ def step_impl(context):
 def step_impl(context):
     text = ["#"] * len(context.series)
     datum_values = numpy.arange(len(context.series[:,0]))
-    context.axes.text(context.x, context.series[:,0], text, annotation=False, color=(datum_values, toyplot.color.brewer("BlueRed")))
+    context.axes.text(context.x, context.series[:,0], text, annotation=False, color=(datum_values, toyplot.color.brewer.palette("BlueRed")))
 
 @then(u'text can be rendered with per-datum value + colormap colors')
 def step_impl(context):
@@ -371,11 +371,11 @@ def step_impl(context):
 
 @then(u'vlines can be rendered with palette colors')
 def step_impl(context):
-    context.axes.vlines(context.series[:,0], color=toyplot.color.brewer("Set1"))
+    context.axes.vlines(context.series[:,0], color=toyplot.color.brewer.palette("Set1"))
 
 @then(u'vlines can be rendered with colormap colors')
 def step_impl(context):
-    context.axes.vlines(context.series[:,0], color=toyplot.color.LinearMap(toyplot.color.brewer("Set1")))
+    context.axes.vlines(context.series[:,0], color=toyplot.color.LinearMap(toyplot.color.brewer.palette("Set1")))
 
 @then(u'vlines can be rendered with per-datum value colors')
 def step_impl(context):
@@ -385,7 +385,7 @@ def step_impl(context):
 @then(u'vlines can be rendered with per-datum value + palette colors')
 def step_impl(context):
     datum_values = numpy.arange(len(context.series[:,0]))
-    context.axes.vlines(context.series[:,0], color=(datum_values, toyplot.color.brewer("BlueRed")))
+    context.axes.vlines(context.series[:,0], color=(datum_values, toyplot.color.brewer.palette("BlueRed")))
 
 @then(u'vlines can be rendered with per-datum value + colormap colors')
 def step_impl(context):

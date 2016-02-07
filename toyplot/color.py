@@ -146,6 +146,7 @@ def broadcast(colors, shape, default=None):
     colormap = None
     if isinstance(colors, (toyplot.color.Palette, toyplot.color.Map)):
         if isinstance(colors, toyplot.color.Palette):
+            toyplot.log.warn("Implicit conversion from palettes to colormaps for color mapping is deprecated.  Use a toyplot.color.Map instead.")
             colormap = toyplot.color.CategoricalMap(colors)
         elif isinstance(colors, toyplot.color.Map):
             colormap = colors
@@ -153,6 +154,7 @@ def broadcast(colors, shape, default=None):
         if per_datum and shape[1] > 1:
             colors = numpy.arange(shape[1]) # More than one series, so generate [0, N) per-series values
     elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Palette):
+        toyplot.log.warn("Implicit conversion from palettes to colormaps for color mapping is deprecated.  Use a toyplot.color.Map instead.")
         colors, palette = colors
         colormap = toyplot.color.CategoricalMap(palette)
     elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Map):
@@ -165,8 +167,7 @@ def broadcast(colors, shape, default=None):
         colors = numpy.array([_require_color(color) for color in colors.flat], dtype=dtype).reshape(colors.shape)
     elif isinstance(colors, numpy.ndarray) and issubclass(colors.dtype.type, numpy.number): # Array of numeric values, so map values to colors
         if colormap is None:
-            palette = toyplot.color.brewer.palette("BlueRed")
-            colormap = LinearMap(palette=palette, domain_min=colors.min(), domain_max=colors.max())
+            colormap = toyplot.color.brewer.map("BlueRed", domain_min=colors.min(), domain_max=colors.max())
         colors = colormap.colors(colors)
     elif isinstance(colors, list): # Arbitrary Python sequence, so convert to colors
         colors = numpy.array([_require_color(color) for color in colors], dtype=dtype)

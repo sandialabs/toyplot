@@ -8,7 +8,7 @@ many plots using a single compact statement.
 
 from __future__ import division
 
-__version__ = "0.11.0"
+__version__ = "0.12.0"
 
 from toyplot.canvas import Canvas
 import logging

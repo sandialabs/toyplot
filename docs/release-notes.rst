@@ -7,6 +7,30 @@
 Release Notes
 =============
 
+Toyplot 0.11.0 - February 18, 2016
+----------------------------------
+
+* Added more complex indexing / slicing options to toyplot.data.Table.
+* Deprecated `toyplot.data.Table.rows()` and `toyplot.data.Table.columns()`.
+* Removed support for custom markers.
+* `-toyplot-anchor-shift` didn't work correctly with rotated text.
+* Documented text alignment behavior for rotated text.
+* Added `location` parameter for axis labels.
+* Improved text alignment defaults for rotated and unrotated axis labels.
+* Don't alter the axis domain if tick labels aren't visible.
+* Change the default linear color map to a diverging blue-red palette.
+* Pandas data frames with duplicate column names can be converted to `toyplot.data.Table`.
+* Allow callers to suppress NaNs in table visualization cells.
+* Render color arrays as swatches in Jupyter notebooks.
+* Added `toyplot.color.brewer.palette()`, `toyplot.color.brewer.map()`, and `toyplot.color.diverging.map()`.
+* Deprecated `toyplot.color.brewer()` and `toyplot.color.diverging()`.
+* `toyplot.color.LinearMap` color stops can be explicitly positioned.
+* Added `toyplot.color.linear.map()` with "Blackbody", "ExtendedBlackbody", "Kindlmann" and "ExtendedKindlmann" color maps.
+* Deprecated implicit conversions from color palettes to color maps during color mapping.
+* Split color-related documentation into separate "Color" and "Color Mapping" sections of the user guide.
+* Improved debugging output when a regression test fails.
+* Many code coverage improvements.
+
 Toyplot 0.10.0 - January 12, 2016
 ---------------------------------
 

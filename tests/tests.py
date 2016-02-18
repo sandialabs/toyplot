@@ -843,11 +843,11 @@ def test_axes_rect():
     y2 = x1 ** 1.5
     color = x1
     title = x1
-    palette = toyplot.color.brewer.palette("BlueRed")
+    colormap = toyplot.color.CategoricalMap(toyplot.color.brewer.palette("BlueRed"))
 
     canvas = toyplot.Canvas()
     axes = canvas.axes()
-    axes.rects(x1, x2, y1, y2, color=(color, palette), title=title)
+    axes.rects(x1, x2, y1, y2, color=(color, colormap), title=title)
     assert_canvas_matches(canvas, "axes-rect")
 
 

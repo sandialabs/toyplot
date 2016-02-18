@@ -144,19 +144,11 @@ def broadcast(colors, shape, default=None):
 
     # Next, extract the user's choice of custom palette / colormap.
     colormap = None
-    if isinstance(colors, (toyplot.color.Palette, toyplot.color.Map)):
-        if isinstance(colors, toyplot.color.Palette):
-            toyplot.log.warn("Implicit conversion from palettes to colormaps for color mapping is deprecated.  Use a toyplot.color.Map instead.")
-            colormap = toyplot.color.CategoricalMap(colors)
-        elif isinstance(colors, toyplot.color.Map):
-            colormap = colors
+    if isinstance(colors, toyplot.color.Map):
+        colormap = colors
         colors = numpy.arange(shape[0]) # By default, generate [0, M) per-datum values
         if per_datum and shape[1] > 1:
             colors = numpy.arange(shape[1]) # More than one series, so generate [0, N) per-series values
-    elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Palette):
-        toyplot.log.warn("Implicit conversion from palettes to colormaps for color mapping is deprecated.  Use a toyplot.color.Map instead.")
-        colors, palette = colors
-        colormap = toyplot.color.CategoricalMap(palette)
     elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Map):
         colors, colormap = colors
 
@@ -748,10 +740,6 @@ class BrewerFactory(object):
         palettes: sequence of (string, :class:`toyplot.color.Map`) tuples.
         """
         return [(name, self.map(name)) for name in self.names(category)]
-
-    def __call__(self, name, count=None, reverse=False):
-        toyplot.log.warn("toyplot.color.brewer() is deprecated, use toyplot.color.brewer.palette() instead.")
-        return self.palette(name=name, count=count, reverse=reverse)
 
     _type_map = {"div": "diverging", "qual": "qualitative", "seq": "sequential"}
 
@@ -1387,10 +1375,6 @@ class DivergingFactory(object):
         palettes: sequence of (string, :class:`toyplot.color.DivergingMap`) tuples.
         """
         return [(name, self.map(name)) for name in self.names()]
-
-    def __call__(self, name, domain_min=None, domain_max=None):
-        toyplot.log.warn("toyplot.color.diverging() is deprecated, use toyplot.color.divering.map() instead.")
-        return self.map(name=name, domain_min=domain_min, domain_max=domain_max)
 
     _data = {
         "BlueBrown": (rgb(0.217, 0.525, 0.910), rgb(0.677, 0.492, 0.093)),

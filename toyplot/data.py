@@ -277,20 +277,6 @@ class Table(object):
         """
         return self._columns.values()
 
-    def columns(self, keys): # pragma: no cover
-        """Return a subset of the table's columns.
-
-        Parameters
-        ----------
-        keys: sequence of string column names.
-
-        Returns
-        -------
-        table: :class:`toyplot.data.Table` containing the requested columns.
-        """
-        toyplot.log.warning("toyplot.data.Table.columns() is deprecated, use the [] operator instead.")
-        return Table([(key, self._columns[key]) for key in keys])
-
     def metadata(self, column):
         """Return metadata for one of the table's columns.
 
@@ -306,22 +292,6 @@ class Table(object):
         if column not in self._columns:
             raise ValueError("Unknown column name '%s'" % column)
         return self._metadata[column]
-
-    def rows(self, index): # pragma: no cover
-        """Return a subset of the table's rows.
-
-        Parameters
-        ----------
-        index: integer row index, or a slice.
-
-        Returns
-        -------
-        table: :class:`toyplot.data.Table` containing the requested rows.
-        """
-        toyplot.log.warning("toyplot.data.Table.rows() is deprecated, use the [] operator instead.")
-        if isinstance(index, numbers.Integral):
-            index = slice(index, index + 1)
-        return Table([(key, self._columns[key][index]) for key in self._columns.keys()])
 
     def matrix(self):
         """Convert the table to a matrix (2D numpy array).

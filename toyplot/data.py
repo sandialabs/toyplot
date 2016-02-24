@@ -50,9 +50,20 @@ class Table(object):
         * :class:`list` / :class:`collections.Sequence` - creates a column for each key-value tuple in the input sequence, in the same order.  Each value must be implicitly convertable to a numpy masked array, and every value must contain the same number of items.
         * :class:`numpy.ndarray` - creates a column for each column in a numpy matrix (2D array).  The order of the columns is maintained, and each column is assigned a unique name.
         * :class:`pandas.DataFrame` - creates a column for each column in a `Pandas <http://pandas.pydata.org>`_ data frame.  The order of the columns is maintained.
+
+    index: bool or string, optional
+        Controls whether to convert a `Pandas <http://pandas.pydata.org>`_ data
+        frame index to columns in the resulting table.  Use index=False (the
+        default) to leave the data frame index out of the table.  Use
+        index=True to include the index in the table, using default column
+        names (hierarchical indices will be stored in the table using multiple
+        columns).  Use index="format string" to include the index and control
+        how the index column names are generated.  The given format string can
+        use positional `{}` / `{0}` or keyword `{index}` arguments to
+        incorporate a zero-based index id into the column names.
     """
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, index=False):
         self._columns = collections.OrderedDict()
         self._metadata = collections.defaultdict(dict)
 
@@ -81,12 +92,17 @@ class Table(object):
                 if data.ndim != 2:
                     raise ValueError(
                         "Only two-dimensional arrays are allowed.")
-                keys = [str(index) for index in numpy.arange(data.shape[1])]
-                values = [data[:, index] for index in numpy.arange(data.shape[1])]
+                keys = [str(i) for i in numpy.arange(data.shape[1])]
+                values = [data[:, i] for i in numpy.arange(data.shape[1])]
             # Input data based on Pandas data structures.
             elif "pandas" in sys.modules and isinstance(data, pandas.DataFrame):
-                    keys = [data.ix[:,index].name for index in range(data.shape[1])]
-                    values = [data.ix[:,index] for index in range(data.shape[1])]
+                    keys = [str(data.ix[:,i].name) for i in range(data.shape[1])]
+                    values = [data.ix[:,i] for i in range(data.shape[1])]
+
+                    if index:
+                        key_format = "index{}" if index == True else index
+                        keys = [key_format.format(i, index=i) for i in numpy.arange(data.index.nlevels)] + keys
+                        values = [data.index.get_level_values(i) for i in numpy.arange(data.index.nlevels)] + values
             else:
                 raise ValueError("Can't create a toyplot.data.Table from an instance of %s" % type(data))
 
@@ -106,14 +122,14 @@ class Table(object):
                     continue
 
                 suffix = 1
-                for index in numpy.flatnonzero(keys == key):
+                for i in numpy.flatnonzero(keys == key):
                     if key not in reserved_keys:
                         reserved_keys.add(key)
                         continue
                     while "%s-%s" % (key, suffix) in reserved_keys:
                         suffix += 1
-                    keys[index] = "%s-%s" % (key, suffix)
-                    reserved_keys.add(keys[index])
+                    keys[i] = "%s-%s" % (key, suffix)
+                    reserved_keys.add(keys[i])
 
             # Store the data.
             for key, value in zip(keys, values):

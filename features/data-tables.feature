@@ -33,18 +33,21 @@ Feature: Data tables
     Then the toyplot.data.Table <response>
 
     Examples:
-      | input                             | response                                        |
-      | nothing                           | is empty                                        |
-      | a toyplot.data.Table              | contains the columns                            |
-      | an OrderedDict containing columns | contains the columns                            |
-      | a dict containing columns         | contains the columns, sorted by key             |
-      | a sequence of name, column tuples | contains the columns                            |
-      | a matrix                          | contains the matrix columns with generated keys |
-      | an array                          | raises ValueError                               |
-      | an integer                        | raises ValueError                               |
-      | a csv file                        | contains the csv file columns                   |
-      | a csv file and conversion         | contains the csv file columns with numeric type |
-      | a pandas dataframe                | contains the data frame columns                 |
+      | input                                          | response                                                    |
+      | nothing                                        | is empty                                                    |
+      | a toyplot.data.Table                           | contains the columns                                        |
+      | an OrderedDict containing columns              | contains the columns                                        |
+      | a dict containing columns                      | contains the columns, sorted by key                         |
+      | a sequence of name, column tuples              | contains the columns                                        |
+      | a matrix                                       | contains the matrix columns with generated keys             |
+      | an array                                       | raises ValueError                                           |
+      | an integer                                     | raises ValueError                                           |
+      | a csv file                                     | contains the csv file columns                               |
+      | a csv file and conversion                      | contains the csv file columns with numeric type             |
+      | a pandas dataframe                             | contains the data frame columns                             |
+      | a pandas dataframe with index                  | contains the data frame columns plus an index column        |
+      | a pandas dataframe with hierarchical index     | contains the data frame columns plus multiple index columns |
+      | a pandas dataframe with hierarchical index and custom index format | contains the data frame columns plus multiple custom format index columns |
       | a pandas dataframe with duplicate column names | contains the data frame columns with uniqified column names |
 
   Scenario Outline: Data table rendering

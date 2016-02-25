@@ -1066,8 +1066,7 @@ class LinearFactory(object):
         map: :class:`toyplot.color.LinearMap`
         """
         palette = Palette([rgb(red, green, blue) for position, red, green, blue in self._data[name]])
-        stops = [position for position, red, green, blue in self._data[name]]
-        return LinearMap(palette=palette, stops=stops, domain_min=domain_min, domain_max=domain_max)
+        return LinearMap(palette=palette, domain_min=domain_min, domain_max=domain_max)
 
     def maps(self):
         """Return a (name, colormap) tuple for every map in the collection.

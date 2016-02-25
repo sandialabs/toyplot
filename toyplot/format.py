@@ -5,6 +5,7 @@
 from __future__ import division
 
 import numpy
+import toyplot.compatibility
 
 
 class Formatter(object):
@@ -50,12 +51,13 @@ class FloatFormatter(Formatter):
         self._nanshow = nanshow
 
     def format(self, value):
-        try:
-            formatted = self._format.format(value).split(".")
-            if len(formatted) == 1:
-                if formatted[0] == "nan" and not self._nanshow:
-                    return "", "", ""
-                return formatted[0], "", ""
-            return formatted[0], ".", formatted[1]
-        except:
-            return str(value), "", ""
+        if isinstance(value, toyplot.compatibility.string_type):
+            return value, "", ""
+
+        if numpy.isnan(value) and not self._nanshow:
+            return "", "", ""
+
+        formatted = self._format.format(value).split(".")
+        if len(formatted) == 1:
+            return formatted[0], "", ""
+        return formatted[0], ".", formatted[1]

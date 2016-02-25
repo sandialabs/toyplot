@@ -101,8 +101,8 @@ class Table(object):
 
                     if index:
                         key_format = "index{}" if index == True else index
-                        keys = [key_format.format(i, index=i) for i in numpy.arange(data.index.nlevels)] + keys
-                        values = [data.index.get_level_values(i) for i in numpy.arange(data.index.nlevels)] + values
+                        keys = [key_format.format(i, index=i) for i in range(data.index.nlevels)] + keys
+                        values = [data.index.get_level_values(i) for i in range(data.index.nlevels)] + values
             else:
                 raise ValueError("Can't create a toyplot.data.Table from an instance of %s" % type(data))
 

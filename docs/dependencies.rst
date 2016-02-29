@@ -10,11 +10,13 @@ Dependencies
 Minimum Requirements
 --------------------
 
-To use Toyplot you'll need the following at a minimum (if you install Toyplot
-using pip, these are automatically installed for you):
-
+To use Toyplot you will need, at a minimum, Python 2 or 3 (duh):
 
 * Python 2.7 / Python 3 - http://python.org
+
+plus the following (if you install Toyplot
+using pip, these are automatically installed for you):
+
 * colormath - https://github.com/gtaylor/python-colormath
 * multipledispatch - https://github.com/mrocklin/multipledispatch
 * numpy - http://numpy.org
@@ -22,7 +24,7 @@ using pip, these are automatically installed for you):
 Timestamp Labels
 ----------------
 
-If you are displaying datetime information using the
+To display datetime information using the
 :class:`toyplot.locator.Timestamp` locator, the following is required (if you
 install Toyplot using pip, it's automatically installed for you):
 
@@ -31,9 +33,8 @@ install Toyplot using pip, it's automatically installed for you):
 PDF Export
 ----------
 
-To generate static PDF versions of your Toyplot figures, the following is
-required (if you install Toyplot using pip, it's automatically installed for
-you):
+Generating static PDF versions of your Toyplot figures requires the following
+(if you install Toyplot using pip, it's automatically installed for you):
 
 * ReportLab - open source PDF toolkit - http://www.reportlab.com/opensource/
 
@@ -41,7 +42,7 @@ PNG Export
 ----------
 
 To generate static PNG versions of your Toyplot figures,
-you'll need the above dependency to generate PDF files, plus Ghostscript:
+you'll need the PDF Export dependencies, plus Ghostscript:
 
 * Ghostscript - Postscript / PDF interpreter - http://www.ghostscript.com
 
@@ -49,15 +50,15 @@ MP4 / WebM Export
 -----------------
 
 If you plan to render animated Toyplot figures as MP4 or WebM videos, you'll need
-the above dependencies for exporting PNG files, plus ffmpeg:
+the PNG Export dependencies for exporting PNG files, plus ffmpeg:
 
 * ffmpeg - cross-platform video conversion - https://www.ffmpeg.org
 
 Qt Interactive Display
 ----------------------
 
-If you want to display interactive Toyplot figures in a window implemented with
-the Qt graphical user interface toolkit, you'll need the following:
+Displaying interactive Toyplot figures in a window implemented with
+the Qt graphical user interface toolkit, the following is required:
 
 * PyQt5 - https://pypi.python.org/pypi/PyQt5
 

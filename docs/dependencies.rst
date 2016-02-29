@@ -58,7 +58,7 @@ Qt Interactive Display
 ----------------------
 
 Displaying interactive Toyplot figures in a window implemented with
-the Qt graphical user interface toolkit, the following is required:
+the Qt graphical user interface toolkit requires the following:
 
 * PyQt5 - https://pypi.python.org/pypi/PyQt5
 

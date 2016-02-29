@@ -4,12 +4,15 @@
 
 from __future__ import division
 
-import arrow
 import datetime
 import numpy
 import toyplot.broadcast
 import toyplot.compatibility
 
+try:
+    import arrow
+except:
+    pass
 
 class TickLocator(object):
 

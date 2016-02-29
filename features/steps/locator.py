@@ -4,10 +4,22 @@
 
 from behave import *
 
-import arrow
 import numpy
+import sys
 import toyplot.locator
 import toyplot.testing
+
+try:
+    import arrow
+except:
+    pass
+
+def arrow_available(context):
+    if "arrow" in sys.modules:
+        return True
+
+    context.scenario.skip(reason="The arrow library is not available.")
+    return False
 
 
 @given(u'sample sin wave data')
@@ -98,93 +110,111 @@ def step_impl(context):
 
 @given(u'seven thousand years of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(9016, 1, 1).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(9016, 1, 1).timestamp
 
 @given(u'one thousand years of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(3016, 1, 1).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(3016, 1, 1).timestamp
 
 @given(u'one hundred years of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2116, 1, 1).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2116, 1, 1).timestamp
 
 @given(u'five years of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2021, 1, 1).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2021, 1, 1).timestamp
 
 @given(u'one year of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2017, 1, 1).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2017, 1, 1).timestamp
 
 @given(u'six months of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2016, 7, 1).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2016, 7, 1).timestamp
 
 @given(u'one month of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2016, 2, 1).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2016, 2, 1).timestamp
 
 @given(u'one week of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2016, 1, 8).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2016, 1, 8).timestamp
 
 @given(u'one day of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2016, 1, 2).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2016, 1, 2).timestamp
 
 @given(u'six hours of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2016, 1, 1, 6).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2016, 1, 1, 6).timestamp
 
 @given(u'two hours of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2016, 1, 1, 2).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2016, 1, 1, 2).timestamp
 
 @given(u'one hour of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2016, 1, 1, 1).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2016, 1, 1, 1).timestamp
 
 @given(u'thirty minutes of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2016, 1, 1, 0, 30).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2016, 1, 1, 0, 30).timestamp
 
 @given(u'five minutes of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2016, 1, 1, 0, 5).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2016, 1, 1, 0, 5).timestamp
 
 @given(u'two minutes of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2016, 1, 1, 0, 2).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2016, 1, 1, 0, 2).timestamp
 
 @given(u'one minute of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2016, 1, 1, 0, 1, 0).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2016, 1, 1, 0, 1, 0).timestamp
 
 @given(u'thirty seconds of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2016, 1, 1, 0, 0, 30).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2016, 1, 1, 0, 0, 30).timestamp
 
 @given(u'five seconds of timestamp data')
 def step_impl(context):
-    context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
-    context.timestamp_end = arrow.get(2016, 1, 1, 0, 0, 5).timestamp
+    if arrow_available(context):
+        context.timestamp_begin = arrow.get(2016, 1, 1).timestamp
+        context.timestamp_end = arrow.get(2016, 1, 1, 0, 0, 5).timestamp
 
 @given(u'a default interval')
 def step_impl(context):

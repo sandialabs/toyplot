@@ -25,7 +25,7 @@ Contents:
   log-scales.rst
   markers.rst
   matrix-visualization.rst
-  number-lines.rst
+  numberline-axes.rst
   null-data.rst
   rendering.rst
   table-axes.rst

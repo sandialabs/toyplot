@@ -632,7 +632,7 @@ class Canvas(object):
 
         Returns
         -------
-        axes: :class:`toyplot.axes.NumberLine`
+        axes: :class:`toyplot.axes.Numberline`
         """
         axes = self.numberline(
             x1=x1,
@@ -677,7 +677,7 @@ class Canvas(object):
             spacing=None,
             padding=None,
         ):
-        """Add a 1D number line to the canvas.
+        """Add a 1D numberline to the canvas.
 
         Parameters
         ----------
@@ -743,7 +743,7 @@ class Canvas(object):
         if padding is None:
             padding = spacing
 
-        axes = toyplot.axes.NumberLine(
+        axes = toyplot.axes.Numberline(
             x1=x1,
             y1=y1,
             x2=x2,

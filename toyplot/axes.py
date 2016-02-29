@@ -1143,7 +1143,7 @@ class Cartesian(object):
 
         Returns
         -------
-        axes: :class:`toyplot.axes.NumberLine`
+        axes: :class:`toyplot.axes.Numberline`
         """
 
         axis = self._parent.color_scale(
@@ -2193,12 +2193,12 @@ class Cartesian(object):
 
 
 ##########################################################################
-# NumberLine
+# Numberline
 
-class NumberLine(object):
-    """Standard one-dimensional coordinate system / number line.
+class Numberline(object):
+    """Standard one-dimensional coordinate system / numberline.
 
-    Do not create NumberLine instances directly.  Use factory methods such
+    Do not create Numberline instances directly.  Use factory methods such
     as :meth:`toyplot.canvas.Canvas.numberline` instead.
     """
     def __init__(
@@ -2251,7 +2251,7 @@ class NumberLine(object):
 
         Use the `show` property to hide all visible parts of the axis: label,
         spine, ticks, tick labels, etc.  Note that this does not affect
-        visibility of the number line contents, just the axis.
+        visibility of the numberline contents, just the axis.
         """
         return self.axis.show
 
@@ -2276,7 +2276,7 @@ class NumberLine(object):
 
     @property
     def spacing(self):
-        """Control the default distance between data added to the number line.
+        """Control the default distance between data added to the numberline.
 
         The default units are CSS pixels, but you may specify the spacing
         using any :ref:`units` you like.

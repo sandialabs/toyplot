@@ -1227,12 +1227,12 @@ def _render(canvas, axis, context):
             )
 
 
-@dispatch(toyplot.canvas.Canvas, toyplot.axes.NumberLine, _RenderContext)
+@dispatch(toyplot.canvas.Canvas, toyplot.axes.Numberline, _RenderContext)
 def _render(canvas, numberline, context):
     numberline._finalize()
 
     numberline_xml = xml.SubElement(context.root, "g", id=context.get_id(
-        numberline), attrib={"class": "toyplot-axes-NumberLine"})
+        numberline), attrib={"class": "toyplot-axes-Numberline"})
 
     children_xml = xml.SubElement(
         numberline_xml,
@@ -1257,7 +1257,7 @@ def _render(canvas, numberline, context):
         ))
 
 
-@dispatch(toyplot.axes.NumberLine, toyplot.color.CategoricalMap, _RenderContext)
+@dispatch(toyplot.axes.Numberline, toyplot.color.CategoricalMap, _RenderContext)
 def _render(numberline, colormap, context):
     offset = numberline._offset[colormap]
     width = numberline._width[colormap]
@@ -1304,7 +1304,7 @@ def _render(numberline, colormap, context):
         style=_css_style(style),
         )
 
-@dispatch(toyplot.axes.NumberLine, toyplot.color.Map, _RenderContext)
+@dispatch(toyplot.axes.Numberline, toyplot.color.Map, _RenderContext)
 def _render(numberline, colormap, context):
     offset = numberline._offset[colormap]
     width = numberline._width[colormap]
@@ -1368,7 +1368,7 @@ def _render(numberline, colormap, context):
         )
 
 
-@dispatch(toyplot.axes.NumberLine, toyplot.mark.Scatterplot, _RenderContext)
+@dispatch(toyplot.axes.Numberline, toyplot.mark.Scatterplot, _RenderContext)
 def _render(numberline, mark, context):
     transform, length = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -numberline._offset[mark])
     mark_xml = xml.SubElement(

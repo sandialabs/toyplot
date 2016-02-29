@@ -1047,6 +1047,10 @@ class BrewerFactory(object):
 
 
 brewer = BrewerFactory()
+"""Instance of :class:`toyplot.color.BrewerFactory`
+
+Use this to create Toyplot color palettes and maps based on the Color Brewer 2.0 palettes.
+"""
 
 class LinearFactory(object):
     def names(self):
@@ -1344,7 +1348,13 @@ class LinearFactory(object):
             ]),
     ])
 
+
 linear = LinearFactory()
+"""Instance of :class:`toyplot.color.LinearFactory`
+
+Use this to create Toyplot linear color maps by name.
+"""
+
 
 class DivergingFactory(object):
     def names(self):
@@ -1384,6 +1394,11 @@ class DivergingFactory(object):
     }
 
 diverging = DivergingFactory()
+"""Instance of :class:`toyplot.color.DivergingFactory`
+
+Use this to create Toyplot diverging color maps by name.
+"""
+
 
 def to_css(color):
     """Convert a Toyplot color to a CSS string.

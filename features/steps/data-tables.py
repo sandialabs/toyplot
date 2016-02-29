@@ -10,9 +10,24 @@ import collections
 import io
 import numpy
 import os
+import sys
 import tempfile
 import toyplot.data
 import toyplot.testing
+
+try:
+    import pandas
+except:
+    pass
+
+
+def pandas_available(context):
+    if "pandas" in sys.modules:
+        return True
+
+    context.scenario.skip(reason="The pandas library is not available.")
+    return False
+     
 
 root_dir = os.path.dirname(os.path.dirname(__file__))
 
@@ -335,12 +350,8 @@ def step_impl(context):
 
 @when(u'toyplot.data.Table is initialized with a pandas dataframe')
 def step_impl(context):
-    try:
-        import pandas
-    except:
-        context.scenario.skip(reason="The pandas library is not available.")
-        return
-    context.data = toyplot.data.Table(pandas.read_csv("docs/temperatures.csv"))
+    if pandas_available(context):
+        context.data = toyplot.data.Table(pandas.read_csv("docs/temperatures.csv"))
 
 
 @then(u'the toyplot.data.Table contains the data frame columns')
@@ -351,12 +362,8 @@ def step_impl(context):
 
 @when(u'toyplot.data.Table is initialized with a pandas dataframe with index')
 def step_impl(context):
-    try:
-        import pandas
-    except:
-        context.scenario.skip(reason="The pandas library is not available.")
-        return
-    context.data = toyplot.data.Table(pandas.read_csv("docs/temperatures.csv"), index=True)
+    if pandas_available(context):
+        context.data = toyplot.data.Table(pandas.read_csv("docs/temperatures.csv"), index=True)
 
 
 @then(u'the toyplot.data.Table contains the data frame columns plus an index column')
@@ -367,15 +374,10 @@ def step_impl(context):
 
 @when(u'toyplot.data.Table is initialized with a pandas dataframe with hierarchical index')
 def step_impl(context):
-    try:
-        import pandas
-    except:
-        context.scenario.skip(reason="The pandas library is not available.")
-        return
-
-    index = [numpy.array(["foo", "foo", "bar", "bar"]), numpy.array(["one", "two", "one", "two"])]
-    data_frame = pandas.DataFrame(numpy.ones((4, 4)), index=index)
-    context.data = toyplot.data.Table(data_frame, index=True)
+    if pandas_available(context):
+        index = [numpy.array(["foo", "foo", "bar", "bar"]), numpy.array(["one", "two", "one", "two"])]
+        data_frame = pandas.DataFrame(numpy.ones((4, 4)), index=index)
+        context.data = toyplot.data.Table(data_frame, index=True)
 
 
 @then(u'the toyplot.data.Table contains the data frame columns plus multiple index columns')
@@ -386,15 +388,10 @@ def step_impl(context):
 
 @when(u'toyplot.data.Table is initialized with a pandas dataframe with hierarchical index and custom index format')
 def step_impl(context):
-    try:
-        import pandas
-    except:
-        context.scenario.skip(reason="The pandas library is not available.")
-        return
-
-    index = [numpy.array(["foo", "foo", "bar", "bar"]), numpy.array(["one", "two", "one", "two"])]
-    data_frame = pandas.DataFrame(numpy.ones((4, 4)), index=index)
-    context.data = toyplot.data.Table(data_frame, index="Index {}")
+    if pandas_available(context):
+        index = [numpy.array(["foo", "foo", "bar", "bar"]), numpy.array(["one", "two", "one", "two"])]
+        data_frame = pandas.DataFrame(numpy.ones((4, 4)), index=index)
+        context.data = toyplot.data.Table(data_frame, index="Index {}")
 
 
 @then(u'the toyplot.data.Table contains the data frame columns plus multiple custom format index columns')
@@ -405,12 +402,8 @@ def step_impl(context):
 
 @when(u'toyplot.data.Table is initialized with a pandas dataframe with duplicate column names')
 def step_impl(context):
-    try:
-        import pandas
-    except:
-        context.scenario.skip(reason="The pandas library is not available.")
-        return
-    context.data = toyplot.data.Table(pandas.read_csv("docs/temperatures.csv")[["STATION", "DATE", "STATION", "DATE", "DATE"]])
+    if pandas_available(context):
+        context.data = toyplot.data.Table(pandas.read_csv("docs/temperatures.csv")[["STATION", "DATE", "STATION", "DATE", "DATE"]])
 
 
 @then(u'the toyplot.data.Table contains the data frame columns with uniqified column names')

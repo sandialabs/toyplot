@@ -222,6 +222,10 @@ class Table(object):
     def __len__(self):
         return list(self._columns.values())[0].shape[0] if len(self._columns) else 0
 
+    def __iter__(self):
+        for row in numpy.arange(self.__len__()):
+            yield tuple([column[row] for column in self._columns.values()])
+
     def _repr_html_(self):
         root_xml = xml.Element(
             "table",

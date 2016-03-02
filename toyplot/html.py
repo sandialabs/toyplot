@@ -194,6 +194,24 @@ _show_mouse_coordinates = string.Template("""
 })();
 """)
 
+_show_axis_mouse_coordinates = string.Template("""
+(function()
+{
+    function display_coordinates(e)
+    {
+        current.x = e.clientX;
+        current.y = e.clientY;
+        console.log(current.matrixTransform(svg.getScreenCTM().inverse()));
+    }
+
+    var root_id = "$root_id";
+    var svg = document.querySelector("#" + root_id + " svg");
+    console.log("svg", svg);
+    var current = svg.createSVGPoint();
+    svg.addEventListener("mousemove", display_coordinates);
+})();
+""")
+
 _animation_controls = string.Template("""
 (function()
 {
@@ -355,6 +373,7 @@ class _RenderContext(object):
         self._data_tables = list()
         self._cartesian_axes = dict()
         self.rendered = set()
+        self.axes = set()
 
     def add_cartesian_axes(self, axes):
         self._cartesian_axes[self.get_id(axes)] = axes
@@ -603,6 +622,11 @@ def render(canvas, fobj=None, animation=False):
         xml.SubElement(controls, "script").text = _show_mouse_coordinates.substitute(
             root_id=root.get("id"),
             cartesian_axes=json.dumps(cartesian_axes, cls=_NumpyJSONEncoder, sort_keys=True))
+
+    if context.axes:
+        xml.SubElement(controls, "script").text = _show_axis_mouse_coordinates.substitute(
+            root_id=root.get("id"),
+            )
 
     # Provide VCR controls.
     if len(svg_animation) > 1:
@@ -1108,6 +1132,8 @@ def _rotated_frame(x1, y1, x2, y2, offset):
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Axis, _RenderContext)
 def _render(canvas, axis, context):
+    context.axes.add(axis)
+
     if axis in context.rendered:
         return
     context.rendered.add(axis)

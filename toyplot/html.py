@@ -199,16 +199,21 @@ _show_axis_mouse_coordinates = string.Template("""
 {
     function display_coordinates(e)
     {
-        current.x = e.clientX;
-        current.y = e.clientY;
-        console.log(current.matrixTransform(svg.getScreenCTM().inverse()));
+
+        for(var i = 0; i != axes.length; ++i)
+        {
+            var axis = axes[i];
+            current.x = e.clientX;
+            current.y = e.clientY;
+            console.log(current.matrixTransform(axis.getScreenCTM().inverse()));
+        }
     }
 
     var root_id = "$root_id";
     var svg = document.querySelector("#" + root_id + " svg");
-    console.log("svg", svg);
     var current = svg.createSVGPoint();
     svg.addEventListener("mousemove", display_coordinates);
+    var axes = document.querySelectorAll("#" + root_id + " .toyplot-axes-Axis");
 })();
 """)
 

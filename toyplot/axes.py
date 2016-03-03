@@ -470,17 +470,34 @@ class Axis(object):
             scale, base = self.scale
             if scale == "log":
                 return toyplot.locator.Log(base=base)
-        raise RuntimeError("Unable to create an appropriate locator.") # pragma: no cover 
+        raise RuntimeError("Unable to create an appropriate locator.") # pragma: no cover
 
-    def _finalize(self, domain_min, domain_max, tick_locations, tick_labels, tick_titles):
+    def _finalize(self, x1, x2, y1, y2, offset, domain_min, domain_max, tick_locations, tick_labels, tick_titles, ticks_above, ticks_below):
+        self._x1 = x1
+        self._x2 = x2
+        self._y1 = y1
+        self._y2 = y2
+        self._offset = offset
         self._domain_min = domain_min
         self._domain_max = domain_max
         self._tick_locations = tick_locations
         self._tick_labels = tick_labels
         self._tick_titles = tick_titles
+        self._ticks_above = ticks_above
+        self._ticks_below = ticks_below
+
+        endpoints = numpy.row_stack(((x1, y1), (x2, y2)))
+        length = numpy.linalg.norm(endpoints[1] - endpoints[0])
+        self.projection = create_projection(
+            scale=self.scale,
+            domain_min=domain_min,
+            domain_max=domain_max,
+            range_min=0.0,
+            range_max=length,
+            )
 
 
-def projection(scale, domain_min, domain_max, range_min, range_max):
+def create_projection(scale, domain_min, domain_max, range_min, range_max):
     if scale == "linear":
         return toyplot.projection.linear(domain_min, domain_max, range_min, range_max)
     scale, base = scale
@@ -742,14 +759,14 @@ class Cartesian(object):
 
         # Optionally expand the domain in range-space (used to make room for text).
         if self._expand_domain_range_x is not None:
-            x_projection = projection(
+            x_projection = create_projection(
                 self.x.scale,
                 domain_min=xdomain_min,
                 domain_max=xdomain_max,
                 range_min=self._xmin_range,
                 range_max=self._xmax_range,
                 )
-            y_projection = projection(
+            y_projection = create_projection(
                 self.y.scale,
                 domain_min=ydomain_min,
                 domain_max=ydomain_max,
@@ -828,34 +845,95 @@ class Cartesian(object):
             ydomain_min = numpy.amin((ydomain_min, ytick_locations[0]))
             ydomain_max = numpy.amax((ydomain_max, ytick_locations[-1]))
 
-        self.x._finalize(
-            domain_min=xdomain_min,
-            domain_max=xdomain_max,
-            tick_locations=xtick_locations,
-            tick_labels=xtick_labels,
-            tick_titles=xtick_titles,
-            )
-        self.y._finalize(
-            domain_min=ydomain_min,
-            domain_max=ydomain_max,
-            tick_locations=ytick_locations,
-            tick_labels=ytick_labels,
-            tick_titles=ytick_titles,
-            )
-
-        self._x_projection = projection(
+        # Create projections for each axis.
+        self._x_projection = create_projection(
             scale=self.x.scale,
             domain_min=xdomain_min,
             domain_max=xdomain_max,
             range_min=self._xmin_range,
             range_max=self._xmax_range,
             )
-        self._y_projection = projection(
+        self._y_projection = create_projection(
             scale=self.y.scale,
             domain_min=ydomain_min,
             domain_max=ydomain_max,
             range_min=self._ymax_range,
             range_max=self._ymin_range,
+            )
+
+        # Finalize positions for all axis components.
+        if self.x.spine.position == "low":
+            x_offset = self.padding
+            x_spine_y = self._ymax_range
+            x_ticks_above = 5
+            x_ticks_below = 0
+#            x_ticks_labels_location = "below"
+#            x_label_baseline_shift = "-200%"
+        elif self.x.spine.position == "high":
+            x_offset = -self.padding
+            x_spine_y = self._ymin_range
+            x_ticks_above = 0
+            x_ticks_below = 5
+#            x_ticks_labels_location = "above"
+#            x_label_baseline_shift = "200%"
+        else:
+            x_offset = 0
+            x_spine_y = self._y_projection(self.x.spine.position)
+            x_ticks_above = 3
+            x_ticks_below = 3
+#            x_ticks_labels_location = "below"
+#            x_label_baseline_shift = "-200%"
+
+        if self.y.spine._position == "low":
+            y_offset = -self.padding
+            y_spine_x = self._xmin_range
+            y_ticks_above = 0
+            y_ticks_below = 5
+#            y_ticks_labels_location = "above"
+#            y_label_baseline_shift = "200%"
+        elif self.y.spine._position == "high":
+            y_offset = self.padding
+            y_spine_x = self._xmax_range
+            y_ticks_above = 5
+            y_ticks_below = 0
+#            y_ticks_labels_location = "below"
+#            y_label_baseline_shift = "-200%"
+        else:
+            y_offset = 0
+            y_spine_x = self._x_projection(self.y.spine._position)
+            y_ticks_above = 3
+            y_ticks_below = 3
+#            y_ticks_labels_location = "below"
+#            y_label_baseline_shift = "200%"
+
+        # Finalize the axes.
+        self.x._finalize(
+            x1=self._xmin_range,
+            x2=self._xmax_range,
+            y1=x_spine_y,
+            y2=x_spine_y,
+            offset=x_offset,
+            domain_min=xdomain_min,
+            domain_max=xdomain_max,
+            tick_locations=xtick_locations,
+            tick_labels=xtick_labels,
+            tick_titles=xtick_titles,
+            ticks_above=x_ticks_above,
+            ticks_below=x_ticks_below,
+            )
+        self.y._finalize(
+            x1=y_spine_x,
+            x2=y_spine_x,
+            y1=self._ymax_range,
+            y2=self._ymin_range,
+            offset=y_offset,
+            domain_min=ydomain_min,
+            domain_max=ydomain_max,
+            tick_locations=ytick_locations,
+            tick_labels=ytick_labels,
+            tick_titles=ytick_titles,
+            ticks_above=y_ticks_above,
+            ticks_below=y_ticks_below,
             )
 
     def _project_x(self, x):
@@ -2478,23 +2556,20 @@ class Numberline(object):
             domain_min = numpy.amin((domain_min, tick_locations[0]))
             domain_max = numpy.amax((domain_max, tick_locations[-1]))
 
+        # Finalize the axis.
         self.axis._finalize(
+            x1=self._x1,
+            x2=self._x2,
+            y1=self._y1,
+            y2=self._y2,
+            offset=self.padding,
             domain_min=domain_min,
             domain_max=domain_max,
             tick_locations=tick_locations,
             tick_labels=tick_labels,
             tick_titles=tick_titles,
-            )
-
-        endpoints = numpy.row_stack(((self._x1, self._y1), (self._x2, self._y2)))
-        length = numpy.linalg.norm(endpoints[1] - endpoints[0])
-
-        self._projection = projection(
-            scale=self.axis.scale,
-            domain_min=domain_min,
-            domain_max=domain_max,
-            range_min=0.0,
-            range_max=length,
+            ticks_above=3,
+            ticks_below=3,
             )
 
 

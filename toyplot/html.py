@@ -1179,26 +1179,18 @@ def _render(canvas, axis, context):
     context.rendered.add(axis)
 
     if axis.show:
-        p = numpy.row_stack(((context.x1, context.y1), (context.x2, context.y2)))
+        p = numpy.row_stack(((axis._x1, axis._y1), (axis._x2, axis._y2)))
         basis = p[1] - p[0]
         length = numpy.linalg.norm(basis)
         theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
 
-        projection = toyplot.axes.projection(
-            scale=axis.scale,
-            domain_min=axis._domain_min,
-            domain_max=axis._domain_max,
-            range_min=0.0,
-            range_max=length,
-            )
-
-        context.add_visible_axis(axis, projection)
+        context.add_visible_axis(axis, axis.projection)
 
         axis_xml = xml.SubElement(
             context.root,
             "g",
             id=context.get_id(axis),
-            transform="translate(%s,%s) rotate(%s) translate(%s,%s)" % (p[0][0], p[0][1], theta, 0, context.offset),
+            transform="translate(%s,%s) rotate(%s) translate(%s,%s)" % (p[0][0], p[0][1], theta, 0, axis._offset),
             attrib={"class": "toyplot-axes-Axis"},
             )
 
@@ -1207,9 +1199,9 @@ def _render(canvas, axis, context):
             x2 = length
             if axis._data_min is not None and axis._data_max is not None:
                 x1 = max(
-                    x1, projection(axis._data_min))
+                    x1, axis.projection(axis._data_min))
                 x2 = min(
-                    x2, projection(axis._data_max))
+                    x2, axis.projection(axis._data_max))
             xml.SubElement(
                 axis_xml,
                 "line",
@@ -1221,15 +1213,15 @@ def _render(canvas, axis, context):
                     axis.spine._style))
 
             if axis.ticks._show:
-                y1 = -context.ticks_above if axis.ticks.above is None else -axis.ticks.above
-                y2 = context.ticks_below if axis.ticks.below is None else axis.ticks.below
+                y1 = -axis._ticks_above if axis.ticks.above is None else -axis.ticks.above
+                y2 = axis._ticks_below if axis.ticks.below is None else axis.ticks.below
 
                 ticks_group = xml.SubElement(axis_xml, "g")
                 for location, tick_style in zip(
                         axis._tick_locations,
                         axis.ticks.tick.styles(axis._tick_locations),
                     ):
-                    x = projection(location)
+                    x = axis.projection(location)
                     xml.SubElement(
                         ticks_group,
                         "line",
@@ -1271,7 +1263,7 @@ def _render(canvas, axis, context):
                     axis._tick_titles,
                     axis.ticks.labels.label.styles(axis._tick_locations),
                 ):
-                x = projection(location)
+                x = axis.projection(location)
 
                 style=toyplot.style.combine(
                     {
@@ -1319,13 +1311,6 @@ def _render(canvas, numberline, context):
 
     _render(canvas, numberline.axis, context.copy(
         root=numberline_xml,
-        x1=numberline._x1,
-        y1=numberline._y1,
-        x2=numberline._x2,
-        y2=numberline._y2,
-        offset=numberline.padding,
-        ticks_above=3,
-        ticks_below=3,
         ticks_labels_location="below",
         label_baseline_shift="-200%",
         ))
@@ -1347,8 +1332,8 @@ def _render(numberline, colormap, context):
         )
 
     samples = numpy.linspace(colormap.domain.min, colormap.domain.max, len(colormap._palette), endpoint=True)
-    projected = numberline._projection(samples)
-    colormap_range_min, colormap_range_max = numberline._projection([colormap.domain.min, colormap.domain.max])
+    projected = numberline.axis.projection(samples)
+    colormap_range_min, colormap_range_max = numberline.axis.projection([colormap.domain.min, colormap.domain.max])
 
     for index, (x1, x2), in enumerate(zip(projected[:-1], projected[1:])):
         color = colormap._palette[index]
@@ -1384,7 +1369,7 @@ def _render(numberline, colormap, context):
     style = numberline._style[colormap]
 
     transform = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
-    colormap_range_min, colormap_range_max = numberline._projection([colormap.domain.min, colormap.domain.max])
+    colormap_range_min, colormap_range_max = numberline.axis.projection([colormap.domain.min, colormap.domain.max])
 
     mark_xml = xml.SubElement(
         context.root,
@@ -1412,7 +1397,7 @@ def _render(numberline, colormap, context):
     samples = numpy.linspace(colormap.domain.min, colormap.domain.max, 64, endpoint=True)
     for sample in samples:
         color = colormap.colors(sample)
-        psample = numberline._projection(sample)
+        psample = numberline.axis.projection(sample)
         offset = (psample - colormap_range_min) / (colormap_range_max - colormap_range_min)
         xml.SubElement(
             gradient_xml,
@@ -1454,7 +1439,7 @@ def _render(numberline, mark, context):
     context.add_data_table(mark, mark._table, title="Scatterplot Data", filename=mark._filename)
 
     dimension1 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates])
-    X = numberline._projection(dimension1)
+    X = numberline.axis.projection(dimension1)
     for x, marker, msize, mfill, mstroke, mopacity, mtitle in zip(
             X.T,
             [mark._table[key] for key in mark._marker],
@@ -1568,71 +1553,33 @@ def _render(canvas, axes, context):
 
     if axes._show:
         if axes.x.spine.position == "low":
-            x_offset = axes.padding
-            x_spine_y = axes._ymax_range
-            x_ticks_above = 5
-            x_ticks_below = 0
             x_ticks_labels_location = "below"
             x_label_baseline_shift = "-200%"
         elif axes.x.spine.position == "high":
-            x_offset = -axes.padding
-            x_spine_y = axes._ymin_range
-            x_ticks_above = 0
-            x_ticks_below = 5
             x_ticks_labels_location = "above"
             x_label_baseline_shift = "200%"
         else:
-            x_offset = 0
-            x_spine_y = axes._project_y(axes.x.spine.position)
-            x_ticks_above = 3
-            x_ticks_below = 3
             x_ticks_labels_location = "below"
             x_label_baseline_shift = "-200%"
 
         if axes.y.spine._position == "low":
-            y_offset = -axes.padding
-            y_spine_x = axes._xmin_range
-            y_ticks_above = 0
-            y_ticks_below = 5
             y_ticks_labels_location = "above"
             y_label_baseline_shift = "200%"
         elif axes.y.spine._position == "high":
-            y_offset = axes.padding
-            y_spine_x = axes._xmax_range
-            y_ticks_above = 5
-            y_ticks_below = 0
             y_ticks_labels_location = "below"
             y_label_baseline_shift = "-200%"
         else:
-            y_offset = 0
-            y_spine_x = axes._project_x(axes.y.spine._position)
-            y_ticks_above = 3
-            y_ticks_below = 3
             y_ticks_labels_location = "below"
             y_label_baseline_shift = "200%"
 
         _render(canvas, axes.x, context.copy(
             root=axes_xml,
-            x1=axes._xmin_range,
-            y1=x_spine_y,
-            x2=axes._xmax_range,
-            y2=x_spine_y,
-            offset=x_offset,
-            ticks_above=x_ticks_above,
-            ticks_below=x_ticks_below,
             ticks_labels_location=x_ticks_labels_location,
             label_baseline_shift=x_label_baseline_shift,
             ))
 
         _render(canvas, axes.y, context.copy(
             root=axes_xml,
-            x1=y_spine_x,
-            y1=axes._ymax_range,
-            x2=y_spine_x,
-            y2=axes._ymin_range,
-            offset=y_offset,
-            ticks_above=y_ticks_above,
-            ticks_below=y_ticks_below,
             ticks_labels_location=y_ticks_labels_location,
             label_baseline_shift=y_label_baseline_shift,
             ))

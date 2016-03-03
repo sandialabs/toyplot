@@ -244,29 +244,6 @@ def test_xml_comparison_string():
 ##########################################################################
 # toyplot
 
-def test_axes_coordinates_show():
-    canvas = toyplot.Canvas()
-    axes = canvas.axes()
-    axes.coordinates.show = False
-    nose.tools.assert_equal(axes.coordinates.show, False)
-    assert_canvas_matches(canvas, "axes-coordinates-show")
-
-
-def test_axes_coordinates_style():
-    canvas = toyplot.Canvas()
-    axes = canvas.axes()
-    axes.coordinates.style = {"stroke": "red", "fill": "ivory"}
-    nose.tools.assert_equal(axes.coordinates.style["stroke"], "red")
-    assert_canvas_matches(canvas, "axes-coordinates-style")
-
-
-def test_axes_coordinates_label():
-    canvas = toyplot.Canvas()
-    axes = canvas.axes()
-    axes.coordinates.label.style = {"fill": "red"}
-    nose.tools.assert_equal(axes.coordinates.label.style["fill"], "red")
-    assert_canvas_matches(canvas, "axes-coordinates-label")
-
 
 def test_axes_tick_titles():
     canvas = toyplot.Canvas()

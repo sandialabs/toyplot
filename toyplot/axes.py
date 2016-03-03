@@ -480,20 +480,10 @@ class Axis(object):
         self._tick_titles = tick_titles
 
 
-def projection(axis, domain_min=None, domain_max=None, range_min=None, range_max=None):
-    if domain_min is None:
-        domain_min = axis._domain_min
-    if domain_max is None:
-        domain_max = axis._domain_max
-    if range_min is None:
-        range_min = 0.0
-    if range_max is None:
-        range_max = 1.0
-
-    if axis._scale == "linear":
+def projection(scale, domain_min, domain_max, range_min, range_max):
+    if scale == "linear":
         return toyplot.projection.linear(domain_min, domain_max, range_min, range_max)
-
-    scale, base = axis._scale
+    scale, base = scale
     return toyplot.projection.log(base, domain_min, domain_max, range_min, range_max)
 
 
@@ -753,14 +743,14 @@ class Cartesian(object):
         # Optionally expand the domain in range-space (used to make room for text).
         if self._expand_domain_range_x is not None:
             x_projection = projection(
-                self.x,
+                self.x.scale,
                 domain_min=xdomain_min,
                 domain_max=xdomain_max,
                 range_min=self._xmin_range,
                 range_max=self._xmax_range,
                 )
             y_projection = projection(
-                self.y,
+                self.y.scale,
                 domain_min=ydomain_min,
                 domain_max=ydomain_max,
                 range_min=self._ymax_range,
@@ -853,8 +843,20 @@ class Cartesian(object):
             tick_titles=ytick_titles,
             )
 
-        self._x_projection = projection(self.x, range_min=self._xmin_range, range_max=self._xmax_range)
-        self._y_projection = projection(self.y, range_min=self._ymax_range, range_max=self._ymin_range)
+        self._x_projection = projection(
+            scale=self.x.scale,
+            domain_min=xdomain_min,
+            domain_max=xdomain_max,
+            range_min=self._xmin_range,
+            range_max=self._xmax_range,
+            )
+        self._y_projection = projection(
+            scale=self.y.scale,
+            domain_min=ydomain_min,
+            domain_max=ydomain_max,
+            range_min=self._ymax_range,
+            range_max=self._ymin_range,
+            )
 
     def _project_x(self, x):
         return self._x_projection(x)

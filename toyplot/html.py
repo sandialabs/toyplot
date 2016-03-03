@@ -1185,9 +1185,15 @@ def _render(canvas, axis, context):
         length = numpy.linalg.norm(basis)
         theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
 
-        project = toyplot.axes.projection(axis, range_min=0.0, range_max=length)
+        projection = toyplot.axes.projection(
+            scale=axis.scale,
+            domain_min=axis._domain_min,
+            domain_max=axis._domain_max,
+            range_min=0.0,
+            range_max=length,
+            )
 
-        context.add_visible_axis(axis, project)
+        context.add_visible_axis(axis, projection)
 
         axis_xml = xml.SubElement(
             context.root,
@@ -1202,9 +1208,9 @@ def _render(canvas, axis, context):
             x2 = length
             if axis._data_min is not None and axis._data_max is not None:
                 x1 = max(
-                    x1, project(axis._data_min))
+                    x1, projection(axis._data_min))
                 x2 = min(
-                    x2, project(axis._data_max))
+                    x2, projection(axis._data_max))
             xml.SubElement(
                 axis_xml,
                 "line",
@@ -1224,7 +1230,7 @@ def _render(canvas, axis, context):
                         axis._tick_locations,
                         axis.ticks.tick.styles(axis._tick_locations),
                     ):
-                    x = project(location)
+                    x = projection(location)
                     xml.SubElement(
                         ticks_group,
                         "line",
@@ -1266,7 +1272,7 @@ def _render(canvas, axis, context):
                     axis._tick_titles,
                     axis.ticks.labels.label.styles(axis._tick_locations),
                 ):
-                x = project(location)
+                x = projection(location)
 
                 style=toyplot.style.combine(
                     {
@@ -1341,7 +1347,13 @@ def _render(numberline, colormap, context):
         transform=transform,
         )
 
-    projection = toyplot.axes.projection(numberline.axis, range_min=0, range_max=length)
+    projection = toyplot.axes.projection(
+        scale=numberline.axis.scale,
+        domain_min=numberline.axis._domain_min,
+        domain_max=numberline.axis._domain_max,
+        range_min=0,
+        range_max=length,
+        )
     samples = numpy.linspace(colormap.domain.min, colormap.domain.max, len(colormap._palette), endpoint=True)
     projected = projection(samples)
     colormap_range_min, colormap_range_max = projection([colormap.domain.min, colormap.domain.max])
@@ -1380,7 +1392,13 @@ def _render(numberline, colormap, context):
     style = numberline._style[colormap]
 
     transform, length = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
-    projection = toyplot.axes.projection(numberline.axis, range_min=0, range_max=length)
+    projection = toyplot.axes.projection(
+        scale=numberline.axis.scale,
+        domain_min=numberline.axis._domain_min,
+        domain_max=numberline.axis._domain_max,
+        range_min=0,
+        range_max=length,
+        )
     colormap_range_min, colormap_range_max = projection([colormap.domain.min, colormap.domain.max])
 
     mark_xml = xml.SubElement(
@@ -1451,7 +1469,13 @@ def _render(numberline, mark, context):
     context.add_data_table(mark, mark._table, title="Scatterplot Data", filename=mark._filename)
 
     dimension1 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates])
-    projection = toyplot.axes.projection(numberline.axis, range_min=0, range_max=length)
+    projection = toyplot.axes.projection(
+        scale=numberline.axis.scale,
+        domain_min=numberline.axis._domain_min,
+        domain_max=numberline.axis._domain_max,
+        range_min=0,
+        range_max=length,
+        )
     X = projection(dimension1)
     for x, marker, msize, mfill, mstroke, mopacity, mtitle in zip(
             X.T,

@@ -199,21 +199,24 @@ _show_axis_mouse_coordinates = string.Template("""
 {
     function display_coordinates(e)
     {
+        var current = svg.createSVGPoint();
+        current.x = e.clientX;
+        current.y = e.clientY;
 
+        /*
         for(var i = 0; i != axes.length; ++i)
         {
             var axis = axes[i];
-            current.x = e.clientX;
-            current.y = e.clientY;
             console.log(current.matrixTransform(axis.getScreenCTM().inverse()));
         }
+        */
     }
 
     var root_id = "$root_id";
+    var axes = $visible_axes;
+
     var svg = document.querySelector("#" + root_id + " svg");
-    var current = svg.createSVGPoint();
     svg.addEventListener("mousemove", display_coordinates);
-    var axes = document.querySelectorAll("#" + root_id + " .toyplot-axes-Axis");
 })();
 """)
 
@@ -377,8 +380,11 @@ class _RenderContext(object):
         self._id_cache = dict()
         self._data_tables = list()
         self._cartesian_axes = dict()
+        self._visible_axes = dict()
         self.rendered = set()
-        self.axes = set()
+
+    def add_visible_axis(self, axis, projection):
+        self._visible_axes[axis] = projection
 
     def add_cartesian_axes(self, axes):
         self._cartesian_axes[self.get_id(axes)] = axes
@@ -585,6 +591,7 @@ def render(canvas, fobj=None, animation=False):
             return -value
         return value
 
+    # Deprecated
     if context._cartesian_axes:
         cartesian_axes = dict()
         for key, axes in context._cartesian_axes.items():
@@ -628,9 +635,40 @@ def render(canvas, fobj=None, animation=False):
             root_id=root.get("id"),
             cartesian_axes=json.dumps(cartesian_axes, cls=_NumpyJSONEncoder, sort_keys=True))
 
-    if context.axes:
+    if context._visible_axes:
+        visible_axes = dict()
+        for axis, projection in context._visible_axes.items():
+            key = context.get_id(axis)
+            visible_axes[key] = list()
+            for segment in projection._segments:
+                visible_axes[key].append(
+                {
+                    "scale": segment.scale,
+                    "domain":
+                    {
+                        "min": segment.domain.min,
+                        "max": segment.domain.max,
+                        "bounds":
+                        {
+                            "min": segment.domain.bounds.min,
+                            "max": segment.domain.bounds.max,
+                        },
+                    },
+                    "range":
+                    {
+                        "min": segment.range.min,
+                        "max": segment.range.max,
+                        "bounds":
+                        {
+                            "min": segment.range.bounds.min,
+                            "max": segment.range.bounds.max,
+                        },
+                    },
+                })
+
         xml.SubElement(controls, "script").text = _show_axis_mouse_coordinates.substitute(
             root_id=root.get("id"),
+            visible_axes=json.dumps(visible_axes, cls=_NumpyJSONEncoder, sort_keys=True),
             )
 
     # Provide VCR controls.
@@ -1137,8 +1175,6 @@ def _rotated_frame(x1, y1, x2, y2, offset):
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Axis, _RenderContext)
 def _render(canvas, axis, context):
-    context.axes.add(axis)
-
     if axis in context.rendered:
         return
     context.rendered.add(axis)
@@ -1150,6 +1186,8 @@ def _render(canvas, axis, context):
         theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
 
         project = axis.projection(range_min=0.0, range_max=length)
+
+        context.add_visible_axis(axis, project)
 
         axis_xml = xml.SubElement(
             context.root,

@@ -726,43 +726,43 @@ class Cartesian(object):
 
     def _finalize(self):
         # Begin with the implicit domain defined by our data.
-        xmin = self.x._display_min
-        xmax = self.x._display_max
-        ymin = self.y._display_min
-        ymax = self.y._display_max
+        xdomain_min = self.x._display_min
+        xdomain_max = self.x._display_max
+        ydomain_min = self.y._display_min
+        ydomain_max = self.y._display_max
 
         # If there is no implicit domain (we don't have any data), default
         # to the origin.
-        if xmin is None:
-            xmin = 0
-        if xmax is None:
-            xmax = 0
-        if ymin is None:
-            ymin = 0
-        if ymax is None:
-            ymax = 0
+        if xdomain_min is None:
+            xdomain_min = 0
+        if xdomain_max is None:
+            xdomain_max = 0
+        if ydomain_min is None:
+            ydomain_min = 0
+        if ydomain_max is None:
+            ydomain_max = 0
 
         # Ensure that the domain is never empty.
-        if xmin == xmax:
-            xmin -= 0.5
-            xmax += 0.5
-        if ymin == ymax:
-            ymin -= 0.5
-            ymax += 0.5
+        if xdomain_min == xdomain_max:
+            xdomain_min -= 0.5
+            xdomain_max += 0.5
+        if ydomain_min == ydomain_max:
+            ydomain_min -= 0.5
+            ydomain_max += 0.5
 
         # Optionally expand the domain in range-space (used to make room for text).
         if self._expand_domain_range_x is not None:
             x_projection = projection(
                 self.x,
-                domain_min=xmin,
-                domain_max=xmax,
+                domain_min=xdomain_min,
+                domain_max=xdomain_max,
                 range_min=self._xmin_range,
                 range_max=self._xmax_range,
                 )
             y_projection = projection(
                 self.y,
-                domain_min=ymin,
-                domain_max=ymax,
+                domain_min=ydomain_min,
+                domain_max=ydomain_max,
                 range_min=self._ymax_range,
                 range_max=self._ymin_range,
                 )
@@ -779,67 +779,79 @@ class Cartesian(object):
             domain_top = y_projection.inverse(range_top)
             domain_bottom = y_projection.inverse(range_bottom)
 
-            xmin = _null_min(domain_left.min(), xmin)
-            xmax = _null_max(domain_right.max(), xmax)
-            ymin = _null_min(domain_bottom.min(), ymin)
-            ymax = _null_max(domain_top.max(), ymax)
+            xdomain_min = _null_min(domain_left.min(), xdomain_min)
+            xdomain_max = _null_max(domain_right.max(), xdomain_max)
+            ydomain_min = _null_min(domain_bottom.min(), ydomain_min)
+            ydomain_max = _null_max(domain_top.max(), ydomain_max)
 
         # Optionally expand the domain to match the aspect ratio of the range.
         if self._aspect == "fit-range":
-            dwidth = (xmax - xmin)
-            dheight = (ymax - ymin)
+            dwidth = (xdomain_max - xdomain_min)
+            dheight = (ydomain_max - ydomain_min)
             daspect = dwidth / dheight
             raspect = (self._xmax_range - self._xmin_range) / (self._ymax_range - self._ymin_range)
 
             if daspect < raspect:
                 offset = ((dwidth * (raspect / daspect)) - dwidth) * 0.5
-                xmin -= offset
-                xmax += offset
+                xdomain_min -= offset
+                xdomain_max += offset
             elif daspect > raspect:
                 offset = ((dheight * (daspect / raspect)) - dheight) * 0.5
-                ymin -= offset
-                ymax += offset
+                ydomain_min -= offset
+                ydomain_max += offset
 
         # Allow users to override the domain.
         if self.x.domain.min is not None:
-            xmin = self.x.domain.min
+            xdomain_min = self.x.domain.min
         if self.x.domain.max is not None:
-            xmax = self.x.domain.max
+            xdomain_max = self.x.domain.max
         if self.y.domain.min is not None:
-            ymin = self.y.domain.min
+            ydomain_min = self.y.domain.min
         if self.y.domain.max is not None:
-            ymax = self.y.domain.max
+            ydomain_max = self.y.domain.max
 
         # Ensure that the domain is never empty.
-        if xmin == xmax:
-            xmin -= 0.5
-            xmax += 0.5
-        if ymin == ymax:
-            ymin -= 0.5
-            ymax += 0.5
+        if xdomain_min == xdomain_max:
+            xdomain_min -= 0.5
+            xdomain_max += 0.5
+        if ydomain_min == ydomain_max:
+            ydomain_min -= 0.5
+            ydomain_max += 0.5
 
         # Calculate tick locations and labels.
         xtick_locations = []
         xtick_labels = []
         xtick_titles = []
         if self.show and self.x.show:
-            xtick_locations, xtick_labels, xtick_titles = self.x.locator().ticks(xmin, xmax)
+            xtick_locations, xtick_labels, xtick_titles = self.x.locator().ticks(xdomain_min, xdomain_max)
         ytick_locations = []
         ytick_labels = []
         ytick_titles = []
         if self.show and self.y.show:
-            ytick_locations, ytick_labels, ytick_titles = self.y.locator().ticks(ymin, ymax)
+            ytick_locations, ytick_labels, ytick_titles = self.y.locator().ticks(ydomain_min, ydomain_max)
 
         # Allow tick locations to grow (never shrink) the domain.
         if len(xtick_locations):
-            xmin = numpy.amin((xmin, xtick_locations[0]))
-            xmax = numpy.amax((xmax, xtick_locations[-1]))
+            xdomain_min = numpy.amin((xdomain_min, xtick_locations[0]))
+            xdomain_max = numpy.amax((xdomain_max, xtick_locations[-1]))
         if len(ytick_locations):
-            ymin = numpy.amin((ymin, ytick_locations[0]))
-            ymax = numpy.amax((ymax, ytick_locations[-1]))
+            ydomain_min = numpy.amin((ydomain_min, ytick_locations[0]))
+            ydomain_max = numpy.amax((ydomain_max, ytick_locations[-1]))
 
-        self.x._finalize(xmin, xmax, xtick_locations, xtick_labels, xtick_titles)
-        self.y._finalize(ymin, ymax, ytick_locations, ytick_labels, ytick_titles)
+        self.x._finalize(
+            domain_min=xdomain_min,
+            domain_max=xdomain_max,
+            tick_locations=xtick_locations,
+            tick_labels=xtick_labels,
+            tick_titles=xtick_titles,
+            )
+        self.y._finalize(
+            domain_min=ydomain_min,
+            domain_max=ydomain_max,
+            tick_locations=ytick_locations,
+            tick_labels=ytick_labels,
+            tick_titles=ytick_titles,
+            )
 
         self._x_projection = projection(self.x, range_min=self._xmin_range, range_max=self._xmax_range)
         self._y_projection = projection(self.y, range_min=self._ymax_range, range_max=self._ymin_range)
@@ -2426,45 +2438,51 @@ class Numberline(object):
 
     def _finalize(self):
         # Begin with the implicit domain defined by our data.
-        min = self.axis._display_min
-        max = self.axis._display_max
+        domain_min = self.axis._display_min
+        domain_max = self.axis._display_max
 
         # If there is no implicit domain (we don't have any data), default
         # to the origin.
-        if min is None:
-            min = 0
-        if max is None:
-            max = 0
+        if domain_min is None:
+            domain_min = 0
+        if domain_max is None:
+            domain_max = 0
 
         # Ensure that the domain is never empty.
-        if min == max:
-            min -= 0.5
-            max += 0.5
+        if domain_min == domain_max:
+            domain_min -= 0.5
+            domain_max += 0.5
 
         # Allow users to override the domain.
         if self.axis.domain.min is not None:
-            min = self.axis.domain.min
+            domain_min = self.axis.domain.min
         if self.axis.domain.max is not None:
-            max = self.axis.domain.max
+            domain_max = self.axis.domain.max
 
         # Ensure that the domain is never empty.
-        if min == max:
-            min -= 0.5
-            max += 0.5
+        if domain_min == domain_max:
+            domain_min -= 0.5
+            domain_max += 0.5
 
         # Calculate tick locations and labels.
         tick_locations = []
         tick_labels = []
         tick_titles = []
         if self.axis.show:
-            tick_locations, tick_labels, tick_titles = self.axis.locator().ticks(min, max)
+            tick_locations, tick_labels, tick_titles = self.axis.locator().ticks(domain_min, domain_max)
 
         # Allow tick locations to grow (never shrink) the domain.
         if len(tick_locations):
-            min = numpy.amin((min, tick_locations[0]))
-            max = numpy.amax((max, tick_locations[-1]))
+            domain_min = numpy.amin((domain_min, tick_locations[0]))
+            domain_max = numpy.amax((domain_max, tick_locations[-1]))
 
-        self.axis._finalize(min, max, tick_locations, tick_labels, tick_titles)
+        self.axis._finalize(
+            domain_min=domain_min,
+            domain_max=domain_max,
+            tick_locations=tick_locations,
+            tick_labels=tick_labels,
+            tick_titles=tick_titles,
+            )
 
 
 ##########################################################################

@@ -144,6 +144,13 @@ _show_axis_mouse_coordinates = string.Template("""
         }
     }
 
+    function hide_coordinates(e)
+    {
+        var coordinates = svg.querySelectorAll(".toyplot-mouse-coordinates");
+        for(var i = 0; i != coordinates.length; ++i)
+            coordinates[i].style.visibility = "hidden";
+    }
+
     function display_coordinates(e)
     {
         var current = svg.createSVGPoint();
@@ -156,7 +163,11 @@ _show_axis_mouse_coordinates = string.Template("""
             var range = current.matrixTransform(axis.getScreenCTM().inverse());
             var projection = axes[axis_id];
             var domain = to_domain(range.x, projection);
-            console.log(range.x, domain);
+            var coordinates = axis.querySelector(".toyplot-mouse-coordinates");
+            coordinates.style.visibility = "visible";
+            coordinates.setAttribute("transform", "translate(" + range.x + ")");
+            var text = coordinates.querySelector("text");
+            text.textContent = domain.toFixed(2);
         }
     }
 
@@ -165,6 +176,7 @@ _show_axis_mouse_coordinates = string.Template("""
 
     var svg = document.querySelector("#" + root_id + " svg");
     svg.addEventListener("mousemove", display_coordinates);
+    svg.addEventListener("mouseout", hide_coordinates);
 })();
 """)
 
@@ -1192,6 +1204,27 @@ def _render(canvas, axis, context):
             style=toyplot.style.combine({"baseline-shift": axis._label_baseline_shift}, axis.label.style),
             )
 
+        if axis.coordinates.show:
+            coordinates_xml = xml.SubElement(
+                axis_xml, "g",
+                attrib={"class": "toyplot-mouse-coordinates"},
+                style=_css_style({"visibility": "hidden"}),
+                transform="",
+                )
+            marker_xml = xml.SubElement(
+                coordinates_xml, "line",
+                x1="0",
+                x2="0",
+                y1="-10",
+                y2="10",
+                )
+            text_xml = xml.SubElement(
+                coordinates_xml, "text",
+                x="0",
+                y="20",
+                style=_css_style({"alignment-baseline":"hanging", "font-weight":"normal", "stroke":"none", "text-anchor":"middle"}),
+                )
+
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Numberline, _RenderContext)
 def _render(canvas, numberline, context):
@@ -1200,11 +1233,7 @@ def _render(canvas, numberline, context):
     numberline_xml = xml.SubElement(context.root, "g", id=context.get_id(
         numberline), attrib={"class": "toyplot-axes-Numberline"})
 
-    children_xml = xml.SubElement(
-        numberline_xml,
-        "g",
-        attrib={"class": "toyplot-coordinate-events"},
-        )
+    children_xml = xml.SubElement(numberline_xml, "g")
 
     for child in numberline._children:
         _render(numberline, child, context.copy(root=children_xml))
@@ -1400,11 +1429,7 @@ def _render(canvas, axes, context):
     children_xml = xml.SubElement(
         axes_xml,
         "g",
-        attrib={
-            "class" : "toyplot-coordinate-events",
-            "clip-path" : "url(#%s)" % clip_xml.get("id"),
-        },
-        style=_css_style({"cursor": "crosshair"}),
+        attrib={"clip-path" : "url(#%s)" % clip_xml.get("id")},
         )
 
     xml.SubElement(

@@ -121,6 +121,18 @@ class _ordered_set(collections.MutableSet):
 class Axis(object):
     """One dimensional axis that can be used to create coordinate systems.
     """
+    class MouseCoordinatesHelper(object):
+        def __init__(self, show=True):
+            self._show = show
+
+        @property
+        def show(self):
+            return self._show
+
+        @show.setter
+        def show(self, value):
+            self._show = value
+
     class DomainHelper(object):
 
         def __init__(self, min, max):
@@ -410,6 +422,7 @@ class Axis(object):
         self._display_min = None
         self._display_max = None
 
+        self.coordinates = Axis.MouseCoordinatesHelper(show=True)
         self.domain = Axis.DomainHelper(domain_min, domain_max)
         self.label = Axis.LabelHelper(label, style={})
         self.spine = Axis.SpineHelper()

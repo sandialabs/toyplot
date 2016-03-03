@@ -1167,10 +1167,9 @@ _draw_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<":
 def _rotated_frame(x1, y1, x2, y2, offset):
     p = numpy.row_stack(((x1, y1), (x2, y2)))
     basis = p[1] - p[0]
-    length = numpy.linalg.norm(basis)
     theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
     transform="translate(%s,%s) rotate(%s) translate(0,%s)" % (p[0][0], p[0][1], theta, offset)
-    return transform, length
+    return transform
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Axis, _RenderContext)
@@ -1338,7 +1337,7 @@ def _render(numberline, colormap, context):
     width = numberline._width[colormap]
     style = numberline._style[colormap]
 
-    transform, length = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
+    transform = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
 
     mark_xml = xml.SubElement(
         context.root,
@@ -1347,16 +1346,9 @@ def _render(numberline, colormap, context):
         transform=transform,
         )
 
-    projection = toyplot.axes.projection(
-        scale=numberline.axis.scale,
-        domain_min=numberline.axis._domain_min,
-        domain_max=numberline.axis._domain_max,
-        range_min=0,
-        range_max=length,
-        )
     samples = numpy.linspace(colormap.domain.min, colormap.domain.max, len(colormap._palette), endpoint=True)
-    projected = projection(samples)
-    colormap_range_min, colormap_range_max = projection([colormap.domain.min, colormap.domain.max])
+    projected = numberline._projection(samples)
+    colormap_range_min, colormap_range_max = numberline._projection([colormap.domain.min, colormap.domain.max])
 
     for index, (x1, x2), in enumerate(zip(projected[:-1], projected[1:])):
         color = colormap._palette[index]
@@ -1391,15 +1383,8 @@ def _render(numberline, colormap, context):
     width = numberline._width[colormap]
     style = numberline._style[colormap]
 
-    transform, length = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
-    projection = toyplot.axes.projection(
-        scale=numberline.axis.scale,
-        domain_min=numberline.axis._domain_min,
-        domain_max=numberline.axis._domain_max,
-        range_min=0,
-        range_max=length,
-        )
-    colormap_range_min, colormap_range_max = projection([colormap.domain.min, colormap.domain.max])
+    transform = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
+    colormap_range_min, colormap_range_max = numberline._projection([colormap.domain.min, colormap.domain.max])
 
     mark_xml = xml.SubElement(
         context.root,
@@ -1427,7 +1412,7 @@ def _render(numberline, colormap, context):
     samples = numpy.linspace(colormap.domain.min, colormap.domain.max, 64, endpoint=True)
     for sample in samples:
         color = colormap.colors(sample)
-        psample = projection(sample)
+        psample = numberline._projection(sample)
         offset = (psample - colormap_range_min) / (colormap_range_max - colormap_range_min)
         xml.SubElement(
             gradient_xml,
@@ -1457,7 +1442,7 @@ def _render(numberline, colormap, context):
 
 @dispatch(toyplot.axes.Numberline, toyplot.mark.Scatterplot, _RenderContext)
 def _render(numberline, mark, context):
-    transform, length = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -numberline._offset[mark])
+    transform = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -numberline._offset[mark])
     mark_xml = xml.SubElement(
         context.root,
         "g",
@@ -1469,14 +1454,7 @@ def _render(numberline, mark, context):
     context.add_data_table(mark, mark._table, title="Scatterplot Data", filename=mark._filename)
 
     dimension1 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates])
-    projection = toyplot.axes.projection(
-        scale=numberline.axis.scale,
-        domain_min=numberline.axis._domain_min,
-        domain_max=numberline.axis._domain_max,
-        range_min=0,
-        range_max=length,
-        )
-    X = projection(dimension1)
+    X = numberline._projection(dimension1)
     for x, marker, msize, mfill, mstroke, mopacity, mtitle in zip(
             X.T,
             [mark._table[key] for key in mark._marker],

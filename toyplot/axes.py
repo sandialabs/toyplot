@@ -2486,6 +2486,17 @@ class Numberline(object):
             tick_titles=tick_titles,
             )
 
+        endpoints = numpy.row_stack(((self._x1, self._y1), (self._x2, self._y2)))
+        length = numpy.linalg.norm(endpoints[1] - endpoints[0])
+
+        self._projection = projection(
+            scale=self.axis.scale,
+            domain_min=domain_min,
+            domain_max=domain_max,
+            range_min=0.0,
+            range_max=length,
+            )
+
 
 ##########################################################################
 # Table

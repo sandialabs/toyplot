@@ -516,70 +516,6 @@ class Cartesian(object):
     Do not create Cartesian instances directly.  Use factory methods such
     as :meth:`toyplot.canvas.Canvas.axes` instead.
     """
-    class CoordinatesHelper(object):
-        def __init__(
-                self,
-                show,
-                xmin_range,
-                xmax_range,
-                ymin_range,
-                ymax_range,
-                style):
-
-            self._show = show
-            self._xmin_range = xmin_range
-            self._xmax_range = xmax_range
-            self._ymin_range = ymin_range
-            self._ymax_range = ymax_range
-
-            self._style = {}
-            self.style = {"stroke": "none", "fill": "white", "opacity": 0.75}
-            self.style = style
-
-            self.label = Cartesian.CoordinatesLabelHelper(style={})
-
-        @property
-        def show(self):
-            return self._show
-
-        @show.setter
-        def show(self, value):
-            self._show = value
-
-        @property
-        def style(self):
-            return self._style
-
-        @style.setter
-        def style(self, value):
-            self._style = toyplot.style.combine(
-                self._style,
-                toyplot.require.style(value, allowed=set(["fill", "opacity", "stroke"])),
-                )
-
-    class CoordinatesLabelHelper(object):
-
-        def __init__(self, style):
-            self._style = {}
-            self.style = {
-                "font-size": "10px",
-                "font-weight": "normal",
-                "stroke": "none",
-                "text-anchor": "middle",
-                "alignment-baseline": "middle",
-                }
-            self.style = style
-
-        @property
-        def style(self):
-            return self._style
-
-        @style.setter
-        def style(self, value):
-            self._style = toyplot.style.combine(
-                self._style,
-                toyplot.require.style(value, allowed=toyplot.require.style.text),
-                )
 
     def __init__(
             self,
@@ -630,13 +566,6 @@ class Cartesian(object):
 
         self._show = show
 
-        self.coordinates = Cartesian.CoordinatesHelper(
-            show=True,
-            xmin_range=xmax_range - 100,
-            xmax_range=xmax_range - 10,
-            ymin_range=ymin_range + 10,
-            ymax_range=ymin_range + 24,
-            style={})
         self.label = Axis.LabelHelper(
             label=label,
             style={"font-size": "14px", "baseline-shift": "100%"},
@@ -2800,7 +2729,7 @@ class Table(object):
                 padding=padding,
                 parent=self._table._parent,
                 )
-            axes.coordinates.show = False
+            #axes.coordinates.show = False
             self._table._children.append(axes)
             return axes
 

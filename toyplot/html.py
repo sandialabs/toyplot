@@ -96,120 +96,68 @@ _export_data_tables = string.Template("""
 })();
 """)
 
-_show_mouse_coordinates = string.Template("""
-(function()
-{
-  var axes = $cartesian_axes;
-
-  function sign(x)
-  {
-    return x < 0 ? -1 : x > 0 ? 1 : 0;
-  }
-
-  function _mix(a, b, amount)
-  {
-    return ((1.0 - amount) * a) + (amount * b);
-  }
-
-  function _log(x, base)
-  {
-    return Math.log(Math.abs(x)) / Math.log(base);
-  }
-
-  function _in_range(a, x, b)
-  {
-    var left = Math.min(a, b);
-    var right = Math.max(a, b);
-    return left <= x && x <= right;
-  }
-
-  function to_domain(projection, range)
-  {
-    for(var i = 0; i != projection.length; ++i)
-    {
-      var segment = projection[i];
-      if(_in_range(segment.range.bounds.min, range, segment.range.bounds.max))
-      {
-        if(segment.scale == "linear")
-        {
-          var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
-          return _mix(segment.domain.min, segment.domain.max, amount)
-        }
-        else if(segment.scale[0] == "log")
-        {
-          var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
-          var base = segment.scale[1];
-          return sign(segment.domain.min) * Math.pow(base, _mix(_log(segment.domain.min, base), _log(segment.domain.max, base), amount));
-        }
-      }
-    }
-  }
-
-  // Compute mouse coordinates relative to a DOM object, with thanks to d3js.org, where this code originated.
-  function d3_mousePoint(container, e)
-  {
-    if (e.changedTouches) e = e.changedTouches[0];
-    var svg = container.ownerSVGElement || container;
-    if (svg.createSVGPoint) {
-      var point = svg.createSVGPoint();
-      point.x = e.clientX, point.y = e.clientY;
-      point = point.matrixTransform(container.getScreenCTM().inverse());
-      return [point.x, point.y];
-    }
-    var rect = container.getBoundingClientRect();
-    return [e.clientX - rect.left - container.clientLeft, e.clientY - rect.top - container.clientTop];
-  };
-
-  function display_coordinates(e)
-  {
-    var dom_axes = e.currentTarget.parentElement;
-    var data = axes[dom_axes.id];
-
-    point = d3_mousePoint(e.target, e);
-    var x = Number(to_domain(data["x"], point[0])).toFixed(2);
-    var y = Number(to_domain(data["y"], point[1])).toFixed(2);
-
-    var coordinates = dom_axes.querySelectorAll(".toyplot-coordinates");
-    for(var i = 0; i != coordinates.length; ++i)
-    {
-      coordinates[i].style.visibility = "visible";
-      coordinates[i].querySelector("text").textContent = "x=" + x + " y=" + y;
-    }
-  }
-
-  function clear_coordinates(e)
-  {
-    var dom_axes = e.currentTarget.parentElement;
-    var coordinates = dom_axes.querySelectorAll(".toyplot-coordinates");
-    for(var i = 0; i != coordinates.length; ++i)
-      coordinates[i].style.visibility = "hidden";
-  }
-
-  for(var axes_id in axes)
-  {
-    var event_target = document.querySelector("#" + axes_id + " .toyplot-coordinate-events");
-    event_target.onmousemove = display_coordinates;
-    event_target.onmouseout = clear_coordinates;
-  }
-})();
-""")
 
 _show_axis_mouse_coordinates = string.Template("""
 (function()
 {
+    function _sign(x)
+    {
+        return x < 0 ? -1 : x > 0 ? 1 : 0;
+    }
+
+    function _mix(a, b, amount)
+    {
+        return ((1.0 - amount) * a) + (amount * b);
+    }
+
+    function _log(x, base)
+    {
+        return Math.log(Math.abs(x)) / Math.log(base);
+    }
+
+    function _in_range(a, x, b)
+    {
+        var left = Math.min(a, b);
+        var right = Math.max(a, b);
+        return left <= x && x <= right;
+    }
+
+    function to_domain(range, projection)
+    {
+        for(var i = 0; i != projection.length; ++i)
+        {
+            var segment = projection[i];
+            if(_in_range(segment.range.bounds.min, range, segment.range.bounds.max))
+            {
+                if(segment.scale == "linear")
+                {
+                    var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
+                    return _mix(segment.domain.min, segment.domain.max, amount)
+                }
+                else if(segment.scale[0] == "log")
+                {
+                    var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
+                    var base = segment.scale[1];
+                    return _sign(segment.domain.min) * Math.pow(base, _mix(_log(segment.domain.min, base), _log(segment.domain.max, base), amount));
+                }
+            }
+        }
+    }
+
     function display_coordinates(e)
     {
         var current = svg.createSVGPoint();
         current.x = e.clientX;
         current.y = e.clientY;
 
-        /*
-        for(var i = 0; i != axes.length; ++i)
+        for(var axis_id in axes)
         {
-            var axis = axes[i];
-            console.log(current.matrixTransform(axis.getScreenCTM().inverse()));
+            var axis = document.querySelector("#" + axis_id);
+            var range = current.matrixTransform(axis.getScreenCTM().inverse());
+            var projection = axes[axis_id];
+            var domain = to_domain(range.x, projection);
+            console.log(range.x, domain);
         }
-        */
     }
 
     var root_id = "$root_id";
@@ -219,6 +167,7 @@ _show_axis_mouse_coordinates = string.Template("""
     svg.addEventListener("mousemove", display_coordinates);
 })();
 """)
+
 
 _animation_controls = string.Template("""
 (function()
@@ -380,11 +329,11 @@ class _RenderContext(object):
         self._id_cache = dict()
         self._data_tables = list()
         self._cartesian_axes = dict()
-        self._visible_axes = dict()
+        self._visible_axes = set()
         self.rendered = set()
 
-    def add_visible_axis(self, axis, projection):
-        self._visible_axes[axis] = projection
+    def add_visible_axis(self, axis):
+        self._visible_axes.add(axis)
 
     def add_cartesian_axes(self, axes):
         self._cartesian_axes[self.get_id(axes)] = axes
@@ -586,61 +535,12 @@ def render(canvas, fobj=None, animation=False):
         xml.SubElement(controls, "script").text = _export_data_tables.substitute(root_id=root.get("id"), data_tables=json.dumps(data_tables))
 
     # Provide interactive mouse coordinates.
-    def _flip_infinities(value):
-        if numpy.isinf(value):
-            return -value
-        return value
-
-    # Deprecated
-    if context._cartesian_axes:
-        cartesian_axes = dict()
-        for key, axes in context._cartesian_axes.items():
-            cartesian_axes[key] = dict()
-            cartesian_axes[key]["x"] = list()
-            for segment in axes._x_projection._segments:
-                cartesian_axes[key]["x"].append(
-                    {
-                        "scale": segment.scale,
-                        "domain": {
-                            "min": segment.domain.min,
-                            "max": segment.domain.max,
-                            "bounds": {
-                                "min": segment.domain.bounds.min,
-                                "max": segment.domain.bounds.max}},
-                        "range": {
-                            "min": segment.range.min,
-                            "max": segment.range.max,
-                            "bounds": {
-                                "min": segment.range.bounds.min,
-                                "max": segment.range.bounds.max}}})
-            cartesian_axes[key]["y"] = list()
-            for segment in axes._y_projection._segments:
-                cartesian_axes[key]["y"].append(
-                    {
-                        "scale": segment.scale,
-                        "domain": {
-                            "min": segment.domain.min,
-                            "max": segment.domain.max,
-                            "bounds": {
-                                "min": segment.domain.bounds.min,
-                                "max": segment.domain.bounds.max}},
-                        "range": {
-                            "min": segment.range.min,
-                            "max": segment.range.max,
-                            "bounds": {
-                                "min": _flip_infinities(segment.range.bounds.min),
-                                "max": _flip_infinities(segment.range.bounds.max)}}})
-
-        xml.SubElement(controls, "script").text = _show_mouse_coordinates.substitute(
-            root_id=root.get("id"),
-            cartesian_axes=json.dumps(cartesian_axes, cls=_NumpyJSONEncoder, sort_keys=True))
-
     if context._visible_axes:
         visible_axes = dict()
-        for axis, projection in context._visible_axes.items():
+        for axis in context._visible_axes:
             key = context.get_id(axis)
             visible_axes[key] = list()
-            for segment in projection._segments:
+            for segment in axis.projection._segments:
                 visible_axes[key].append(
                 {
                     "scale": segment.scale,
@@ -1184,7 +1084,7 @@ def _render(canvas, axis, context):
         length = numpy.linalg.norm(basis)
         theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
 
-        context.add_visible_axis(axis, axis.projection)
+        context.add_visible_axis(axis)
 
         axis_xml = xml.SubElement(
             context.root,
@@ -1519,35 +1419,6 @@ def _render(canvas, axes, context):
 
     for child in axes._children:
         _render(axes, child, context.copy(root=children_xml))
-
-    if axes.coordinates._show:
-        context.add_cartesian_axes(axes)
-        coordinates_xml = xml.SubElement(axes_xml, "g", style=_css_style(
-            {"visibility": "hidden"}), attrib={"class": "toyplot-coordinates"})
-        xml.SubElement(
-            coordinates_xml,
-            "rect",
-            x=repr(
-                axes.coordinates._xmin_range),
-            y=repr(
-                axes.coordinates._ymin_range),
-            width=repr(
-                axes.coordinates._xmax_range -
-                axes.coordinates._xmin_range),
-            height=repr(
-                axes.coordinates._ymax_range -
-                axes.coordinates._ymin_range),
-            style=_css_style(
-                axes.coordinates._style))
-        xml.SubElement(
-            coordinates_xml,
-            "text",
-            x=repr(
-                (axes.coordinates._xmin_range + axes.coordinates._xmax_range) * 0.5),
-            y=repr(
-                (axes.coordinates._ymin_range + axes.coordinates._ymax_range) * 0.5),
-            style=_css_style(
-                axes.coordinates.label._style))
 
     if axes._show:
         _render(canvas, axes.x, context.copy(

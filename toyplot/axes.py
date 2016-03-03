@@ -472,7 +472,7 @@ class Axis(object):
                 return toyplot.locator.Log(base=base)
         raise RuntimeError("Unable to create an appropriate locator.") # pragma: no cover
 
-    def _finalize(self, x1, x2, y1, y2, offset, domain_min, domain_max, tick_locations, tick_labels, tick_titles, ticks_above, ticks_below):
+    def _finalize(self, x1, x2, y1, y2, offset, domain_min, domain_max, tick_locations, tick_labels, tick_titles, ticks_above, ticks_below, tick_labels_location, label_baseline_shift):
         self._x1 = x1
         self._x2 = x2
         self._y1 = y1
@@ -485,6 +485,8 @@ class Axis(object):
         self._tick_titles = tick_titles
         self._ticks_above = ticks_above
         self._ticks_below = ticks_below
+        self._tick_labels_location = tick_labels_location
+        self._label_baseline_shift = label_baseline_shift
 
         endpoints = numpy.row_stack(((x1, y1), (x2, y2)))
         length = numpy.linalg.norm(endpoints[1] - endpoints[0])
@@ -867,44 +869,44 @@ class Cartesian(object):
             x_spine_y = self._ymax_range
             x_ticks_above = 5
             x_ticks_below = 0
-#            x_ticks_labels_location = "below"
-#            x_label_baseline_shift = "-200%"
+            x_ticks_labels_location = "below"
+            x_label_baseline_shift = "-200%"
         elif self.x.spine.position == "high":
             x_offset = -self.padding
             x_spine_y = self._ymin_range
             x_ticks_above = 0
             x_ticks_below = 5
-#            x_ticks_labels_location = "above"
-#            x_label_baseline_shift = "200%"
+            x_ticks_labels_location = "above"
+            x_label_baseline_shift = "200%"
         else:
             x_offset = 0
             x_spine_y = self._y_projection(self.x.spine.position)
             x_ticks_above = 3
             x_ticks_below = 3
-#            x_ticks_labels_location = "below"
-#            x_label_baseline_shift = "-200%"
+            x_ticks_labels_location = "below"
+            x_label_baseline_shift = "-200%"
 
         if self.y.spine._position == "low":
             y_offset = -self.padding
             y_spine_x = self._xmin_range
             y_ticks_above = 0
             y_ticks_below = 5
-#            y_ticks_labels_location = "above"
-#            y_label_baseline_shift = "200%"
+            y_ticks_labels_location = "above"
+            y_label_baseline_shift = "200%"
         elif self.y.spine._position == "high":
             y_offset = self.padding
             y_spine_x = self._xmax_range
             y_ticks_above = 5
             y_ticks_below = 0
-#            y_ticks_labels_location = "below"
-#            y_label_baseline_shift = "-200%"
+            y_ticks_labels_location = "below"
+            y_label_baseline_shift = "-200%"
         else:
             y_offset = 0
             y_spine_x = self._x_projection(self.y.spine._position)
             y_ticks_above = 3
             y_ticks_below = 3
-#            y_ticks_labels_location = "below"
-#            y_label_baseline_shift = "200%"
+            y_ticks_labels_location = "below"
+            y_label_baseline_shift = "200%"
 
         # Finalize the axes.
         self.x._finalize(
@@ -920,6 +922,8 @@ class Cartesian(object):
             tick_titles=xtick_titles,
             ticks_above=x_ticks_above,
             ticks_below=x_ticks_below,
+            tick_labels_location=x_ticks_labels_location,
+            label_baseline_shift=x_label_baseline_shift,
             )
         self.y._finalize(
             x1=y_spine_x,
@@ -934,6 +938,8 @@ class Cartesian(object):
             tick_titles=ytick_titles,
             ticks_above=y_ticks_above,
             ticks_below=y_ticks_below,
+            tick_labels_location=y_ticks_labels_location,
+            label_baseline_shift=y_label_baseline_shift,
             )
 
     def _project_x(self, x):
@@ -2570,6 +2576,8 @@ class Numberline(object):
             tick_titles=tick_titles,
             ticks_above=3,
             ticks_below=3,
+            tick_labels_location="below",
+            label_baseline_shift="-200%",
             )
 
 

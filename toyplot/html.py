@@ -1235,7 +1235,7 @@ def _render(canvas, axis, context):
 
         if axis.ticks.labels.show:
 
-            location = context.ticks_labels_location
+            location = axis._tick_labels_location
             if axis.ticks.labels.location is not None:
                 location = axis.ticks.labels.location
 
@@ -1289,7 +1289,7 @@ def _render(canvas, axis, context):
             text=axis.label.text,
             x=length * 0.5,
             y=0,
-            style=toyplot.style.combine({"baseline-shift": context.label_baseline_shift}, axis.label.style),
+            style=toyplot.style.combine({"baseline-shift": axis._label_baseline_shift}, axis.label.style),
             )
 
 
@@ -1311,8 +1311,6 @@ def _render(canvas, numberline, context):
 
     _render(canvas, numberline.axis, context.copy(
         root=numberline_xml,
-        ticks_labels_location="below",
-        label_baseline_shift="-200%",
         ))
 
 
@@ -1552,36 +1550,12 @@ def _render(canvas, axes, context):
                 axes.coordinates.label._style))
 
     if axes._show:
-        if axes.x.spine.position == "low":
-            x_ticks_labels_location = "below"
-            x_label_baseline_shift = "-200%"
-        elif axes.x.spine.position == "high":
-            x_ticks_labels_location = "above"
-            x_label_baseline_shift = "200%"
-        else:
-            x_ticks_labels_location = "below"
-            x_label_baseline_shift = "-200%"
-
-        if axes.y.spine._position == "low":
-            y_ticks_labels_location = "above"
-            y_label_baseline_shift = "200%"
-        elif axes.y.spine._position == "high":
-            y_ticks_labels_location = "below"
-            y_label_baseline_shift = "-200%"
-        else:
-            y_ticks_labels_location = "below"
-            y_label_baseline_shift = "200%"
-
         _render(canvas, axes.x, context.copy(
             root=axes_xml,
-            ticks_labels_location=x_ticks_labels_location,
-            label_baseline_shift=x_label_baseline_shift,
             ))
 
         _render(canvas, axes.y, context.copy(
             root=axes_xml,
-            ticks_labels_location=y_ticks_labels_location,
-            label_baseline_shift=y_label_baseline_shift,
             ))
 
         _draw_text(

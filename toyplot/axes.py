@@ -559,7 +559,10 @@ class Cartesian(object):
         self._xmax_range = xmax_range
         self._ymin_range = ymin_range
         self._ymax_range = ymax_range
-        self._aspect = aspect
+
+        self._aspect = None
+        self.aspect = aspect
+
         self._expand_domain_range_x = None
         self._expand_domain_range_y = None
         self._expand_domain_range_left = None

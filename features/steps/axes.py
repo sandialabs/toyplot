@@ -75,10 +75,10 @@ def step_impl(context):
 @then(u'the cartesian axes can be rendered with sized x ticks')
 def step_impl(context):
     context.axes.x.ticks.show = True
-    context.axes.x.ticks.above = 10
-    context.axes.x.ticks.below = 3
-    nose.tools.assert_equal(context.axes.x.ticks.above, 10)
-    nose.tools.assert_equal(context.axes.x.ticks.below, 3)
+    context.axes.x.ticks.far = 10
+    context.axes.x.ticks.near = 3
+    nose.tools.assert_equal(context.axes.x.ticks.far, 10)
+    nose.tools.assert_equal(context.axes.x.ticks.near, 3)
 
 
 @then(u'the cartesian axes can be rendered with styled x ticks')
@@ -218,10 +218,10 @@ def step_impl(context):
 @then(u'the cartesian axes can be rendered with sized y ticks')
 def step_impl(context):
     context.axes.y.ticks.show = True
-    context.axes.y.ticks.above = 3
-    context.axes.y.ticks.below = 10
-    nose.tools.assert_equal(context.axes.y.ticks.above, 3)
-    nose.tools.assert_equal(context.axes.y.ticks.below, 10)
+    context.axes.y.ticks.near = 3
+    context.axes.y.ticks.far = 10
+    nose.tools.assert_equal(context.axes.y.ticks.near, 3)
+    nose.tools.assert_equal(context.axes.y.ticks.far, 10)
 
 
 @then(u'the cartesian axes can be rendered with styled y ticks')

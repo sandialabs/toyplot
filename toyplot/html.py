@@ -1226,18 +1226,24 @@ def _render(canvas, axis, context):
                 style=_css_style({"visibility": "hidden"}),
                 transform="",
                 )
+
+            y1 = 10 if axis._tick_location == "below" else -10
+            y2 = -10 if axis._tick_location == "below" else 10
             marker_xml = xml.SubElement(
                 coordinates_xml, "line",
                 x1="0",
                 x2="0",
-                y1="-10",
-                y2="10",
+                y1=repr(y1),
+                y2=repr(y2),
                 )
+
+            y = 20 if axis._tick_location == "below" else -20
+            alignment_baseline = "hanging" if axis._tick_location == "below" else "alphabetic"
             text_xml = xml.SubElement(
                 coordinates_xml, "text",
                 x="0",
-                y="20",
-                style=_css_style({"alignment-baseline":"hanging", "font-weight":"normal", "stroke":"none", "text-anchor":"middle"}),
+                y=repr(y),
+                style=_css_style({"alignment-baseline":alignment_baseline, "font-weight":"normal", "stroke":"none", "text-anchor":"middle"}),
                 )
 
 

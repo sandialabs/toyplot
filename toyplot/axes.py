@@ -279,8 +279,9 @@ class Axis(object):
         def __init__(self, locator, angle):
             self._locator = locator
             self._show = False
-            self._above = None
-            self._below = None
+            self._location = None
+            self._near = None
+            self._far = None
             self._style = {}
             self.labels = Axis.TickLabelsHelper(angle)
             self.tick = Axis.PerTickHelper(toyplot.require.style.line)
@@ -302,26 +303,34 @@ class Axis(object):
             self._show = value
 
         @property
-        def above(self):
-            return self._above
+        def location(self):
+            return self._location
 
-        @above.setter
-        def above(self, value):
-            if value is None:
-                self._above = None
-            else:
-                self._above = toyplot.units.convert(value, target="px", default="px")
+        @location.setter
+        def location(self, value):
+            self._location = toyplot.require.value_in(value, [None, "above", "below"])
 
         @property
-        def below(self):
-            return self._below
+        def near(self):
+            return self._near
 
-        @below.setter
-        def below(self, value):
+        @near.setter
+        def near(self, value):
             if value is None:
-                self._below = None
+                self._near = None
             else:
-                self._below = toyplot.units.convert(value, target="px", default="px")
+                self._near = toyplot.units.convert(value, target="px", default="px")
+
+        @property
+        def far(self):
+            return self._far
+
+        @far.setter
+        def far(self, value):
+            if value is None:
+                self._far = None
+            else:
+                self._far = toyplot.units.convert(value, target="px", default="px")
 
         @property
         def style(self):
@@ -367,6 +376,7 @@ class Axis(object):
 
         @location.setter
         def location(self, value):
+            toyplot.log.warn("<axis>.ticks.labels.location is deprecated, use <axis>.ticks.location instead.")
             self._location = toyplot.require.value_in(value, [None, "above", "below"])
 
         @property
@@ -485,7 +495,7 @@ class Axis(object):
                 return toyplot.locator.Log(base=base)
         raise RuntimeError("Unable to create an appropriate locator.") # pragma: no cover
 
-    def _finalize(self, x1, x2, y1, y2, offset, domain_min, domain_max, tick_locations, tick_labels, tick_titles, ticks_above, ticks_below, tick_labels_location, label_baseline_shift):
+    def _finalize(self, x1, x2, y1, y2, offset, domain_min, domain_max, tick_locations, tick_labels, tick_titles, default_tick_location, default_ticks_near, default_ticks_far, label_baseline_shift):
         self._x1 = x1
         self._x2 = x2
         self._y1 = y1
@@ -496,9 +506,10 @@ class Axis(object):
         self._tick_locations = tick_locations
         self._tick_labels = tick_labels
         self._tick_titles = tick_titles
-        self._ticks_above = ticks_above
-        self._ticks_below = ticks_below
-        self._tick_labels_location = tick_labels_location
+        self._tick_location = self.ticks.location if self.ticks.location is not None else default_tick_location
+        self._ticks_near = self.ticks.near if self.ticks.near is not None else default_ticks_near
+        self._ticks_far = self.ticks.far if self.ticks.far is not None else default_ticks_far
+        self._tick_labels_location = self.ticks.labels.location if self.ticks.labels.location is not None else self._tick_location
         self._label_baseline_shift = label_baseline_shift
 
         endpoints = numpy.row_stack(((x1, y1), (x2, y2)))
@@ -812,45 +823,45 @@ class Cartesian(object):
         if self.x.spine.position == "low":
             x_offset = self.padding
             x_spine_y = self._ymax_range
-            x_ticks_above = 5
-            x_ticks_below = 0
-            x_ticks_labels_location = "below"
+            x_ticks_near = 0
+            x_ticks_far = 5
+            x_tick_location = "below"
             x_label_baseline_shift = "-200%"
         elif self.x.spine.position == "high":
             x_offset = -self.padding
             x_spine_y = self._ymin_range
-            x_ticks_above = 0
-            x_ticks_below = 5
-            x_ticks_labels_location = "above"
+            x_ticks_near = 5
+            x_ticks_far = 0
+            x_tick_location = "above"
             x_label_baseline_shift = "200%"
         else:
             x_offset = 0
             x_spine_y = self._y_projection(self.x.spine.position)
-            x_ticks_above = 3
-            x_ticks_below = 3
-            x_ticks_labels_location = "below"
+            x_ticks_near = 3
+            x_ticks_far = 3
+            x_tick_location = "below"
             x_label_baseline_shift = "-200%"
 
         if self.y.spine._position == "low":
             y_offset = -self.padding
             y_spine_x = self._xmin_range
-            y_ticks_above = 0
-            y_ticks_below = 5
-            y_ticks_labels_location = "above"
+            y_ticks_near = 0
+            y_ticks_far = 5
+            y_tick_location = "above"
             y_label_baseline_shift = "200%"
         elif self.y.spine._position == "high":
             y_offset = self.padding
             y_spine_x = self._xmax_range
-            y_ticks_above = 5
-            y_ticks_below = 0
-            y_ticks_labels_location = "below"
+            y_ticks_near = 0
+            y_ticks_far = 5
+            y_tick_location = "below"
             y_label_baseline_shift = "-200%"
         else:
             y_offset = 0
             y_spine_x = self._x_projection(self.y.spine._position)
-            y_ticks_above = 3
-            y_ticks_below = 3
-            y_ticks_labels_location = "below"
+            y_ticks_near = 3
+            y_ticks_far = 3
+            y_tick_location = "below"
             y_label_baseline_shift = "200%"
 
         # Finalize the axes.
@@ -865,9 +876,9 @@ class Cartesian(object):
             tick_locations=xtick_locations,
             tick_labels=xtick_labels,
             tick_titles=xtick_titles,
-            ticks_above=x_ticks_above,
-            ticks_below=x_ticks_below,
-            tick_labels_location=x_ticks_labels_location,
+            default_tick_location=x_tick_location,
+            default_ticks_far=x_ticks_far,
+            default_ticks_near=x_ticks_near,
             label_baseline_shift=x_label_baseline_shift,
             )
         self.y._finalize(
@@ -881,9 +892,9 @@ class Cartesian(object):
             tick_locations=ytick_locations,
             tick_labels=ytick_labels,
             tick_titles=ytick_titles,
-            ticks_above=y_ticks_above,
-            ticks_below=y_ticks_below,
-            tick_labels_location=y_ticks_labels_location,
+            default_tick_location=y_tick_location,
+            default_ticks_far=y_ticks_far,
+            default_ticks_near=y_ticks_near,
             label_baseline_shift=y_label_baseline_shift,
             )
 
@@ -2519,9 +2530,9 @@ class Numberline(object):
             tick_locations=tick_locations,
             tick_labels=tick_labels,
             tick_titles=tick_titles,
-            ticks_above=3,
-            ticks_below=3,
-            tick_labels_location="below",
+            default_tick_location="below",
+            default_ticks_near=3,
+            default_ticks_far=3,
             label_baseline_shift="-200%",
             )
 

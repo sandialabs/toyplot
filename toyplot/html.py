@@ -1212,9 +1212,9 @@ def _render(canvas, axis, context):
                 style=_css_style(
                     axis.spine._style))
 
-            if axis.ticks._show:
-                y1 = -axis._ticks_above if axis.ticks.above is None else -axis.ticks.above
-                y2 = axis._ticks_below if axis.ticks.below is None else axis.ticks.below
+            if axis.ticks.show:
+                y1 = axis._ticks_near if axis._tick_location == "below" else -axis._ticks_near
+                y2 = -axis._ticks_far if axis._tick_location == "below" else axis._ticks_far
 
                 ticks_group = xml.SubElement(axis_xml, "g")
                 for location, tick_style in zip(
@@ -1234,10 +1234,7 @@ def _render(canvas, axis, context):
                             tick_style))
 
         if axis.ticks.labels.show:
-
             location = axis._tick_labels_location
-            if axis.ticks.labels.location is not None:
-                location = axis.ticks.labels.location
 
             offset = 6
             if axis.ticks.labels.offset is not None:

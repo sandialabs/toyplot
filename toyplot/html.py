@@ -122,6 +122,17 @@ _show_axis_mouse_coordinates = string.Template("""
         return left <= x && x <= right;
     }
 
+    function inside(range, projection)
+    {
+        for(var i = 0; i != projection.length; ++i)
+        {
+            var segment = projection[i];
+            if(_in_range(segment.range.min, range, segment.range.max))
+                return true;
+        }
+        return false;
+    }
+
     function to_domain(range, projection)
     {
         for(var i = 0; i != projection.length; ++i)
@@ -159,15 +170,22 @@ _show_axis_mouse_coordinates = string.Template("""
 
         for(var axis_id in axes)
         {
-            var axis = document.querySelector("#" + axis_id);
-            var range = current.matrixTransform(axis.getScreenCTM().inverse());
             var projection = axes[axis_id];
-            var domain = to_domain(range.x, projection);
+            var axis = document.querySelector("#" + axis_id);
             var coordinates = axis.querySelector(".toyplot-mouse-coordinates");
-            coordinates.style.visibility = "visible";
-            coordinates.setAttribute("transform", "translate(" + range.x + ")");
-            var text = coordinates.querySelector("text");
-            text.textContent = domain.toFixed(2);
+            var local = current.matrixTransform(axis.getScreenCTM().inverse());
+            if(inside(local.x, projection))
+            {
+                var domain = to_domain(local.x, projection);
+                coordinates.style.visibility = "visible";
+                coordinates.setAttribute("transform", "translate(" + local.x + ")");
+                var text = coordinates.querySelector("text");
+                text.textContent = domain.toFixed(2);
+            }
+            else
+            {
+                coordinates.style.visibility= "hidden";
+            }
         }
     }
 

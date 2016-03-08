@@ -1164,7 +1164,7 @@ _draw_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<":
     "^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
 
-def _rotated_frame(x1, y1, x2, y2, offset):
+def _axis_transform(x1, y1, x2, y2, offset):
     p = numpy.row_stack(((x1, y1), (x2, y2)))
     basis = p[1] - p[0]
     theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
@@ -1317,7 +1317,7 @@ def _render(numberline, colormap, context):
     width = numberline._width[colormap]
     style = numberline._style[colormap]
 
-    transform = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
+    transform = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
 
     mark_xml = xml.SubElement(
         context.root,
@@ -1363,7 +1363,7 @@ def _render(numberline, colormap, context):
     width = numberline._width[colormap]
     style = numberline._style[colormap]
 
-    transform = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
+    transform = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
     colormap_range_min, colormap_range_max = numberline.axis.projection([colormap.domain.min, colormap.domain.max])
 
     mark_xml = xml.SubElement(
@@ -1422,7 +1422,7 @@ def _render(numberline, colormap, context):
 
 @dispatch(toyplot.axes.Numberline, toyplot.mark.Scatterplot, _RenderContext)
 def _render(numberline, mark, context):
-    transform = _rotated_frame(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -numberline._offset[mark])
+    transform = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -numberline._offset[mark])
     mark_xml = xml.SubElement(
         context.root,
         "g",

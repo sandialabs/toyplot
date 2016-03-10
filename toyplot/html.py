@@ -193,7 +193,7 @@ _show_axis_mouse_coordinates = string.Template("""
     var axes = $visible_axes;
 
     var svg = document.querySelector("#" + root_id + " svg");
-    svg.addEventListener("mousemove", display_coordinates);
+    svg.addEventListener("click", display_coordinates);
     svg.addEventListener("mouseout", hide_coordinates);
 })();
 """)

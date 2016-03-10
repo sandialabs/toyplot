@@ -157,7 +157,7 @@ _show_axis_mouse_coordinates = string.Template("""
 
     function hide_coordinates(e)
     {
-        var coordinates = svg.querySelectorAll(".toyplot-mouse-coordinates");
+        var coordinates = svg.querySelectorAll(".toyplot-axes-Axis-coordinates");
         for(var i = 0; i != coordinates.length; ++i)
             coordinates[i].style.visibility = "hidden";
     }
@@ -172,7 +172,7 @@ _show_axis_mouse_coordinates = string.Template("""
         {
             var projection = axes[axis_id];
             var axis = document.querySelector("#" + axis_id);
-            var coordinates = axis.querySelector(".toyplot-mouse-coordinates");
+            var coordinates = axis.querySelector(".toyplot-axes-Axis-coordinates");
             var local = current.matrixTransform(axis.getScreenCTM().inverse());
             if(inside(local.x, projection))
             {
@@ -460,18 +460,33 @@ def render(canvas, fobj=None, animation=False):
     """
     canvas.autorender(False)
 
+    # Create the top-level HTML element.
+    root = xml.Element(
+        "div",
+        align="center",
+        attrib={
+            "class": "toyplot-canvas-Canvas",
+            },
+        id="t" +
+        uuid.uuid4().hex)
+
     # Create the SVG representation.
     context = _RenderContext()
     svg = xml.Element(
         "svg",
         xmlns="http://www.w3.org/2000/svg",
-        attrib={"xmlns:toyplot": "http://www.sandia.gov/toyplot"},
+        attrib={
+            "xmlns:toyplot": "http://www.sandia.gov/toyplot",
+            },
         width="%rpx" % canvas.width,
         height="%rpx" % canvas.height,
         viewBox="0 0 %r %r" % (canvas.width, canvas.height),
         preserveAspectRatio="xMidYMid meet",
         style=_css_style(canvas._style),
         id=context.get_id(canvas))
+    root.append(svg)
+
+    # Render canvas children.
     for child in canvas._children:
         _render(canvas, child, context.copy(root=svg))
 
@@ -487,15 +502,6 @@ def render(canvas, fobj=None, animation=False):
                 svg_animation[time][type].append(
                     [context.get_id(change[0])] + list(change[1:]))
 
-    # Create the top-level HTML element.
-    root = xml.Element(
-        "div",
-        align="center",
-        attrib={
-            "class": "toyplot"},
-        id="t" +
-        uuid.uuid4().hex)
-    root.append(svg)
 
     # Add HTML controls.
     controls = xml.SubElement(
@@ -1222,7 +1228,7 @@ def _render(canvas, axis, context):
         if axis.coordinates.show:
             coordinates_xml = xml.SubElement(
                 axis_xml, "g",
-                attrib={"class": "toyplot-mouse-coordinates"},
+                attrib={"class": "toyplot-axes-Axis-coordinates"},
                 style=_css_style({"visibility": "hidden"}),
                 transform="",
                 )

@@ -170,21 +170,24 @@ _show_axis_mouse_coordinates = string.Template("""
 
         for(var axis_id in axes)
         {
-            var projection = axes[axis_id];
             var axis = document.querySelector("#" + axis_id);
             var coordinates = axis.querySelector(".toyplot-axes-Axis-coordinates");
-            var local = current.matrixTransform(axis.getScreenCTM().inverse());
-            if(inside(local.x, projection))
+            if(coordinates)
             {
-                var domain = to_domain(local.x, projection);
-                coordinates.style.visibility = "visible";
-                coordinates.setAttribute("transform", "translate(" + local.x + ")");
-                var text = coordinates.querySelector("text");
-                text.textContent = domain.toFixed(2);
-            }
-            else
-            {
-                coordinates.style.visibility= "hidden";
+                var projection = axes[axis_id];
+                var local = current.matrixTransform(axis.getScreenCTM().inverse());
+                if(inside(local.x, projection))
+                {
+                    var domain = to_domain(local.x, projection);
+                    coordinates.style.visibility = "visible";
+                    coordinates.setAttribute("transform", "translate(" + local.x + ")");
+                    var text = coordinates.querySelector("text");
+                    text.textContent = domain.toFixed(2);
+                }
+                else
+                {
+                    coordinates.style.visibility= "hidden";
+                }
             }
         }
     }
@@ -194,7 +197,7 @@ _show_axis_mouse_coordinates = string.Template("""
 
     var svg = document.querySelector("#" + root_id + " svg");
     svg.addEventListener("click", display_coordinates);
-    svg.addEventListener("mouseout", hide_coordinates);
+    //svg.addEventListener("mouseout", hide_coordinates);
 })();
 """)
 
@@ -1225,7 +1228,7 @@ def _render(canvas, axis, context):
             style=toyplot.style.combine({"baseline-shift": axis._label_baseline_shift}, axis.label.style),
             )
 
-        if axis.coordinates.show:
+        if axis.interactive.coordinates.show:
             coordinates_xml = xml.SubElement(
                 axis_xml, "g",
                 attrib={"class": "toyplot-axes-Axis-coordinates"},

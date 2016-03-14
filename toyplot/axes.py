@@ -121,7 +121,7 @@ class _ordered_set(collections.MutableSet):
 class Axis(object):
     """One dimensional axis that can be used to create coordinate systems.
     """
-    class MouseCoordinatesHelper(object):
+    class InteractiveCoordinatesHelper(object):
         def __init__(self, show=True):
             self._show = show
 
@@ -132,6 +132,14 @@ class Axis(object):
         @show.setter
         def show(self, value):
             self._show = value
+
+    class InteractiveHelper(object):
+        def __init__(self):
+            self._coordinates = toyplot.axes.Axis.InteractiveCoordinatesHelper()
+
+        @property
+        def coordinates(self):
+            return self._coordinates
 
     class DomainHelper(object):
 
@@ -432,7 +440,7 @@ class Axis(object):
         self._display_min = None
         self._display_max = None
 
-        self.coordinates = Axis.MouseCoordinatesHelper(show=True)
+        self.interactive = Axis.InteractiveHelper()
         self.domain = Axis.DomainHelper(domain_min, domain_max)
         self.label = Axis.LabelHelper(label, style={})
         self.spine = Axis.SpineHelper()

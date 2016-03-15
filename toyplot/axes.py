@@ -115,34 +115,137 @@ class _ordered_set(collections.MutableSet):
         return set(self) == set(other)
 
 
+class _LineStylePropertyMixin(object):
+    """Provide a style property for text objects."""
+    def __init__(self):
+        self._style = {}
+
+    @property
+    def style(self):
+        return self._style
+
+    @style.setter
+    def style(self, value):
+        self._style = toyplot.style.combine(
+            self._style,
+            toyplot.require.style(value, allowed=toyplot.require.style.line),
+            )
+
+
+class _LocationPropertyMixin(object):
+    """Provide a location property for objects that can positined above / below an axis."""
+    def __init__(self):
+        self._location = None
+
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, value):
+        self._location = toyplot.require.value_in(value, [None, "above", "below"])
+
+
+class _NearFarPropertyMixin(object):
+    """Provide near and far properties for objects (like ticks) that can be sized relative to an axis location."""
+    def __init__(self):
+        self._near = None
+        self._far = None
+
+    @property
+    def near(self):
+        return self._near
+
+    @near.setter
+    def near(self, value):
+        if value is None:
+            self._near = None
+        else:
+            self._near = toyplot.units.convert(value, target="px", default="px")
+
+    @property
+    def far(self):
+        return self._far
+
+    @far.setter
+    def far(self, value):
+        if value is None:
+            self._far = None
+        else:
+            self._far = toyplot.units.convert(value, target="px", default="px")
+
+
+class _OffsetPropertyMixin(object):
+    """Provide an offset property for objects that can be positioned relative to an axis."""
+    def __init__(self):
+        self._offset = None
+
+    @property
+    def offset(self):
+        return self._offset
+
+    @offset.setter
+    def offset(self, value):
+        if value is None:
+            self._offset = value
+        else:
+            self._offset = toyplot.units.convert(value, target="px", default="px")
+
+
+class _ShowPropertyMixin(object):
+    """Provide a show property for objects that can be hidden / shown."""
+    def __init__(self):
+        self._show = None
+
+    @property
+    def show(self):
+        return self._show
+
+    @show.setter
+    def show(self, value):
+        if not isinstance(value, bool):
+            raise ValueError("A boolean value is required.")
+        self._show = value
+
+
+class _TextPropertyMixin(object):
+    """Provide a text property."""
+    def __init__(self):
+        self._text = None
+
+    @property
+    def text(self):
+        return self._text
+
+    @text.setter
+    def text(self, value):
+        self._text = value
+
+
+class _TextStylePropertyMixin(object):
+    """Provide a style property for text objects."""
+    def __init__(self):
+        self._style = {}
+
+    @property
+    def style(self):
+        return self._style
+
+    @style.setter
+    def style(self, value):
+        self._style = toyplot.style.combine(
+            self._style,
+            toyplot.require.style(value, allowed=toyplot.require.style.text),
+            )
+
+
 ##########################################################################
 # Axis
 
-class Axis(object):
+class Axis(_ShowPropertyMixin):
     """One dimensional axis that can be used to create coordinate systems.
     """
-    class InteractiveCoordinatesHelper(object):
-        def __init__(self, show=True):
-            self._show = show
-
-        @property
-        def show(self):
-            return self._show
-
-        @show.setter
-        def show(self, value):
-            self._show = value
-
-    class InteractiveHelper(object):
-        def __init__(self):
-            self._coordinates = toyplot.axes.Axis.InteractiveCoordinatesHelper()
-
-        @property
-        def coordinates(self):
-            return self._coordinates
-
     class DomainHelper(object):
-
         def __init__(self, min, max):
             self._min = min
             self._max = max
@@ -163,13 +266,27 @@ class Axis(object):
         def max(self, value):
             self._max = value
 
-    class LabelHelper(object):
+    class InteractiveCoordinatesHelper(_ShowPropertyMixin):
+        def __init__(self):
+            _ShowPropertyMixin.__init__(self)
+            self.show = True
 
-        def __init__(self, label, style):
-            self._text = label
-            self._offset = 0
+    class InteractiveHelper(object):
+        def __init__(self):
+            self._coordinates = toyplot.axes.Axis.InteractiveCoordinatesHelper()
 
-            self._style = {}
+        @property
+        def coordinates(self):
+            return self._coordinates
+
+    class LabelHelper(_TextPropertyMixin, _TextStylePropertyMixin, _OffsetPropertyMixin):
+        def __init__(self, text, style):
+            _TextPropertyMixin.__init__(self)
+            _TextStylePropertyMixin.__init__(self)
+            _OffsetPropertyMixin.__init__(self)
+
+            self.text = text
+
             self.style = {
                 "alignment-baseline": "middle",
                 "font-size": "12px",
@@ -179,48 +296,17 @@ class Axis(object):
                 }
             self.style = style
 
-        @property
-        def text(self):
-            return self._text
+            self.offset = 0
 
-        @text.setter
-        def text(self, value):
-            self._text = value
 
-        @property
-        def offset(self):
-            return self._offset
-
-        @offset.setter
-        def offset(self, value):
-            self._offset = toyplot.units.convert(
-                value, target="px", default="px")
-
-        @property
-        def style(self):
-            return self._style
-
-        @style.setter
-        def style(self, value):
-            self._style = toyplot.style.combine(
-                self._style,
-                toyplot.require.style(value, allowed=toyplot.require.style.text),
-                )
-
-    class SpineHelper(object):
-
+    class SpineHelper(_ShowPropertyMixin, _LineStylePropertyMixin):
         def __init__(self):
-            self._show = True
+            _ShowPropertyMixin.__init__(self)
+            _LineStylePropertyMixin.__init__(self)
+
+            self.show = True
+
             self._position = "low"
-            self._style = {}
-
-        @property
-        def show(self):
-            return self._show
-
-        @show.setter
-        def show(self, value):
-            self._show = value
 
         @property
         def position(self):
@@ -230,16 +316,6 @@ class Axis(object):
         def position(self, value):
             self._position = value
 
-        @property
-        def style(self):
-            return self._style
-
-        @style.setter
-        def style(self, value):
-            self._style = toyplot.style.combine(
-                self._style,
-                toyplot.require.style(value, allowed=toyplot.require.style.line),
-                )
 
     class PerTickHelper(object):
 
@@ -282,15 +358,16 @@ class Axis(object):
                 results[numpy.argmin(deltas)] = self._values[value].get("style", None)
             return results
 
-    class TicksHelper(object):
-
+    class TicksHelper(_ShowPropertyMixin, _LineStylePropertyMixin, _LocationPropertyMixin, _NearFarPropertyMixin):
         def __init__(self, locator, angle):
+            _ShowPropertyMixin.__init__(self)
+            _LineStylePropertyMixin.__init__(self)
+            _LocationPropertyMixin.__init__(self)
+            _NearFarPropertyMixin.__init__(self)
+
+            self.show = False
+
             self._locator = locator
-            self._show = False
-            self._location = None
-            self._near = None
-            self._far = None
-            self._style = {}
             self.labels = Axis.TickLabelsHelper(angle)
             self.tick = Axis.PerTickHelper(toyplot.require.style.line)
 
@@ -302,81 +379,25 @@ class Axis(object):
         def locator(self, value):
             self._locator = value
 
-        @property
-        def show(self):
-            return self._show
 
-        @show.setter
-        def show(self, value):
-            self._show = value
-
-        @property
-        def location(self):
-            return self._location
-
-        @location.setter
-        def location(self, value):
-            self._location = toyplot.require.value_in(value, [None, "above", "below"])
-
-        @property
-        def near(self):
-            return self._near
-
-        @near.setter
-        def near(self, value):
-            if value is None:
-                self._near = None
-            else:
-                self._near = toyplot.units.convert(value, target="px", default="px")
-
-        @property
-        def far(self):
-            return self._far
-
-        @far.setter
-        def far(self, value):
-            if value is None:
-                self._far = None
-            else:
-                self._far = toyplot.units.convert(value, target="px", default="px")
-
-        @property
-        def style(self):
-            return self._style
-
-        @style.setter
-        def style(self, value):
-            self._style = toyplot.style.combine(
-                self._style,
-                toyplot.require.style(value, allowed=toyplot.require.style.line),
-                )
-
-    class TickLabelsHelper(object):
-
+    class TickLabelsHelper(_ShowPropertyMixin, _TextStylePropertyMixin, _OffsetPropertyMixin):
         def __init__(self, angle):
-            self._show = True
+            _ShowPropertyMixin.__init__(self)
+            _TextStylePropertyMixin.__init__(self)
+            _OffsetPropertyMixin.__init__(self)
 
-            self._location = None
+            self.show = True
 
-            self._offset = None
-
-            self._angle = angle
-
-            self._style = {}
             self.style = {
                 "font-size": "10px",
                 "font-weight": "normal",
                 "stroke": "none",
                 }
+
+            self._location = None
+            self._angle = angle
+
             self.label = Axis.PerTickHelper(toyplot.require.style.text)
-
-        @property
-        def show(self):
-            return self._show
-
-        @show.setter
-        def show(self, value):
-            self._show = value
 
         @property
         def location(self):
@@ -388,19 +409,6 @@ class Axis(object):
             self._location = toyplot.require.value_in(value, [None, "above", "below"])
 
         @property
-        def offset(self):
-            return self._offset
-
-        @offset.setter
-        def offset(self, value):
-            if value is None:
-                self._offset = value
-                return
-
-            self._offset = toyplot.units.convert(
-                value, target="px", default="px")
-
-        @property
         def angle(self):
             return self._angle
 
@@ -408,16 +416,6 @@ class Axis(object):
         def angle(self, value):
             self._angle = value
 
-        @property
-        def style(self):
-            return self._style
-
-        @style.setter
-        def style(self, value):
-            self._style = toyplot.style.combine(
-                self._style,
-                toyplot.require.style(value, allowed=toyplot.require.style.text),
-                )
 
     def __init__(
             self,
@@ -429,8 +427,9 @@ class Axis(object):
             tick_angle=0,
             tick_locator=None,
         ):
+        _ShowPropertyMixin.__init__(self)
+        self.show = show
         self.scale = scale # This calls the property setter
-        self._show = show
         self._tick_labels = []
         self._tick_locations = []
         self._tick_titles = []
@@ -445,14 +444,6 @@ class Axis(object):
         self.label = Axis.LabelHelper(label, style={})
         self.spine = Axis.SpineHelper()
         self.ticks = Axis.TicksHelper(tick_locator, tick_angle)
-
-    @property
-    def show(self):
-        return self._show
-
-    @show.setter
-    def show(self, value):
-        self._show = value
 
     @property
     def scale(self):
@@ -602,7 +593,7 @@ class Cartesian(object):
         self._show = show
 
         self.label = Axis.LabelHelper(
-            label=label,
+            text=label,
             style={"font-size": "14px", "baseline-shift": "100%"},
             )
 
@@ -2552,12 +2543,13 @@ class Numberline(object):
 class Table(object):
     """Experimental table coordinate system.
     """
-    class Label(object):
+    class Label(_TextPropertyMixin, _TextStylePropertyMixin):
+        def __init__(self, text, style):
+            _TextPropertyMixin.__init__(self)
+            _TextStylePropertyMixin.__init__(self)
 
-        def __init__(self, label, style):
-            self._text = label
+            self.text = text
 
-            self._style = {}
             self.style = {
                 "font-weight": "bold",
                 "stroke": "none",
@@ -2566,27 +2558,8 @@ class Table(object):
                 }
             self.style = style
 
-        @property
-        def text(self):
-            return self._text
-
-        @text.setter
-        def text(self, value):
-            self._text = value
-
-        @property
-        def style(self):
-            return self._style
-
-        @style.setter
-        def style(self, value):
-            self._style = toyplot.style.combine(
-                self._style,
-                toyplot.require.style(value, toyplot.require.style.text),
-                )
 
     class Cell(object):
-
         def __init__(self, row=None, column=None, align=None, style=None):
             self._row = row
             self._column = column
@@ -2638,7 +2611,6 @@ class Table(object):
         default_format = toyplot.format.DefaultFormatter()
 
     class CellReference(object):
-
         def __init__(self, table, cells):
             self._table = table
             self._cells = cells

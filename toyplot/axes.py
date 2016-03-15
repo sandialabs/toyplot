@@ -115,13 +115,27 @@ class _ordered_set(collections.MutableSet):
         return set(self) == set(other)
 
 
-class _LineStylePropertyMixin(object):
-    """Provide a style property for text objects."""
+class LineStyleProperty(object):
+    """Provide a style property for ticks, spines, and other linear objects."""
     def __init__(self):
         self._style = {}
 
     @property
     def style(self):
+        """Dictionary of CSS property-value pairs.
+
+        Use the *style* property to control the appearance of a line.  The
+        following CSS properties are allowed:
+
+        * opacity
+        * stroke
+        * stroke-dasharray
+        * stroke-opacity
+        * stroke-width
+
+        Note that when assigning to the *style* property, the properties you
+        supply are merged with the existing properties.
+        """
         return self._style
 
     @style.setter
@@ -132,13 +146,16 @@ class _LineStylePropertyMixin(object):
             )
 
 
-class _LocationPropertyMixin(object):
-    """Provide a location property for objects that can positined above / below an axis."""
+class LocationProperty(object):
+    """Provide a location property for objects that can positined above or below an axis."""
     def __init__(self):
         self._location = None
 
     @property
     def location(self):
+        """Specifies the position of an object relative to an axis.  Allowed
+        values are "above", "below", or *None*.
+        """
         return self._location
 
     @location.setter
@@ -146,14 +163,17 @@ class _LocationPropertyMixin(object):
         self._location = toyplot.require.value_in(value, [None, "above", "below"])
 
 
-class _NearFarPropertyMixin(object):
-    """Provide near and far properties for objects (like ticks) that can be sized relative to an axis location."""
+class NearFarProperty(object):
+    """Provide near and far properties for endpoints relative to an axis."""
     def __init__(self):
         self._near = None
         self._far = None
 
     @property
     def near(self):
+        """Specifies the distance of an endpoint from an axis, in the direction
+        towards the object's *location*.
+        """
         return self._near
 
     @near.setter
@@ -165,6 +185,9 @@ class _NearFarPropertyMixin(object):
 
     @property
     def far(self):
+        """Specifies the distance of an endpoint from an axis, in the direction
+        away from the object's *location*.
+        """
         return self._far
 
     @far.setter
@@ -175,13 +198,17 @@ class _NearFarPropertyMixin(object):
             self._far = toyplot.units.convert(value, target="px", default="px")
 
 
-class _OffsetPropertyMixin(object):
+class OffsetProperty(object):
     """Provide an offset property for objects that can be positioned relative to an axis."""
     def __init__(self):
         self._offset = None
 
     @property
     def offset(self):
+        """Specifies the distance of an object from an axis, in a direction
+        based on the object's location.  In other words, increasing values of
+        *offset* move an object further away from the axis, whether the object
+        location is "above" or "below"."""
         return self._offset
 
     @offset.setter
@@ -192,7 +219,7 @@ class _OffsetPropertyMixin(object):
             self._offset = toyplot.units.convert(value, target="px", default="px")
 
 
-class _ShowPropertyMixin(object):
+class ShowProperty(object):
     """Provide a show property for objects that can be hidden / shown."""
     def __init__(self):
         self._show = None
@@ -208,7 +235,7 @@ class _ShowPropertyMixin(object):
         self._show = value
 
 
-class _TextPropertyMixin(object):
+class TextProperty(object):
     """Provide a text property."""
     def __init__(self):
         self._text = None
@@ -222,13 +249,34 @@ class _TextPropertyMixin(object):
         self._text = value
 
 
-class _TextStylePropertyMixin(object):
+class TextStyleProperty(object):
     """Provide a style property for text objects."""
     def __init__(self):
         self._style = {}
 
     @property
     def style(self):
+        """Dictionary of CSS property-value pairs.
+
+        Use the *style* property to control the appearance of text.  The
+        following CSS properties are allowed:
+
+        * alignment-baseline
+        * baseline-shift
+        * fill
+        * fill-opacity
+        * font-size
+        * font-weight
+        * opacity
+        * stroke
+        * stroke-opacity
+        * stroke-width
+        * text-anchor
+        * -toyplot-anchor-shift
+
+        Note that when assigning to the *style* property, the properties you
+        supply are merged with the existing properties.
+        """
         return self._style
 
     @style.setter
@@ -242,7 +290,7 @@ class _TextStylePropertyMixin(object):
 ##########################################################################
 # Axis
 
-class Axis(_ShowPropertyMixin):
+class Axis(ShowProperty):
     """One dimensional axis that can be used to create coordinate systems.
     """
     class DomainHelper(object):
@@ -266,9 +314,9 @@ class Axis(_ShowPropertyMixin):
         def max(self, value):
             self._max = value
 
-    class InteractiveCoordinatesHelper(_ShowPropertyMixin):
+    class InteractiveCoordinatesHelper(ShowProperty):
         def __init__(self):
-            _ShowPropertyMixin.__init__(self)
+            ShowProperty.__init__(self)
             self.show = True
 
     class InteractiveHelper(object):
@@ -279,11 +327,11 @@ class Axis(_ShowPropertyMixin):
         def coordinates(self):
             return self._coordinates
 
-    class LabelHelper(_TextPropertyMixin, _TextStylePropertyMixin, _OffsetPropertyMixin):
+    class LabelHelper(TextProperty, TextStyleProperty, OffsetProperty):
         def __init__(self, text, style):
-            _TextPropertyMixin.__init__(self)
-            _TextStylePropertyMixin.__init__(self)
-            _OffsetPropertyMixin.__init__(self)
+            TextProperty.__init__(self)
+            TextStyleProperty.__init__(self)
+            OffsetProperty.__init__(self)
 
             self.text = text
 
@@ -299,10 +347,10 @@ class Axis(_ShowPropertyMixin):
             self.offset = 0
 
 
-    class SpineHelper(_ShowPropertyMixin, _LineStylePropertyMixin):
+    class SpineHelper(ShowProperty, LineStyleProperty):
         def __init__(self):
-            _ShowPropertyMixin.__init__(self)
-            _LineStylePropertyMixin.__init__(self)
+            ShowProperty.__init__(self)
+            LineStyleProperty.__init__(self)
 
             self.show = True
 
@@ -358,12 +406,12 @@ class Axis(_ShowPropertyMixin):
                 results[numpy.argmin(deltas)] = self._values[value].get("style", None)
             return results
 
-    class TicksHelper(_ShowPropertyMixin, _LineStylePropertyMixin, _LocationPropertyMixin, _NearFarPropertyMixin):
+    class TicksHelper(ShowProperty, LineStyleProperty, LocationProperty, NearFarProperty):
         def __init__(self, locator, angle):
-            _ShowPropertyMixin.__init__(self)
-            _LineStylePropertyMixin.__init__(self)
-            _LocationPropertyMixin.__init__(self)
-            _NearFarPropertyMixin.__init__(self)
+            ShowProperty.__init__(self)
+            LineStyleProperty.__init__(self)
+            LocationProperty.__init__(self)
+            NearFarProperty.__init__(self)
 
             self.show = False
 
@@ -380,11 +428,11 @@ class Axis(_ShowPropertyMixin):
             self._locator = value
 
 
-    class TickLabelsHelper(_ShowPropertyMixin, _TextStylePropertyMixin, _OffsetPropertyMixin):
+    class TickLabelsHelper(ShowProperty, TextStyleProperty, OffsetProperty):
         def __init__(self, angle):
-            _ShowPropertyMixin.__init__(self)
-            _TextStylePropertyMixin.__init__(self)
-            _OffsetPropertyMixin.__init__(self)
+            ShowProperty.__init__(self)
+            TextStyleProperty.__init__(self)
+            OffsetProperty.__init__(self)
 
             self.show = True
 
@@ -427,7 +475,7 @@ class Axis(_ShowPropertyMixin):
             tick_angle=0,
             tick_locator=None,
         ):
-        _ShowPropertyMixin.__init__(self)
+        ShowProperty.__init__(self)
         self.show = show
         self.scale = scale # This calls the property setter
         self._tick_labels = []
@@ -2543,10 +2591,10 @@ class Numberline(object):
 class Table(object):
     """Experimental table coordinate system.
     """
-    class Label(_TextPropertyMixin, _TextStylePropertyMixin):
+    class Label(TextProperty, TextStyleProperty):
         def __init__(self, text, style):
-            _TextPropertyMixin.__init__(self)
-            _TextStylePropertyMixin.__init__(self)
+            TextProperty.__init__(self)
+            TextStyleProperty.__init__(self)
 
             self.text = text
 

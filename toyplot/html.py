@@ -468,7 +468,7 @@ def render(canvas, fobj=None, animation=False):
         "div",
         align="center",
         attrib={
-            "class": "toyplot-canvas-Canvas",
+            "class": "toyplot",
             },
         id="t" +
         uuid.uuid4().hex)
@@ -479,6 +479,7 @@ def render(canvas, fobj=None, animation=False):
         "svg",
         xmlns="http://www.w3.org/2000/svg",
         attrib={
+            "class": "toyplot-canvas-Canvas",
             "xmlns:toyplot": "http://www.sandia.gov/toyplot",
             },
         width="%rpx" % canvas.width,

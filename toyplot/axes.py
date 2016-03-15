@@ -146,21 +146,17 @@ class LineStyleProperty(object):
             )
 
 
-class LocationProperty(object):
-    """Provide a location property for objects that can positined above or below an axis."""
-    def __init__(self):
-        self._location = None
-
-    @property
-    def location(self):
-        """Specifies the position of an object relative to an axis.  Allowed
-        values are "above", "below", or *None*.
+def LocationProperty():
+    def getter(self):
+        """Specifies position relative to the axis.  Allowed values are
+        "above", "below", or *None*.
         """
         return self._location
 
-    @location.setter
-    def location(self, value):
+    def setter(self, value):
         self._location = toyplot.require.value_in(value, [None, "above", "below"])
+
+    return property(getter, setter)
 
 
 class NearFarProperty(object):
@@ -406,12 +402,13 @@ class Axis(ShowProperty):
                 results[numpy.argmin(deltas)] = self._values[value].get("style", None)
             return results
 
-    class TicksHelper(ShowProperty, LineStyleProperty, LocationProperty, NearFarProperty):
+    class TicksHelper(ShowProperty, LineStyleProperty, NearFarProperty):
         def __init__(self, locator, angle):
             ShowProperty.__init__(self)
             LineStyleProperty.__init__(self)
-            LocationProperty.__init__(self)
             NearFarProperty.__init__(self)
+
+            self._location = None
 
             self.show = False
 
@@ -426,6 +423,13 @@ class Axis(ShowProperty):
         @locator.setter
         def locator(self, value):
             self._locator = value
+
+        location = LocationProperty()
+        """Controls the position of ticks (and labels) relative to the axis.
+
+        Allowed values are "above" (force labels to appear above the axis), "below"
+        (the opposite), or `None` (use default, context-sensitive behavior).
+        """
 
 
     class TickLabelsHelper(ShowProperty, TextStyleProperty, OffsetProperty):

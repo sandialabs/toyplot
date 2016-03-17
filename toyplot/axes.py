@@ -115,6 +115,9 @@ class _ordered_set(collections.MutableSet):
         return set(self) == set(other)
 
 
+def _opposite_location(location):
+    return "above" if location == "below" else "below"
+
 def _create_far_property():
     def getter(self):
         """Specifies the distance from the axis, in the opposite direction as `location`.
@@ -268,6 +271,7 @@ class Axis(object):
     """One dimensional axis that can be used to create coordinate systems.
     """
     class DomainHelper(object):
+        """Controls domain related behavior for this axis."""
         def __init__(self, min, max):
             self._min = min
             self._max = max
@@ -298,14 +302,22 @@ class Axis(object):
     class InteractiveCoordinatesHelper(object):
         """Controls the appearance and behavior of interactive coordinates."""
         def __init__(self):
+            self._location = None
             self._show = True
 
+        location = _create_location_property()
+        """Controls the position of interactive coordinates relative to the axis.
+
+        Allowed values are "above" (force coordinates to appear above the axis), "below"
+        (the opposite), or `None` (the default - display interactive coordinates opposite
+        tick labels).
+        """
         show = _create_show_property()
         """Set `False` to disable showing interactive coordinates for this axis."""
 
 
     class InteractiveHelper(object):
-        """Used to control interactive behavior for this axis."""
+        """Controls interactive behavior for this axis."""
         def __init__(self):
             self._coordinates = toyplot.axes.Axis.InteractiveCoordinatesHelper()
 
@@ -589,6 +601,7 @@ class Axis(object):
         self._ticks_near = self.ticks.near if self.ticks.near is not None else default_ticks_near
         self._ticks_far = self.ticks.far if self.ticks.far is not None else default_ticks_far
         self._tick_labels_location = self.ticks.labels.location if self.ticks.labels.location is not None else self._tick_location
+        self._interactive_coordinates_location = self.interactive.coordinates.location if self.interactive.coordinates.location is not None else _opposite_location(self._tick_labels_location)
         self._label_baseline_shift = label_baseline_shift
 
         endpoints = numpy.row_stack(((x1, y1), (x2, y2)))

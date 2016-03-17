@@ -1237,8 +1237,8 @@ def _render(canvas, axis, context):
                 transform="",
                 )
 
-            y1 = 10 if axis._tick_location == "below" else -10
-            y2 = -10 if axis._tick_location == "below" else 10
+            y1 = 10 if axis._interactive_coordinates_location == "below" else -10
+            y2 = -10 if axis._interactive_coordinates_location == "below" else 10
             marker_xml = xml.SubElement(
                 coordinates_xml, "line",
                 x1="0",
@@ -1247,8 +1247,8 @@ def _render(canvas, axis, context):
                 y2=repr(y2),
                 )
 
-            y = 20 if axis._tick_location == "below" else -20
-            alignment_baseline = "hanging" if axis._tick_location == "below" else "alphabetic"
+            y = 20 if axis._interactive_coordinates_location == "below" else -20
+            alignment_baseline = "hanging" if axis._interactive_coordinates_location == "below" else "alphabetic"
             text_xml = xml.SubElement(
                 coordinates_xml, "text",
                 x="0",

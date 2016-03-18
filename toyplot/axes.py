@@ -299,11 +299,45 @@ class Axis(object):
             self._max = value
 
 
+    class InteractiveCoordinatesLabelHelper(object):
+        def __init__(self):
+            self._show = True
+            self._style = {
+                "fill": "slategray",
+                "font-size": "10px",
+                "font-weight": "normal",
+                "stroke": "none",
+                "text-anchor": "middle",
+                }
+
+        show = _create_show_property()
+        style = _create_text_style_property()
+
+
+    class InteractiveCoordinatesTickHelper(object):
+        def __init__(self):
+            self._show = True
+            self._style = {
+                "stroke":"slategray",
+                "stroke-width": 1.0,
+                }
+
+        show = _create_show_property()
+        style = _create_line_style_property()
+
+
     class InteractiveCoordinatesHelper(object):
         """Controls the appearance and behavior of interactive coordinates."""
         def __init__(self):
+            self._label = toyplot.axes.Axis.InteractiveCoordinatesLabelHelper()
             self._location = None
             self._show = True
+            self._tick = toyplot.axes.Axis.InteractiveCoordinatesTickHelper()
+
+        @property
+        def label(self):
+            """:class:`toyplot.axes.Axis.InteractiveCoordinatesLabelHelper` instance."""
+            return self._label
 
         location = _create_location_property()
         """Controls the position of interactive coordinates relative to the axis.
@@ -314,6 +348,11 @@ class Axis(object):
         """
         show = _create_show_property()
         """Set `False` to disable showing interactive coordinates for this axis."""
+
+        @property
+        def tick(self):
+            """:class:`toyplot.axes.Axis.InteractiveCoordinatesTickHelper` instance."""
+            return self._tick
 
 
     class InteractiveHelper(object):
@@ -601,6 +640,7 @@ class Axis(object):
         self._ticks_near = self.ticks.near if self.ticks.near is not None else default_ticks_near
         self._ticks_far = self.ticks.far if self.ticks.far is not None else default_ticks_far
         self._tick_labels_location = self.ticks.labels.location if self.ticks.labels.location is not None else self._tick_location
+        self._tick_labels_offset = self.ticks.labels.offset if self.ticks.labels.offset is not None else 6
         self._interactive_coordinates_location = self.interactive.coordinates.location if self.interactive.coordinates.location is not None else _opposite_location(self._tick_labels_location)
         self._label_baseline_shift = label_baseline_shift
 

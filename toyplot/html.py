@@ -1176,10 +1176,6 @@ def _render(canvas, axis, context):
         if axis.ticks.labels.show:
             location = axis._tick_labels_location
 
-            offset = 6
-            if axis.ticks.labels.offset is not None:
-                offset = axis.ticks.labels.offset
-
             if axis.ticks.labels.angle:
                 alignment_baseline = "central"
 
@@ -1191,7 +1187,7 @@ def _render(canvas, axis, context):
                 alignment_baseline = "alphabetic" if location == "above" else "hanging"
                 text_anchor = "middle"
 
-            y = offset if location == "below" else -offset
+            y = axis._tick_labels_offset if location == "below" else -axis._tick_labels_offset
 
             ticks_group = xml.SubElement(axis_xml, "g")
             for location, label, title, label_style in zip(
@@ -1237,24 +1233,32 @@ def _render(canvas, axis, context):
                 transform="",
                 )
 
-            y1 = 10 if axis._interactive_coordinates_location == "below" else -10
-            y2 = -10 if axis._interactive_coordinates_location == "below" else 10
-            marker_xml = xml.SubElement(
-                coordinates_xml, "line",
-                x1="0",
-                x2="0",
-                y1=repr(y1),
-                y2=repr(y2),
-                )
+            if axis.interactive.coordinates.tick.show:
+                y1 = axis._tick_labels_offset if axis._interactive_coordinates_location == "below" else -axis._tick_labels_offset
+                y1 *= 0.5
+                y2 = -axis._tick_labels_offset if axis._interactive_coordinates_location == "below" else axis._tick_labels_offset
+                y2 *= 0.75
+                marker_xml = xml.SubElement(
+                    coordinates_xml, "line",
+                    x1="0",
+                    x2="0",
+                    y1=repr(y1),
+                    y2=repr(y2),
+                    style=_css_style(axis.interactive.coordinates.tick.style),
+                    )
 
-            y = 20 if axis._interactive_coordinates_location == "below" else -20
-            alignment_baseline = "hanging" if axis._interactive_coordinates_location == "below" else "alphabetic"
-            text_xml = xml.SubElement(
-                coordinates_xml, "text",
-                x="0",
-                y=repr(y),
-                style=_css_style({"alignment-baseline":alignment_baseline, "font-weight":"normal", "stroke":"none", "text-anchor":"middle"}),
-                )
+            if axis.interactive.coordinates.label.show:
+                y = axis._tick_labels_offset if axis._interactive_coordinates_location == "below" else -axis._tick_labels_offset
+                alignment_baseline = "hanging" if axis._interactive_coordinates_location == "below" else "alphabetic"
+                text_xml = xml.SubElement(
+                    coordinates_xml, "text",
+                    x="0",
+                    y=repr(y),
+                    style=_css_style(toyplot.style.combine(
+                        {"alignment-baseline": alignment_baseline},
+                        axis.interactive.coordinates.label.style,
+                        )),
+                    )
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Numberline, _RenderContext)

@@ -264,6 +264,13 @@ def _create_text_style_property():
     return property(getter, setter)
 
 
+def _create_projection(scale, domain_min, domain_max, range_min, range_max):
+    if scale == "linear":
+        return toyplot.projection.linear(domain_min, domain_max, range_min, range_max)
+    scale, base = scale
+    return toyplot.projection.log(base, domain_min, domain_max, range_min, range_max)
+
+
 ##########################################################################
 # Axis
 
@@ -646,20 +653,13 @@ class Axis(object):
 
         endpoints = numpy.row_stack(((x1, y1), (x2, y2)))
         length = numpy.linalg.norm(endpoints[1] - endpoints[0])
-        self.projection = create_projection(
+        self.projection = _create_projection(
             scale=self.scale,
             domain_min=domain_min,
             domain_max=domain_max,
             range_min=0.0,
             range_max=length,
             )
-
-
-def create_projection(scale, domain_min, domain_max, range_min, range_max):
-    if scale == "linear":
-        return toyplot.projection.linear(domain_min, domain_max, range_min, range_max)
-    scale, base = scale
-    return toyplot.projection.log(base, domain_min, domain_max, range_min, range_max)
 
 
 ##########################################################################
@@ -849,14 +849,14 @@ class Cartesian(object):
 
         # Optionally expand the domain in range-space (used to make room for text).
         if self._expand_domain_range_x is not None:
-            x_projection = create_projection(
+            x_projection = _create_projection(
                 self.x.scale,
                 domain_min=xdomain_min,
                 domain_max=xdomain_max,
                 range_min=self._xmin_range,
                 range_max=self._xmax_range,
                 )
-            y_projection = create_projection(
+            y_projection = _create_projection(
                 self.y.scale,
                 domain_min=ydomain_min,
                 domain_max=ydomain_max,
@@ -936,14 +936,14 @@ class Cartesian(object):
             ydomain_max = numpy.amax((ydomain_max, ytick_locations[-1]))
 
         # Create projections for each axis.
-        self._x_projection = create_projection(
+        self._x_projection = _create_projection(
             scale=self.x.scale,
             domain_min=xdomain_min,
             domain_max=xdomain_max,
             range_min=self._xmin_range,
             range_max=self._xmax_range,
             )
-        self._y_projection = create_projection(
+        self._y_projection = _create_projection(
             scale=self.y.scale,
             domain_min=ydomain_min,
             domain_max=ydomain_max,

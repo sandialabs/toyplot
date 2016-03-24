@@ -397,6 +397,9 @@ class _RenderContext(object):
     def root(self):
         return self._root
 
+    @property
+    def visible_axes(self):
+        return self._visible_axes
 
 def apply_changes(html, changes):
     for change_type, instructions in changes.items():
@@ -473,32 +476,13 @@ def render(canvas, fobj=None, animation=False):
     root = xml.Element(
         "div",
         align="center",
-        attrib={
-            "class": "toyplot",
-            },
-        id="t" +
-        uuid.uuid4().hex)
+        attrib={"class": "toyplot"},
+        id="t" + uuid.uuid4().hex,
+        )
 
-    # Create the SVG representation.
+    # Render the canvas.
     context = _RenderContext()
-    svg = xml.Element(
-        "svg",
-        xmlns="http://www.w3.org/2000/svg",
-        attrib={
-            "class": "toyplot-canvas-Canvas",
-            "xmlns:toyplot": "http://www.sandia.gov/toyplot",
-            },
-        width="%rpx" % canvas.width,
-        height="%rpx" % canvas.height,
-        viewBox="0 0 %r %r" % (canvas.width, canvas.height),
-        preserveAspectRatio="xMidYMid meet",
-        style=_css_style(canvas._style),
-        id=context.get_id(canvas))
-    root.append(svg)
-
-    # Render canvas children.
-    for child in canvas._children:
-        _render(canvas, child, context.copy(root=svg))
+    _render(canvas, context.copy(root=root))
 
     # Collect animation data.
     svg_animation = collections.defaultdict(
@@ -512,201 +496,10 @@ def render(canvas, fobj=None, animation=False):
                 svg_animation[time][type].append(
                     [context.get_id(change[0])] + list(change[1:]))
 
+    # Render interactive functionality.
+    _render_interactive(canvas, svg_animation, context.copy(root=root))
 
-    # Add HTML controls.
-    controls = xml.SubElement(
-        root,
-        "div",
-        attrib={"class": "toyplot-controls"},
-        )
-    mark_popup = xml.SubElement(
-        controls,
-        "ul",
-        attrib={"class": "toyplot-mark-popup"},
-        onmouseleave="this.style.visibility='hidden'",
-        style=_css_style({
-            "background": "rgba(0%,0%,0%,0.75)",
-            "border": "0",
-            "border-radius": "6px",
-            "color": "white",
-            "cursor": "default",
-            "list-style": "none",
-            "margin": "0",
-            "padding": "5px",
-            "position": "fixed",
-            "visibility": "hidden",
-        }))
-    xml.SubElement(
-        mark_popup,
-        "li",
-        attrib={
-            "class": "toyplot-mark-popup-title"},
-        style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;")
-    xml.SubElement(
-        mark_popup,
-        "li",
-        attrib={
-            "class": "toyplot-mark-popup-save-csv"},
-        style="border-radius:3px;padding:5px;list-style:none;margin:0;",
-        onmouseover="this.style.color='steelblue';this.style.background='white'",
-        onmouseout="this.style.color='white';this.style.background='steelblue'").text = "Save as .csv"
-
-    # Allow users to export embedded table data.
-    if context._data_tables:
-        data_tables = list()
-        for data_table in context._data_tables:
-            mark = data_table["mark"]
-            title = data_table["title"]
-            table = data_table["table"]
-            filename = data_table["filename"] if data_table["filename"] else "toyplot"
-
-            names = []
-            data = []
-            for name, column in table.items():
-                if "toyplot:exportable" in table.metadata(
-                        name) and table.metadata(name)["toyplot:exportable"]:
-                    if column.dtype == toyplot.color.dtype:
-                        raise ValueError("Color column table export isn't supported.") # pragma: no cover
-#                        for suffix, channel in zip(
-#                                [":red", ":green", ":blue", ":alpha"], ["r", "g", "b", "a"]):
-#                            names.append(name + suffix)
-#                            data.append(column[channel].tolist())
-                    else:
-                        names.append(name)
-                        data.append(column.tolist())
-            if names:
-                data_tables.append(
-                    {"id": context.get_id(mark), "filename": filename, "title": title, "names": names, "data": data})
-
-        xml.SubElement(controls, "script").text = _export_data_tables.substitute(root_id=root.get("id"), data_tables=json.dumps(data_tables))
-
-    # Provide interactive mouse coordinates.
-    if context._visible_axes:
-        visible_axes = dict()
-        for axis in context._visible_axes:
-            key = context.get_id(axis)
-            visible_axes[key] = list()
-            for segment in axis.projection._segments:
-                visible_axes[key].append(
-                {
-                    "scale": segment.scale,
-                    "domain":
-                    {
-                        "min": segment.domain.min,
-                        "max": segment.domain.max,
-                        "bounds":
-                        {
-                            "min": segment.domain.bounds.min,
-                            "max": segment.domain.bounds.max,
-                        },
-                    },
-                    "range":
-                    {
-                        "min": segment.range.min,
-                        "max": segment.range.max,
-                        "bounds":
-                        {
-                            "min": segment.range.bounds.min,
-                            "max": segment.range.bounds.max,
-                        },
-                    },
-                })
-
-        xml.SubElement(controls, "script").text = _show_axis_mouse_coordinates.substitute(
-            root_id=root.get("id"),
-            visible_axes=json.dumps(visible_axes, cls=_NumpyJSONEncoder, sort_keys=True),
-            )
-
-    # Provide VCR controls.
-    if len(svg_animation) > 1:
-        times = numpy.array(sorted(svg_animation.keys()))
-        durations = times[1:] - times[:-1]
-        changes = [change for time, change in sorted(svg_animation.items())]
-
-        vcr_controls = xml.SubElement(
-            controls, "div", attrib={"class": "toyplot-vcr-controls"})
-        xml.SubElement(
-            vcr_controls,
-            "input",
-            title="Frame",
-            type="range",
-            min="0",
-            max=str(
-                len(times) -
-                2),
-            step="1",
-            value="0",
-            id="%s-current-frame" %
-            root.get("id"))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Rewind",
-            style="width:40px;height:24px",
-            id="%s-rewind" % root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><polygon points="10,5 0,10 10,15" stroke="none" fill="{near_black}"/><polygon points="20,5 10,10 20,15" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Reverse Play",
-            style="width:40px;height:24px",
-            id="%s-reverse-play" % root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Frame Rewind",
-            style="width:40px;height:24px",
-            id="%s-frame-rewind" % root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/><rect x="17" y="5" width="2" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Stop",
-            style="width:40px;height:24px",
-            id="%s-stop" % root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><rect x="5" y="5" width="10" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Frame Advance",
-            style="width:40px;height:24px",
-            id="%s-frame-advance" % root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/><rect x="1" y="5" width="2" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Play",
-            style="width:40px;height:24px",
-            id="%s-forward-play" % root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Fast Forward",
-            style="width:40px;height:24px",
-            id="%s-fast-forward" % root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><polygon points="0,5 10,10 0,15" stroke="none" fill="{near_black}"/><polygon points="10,5 20,10 10,15" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
-
-        xml.SubElement(controls, "script").text = _animation_controls.substitute(
-            root_id=root.get("id"),
-            frame_durations=json.dumps(durations.tolist()),
-            state_changes=json.dumps(changes, cls=_NumpyJSONEncoder))
-
+    # Return / write the results.
     if isinstance(fobj, toyplot.compatibility.string_type):
         with open(fobj, "wb") as file:
             file.write(xml.tostring(root, method="html"))
@@ -1116,6 +909,222 @@ def _axis_transform(x1, y1, x2, y2, offset):
     theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
     transform="translate(%s,%s) rotate(%s) translate(0,%s)" % (p[0][0], p[0][1], theta, offset)
     return transform
+
+
+@dispatch(toyplot.canvas.Canvas, _RenderContext)
+def _render(canvas, context):
+    svg = xml.SubElement(
+        context.root,
+        "svg",
+        xmlns="http://www.w3.org/2000/svg",
+        attrib={
+            "class": "toyplot-canvas-Canvas",
+            "xmlns:toyplot": "http://www.sandia.gov/toyplot",
+            },
+        width="%rpx" % canvas.width,
+        height="%rpx" % canvas.height,
+        viewBox="0 0 %r %r" % (canvas.width, canvas.height),
+        preserveAspectRatio="xMidYMid meet",
+        style=_css_style(canvas._style),
+        id=context.get_id(canvas))
+
+    for child in canvas._children:
+        _render(canvas, child, context.copy(root=svg))
+
+
+def _render_interactive(canvas, svg_animation, context):
+    controls = xml.SubElement(
+        context.root,
+        "div",
+        attrib={"class": "toyplot-controls"},
+        )
+    mark_popup = xml.SubElement(
+        controls,
+        "ul",
+        attrib={"class": "toyplot-mark-popup"},
+        onmouseleave="this.style.visibility='hidden'",
+        style=_css_style({
+            "background": "rgba(0%,0%,0%,0.75)",
+            "border": "0",
+            "border-radius": "6px",
+            "color": "white",
+            "cursor": "default",
+            "list-style": "none",
+            "margin": "0",
+            "padding": "5px",
+            "position": "fixed",
+            "visibility": "hidden",
+        }))
+    xml.SubElement(
+        mark_popup,
+        "li",
+        attrib={
+            "class": "toyplot-mark-popup-title"},
+        style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;")
+    xml.SubElement(
+        mark_popup,
+        "li",
+        attrib={
+            "class": "toyplot-mark-popup-save-csv"},
+        style="border-radius:3px;padding:5px;list-style:none;margin:0;",
+        onmouseover="this.style.color='steelblue';this.style.background='white'",
+        onmouseout="this.style.color='white';this.style.background='steelblue'").text = "Save as .csv"
+
+    # Allow users to export embedded table data.
+    if context._data_tables:
+        data_tables = list()
+        for data_table in context._data_tables:
+            mark = data_table["mark"]
+            title = data_table["title"]
+            table = data_table["table"]
+            filename = data_table["filename"] if data_table["filename"] else "toyplot"
+
+            names = []
+            data = []
+            for name, column in table.items():
+                if "toyplot:exportable" in table.metadata(
+                        name) and table.metadata(name)["toyplot:exportable"]:
+                    if column.dtype == toyplot.color.dtype:
+                        raise ValueError("Color column table export isn't supported.") # pragma: no cover
+#                        for suffix, channel in zip(
+#                                [":red", ":green", ":blue", ":alpha"], ["r", "g", "b", "a"]):
+#                            names.append(name + suffix)
+#                            data.append(column[channel].tolist())
+                    else:
+                        names.append(name)
+                        data.append(column.tolist())
+            if names:
+                data_tables.append(
+                    {"id": context.get_id(mark), "filename": filename, "title": title, "names": names, "data": data})
+
+        xml.SubElement(controls, "script").text = _export_data_tables.substitute(root_id=context.root.get("id"), data_tables=json.dumps(data_tables))
+
+    # Provide interactive mouse coordinates.
+    if context.visible_axes:
+        visible_axes = dict()
+        for axis in context.visible_axes:
+            key = context.get_id(axis)
+            visible_axes[key] = list()
+            for segment in axis.projection._segments:
+                visible_axes[key].append(
+                {
+                    "scale": segment.scale,
+                    "domain":
+                    {
+                        "min": segment.domain.min,
+                        "max": segment.domain.max,
+                        "bounds":
+                        {
+                            "min": segment.domain.bounds.min,
+                            "max": segment.domain.bounds.max,
+                        },
+                    },
+                    "range":
+                    {
+                        "min": segment.range.min,
+                        "max": segment.range.max,
+                        "bounds":
+                        {
+                            "min": segment.range.bounds.min,
+                            "max": segment.range.bounds.max,
+                        },
+                    },
+                })
+
+        xml.SubElement(controls, "script").text = _show_axis_mouse_coordinates.substitute(
+            root_id=context.root.get("id"),
+            visible_axes=json.dumps(visible_axes, cls=_NumpyJSONEncoder, sort_keys=True),
+            )
+
+    # Provide VCR controls.
+    if len(svg_animation) > 1:
+        times = numpy.array(sorted(svg_animation.keys()))
+        durations = times[1:] - times[:-1]
+        changes = [change for time, change in sorted(svg_animation.items())]
+
+        vcr_controls = xml.SubElement(
+            controls, "div", attrib={"class": "toyplot-vcr-controls"})
+        xml.SubElement(
+            vcr_controls,
+            "input",
+            title="Frame",
+            type="range",
+            min="0",
+            max=str(
+                len(times) -
+                2),
+            step="1",
+            value="0",
+            id="%s-current-frame" %
+            context.root.get("id"))
+        xml.SubElement(
+            vcr_controls,
+            "button",
+            title="Rewind",
+            style="width:40px;height:24px",
+            id="%s-rewind" % context.root.get("id")).append(
+                xml.XML(
+                    """<svg width="20" height="20"><polygon points="10,5 0,10 10,15" stroke="none" fill="{near_black}"/><polygon points="20,5 10,10 20,15" stroke="none" fill="{near_black}"/></svg>""".format(
+                        near_black=toyplot.color.near_black)))
+        xml.SubElement(
+            vcr_controls,
+            "button",
+            title="Reverse Play",
+            style="width:40px;height:24px",
+            id="%s-reverse-play" % context.root.get("id")).append(
+                xml.XML(
+                    """<svg width="20" height="20"><polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/></svg>""".format(
+                        near_black=toyplot.color.near_black)))
+        xml.SubElement(
+            vcr_controls,
+            "button",
+            title="Frame Rewind",
+            style="width:40px;height:24px",
+            id="%s-frame-rewind" % context.root.get("id")).append(
+                xml.XML(
+                    """<svg width="20" height="20"><polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/><rect x="17" y="5" width="2" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
+                        near_black=toyplot.color.near_black)))
+        xml.SubElement(
+            vcr_controls,
+            "button",
+            title="Stop",
+            style="width:40px;height:24px",
+            id="%s-stop" % context.root.get("id")).append(
+                xml.XML(
+                    """<svg width="20" height="20"><rect x="5" y="5" width="10" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
+                        near_black=toyplot.color.near_black)))
+        xml.SubElement(
+            vcr_controls,
+            "button",
+            title="Frame Advance",
+            style="width:40px;height:24px",
+            id="%s-frame-advance" % context.root.get("id")).append(
+                xml.XML(
+                    """<svg width="20" height="20"><polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/><rect x="1" y="5" width="2" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
+                        near_black=toyplot.color.near_black)))
+        xml.SubElement(
+            vcr_controls,
+            "button",
+            title="Play",
+            style="width:40px;height:24px",
+            id="%s-forward-play" % context.root.get("id")).append(
+                xml.XML(
+                    """<svg width="20" height="20"><polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/></svg>""".format(
+                        near_black=toyplot.color.near_black)))
+        xml.SubElement(
+            vcr_controls,
+            "button",
+            title="Fast Forward",
+            style="width:40px;height:24px",
+            id="%s-fast-forward" % context.root.get("id")).append(
+                xml.XML(
+                    """<svg width="20" height="20"><polygon points="0,5 10,10 0,15" stroke="none" fill="{near_black}"/><polygon points="10,5 20,10 10,15" stroke="none" fill="{near_black}"/></svg>""".format(
+                        near_black=toyplot.color.near_black)))
+
+        xml.SubElement(controls, "script").text = _animation_controls.substitute(
+            root_id=context.root.get("id"),
+            frame_durations=json.dumps(durations.tolist()),
+            state_changes=json.dumps(changes, cls=_NumpyJSONEncoder))
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Axis, _RenderContext)

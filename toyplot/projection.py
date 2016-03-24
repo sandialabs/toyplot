@@ -181,7 +181,34 @@ def log(
     projection : :class:`toyplot.projection.Piecewise`
     """
 
-    # Negative domain
+    # Domain is all positive.
+    if 0 < domain_min:
+        return Piecewise([
+            Piecewise.Segment(
+                "linear",
+                -numpy.inf,
+                domain_min - (domain_max - domain_min),
+                domain_min,
+                domain_min,
+                -numpy.inf,
+                range_min - (range_max - range_min),
+                range_min,
+                range_min,
+                ),
+            Piecewise.Segment(
+                ("log", base),
+                domain_min,
+                domain_min,
+                domain_max,
+                numpy.inf,
+                range_min,
+                range_min,
+                range_max,
+                numpy.inf,
+                ),
+            ])
+
+    # Domain is all negative.
     if domain_max < 0:
         return Piecewise([
             Piecewise.Segment(
@@ -189,26 +216,21 @@ def log(
                 -numpy.inf,
                 domain_min,
                 domain_max,
-                numpy.inf,
-                -numpy.inf,
-                range_min,
-                range_max,
-                numpy.inf,
-                ),
-            ])
-
-    # Positive domain
-    if 0 < domain_min:
-        return Piecewise([
-            Piecewise.Segment(
-                ("log", base),
-                -numpy.inf,
-                domain_min,
                 domain_max,
-                numpy.inf,
                 -numpy.inf,
                 range_min,
                 range_max,
+                range_max,
+                ),
+            Piecewise.Segment(
+                "linear",
+                domain_max,
+                domain_max,
+                domain_max + (domain_max - domain_min),
+                numpy.inf,
+                range_max,
+                range_max,
+                range_max + (range_max - range_min),
                 numpy.inf,
                 ),
             ])

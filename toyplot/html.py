@@ -358,18 +358,14 @@ _animation_controls = string.Template("""
 
 class _RenderContext(object):
     def __init__(self):
-        self.root = None
+        self._root = None
         self._id_cache = dict()
         self._data_tables = list()
-        self._cartesian_axes = dict()
         self._visible_axes = set()
-        self.rendered = set()
+        self._rendered = set()
 
     def add_visible_axis(self, axis):
         self._visible_axes.add(axis)
-
-    def add_cartesian_axes(self, axes):
-        self._cartesian_axes[self.get_id(axes)] = axes
 
     def add_data_table(self, mark, table, title, filename):
         self._data_tables.append({
@@ -379,17 +375,27 @@ class _RenderContext(object):
             "filename": filename,
             })
 
+    def add_rendered(self, renderable):
+        self._rendered.add(renderable)
+
     def get_id(self, obj):
         python_id = id(obj)
         if python_id not in self._id_cache:
             self._id_cache[python_id] = "t" + uuid.uuid4().hex
         return self._id_cache[python_id]
 
-    def copy(self, **kwargs):
+    def copy(self, root):
         result = copy.copy(self)
-        for name in kwargs:
-            setattr(result, name, kwargs[name])
+        result._root = root
         return result
+
+    @property
+    def rendered(self):
+        return self._rendered
+
+    @property
+    def root(self):
+        return self._root
 
 
 def apply_changes(html, changes):
@@ -1116,7 +1122,7 @@ def _axis_transform(x1, y1, x2, y2, offset):
 def _render(canvas, axis, context):
     if axis in context.rendered:
         return
-    context.rendered.add(axis)
+    context.add_rendered(axis)
 
     if axis.show:
         p = numpy.row_stack(((axis._x1, axis._y1), (axis._x2, axis._y2)))

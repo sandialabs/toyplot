@@ -357,8 +357,9 @@ _animation_controls = string.Template("""
 
 
 class _RenderContext(object):
-    def __init__(self):
-        self._root = None
+    def __init__(self, root):
+        self._root = root
+        self._parent = None
         self._id_cache = dict()
         self._data_tables = list()
         self._visible_axes = set()
@@ -384,10 +385,14 @@ class _RenderContext(object):
             self._id_cache[python_id] = "t" + uuid.uuid4().hex
         return self._id_cache[python_id]
 
-    def copy(self, root):
+    def copy(self, parent):
         result = copy.copy(self)
-        result._root = root
+        result._parent = parent
         return result
+
+    @property
+    def parent(self):
+        return self._parent
 
     @property
     def rendered(self):
@@ -473,7 +478,7 @@ def render(canvas, fobj=None, animation=False):
     canvas.autorender(False)
 
     # Create the top-level HTML element.
-    root = xml.Element(
+    root_xml = xml.Element(
         "div",
         align="center",
         attrib={"class": "toyplot"},
@@ -481,8 +486,8 @@ def render(canvas, fobj=None, animation=False):
         )
 
     # Render the canvas.
-    context = _RenderContext()
-    _render(canvas, context.copy(root=root))
+    context = _RenderContext(root=root_xml)
+    _render(canvas, context.copy(parent=root_xml))
 
     # Collect animation data.
     svg_animation = collections.defaultdict(
@@ -497,18 +502,18 @@ def render(canvas, fobj=None, animation=False):
                     [context.get_id(change[0])] + list(change[1:]))
 
     # Render interactive functionality.
-    _render_interactive(canvas, svg_animation, context.copy(root=root))
+    _render_interactive(canvas, svg_animation, context.copy(parent=root_xml))
 
     # Return / write the results.
     if isinstance(fobj, toyplot.compatibility.string_type):
         with open(fobj, "wb") as file:
-            file.write(xml.tostring(root, method="html"))
+            file.write(xml.tostring(root_xml, method="html"))
     elif fobj is not None:
-        fobj.write(xml.tostring(root, method="html"))
+        fobj.write(xml.tostring(root_xml, method="html"))
     else:
         if animation:
-            return root, svg_animation
-        return root
+            return root_xml, svg_animation
+        return root_xml
 
 
 def _color_fixup(styles):
@@ -914,7 +919,7 @@ def _axis_transform(x1, y1, x2, y2, offset):
 @dispatch(toyplot.canvas.Canvas, _RenderContext)
 def _render(canvas, context):
     svg = xml.SubElement(
-        context.root,
+        context.parent,
         "svg",
         xmlns="http://www.w3.org/2000/svg",
         attrib={
@@ -929,17 +934,27 @@ def _render(canvas, context):
         id=context.get_id(canvas))
 
     for child in canvas._children:
-        _render(canvas, child, context.copy(root=svg))
+        _render(canvas, child, context.copy(parent=svg))
 
 
 def _render_interactive(canvas, svg_animation, context):
-    controls = xml.SubElement(
-        context.root,
+    interactive_xml = xml.SubElement(
+        context.parent,
         "div",
-        attrib={"class": "toyplot-controls"},
+        attrib={"class": "toyplot-interactive"},
         )
-    mark_popup = xml.SubElement(
-        controls,
+
+    _render_data_table_export(context.copy(parent=interactive_xml))
+    _render_interactive_mouse_coordinates(context.copy(parent=interactive_xml))
+    _render_vcr_controls(svg_animation, context.copy(parent=interactive_xml))
+
+def _render_data_table_export(context):
+    # Allow users to export embedded table data.
+    if not context._data_tables:
+        return
+
+    menu_xml = xml.SubElement(
+        context.parent,
         "ul",
         attrib={"class": "toyplot-mark-popup"},
         onmouseleave="this.style.visibility='hidden'",
@@ -956,50 +971,48 @@ def _render_interactive(canvas, svg_animation, context):
             "visibility": "hidden",
         }))
     xml.SubElement(
-        mark_popup,
+        menu_xml,
         "li",
-        attrib={
-            "class": "toyplot-mark-popup-title"},
-        style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;")
+        attrib={"class": "toyplot-mark-popup-title"},
+        style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;",
+        )
     xml.SubElement(
-        mark_popup,
+        menu_xml,
         "li",
-        attrib={
-            "class": "toyplot-mark-popup-save-csv"},
+        attrib={"class": "toyplot-mark-popup-save-csv"},
         style="border-radius:3px;padding:5px;list-style:none;margin:0;",
         onmouseover="this.style.color='steelblue';this.style.background='white'",
         onmouseout="this.style.color='white';this.style.background='steelblue'").text = "Save as .csv"
 
-    # Allow users to export embedded table data.
-    if context._data_tables:
-        data_tables = list()
-        for data_table in context._data_tables:
-            mark = data_table["mark"]
-            title = data_table["title"]
-            table = data_table["table"]
-            filename = data_table["filename"] if data_table["filename"] else "toyplot"
+    data_tables = list()
+    for data_table in context._data_tables:
+        mark = data_table["mark"]
+        title = data_table["title"]
+        table = data_table["table"]
+        filename = data_table["filename"] if data_table["filename"] else "toyplot"
 
-            names = []
-            data = []
-            for name, column in table.items():
-                if "toyplot:exportable" in table.metadata(
-                        name) and table.metadata(name)["toyplot:exportable"]:
-                    if column.dtype == toyplot.color.dtype:
-                        raise ValueError("Color column table export isn't supported.") # pragma: no cover
+        names = []
+        data = []
+        for name, column in table.items():
+            if "toyplot:exportable" in table.metadata(
+                    name) and table.metadata(name)["toyplot:exportable"]:
+                if column.dtype == toyplot.color.dtype:
+                    raise ValueError("Color column table export isn't supported.") # pragma: no cover
 #                        for suffix, channel in zip(
 #                                [":red", ":green", ":blue", ":alpha"], ["r", "g", "b", "a"]):
 #                            names.append(name + suffix)
 #                            data.append(column[channel].tolist())
-                    else:
-                        names.append(name)
-                        data.append(column.tolist())
-            if names:
-                data_tables.append(
-                    {"id": context.get_id(mark), "filename": filename, "title": title, "names": names, "data": data})
+                else:
+                    names.append(name)
+                    data.append(column.tolist())
+        if names:
+            data_tables.append(
+                {"id": context.get_id(mark), "filename": filename, "title": title, "names": names, "data": data})
 
-        xml.SubElement(controls, "script").text = _export_data_tables.substitute(root_id=context.root.get("id"), data_tables=json.dumps(data_tables))
+    xml.SubElement(context.parent, "script").text = _export_data_tables.substitute(root_id=context.root.get("id"), data_tables=json.dumps(data_tables))
 
-    # Provide interactive mouse coordinates.
+
+def _render_interactive_mouse_coordinates(context):
     if context.visible_axes:
         visible_axes = dict()
         for axis in context.visible_axes:
@@ -1031,100 +1044,103 @@ def _render_interactive(canvas, svg_animation, context):
                     },
                 })
 
-        xml.SubElement(controls, "script").text = _show_axis_mouse_coordinates.substitute(
+        xml.SubElement(context.parent, "script").text = _show_axis_mouse_coordinates.substitute(
             root_id=context.root.get("id"),
             visible_axes=json.dumps(visible_axes, cls=_NumpyJSONEncoder, sort_keys=True),
             )
 
-    # Provide VCR controls.
-    if len(svg_animation) > 1:
-        times = numpy.array(sorted(svg_animation.keys()))
-        durations = times[1:] - times[:-1]
-        changes = [change for time, change in sorted(svg_animation.items())]
 
-        vcr_controls = xml.SubElement(
-            controls, "div", attrib={"class": "toyplot-vcr-controls"})
-        xml.SubElement(
-            vcr_controls,
-            "input",
-            title="Frame",
-            type="range",
-            min="0",
-            max=str(
-                len(times) -
-                2),
-            step="1",
-            value="0",
-            id="%s-current-frame" %
-            context.root.get("id"))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Rewind",
-            style="width:40px;height:24px",
-            id="%s-rewind" % context.root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><polygon points="10,5 0,10 10,15" stroke="none" fill="{near_black}"/><polygon points="20,5 10,10 20,15" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Reverse Play",
-            style="width:40px;height:24px",
-            id="%s-reverse-play" % context.root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Frame Rewind",
-            style="width:40px;height:24px",
-            id="%s-frame-rewind" % context.root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/><rect x="17" y="5" width="2" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Stop",
-            style="width:40px;height:24px",
-            id="%s-stop" % context.root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><rect x="5" y="5" width="10" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Frame Advance",
-            style="width:40px;height:24px",
-            id="%s-frame-advance" % context.root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/><rect x="1" y="5" width="2" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Play",
-            style="width:40px;height:24px",
-            id="%s-forward-play" % context.root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
-        xml.SubElement(
-            vcr_controls,
-            "button",
-            title="Fast Forward",
-            style="width:40px;height:24px",
-            id="%s-fast-forward" % context.root.get("id")).append(
-                xml.XML(
-                    """<svg width="20" height="20"><polygon points="0,5 10,10 0,15" stroke="none" fill="{near_black}"/><polygon points="10,5 20,10 10,15" stroke="none" fill="{near_black}"/></svg>""".format(
-                        near_black=toyplot.color.near_black)))
+def _render_vcr_controls(svg_animation, context):
+    if len(svg_animation) < 2:
+        return
 
-        xml.SubElement(controls, "script").text = _animation_controls.substitute(
-            root_id=context.root.get("id"),
-            frame_durations=json.dumps(durations.tolist()),
-            state_changes=json.dumps(changes, cls=_NumpyJSONEncoder))
+    times = numpy.array(sorted(svg_animation.keys()))
+    durations = times[1:] - times[:-1]
+    changes = [change for time, change in sorted(svg_animation.items())]
+
+    vcr_controls = xml.SubElement(
+        context.parent, "div", attrib={"class": "toyplot-vcr-controls"})
+    xml.SubElement(
+        vcr_controls,
+        "input",
+        title="Frame",
+        type="range",
+        min="0",
+        max=str(
+            len(times) -
+            2),
+        step="1",
+        value="0",
+        id="%s-current-frame" %
+        context.root.get("id"))
+    xml.SubElement(
+        vcr_controls,
+        "button",
+        title="Rewind",
+        style="width:40px;height:24px",
+        id="%s-rewind" % context.root.get("id")).append(
+            xml.XML(
+                """<svg width="20" height="20"><polygon points="10,5 0,10 10,15" stroke="none" fill="{near_black}"/><polygon points="20,5 10,10 20,15" stroke="none" fill="{near_black}"/></svg>""".format(
+                    near_black=toyplot.color.near_black)))
+    xml.SubElement(
+        vcr_controls,
+        "button",
+        title="Reverse Play",
+        style="width:40px;height:24px",
+        id="%s-reverse-play" % context.root.get("id")).append(
+            xml.XML(
+                """<svg width="20" height="20"><polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/></svg>""".format(
+                    near_black=toyplot.color.near_black)))
+    xml.SubElement(
+        vcr_controls,
+        "button",
+        title="Frame Rewind",
+        style="width:40px;height:24px",
+        id="%s-frame-rewind" % context.root.get("id")).append(
+            xml.XML(
+                """<svg width="20" height="20"><polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/><rect x="17" y="5" width="2" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
+                    near_black=toyplot.color.near_black)))
+    xml.SubElement(
+        vcr_controls,
+        "button",
+        title="Stop",
+        style="width:40px;height:24px",
+        id="%s-stop" % context.root.get("id")).append(
+            xml.XML(
+                """<svg width="20" height="20"><rect x="5" y="5" width="10" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
+                    near_black=toyplot.color.near_black)))
+    xml.SubElement(
+        vcr_controls,
+        "button",
+        title="Frame Advance",
+        style="width:40px;height:24px",
+        id="%s-frame-advance" % context.root.get("id")).append(
+            xml.XML(
+                """<svg width="20" height="20"><polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/><rect x="1" y="5" width="2" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
+                    near_black=toyplot.color.near_black)))
+    xml.SubElement(
+        vcr_controls,
+        "button",
+        title="Play",
+        style="width:40px;height:24px",
+        id="%s-forward-play" % context.root.get("id")).append(
+            xml.XML(
+                """<svg width="20" height="20"><polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/></svg>""".format(
+                    near_black=toyplot.color.near_black)))
+    xml.SubElement(
+        vcr_controls,
+        "button",
+        title="Fast Forward",
+        style="width:40px;height:24px",
+        id="%s-fast-forward" % context.root.get("id")).append(
+            xml.XML(
+                """<svg width="20" height="20"><polygon points="0,5 10,10 0,15" stroke="none" fill="{near_black}"/><polygon points="10,5 20,10 10,15" stroke="none" fill="{near_black}"/></svg>""".format(
+                    near_black=toyplot.color.near_black)))
+
+    xml.SubElement(context.parent, "script").text = _animation_controls.substitute(
+        root_id=context.root.get("id"),
+        frame_durations=json.dumps(durations.tolist()),
+        state_changes=json.dumps(changes, cls=_NumpyJSONEncoder))
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Axis, _RenderContext)
@@ -1142,7 +1158,7 @@ def _render(canvas, axis, context):
         context.add_visible_axis(axis)
 
         axis_xml = xml.SubElement(
-            context.root,
+            context.parent,
             "g",
             id=context.get_id(axis),
             transform="translate(%s,%s) rotate(%s) translate(%s,%s)" % (p[0][0], p[0][1], theta, 0, axis._offset),
@@ -1280,17 +1296,15 @@ def _render(canvas, axis, context):
 def _render(canvas, numberline, context):
     numberline._finalize()
 
-    numberline_xml = xml.SubElement(context.root, "g", id=context.get_id(
+    numberline_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         numberline), attrib={"class": "toyplot-axes-Numberline"})
 
     children_xml = xml.SubElement(numberline_xml, "g")
 
     for child in numberline._children:
-        _render(numberline, child, context.copy(root=children_xml))
+        _render(numberline, child, context.copy(parent=children_xml))
 
-    _render(canvas, numberline.axis, context.copy(
-        root=numberline_xml,
-        ))
+    _render(canvas, numberline.axis, context.copy(parent=numberline_xml))
 
 
 @dispatch(toyplot.axes.Numberline, toyplot.color.CategoricalMap, _RenderContext)
@@ -1302,7 +1316,7 @@ def _render(numberline, colormap, context):
     transform = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
 
     mark_xml = xml.SubElement(
-        context.root,
+        context.parent,
         "g", id=context.get_id(colormap),
         attrib={"class": "toyplot-color-CategoricalMap"},
         transform=transform,
@@ -1349,7 +1363,7 @@ def _render(numberline, colormap, context):
     colormap_range_min, colormap_range_max = numberline.axis.projection([colormap.domain.min, colormap.domain.max])
 
     mark_xml = xml.SubElement(
-        context.root,
+        context.parent,
         "g", id=context.get_id(colormap),
         attrib={"class": "toyplot-color-Map"},
         transform=transform,
@@ -1406,7 +1420,7 @@ def _render(numberline, colormap, context):
 def _render(numberline, mark, context):
     transform = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -numberline._offset[mark])
     mark_xml = xml.SubElement(
-        context.root,
+        context.parent,
         "g",
         style=_css_style(mark._style),
         id=context.get_id(mark),
@@ -1463,7 +1477,7 @@ def _render(numberline, mark, context):
 def _render(canvas, axes, context):
     axes._finalize()
 
-    axes_xml = xml.SubElement(context.root, "g", id=context.get_id(
+    axes_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         axes), attrib={"class": "toyplot-axes-Cartesian"})
 
     clip_xml = xml.SubElement(axes_xml, "clipPath", id="t" + uuid.uuid4().hex)
@@ -1493,17 +1507,11 @@ def _render(canvas, axes, context):
         )
 
     for child in axes._children:
-        _render(axes, child, context.copy(root=children_xml))
+        _render(axes, child, context.copy(parent=children_xml))
 
     if axes._show:
-        _render(canvas, axes.x, context.copy(
-            root=axes_xml,
-            ))
-
-        _render(canvas, axes.y, context.copy(
-            root=axes_xml,
-            ))
-
+        _render(canvas, axes.x, context.copy(parent=axes_xml))
+        _render(canvas, axes.y, context.copy(parent=axes_xml))
         _draw_text(
             root=axes_xml,
             text=axes.label._text,
@@ -1517,7 +1525,7 @@ def _render(canvas, axes, context):
 def _render(canvas, axes, context):
     axes._finalize()
 
-    axes_xml = xml.SubElement(context.root, "g", id=context.get_id(
+    axes_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         axes), attrib={"class": "toyplot-axes-Table"})
 
     # Render title
@@ -1531,7 +1539,7 @@ def _render(canvas, axes, context):
 
     # Render children.
     for child in axes._children:
-        _render(axes._parent, child, context.copy(root=axes_xml))
+        _render(axes._parent, child, context.copy(parent=axes_xml))
 
     # Render visible cells.
     for cell in axes._visible_cells:
@@ -1742,7 +1750,7 @@ def _render(axes, mark, context):
         boundaries = axes._project_x(boundaries)
 
     mark_xml = xml.SubElement(
-        context.root,
+        context.parent,
         "g",
         style=_css_style(
             mark._style),
@@ -1821,7 +1829,7 @@ def _render(axes, mark, context):
         boundaries = axes._project_x(boundaries)
 
     mark_xml = xml.SubElement(
-        context.root,
+        context.parent,
         "g",
         style=_css_style(
             mark._style),
@@ -1879,7 +1887,7 @@ def _render(axes, mark, context):
         boundaries = axes._project_x(boundaries)
 
     mark_xml = xml.SubElement(
-        context.root,
+        context.parent,
         "g",
         style=_css_style(
             mark._style),
@@ -1931,7 +1939,7 @@ def _render(axes, mark, context):
         boundaries = axes._project_x(boundaries)
 
     mark_xml = xml.SubElement(
-        context.root,
+        context.parent,
         "g",
         style=_css_style(
             mark._style),
@@ -1978,7 +1986,7 @@ def _render(axes, mark, context):
         boundary1 = axes._xmin_range
         boundary2 = axes._xmax_range
     mark_xml = xml.SubElement(
-        context.root,
+        context.parent,
         "g",
         style=_css_style(
             mark._style),
@@ -2018,7 +2026,7 @@ def _render(canvas, legend, context):
     width = legend._xmax - legend._xmin
     height = legend._ymax - legend._ymin
     xml.SubElement(
-        context.root,
+        context.parent,
         "rect",
         x=repr(x),
         y=repr(y),
@@ -2048,7 +2056,7 @@ def _render(canvas, legend, context):
 
             if mark == "line":
                 xml.SubElement(
-                    context.root,
+                    context.parent,
                     "line",
                     x1=repr(mark_x),
                     y1=repr(mark_y + mark_height),
@@ -2058,7 +2066,7 @@ def _render(canvas, legend, context):
                     )
             elif mark == "rect":
                 xml.SubElement(
-                    context.root,
+                    context.parent,
                     "rect",
                     x=repr(mark_x),
                     y=repr(mark_y),
@@ -2070,7 +2078,7 @@ def _render(canvas, legend, context):
                 dstyle = toyplot.style.combine(
                     {"stroke": toyplot.color.to_css(mark._stroke[0])}, mark._style)
                 xml.SubElement(
-                    context.root,
+                    context.parent,
                     "line",
                     x1=repr(mark_x),
                     y1=repr(mark_y + mark_height),
@@ -2086,7 +2094,7 @@ def _render(canvas, legend, context):
                     },
                     mark_style)
                 _draw_marker(
-                    context.root,
+                    context.parent,
                     mark_x + (mark_width / 2),
                     mark_y + (mark_height / 2),
                     min(mark_width, mark_height),
@@ -2099,7 +2107,7 @@ def _render(canvas, legend, context):
                 dstyle = toyplot.style.combine({"fill": toyplot.color.to_css(
                     mark._fill[0]), "opacity": mark._opacity[0]}, mark._style)
                 xml.SubElement(
-                    context.root,
+                    context.parent,
                     "rect",
                     x=repr(mark_x),
                     y=repr(mark_y),
@@ -2111,7 +2119,7 @@ def _render(canvas, legend, context):
                 computed_style = toyplot.style.combine(
                     {"stroke": toyplot.color.near_black, "fill": "none"}, mark_style)
                 _draw_marker(
-                    context.root,
+                    context.parent,
                     mark_x + (mark_width / 2),
                     mark_y + (mark_height / 2),
                     min(mark_width, mark_height),
@@ -2121,7 +2129,7 @@ def _render(canvas, legend, context):
                     )
 
             _draw_text(
-                root=context.root,
+                root=context.parent,
                 text=mark_label,
                 x=x + mark_width + (2 * mark_gutter),
                 y=y + ((i + 1) * mark_gutter) +  (i * mark_height) + (mark_height / 2),
@@ -2138,7 +2146,7 @@ def _render(axes, mark, context): # pragma: no cover
         elif mark._coordinate_axes[i] == "y":
             y = axes._project_y(mark._ecoordinates.T[i])
 
-    mark_xml = xml.SubElement(context.root, "g", id=context.get_id(mark), attrib={"class": "toyplot-mark-Graph"})
+    mark_xml = xml.SubElement(context.parent, "g", id=context.get_id(mark), attrib={"class": "toyplot-mark-Graph"})
     #context.add_data_table(mark, mark._vtable, title="Graph Vertex Data", filename=mark._vertex_filename)
     #context.add_data_table(mark, mark._etable, title="Graph Edge Data", filename=mark._edge_filename)
 
@@ -2247,7 +2255,7 @@ def _render(axes, mark, context):
         series = axes._project_x(series)
 
     mark_xml = xml.SubElement(
-        context.root,
+        context.parent,
         "g",
         style=_css_style(toyplot.style.combine({"fill":"none"}, mark._style)),
         id=context.get_id(mark),
@@ -2343,7 +2351,7 @@ def _render(axes, mark, context):
         y1 = axes._project_y(mark._table[mark._left[0]])
         y2 = axes._project_y(mark._table[mark._right[0]])
     mark_xml = xml.SubElement(
-        context.root,
+        context.parent,
         "g",
         style=_css_style(
             mark._style),
@@ -2392,7 +2400,7 @@ def _render(axes, mark, context):
         Y = axes._project_y(dimension1)
 
     mark_xml = xml.SubElement(
-        context.root,
+        context.parent,
         "g",
         style=_css_style(mark._style),
         id=context.get_id(mark),
@@ -2455,7 +2463,7 @@ def _render(parent, mark, context):
         y = parent._project_y(y)
 
     mark_xml = xml.SubElement(
-        context.root,
+        context.parent,
         "g",
         style=_css_style(
             mark._style),

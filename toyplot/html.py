@@ -364,6 +364,7 @@ class _RenderContext(object):
         self._data_tables = list()
         self._visible_axes = set()
         self._rendered = set()
+        self._animation = collections.defaultdict(lambda: collections.defaultdict(list))
 
     def add_visible_axis(self, axis):
         self._visible_axes.add(axis)
@@ -389,6 +390,10 @@ class _RenderContext(object):
         result = copy.copy(self)
         result._parent = parent
         return result
+
+    @property
+    def animation(self):
+        return self._animation
 
     @property
     def parent(self):
@@ -489,21 +494,6 @@ def render(canvas, fobj=None, animation=False):
     context = _RenderContext(root=root_xml)
     _render(canvas, context.copy(parent=root_xml))
 
-    # Collect animation data.
-    svg_animation = collections.defaultdict(
-        lambda: collections.defaultdict(list))
-    for time, time_changes in list(canvas._animation.items())[:-1]:
-        # Ensure we have an entry for every time, even if there aren't any
-        # changes.
-        svg_animation[time]
-        for type, type_changes in time_changes.items():
-            for change in type_changes:
-                svg_animation[time][type].append(
-                    [context.get_id(change[0])] + list(change[1:]))
-
-    # Render interactive functionality.
-    _render_interactive(canvas, svg_animation, context.copy(parent=root_xml))
-
     # Return / write the results.
     if isinstance(fobj, toyplot.compatibility.string_type):
         with open(fobj, "wb") as file:
@@ -512,7 +502,7 @@ def render(canvas, fobj=None, animation=False):
         fobj.write(xml.tostring(root_xml, method="html"))
     else:
         if animation:
-            return root_xml, svg_animation
+            return root_xml, context.animation
         return root_xml
 
 
@@ -918,7 +908,7 @@ def _axis_transform(x1, y1, x2, y2, offset):
 
 @dispatch(toyplot.canvas.Canvas, _RenderContext)
 def _render(canvas, context):
-    svg = xml.SubElement(
+    svg_xml = xml.SubElement(
         context.parent,
         "svg",
         xmlns="http://www.w3.org/2000/svg",
@@ -934,10 +924,8 @@ def _render(canvas, context):
         id=context.get_id(canvas))
 
     for child in canvas._children:
-        _render(canvas, child, context.copy(parent=svg))
+        _render(canvas, child, context.copy(parent=svg_xml))
 
-
-def _render_interactive(canvas, svg_animation, context):
     interactive_xml = xml.SubElement(
         context.parent,
         "div",
@@ -946,7 +934,8 @@ def _render_interactive(canvas, svg_animation, context):
 
     _render_data_table_export(context.copy(parent=interactive_xml))
     _render_interactive_mouse_coordinates(context.copy(parent=interactive_xml))
-    _render_vcr_controls(svg_animation, context.copy(parent=interactive_xml))
+    _render_vcr_controls(canvas, context.copy(parent=interactive_xml))
+
 
 def _render_data_table_export(context):
     # Allow users to export embedded table data.
@@ -1050,13 +1039,23 @@ def _render_interactive_mouse_coordinates(context):
             )
 
 
-def _render_vcr_controls(svg_animation, context):
-    if len(svg_animation) < 2:
+def _render_vcr_controls(canvas, context):
+    # Collect animation data.
+    for time, time_changes in list(canvas._animation.items())[:-1]:
+        # Ensure we have an entry for every time, even if there aren't any
+        # changes.
+        context.animation[time]
+        for type, type_changes in time_changes.items():
+            for change in type_changes:
+                context.animation[time][type].append(
+                    [context.get_id(change[0])] + list(change[1:]))
+
+    if len(context.animation) < 2:
         return
 
-    times = numpy.array(sorted(svg_animation.keys()))
+    times = numpy.array(sorted(context.animation.keys()))
     durations = times[1:] - times[:-1]
-    changes = [change for time, change in sorted(svg_animation.items())]
+    changes = [change for time, change in sorted(context.animation.items())]
 
     vcr_controls = xml.SubElement(
         context.parent, "div", attrib={"class": "toyplot-vcr-controls"})

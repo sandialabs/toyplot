@@ -615,40 +615,16 @@ def _render(canvas, context):
 
 
 def _render_data_table_export(context):
-    # Allow users to export embedded table data.
     if not context._data_tables:
         return
 
-    menu_xml = xml.SubElement(
-        context.parent,
-        "ul",
-        attrib={"class": "toyplot-mark-popup"},
-        onmouseleave="this.style.visibility='hidden'",
-        style=_css_style({
-            "background": "rgba(0%,0%,0%,0.75)",
-            "border": "0",
-            "border-radius": "6px",
-            "color": "white",
-            "cursor": "default",
-            "list-style": "none",
-            "margin": "0",
-            "padding": "5px",
-            "position": "fixed",
-            "visibility": "hidden",
-        }))
-    xml.SubElement(
-        menu_xml,
-        "li",
-        attrib={"class": "toyplot-mark-popup-title"},
-        style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0;",
-        )
-    xml.SubElement(
-        menu_xml,
-        "li",
-        attrib={"class": "toyplot-mark-popup-save-csv"},
-        style="border-radius:3px;padding:5px;list-style:none;margin:0;",
-        onmouseover="this.style.color='steelblue';this.style.background='white'",
-        onmouseout="this.style.color='white';this.style.background='steelblue'").text = "Save as .csv"
+    context.parent.append(xml.XML(
+        """<ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden">
+            <li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0"/>
+            <li class="toyplot-mark-popup-save-csv" style="border-radius:3px;padding:5px;list-style:none;margin:0" onmouseover="this.style.color='steelblue';this.style.background='white'" onmouseout="this.style.color='white';this.style.background='steelblue'">
+                Save as .csv
+            </li>
+        </ul>"""))
 
     data_tables = list()
     for data_table in context._data_tables:

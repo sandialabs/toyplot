@@ -960,65 +960,11 @@ def _render(frames, context):
           var current_frame = null;
           var timeout = null;
 
-          function on_set_frame()
+          function set_timeout(value)
           {
             if(timeout !== null)
               window.clearTimeout(timeout);
-            timeout = null;
-            set_current_frame(document.querySelector("#" + root_id + " .toyplot-current-frame").valueAsNumber);
-            for(var frame = 0; frame <= current_frame; ++frame)
-              render_changes(frame);
-          }
-
-          function on_frame_rewind()
-          {
-            if(timeout !== null)
-              window.clearTimeout(timeout);
-            set_current_frame((current_frame - 1 + frame_durations.length) % frame_durations.length);
-            for(var frame = 0; frame <= current_frame; ++frame)
-              render_changes(frame);
-          }
-
-          function on_rewind()
-          {
-            render_changes(0);
-            set_current_frame(0);
-          }
-
-          function on_play_reverse()
-          {
-            if(timeout !== null)
-              window.clearTimeout(timeout);
-            timeout = window.setTimeout(play_reverse, frame_durations[(current_frame - 1 + frame_durations.length) % frame_durations.length] * 1000);
-          }
-
-          function on_stop()
-          {
-            if(timeout !== null)
-              window.clearTimeout(timeout);
-            timeout = null;
-          }
-
-          function on_play_forward()
-          {
-            if(timeout !== null)
-              window.clearTimeout(timeout);
-            timeout = window.setTimeout(play_forward, frame_durations[current_frame] * 1000);
-          }
-
-          function on_fast_forward()
-          {
-            for(var frame = 0; frame != frame_durations.length; ++frame)
-              render_changes(frame);
-            set_current_frame(frame_durations.length - 1);
-          }
-
-          function on_frame_advance()
-          {
-            if(timeout !== null)
-              window.clearTimeout(timeout);
-            set_current_frame((current_frame + 1) % frame_durations.length);
-            render_changes(current_frame);
+            timeout = value;
           }
 
           function set_current_frame(frame)
@@ -1030,16 +976,15 @@ def _render(frames, context):
           function play_reverse()
           {
             set_current_frame((current_frame - 1 + frame_durations.length) % frame_durations.length);
-            for(var frame = 0; frame <= current_frame; ++frame)
-              render_changes(frame);
-            timeout = window.setTimeout(play_reverse, frame_durations[(current_frame - 1 + frame_durations.length) % frame_durations.length] * 1000);
+            render_changes(0, current_frame+1)
+            set_timeout(window.setTimeout(play_reverse, frame_durations[(current_frame - 1 + frame_durations.length) % frame_durations.length] * 1000));
           }
 
           function play_forward()
           {
             set_current_frame((current_frame + 1) % frame_durations.length);
-            render_changes(current_frame);
-            timeout = window.setTimeout(play_forward, frame_durations[current_frame] * 1000);
+            render_changes(current_frame, current_frame+1);
+            set_timeout(window.setTimeout(play_forward, frame_durations[current_frame] * 1000));
           }
 
           var item_cache = {};
@@ -1050,37 +995,89 @@ def _render(frames, context):
             return item_cache[id];
           }
 
-          function render_changes(frame)
+          function render_changes(begin, end)
           {
-            var changes = state_changes[frame];
-            for(var type in changes)
+            for(var frame = begin; frame != end; ++frame)
             {
-              var type_changes = changes[type]
-              if(type == "set-mark-style")
-              {
-                for(var i = 0; i != type_changes.length; ++i)
+                var changes = state_changes[frame];
+                for(var type in changes)
                 {
-                  var mark_style = type_changes[i];
-                  var mark = get_item(mark_style[0]);
-                  for(var key in mark_style[1])
-                    mark.style.setProperty(key, mark_style[1][key]);
+                  var type_changes = changes[type]
+                  if(type == "set-mark-style")
+                  {
+                    for(var i = 0; i != type_changes.length; ++i)
+                    {
+                      var mark_style = type_changes[i];
+                      var mark = get_item(mark_style[0]);
+                      for(var key in mark_style[1])
+                        mark.style.setProperty(key, mark_style[1][key]);
+                    }
+                  }
+                  else if(type == "set-datum-style")
+                  {
+                    for(var i = 0; i != type_changes.length; ++i)
+                    {
+                      var datum_style = type_changes[i];
+                      var datum = get_item(datum_style[0]).querySelectorAll(".toyplot-Series")[datum_style[1]].querySelectorAll(".toyplot-Datum")[datum_style[2]];
+                      for(var key in datum_style[3])
+                        datum.style.setProperty(key, datum_style[3][key]);
+                    }
+                  }
                 }
-              }
-              else if(type == "set-datum-style")
-              {
-                for(var i = 0; i != type_changes.length; ++i)
-                {
-                  var datum_style = type_changes[i];
-                  var datum = get_item(datum_style[0]).querySelectorAll(".toyplot-Series")[datum_style[1]].querySelectorAll(".toyplot-Datum")[datum_style[2]];
-                  for(var key in datum_style[3])
-                    datum.style.setProperty(key, datum_style[3][key]);
-                }
-              }
             }
           }
 
+          function on_set_frame()
+          {
+            set_timeout(null);
+            set_current_frame(document.querySelector("#" + root_id + " .toyplot-current-frame").valueAsNumber);
+            render_changes(0, current_frame+1);
+          }
+
+          function on_frame_rewind()
+          {
+            set_timeout(null);
+            set_current_frame((current_frame - 1 + frame_durations.length) % frame_durations.length);
+            render_changes(0, current_frame+1);
+          }
+
+          function on_rewind()
+          {
+            set_current_frame(0);
+            render_changes(0, current_frame+1);
+          }
+
+          function on_play_reverse()
+          {
+            set_timeout(window.setTimeout(play_reverse, frame_durations[(current_frame - 1 + frame_durations.length) % frame_durations.length] * 1000));
+          }
+
+          function on_stop()
+          {
+            set_timeout(null);
+          }
+
+          function on_play_forward()
+          {
+            set_timeout(window.setTimeout(play_forward, frame_durations[current_frame] * 1000));
+          }
+
+          function on_fast_forward()
+          {
+            set_timeout(null);
+            set_current_frame(frame_durations.length - 1);
+            render_changes(0, current_frame + 1)
+          }
+
+          function on_frame_advance()
+          {
+            set_timeout(null);
+            set_current_frame((current_frame + 1) % frame_durations.length);
+            render_changes(current_frame, current_frame+1);
+          }
+
           set_current_frame(0);
-          render_changes(current_frame);
+          render_changes(0, current_frame+1);
 
           document.querySelector("#" + root_id + " .toyplot-current-frame").oninput = on_set_frame;
           document.querySelector("#" + root_id + " .toyplot-rewind").onclick = on_rewind;

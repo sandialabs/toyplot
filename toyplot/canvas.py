@@ -18,14 +18,12 @@ import toyplot.units
 
 
 class AnimationFrame(object):
-
     """Used to specify modifications to a `toyplot.canvas.Canvas` during animation.
 
     Do not create AnimationFrame instances yourself, an instance of
     AnimationFrame is automatically created by :meth:`toyplot.canvas.Canvas.animate`
     or :meth:`toyplot.canvas.Canvas.time` and passed to your callback.
     """
-
     def __init__(self, index, begin, end, changes):
         self._index = index
         self._begin = begin
@@ -98,12 +96,11 @@ class AnimationFrame(object):
         self._changes[self._begin][
             "set-datum-text"].append((mark, series, datum, text))
 
+
 ##########################################################################
 # Canvas
 
-
 class Canvas(object):
-
     """Top-level container for Toyplot drawings.
 
     Parameters
@@ -130,6 +127,10 @@ class Canvas(object):
     >>> canvas = toyplot.Canvas("8in", "6in", style={"background-color":"yellow"})
     """
 
+    class _AnimationFrames(collections.defaultdict):
+        def __init__(self):
+            collections.defaultdict.__init__(self, lambda: collections.defaultdict(list))
+
     def __init__(self, width=None, height=None, style=None, autorender=None, autoformat=None):
         self._width = toyplot.units.convert(
             width, "px", default="px") if width is not None else 600
@@ -149,8 +150,7 @@ class Canvas(object):
             },
             toyplot.require.style(style, allowed=set(["background-color", "border"])),
             )
-        self._animation = collections.defaultdict(
-            lambda: collections.defaultdict(list))
+        self._animation = toyplot.Canvas._AnimationFrames()
         self._children = []
         self.autorender(autorender, autoformat)
 

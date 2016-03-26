@@ -202,160 +202,6 @@ _show_axis_mouse_coordinates = string.Template("""
 """)
 
 
-_animation_controls = string.Template("""
-(function()
-{
-  var root_id = "$root_id";
-  var frame_durations = $frame_durations;
-  var state_changes = $state_changes;
-
-  var current_frame = null;
-  var timeout = null;
-
-  function on_set_frame()
-  {
-    if(timeout !== null)
-      window.clearTimeout(timeout);
-    timeout = null;
-    set_current_frame(document.getElementById(root_id + "-current-frame").valueAsNumber);
-    for(var frame = 0; frame <= current_frame; ++frame)
-      render_changes(frame);
-  }
-
-  function on_frame_rewind()
-  {
-    if(timeout !== null)
-      window.clearTimeout(timeout);
-    set_current_frame((current_frame - 1 + frame_durations.length) % frame_durations.length);
-    for(var frame = 0; frame <= current_frame; ++frame)
-      render_changes(frame);
-  }
-
-  function on_rewind()
-  {
-    render_changes(0);
-    set_current_frame(0);
-  }
-
-  function on_play_reverse()
-  {
-    if(timeout !== null)
-      window.clearTimeout(timeout);
-    timeout = window.setTimeout(play_reverse, frame_durations[(current_frame - 1 + frame_durations.length) % frame_durations.length] * 1000);
-  }
-
-  function on_stop()
-  {
-    if(timeout !== null)
-      window.clearTimeout(timeout);
-    timeout = null;
-  }
-
-  function on_play_forward()
-  {
-    if(timeout !== null)
-      window.clearTimeout(timeout);
-    timeout = window.setTimeout(play_forward, frame_durations[current_frame] * 1000);
-  }
-
-  function on_fast_forward()
-  {
-    for(var frame = 0; frame != frame_durations.length; ++frame)
-      render_changes(frame);
-    set_current_frame(frame_durations.length - 1);
-  }
-
-  function on_frame_advance()
-  {
-    if(timeout !== null)
-      window.clearTimeout(timeout);
-    set_current_frame((current_frame + 1) % frame_durations.length);
-    render_changes(current_frame);
-  }
-
-  function set_current_frame(frame)
-  {
-    current_frame = frame;
-    document.getElementById(root_id + "-current-frame").value = frame;
-  }
-
-  function play_reverse()
-  {
-    set_current_frame((current_frame - 1 + frame_durations.length) % frame_durations.length);
-    for(var frame = 0; frame <= current_frame; ++frame)
-      render_changes(frame);
-    timeout = window.setTimeout(play_reverse, frame_durations[(current_frame - 1 + frame_durations.length) % frame_durations.length] * 1000);
-  }
-
-  function play_forward()
-  {
-    set_current_frame((current_frame + 1) % frame_durations.length);
-    render_changes(current_frame);
-    timeout = window.setTimeout(play_forward, frame_durations[current_frame] * 1000);
-  }
-
-  var item_cache = {};
-  function get_item(id)
-  {
-    if(!(id in item_cache))
-      item_cache[id] = document.getElementById(id);
-    return item_cache[id];
-  }
-
-  function render_changes(frame)
-  {
-    var changes = state_changes[frame];
-    for(var type in changes)
-    {
-      var type_changes = changes[type]
-      if(type == "set-mark-style")
-      {
-        for(var i = 0; i != type_changes.length; ++i)
-        {
-          var mark_style = type_changes[i];
-          var mark = get_item(mark_style[0]);
-          for(var key in mark_style[1])
-            mark.style.setProperty(key, mark_style[1][key]);
-        }
-      }
-      else if(type == "set-datum-style")
-      {
-        for(var i = 0; i != type_changes.length; ++i)
-        {
-          var datum_style = type_changes[i];
-          var datum = get_item(datum_style[0]).querySelectorAll(".toyplot-Series")[datum_style[1]].querySelectorAll(".toyplot-Datum")[datum_style[2]];
-          for(var key in datum_style[3])
-            datum.style.setProperty(key, datum_style[3][key]);
-        }
-      }
-      else if(type == "set-datum-text")
-      {
-        for(var i = 0; i != type_changes.length; ++i)
-        {
-          var datum_text = type_changes[i];
-          var datum = get_item(datum_text[0]).querySelectorAll(".toyplot-Series")[datum_text[1]].querySelectorAll(".toyplot-Datum")[datum_text[2]];
-          datum.textContent = datum_text[3];
-        }
-      }
-    }
-  }
-
-  set_current_frame(0);
-  render_changes(current_frame);
-
-  document.getElementById(root_id + "-current-frame").oninput = on_set_frame;
-  document.getElementById(root_id + "-rewind").onclick = on_rewind;
-  document.getElementById(root_id + "-reverse-play").onclick = on_play_reverse;
-  document.getElementById(root_id + "-frame-rewind").onclick = on_frame_rewind;
-  document.getElementById(root_id + "-stop").onclick = on_stop;
-  document.getElementById(root_id + "-frame-advance").onclick = on_frame_advance;
-  document.getElementById(root_id + "-forward-play").onclick = on_play_forward;
-  document.getElementById(root_id + "-fast-forward").onclick = on_fast_forward;
-
-})();
-""")
-
-
 class _RenderContext(object):
     def __init__(self, root):
         self._root = root
@@ -934,7 +780,7 @@ def _render(canvas, context):
 
     _render_data_table_export(context.copy(parent=interactive_xml))
     _render_interactive_mouse_coordinates(context.copy(parent=interactive_xml))
-    _render_vcr_controls(canvas, context.copy(parent=interactive_xml))
+    _render(canvas._animation, context.copy(parent=interactive_xml))
 
 
 def _render_data_table_export(context):
@@ -1039,9 +885,10 @@ def _render_interactive_mouse_coordinates(context):
             )
 
 
-def _render_vcr_controls(canvas, context):
+@dispatch(toyplot.canvas.Canvas._AnimationFrames, _RenderContext)
+def _render(frames, context):
     # Collect animation data.
-    for time, time_changes in list(canvas._animation.items())[:-1]:
+    for time, time_changes in list(frames.items())[:-1]:
         # Ensure we have an entry for every time, even if there aren't any
         # changes.
         context.animation[time]
@@ -1057,89 +904,207 @@ def _render_vcr_controls(canvas, context):
     durations = times[1:] - times[:-1]
     changes = [change for time, change in sorted(context.animation.items())]
 
-    vcr_controls = xml.SubElement(
-        context.parent, "div", attrib={"class": "toyplot-vcr-controls"})
-    xml.SubElement(
-        vcr_controls,
-        "input",
-        title="Frame",
-        type="range",
-        min="0",
-        max=str(
-            len(times) -
-            2),
-        step="1",
-        value="0",
-        id="%s-current-frame" %
-        context.root.get("id"))
-    xml.SubElement(
-        vcr_controls,
-        "button",
-        title="Rewind",
-        style="width:40px;height:24px",
-        id="%s-rewind" % context.root.get("id")).append(
-            xml.XML(
-                """<svg width="20" height="20"><polygon points="10,5 0,10 10,15" stroke="none" fill="{near_black}"/><polygon points="20,5 10,10 20,15" stroke="none" fill="{near_black}"/></svg>""".format(
-                    near_black=toyplot.color.near_black)))
-    xml.SubElement(
-        vcr_controls,
-        "button",
-        title="Reverse Play",
-        style="width:40px;height:24px",
-        id="%s-reverse-play" % context.root.get("id")).append(
-            xml.XML(
-                """<svg width="20" height="20"><polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/></svg>""".format(
-                    near_black=toyplot.color.near_black)))
-    xml.SubElement(
-        vcr_controls,
-        "button",
-        title="Frame Rewind",
-        style="width:40px;height:24px",
-        id="%s-frame-rewind" % context.root.get("id")).append(
-            xml.XML(
-                """<svg width="20" height="20"><polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/><rect x="17" y="5" width="2" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
-                    near_black=toyplot.color.near_black)))
-    xml.SubElement(
-        vcr_controls,
-        "button",
-        title="Stop",
-        style="width:40px;height:24px",
-        id="%s-stop" % context.root.get("id")).append(
-            xml.XML(
-                """<svg width="20" height="20"><rect x="5" y="5" width="10" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
-                    near_black=toyplot.color.near_black)))
-    xml.SubElement(
-        vcr_controls,
-        "button",
-        title="Frame Advance",
-        style="width:40px;height:24px",
-        id="%s-frame-advance" % context.root.get("id")).append(
-            xml.XML(
-                """<svg width="20" height="20"><polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/><rect x="1" y="5" width="2" height="10" stroke="none" fill="{near_black}"/></svg>""".format(
-                    near_black=toyplot.color.near_black)))
-    xml.SubElement(
-        vcr_controls,
-        "button",
-        title="Play",
-        style="width:40px;height:24px",
-        id="%s-forward-play" % context.root.get("id")).append(
-            xml.XML(
-                """<svg width="20" height="20"><polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/></svg>""".format(
-                    near_black=toyplot.color.near_black)))
-    xml.SubElement(
-        vcr_controls,
-        "button",
-        title="Fast Forward",
-        style="width:40px;height:24px",
-        id="%s-fast-forward" % context.root.get("id")).append(
-            xml.XML(
-                """<svg width="20" height="20"><polygon points="0,5 10,10 0,15" stroke="none" fill="{near_black}"/><polygon points="10,5 20,10 10,15" stroke="none" fill="{near_black}"/></svg>""".format(
-                    near_black=toyplot.color.near_black)))
+    context.parent.append(xml.XML(
+        """<div class="toyplot-vcr-controls">
+            <input class="toyplot-current-frame" title="Frame" type="range" min="0" max="{frames}" step="1" value="0"/>
+            <button class="toyplot-rewind" title="Rewind" style="width:40px;height:24px">
+                <svg width="20" height="20">
+                    <polygon points="10,5 0,10 10,15" stroke="none" fill="{near_black}"/>
+                    <polygon points="20,5 10,10 20,15" stroke="none" fill="{near_black}"/>
+                </svg>
+            </button>
+            <button class="toyplot-reverse-play" title="Reverse Play" style="width:40px;height:24px">
+                <svg width="20" height="20">
+                    <polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/>
+                </svg>
+            </button>
+            <button class="toyplot-frame-rewind" title="Frame Rewind" style="width:40px;height:24px">
+                <svg width="20" height="20">
+                    <polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/>
+                    <rect x="17" y="5" width="2" height="10" stroke="none" fill="{near_black}"/>
+                </svg>
+            </button>
+            <button class="toyplot-stop" title="Stop" style="width:40px;height:24px">
+                <svg width="20" height="20">
+                    <rect x="5" y="5" width="10" height="10" stroke="none" fill="{near_black}"/>
+                </svg>
+            </button>
+            <button class="toyplot-frame-advance" title="Frame Advance" style="width:40px;height:24px">
+                <svg width="20" height="20">
+                    <polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/>
+                    <rect x="1" y="5" width="2" height="10" stroke="none" fill="{near_black}"/>
+                </svg>
+            </button>
+            <button class="toyplot-forward-play" title="Play" style="width:40px;height:24px">
+                <svg width="20" height="20">
+                    <polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/>
+                </svg>
+            </button>
+            <button class="toyplot-fast-forward" title="Fast Forward" style="width:40px;height:24px">
+                <svg width="20" height="20">
+                    <polygon points="0,5 10,10 0,15" stroke="none" fill="{near_black}"/>
+                    <polygon points="10,5 20,10 10,15" stroke="none" fill="{near_black}"/>
+                </svg>
+            </button>
+        </div>""".format(
+            frames = len(times) - 2,
+            near_black=toyplot.color.near_black,
+            )))
 
-    xml.SubElement(context.parent, "script").text = _animation_controls.substitute(
-        root_id=context.root.get("id"),
-        frame_durations=json.dumps(durations.tolist()),
-        state_changes=json.dumps(changes, cls=_NumpyJSONEncoder))
+    xml.SubElement(context.parent, "script").text = string.Template("""
+        (function()
+        {
+          var root_id = "$root_id";
+          var frame_durations = $frame_durations;
+          var state_changes = $state_changes;
+
+          var current_frame = null;
+          var timeout = null;
+
+          function on_set_frame()
+          {
+            if(timeout !== null)
+              window.clearTimeout(timeout);
+            timeout = null;
+            set_current_frame(document.querySelector("#" + root_id + " .toyplot-current-frame").valueAsNumber);
+            for(var frame = 0; frame <= current_frame; ++frame)
+              render_changes(frame);
+          }
+
+          function on_frame_rewind()
+          {
+            if(timeout !== null)
+              window.clearTimeout(timeout);
+            set_current_frame((current_frame - 1 + frame_durations.length) % frame_durations.length);
+            for(var frame = 0; frame <= current_frame; ++frame)
+              render_changes(frame);
+          }
+
+          function on_rewind()
+          {
+            render_changes(0);
+            set_current_frame(0);
+          }
+
+          function on_play_reverse()
+          {
+            if(timeout !== null)
+              window.clearTimeout(timeout);
+            timeout = window.setTimeout(play_reverse, frame_durations[(current_frame - 1 + frame_durations.length) % frame_durations.length] * 1000);
+          }
+
+          function on_stop()
+          {
+            if(timeout !== null)
+              window.clearTimeout(timeout);
+            timeout = null;
+          }
+
+          function on_play_forward()
+          {
+            if(timeout !== null)
+              window.clearTimeout(timeout);
+            timeout = window.setTimeout(play_forward, frame_durations[current_frame] * 1000);
+          }
+
+          function on_fast_forward()
+          {
+            for(var frame = 0; frame != frame_durations.length; ++frame)
+              render_changes(frame);
+            set_current_frame(frame_durations.length - 1);
+          }
+
+          function on_frame_advance()
+          {
+            if(timeout !== null)
+              window.clearTimeout(timeout);
+            set_current_frame((current_frame + 1) % frame_durations.length);
+            render_changes(current_frame);
+          }
+
+          function set_current_frame(frame)
+          {
+            current_frame = frame;
+            document.querySelector("#" + root_id + " .toyplot-current-frame").value = frame;
+          }
+
+          function play_reverse()
+          {
+            set_current_frame((current_frame - 1 + frame_durations.length) % frame_durations.length);
+            for(var frame = 0; frame <= current_frame; ++frame)
+              render_changes(frame);
+            timeout = window.setTimeout(play_reverse, frame_durations[(current_frame - 1 + frame_durations.length) % frame_durations.length] * 1000);
+          }
+
+          function play_forward()
+          {
+            set_current_frame((current_frame + 1) % frame_durations.length);
+            render_changes(current_frame);
+            timeout = window.setTimeout(play_forward, frame_durations[current_frame] * 1000);
+          }
+
+          var item_cache = {};
+          function get_item(id)
+          {
+            if(!(id in item_cache))
+              item_cache[id] = document.getElementById(id);
+            return item_cache[id];
+          }
+
+          function render_changes(frame)
+          {
+            var changes = state_changes[frame];
+            for(var type in changes)
+            {
+              var type_changes = changes[type]
+              if(type == "set-mark-style")
+              {
+                for(var i = 0; i != type_changes.length; ++i)
+                {
+                  var mark_style = type_changes[i];
+                  var mark = get_item(mark_style[0]);
+                  for(var key in mark_style[1])
+                    mark.style.setProperty(key, mark_style[1][key]);
+                }
+              }
+              else if(type == "set-datum-style")
+              {
+                for(var i = 0; i != type_changes.length; ++i)
+                {
+                  var datum_style = type_changes[i];
+                  var datum = get_item(datum_style[0]).querySelectorAll(".toyplot-Series")[datum_style[1]].querySelectorAll(".toyplot-Datum")[datum_style[2]];
+                  for(var key in datum_style[3])
+                    datum.style.setProperty(key, datum_style[3][key]);
+                }
+              }
+              else if(type == "set-datum-text")
+              {
+                for(var i = 0; i != type_changes.length; ++i)
+                {
+                  var datum_text = type_changes[i];
+                  var datum = get_item(datum_text[0]).querySelectorAll(".toyplot-Series")[datum_text[1]].querySelectorAll(".toyplot-Datum")[datum_text[2]];
+                  datum.textContent = datum_text[3];
+                }
+              }
+            }
+          }
+
+          set_current_frame(0);
+          render_changes(current_frame);
+
+          document.querySelector("#" + root_id + " .toyplot-current-frame").oninput = on_set_frame;
+          document.querySelector("#" + root_id + " .toyplot-rewind").onclick = on_rewind;
+          document.querySelector("#" + root_id + " .toyplot-reverse-play").onclick = on_play_reverse;
+          document.querySelector("#" + root_id + " .toyplot-frame-rewind").onclick = on_frame_rewind;
+          document.querySelector("#" + root_id + " .toyplot-stop").onclick = on_stop;
+          document.querySelector("#" + root_id + " .toyplot-frame-advance").onclick = on_frame_advance;
+          document.querySelector("#" + root_id + " .toyplot-forward-play").onclick = on_play_forward;
+          document.querySelector("#" + root_id + " .toyplot-fast-forward").onclick = on_fast_forward;
+        })();""").substitute(
+            root_id=context.root.get("id"),
+            frame_durations=json.dumps(durations.tolist()),
+            state_changes=json.dumps(changes, cls=_NumpyJSONEncoder),
+            )
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.axes.Axis, _RenderContext)

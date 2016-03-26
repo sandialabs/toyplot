@@ -33,175 +33,6 @@ class _NumpyJSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-_export_data_tables = string.Template("""
-(function()
-{
-  var data_tables = $data_tables;
-
-  function save_csv(data_table)
-  {
-    var uri = "data:text/csv;charset=utf-8,";
-    uri += data_table.names.join(",") + "\\n";
-    for(var i = 0; i != data_table.data[0].length; ++i)
-    {
-      for(var j = 0; j != data_table.data.length; ++j)
-      {
-        if(j)
-          uri += ",";
-        uri += data_table.data[j][i];
-      }
-      uri += "\\n";
-    }
-    uri = encodeURI(uri);
-
-    var link = document.createElement("a");
-    if(typeof link.download != "undefined")
-    {
-      link.href = uri;
-      link.style = "visibility:hidden";
-      link.download = data_table.filename + ".csv";
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-    else
-    {
-      window.open(uri);
-    }
-  }
-
-  function open_popup(data_table)
-  {
-    return function(e)
-    {
-      var popup = document.querySelector("#$root_id .toyplot-mark-popup");
-      popup.querySelector(".toyplot-mark-popup-title").innerHTML = data_table.title;
-      popup.querySelector(".toyplot-mark-popup-save-csv").onclick = function() { popup.style.visibility = "hidden"; save_csv(data_table); }
-      popup.style.left = (e.clientX - 50) + "px";
-      popup.style.top = (e.clientY - 20) + "px";
-      popup.style.visibility = "visible";
-      e.stopPropagation();
-      e.preventDefault();
-    }
-
-  }
-
-  for(var i = 0; i != data_tables.length; ++i)
-  {
-    var data_table = data_tables[i];
-    var event_target = document.querySelector("#" + data_table.id);
-    event_target.oncontextmenu = open_popup(data_table);
-  }
-})();
-""")
-
-
-_show_axis_mouse_coordinates = string.Template("""
-(function()
-{
-    function _sign(x)
-    {
-        return x < 0 ? -1 : x > 0 ? 1 : 0;
-    }
-
-    function _mix(a, b, amount)
-    {
-        return ((1.0 - amount) * a) + (amount * b);
-    }
-
-    function _log(x, base)
-    {
-        return Math.log(Math.abs(x)) / Math.log(base);
-    }
-
-    function _in_range(a, x, b)
-    {
-        var left = Math.min(a, b);
-        var right = Math.max(a, b);
-        return left <= x && x <= right;
-    }
-
-    function inside(range, projection)
-    {
-        for(var i = 0; i != projection.length; ++i)
-        {
-            var segment = projection[i];
-            if(_in_range(segment.range.min, range, segment.range.max))
-                return true;
-        }
-        return false;
-    }
-
-    function to_domain(range, projection)
-    {
-        for(var i = 0; i != projection.length; ++i)
-        {
-            var segment = projection[i];
-            if(_in_range(segment.range.bounds.min, range, segment.range.bounds.max))
-            {
-                if(segment.scale == "linear")
-                {
-                    var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
-                    return _mix(segment.domain.min, segment.domain.max, amount)
-                }
-                else if(segment.scale[0] == "log")
-                {
-                    var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
-                    var base = segment.scale[1];
-                    return _sign(segment.domain.min) * Math.pow(base, _mix(_log(segment.domain.min, base), _log(segment.domain.max, base), amount));
-                }
-            }
-        }
-    }
-
-    function hide_coordinates(e)
-    {
-        var coordinates = svg.querySelectorAll(".toyplot-axes-Axis-coordinates");
-        for(var i = 0; i != coordinates.length; ++i)
-            coordinates[i].style.visibility = "hidden";
-    }
-
-    function display_coordinates(e)
-    {
-        var current = svg.createSVGPoint();
-        current.x = e.clientX;
-        current.y = e.clientY;
-
-        for(var axis_id in axes)
-        {
-            var axis = document.querySelector("#" + axis_id);
-            var coordinates = axis.querySelector(".toyplot-axes-Axis-coordinates");
-            if(coordinates)
-            {
-                var projection = axes[axis_id];
-                var local = current.matrixTransform(axis.getScreenCTM().inverse());
-                if(inside(local.x, projection))
-                {
-                    var domain = to_domain(local.x, projection);
-                    coordinates.style.visibility = "visible";
-                    coordinates.setAttribute("transform", "translate(" + local.x + ")");
-                    var text = coordinates.querySelector("text");
-                    text.textContent = domain.toFixed(2);
-                }
-                else
-                {
-                    coordinates.style.visibility= "hidden";
-                }
-            }
-        }
-    }
-
-    var root_id = "$root_id";
-    var axes = $visible_axes;
-
-    var svg = document.querySelector("#" + root_id + " svg");
-    svg.addEventListener("click", display_coordinates);
-    //svg.addEventListener("mouseout", hide_coordinates);
-})();
-""")
-
-
 class _RenderContext(object):
     def __init__(self, root):
         self._root = root
@@ -844,45 +675,213 @@ def _render_data_table_export(context):
             data_tables.append(
                 {"id": context.get_id(mark), "filename": filename, "title": title, "names": names, "data": data})
 
-    xml.SubElement(context.parent, "script").text = _export_data_tables.substitute(root_id=context.root.get("id"), data_tables=json.dumps(data_tables))
+    xml.SubElement(context.parent, "script").text = string.Template("""
+        (function()
+        {
+          var data_tables = $data_tables;
+
+          function save_csv(data_table)
+          {
+            var uri = "data:text/csv;charset=utf-8,";
+            uri += data_table.names.join(",") + "\\n";
+            for(var i = 0; i != data_table.data[0].length; ++i)
+            {
+              for(var j = 0; j != data_table.data.length; ++j)
+              {
+                if(j)
+                  uri += ",";
+                uri += data_table.data[j][i];
+              }
+              uri += "\\n";
+            }
+            uri = encodeURI(uri);
+
+            var link = document.createElement("a");
+            if(typeof link.download != "undefined")
+            {
+              link.href = uri;
+              link.style = "visibility:hidden";
+              link.download = data_table.filename + ".csv";
+
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }
+            else
+            {
+              window.open(uri);
+            }
+          }
+
+          function open_popup(data_table)
+          {
+            return function(e)
+            {
+              var popup = document.querySelector("#$root_id .toyplot-mark-popup");
+              popup.querySelector(".toyplot-mark-popup-title").innerHTML = data_table.title;
+              popup.querySelector(".toyplot-mark-popup-save-csv").onclick = function() { popup.style.visibility = "hidden"; save_csv(data_table); }
+              popup.style.left = (e.clientX - 50) + "px";
+              popup.style.top = (e.clientY - 20) + "px";
+              popup.style.visibility = "visible";
+              e.stopPropagation();
+              e.preventDefault();
+            }
+
+          }
+
+          for(var i = 0; i != data_tables.length; ++i)
+          {
+            var data_table = data_tables[i];
+            var event_target = document.querySelector("#" + data_table.id);
+            event_target.oncontextmenu = open_popup(data_table);
+          }
+        })();
+        """).substitute(
+            root_id=context.root.get("id"),
+            data_tables=json.dumps(data_tables),
+            )
 
 
 def _render_interactive_mouse_coordinates(context):
-    if context.visible_axes:
-        visible_axes = dict()
-        for axis in context.visible_axes:
-            key = context.get_id(axis)
-            visible_axes[key] = list()
-            for segment in axis.projection._segments:
-                visible_axes[key].append(
-                {
-                    "scale": segment.scale,
-                    "domain":
-                    {
-                        "min": segment.domain.min,
-                        "max": segment.domain.max,
-                        "bounds":
-                        {
-                            "min": segment.domain.bounds.min,
-                            "max": segment.domain.bounds.max,
-                        },
-                    },
-                    "range":
-                    {
-                        "min": segment.range.min,
-                        "max": segment.range.max,
-                        "bounds":
-                        {
-                            "min": segment.range.bounds.min,
-                            "max": segment.range.bounds.max,
-                        },
-                    },
-                })
+    if not context.visible_axes:
+        return
 
-        xml.SubElement(context.parent, "script").text = _show_axis_mouse_coordinates.substitute(
-            root_id=context.root.get("id"),
-            visible_axes=json.dumps(visible_axes, cls=_NumpyJSONEncoder, sort_keys=True),
-            )
+    visible_axes = dict()
+    for axis in context.visible_axes:
+        key = context.get_id(axis)
+        visible_axes[key] = list()
+        for segment in axis.projection._segments:
+            visible_axes[key].append(
+            {
+                "scale": segment.scale,
+                "domain":
+                {
+                    "min": segment.domain.min,
+                    "max": segment.domain.max,
+                    "bounds":
+                    {
+                        "min": segment.domain.bounds.min,
+                        "max": segment.domain.bounds.max,
+                    },
+                },
+                "range":
+                {
+                    "min": segment.range.min,
+                    "max": segment.range.max,
+                    "bounds":
+                    {
+                        "min": segment.range.bounds.min,
+                        "max": segment.range.bounds.max,
+                    },
+                },
+            })
+
+    xml.SubElement(context.parent, "script").text = string.Template("""
+        (function()
+        {
+            function _sign(x)
+            {
+                return x < 0 ? -1 : x > 0 ? 1 : 0;
+            }
+
+            function _mix(a, b, amount)
+            {
+                return ((1.0 - amount) * a) + (amount * b);
+            }
+
+            function _log(x, base)
+            {
+                return Math.log(Math.abs(x)) / Math.log(base);
+            }
+
+            function _in_range(a, x, b)
+            {
+                var left = Math.min(a, b);
+                var right = Math.max(a, b);
+                return left <= x && x <= right;
+            }
+
+            function inside(range, projection)
+            {
+                for(var i = 0; i != projection.length; ++i)
+                {
+                    var segment = projection[i];
+                    if(_in_range(segment.range.min, range, segment.range.max))
+                        return true;
+                }
+                return false;
+            }
+
+            function to_domain(range, projection)
+            {
+                for(var i = 0; i != projection.length; ++i)
+                {
+                    var segment = projection[i];
+                    if(_in_range(segment.range.bounds.min, range, segment.range.bounds.max))
+                    {
+                        if(segment.scale == "linear")
+                        {
+                            var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
+                            return _mix(segment.domain.min, segment.domain.max, amount)
+                        }
+                        else if(segment.scale[0] == "log")
+                        {
+                            var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
+                            var base = segment.scale[1];
+                            return _sign(segment.domain.min) * Math.pow(base, _mix(_log(segment.domain.min, base), _log(segment.domain.max, base), amount));
+                        }
+                    }
+                }
+            }
+
+            function hide_coordinates(e)
+            {
+                var coordinates = svg.querySelectorAll(".toyplot-axes-Axis-coordinates");
+                for(var i = 0; i != coordinates.length; ++i)
+                    coordinates[i].style.visibility = "hidden";
+            }
+
+            function display_coordinates(e)
+            {
+                var current = svg.createSVGPoint();
+                current.x = e.clientX;
+                current.y = e.clientY;
+
+                for(var axis_id in axes)
+                {
+                    var axis = document.querySelector("#" + axis_id);
+                    var coordinates = axis.querySelector(".toyplot-axes-Axis-coordinates");
+                    if(coordinates)
+                    {
+                        var projection = axes[axis_id];
+                        var local = current.matrixTransform(axis.getScreenCTM().inverse());
+                        if(inside(local.x, projection))
+                        {
+                            var domain = to_domain(local.x, projection);
+                            coordinates.style.visibility = "visible";
+                            coordinates.setAttribute("transform", "translate(" + local.x + ")");
+                            var text = coordinates.querySelector("text");
+                            text.textContent = domain.toFixed(2);
+                        }
+                        else
+                        {
+                            coordinates.style.visibility= "hidden";
+                        }
+                    }
+                }
+            }
+
+            var root_id = "$root_id";
+            var axes = $visible_axes;
+
+            var svg = document.querySelector("#" + root_id + " svg");
+            svg.addEventListener("click", display_coordinates);
+            //svg.addEventListener("mouseout", hide_coordinates);
+        })();
+        """).substitute(
+        root_id=context.root.get("id"),
+        visible_axes=json.dumps(visible_axes, cls=_NumpyJSONEncoder, sort_keys=True),
+        )
 
 
 @dispatch(toyplot.canvas.Canvas._AnimationFrames, _RenderContext)
@@ -1100,7 +1099,8 @@ def _render(frames, context):
           document.querySelector("#" + root_id + " .toyplot-frame-advance").onclick = on_frame_advance;
           document.querySelector("#" + root_id + " .toyplot-forward-play").onclick = on_play_forward;
           document.querySelector("#" + root_id + " .toyplot-fast-forward").onclick = on_fast_forward;
-        })();""").substitute(
+        })();
+        """).substitute(
             root_id=context.root.get("id"),
             frame_durations=json.dumps(durations.tolist()),
             state_changes=json.dumps(changes, cls=_NumpyJSONEncoder),

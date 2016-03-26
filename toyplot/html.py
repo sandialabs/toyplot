@@ -1076,15 +1076,6 @@ def _render(frames, context):
                     datum.style.setProperty(key, datum_style[3][key]);
                 }
               }
-              else if(type == "set-datum-text")
-              {
-                for(var i = 0; i != type_changes.length; ++i)
-                {
-                  var datum_text = type_changes[i];
-                  var datum = get_item(datum_text[0]).querySelectorAll(".toyplot-Series")[datum_text[1]].querySelectorAll(".toyplot-Datum")[datum_text[2]];
-                  datum.textContent = datum_text[3];
-                }
-              }
             }
           }
 

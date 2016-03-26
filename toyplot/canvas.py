@@ -82,20 +82,6 @@ class AnimationFrame(object):
         self._changes[self._begin][
             "set-datum-style"].append((mark, series, datum, style))
 
-    def set_datum_text(self, mark, series, datum, text):
-        """Change the text in a :class:`toyplot.mark.Text` at the current frame.
-
-        Parameters
-        ----------
-        mark: :class:`toyplot.mark.Text` instance
-        value: string
-        """
-        if not isinstance(mark, toyplot.mark.Text):
-            raise ValueError(
-                "Mark text can only be set for toyplot.mark.Text instances.")
-        self._changes[self._begin][
-            "set-datum-text"].append((mark, series, datum, text))
-
 
 ##########################################################################
 # Canvas

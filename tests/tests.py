@@ -883,8 +883,6 @@ def test_animation_frame_sanity_checks():
         frame.set_mark_style(None, {})
     with nose.tools.assert_raises(ValueError):
         frame.set_datum_style(None, 0, 0, {})
-    with nose.tools.assert_raises(ValueError):
-        frame.set_datum_text(None, 0, 0, "")
 
 
 def test_canvas_time():
@@ -912,10 +910,7 @@ def test_html_render_animation():
 
     def callback(frame):
         frame.set_mark_style(text, {"fill-opacity": frame.time()})
-        frame.set_datum_text(text, 0, 0, "frame %s time %s duration %s" % (
-            frame.index(), frame.time(), frame.duration()))
-        frame.set_datum_style(
-            scatterplot, 0, frame.index(), {"stroke": "none"})
+        frame.set_datum_style(scatterplot, 0, frame.index(), {"stroke": "none"})
     canvas.animate(10, callback)
     dom = toyplot.html.render(canvas)
 

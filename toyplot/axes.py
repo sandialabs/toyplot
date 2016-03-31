@@ -2417,12 +2417,12 @@ class Numberline(object):
             scale=scale,
             )
         self._children = []
-        self._offset = {}
+        self._child_offset = {}
         self._palette = toyplot.color.Palette()
         self._parent = parent
         self._scatterplot_colors = itertools.cycle(self._palette)
-        self._style = {}
-        self._width = {}
+        self._child_style = {}
+        self._child_width = {}
         self._x1 = x1
         self._x2 = x2
         self._y1 = y1
@@ -2493,9 +2493,9 @@ class Numberline(object):
 
         self.update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=True)
         self._children.append(colormap)
-        self._offset[colormap] = offset
-        self._width[colormap] = width
-        self._style[colormap] = style
+        self._child_offset[colormap] = offset
+        self._child_width[colormap] = width
+        self._child_style[colormap] = style
 
 
     def scatterplot(
@@ -2609,7 +2609,7 @@ class Numberline(object):
             )
 
         self._children.append(mark)
-        self._offset[mark] = offset
+        self._child_offset[mark] = offset
 
         return mark
 

@@ -575,11 +575,14 @@ _draw_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<":
     "^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
 
-def _axis_transform(x1, y1, x2, y2, offset):
+def _axis_transform(x1, y1, x2, y2, offset, return_length=False):
     p = numpy.row_stack(((x1, y1), (x2, y2)))
     basis = p[1] - p[0]
+    length = numpy.linalg.norm(basis)
     theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
     transform="translate(%s,%s) rotate(%s) translate(0,%s)" % (p[0][0], p[0][1], theta, offset)
+    if return_length:
+        return transform, length
     return transform
 
 
@@ -1227,7 +1230,31 @@ def _render(canvas, numberline, context):
     numberline_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         numberline), attrib={"class": "toyplot-axes-Numberline"})
 
-    children_xml = xml.SubElement(numberline_xml, "g")
+    clip_xml = xml.SubElement(
+        numberline_xml,
+        "clipPath",
+        id="t" + uuid.uuid4().hex,
+        )
+
+    transform, length = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, offset=0, return_length=True)
+    height = numberline.axis._offset
+    if numberline._child_offset:
+        height += numpy.amax(numberline._child_offset.values())
+    xml.SubElement(
+        clip_xml,
+        "rect",
+        x=repr(0),
+        y=repr(-height),
+        width=repr(length),
+        height=repr(height + numberline.axis._offset),
+        transform=transform,
+        )
+
+    children_xml = xml.SubElement(
+        numberline_xml,
+        "g",
+        attrib={"clip-path": "url(#%s)" % clip_xml.get("id")},
+        )
 
     for child in numberline._children:
         _render(numberline, child, context.copy(parent=children_xml))
@@ -1237,9 +1264,9 @@ def _render(canvas, numberline, context):
 
 @dispatch(toyplot.axes.Numberline, toyplot.color.CategoricalMap, _RenderContext)
 def _render(numberline, colormap, context):
-    offset = numberline._offset[colormap]
-    width = numberline._width[colormap]
-    style = numberline._style[colormap]
+    offset = numberline._child_offset[colormap]
+    width = numberline._child_width[colormap]
+    style = numberline._child_style[colormap]
 
     transform = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
 
@@ -1283,9 +1310,9 @@ def _render(numberline, colormap, context):
 
 @dispatch(toyplot.axes.Numberline, toyplot.color.Map, _RenderContext)
 def _render(numberline, colormap, context):
-    offset = numberline._offset[colormap]
-    width = numberline._width[colormap]
-    style = numberline._style[colormap]
+    offset = numberline._child_offset[colormap]
+    width = numberline._child_width[colormap]
+    style = numberline._child_style[colormap]
 
     transform = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
     colormap_range_min, colormap_range_max = numberline.axis.projection([colormap.domain.min, colormap.domain.max])
@@ -1346,7 +1373,7 @@ def _render(numberline, colormap, context):
 
 @dispatch(toyplot.axes.Numberline, toyplot.mark.Scatterplot, _RenderContext)
 def _render(numberline, mark, context):
-    transform = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -numberline._offset[mark])
+    transform = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -numberline._child_offset[mark])
     mark_xml = xml.SubElement(
         context.parent,
         "g",
@@ -1405,10 +1432,10 @@ def _render(numberline, mark, context):
 def _render(canvas, axes, context):
     axes._finalize()
 
-    axes_xml = xml.SubElement(context.parent, "g", id=context.get_id(
+    cartesian_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         axes), attrib={"class": "toyplot-axes-Cartesian"})
 
-    clip_xml = xml.SubElement(axes_xml, "clipPath", id="t" + uuid.uuid4().hex)
+    clip_xml = xml.SubElement(cartesian_xml, "clipPath", id="t" + uuid.uuid4().hex)
     xml.SubElement(
         clip_xml,
         "rect",
@@ -1419,7 +1446,7 @@ def _render(canvas, axes, context):
         )
 
     children_xml = xml.SubElement(
-        axes_xml,
+        cartesian_xml,
         "g",
         attrib={"clip-path" : "url(#%s)" % clip_xml.get("id")},
         )
@@ -1438,10 +1465,10 @@ def _render(canvas, axes, context):
         _render(axes, child, context.copy(parent=children_xml))
 
     if axes._show:
-        _render(canvas, axes.x, context.copy(parent=axes_xml))
-        _render(canvas, axes.y, context.copy(parent=axes_xml))
+        _render(canvas, axes.x, context.copy(parent=cartesian_xml))
+        _render(canvas, axes.y, context.copy(parent=cartesian_xml))
         _draw_text(
-            root=axes_xml,
+            root=cartesian_xml,
             text=axes.label._text,
             x=(axes._xmin_range + axes._xmax_range) * 0.5,
             y=axes._ymin_range,

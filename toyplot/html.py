@@ -1239,7 +1239,7 @@ def _render(canvas, numberline, context):
     transform, length = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, offset=0, return_length=True)
     height = numberline.axis._offset
     if numberline._child_offset:
-        height += numpy.amax(numberline._child_offset.values())
+        height += numpy.amax(list(numberline._child_offset.values()))
     xml.SubElement(
         clip_xml,
         "rect",

@@ -813,13 +813,6 @@ def _render_interactive_mouse_coordinates(context):
                 }
             }
 
-            function hide_coordinates(e)
-            {
-                var coordinates = svg.querySelectorAll(".toyplot-axes-Axis-coordinates");
-                for(var i = 0; i != coordinates.length; ++i)
-                    coordinates[i].style.visibility = "hidden";
-            }
-
             function display_coordinates(e)
             {
                 var current = svg.createSVGPoint();
@@ -855,7 +848,6 @@ def _render_interactive_mouse_coordinates(context):
 
             var svg = document.querySelector("#" + root_id + " svg");
             svg.addEventListener("click", display_coordinates);
-            //svg.addEventListener("mouseout", hide_coordinates);
         })();
         """).substitute(
         root_id=context.root.get("id"),
@@ -1449,16 +1441,6 @@ def _render(canvas, axes, context):
         cartesian_xml,
         "g",
         attrib={"clip-path" : "url(#%s)" % clip_xml.get("id")},
-        )
-
-    xml.SubElement(
-        children_xml,
-        "rect",
-        x=repr(axes._xmin_range - axes.padding),
-        y=repr(axes._ymin_range - axes.padding),
-        width=repr(axes._xmax_range - axes._xmin_range + axes.padding * 2),
-        height=repr(axes._ymax_range - axes._ymin_range + axes.padding * 2),
-        style=_css_style({"visibility": "hidden", "pointer-events": "all"}),
         )
 
     for child in axes._children:

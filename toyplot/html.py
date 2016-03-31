@@ -580,7 +580,13 @@ def _axis_transform(x1, y1, x2, y2, offset, return_length=False):
     basis = p[1] - p[0]
     length = numpy.linalg.norm(basis)
     theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
-    transform="translate(%s,%s) rotate(%s) translate(0,%s)" % (p[0][0], p[0][1], theta, offset)
+    transform=str()
+    if p[0][0] or p[0][1]:
+        transform += "translate(%s,%s)" % (p[0][0], p[0][1])
+    if theta:
+        transform += "rotate(%s)" % theta
+    if offset:
+        transform += "translate(0,%s)" % offset
     if return_length:
         return transform, length
     return transform
@@ -1073,18 +1079,15 @@ def _render(canvas, axis, context):
     context.add_rendered(axis)
 
     if axis.show:
-        p = numpy.row_stack(((axis._x1, axis._y1), (axis._x2, axis._y2)))
-        basis = p[1] - p[0]
-        length = numpy.linalg.norm(basis)
-        theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
-
         context.add_visible_axis(axis)
+
+        transform, length = _axis_transform(axis._x1, axis._y1, axis._x2, axis._y2, offset=axis._offset, return_length=True)
 
         axis_xml = xml.SubElement(
             context.parent,
             "g",
             id=context.get_id(axis),
-            transform="translate(%s,%s) rotate(%s) translate(%s,%s)" % (p[0][0], p[0][1], theta, 0, axis._offset),
+            transform=transform,
             attrib={"class": "toyplot-axes-Axis"},
             )
 
@@ -1229,9 +1232,11 @@ def _render(canvas, numberline, context):
         )
 
     transform, length = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, offset=0, return_length=True)
+
     height = numberline.axis._offset
     if numberline._child_offset:
         height += numpy.amax(list(numberline._child_offset.values()))
+
     xml.SubElement(
         clip_xml,
         "rect",
@@ -1239,13 +1244,13 @@ def _render(canvas, numberline, context):
         y=repr(-height),
         width=repr(length),
         height=repr(height + numberline.axis._offset),
-        transform=transform,
         )
 
     children_xml = xml.SubElement(
         numberline_xml,
         "g",
         attrib={"clip-path": "url(#%s)" % clip_xml.get("id")},
+        transform=transform,
         )
 
     for child in numberline._children:
@@ -1260,14 +1265,13 @@ def _render(numberline, colormap, context):
     width = numberline._child_width[colormap]
     style = numberline._child_style[colormap]
 
-    transform = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
-
     mark_xml = xml.SubElement(
         context.parent,
         "g", id=context.get_id(colormap),
         attrib={"class": "toyplot-color-CategoricalMap"},
-        transform=transform,
         )
+    if offset:
+        mark_xml.set("transform", "translate(0,%s)" % -offset)
 
     samples = numpy.linspace(colormap.domain.min, colormap.domain.max, len(colormap._palette), endpoint=True)
     projected = numberline.axis.projection(samples)
@@ -1306,15 +1310,15 @@ def _render(numberline, colormap, context):
     width = numberline._child_width[colormap]
     style = numberline._child_style[colormap]
 
-    transform = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -offset)
     colormap_range_min, colormap_range_max = numberline.axis.projection([colormap.domain.min, colormap.domain.max])
 
     mark_xml = xml.SubElement(
         context.parent,
         "g", id=context.get_id(colormap),
         attrib={"class": "toyplot-color-Map"},
-        transform=transform,
         )
+    if offset:
+        mark_xml.set("transform", "translate(0, %s)" % -offset)
 
     defs_xml = xml.SubElement(
         mark_xml,
@@ -1365,15 +1369,18 @@ def _render(numberline, colormap, context):
 
 @dispatch(toyplot.axes.Numberline, toyplot.mark.Scatterplot, _RenderContext)
 def _render(numberline, mark, context):
-    transform = _axis_transform(numberline._x1, numberline._y1, numberline._x2, numberline._y2, -numberline._child_offset[mark])
+    offset = numberline._child_offset[mark]
+
     mark_xml = xml.SubElement(
         context.parent,
         "g",
         style=_css_style(mark._style),
         id=context.get_id(mark),
         attrib={"class": "toyplot-mark-Scatterplot"},
-        transform=transform,
         )
+    if offset:
+        mark_xml.set("transform", "translate(0,%s)" % -offset)
+
     context.add_data_table(mark, mark._table, title="Scatterplot Data", filename=mark._filename)
 
     dimension1 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates])

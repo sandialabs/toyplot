@@ -96,7 +96,7 @@ def step_impl(context):
 @then(u'the subgraph can be rendered with the graph layout')
 def step_impl(context):
     context.canvas = toyplot.Canvas(width=1000, height=500)
-    axes = context.canvas.axes(grid=(1, 2, 0), show=False)
+    axes = context.canvas.cartesian(grid=(1, 2, 0), show=False)
     axes.aspect = "fit-range"
     mark = axes.graph(
         context.graph,
@@ -106,7 +106,7 @@ def step_impl(context):
         ecolor="black",
         eopacity=0.2,
         )
-    axes = context.canvas.axes(grid=(1, 2, 1), show=False)
+    axes = context.canvas.cartesian(grid=(1, 2, 1), show=False)
     axes.aspect = "fit-range"
     mark = axes.graph(
         context.subgraph,
@@ -121,7 +121,7 @@ def step_impl(context):
 @then(u'the graph can be rendered with the subgraph layout')
 def step_impl(context):
     context.canvas = toyplot.Canvas(width=1000, height=500)
-    axes = context.canvas.axes(grid=(1, 2, 0), show=False)
+    axes = context.canvas.cartesian(grid=(1, 2, 0), show=False)
     axes.aspect = "fit-range"
     mark = axes.graph(
         context.subgraph,
@@ -131,7 +131,7 @@ def step_impl(context):
         ecolor="black",
         eopacity=0.2,
         )
-    axes = context.canvas.axes(grid=(1, 2, 1), show=False)
+    axes = context.canvas.cartesian(grid=(1, 2, 1), show=False)
     axes.aspect = "fit-range"
     mark = axes.graph(
         context.graph,

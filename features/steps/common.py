@@ -16,7 +16,7 @@ def step_impl(context):
 @given(u'a set of cartesian axes')
 def step_impl(context):
     context.canvas = toyplot.Canvas()
-    context.axes = context.canvas.axes()
+    context.axes = context.canvas.cartesian()
 
 
 @given(u'a sample plot')

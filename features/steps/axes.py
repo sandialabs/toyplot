@@ -533,7 +533,7 @@ def step_impl(context):
 @when(u'adding default line marks to axes')
 def step_impl(context):
     context.canvas = toyplot.Canvas()
-    axes = context.canvas.axes()
+    axes = context.canvas.cartesian()
     axes.hlines(numpy.linspace(0, 0.6), style={"stroke":"steelblue", "opacity":0.4})
     axes.vlines(numpy.linspace(0, 1), style={"stroke":"steelblue", "opacity":0.4})
     axes.plot(numpy.linspace(0.25, 0.75), numpy.linspace(0.25, 0.75) ** 2);
@@ -547,7 +547,7 @@ def step_impl(context):
 @when(u'adding data line marks to axes')
 def step_impl(context):
     context.canvas = toyplot.Canvas()
-    axes = context.canvas.axes()
+    axes = context.canvas.cartesian()
     axes.hlines(numpy.linspace(0, 0.6), style={"stroke":"steelblue", "opacity":0.4}, annotation=False)
     axes.vlines(numpy.linspace(0, 1), style={"stroke":"steelblue", "opacity":0.4}, annotation=False)
     axes.plot(numpy.linspace(0.25, 0.75), numpy.linspace(0.25, 0.75) ** 2);

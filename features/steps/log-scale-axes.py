@@ -57,17 +57,17 @@ def step_impl(context):
 
 @given(u'log 10 axes on x and y')
 def step_impl(context):
-    context.axes = context.canvas.axes(xscale="log10", yscale="log10")
+    context.axes = context.canvas.cartesian(xscale="log10", yscale="log10")
 
 
 @given(u'log 2 axes on x and y')
 def step_impl(context):
-    context.axes = context.canvas.axes(xscale="log2", yscale="log2")
+    context.axes = context.canvas.cartesian(xscale="log2", yscale="log2")
 
 
 @given(u'log 10 axes on x and y with custom format')
 def step_impl(context):
-    context.axes = context.canvas.axes(xscale="log10", yscale="log10")
+    context.axes = context.canvas.cartesian(xscale="log10", yscale="log10")
     context.axes.x.ticks.locator = toyplot.locator.Log(base=10, format="{base}^{exponent}")
     context.axes.y.ticks.locator = toyplot.locator.Log(base=10, format="{base}^{exponent}")
 
@@ -89,13 +89,13 @@ def step_impl(context):
 
 @given(u'log 10 axes on y with domain min 10')
 def step_impl(context):
-    context.axes = context.canvas.axes(yscale="log10")
+    context.axes = context.canvas.cartesian(yscale="log10")
     context.axes.y.domain.min = 10
 
 
 @given(u'log 10 axes on y with domain max -10')
 def step_impl(context):
-    context.axes = context.canvas.axes(yscale="log10")
+    context.axes = context.canvas.cartesian(yscale="log10")
     context.axes.y.domain.max = -10
 
 

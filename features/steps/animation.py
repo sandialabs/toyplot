@@ -35,7 +35,7 @@ except:
 def step_impl(context):
     context.canvas = toyplot.Canvas(
         style={"background-color": "white"}, width=600, height=600)
-    axes = context.canvas.axes()
+    axes = context.canvas.cartesian()
     scatterplot = axes.scatterplot(numpy.arange(10))
 
     def callback(frame):

@@ -247,7 +247,7 @@ def test_xml_comparison_string():
 
 def test_axes_tick_titles():
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.x.ticks.locator = toyplot.locator.Explicit(
         locations=[-0.5, 0, 0.5], titles=["Foo", "Bar", "Baz"])
     axes.y.ticks.locator = toyplot.locator.Explicit(
@@ -257,7 +257,7 @@ def test_axes_tick_titles():
 
 def test_axes_palette():
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     for i in range(10):
         axes.plot(numpy.arange(2), numpy.repeat(i, 2))
     assert_canvas_matches(canvas, "axes-palette")
@@ -265,7 +265,7 @@ def test_axes_palette():
 
 def test_axes_palettes():
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.fill(numpy.sin(numpy.linspace(0, 2 * numpy.pi, 100)),
               style={"fill-opacity": 0.5})
     axes.plot(numpy.sin(numpy.linspace(0, 2 * numpy.pi, 100)), marker="o")
@@ -292,7 +292,7 @@ def test_axes_bars_one_magnitude():
     y = numpy.mean(observations, axis=1)
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(y)
     assert_canvas_matches(canvas, "axes-bars-one-magnitude")
 
@@ -304,7 +304,7 @@ def test_axes_bars_one_magnitude_centers():
     y = numpy.mean(observations, axis=1)
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(x, y)
     assert_canvas_matches(canvas, "axes-bars-one-magnitude-centers")
 
@@ -318,7 +318,7 @@ def test_axes_bars_one_magnitude_edges():
     y = numpy.mean(observations, axis=1)
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(x1, x2, y)
     assert_canvas_matches(canvas, "axes-bars-one-magnitude-edges")
 
@@ -330,7 +330,7 @@ def test_axes_bars_n_magnitudes():
         (numpy.mean(observations, axis=1), numpy.std(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(series)
     assert_canvas_matches(canvas, "axes-bars-n-magnitudes")
 
@@ -342,7 +342,7 @@ def test_axes_bars_n_magnitudes_along_y():
         (numpy.mean(observations, axis=1), numpy.std(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(series, along="y")
     assert_canvas_matches(canvas, "axes-bars-n-magnitudes-along-y")
 
@@ -355,7 +355,7 @@ def test_axes_bars_n_magnitudes_centers():
         (numpy.mean(observations, axis=1), numpy.std(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(x, series)
     assert_canvas_matches(canvas, "axes-bars-n-magnitudes-centers")
 
@@ -370,7 +370,7 @@ def test_axes_bars_n_magnitudes_edges():
         (numpy.mean(observations, axis=1), numpy.std(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(x1, x2, series)
     assert_canvas_matches(canvas, "axes-bars-n-magnitudes-edges")
 
@@ -382,7 +382,7 @@ def test_axes_bars_n_magnitudes_symmetric():
         (numpy.mean(observations, axis=1), numpy.std(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(series, baseline="symmetric")
     assert_canvas_matches(canvas, "axes-bars-n-magnitudes-symmetric")
 
@@ -394,7 +394,7 @@ def test_axes_bars_n_magnitudes_wiggle():
         (numpy.mean(observations, axis=1), numpy.std(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(series, baseline="wiggle")
     assert_canvas_matches(canvas, "axes-bars-n-magnitudes-wiggle")
 
@@ -406,7 +406,7 @@ def test_axes_bars_n_magnitudes_titles():
         (numpy.mean(observations, axis=1), numpy.std(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(series, baseline="stacked", title=["mean", "standard deviation"])
     assert_canvas_matches(canvas, "axes-bars-n-magnitudes-titles")
 
@@ -414,7 +414,7 @@ def test_axes_bars_n_magnitudes_titles():
 def test_axes_bars_histogram():
     numpy.random.seed(1234)
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(numpy.histogram(numpy.random.normal(size=10000), 100))
     assert_canvas_matches(canvas, "axes-bars-histogram")
 
@@ -425,7 +425,7 @@ def test_axes_bars_one_boundary():
     y1 = numpy.mean(observations, axis=1)
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(y1, baseline=None)
     assert_canvas_matches(canvas, "axes-bars-one-boundary")
 
@@ -437,7 +437,7 @@ def test_axes_bars_one_boundary_centers():
     y1 = numpy.mean(observations, axis=1)
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(x, y1, baseline=None)
     assert_canvas_matches(canvas, "axes-bars-one-boundary-centers")
 
@@ -451,7 +451,7 @@ def test_axes_bars_one_boundary_edges():
     y1 = numpy.mean(observations, axis=1)
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(x1, x2, y1, baseline=None)
     assert_canvas_matches(canvas, "axes-bars-one-boundary-edges")
 
@@ -463,7 +463,7 @@ def test_axes_bars_n_boundaries():
         observations, axis=1), numpy.max(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(series, baseline=None)
     assert_canvas_matches(canvas, "axes-bars-n-boundaries")
 
@@ -475,7 +475,7 @@ def test_axes_bars_n_boundaries_along_y():
         observations, axis=1), numpy.max(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(series, along="y", baseline=None)
     assert_canvas_matches(canvas, "axes-bars-n-boundaries-along-y")
 
@@ -488,7 +488,7 @@ def test_axes_bars_n_boundaries_centers():
         observations, axis=1), numpy.max(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(x, series, baseline=None)
     assert_canvas_matches(canvas, "axes-bars-n-boundaries-centers")
 
@@ -503,7 +503,7 @@ def test_axes_bars_n_boundaries_edges():
         observations, axis=1), numpy.max(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(x1, x2, series, baseline=None)
     assert_canvas_matches(canvas, "axes-bars-n-boundaries-edges")
 
@@ -520,7 +520,7 @@ def test_axes_bars_n_boundaries_titles():
                         observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.bars(
         series,
         title=[
@@ -538,7 +538,7 @@ def test_axes_plot_one_variable():
     y = numpy.mean(observations, axis=1)
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.plot(y)
     assert_canvas_matches(canvas, "axes-plot-one-variable")
 
@@ -550,7 +550,7 @@ def test_axes_plot_one_variable_x():
     y = numpy.mean(observations, axis=1)
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.plot(x, y)
     assert_canvas_matches(canvas, "axes-plot-one-variable-x")
 
@@ -562,7 +562,7 @@ def test_axes_plot_n_variables():
         observations, axis=1), numpy.max(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.plot(series)
     assert_canvas_matches(canvas, "axes-plot-n-variables")
 
@@ -575,7 +575,7 @@ def test_axes_plot_n_variables_x():
         observations, axis=1), numpy.max(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.plot(x, series)
     assert_canvas_matches(canvas, "axes-plot-n-variables-x")
 
@@ -587,7 +587,7 @@ def test_axes_plot_n_variables_along_y():
         observations, axis=1), numpy.max(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.plot(series, along="y")
     assert_canvas_matches(canvas, "axes-plot-n-variables-along-y")
 
@@ -675,7 +675,7 @@ def test_axes_scatterplot_one_variable():
     y = numpy.mean(observations, axis=1)
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.scatterplot(y)
     assert_canvas_matches(canvas, "axes-scatterplot-one-variable")
 
@@ -687,7 +687,7 @@ def test_axes_scatterplot_one_variable_x():
     y = numpy.mean(observations, axis=1)
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.scatterplot(x, y)
     assert_canvas_matches(canvas, "axes-scatterplot-one-variable-x")
 
@@ -699,7 +699,7 @@ def test_axes_scatterplot_one_variable_fill():
     color = numpy.arange(len(observations))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.scatterplot(y, color=color)
     assert_canvas_matches(canvas, "axes-scatterplot-one-variable-fill")
 
@@ -711,7 +711,7 @@ def test_axes_scatterplot_n_variables():
         observations, axis=1), numpy.max(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.scatterplot(series)
     assert_canvas_matches(canvas, "axes-scatterplot-n-variables")
 
@@ -724,7 +724,7 @@ def test_axes_scatterplot_n_variables_x():
         observations, axis=1), numpy.max(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.scatterplot(x, series)
     assert_canvas_matches(canvas, "axes-scatterplot-n-variables-x")
 
@@ -736,7 +736,7 @@ def test_axes_scatterplot_n_variables_along_y():
         observations, axis=1), numpy.max(observations, axis=1)))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.scatterplot(series, along="y")
     assert_canvas_matches(canvas, "axes-scatterplot-n-variables-along-y")
 
@@ -746,7 +746,7 @@ def test_axes_scatterplot_singular():
     y = numpy.sin(x)
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.plot(x, y)
     axes.scatterplot(x[0], y[0], color="red")
     assert_canvas_matches(canvas, "axes-scatterplot-singular")
@@ -787,7 +787,7 @@ def test_axes_scatterplot_markers():
     ]
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.scatterplot(
         numpy.arange(
             len(markers)),
@@ -801,14 +801,14 @@ def test_axes_scatterplot_markers():
 
 def test_axes_rect_singular():
     canvas = toyplot.Canvas()
-    axes = canvas.axes(xmin=0, xmax=1, ymin=0, ymax=1)
+    axes = canvas.cartesian(xmin=0, xmax=1, ymin=0, ymax=1)
     axes.rects(0.1, 0.2, 0.3, 0.6)
     assert_canvas_matches(canvas, "axes-rect-singular")
 
 
 def test_axes_rect_singular_along_y():
     canvas = toyplot.Canvas()
-    axes = canvas.axes(xmin=0, xmax=1, ymin=0, ymax=1)
+    axes = canvas.cartesian(xmin=0, xmax=1, ymin=0, ymax=1)
     axes.rects(0.1, 0.2, 0.3, 0.6, along="y")
     assert_canvas_matches(canvas, "axes-rect-singular-along-y")
 
@@ -823,14 +823,14 @@ def test_axes_rect():
     colormap = toyplot.color.CategoricalMap(toyplot.color.brewer.palette("BlueRed"))
 
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     axes.rects(x1, x2, y1, y2, color=(color, colormap), title=title)
     assert_canvas_matches(canvas, "axes-rect")
 
 
 def test_axes_text():
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     x = numpy.linspace(0, 1)
     y = numpy.sin(x * 10)
     text = ["s%s" % index for index in range(len(x))]
@@ -845,7 +845,7 @@ def test_axes_text_angle_fill():
     color = numpy.linspace(1, 0, len(x))
 
     canvas = toyplot.Canvas(400, 400)
-    axes = canvas.axes(xmin=-0.25, xmax=0.5, ymin=-0.5, ymax=0.25)
+    axes = canvas.cartesian(xmin=-0.25, xmax=0.5, ymin=-0.5, ymax=0.25)
     axes.text(
         x,
         y,
@@ -863,7 +863,7 @@ def test_axes_text_angle_fill():
 
 def test_axes_legend():
     canvas = toyplot.Canvas()
-    axes = canvas.axes(grid=(2, 2, 1, 1))
+    axes = canvas.cartesian(grid=(2, 2, 1, 1))
     axes.legend(
         (("foo", "s"), ("bar", "o")), corner=("bottom-left", 30, 100, 50))
     assert_canvas_matches(canvas, "axes-legend")
@@ -904,7 +904,7 @@ def test_canvas_time():
 
 def test_html_render_animation():
     canvas = toyplot.Canvas()
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     text = canvas.text(100, 100, "")
     scatterplot = axes.scatterplot(numpy.arange(10))
 
@@ -921,7 +921,7 @@ def test_html_render_animation():
 def test_legend():
     x = numpy.linspace(0, 2 * numpy.pi, 200)
     canvas = toyplot.Canvas(800, 600)
-    axes = canvas.axes()
+    axes = canvas.cartesian()
     plots = [axes.plot(x, 0.5 * i * numpy.sin(x * i))
              for i in numpy.linspace(1, 2, 3)]
     fill = axes.fill(x, numpy.sin(x) * 0.1, numpy.cos(x) * 0.1)

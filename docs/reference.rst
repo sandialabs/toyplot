@@ -10,11 +10,11 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   toyplot.axes.rst
    toyplot.broadcast.rst
    toyplot.browser.rst
    toyplot.canvas.rst
    toyplot.color.rst
+   toyplot.coordinates.rst
    toyplot.compatibility.rst
    toyplot.config.rst
    toyplot.data.rst

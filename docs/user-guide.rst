@@ -13,7 +13,7 @@ Contents:
   :maxdepth: 2
 
   canvas-layout.rst
-  cartesian-axes.rst
+  cartesian-coordinates.rst
   colors.rst
   color-mapping.rst
   convenience-api.rst
@@ -25,10 +25,10 @@ Contents:
   log-scales.rst
   markers.rst
   matrix-visualization.rst
-  numberline-axes.rst
+  numberline-coordinates.rst
   null-data.rst
   rendering.rst
-  table-axes.rst
+  table-coordinates.rst
   text.rst
   tick-locators.rst
   units.rst

@@ -252,6 +252,57 @@ class Canvas(object):
             yscale="linear",
             padding=10,
         ):
+
+        toyplot.log.warning("toyplot.canvas.Canvas.axes() is deprecated, use toyplot.canvas.Canvas.cartesian() instead.")
+
+        return self.cartesian(
+            bounds=bounds,
+            rect=rect,
+            corner=corner,
+            grid=grid,
+            gutter=gutter,
+            xmin=xmin,
+            xmax=xmax,
+            ymin=ymin,
+            ymax=ymax,
+            aspect=aspect,
+            show=show,
+            xshow=xshow,
+            yshow=yshow,
+            label=label,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xticklocator=xticklocator,
+            yticklocator=yticklocator,
+            xscale=xscale,
+            yscale=yscale,
+            padding=padding,
+            )
+
+    def cartesian(
+            self,
+            bounds=None,
+            rect=None,
+            corner=None,
+            grid=None,
+            gutter=50,
+            xmin=None,
+            xmax=None,
+            ymin=None,
+            ymax=None,
+            aspect=None,
+            show=True,
+            xshow=True,
+            yshow=True,
+            label=None,
+            xlabel=None,
+            ylabel=None,
+            xticklocator=None,
+            yticklocator=None,
+            xscale="linear",
+            yscale="linear",
+            padding=10,
+        ):
         """Add a set of Cartesian axes to the canvas.
 
         Parameters

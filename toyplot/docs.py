@@ -20,7 +20,7 @@ def plot_luma(a, b=None):
         x = numpy.linspace(0, 1, 200)
         y = [toyplot.color.to_lab(color)[0] for color in colormap.colors(x, 0, 1)]
 
-        axes = canvas.axes(
+        axes = canvas.cartesian(
             grid=(grid_m, grid_n, index),
             ymin=0,
             ymax=100,

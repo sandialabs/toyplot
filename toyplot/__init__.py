@@ -59,7 +59,7 @@ def bars(
       The new bar mark.
     """
     canvas = Canvas(width=width, height=height)
-    axes = canvas.axes(
+    axes = canvas.cartesian(
         xmin=xmin,
         xmax=xmax,
         ymin=ymin,
@@ -130,7 +130,7 @@ def fill(
       The new bar mark.
     """
     canvas = Canvas(width=width, height=height)
-    axes = canvas.axes(
+    axes = canvas.cartesian(
         xmin=xmin,
         xmax=xmax,
         ymin=ymin,
@@ -200,7 +200,7 @@ def graph(
         The new graph mark.
     """
     canvas = Canvas(width=width, height=height)
-    axes = canvas.axes(aspect="fit-range", show=False, padding=padding)
+    axes = canvas.cartesian(aspect="fit-range", show=False, padding=padding)
     mark = axes.graph(
         a=a,
         b=b,
@@ -331,7 +331,7 @@ def plot(
       The new plot mark.
     """
     canvas = Canvas(width=width, height=height)
-    axes = canvas.axes(
+    axes = canvas.cartesian(
         aspect=aspect,
         xmin=xmin,
         xmax=xmax,
@@ -414,7 +414,7 @@ def scatterplot(
       The new scatter plot mark.
     """
     canvas = Canvas(width=width, height=height)
-    axes = canvas.axes(
+    axes = canvas.cartesian(
         aspect=aspect,
         xmin=xmin,
         xmax=xmax,

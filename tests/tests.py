@@ -114,7 +114,7 @@ def xml_comparison_string(element):
         text = element.text if element.text is not None else ""
         if element.tag in [
                 "{http://www.sandia.gov/toyplot}data-table",
-                "{http://www.sandia.gov/toyplot}axes"]:
+                "{http://www.sandia.gov/toyplot}coordinates"]:
             text = str(json_comparison_string(json.loads(element.text)))
         buffer.write(u">%s\n" % text)
         for child in list(element):

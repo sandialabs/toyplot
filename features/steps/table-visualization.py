@@ -20,7 +20,7 @@ def step_impl(context):
     context.data["blah"] = numpy.repeat("", 10)
 
 
-@given(u'an instance of toyplot.axes.Table')
+@given(u'an instance of toyplot.coordinates.Table')
 def step_impl(context):
     context.table_axes = context.canvas.table(context.data)
 
@@ -172,7 +172,7 @@ def step_impl(context):
     context.table_axes.column(0).width = (1, "cm")
     context.table_axes.row(0).height = "1cm"
 
-@then(u'an instance of toyplot.axes.Table can be rendered without a header')
+@then(u'an instance of toyplot.coordinates.Table can be rendered without a header')
 def step_impl(context):
     context.canvas = toyplot.Canvas()
     context.table_axes = context.canvas.table(context.data, hrows=0)
@@ -189,7 +189,7 @@ def step_impl(context):
     for key, column in context.data.items():
         context.data[key] = numpy.ma.masked_where(column < 0.5, column)
 
-@given(u'an instance of toyplot.axes.Table with 4 rows and 3 columns')
+@given(u'an instance of toyplot.coordinates.Table with 4 rows and 3 columns')
 def step_impl(context):
     context.table_axes = context.canvas.table(rows=4, columns=3)
     context.table_axes.grid.hlines[...] = "single"

@@ -7,7 +7,7 @@ from __future__ import division
 import collections
 import numbers
 import numpy
-import toyplot.axes
+import toyplot.coordinates
 import toyplot.broadcast
 import toyplot.color
 import toyplot.compatibility
@@ -310,12 +310,12 @@ class Canvas(object):
 
         Returns
         -------
-        axes: :class:`toyplot.axes.Cartesian`
+        axes: :class:`toyplot.coordinates.Cartesian`
         """
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
         self._children.append(
-            toyplot.axes.Cartesian(
+            toyplot.coordinates.Cartesian(
                 xmin_range,
                 xmax_range,
                 ymin_range,
@@ -442,7 +442,7 @@ class Canvas(object):
 
         Returns
         -------
-        axes: :class:`toyplot.axes.Table`
+        axes: :class:`toyplot.coordinates.Table`
         """
         colormap = None
         palette = None
@@ -468,7 +468,7 @@ class Canvas(object):
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
 
-        table = toyplot.axes.Table(
+        table = toyplot.coordinates.Table(
             xmin_range,
             xmax_range,
             ymin_range,
@@ -618,7 +618,7 @@ class Canvas(object):
 
         Returns
         -------
-        axes: :class:`toyplot.axes.Numberline`
+        axes: :class:`toyplot.coordinates.Numberline`
         """
         axes = self.numberline(
             x1=x1,
@@ -690,7 +690,7 @@ class Canvas(object):
 
         Returns
         -------
-        axes: :class:`toyplot.axes.Cartesian`
+        axes: :class:`toyplot.coordinates.Cartesian`
         """
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
@@ -729,7 +729,7 @@ class Canvas(object):
         if padding is None:
             padding = spacing
 
-        axes = toyplot.axes.Numberline(
+        axes = toyplot.coordinates.Numberline(
             x1=x1,
             y1=y1,
             x2=x2,
@@ -768,7 +768,7 @@ class Canvas(object):
 
         Returns
         -------
-        axes: :class:`toyplot.axes.Table`
+        axes: :class:`toyplot.coordinates.Table`
         """
         if data is not None:
             data = toyplot.data.Table(data)
@@ -790,7 +790,7 @@ class Canvas(object):
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-        table = toyplot.axes.Table(
+        table = toyplot.coordinates.Table(
             xmin_range,
             xmax_range,
             ymin_range,

@@ -45,7 +45,7 @@ def bars(
         ):
     """Convenience function for creating a bar plot in a single call.
 
-    See :meth:`toyplot.axes.Cartesian.bars`,
+    See :meth:`toyplot.coordinates.Cartesian.bars`,
     :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
     parameter descriptions.
 
@@ -53,7 +53,7 @@ def bars(
     -------
     canvas: :class:`toyplot.canvas.Canvas`
       A new canvas object.
-    axes: :class:`toyplot.axes.Cartesian`
+    axes: :class:`toyplot.coordinates.Cartesian`
       A new set of 2D axes that fill the canvas.
     mark: :class:`toyplot.mark.BarMagnitudes` or :class:`toyplot.mark.BarBoundaries`
       The new bar mark.
@@ -116,7 +116,7 @@ def fill(
         ):
     """Convenience function for creating a fill plot in a single call.
 
-    See :meth:`toyplot.axes.Cartesian.fill`,
+    See :meth:`toyplot.coordinates.Cartesian.fill`,
     :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
     parameter descriptions.
 
@@ -124,7 +124,7 @@ def fill(
     -------
     canvas: :class:`toyplot.canvas.Canvas`
       A new canvas object.
-    axes: :class:`toyplot.axes.Cartesian`
+    axes: :class:`toyplot.coordinates.Cartesian`
       A new set of 2D axes that fill the canvas.
     mark: :class:`toyplot.mark.FillBoundaries` or :class:`toyplot.mark.FillMagnitudes`
       The new bar mark.
@@ -186,7 +186,7 @@ def graph(
         ): # pragma: no cover
     """Convenience function for creating a graph plot in a single call.
 
-    See :meth:`toyplot.axes.Cartesian.graph`,
+    See :meth:`toyplot.coordinates.Cartesian.graph`,
     :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
     parameter descriptions.
 
@@ -194,7 +194,7 @@ def graph(
     -------
     canvas: :class:`toyplot.canvas.Canvas`
         A new canvas object.
-    axes: :class:`toyplot.axes.Cartesian`
+    axes: :class:`toyplot.coordinates.Cartesian`
         A new set of 2D axes that fill the canvas.
     mark: :class:`toyplot.mark.Graph`
         The new graph mark.
@@ -255,7 +255,7 @@ def matrix(
     -------
     canvas: :class:`toyplot.canvas.Canvas`
       A new canvas object.
-    table: :class:`toyplot.axes.Table`
+    table: :class:`toyplot.coordinates.Table`
       A new set of table axes that fill the canvas.
     """
     canvas = Canvas(width=width, height=height)
@@ -317,7 +317,7 @@ def plot(
         ):
     """Convenience function for creating a line plot in a single call.
 
-    See :meth:`toyplot.axes.Cartesian.plot`,
+    See :meth:`toyplot.coordinates.Cartesian.plot`,
     :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
     parameter descriptions.
 
@@ -325,7 +325,7 @@ def plot(
     -------
     canvas: :class:`toyplot.canvas.Canvas`
       A new canvas object.
-    axes: :class:`toyplot.axes.Cartesian`
+    axes: :class:`toyplot.coordinates.Cartesian`
       A new set of 2D axes that fill the canvas.
     mark: :class:`toyplot.mark.Plot`
       The new plot mark.
@@ -400,7 +400,7 @@ def scatterplot(
         ):
     """Convenience function for creating a scatter plot in a single call.
 
-    See :meth:`toyplot.axes.Cartesian.scatterplot`,
+    See :meth:`toyplot.coordinates.Cartesian.scatterplot`,
     :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
     parameter descriptions.
 
@@ -408,7 +408,7 @@ def scatterplot(
     -------
     canvas: :class:`toyplot.canvas.Canvas`
       A new canvas object.
-    axes: :class:`toyplot.axes.Cartesian`
+    axes: :class:`toyplot.coordinates.Cartesian`
       A new set of 2D axes that fill the canvas.
     mark: :class:`toyplot.mark.Plot`
       The new scatter plot mark.
@@ -467,7 +467,7 @@ def table(
     -------
     canvas: :class:`toyplot.canvas.Canvas`
       A new canvas object.
-    table: :class:`toyplot.axes.Table`
+    table: :class:`toyplot.coordinates.Table`
       A new set of table axes that fill the canvas.
     """
     canvas = Canvas(width=width, height=height)

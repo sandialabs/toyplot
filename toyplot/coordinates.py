@@ -336,14 +336,14 @@ class Axis(object):
     class InteractiveCoordinatesHelper(object):
         """Controls the appearance and behavior of interactive coordinates."""
         def __init__(self):
-            self._label = toyplot.axes.Axis.InteractiveCoordinatesLabelHelper()
+            self._label = toyplot.coordinates.Axis.InteractiveCoordinatesLabelHelper()
             self._location = None
             self._show = True
-            self._tick = toyplot.axes.Axis.InteractiveCoordinatesTickHelper()
+            self._tick = toyplot.coordinates.Axis.InteractiveCoordinatesTickHelper()
 
         @property
         def label(self):
-            """:class:`toyplot.axes.Axis.InteractiveCoordinatesLabelHelper` instance."""
+            """:class:`toyplot.coordinates.Axis.InteractiveCoordinatesLabelHelper` instance."""
             return self._label
 
         location = _create_location_property()
@@ -358,18 +358,18 @@ class Axis(object):
 
         @property
         def tick(self):
-            """:class:`toyplot.axes.Axis.InteractiveCoordinatesTickHelper` instance."""
+            """:class:`toyplot.coordinates.Axis.InteractiveCoordinatesTickHelper` instance."""
             return self._tick
 
 
     class InteractiveHelper(object):
         """Controls interactive behavior for this axis."""
         def __init__(self):
-            self._coordinates = toyplot.axes.Axis.InteractiveCoordinatesHelper()
+            self._coordinates = toyplot.coordinates.Axis.InteractiveCoordinatesHelper()
 
         @property
         def coordinates(self):
-            """:class:`toyplot.axes.Axis.InteractiveCoordinatesHelper` instance."""
+            """:class:`toyplot.coordinates.Axis.InteractiveCoordinatesHelper` instance."""
             return self._coordinates
 
 
@@ -560,17 +560,17 @@ class Axis(object):
 
     @property
     def interactive(self):
-        """:class:`toyplot.axes.Axis.InteractiveHelper` instance."""
+        """:class:`toyplot.coordinates.Axis.InteractiveHelper` instance."""
         return self._interactive
 
     @property
     def domain(self):
-        """:class:`toyplot.axes.Axis.DomainHelper` instance."""
+        """:class:`toyplot.coordinates.Axis.DomainHelper` instance."""
         return self._domain
 
     @property
     def label(self):
-        """:class:`toyplot.axes.Axis.LabelHelper` instance."""
+        """:class:`toyplot.coordinates.Axis.LabelHelper` instance."""
         return self._label
 
     @property
@@ -598,12 +598,12 @@ class Axis(object):
 
     @property
     def spine(self):
-        """:class:`toyplot.axes.Axis.SpineHelper` instance."""
+        """:class:`toyplot.coordinates.Axis.SpineHelper` instance."""
         return self._spine
 
     @property
     def ticks(self):
-        """:class:`toyplot.axes.Axis.TicksHelper` instance."""
+        """:class:`toyplot.coordinates.Axis.TicksHelper` instance."""
         return self._ticks
 
     def update_domain(self, values, display=True, data=True):
@@ -1332,7 +1332,7 @@ class Cartesian(object):
 
         Returns
         -------
-        axes: :class:`toyplot.axes.Numberline`
+        axes: :class:`toyplot.coordinates.Numberline`
         """
 
         axis = self._parent.color_scale(
@@ -2206,7 +2206,7 @@ class Cartesian(object):
 
         Returns
         -------
-        axes: :class:`toyplot.axes.Cartesian`
+        axes: :class:`toyplot.coordinates.Cartesian`
         """
 
         shared = Cartesian(
@@ -2433,7 +2433,7 @@ class Numberline(object):
 
     @property
     def axis(self):
-        """:class:`toyplot.axes.Axis` instance that provides the numberline
+        """:class:`toyplot.coordinates.Axis` instance that provides the numberline
         coordinate system."""
         return self._axis
 
@@ -2853,7 +2853,7 @@ class Table(object):
             top = numpy.min([cell.top for cell in self._cells.flat]) + cell_padding
             bottom = numpy.max([cell.bottom for cell in self._cells.flat]) - cell_padding
 
-            axes = toyplot.axes.Cartesian(
+            axes = toyplot.coordinates.Cartesian(
                 left,
                 right,
                 top,

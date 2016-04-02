@@ -12,7 +12,7 @@ import json
 import numbers
 import numpy
 import string
-import toyplot.axes
+import toyplot.coordinates
 import toyplot.canvas
 import toyplot.color
 import toyplot.compatibility
@@ -35,16 +35,17 @@ class _NumpyJSONEncoder(json.JSONEncoder):
 
 class _RenderContext(object):
     def __init__(self, root):
-        self._root = root
-        self._parent = None
-        self._id_cache = dict()
-        self._data_tables = list()
-        self._visible_axes = set()
-        self._rendered = set()
         self._animation = collections.defaultdict(lambda: collections.defaultdict(list))
+        self._coordinate_systems = set()
+        self._data_tables = list()
+        self._id_cache = dict()
+        self._parent = None
+        self._rendered = set()
+        self._root = root
+        self._visible_axes = set()
 
-    def add_visible_axis(self, axis):
-        self._visible_axes.add(axis)
+    def add_coordinate_system(self, coordinate_system):
+        self._coordinate_systems.add(coordinate_system)
 
     def add_data_table(self, mark, table, title, filename):
         self._data_tables.append({
@@ -54,8 +55,14 @@ class _RenderContext(object):
             "filename": filename,
             })
 
-    def add_rendered(self, renderable):
+    def add_visible_axis(self, axis):
+        self._visible_axes.add(axis)
+
+    def already_rendered(self, renderable):
+        if renderable in self._rendered:
+            return True
         self._rendered.add(renderable)
+        return False
 
     def get_id(self, obj):
         python_id = id(obj)
@@ -73,12 +80,12 @@ class _RenderContext(object):
         return self._animation
 
     @property
-    def parent(self):
-        return self._parent
+    def coordinate_systems(self):
+        return self._coordinate_systems
 
     @property
-    def rendered(self):
-        return self._rendered
+    def parent(self):
+        return self._parent
 
     @property
     def root(self):
@@ -619,6 +626,7 @@ def _render(canvas, context):
         )
 
     _render_data_table_export(context.copy(parent=interactive_xml))
+    _render_data_cursors(context.copy(parent=interactive_xml))
     _render_interactive_mouse_coordinates(context.copy(parent=interactive_xml))
     _render(canvas._animation, context.copy(parent=interactive_xml))
 
@@ -727,6 +735,10 @@ def _render_data_table_export(context):
             )
 
 
+def _render_data_cursors(context):
+    if not context.coordinate_systems:
+        return
+
 def _render_interactive_mouse_coordinates(context):
     if not context.visible_axes:
         return
@@ -828,7 +840,7 @@ def _render_interactive_mouse_coordinates(context):
                 for(var axis_id in axes)
                 {
                     var axis = document.querySelector("#" + axis_id);
-                    var coordinates = axis.querySelector(".toyplot-axes-Axis-coordinates");
+                    var coordinates = axis.querySelector(".toyplot-coordinates-Axis-coordinates");
                     if(coordinates)
                     {
                         var projection = axes[axis_id];
@@ -1072,11 +1084,10 @@ def _render(frames, context):
             )
 
 
-@dispatch(toyplot.canvas.Canvas, toyplot.axes.Axis, _RenderContext)
+@dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Axis, _RenderContext)
 def _render(canvas, axis, context):
-    if axis in context.rendered:
+    if context.already_rendered(axis):
         return
-    context.add_rendered(axis)
 
     if axis.show:
         context.add_visible_axis(axis)
@@ -1088,7 +1099,7 @@ def _render(canvas, axis, context):
             "g",
             id=context.get_id(axis),
             transform=transform,
-            attrib={"class": "toyplot-axes-Axis"},
+            attrib={"class": "toyplot-coordinates-Axis"},
             )
 
         if axis.spine.show:
@@ -1185,7 +1196,7 @@ def _render(canvas, axis, context):
         if axis.interactive.coordinates.show:
             coordinates_xml = xml.SubElement(
                 axis_xml, "g",
-                attrib={"class": "toyplot-axes-Axis-coordinates"},
+                attrib={"class": "toyplot-coordinates-Axis-coordinates"},
                 style=_css_style({"visibility": "hidden"}),
                 transform="",
                 )
@@ -1218,12 +1229,14 @@ def _render(canvas, axis, context):
                     )
 
 
-@dispatch(toyplot.canvas.Canvas, toyplot.axes.Numberline, _RenderContext)
+@dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Numberline, _RenderContext)
 def _render(canvas, numberline, context):
     numberline._finalize()
 
+    context.add_coordinate_system(numberline)
+
     numberline_xml = xml.SubElement(context.parent, "g", id=context.get_id(
-        numberline), attrib={"class": "toyplot-axes-Numberline"})
+        numberline), attrib={"class": "toyplot-coordinates-Numberline"})
 
     clip_xml = xml.SubElement(
         numberline_xml,
@@ -1259,7 +1272,7 @@ def _render(canvas, numberline, context):
     _render(canvas, numberline.axis, context.copy(parent=numberline_xml))
 
 
-@dispatch(toyplot.axes.Numberline, toyplot.color.CategoricalMap, _RenderContext)
+@dispatch(toyplot.coordinates.Numberline, toyplot.color.CategoricalMap, _RenderContext)
 def _render(numberline, colormap, context):
     offset = numberline._child_offset[colormap]
     width = numberline._child_width[colormap]
@@ -1304,7 +1317,7 @@ def _render(numberline, colormap, context):
         style=_css_style(style),
         )
 
-@dispatch(toyplot.axes.Numberline, toyplot.color.Map, _RenderContext)
+@dispatch(toyplot.coordinates.Numberline, toyplot.color.Map, _RenderContext)
 def _render(numberline, colormap, context):
     offset = numberline._child_offset[colormap]
     width = numberline._child_width[colormap]
@@ -1367,7 +1380,7 @@ def _render(numberline, colormap, context):
         )
 
 
-@dispatch(toyplot.axes.Numberline, toyplot.mark.Scatterplot, _RenderContext)
+@dispatch(toyplot.coordinates.Numberline, toyplot.mark.Scatterplot, _RenderContext)
 def _render(numberline, mark, context):
     offset = numberline._child_offset[mark]
 
@@ -1427,12 +1440,14 @@ def _render(numberline, mark, context):
                 )
 
 
-@dispatch(toyplot.canvas.Canvas, toyplot.axes.Cartesian, _RenderContext)
+@dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Cartesian, _RenderContext)
 def _render(canvas, axes, context):
     axes._finalize()
 
+    context.add_coordinate_system(axes)
+
     cartesian_xml = xml.SubElement(context.parent, "g", id=context.get_id(
-        axes), attrib={"class": "toyplot-axes-Cartesian"})
+        axes), attrib={"class": "toyplot-coordinates-Cartesian"})
 
     clip_xml = xml.SubElement(cartesian_xml, "clipPath", id="t" + uuid.uuid4().hex)
     xml.SubElement(
@@ -1465,12 +1480,12 @@ def _render(canvas, axes, context):
             )
 
 
-@dispatch(toyplot.canvas.Canvas, toyplot.axes.Table, _RenderContext)
+@dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Table, _RenderContext)
 def _render(canvas, axes, context):
     axes._finalize()
 
     axes_xml = xml.SubElement(context.parent, "g", id=context.get_id(
-        axes), attrib={"class": "toyplot-axes-Table"})
+        axes), attrib={"class": "toyplot-coordinates-Table"})
 
     # Render title
     _draw_text(
@@ -1669,7 +1684,7 @@ def _render(canvas, axes, context):
                     )
 
 
-@dispatch(toyplot.axes.Cartesian, toyplot.mark.BarBoundaries, _RenderContext)
+@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.BarBoundaries, _RenderContext)
 def _render(axes, mark, context):
     left = mark._table[mark._left[0]]
     right = mark._table[mark._right[0]]
@@ -1746,7 +1761,7 @@ def _render(axes, mark, context):
                 xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
-@dispatch(toyplot.axes.Cartesian, toyplot.mark.BarMagnitudes, _RenderContext)
+@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.BarMagnitudes, _RenderContext)
 def _render(axes, mark, context):
     left = mark._table[mark._left[0]]
     right = mark._table[mark._right[0]]
@@ -1818,7 +1833,7 @@ def _render(axes, mark, context):
                 xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
-@dispatch(toyplot.axes.Cartesian, toyplot.mark.FillBoundaries, _RenderContext)
+@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.FillBoundaries, _RenderContext)
 def _render(axes, mark, context):
     boundaries = numpy.ma.column_stack(
         [mark._table[key] for key in mark._boundaries])
@@ -1866,7 +1881,7 @@ def _render(axes, mark, context):
                 xml.SubElement(series_xml, "title").text = str(title)
 
 
-@dispatch(toyplot.axes.Cartesian, toyplot.mark.FillMagnitudes, _RenderContext)
+@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.FillMagnitudes, _RenderContext)
 def _render(axes, mark, context):
     magnitudes = numpy.ma.column_stack(
         [mark._table[mark._baseline[0]]] + [mark._table[key] for key in mark._magnitudes])
@@ -1911,7 +1926,7 @@ def _render(axes, mark, context):
                 xml.SubElement(series_xml, "title").text = str(title)
 
 
-@dispatch(toyplot.axes.Cartesian, toyplot.mark.AxisLines, _RenderContext)
+@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.AxisLines, _RenderContext)
 def _render(axes, mark, context):
     if mark._coordinate_axes[0] == "x":
         p1 = "x1"
@@ -1963,7 +1978,7 @@ def _render(axes, mark, context):
             xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
-@dispatch((toyplot.canvas.Canvas, toyplot.axes.Cartesian), toyplot.mark.Legend, _RenderContext)
+@dispatch((toyplot.canvas.Canvas, toyplot.coordinates.Cartesian), toyplot.mark.Legend, _RenderContext)
 def _render(canvas, legend, context):
     x = legend._xmin
     y = legend._ymin
@@ -2081,7 +2096,7 @@ def _render(canvas, legend, context):
                 )
 
 
-@dispatch(toyplot.axes.Cartesian, toyplot.mark.Graph, _RenderContext)
+@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Graph, _RenderContext)
 def _render(axes, mark, context): # pragma: no cover
     # Project edge coordinates
     for i in range(2):
@@ -2186,7 +2201,7 @@ def _render(axes, mark, context): # pragma: no cover
                 )
 
 
-@dispatch(toyplot.axes.Cartesian, toyplot.mark.Plot, _RenderContext)
+@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Plot, _RenderContext)
 def _render(axes, mark, context):
     position = mark._table[mark._coordinates[0]]
     series = numpy.ma.column_stack([mark._table[key] for key in mark._series])
@@ -2282,7 +2297,7 @@ def _render(axes, mark, context):
                 )
 
 
-@dispatch(toyplot.axes.Cartesian, toyplot.mark.Rect, _RenderContext)
+@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Rect, _RenderContext)
 def _render(axes, mark, context):
     if mark._coordinate_axes.tolist() == ["x", "y"]:
         x1 = axes._project_x(mark._table[mark._left[0]])
@@ -2331,7 +2346,7 @@ def _render(axes, mark, context):
             xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
-@dispatch(toyplot.axes.Cartesian, toyplot.mark.Scatterplot, _RenderContext)
+@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Scatterplot, _RenderContext)
 def _render(axes, mark, context):
     dimension1 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates[0::2]])
     dimension2 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates[1::2]])
@@ -2397,12 +2412,12 @@ def _render(axes, mark, context):
                 )
 
 
-@dispatch((toyplot.canvas.Canvas, toyplot.axes.Cartesian), toyplot.mark.Text, _RenderContext)
+@dispatch((toyplot.canvas.Canvas, toyplot.coordinates.Cartesian), toyplot.mark.Text, _RenderContext)
 def _render(parent, mark, context):
     x = mark._table[mark._coordinates[numpy.where(mark._coordinate_axes == "x")[0][0]]]
     y = mark._table[mark._coordinates[numpy.where(mark._coordinate_axes == "y")[0][0]]]
 
-    if isinstance(parent, toyplot.axes.Cartesian):
+    if isinstance(parent, toyplot.coordinates.Cartesian):
         x = parent._project_x(x)
         y = parent._project_y(y)
 

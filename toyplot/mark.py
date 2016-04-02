@@ -26,7 +26,7 @@ class AxisLines(Mark):
     """Render multiple lines parallel to an axis.
 
     Do not create AxisLines instances directly.  Use factory methods such as
-    :meth:`toyplot.axes.Cartesian.hlines` and :meth:`toyplot.axes.Cartesian.vlines` instead.
+    :meth:`toyplot.coordinates.Cartesian.hlines` and :meth:`toyplot.coordinates.Cartesian.vlines` instead.
     """
 
     def __init__(
@@ -63,7 +63,7 @@ class BarBoundaries(Mark):
     """Render multiple stacked bars defined by bar boundaries.
 
     Do not create BarBoundaries instances directly.  Use factory methods such as
-    :func:`toyplot.bars` or :meth:`toyplot.axes.Cartesian.bars` instead.
+    :func:`toyplot.bars` or :meth:`toyplot.coordinates.Cartesian.bars` instead.
     """
 
     def __init__(
@@ -109,7 +109,7 @@ class BarMagnitudes(Mark):
     """Render multiple stacked bars defined by bar magnitudes.
 
     Do not create BarMagnitudes instances directly.  Use factory methods such as
-    :func:`toyplot.bars` or :meth:`toyplot.axes.Cartesian.bars` instead.
+    :func:`toyplot.bars` or :meth:`toyplot.coordinates.Cartesian.bars` instead.
     """
 
     def __init__(
@@ -157,7 +157,7 @@ class FillBoundaries(Mark):
     """Render multiple stacked fill regions defined by boundaries.
 
     Do not create FillBoundaries instances directly.  Use factory methods such
-    as :func:`toyplot.fill` or :meth:`toyplot.axes.Cartesian.fill` instead.
+    as :func:`toyplot.fill` or :meth:`toyplot.coordinates.Cartesian.fill` instead.
     """
 
     def __init__(
@@ -200,7 +200,7 @@ class FillMagnitudes(Mark):
     """Render multiple stacked fill regions defined by magnitudes.
 
     Do not create FillMagnitudes instances directly.  Use factory methods such
-    as :func:`toyplot.fill` or :meth:`toyplot.axes.Cartesian.fill` instead.
+    as :func:`toyplot.fill` or :meth:`toyplot.coordinates.Cartesian.fill` instead.
     """
 
     def __init__(
@@ -247,7 +247,7 @@ class Graph(Mark): # pragma: no cover
     """Plot a graph (collection of vertices and edges).
 
     Do not create Graph instances directly.  Use factory methods such as
-    :meth:`toyplot.axes.Cartesian.graph` instead.
+    :meth:`toyplot.coordinates.Cartesian.graph` instead.
     """
 
     def __init__(
@@ -385,8 +385,8 @@ class Plot(Mark):
 
     Do not create Plot instances directly.  Use factory methods such as
     :func:`toyplot.plot`, :func:`toyplot.scatterplot`,
-    :meth:`toyplot.axes.Cartesian.plot` and
-    :meth:`toyplot.axes.Cartesian.scatterplot` instead.
+    :meth:`toyplot.coordinates.Cartesian.plot` and
+    :meth:`toyplot.coordinates.Cartesian.scatterplot` instead.
     """
 
     def __init__(
@@ -456,7 +456,7 @@ class Rect(Mark):
     """Plot axis-aligned rectangles.
 
     Do not create Rect instances directly.  Use factory methods such as
-    :meth:`toyplot.axes.Cartesian.rect` instead.
+    :meth:`toyplot.coordinates.Cartesian.rect` instead.
     """
 
     def __init__(
@@ -505,7 +505,7 @@ class Scatterplot(Mark):
     """Plot multivariate data series using markers.
 
     Do not create Scatterplot instances directly.  Use factory methods such as
-    :func:`toyplot.scatterplot` and :meth:`toyplot.axes.Cartesian.scatterplot`
+    :func:`toyplot.scatterplot` and :meth:`toyplot.coordinates.Cartesian.scatterplot`
     instead.
     """
 
@@ -563,7 +563,7 @@ class Text(Mark):
     """Render text.
 
     Do not create Text instances directly.  Use factory methods such as
-    :meth:`toyplot.canvas.Canvas.text` or :meth:`toyplot.axes.Cartesian.text` instead.
+    :meth:`toyplot.canvas.Canvas.text` or :meth:`toyplot.coordinates.Cartesian.text` instead.
     """
 
     def __init__(
@@ -620,7 +620,7 @@ class Legend(Mark):
     """Render a figure legend (a collection of markers and labels).
 
     Do not create Legend instances directly.  Use factory methods such as
-    :meth:`toyplot.canvas.Canvas.legend` or :meth:`toyplot.axes.Cartesian.legend` instead.
+    :meth:`toyplot.canvas.Canvas.legend` or :meth:`toyplot.coordinates.Cartesian.legend` instead.
     """
 
     def __init__(self, xmin, xmax, ymin, ymax, marks, style, lstyle):

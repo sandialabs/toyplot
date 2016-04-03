@@ -43,8 +43,7 @@ class Null(TickLocator):
         return [], [], []
 
 
-class Basic(TickLocator):
-
+class Uniform(TickLocator):
     """Generate N evenly spaced ticks that include the minimum and maximum values of a domain.
 
     Parameters
@@ -80,6 +79,12 @@ class Basic(TickLocator):
         labels = [self._format.format(location) for location in locations]
         titles = numpy.repeat(None, len(labels))
         return locations, labels, titles
+
+
+class Basic(Uniform):
+    def __init__(self, count=5, format="{:g}"):
+        toyplot.log.warning("toyplot.locator.Basic is deprecated, use toyplot.locator.Uniform instead.")
+        Uniform.__init__(self, count=count, format=format)
 
 
 class Explicit(TickLocator):

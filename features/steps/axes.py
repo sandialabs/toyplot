@@ -92,7 +92,7 @@ def step_impl(context):
     u'the cartesian axes can be rendered with x ticks controlled by a locator')
 def step_impl(context):
     context.axes.x.ticks.show = True
-    locator = toyplot.locator.Basic(count=11)
+    locator = toyplot.locator.Uniform(count=11)
     context.axes.x.ticks.locator = locator
     nose.tools.assert_is(context.axes.x.ticks.locator, locator)
 
@@ -235,7 +235,7 @@ def step_impl(context):
     u'the cartesian axes can be rendered with y ticks controlled by a locator')
 def step_impl(context):
     context.axes.y.ticks.show = True
-    locator = toyplot.locator.Basic(count=5)
+    locator = toyplot.locator.Uniform(count=5)
     context.axes.y.ticks.locator = locator
     nose.tools.assert_is(context.axes.y.ticks.locator, locator)
 

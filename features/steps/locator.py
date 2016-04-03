@@ -40,8 +40,8 @@ def step_impl(context):
 def step_impl(context):
     canvas = toyplot.Canvas()
     axes = canvas.cartesian(
-        xticklocator=toyplot.locator.Basic(count=10, format="{:.3g}"))
-    axes.y.ticks.locator = toyplot.locator.Basic(count=3, format="{:.1f}")
+        xticklocator=toyplot.locator.Uniform(count=10, format="{:.3g}"))
+    axes.y.ticks.locator = toyplot.locator.Uniform(count=3, format="{:.1f}")
     axes.plot(context.x, context.y)
     toyplot.testing.assert_canvas_equal(canvas, "tick-locator-basic")
 

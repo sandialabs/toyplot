@@ -688,7 +688,7 @@ class BrewerFactory(object):
 
         Parameters
         ----------
-        name: string
+        name: :class:`str`
           The name of the ColorBrewer 2.0 palette.
 
         count: integer, optional
@@ -714,12 +714,12 @@ class BrewerFactory(object):
 
         Parameters
         ----------
-        category: string, optional
+        category: :class:`str`, optional
             If specified, only return palettes from the given category.
 
         Returns
         -------
-        palettes: sequence of (string, :class:`toyplot.color.Palette`) tuples.
+        palettes: sequence of (:class:`str`, :class:`toyplot.color.Palette`) tuples.
         """
         return [(name, self.palette(name)) for name in self.names(category)]
 
@@ -748,12 +748,12 @@ class BrewerFactory(object):
 
         Parameters
         ----------
-        category: string, optional
+        category: :class:`str`, optional
             If specified, only return palettes from the given category.
 
         Returns
         -------
-        palettes: sequence of (string, :class:`toyplot.color.Map`) tuples.
+        palettes: sequence of (:class:`str`, :class:`toyplot.color.Map`) tuples.
         """
         return [(name, self.map(name)) for name in self.names(category)]
 
@@ -1078,7 +1078,7 @@ class LinearFactory(object):
 
         Parameters
         ----------
-        name: string
+        name: :class:`str`
           The name of the map.  Use :py:meth:`toyplot.color.LinearFactory.names` to retrieve a list of available names.
 
         Returns
@@ -1093,7 +1093,7 @@ class LinearFactory(object):
 
         Returns
         -------
-        palettes: sequence of (string, :class:`toyplot.color.DivergingMap`) tuples.
+        palettes: sequence of (:class:`str`, :class:`toyplot.color.DivergingMap`) tuples.
         """
         return [(name, self.map(name)) for name in self.names()]
 
@@ -1382,7 +1382,7 @@ class DivergingFactory(object):
 
         Parameters
         ----------
-        name: string
+        name: :class:`str`
           The name of the map.  Use :py:meth:`toyplot.color.DivergingFactory.names` to retrieve a list of available names.
 
         Returns
@@ -1397,7 +1397,7 @@ class DivergingFactory(object):
 
         Returns
         -------
-        palettes: sequence of (string, :class:`toyplot.color.DivergingMap`) tuples.
+        palettes: sequence of (:class:`str`, :class:`toyplot.color.DivergingMap`) tuples.
         """
         return [(name, self.map(name)) for name in self.names()]
 
@@ -1426,8 +1426,7 @@ def to_css(color):
 
     Returns
     -------
-    css: str
-        String containing a CSS color value.
+    css: :class:`str` containing a CSS color value.
       """
     return "rgba(%.1f%%,%.1f%%,%.1f%%,%.3f)" % (color["r"] * 100, color["g"] * 100, color["b"] * 100, color["a"])
 
@@ -1437,12 +1436,11 @@ def css(value):
 
     Parameters
     ----------
-    value: string
+    value: :class:`str`
 
     Returns
     -------
-    color: :class:`numpy.ndarray`
-        Array of RGBA values with dtype = :data:`toyplot.color.dtype`.
+    color: :class:`numpy.ndarray` scalar containing RGBA values with dtype = :data:`toyplot.color.dtype`.
     """
     if value.lower() in css.names:
         color = css.names[value.lower()]

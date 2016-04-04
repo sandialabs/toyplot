@@ -49,7 +49,7 @@ class Table(object):
         * :class:`dict` / :class:`collections.Mapping` - creates a column for each key-value pair in the input, sorted by key in lexicographical order.  Each value must be implicitly convertable to a numpy masked array, and every value must contain the same number of items.
         * :class:`list` / :class:`collections.Sequence` - creates a column for each key-value tuple in the input sequence, in the same order.  Each value must be implicitly convertable to a numpy masked array, and every value must contain the same number of items.
         * :class:`numpy.ndarray` - creates a column for each column in a numpy matrix (2D array).  The order of the columns is maintained, and each column is assigned a unique name.
-        * :class:`pandas.DataFrame` - creates a column for each column in a `Pandas <http://pandas.pydata.org>`_ data frame.  The order of the columns is maintained.
+        * :class:`pandas.core.frame.DataFrame` - creates a column for each column in a `Pandas <http://pandas.pydata.org>`_ data frame.  The order of the columns is maintained.
 
     index: bool or string, optional
         Controls whether to convert a `Pandas <http://pandas.pydata.org>`_ data

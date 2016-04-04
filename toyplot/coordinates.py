@@ -2069,8 +2069,7 @@ class Cartesian(object):
           Human-readable title for the mark.  The SVG / HTML backends render the
           title as a tooltip.
         style: dict, optional
-          Collection of CSS styles to apply across all datums.  See
-          :class:`toyplot.toyplot.Plot` for a list of useful styles.
+          Collection of CSS styles to apply across all datums.
 
         Returns
         -------
@@ -2524,8 +2523,7 @@ class Numberline(object):
           Human-readable title for the mark.  The SVG / HTML backends render the
           title as a tooltip.
         style: dict, optional
-          Collection of CSS styles to apply across all datums.  See
-          :class:`toyplot.toyplot.Plot` for a list of useful styles.
+          Collection of CSS styles to apply across all datums.
 
         Returns
         -------

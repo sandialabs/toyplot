@@ -11,12 +11,13 @@ def combine(*styles):
 
     Parameters
     ----------
-    styles: sequence of dicts
+    styles: sequence of :class:`dict` instances
         A collection of dicts containing CSS-compatible name-value pairs.
 
     Returns
     -------
-    styles: dict containing CSS-compatible name-value pairs.
+    styles: :class:`dict`
+        Dictionary containing CSS-compatible name-value pairs.
     """
     computed_style = {}
     for style in styles:

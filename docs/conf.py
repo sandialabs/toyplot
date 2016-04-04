@@ -71,12 +71,27 @@ sys.path.insert(0, os.path.abspath(".."))
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.viewcode",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
+    "sphinx.ext.viewcode",
     "sphinxcontrib.napoleon",
 ]
 
 napoleon_use_param = False
+
+# Complain about all cross reference targets that can't be found.
+nitpicky = True
+
+nitpick_ignore = [
+#    ("py:class", "object"),
+    ]
+
+intersphinx_mapping = {
+    "arrow": ("https://arrow.readthedocs.org/en/latest", None),
+    "numpy": ("http://docs.scipy.org/doc/numpy-1.10.1", None),
+    "python": ("https://docs.python.org/2.7", None),
+    "PIL": ("https://pillow.readthedocs.org/en/3.2.x", None),
+    }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

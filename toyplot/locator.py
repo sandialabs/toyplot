@@ -669,10 +669,10 @@ class Timestamp(TickLocator):
         "minutes", "second", and "seconds".
     timezone: string, optional
         Specifies a local timezone to be used for label generation.  Defaults
-        to "utc".  Supports any timezone code allowed by :class:`arrow.Arrow`.
+        to "utc".  Supports any timezone code allowed by :class:`arrow.arrow.Arrow`.
     format: string, optional
         Format string used to generate labels from tick locations.  The
-        formatted value will be a :class:`arrow.Arrow` object, so any of the
+        formatted value will be a :class:`arrow.arrow.Arrow` object, so any of the
         attributes and formatting provided by https://arrow.readthedocs.org may
         be used in the format.  For example, to display the full day of the
         week, month, day of the month without zero padding, and year, you could

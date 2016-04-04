@@ -31,7 +31,7 @@ def convert_notebook(name):
     if not os.path.exists(test_dir):
         os.mkdir(test_dir)
 
-    subprocess.check_call(["ipython",
+    subprocess.check_call(["jupyter",
                            "nbconvert",
                            "--execute",
                            "--to",
@@ -51,7 +51,7 @@ def convert_notebook(name):
     if arguments.command == "latex":
         env["TOYPLOT_AUTOFORMAT"] = "png"
 
-    subprocess.check_call(["ipython",
+    subprocess.check_call(["jupyter",
                            "nbconvert",
                            "--execute",
                            "--to",

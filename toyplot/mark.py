@@ -456,7 +456,7 @@ class Rect(Mark):
     """Plot axis-aligned rectangles.
 
     Do not create Rect instances directly.  Use factory methods such as
-    :meth:`toyplot.coordinates.Cartesian.rect` instead.
+    :meth:`toyplot.coordinates.Cartesian.rects` instead.
     """
 
     def __init__(

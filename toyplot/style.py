@@ -16,8 +16,7 @@ def combine(*styles):
 
     Returns
     -------
-    styles: :class:`dict`
-        Dictionary containing CSS-compatible name-value pairs.
+    styles: :class:`dict` containing CSS-compatible name-value pairs.
     """
     computed_style = {}
     for style in styles:

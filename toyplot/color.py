@@ -15,8 +15,9 @@ import xml.etree.ElementTree as xml
 near_black = "#292724"
 
 
-dtype = {"names": ["r", "g", "b", "a"], "formats": [
-    "float64", "float64", "float64", "float64"]}
+dtype = {"names": ["r", "g", "b", "a"], "formats": ["float64", "float64", "float64", "float64"]}
+"""Data type for storing RGBA color information in :class:`numpy.ndarray` instances.
+"""
 
 
 def _html_color_swatches(colors, css_class, margin=0):
@@ -55,17 +56,32 @@ except:
 
 
 def rgb(r, g, b):
-    """Construct a Toyplot color from RGB values."""
+    """Construct a Toyplot color from RGB values.
+
+    Returns
+    -------
+    color: :class:`numpy.ndarray` scalar containing RGBA values with dtype = :data:`toyplot.color.dtype`.
+    """
     return numpy.array((r, g, b, 1.0), dtype=dtype)
 
 
 def rgba(r, g, b, a):
-    """Construct a Toyplot color from RGBA values."""
+    """Construct a Toyplot color from RGBA values.
+
+    Returns
+    -------
+    color: :class:`numpy.ndarray` scalar containing RGBA values with dtype = :data:`toyplot.color.dtype`.
+    """
     return numpy.array((r, g, b, a), dtype=dtype)
 
 
 def lab(L, a, b):
-    """Construct a Toyplot color from Lab values."""
+    """Construct a Toyplot color from Lab values.
+
+    Returns
+    -------
+    color: :class:`numpy.ndarray` scalar containing RGBA values with dtype = :data:`toyplot.color.dtype`.
+    """
     from colormath.color_objects import sRGBColor, LabColor
     from colormath.color_conversions import convert_color
     RGB = convert_color(LabColor(L, a, b), sRGBColor)
@@ -124,7 +140,7 @@ def broadcast(colors, shape, default=None):
 
     Returns
     -------
-    colors : numpy.ndarray containing RGBA colors.
+    colors: One- or two-dimensional :class:`numpy.ndarray` containing RGBA values with dtype = :data:`toyplot.color.dtype`.
     """
     if colors is None and default is None:
         raise ValueError("Must supply colors or default.") # pragma: no cover
@@ -244,7 +260,7 @@ class Palette(object):
 
         Returns
         -------
-        color: Toyplot color.
+        color: :class:`numpy.ndarray` scalar containing RGBA values with dtype = :data:`toyplot.color.dtype`.
         """
         return self.__getitem__(index)
 
@@ -258,7 +274,7 @@ class Palette(object):
 
         Returns
         -------
-        css: CSS RGBA color string.
+        css: :class:`str` containing a CSS color.
         """
         return to_css(self._colors[int(index)])
 
@@ -341,7 +357,7 @@ class CategoricalMap(Map):
 
         Returns
         -------
-        colors: array of Toyplot colors with the same shape as `values`.
+        colors: :class:`numpy.ndarray` containing RGBA values with dtype = :data:`toyplot.color.dtype` and the same shape as `values`.
         """
         values = numpy.array(values, dtype="int64")
         flat = numpy.ravel(values) % len(self._palette._colors)
@@ -360,7 +376,7 @@ class CategoricalMap(Map):
 
         Returns
         -------
-        color: Toyplot color.
+        color: :class:`numpy.ndarray` scalar containing RGBA values with dtype = :data:`toyplot.color.dtype`.
         """
         return self.colors(index, domain_min, domain_max)
 
@@ -376,7 +392,7 @@ class CategoricalMap(Map):
 
         Returns
         -------
-        css: CSS color string.
+        css: :class:`str` containing a CSS color.
         """
         return to_css(self.colors(index, domain_min, domain_max))
 
@@ -446,7 +462,7 @@ class DivergingMap(Map):
 
         Returns
         -------
-        colors: array of Toyplot colors with the same shape as `values`
+        colors: :class:`numpy.ndarray` containing RGBA values with dtype = :data:`toyplot.color.dtype` and the same shape as `values`.
         """
 
         values = numpy.array(values)
@@ -492,7 +508,7 @@ class DivergingMap(Map):
 
         Returns
         -------
-        color: Toyplot color
+        color: :class:`numpy.ndarray` scalar containing RGBA values with dtype = :data:`toyplot.color.dtype`.
         """
         return self.colors(value, domain_min, domain_max)
 
@@ -505,7 +521,7 @@ class DivergingMap(Map):
 
         Returns
         -------
-        css: CSS color string
+        css: :class:`str` containing a CSS color.
         """
         return to_css(self.colors(value, domain_min, domain_max))
 
@@ -584,7 +600,7 @@ class LinearMap(Map):
 
         Returns
         -------
-        colors: array of Toyplot colors with the same shape as `values`.
+        colors: :class:`numpy.ndarray` containing RGBA values with dtype = :data:`toyplot.color.dtype` and the same shape as `values`.
         """
         values = numpy.array(values)
         domain_min = domain_min if domain_min is not None else self.domain.min if self.domain.min is not None else values.min()
@@ -608,7 +624,7 @@ class LinearMap(Map):
 
         Returns
         -------
-        color: Toyplot color
+        color: :class:`numpy.ndarray` scalar containing RGBA values with dtype = :data:`toyplot.color.dtype`.
         """
         return self.colors(value, domain_min, domain_max)
 
@@ -621,7 +637,7 @@ class LinearMap(Map):
 
         Returns
         -------
-        css: CSS color string
+        css: :class:`str` containing a CSS color.
         """
         return to_css(self.colors(value, domain_min, domain_max))
 
@@ -1405,12 +1421,13 @@ def to_css(color):
 
     Parameters
     ----------
-    color: RGBA tuple with values in the range [0, 1].
-      Color value, which is converted to a CSS rgba() color.
+    color: :class:`numpy.ndarray`
+        Array of RGBA values with dtype = :data:`toyplot.color.dtype`, which is converted to a CSS rgba() color.
 
     Returns
     -------
-    css: string
+    css: str
+        String containing a CSS color value.
       """
     return "rgba(%.1f%%,%.1f%%,%.1f%%,%.3f)" % (color["r"] * 100, color["g"] * 100, color["b"] * 100, color["a"])
 
@@ -1424,7 +1441,8 @@ def css(value):
 
     Returns
     -------
-    color: RGBA tuple with all values in the range [0, 1]
+    color: :class:`numpy.ndarray`
+        Array of RGBA values with dtype = :data:`toyplot.color.dtype`.
     """
     if value.lower() in css.names:
         color = css.names[value.lower()]

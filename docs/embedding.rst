@@ -139,5 +139,5 @@ been carefully crafted to support embedding and maximize consistency:
 * If you pass a file-like object as the `fileobj` parameter, the canvas will be written directly to the object.  So you could store any figure to an in-memory :class:`StringIO.StringIO` buffer for subsequent processing, for example.
 * If you don't supply the `fileobj` parameter when rendering, the canvas will be returned to the caller in whatever high-level form is most appropriate for that backend:
     * The :mod:`toyplot.html` and :mod:`toyplot.svg` backends return an instance of :class:`xml.etree.ElementTree.Element` that contains the DOM representation of the figure.  This makes it easy to manipulate the figure for embedding in a larger DOM or subsequent processing.
-    * The :mod:`toyplot.pdf` and :mod:`toyplot.png` backends return the raw bytes of a PDF or PNG file, respectively.  So you could pass the PNG image bytes to :mod:`PIL`, for example.
+    * The :mod:`toyplot.pdf` and :mod:`toyplot.png` backends return the raw bytes of a PDF or PNG file, respectively.  So you could pass the PNG image to :func:`PIL.Image.open`, for example.
 

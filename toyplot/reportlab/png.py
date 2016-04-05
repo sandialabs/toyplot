@@ -48,9 +48,8 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
     Returns
     -------
-    png: PNG image data, or `None`
-      PNG representation of `canvas`, or `None` if the caller specifies the
-      `fobj` parameter.
+    png: :class:`bytes` containing PNG image data, or `None`
+      Returns `None` if the caller specifies the `fobj` parameter, returns the PNG image data otherwise.
     """
     svg = toyplot.svg.render(canvas)
     scale = canvas._point_scale(width=width, height=height, scale=scale)
@@ -111,7 +110,7 @@ def render_frames(canvas, width=None, height=None, scale=None):
 
     Returns
     -------
-    frames: Python generator expression that returns each PNG image in the sequence.
+    frames: Sequence of :class:`bytes` objects containing PNG image data.
       The caller must iterate over the returned frames and is responsible for all
       subsequent processing, including disk I/O, video compression, etc.
 

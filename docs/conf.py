@@ -83,13 +83,13 @@ napoleon_use_param = False
 nitpicky = True
 
 nitpick_ignore = [
-#    ("py:class", "object"),
+    ("py:class", "QApplication"),
     ]
 
 intersphinx_mapping = {
     "arrow": ("https://arrow.readthedocs.org/en/latest", None),
     "numpy": ("http://docs.scipy.org/doc/numpy-1.10.1", None),
-    "python": ("https://docs.python.org/2.7", None),
+    "python": ("https://docs.python.org/3.5", None),
     "PIL": ("https://pillow.readthedocs.org/en/3.2.x", None),
     }
 

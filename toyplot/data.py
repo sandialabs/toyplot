@@ -284,7 +284,7 @@ class Table(object):
 
         Returns
         -------
-        keys: sequence of string column names.
+        keys: sequence of :class:`str` column names.
         """
         return self._columns.keys()
 
@@ -293,7 +293,7 @@ class Table(object):
 
         Returns
         -------
-        values: sequence of numpy.ndarray columns.
+        values: sequence of :class:`numpy.ndarray` columns.
         """
         return self._columns.values()
 
@@ -307,7 +307,7 @@ class Table(object):
 
         Returns
         -------
-        metadata: dict containing key-value pairs.
+        metadata: :class:`dict` containing key-value pairs.
         """
         if column not in self._columns:
             raise ValueError("Unknown column name '%s'" % column)

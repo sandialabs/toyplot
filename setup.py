@@ -25,7 +25,7 @@ setup(
         "arrow",
         "colormath",
         "multipledispatch",
-        "numpy>=1.7",
+        "numpy>=1.8.0",
         "reportlab",
     ],
     long_description="""Toyplot is the kid-sized plotting toolkit for Python with grownup-sized goals:

@@ -19,7 +19,7 @@ using pip, these are automatically installed for you):
 
 * colormath - https://github.com/gtaylor/python-colormath
 * multipledispatch - https://github.com/mrocklin/multipledispatch
-* numpy - http://numpy.org
+* numpy >= 1.8.0 - http://numpy.org
 
 Timestamp Labels
 ----------------

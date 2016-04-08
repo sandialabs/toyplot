@@ -109,8 +109,8 @@ class Table(object):
             # Get the set of unique keys, so we can see if there are any duplicates.
             keys = numpy.array(keys, dtype="object")
             key_counter = collections.Counter(keys)
-            key_dictionary = key_counter.keys()
-            key_counts = key_counter.values()
+            key_dictionary = numpy.array(list(key_counter.keys()))
+            key_counts = numpy.array(list(key_counter.values()))
 
             if numpy.any(key_counts > 1):
                 toyplot.log.warn("Altering duplicate column names to make them unique.")

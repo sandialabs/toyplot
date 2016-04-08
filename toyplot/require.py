@@ -61,6 +61,7 @@ style.text = set([
     "stroke-opacity",
     "stroke-width",
     "text-anchor",
+    "text-shadow",
     "-toyplot-anchor-shift",
     ])
 

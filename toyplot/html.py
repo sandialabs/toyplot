@@ -2453,3 +2453,30 @@ def _render(parent, mark, context):
             title=dtitle,
             )
 
+
+@dispatch((toyplot.canvas.Canvas), toyplot.mark.Image, _RenderContext)
+def _render(parent, mark, context):
+    mark_xml = xml.SubElement(
+        context.parent,
+        "g",
+        id=context.get_id(mark),
+        attrib={"class": "toyplot-mark-Image"},
+        )
+
+    import base64
+    import StringIO
+    buffer = StringIO.StringIO()
+    import numpngw
+    numpngw.write_png(buffer, mark._data)
+    data = base64.standard_b64encode(buffer.getvalue())
+
+    xml.SubElement(
+        mark_xml,
+        "image",
+        x=repr(mark._xmin_range),
+        y=repr(mark._ymin_range),
+        width=repr(mark._xmax_range - mark._xmin_range),
+        height=repr(mark._ymax_range - mark._ymin_range),
+        attrib={"xlink:href": "data:image/png;base64,%s" % data},
+        )
+

@@ -379,6 +379,42 @@ class Graph(Mark): # pragma: no cover
         """Return the graph edges as a :math:`E \\times 2` matrix of source, target indices."""
         return numpy.column_stack((self._etable[self._esource[0]], self._etable[self._etarget[0]]))
 
+
+class Image(Mark):
+    """Plot a bitmap image.
+
+    Do not create Image instances directly.  Use factory methods such as
+    :func:`toyplot.image` and :func:`toyplot.canvas.Canvas.image` instead.
+    """
+    def __init__(
+            self,
+            xmin_range,
+            xmax_range,
+            ymin_range,
+            ymax_range,
+            data,
+        ):
+        Mark.__init__(self)
+
+        self._xmin_range = xmin_range
+        self._xmax_range = xmax_range
+        self._ymin_range = ymin_range
+        self._ymax_range = ymax_range
+
+        data = numpy.array(data)
+        toyplot.log.info("Image data: %s %s" % (data.shape, data.dtype))
+
+        if data.ndim < 2 or data.ndim > 3:
+            raise ValueError("Image must be a 2D or 3D array.")
+
+        if issubclass(data.dtype.type, numpy.bool_):
+            data = (data * 255.0).astype("uint8")
+        elif issubclass(data.dtype.type, numpy.floating):
+            data = (data * 255.0).astype("uint8")
+
+        self._data = data
+
+
 class Plot(Mark):
 
     """Plot multiple bivariate data series using lines and/or markers.

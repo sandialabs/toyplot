@@ -226,6 +226,31 @@ def graph(
         )
     return canvas, axes, mark
 
+
+def image(
+        data,
+        width=None,
+        height=None,
+        ): # pragma: no cover
+    """Convenience function for displaying an image in a single call.
+
+    See :meth:`toyplot.canvas.Canvas.image`, and :class:`toyplot.canvas.Canvas`
+    for parameter descriptions.
+
+    Returns
+    -------
+    canvas: :class:`toyplot.canvas.Canvas`
+        A new canvas object.
+    mark: :class:`toyplot.mark.Image`
+        The new image mark.
+    """
+    canvas = Canvas(width=width, height=height)
+    mark = canvas.image(
+        data=data,
+        )
+    return canvas, mark
+
+
 def matrix(
         data,
         label=None,

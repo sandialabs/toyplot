@@ -879,6 +879,63 @@ class Canvas(object):
         self._children.append(table)
         return table
 
+    def image(
+            self,
+            data,
+            bounds=None,
+            rect=None,
+            corner=None,
+            grid=None,
+            gutter=50,
+        ):
+        """Add an image to the canvas.
+
+        Parameters
+        ----------
+        bounds: (xmin, xmax, ymin, ymax) tuple, optional
+          Use the bounds property to position / size the image by specifying the
+          position of each of its boundaries.  Assumes CSS pixels if units
+          aren't provided, and supports all units described in :ref:`units`,
+          including percentage of the canvas width / height.
+        rect: (x, y, width, height) tuple, optional
+          Use the rect property to position / size the image by specifying its
+          upper-left-hand corner, width, and height.  Assumes CSS pixels if
+          units aren't provided, and supports all units described in
+          :ref:`units`, including percentage of the canvas width / height.
+        corner: (corner, inset, width, height) tuple, optional
+          Use the corner property to position / size the image by specifying its
+          width and height, plus an inset from a corner of the canvas.  Allowed
+          corner values are "top-left", "top", "top-right", "right",
+          "bottom-right", "bottom", "bottom-left", and "left".  The width and
+          height may be specified using absolute units as described in
+          :ref:`units`, or as a percentage of the canvas width / height.  The
+          inset only supports absolute drawing units.  All units default to CSS
+          pixels if unspecified.
+        grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
+          Use the grid property to position / size the image using a collection of
+          grid cells filling the canvas.  Specify the number of rows and columns in
+          the grid, then specify either a zero-based cell index (which runs in
+          left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
+          a set of i, column-span, j, row-span coordinates so the legend can cover
+          more than one cell.
+        gutter: size of the gutter around grid cells, optional
+          Specifies the amount of empty space to leave between grid cells When using the
+          `grid` parameter for positioning.  Assumes CSS pixels by default, and supports
+          all of the absolute units described in :ref:`units`.
+        """
+        xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
+            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+
+        self._children.append(
+            toyplot.mark.Image(
+                xmin_range,
+                xmax_range,
+                ymin_range,
+                ymax_range,
+                data=data,
+                ))
+        return self._children[-1]
+
     def text(
             self,
             x,

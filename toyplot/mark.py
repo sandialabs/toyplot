@@ -406,11 +406,15 @@ class Image(Mark):
 
         if data.ndim < 2 or data.ndim > 3:
             raise ValueError("Image must be a 2D or 3D array.")
+        if data.ndim == 3 and (data.shape[2] < 1 or data.shape[2] > 4):
+            raise ValueError("Image must contain 1, 2, 3, or 4 channels.")
+        if issubclass(data.dtype.type, (numpy.object_, numpy.complexfloating, numpy.flexible)):
+            raise ValueError("Unsupported image dtype: %s" % data.dtype)
 
-        if issubclass(data.dtype.type, numpy.bool_):
-            data = (data * 255.0).astype("uint8")
-        elif issubclass(data.dtype.type, numpy.floating):
-            data = (data * 255.0).astype("uint8")
+#        if issubclass(data.dtype.type, numpy.bool_):
+#            data = (data * 255.0).astype("uint8")
+#        elif issubclass(data.dtype.type, numpy.floating):
+#            data = (data * 255.0).astype("uint8")
 
         self._data = data
 

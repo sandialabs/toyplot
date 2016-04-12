@@ -2468,7 +2468,7 @@ def _render(parent, mark, context):
     import StringIO
     buffer = StringIO.StringIO()
     import numpngw
-    numpngw.write_png(buffer, mark._data)
+    numpngw.write_png(buffer, mark._data, text_list=[("Creation Time", None), ("Software", None)])
     data = base64.standard_b64encode(buffer.getvalue())
 
     xml.SubElement(

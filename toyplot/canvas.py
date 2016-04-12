@@ -122,20 +122,19 @@ class Canvas(object):
             width, "px", default="px") if width is not None else 600
         self._height = toyplot.units.convert(
             height, "px", default="px") if height is not None else self._width
-        self._style = toyplot.style.combine(
-            {
-                "background-color": "transparent",
-                "fill": toyplot.color.near_black,
-                "fill-opacity": 1.0,
-                "font-family": "Helvetica",
-                "font-size": "12px",
-                "opacity": 1.0,
-                "stroke": toyplot.color.near_black,
-                "stroke-opacity": 1.0,
-                "stroke-width": 1.0,
-            },
-            toyplot.require.style(style, allowed=set(["background-color", "border"])),
-            )
+        self._style = {
+            "background-color": "transparent",
+            "fill": toyplot.color.near_black,
+            "fill-opacity": 1.0,
+            "font-family": "Helvetica",
+            "font-size": "12px",
+            "opacity": 1.0,
+            "stroke": toyplot.color.near_black,
+            "stroke-opacity": 1.0,
+            "stroke-width": 1.0,
+        }
+        self.style = style
+
         self._animation = toyplot.Canvas._AnimationFrames()
         self._children = []
         self.autorender(autorender, autoformat)
@@ -155,14 +154,26 @@ class Canvas(object):
         return toyplot.png.render(self)
 
     @property
-    def width(self):
-        """Width of the canvas in CSS pixels."""
-        return self._width
-
-    @property
     def height(self):
         """Height of the canvas in CSS pixels."""
         return self._height
+
+    @property
+    def style(self):
+        """Canvas style."""
+        return self._style
+
+    @style.setter
+    def style(self, value):
+        self._style = toyplot.style.combine(
+            self._style,
+            toyplot.require.style(value, allowed=set(["background-color", "border"])),
+            )
+
+    @property
+    def width(self):
+        """Width of the canvas in CSS pixels."""
+        return self._width
 
     def animate(self, frames, callback=None):
         """Generate a collection of animation frames, calling a callback to store an explicit representation of what changes at each frame.

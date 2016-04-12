@@ -7,6 +7,7 @@
 from __future__ import absolute_import
 from __future__ import division
 
+import base64
 import numpy
 import re
 import reportlab.pdfgen.canvas
@@ -364,6 +365,31 @@ def render(svg, canvas):
 
                 text_state["chunks"][-1].append((x, y, fill, stroke, font_family, font_size, element.text, string_width))
                 text_state["x"] += string_width
+
+            elif element.tag == "image":
+                image = element.get("xlink:href")
+                if not image.startswith("data:image/png;base64,"):
+                    raise ValueError("Unsupported image type.")
+                image = base64.standard_b64decode(image[22:])
+                import StringIO
+                image = StringIO.StringIO(image)
+                import PIL.Image
+                image = PIL.Image.open(image)
+                image = reportlab.lib.utils.ImageReader(image)
+
+                x = float(element.get("x"))
+                y = float(element.get("y"))
+                width = float(element.get("width"))
+                height = float(element.get("height"))
+
+                canvas.saveState()
+                path = canvas.beginPath()
+                set_fill_color(canvas, toyplot.color.rgb(1, 1, 1))
+                canvas.rect(x, y, width, height, stroke=0, fill=1)
+                canvas.translate(x, y + height)
+                canvas.scale(1, -1)
+                canvas.drawImage(image=image, x=0, y=0, width=width, height=height, mask=None)
+                canvas.restoreState()
 
             elif element.tag in ["defs", "title"]:
                 pass

@@ -608,6 +608,7 @@ def _render(canvas, context):
         attrib={
             "class": "toyplot-canvas-Canvas",
             "xmlns:toyplot": "http://www.sandia.gov/toyplot",
+            "xmlns:xlink": "http://www.w3.org/1999/xlink",
             },
         width="%rpx" % canvas.width,
         height="%rpx" % canvas.height,

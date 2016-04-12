@@ -8,6 +8,7 @@ from __future__ import absolute_import
 from __future__ import division
 
 import base64
+import io
 import numpy
 import re
 import reportlab.pdfgen.canvas
@@ -367,13 +368,13 @@ def render(svg, canvas):
                 text_state["x"] += string_width
 
             elif element.tag == "image":
+                import PIL.Image
                 image = element.get("xlink:href")
                 if not image.startswith("data:image/png;base64,"):
                     raise ValueError("Unsupported image type.")
                 image = base64.standard_b64decode(image[22:])
-                import StringIO
-                image = StringIO.StringIO(image)
-                import PIL.Image
+                image = io.BytesIO(image)
+                print image
                 image = PIL.Image.open(image)
                 image = reportlab.lib.utils.ImageReader(image)
 

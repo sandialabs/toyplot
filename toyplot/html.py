@@ -5,8 +5,10 @@
 from __future__ import division
 
 from multipledispatch import dispatch
+import base64
 import collections
 import copy
+import io
 import itertools
 import json
 import numbers
@@ -2457,19 +2459,18 @@ def _render(parent, mark, context):
 
 @dispatch((toyplot.canvas.Canvas), toyplot.mark.Image, _RenderContext)
 def _render(parent, mark, context):
+    import numpngw
+
+    buffer = io.BytesIO()
+    numpngw.write_png(buffer, mark._data, text_list=[("Creation Time", None), ("Software", None)])
+    data = base64.standard_b64encode(buffer.getvalue())
+
     mark_xml = xml.SubElement(
         context.parent,
         "g",
         id=context.get_id(mark),
         attrib={"class": "toyplot-mark-Image"},
         )
-
-    import base64
-    import StringIO
-    buffer = StringIO.StringIO()
-    import numpngw
-    numpngw.write_png(buffer, mark._data, text_list=[("Creation Time", None), ("Software", None)])
-    data = base64.standard_b64encode(buffer.getvalue())
 
     xml.SubElement(
         mark_xml,

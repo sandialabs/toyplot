@@ -2480,7 +2480,7 @@ def _render(parent, mark, context):
 
     writer = png.Writer(width=width, height=height, greyscale=greyscale, alpha=alpha, bitdepth=bitdepth)
     writer.write(buffer, numpy.reshape(data, (-1, mark._data.shape[1] * mark._data.shape[2])))
-    data = base64.standard_b64encode(buffer.getvalue())
+    encoded = base64.standard_b64encode(buffer.getvalue()).decode("ascii")
 
     mark_xml = xml.SubElement(
         context.parent,
@@ -2496,6 +2496,6 @@ def _render(parent, mark, context):
         y=repr(mark._ymin_range),
         width=repr(mark._xmax_range - mark._xmin_range),
         height=repr(mark._ymax_range - mark._ymin_range),
-        attrib={"xlink:href": "data:image/png;base64,%s" % data},
+        attrib={"xlink:href": "data:image/png;base64," + encoded},
         )
 

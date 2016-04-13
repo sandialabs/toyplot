@@ -13,4 +13,7 @@ Feature: Image visualization
             | a numpy 8 bit LA image          | image-numpy-8-bit-LA                   |
             | a numpy 8 bit RGB image         | image-numpy-8-bit-RGB                  |
             | a numpy 8 bit RGBA image        | image-numpy-8-bit-RGBA                 |
+            | a pillow 8 bit L image          | image-numpy-8-bit-L                    |
+            | a pillow 8 bit RGB image        | image-numpy-8-bit-RGB                  |
+            | a pillow 8 bit RGBA image       | image-numpy-8-bit-RGBA                 |
 

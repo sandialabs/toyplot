@@ -6,6 +6,7 @@ from behave import *
 
 import nose.tools
 import numpy
+import PIL.Image
 import os
 import toyplot.testing
 
@@ -47,6 +48,27 @@ def step_impl(context):
     context.image = toyplot.testing.read_png(os.path.join(art_dir, "toyplot-8-RGBA.png"))
     nose.tools.assert_equal(context.image.shape, (256, 256, 4))
     nose.tools.assert_equal(context.image.dtype, "uint8")
+
+
+@given(u'a pillow 8 bit L image')
+def step_impl(context):
+    context.image = PIL.Image.open(os.path.join(art_dir, "toyplot-8-L.png"))
+    nose.tools.assert_equal(context.image.size, (256, 256))
+    nose.tools.assert_equal(context.image.mode, "L")
+
+
+@given(u'a pillow 8 bit RGB image')
+def step_impl(context):
+    context.image = PIL.Image.open(os.path.join(art_dir, "toyplot-8-RGB.png"))
+    nose.tools.assert_equal(context.image.size, (256, 256))
+    nose.tools.assert_equal(context.image.mode, "RGB")
+
+
+@given(u'a pillow 8 bit RGBA image')
+def step_impl(context):
+    context.image = PIL.Image.open(os.path.join(art_dir, "toyplot-8-RGBA.png"))
+    nose.tools.assert_equal(context.image.size, (256, 256))
+    nose.tools.assert_equal(context.image.mode, "RGBA")
 
 
 @given(u'a canvas background color')

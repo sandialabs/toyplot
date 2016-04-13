@@ -12,8 +12,7 @@ import os
 import subprocess
 import sys
 import tempfile
-import toyplot
-import PIL.Image
+import toyplot.testing
 
 try:
     import toyplot.mp4
@@ -79,6 +78,7 @@ def step_impl(context, type):
 @then(u'the canvas can be rendered as png frames')
 def step_impl(context):
     for frame in toyplot.png.render_frames(context.canvas):
-        image = PIL.Image.open(io.BytesIO(frame))
-        nose.tools.assert_equal(image.format, "PNG")
+        image = toyplot.testing.read_png(io.BytesIO(frame))
+        nose.tools.assert_equal(image.shape, (600, 600, 4))
+        nose.tools.assert_equal(image.dtype, "uint8")
 

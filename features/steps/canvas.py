@@ -3,7 +3,6 @@
 # rights in this software.
 
 from behave import *
-import PIL.Image
 import io
 import nose.tools
 import numpy.testing
@@ -72,8 +71,9 @@ def step_impl(context):
 @then(u'the canvas can be rendered in Jupyter as a PNG image')
 def step_impl(context):
     png = context.canvas._repr_png_()
-    image = PIL.Image.open(io.BytesIO(png))
-    nose.tools.assert_equal(image.format, "PNG")
+    image = toyplot.testing.read_png(io.BytesIO(png))
+    nose.tools.assert_equal(image.shape, (600, 600, 4))
+    nose.tools.assert_equal(image.dtype, "uint8")
 
 @then(u'numberlines can be added to the canvas using relative coordinates')
 def step_impl(context):

@@ -30,6 +30,14 @@ install Toyplot using pip, it's automatically installed for you):
 
 * arrow - Better dates and times for Python - http://arrow.readthedocs.org
 
+Bitmap Images
+-------------
+
+To add bitmap images to your figures, you'll need the following (if you install Toyplot
+using pip, it's automatically installed for you):
+
+* pypng - Python PNG IO library - https://pythonhosted.org/pypng/index.html
+
 PDF Export
 ----------
 

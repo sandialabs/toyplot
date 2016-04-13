@@ -4,7 +4,6 @@
 
 from behave import *
 
-import PIL.Image
 import importlib
 import io
 import nose.tools
@@ -69,45 +68,50 @@ def step_impl(context):
 def step_impl(context):
     target = os.path.join(toyplot.testing.backend_dir, "%s.png" % context.name)
     context.backend.render(context.canvas, target)
-    image = PIL.Image.open(target)
-    nose.tools.assert_equal(image.format, "PNG")
+    image = toyplot.testing.read_png(target)
+    nose.tools.assert_equal(image.shape, (600, 600, 4))
+    nose.tools.assert_equal(image.dtype, "uint8")
 
 
 @then(u'the canvas can be rendered to a png buffer')
 def step_impl(context):
-    stream = io.BytesIO()
-    context.backend.render(context.canvas, stream)
-    image = PIL.Image.open(stream)
-    nose.tools.assert_equal(image.format, "PNG")
+    buffer = io.BytesIO()
+    context.backend.render(context.canvas, buffer)
+    buffer.seek(0)
+
+    image = toyplot.testing.read_png(buffer)
+    nose.tools.assert_equal(image.shape, (600, 600, 4))
+    nose.tools.assert_equal(image.dtype, "uint8")
 
 
 @then(u'the canvas can be rendered to a returned png document')
 def step_impl(context):
     png = context.backend.render(context.canvas)
-    image = PIL.Image.open(io.BytesIO(png))
-    nose.tools.assert_equal(image.format, "PNG")
+    image = toyplot.testing.read_png(io.BytesIO(png))
+    nose.tools.assert_equal(image.shape, (600, 600, 4))
+    nose.tools.assert_equal(image.dtype, "uint8")
 
 
 @then(u'the canvas can be rendered to a 200 pixel wide png document')
 def step_impl(context):
     png = context.backend.render(context.canvas, width="200px")
-    image = PIL.Image.open(io.BytesIO(png))
-    nose.tools.assert_equal(image.format, "PNG")
-    nose.tools.assert_equal(image.size, (200, 200))
+    image = toyplot.testing.read_png(io.BytesIO(png))
+    nose.tools.assert_equal(image.shape, (200, 200, 4))
+    nose.tools.assert_equal(image.dtype, "uint8")
 
 @then(u'the canvas can be rendered to a 150 pixel high png document')
 def step_impl(context):
     png = context.backend.render(context.canvas, height="150px")
-    image = PIL.Image.open(io.BytesIO(png))
-    nose.tools.assert_equal(image.format, "PNG")
-    nose.tools.assert_equal(image.size, (150, 150))
+    image = toyplot.testing.read_png(io.BytesIO(png))
+    nose.tools.assert_equal(image.shape, (150, 150, 4))
+    nose.tools.assert_equal(image.dtype, "uint8")
 
 @then(u'the canvas can be rendered to a half scale png document')
 def step_impl(context):
     png = context.backend.render(context.canvas, scale=0.5)
-    image = PIL.Image.open(io.BytesIO(png))
-    nose.tools.assert_equal(image.format, "PNG")
-    nose.tools.assert_equal(image.size, (300, 300))
+    image = toyplot.testing.read_png(io.BytesIO(png))
+    nose.tools.assert_equal(image.shape, (300, 300, 4))
+    nose.tools.assert_equal(image.dtype, "uint8")
 
 
 @then(u'the canvas can be rendered to an svg file')

@@ -229,8 +229,11 @@ def assert_canvas_equal(canvas, name):
             )
         raise AssertionError(message)
 
-def read_png(path):
-    reader = png.Reader(path)
+def read_png(fobj):
+    if isinstance(fobj, toyplot.compatibility.string_type):
+        reader = png.Reader(filename=fobj)
+    else:
+        reader = png.Reader(fobj)
     width, height, pixels, meta = reader.read()
     planes = 1 if meta["greyscale"] else 3
     if meta["alpha"]:

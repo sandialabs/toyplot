@@ -2459,21 +2459,26 @@ def _render(parent, mark, context):
 
 @dispatch((toyplot.canvas.Canvas), toyplot.mark.Image, _RenderContext)
 def _render(parent, mark, context):
-#    import numpngw
-#    buffer = io.BytesIO()
-#    numpngw.write_png(buffer, mark._data, text_list=[("Creation Time", None), ("Software", None)])
-#    data = base64.standard_b64encode(buffer.getvalue())
-
     import toyplot.pngio
     buffer = io.BytesIO()
 
     data = mark._data
     width = data.shape[0]
     height = data.shape[1]
-    grayscale = (data.ndim == 2) or (data.ndim == 3 and data.shape[2] < 3)
-    alpha = (data.ndim == 3 and data.shape[2] == 2 or data.shape[2] == 4)
+    greyscale = data.shape[2] < 3
+    alpha = data.shape[2] == 2 or data.shape[2] == 4
 
-    writer = toyplot.pngio.Writer(width=width, height=height)
+    toyplot.log.debug("Image data: %s %s", data.shape, data.dtype)
+
+    if issubclass(data.dtype.type, numpy.bool_):
+        bitdepth=1
+    elif issubclass(data.dtype.type, numpy.floating):
+        data = (data * 255.0).astype("uint8")
+        bitdepth=8
+    else:
+        bitdepth=8
+
+    writer = toyplot.pngio.Writer(width=width, height=height, greyscale=greyscale, alpha=alpha, bitdepth=bitdepth)
     writer.write(buffer, numpy.reshape(data, (-1, mark._data.shape[1] * mark._data.shape[2])))
     data = base64.standard_b64encode(buffer.getvalue())
 

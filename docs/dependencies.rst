@@ -93,6 +93,7 @@ code coverage:
 * mock - mocking and testing library - http://www.voidspace.org.uk/python/mock
 * nose - unit test framework - https://nose.readthedocs.org/en/latest
 * nose-exclude - a nose plugin to simplify excluding directories - https://pypi.python.org/pypi/nose-exclude
+* Pillow - the friendly Python Imaging Library fork - http://pillow.readthedocs.org/en/3.0.x/
 * xmldiff - print differences between XML files - https://pypi.python.org/pypi/xmldiff
 
 Generating Documentation

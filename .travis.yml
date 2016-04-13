@@ -16,9 +16,9 @@ install:
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
     - conda info -a
-    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION graphviz mock multipledispatch networkx numpy=1.8.2 pandas=0.14.1 pillow pip reportlab scikit-image
+    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION graphviz mock multipledispatch networkx numpy=1.8.2 pandas=0.14.1 pillow pip reportlab
     - source activate test-environment
-    - pip install arrow behave "colormath>=2.1.0" coverage coveralls nose-exclude numpngw
+    - pip install arrow behave "colormath>=2.1.0" coverage coveralls nose-exclude pypng
     - wget http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
     - mkdir ffmpeg
     - tar xf ffmpeg-release-64bit-static.tar.xz --strip-components 1 -C ffmpeg

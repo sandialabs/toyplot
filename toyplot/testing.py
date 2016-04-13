@@ -2,12 +2,16 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+from __future__ import absolute_import
+
 import collections
 import io
+import itertools
 import json
 import os
 import numbers
 import numpy.testing
+import png
 import re
 import subprocess
 import sys
@@ -224,3 +228,16 @@ def assert_canvas_equal(canvas, name):
             test.communicate()[0],
             )
         raise AssertionError(message)
+
+def read_png(path):
+    reader = png.Reader(path)
+    width, height, pixels, meta = reader.read()
+    planes = 1 if meta["greyscale"] else 3
+    if meta["alpha"]:
+        planes += 1
+    if meta["bitdepth"] == 1:
+        image = numpy.resize(numpy.vstack(pixels), (height, width, planes))
+    elif meta["bitdepth"] == 8:
+        image = numpy.resize(numpy.vstack(itertools.imap(numpy.uint8, pixels)), (height, width, planes))
+    return image
+

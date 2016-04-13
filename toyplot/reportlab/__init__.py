@@ -374,7 +374,6 @@ def render(svg, canvas):
                     raise ValueError("Unsupported image type.")
                 image = base64.standard_b64decode(image[22:])
                 image = io.BytesIO(image)
-                print image
                 image = PIL.Image.open(image)
                 image = reportlab.lib.utils.ImageReader(image)
 

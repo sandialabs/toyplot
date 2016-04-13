@@ -2,7 +2,7 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-from __future__ import division
+from __future__ import division, absolute_import
 
 from multipledispatch import dispatch
 import base64
@@ -2459,7 +2459,7 @@ def _render(parent, mark, context):
 
 @dispatch((toyplot.canvas.Canvas), toyplot.mark.Image, _RenderContext)
 def _render(parent, mark, context):
-    import toyplot.pngio
+    import png
     buffer = io.BytesIO()
 
     data = mark._data
@@ -2478,7 +2478,7 @@ def _render(parent, mark, context):
     else:
         bitdepth=8
 
-    writer = toyplot.pngio.Writer(width=width, height=height, greyscale=greyscale, alpha=alpha, bitdepth=bitdepth)
+    writer = png.Writer(width=width, height=height, greyscale=greyscale, alpha=alpha, bitdepth=bitdepth)
     writer.write(buffer, numpy.reshape(data, (-1, mark._data.shape[1] * mark._data.shape[2])))
     data = base64.standard_b64encode(buffer.getvalue())
 

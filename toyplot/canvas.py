@@ -512,6 +512,7 @@ class Canvas(object):
             data, colors = data
             matrix = toyplot.require.scalar_matrix(data)
             if isinstance(colors, toyplot.color.Palette):
+                toyplot.log.warn("Implicit conversion from palettes to colormaps for color mapping is deprecated.  Use a toyplot.color.Map instead.")
                 palette = colors
             elif isinstance(colors, toyplot.color.Map):
                 colormap = colors

@@ -6,6 +6,7 @@ from __future__ import division
 
 import collections
 import numpy
+import toyplot.color
 import toyplot.require
 
 
@@ -407,7 +408,7 @@ class Image(Mark):
             raise ValueError("Image must be a 1D, 2D or 3D array.")
         if data.shape[2] < 1 or data.shape[2] > 4:
             raise ValueError("Image must contain 1, 2, 3, or 4 channels.")
-        if issubclass(data.dtype.type, (numpy.object_, numpy.complexfloating, numpy.flexible)):
+        if issubclass(data.dtype.type, (numpy.object_, numpy.complexfloating, numpy.flexible)) and data.dtype != toyplot.color.dtype:
             raise ValueError("Unsupported image dtype: %s" % data.dtype)
 
         self._data = data

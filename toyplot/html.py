@@ -2463,13 +2463,11 @@ def _render(parent, mark, context):
     buffer = io.BytesIO()
 
     data = mark._data
-    width = data.shape[0]
-    height = data.shape[1]
-    greyscale = data.shape[2] < 3
-    alpha = data.shape[2] == 2 or data.shape[2] == 4
 
     toyplot.log.debug("Image data: %s %s", data.shape, data.dtype)
 
+    if data.dtype == toyplot.color.dtype:
+        data = numpy.dstack((data["r"], data["g"], data["b"], data["a"]))
     if issubclass(data.dtype.type, numpy.bool_):
         bitdepth=1
     elif issubclass(data.dtype.type, numpy.floating):
@@ -2478,8 +2476,13 @@ def _render(parent, mark, context):
     else:
         bitdepth=8
 
+    width = data.shape[0]
+    height = data.shape[1]
+    greyscale = data.shape[2] < 3
+    alpha = data.shape[2] == 2 or data.shape[2] == 4
+
     writer = png.Writer(width=width, height=height, greyscale=greyscale, alpha=alpha, bitdepth=bitdepth)
-    writer.write(buffer, numpy.reshape(data, (-1, mark._data.shape[1] * mark._data.shape[2])))
+    writer.write(buffer, numpy.reshape(data, (-1, data.shape[1] * data.shape[2])))
     encoded = base64.standard_b64encode(buffer.getvalue()).decode("ascii")
 
     mark_xml = xml.SubElement(

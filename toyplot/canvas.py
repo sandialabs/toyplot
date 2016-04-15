@@ -934,6 +934,24 @@ class Canvas(object):
           `grid` parameter for positioning.  Assumes CSS pixels by default, and supports
           all of the absolute units described in :ref:`units`.
         """
+        colormap = None
+        palette = None
+        if isinstance(data, tuple):
+            data, colors = data
+            if isinstance(colors, toyplot.color.Palette):
+                palette = colors
+            elif isinstance(colors, toyplot.color.Map):
+                colormap = colors
+            if colormap is None:
+                if palette is None:
+                    palette = toyplot.color.brewer.palette("BlueRed")
+                colormap = toyplot.color.LinearMap(
+                    palette=palette,
+                    domain_min=data.min(),
+                    domain_max=data.max(),
+                    )
+            data = colormap.colors(data)
+
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
 

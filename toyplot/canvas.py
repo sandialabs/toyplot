@@ -904,6 +904,7 @@ class Canvas(object):
 
         Parameters
         ----------
+        data: image, or (image, colormap) tuple
         bounds: (xmin, xmax, ymin, ymax) tuple, optional
           Use the bounds property to position / size the image by specifying the
           position of each of its boundaries.  Assumes CSS pixels if units
@@ -938,19 +939,9 @@ class Canvas(object):
         colormap = None
         palette = None
         if isinstance(data, tuple):
-            data, colors = data
-            if isinstance(colors, toyplot.color.Palette):
-                palette = colors
-            elif isinstance(colors, toyplot.color.Map):
-                colormap = colors
-            if colormap is None:
-                if palette is None:
-                    palette = toyplot.color.brewer.palette("BlueRed")
-                colormap = toyplot.color.LinearMap(
-                    palette=palette,
-                    domain_min=data.min(),
-                    domain_max=data.max(),
-                    )
+            data, colormap = data
+            if not isinstance(colormap, toyplot.color.Map):
+                raise ValueError("Expected toyplot.color.Map, received %s." % colormap)
             data = colormap.colors(data)
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(

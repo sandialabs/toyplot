@@ -942,6 +942,9 @@ class Canvas(object):
             data, colormap = data
             if not isinstance(colormap, toyplot.color.Map):
                 raise ValueError("Expected toyplot.color.Map, received %s." % colormap)
+            data = numpy.atleast_3d(data)
+            if data.shape[2] != 1:
+                raise ValueError("Expected an image with one channel.")
             data = colormap.colors(data)
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(

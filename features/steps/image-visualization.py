@@ -29,6 +29,14 @@ def step_impl(context):
     nose.tools.assert_equal(context.image.dtype, "uint8")
 
 
+@given(u'a numpy 8 bit L image with colormap')
+def step_impl(context):
+    context.image = toyplot.testing.read_png(os.path.join(art_dir, "toyplot-8-L.png"))
+    nose.tools.assert_equal(context.image.shape, (256, 256, 1))
+    nose.tools.assert_equal(context.image.dtype, "uint8")
+    context.image = (context.image, toyplot.color.brewer.map("BlueRed"))
+
+
 @given(u'a numpy 8 bit LA image')
 def step_impl(context):
     context.image = toyplot.testing.read_png(os.path.join(art_dir, "toyplot-8-LA.png"))
@@ -55,6 +63,14 @@ def step_impl(context):
     context.image = PIL.Image.open(os.path.join(art_dir, "toyplot-8-L.png"))
     nose.tools.assert_equal(context.image.size, (256, 256))
     nose.tools.assert_equal(context.image.mode, "L")
+
+
+@given(u'a pillow 8 bit L image with colormap')
+def step_impl(context):
+    context.image = PIL.Image.open(os.path.join(art_dir, "toyplot-8-L.png"))
+    nose.tools.assert_equal(context.image.size, (256, 256))
+    nose.tools.assert_equal(context.image.mode, "L")
+    context.image = (context.image, toyplot.color.brewer.map("BlueRed"))
 
 
 @given(u'a pillow 8 bit RGB image')

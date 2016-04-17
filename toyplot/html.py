@@ -2476,8 +2476,8 @@ def _render(parent, mark, context):
     else:
         bitdepth=8
 
-    width = data.shape[0]
-    height = data.shape[1]
+    width = data.shape[1]
+    height = data.shape[0]
     greyscale = data.shape[2] < 3
     alpha = data.shape[2] == 2 or data.shape[2] == 4
 

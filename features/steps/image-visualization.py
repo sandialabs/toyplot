@@ -87,6 +87,23 @@ def step_impl(context):
     nose.tools.assert_equal(context.image.mode, "RGBA")
 
 
+@given(u'a non-square numpy 8 bit L image')
+def step_impl(context):
+    numpy.random.seed(1234)
+    context.image = numpy.random.uniform(0, 1, size=(10, 5)).repeat(50, axis=0).repeat(50, axis=1)
+    nose.tools.assert_equal(context.image.shape, (500, 250))
+    nose.tools.assert_equal(context.image.dtype, "float64")
+
+
+@given(u'a non-square numpy 8 bit L image with colormap')
+def step_impl(context):
+    numpy.random.seed(1234)
+    context.image = numpy.random.uniform(0, 1, size=(10, 5)).repeat(50, axis=0).repeat(50, axis=1)
+    nose.tools.assert_equal(context.image.shape, (500, 250))
+    nose.tools.assert_equal(context.image.dtype, "float64")
+    context.image = (context.image, toyplot.color.linear.map("Blackbody"))
+
+
 @given(u'a canvas background color')
 def step_impl(context):
     context.canvas.style = {"background-color":"lightgray"}

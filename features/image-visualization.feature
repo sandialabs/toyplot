@@ -18,4 +18,6 @@ Feature: Image visualization
             | a pillow 8 bit L image with colormap    | image-numpy-8-bit-L-colormap           |
             | a pillow 8 bit RGB image                | image-numpy-8-bit-RGB                  |
             | a pillow 8 bit RGBA image               | image-numpy-8-bit-RGBA                 |
+            | a non-square numpy 8 bit L image                   | image-non-square-numpy-8-bit-L                    |
+            | a non-square numpy 8 bit L image with colormap     | image-non-square-numpy-8-bit-L-colormap           |
 

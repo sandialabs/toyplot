@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import *
 import numpy
 import sys
 import toyplot.html
+import toyplot.require
 import xml.etree.ElementTree as xml
 
 def application():
@@ -55,6 +56,8 @@ def show(canvas, title="Toyplot Figure"):
     title: string, optional
       Optional page title to be displayed in the window.
     """
+
+    canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
 
     qapplication = application()
 

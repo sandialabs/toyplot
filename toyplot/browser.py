@@ -6,6 +6,8 @@
 
 from __future__ import division, absolute_import
 
+import collections
+
 def show(canvases, title="Toyplot Figure"):
     """Display one or more canvases in a web browser.
 
@@ -30,6 +32,9 @@ def show(canvases, title="Toyplot Figure"):
     import toyplot.html
     import xml.etree.ElementTree as xml
     import webbrowser
+
+    if not isinstance(canvases, (toyplot.canvas.Canvas, collections.Iterable)):
+        raise ValueError("Expected one or more instances of %s, received %s." % (toyplot.canvas.Canvas, type(canvases)))
 
     if isinstance(canvases, toyplot.canvas.Canvas):
         canvases = [canvases]

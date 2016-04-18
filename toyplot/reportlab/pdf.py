@@ -11,6 +11,7 @@ from __future__ import division
 import io
 import reportlab.pdfgen.canvas
 import toyplot.reportlab
+import toyplot.require
 import toyplot.svg
 
 
@@ -51,6 +52,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
     >>> toyplot.reportlab.pdf.render(canvas, "figure-1.pdf", width=(4, "inches"))
     """
+    canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
     svg = toyplot.svg.render(canvas)
     scale = canvas._point_scale(width=width, height=height, scale=scale)
     if fobj is None:

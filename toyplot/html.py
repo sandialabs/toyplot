@@ -166,6 +166,7 @@ def render(canvas, fobj=None, animation=False):
     supply the <html>, <body> etc. if the result is intended as a standalone
     HTML document.
     """
+    canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
     canvas.autorender(False)
 
     # Create the top-level HTML element.

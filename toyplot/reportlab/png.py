@@ -14,6 +14,7 @@ import os.path
 import reportlab.pdfgen.canvas
 import subprocess
 import toyplot.reportlab
+import toyplot.require
 import toyplot.svg
 
 
@@ -51,6 +52,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     png: :class:`bytes` containing PNG image data, or `None`
       Returns `None` if the caller specifies the `fobj` parameter, returns the PNG image data otherwise.
     """
+    canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
     svg = toyplot.svg.render(canvas)
     scale = canvas._point_scale(width=width, height=height, scale=scale)
     pdf = io.BytesIO()
@@ -119,6 +121,7 @@ def render_frames(canvas, width=None, height=None, scale=None):
     >>> for frame, png in enumerate(toyplot.reportlab.png.render_frames(canvas)):
     ...   open("frame-%s.png" % frame, "wb").write(png)
     """
+    canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
     svg, svg_animation = toyplot.svg.render(canvas, animation=True)
     scale = canvas._point_scale(width=width, height=height, scale=scale)
 

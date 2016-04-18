@@ -8,7 +8,7 @@ from __future__ import absolute_import
 from __future__ import division
 
 
-import toyplot
+import toyplot.require
 import toyplot.reportlab.pdf as implementation
 
 
@@ -54,4 +54,5 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     The output PDF is currently rendered using
     :func:`toyplot.reportlab.pdf.render()`.
     """
+    canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
     return implementation.render(canvas, fobj, width, height, scale)

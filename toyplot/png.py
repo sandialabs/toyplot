@@ -8,7 +8,7 @@ from __future__ import absolute_import
 from __future__ import division
 
 
-import toyplot
+import toyplot.require
 import toyplot.reportlab.png as implementation
 
 
@@ -44,6 +44,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     The output PNG is rendered using :func:`toyplot.reportlab.png.render()`.
     This is subject to change.
     """
+    canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
     return implementation.render(canvas, fobj, width, height, scale)
 
 
@@ -81,5 +82,6 @@ def render_frames(canvas, width=None, height=None, scale=None):
     >>> for frame, png in enumerate(toyplot.png.render_frames(canvas)):
     ...   open("frame-%s.png" % frame, "wb").write(png)
     """
+    canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
     return implementation.render_frames(canvas, width, height, scale)
 

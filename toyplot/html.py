@@ -1982,12 +1982,41 @@ def _render(axes, mark, context):
             xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
+@dispatch(toyplot.mark.Mark)
+def _legend_markers(mark):
+    return []
+
+
 @dispatch((toyplot.canvas.Canvas, toyplot.coordinates.Cartesian), toyplot.mark.Legend, _RenderContext)
 def _render(canvas, legend, context):
+    if not legend._entries:
+        return
+
+    entries = []
+
+    for entry in legend._entries:
+        label, spec = entry
+
+        if isinstance(spec, toyplot.mark.Mark):
+            markers = _legend_markers(spec)
+        elif isinstance(spec, list):
+            markers = spec
+        else:
+            markers = [spec]
+
+        toyplot.log.debug("%s %s" % (label, markers))
+
+        entries.append((label, markers))
+
     x = legend._xmin
     y = legend._ymin
     width = legend._xmax - legend._xmin
     height = legend._ymax - legend._ymin
+    marker_height = (height - (legend._gutter * (len(entries) + 1))) / len(entries)
+    marker_width = marker_height
+
+    label_offset = (numpy.amax([len(markers) for label, markers in entries]) * (legend._gutter + marker_width)) + marker_width
+
     xml.SubElement(
         context.parent,
         "rect",
@@ -2000,110 +2029,27 @@ def _render(canvas, legend, context):
         attrib={"class": "toyplot-mark-Legend"},
         )
 
-    entry_count = len(legend._entries)
-    if not entry_count:
-        return
+    for i, (label, markers) in enumerate(entries):
+        marker_y = y + ((i + 1) * legend._gutter) + (i * marker_height)
 
-    entry_gutter = legend._gutter
-    entry_height = (height - (legend._gutter * (entry_count + 1))) / entry_count
+        for j, marker in enumerate(markers):
+            marker_x = x + legend._gutter + (j * marker_width)
 
-    for i, entry in enumerate(legend._entries):
-        entry_x = x + entry_gutter
-        entry_y = y + ((i + 1) * entry_gutter) + (i * entry_height)
-        entry_width = entry_height
-
-        try:
-            label, spec = entry
-        except:
-            pass
-        if spec == "line":
-            markers = ["/"]
-        elif spec == "rect":
-            markers = ["s"]
-        elif isinstance(spec, toyplot.mark.Mark):
-            markers = spec.legend_markers()
-        elif isinstance(spec, list):
-            markers = spec
-        else:
-            markers = [spec]
-
-        toyplot.log.debug("%s %s" % (label, markers))
-
-#        mark_style = {}
-#        if isinstance(entry, tuple) and len(entry) == 2:
-#            mark_label, mark = entry
-#        elif isinstance(entry, tuple) and len(entry) == 3:
-#            mark_label, mark, mark_style = entry
-
-#        if marker == "line":
-#            marker = "/"
-#        elif marker == "rect":
-#            marker = "s"
-#        elif isinstance(mark, toyplot.mark.Plot):
-#            mark_style = toyplot.style.combine(
-#                {
-#                    "stroke": toyplot.color.to_css(mark._stroke[0]),
-#                },
-#                mark._style,
-#                mark_style,
-#                )
-#            mark = "/"
-#        elif isinstance(mark, toyplot.mark.Scatterplot):
-#            mark_style = toyplot.style.combine(
-#                {
-#                    "fill": toyplot.color.to_css(mark._table[mark._mfill[0]][0]),
-#                    "stroke": toyplot.color.to_css(mark._table[mark._mstroke[0]][0]),
-#                    "opacity": mark._table[mark._mopacity[0]][0],
-#                },
-#                mark_style,
-#                )
-#            mark = mark._table[mark._marker[0]][0]
-#        elif isinstance(mark, (toyplot.mark.BarBoundaries, toyplot.mark.BarMagnitudes)):
-#            mark_style = toyplot.style.combine(
-#                {
-#                    "fill": toyplot.color.to_css(mark._table[mark._fill[0]][0]),
-#                    "opacity": mark._table[mark._opacity[0]][0],
-#                },
-#                mark._style,
-#                mark_style,
-#                )
-#            mark = "s"
-#        elif isinstance(mark, (toyplot.mark.FillBoundaries, toyplot.mark.FillMagnitudes)):
-#            toyplot.log.debug(mark._fill)
-#            mark_style = toyplot.style.combine(
-#                {
-#                    "fill": toyplot.color.to_css(mark._fill[0]),
-#                    "opacity": mark._opacity[0],
-#                },
-#                mark._style,
-#                mark_style,
-#                )
-#            mark = "s"
-
-#        computed_style = toyplot.style.combine(
-#            {
-#                "stroke": toyplot.color.near_black,
-#                "fill": "none",
-#            },
-#            mark_style,
-#            )
-
-        for marker in markers:
             _draw_marker(
                 context.parent,
-                entry_x + (entry_width / 2),
-                entry_y + (entry_height / 2),
-                min(entry_width, entry_height),
+                marker_x + (marker_width / 2),
+                marker_y + (marker_height / 2),
+                min(marker_width, marker_height),
                 marker,
-                {"stroke":"none"},#computed_style,
+                {},#computed_style,
                 {},
                 )
 
         _draw_text(
             root=context.parent,
             text=label,
-            x=x + entry_width + (2 * entry_gutter),
-            y=y + ((i + 1) * entry_gutter) +  (i * entry_height) + (entry_height / 2),
+            x=x + label_offset,
+            y=y + ((i + 1) * legend._gutter) +  (i * marker_height) + (marker_height / 2),
             style=legend._lstyle,
             )
 
@@ -2211,6 +2157,27 @@ def _render(axes, mark, context): # pragma: no cover
                 style=mark._vlstyle,
                 attributes={"class": "toyplot-Datum"},
                 )
+
+
+@dispatch(toyplot.mark.Plot)
+def _legend_markers(mark):
+    markers = []
+
+    for stroke, stroke_width, stroke_opacity in zip(mark._stroke.T, mark._stroke_width.T, mark._stroke_opacity.T):
+        markers.append(
+        {
+            "shape": "/",
+            "mstyle": toyplot.style.combine(
+                {
+                    "stroke": toyplot.color.to_css(stroke),
+                    "stroke-width": stroke_width,
+                    "stroke-opacity": stroke_opacity,
+                },
+                mark._style,
+            ),
+        })
+
+    return markers
 
 
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Plot, _RenderContext)

@@ -21,9 +21,6 @@ class Mark(object):
     def __init__(self):
         pass
 
-    def legend_markers(self):
-        return []
-
 class AxisLines(Mark):
 
     """Render multiple lines parallel to an axis.
@@ -648,9 +645,9 @@ class Text(Mark):
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
+
 ##########################################################################
 # More specialized marks
-
 
 class Legend(Mark):
 

@@ -1688,6 +1688,30 @@ def _render(canvas, axes, context):
                     )
 
 
+@dispatch((toyplot.mark.BarBoundaries, toyplot.mark.BarMagnitudes))
+def _legend_markers(mark):
+    markers = []
+
+    for fill, opacity in zip(
+            [mark._table[key] for key in mark._fill],
+            [mark._table[key] for key in mark._opacity],
+        ):
+        markers.append(
+        {
+            "shape": "s",
+            "mstyle": toyplot.style.combine(
+                {
+                    "fill": toyplot.color.to_css(fill[0]),
+                    "fill-opacity": opacity[0],
+                },
+                mark._style,
+            ),
+        })
+
+    return markers
+
+
+
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.BarBoundaries, _RenderContext)
 def _render(axes, mark, context):
     left = mark._table[mark._left[0]]
@@ -2015,7 +2039,7 @@ def _render(canvas, legend, context):
     marker_height = (height - (legend._gutter * (len(entries) + 1))) / len(entries)
     marker_width = marker_height
 
-    label_offset = (numpy.amax([len(markers) for label, markers in entries]) * (legend._gutter + marker_width)) + marker_width
+    label_offset = (numpy.amax([len(markers) for label, markers in entries]) * (legend._gutter + marker_width)) + legend._gutter
 
     xml.SubElement(
         context.parent,
@@ -2033,7 +2057,7 @@ def _render(canvas, legend, context):
         marker_y = y + ((i + 1) * legend._gutter) + (i * marker_height)
 
         for j, marker in enumerate(markers):
-            marker_x = x + legend._gutter + (j * marker_width)
+            marker_x = x + legend._gutter + (j * (marker_width + legend._gutter))
 
             _draw_marker(
                 context.parent,

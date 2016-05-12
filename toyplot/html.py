@@ -581,7 +581,7 @@ def _draw_marker(
             )
     return marker_xml
 
-_draw_marker.variations = {"-": ("|", 90), "x": ("+", 45), "v": ("^", 180), "<": (
+_draw_marker.variations = {"-": ("|", 90), "/": ("|", -45), "\\": ("|", 45), "x": ("+", 45), "v": ("^", 180), "<": (
     "^", -90), ">": ("^", 90), "d": ("s", 45), "o-": ("o|", 90), "ox": ("o+", 45)}
 
 
@@ -2001,103 +2001,92 @@ def _render(canvas, legend, context):
         )
 
     mark_count = len(legend._marks)
-    if mark_count:
-        mark_gutter = legend._gutter
-        mark_height = (
-            height - (legend._gutter * (mark_count + 1))) / mark_count
+    if not mark_count:
+        return
 
-        for i, item in enumerate(legend._marks):
-            mark_x = x + mark_gutter
-            mark_y = y + ((i + 1) * mark_gutter) + (i * mark_height)
-            mark_width = mark_height
+    mark_gutter = legend._gutter
+    mark_height = (height - (legend._gutter * (mark_count + 1))) / mark_count
 
-            mark_style = {}
-            if isinstance(item, tuple) and len(item) == 2:
-                mark_label, mark = item
-            elif isinstance(item, tuple) and len(item) == 3:
-                mark_label, mark, mark_style = item
+    for i, item in enumerate(legend._marks):
+        mark_x = x + mark_gutter
+        mark_y = y + ((i + 1) * mark_gutter) + (i * mark_height)
+        mark_width = mark_height
 
-            if mark == "line":
-                xml.SubElement(
-                    context.parent,
-                    "line",
-                    x1=repr(mark_x),
-                    y1=repr(mark_y + mark_height),
-                    x2=repr(mark_x + mark_width),
-                    y2=repr(mark_y),
-                    style=_css_style(mark_style),
-                    )
-            elif mark == "rect":
-                xml.SubElement(
-                    context.parent,
-                    "rect",
-                    x=repr(mark_x),
-                    y=repr(mark_y),
-                    width=repr(mark_width),
-                    height=repr(mark_height),
-                    style=_css_style({"stroke": "none"}, mark_style),
-                    )
-            elif isinstance(mark, toyplot.mark.Plot):
-                dstyle = toyplot.style.combine(
-                    {"stroke": toyplot.color.to_css(mark._stroke[0])}, mark._style)
-                xml.SubElement(
-                    context.parent,
-                    "line",
-                    x1=repr(mark_x),
-                    y1=repr(mark_y + mark_height),
-                    x2=repr(mark_x + mark_width),
-                    y2=repr(mark_y),
-                    style=_css_style(dstyle, mark_style))
-            elif isinstance(mark, toyplot.mark.Scatterplot):
-                dstyle = toyplot.style.combine(
-                    {
-                        "fill": toyplot.color.to_css(mark._table[mark._mfill[0]][0]),
-                        "stroke": toyplot.color.to_css(mark._table[mark._mstroke[0]][0]),
-                        "opacity": mark._table[mark._mopacity[0]][0],
-                    },
-                    mark_style)
-                _draw_marker(
-                    context.parent,
-                    mark_x + (mark_width / 2),
-                    mark_y + (mark_height / 2),
-                    min(mark_width, mark_height),
-                    mark._table[mark._marker[0]][0],
-                    dstyle,
-                    {},
-                    )
-                pass
-            elif isinstance(mark, (toyplot.mark.BarBoundaries, toyplot.mark.BarMagnitudes, toyplot.mark.FillBoundaries, toyplot.mark.FillMagnitudes)):
-                dstyle = toyplot.style.combine({"fill": toyplot.color.to_css(
-                    mark._fill[0]), "opacity": mark._opacity[0]}, mark._style)
-                xml.SubElement(
-                    context.parent,
-                    "rect",
-                    x=repr(mark_x),
-                    y=repr(mark_y),
-                    width=repr(mark_width),
-                    height=repr(mark_height),
-                    style=_css_style(dstyle, mark_style),
-                    )
-            else:
-                computed_style = toyplot.style.combine(
-                    {"stroke": toyplot.color.near_black, "fill": "none"}, mark_style)
-                _draw_marker(
-                    context.parent,
-                    mark_x + (mark_width / 2),
-                    mark_y + (mark_height / 2),
-                    min(mark_width, mark_height),
-                    mark,
-                    computed_style,
-                    {},
-                    )
+        mark_style = {}
+        if isinstance(item, tuple) and len(item) == 2:
+            mark_label, mark = item
+        elif isinstance(item, tuple) and len(item) == 3:
+            mark_label, mark, mark_style = item
 
-            _draw_text(
-                root=context.parent,
-                text=mark_label,
-                x=x + mark_width + (2 * mark_gutter),
-                y=y + ((i + 1) * mark_gutter) +  (i * mark_height) + (mark_height / 2),
-                style=legend._lstyle,
+        if mark == "line":
+            mark = "/"
+        elif mark == "rect":
+            mark = "s"
+        elif isinstance(mark, toyplot.mark.Plot):
+            mark_style = toyplot.style.combine(
+                {
+                    "stroke": toyplot.color.to_css(mark._stroke[0]),
+                },
+                mark._style,
+                mark_style,
                 )
+            mark = "/"
+        elif isinstance(mark, toyplot.mark.Scatterplot):
+            mark_style = toyplot.style.combine(
+                {
+                    "fill": toyplot.color.to_css(mark._table[mark._mfill[0]][0]),
+                    "stroke": toyplot.color.to_css(mark._table[mark._mstroke[0]][0]),
+                    "opacity": mark._table[mark._mopacity[0]][0],
+                },
+                mark_style,
+                )
+            mark = mark._table[mark._marker[0]][0]
+        elif isinstance(mark, (toyplot.mark.BarBoundaries, toyplot.mark.BarMagnitudes)):
+            mark_style = toyplot.style.combine(
+                {
+                    "fill": toyplot.color.to_css(mark._table[mark._fill[0]][0]),
+                    "opacity": mark._table[mark._opacity[0]][0],
+                },
+                mark._style,
+                mark_style,
+                )
+            mark = "s"
+        elif isinstance(mark, (toyplot.mark.FillBoundaries, toyplot.mark.FillMagnitudes)):
+            toyplot.log.debug(mark._fill)
+            mark_style = toyplot.style.combine(
+                {
+                    "fill": toyplot.color.to_css(mark._fill[0]),
+                    "opacity": mark._opacity[0],
+                },
+                mark._style,
+                mark_style,
+                )
+            mark = "s"
+
+        computed_style = toyplot.style.combine(
+            {
+                "stroke": toyplot.color.near_black,
+                "fill": "none",
+            },
+            mark_style,
+            )
+        _draw_marker(
+            context.parent,
+            mark_x + (mark_width / 2),
+            mark_y + (mark_height / 2),
+            min(mark_width, mark_height),
+            mark,
+            computed_style,
+            {},
+            )
+
+        _draw_text(
+            root=context.parent,
+            text=mark_label,
+            x=x + mark_width + (2 * mark_gutter),
+            y=y + ((i + 1) * mark_gutter) +  (i * mark_height) + (mark_height / 2),
+            style=legend._lstyle,
+            )
 
 
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Graph, _RenderContext)

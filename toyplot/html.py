@@ -2080,7 +2080,7 @@ def _render(canvas, legend, context):
         marker_y = y + ((i + 1) * legend._gutter) + (i * marker_height)
 
         for j, marker in enumerate(markers):
-            marker_x = x + legend._gutter + (j * (marker_width + legend._gutter))
+            marker_x = x + label_offset - (len(markers) * (marker_width + legend._gutter)) + (j * (marker_width + legend._gutter))
 
             _draw_marker(
                 context.parent,

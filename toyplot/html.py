@@ -1861,6 +1861,31 @@ def _render(axes, mark, context):
                 xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
+@dispatch((toyplot.mark.FillBoundaries, toyplot.mark.FillMagnitudes))
+def _legend_markers(mark):
+    markers = []
+
+    for fill, opacity in zip(
+            mark._fill,
+            mark._opacity,
+        ):
+
+        markers.append(
+        {
+            "shape": "s",
+            "mstyle": toyplot.style.combine(
+                {
+                    "fill": toyplot.color.to_css(fill),
+                    "fill-opacity": opacity,
+                },
+                mark._style,
+            ),
+        })
+
+    return markers
+
+
+
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.FillBoundaries, _RenderContext)
 def _render(axes, mark, context):
     boundaries = numpy.ma.column_stack(
@@ -2027,8 +2052,6 @@ def _render(canvas, legend, context):
             markers = spec
         else:
             markers = [spec]
-
-        toyplot.log.debug("%s %s" % (label, markers))
 
         entries.append((label, markers))
 

@@ -1747,8 +1747,8 @@ class Cartesian(object):
 
         Parameters
         ----------
-        marks: sequence of marks to add to the legend
-          Each mark to be displayed in the legend should be specified using either
+        entries: sequence of entries to add to the legend
+          Each entry to be displayed in the legend should be specified using either
           a (label, mark) tuple or a (label, mark, style) tuple.  Each label should
           be the human-readable text to be displayed next to the mark.  The mark
           can be a string value "line" or "rect", a marker string "o", "s", "^",
@@ -1799,7 +1799,7 @@ class Cartesian(object):
                 xmax,
                 ymin,
                 ymax,
-                marks,
+                entries,
                 style,
                 label_style))
         return self._children[-1]

@@ -1735,7 +1735,7 @@ class Cartesian(object):
 
     def legend(
             self,
-            marks,
+            entries,
             bounds=None,
             rect=None,
             corner=None,
@@ -1747,12 +1747,11 @@ class Cartesian(object):
 
         Parameters
         ----------
-        entries: sequence of entries to add to the legend
-          Each entry to be displayed in the legend should be specified using either
-          a (label, mark) tuple or a (label, mark, style) tuple.  Each label should
-          be the human-readable text to be displayed next to the mark.  The mark
-          can be a string value "line" or "rect", a marker string "o", "s", "^",
-          or an actual intance of :class:`toyplot.mark.Mark`.
+        entries: sequence of entries to add to the legend Each entry to be
+            displayed in the legend must be either a (label, mark) tuple or a
+            (label, marker) tuple.  Labels are human-readable text, markers are
+            specified using the syntax described in :ref:`markers`, and marks can
+            be any instance of :class:`toyplot.mark.Mark`.
         bounds: (xmin, xmax, ymin, ymax) tuple, optional
           Use the bounds property to position / size the legend by specifying the
           position of each of its boundaries.  The boundaries may be specified in

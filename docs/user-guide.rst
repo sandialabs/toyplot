@@ -20,6 +20,7 @@ Contents:
   data-tables.rst
   embedding.rst
   graph-visualization.rst
+  image-visualization.rst
   interaction.rst
   labels-and-legends.rst
   log-scales.rst

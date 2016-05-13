@@ -90,6 +90,7 @@ notebooks = [
         "convenience-api",
         "data-tables",
         "graph-visualization",
+        "image-visualization",
         "interaction",
         "labels-and-legends",
         "log-scales",

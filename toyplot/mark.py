@@ -21,7 +21,6 @@ class Mark(object):
     def __init__(self):
         pass
 
-
 class AxisLines(Mark):
 
     """Render multiple lines parallel to an axis.
@@ -484,7 +483,7 @@ class Plot(Mark):
         self._mlstyle = toyplot.require.style(mlstyle, allowed=toyplot.require.style.text)
         # Export filename
         self._filename = toyplot.require.filename(filename)
-
+        
 
 class Rect(Mark):
 
@@ -646,9 +645,9 @@ class Text(Mark):
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
+
 ##########################################################################
 # More specialized marks
-
 
 class Legend(Mark):
 
@@ -658,14 +657,14 @@ class Legend(Mark):
     :meth:`toyplot.canvas.Canvas.legend` or :meth:`toyplot.coordinates.Cartesian.legend` instead.
     """
 
-    def __init__(self, xmin, xmax, ymin, ymax, marks, style, lstyle):
+    def __init__(self, xmin, xmax, ymin, ymax, entries, style, lstyle):
         Mark.__init__(self)
         self._xmin = xmin
         self._xmax = xmax
         self._ymin = ymin
         self._ymax = ymax
         self._gutter = 10
-        self._marks = marks
+        self._entries = entries
         # Styles the box surrounding the legend
         self._style = toyplot.style.combine(
             {

@@ -861,14 +861,6 @@ def test_axes_text_angle_fill():
     assert_canvas_matches(canvas, "axes-text-angle-fill")
 
 
-def test_axes_legend():
-    canvas = toyplot.Canvas()
-    axes = canvas.cartesian(grid=(2, 2, 1, 1))
-    axes.legend(
-        (("foo", "s"), ("bar", "o")), corner=("bottom-left", 30, 100, 50))
-    assert_canvas_matches(canvas, "axes-legend")
-
-
 def test_animation_frame_sanity_checks():
     frame = toyplot.canvas.AnimationFrame(
         index=1,
@@ -913,34 +905,5 @@ def test_html_render_animation():
         frame.set_datum_style(scatterplot, 0, frame.index(), {"stroke": "none"})
     canvas.animate(10, callback)
     dom = toyplot.html.render(canvas)
-
-
-##########################################################################
-# High-level tests that combine multiple API calls into whole figures.
-
-def test_legend():
-    x = numpy.linspace(0, 2 * numpy.pi, 200)
-    canvas = toyplot.Canvas(800, 600)
-    axes = canvas.cartesian()
-    plots = [axes.plot(x, 0.5 * i * numpy.sin(x * i))
-             for i in numpy.linspace(1, 2, 3)]
-    fill = axes.fill(x, numpy.sin(x) * 0.1, numpy.cos(x) * 0.1)
-    axes.x.label.text = "Time"
-    axes.y.label.text = "Temp"
-    canvas.legend([
-        ("Plot 1", plots[0]),
-        ("Plot 2", plots[1]),
-        ("Plot 3", plots[2]),
-        ("Fill", fill),
-        ("Explicit Line", "line", {"stroke": "red", "stroke-width": 1.0}),
-        ("Explicit Rect", "rect", {"fill": "green"}),
-        ("Explicit Marker", "^", {
-            "fill": "lightblue", "stroke": toyplot.color.near_black}),
-        ("Explicit Marker", "o", {
-            "fill": "yellow", "stroke": toyplot.color.near_black}),
-        ("Explicit Marker", "s", {"fill": "pink", "stroke": toyplot.color.near_black})],
-        bounds=(100, 200, 350, 550),
-    )
-    assert_canvas_matches(canvas, "legend")
 
 

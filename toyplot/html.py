@@ -1711,7 +1711,6 @@ def _legend_markers(mark):
     return markers
 
 
-
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.BarBoundaries, _RenderContext)
 def _render(axes, mark, context):
     left = mark._table[mark._left[0]]
@@ -2370,6 +2369,44 @@ def _render(axes, mark, context):
             )
         if dtitle is not None:
             xml.SubElement(datum_xml, "title").text = str(dtitle)
+
+
+@dispatch(toyplot.mark.Scatterplot)
+def _legend_markers(mark):
+    markers = []
+
+    for marker, mfill, mstroke, mopacity in zip(
+            [mark._table[key] for key in mark._marker],
+            [mark._table[key] for key in mark._mfill],
+            [mark._table[key] for key in mark._mstroke],
+            [mark._table[key] for key in mark._mopacity],
+        ):
+
+        for dmarker, dfill, dstroke, dopacity in zip(
+                marker,
+                mfill,
+                mstroke,
+                mopacity,
+            ):
+            if isinstance(dmarker, toyplot.compatibility.string_type):
+                dmarker = {"shape": dmarker}
+            dmarker["mstyle"] = toyplot.style.combine(
+                dmarker.get("mstyle", None),
+                {
+                    "fill": toyplot.color.to_css(dfill),
+                    "stroke": toyplot.color.to_css(dstroke),
+                    "opacity": dopacity,
+                },
+                mark._mstyle,
+                )
+            dmarker["lstyle"] = toyplot.style.combine(
+                dmarker.get("lstyle", None),
+                mark._mlstyle,
+                )
+            markers.append(dmarker)
+            break
+
+    return markers
 
 
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Scatterplot, _RenderContext)

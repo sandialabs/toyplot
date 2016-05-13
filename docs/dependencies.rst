@@ -28,7 +28,7 @@ To display datetime information using the
 :class:`toyplot.locator.Timestamp` locator, the following is required (if you
 install Toyplot using pip, it's automatically installed for you):
 
-* arrow - Better dates and times for Python - http://arrow.readthedocs.org
+* arrow - Better dates and times for Python - http://arrow.readthedocs.io
 
 Bitmap Images
 -------------
@@ -48,7 +48,7 @@ Generating static PDF versions of your Toyplot figures requires the following
 
 If your Toyplot figures contain bitmap images, ReportLab also requires the following:
 
-* Pillow - the friendly Python Imaging Library fork - http://pillow.readthedocs.org/en/3.0.x/
+* Pillow - the friendly Python Imaging Library fork - http://pillow.readthedocs.io/en/3.0.x/
 
 PNG Export
 ----------
@@ -91,9 +91,9 @@ code coverage:
 * behave - BDD test framework - http://pythonhosted.org/behave
 * coverage - code coverage module - http://nedbatchelder.com/code/coverage
 * mock - mocking and testing library - http://www.voidspace.org.uk/python/mock
-* nose - unit test framework - https://nose.readthedocs.org/en/latest
+* nose - unit test framework - https://nose.readthedocs.io/en/latest
 * nose-exclude - a nose plugin to simplify excluding directories - https://pypi.python.org/pypi/nose-exclude
-* Pillow - the friendly Python Imaging Library fork - http://pillow.readthedocs.org/en/3.0.x/
+* Pillow - the friendly Python Imaging Library fork - http://pillow.readthedocs.io/en/3.0.x/
 * xmldiff - print differences between XML files - https://pypi.python.org/pypi/xmldiff
 
 Generating Documentation
@@ -103,7 +103,7 @@ And you'll need to following to generate this documentation:
 
 * Sphinx - documentation builder - http://sphinx-doc.org
 * Sphinx readthedocs theme - https://github.com/snide/sphinx_rtd_theme
-* napoleon - http://sphinxcontrib-napoleon.readthedocs.org/en/latest/
+* napoleon - http://sphinxcontrib-napoleon.readthedocs.io/en/latest/
 * Jupyter - http://ipython.org
 * Pandoc - http://johnmacfarlane.net/pandoc
 

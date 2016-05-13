@@ -50,7 +50,7 @@ Writing Regression Tests
 
 .. note::
 
-  Toyplot has been gradually transitioning from `nose <https://nose.readthedocs.org/en/latest/>`_
+  Toyplot has been gradually transitioning from `nose <https://nose.readthedocs.io/en/latest/>`_
   to `behave <http://pythonhosted.org/behave>`_ for implementing regression tests.  New tests should
   be added to the `features` directory using behave.  The following outlines how the old tests
   were written, and will remain as a reference until they are all replaced.

@@ -7,7 +7,7 @@ Support
 
 The Toyplot documentation:
 
-* http://toyplot.readthedocs.org
+* http://toyplot.readthedocs.io
 
 Visit our GitHub repository for access to source code, issue tracker, and the wiki:
 

@@ -87,10 +87,10 @@ nitpick_ignore = [
     ]
 
 intersphinx_mapping = {
-    "arrow": ("https://arrow.readthedocs.org/en/latest", None),
+    "arrow": ("http://arrow.readthedocs.io/en/latest", None),
     "numpy": ("http://docs.scipy.org/doc/numpy-1.10.1", None),
-    "python": ("https://docs.python.org/3.5", None),
-    "PIL": ("https://pillow.readthedocs.org/en/3.2.x", None),
+    "python": ("http://docs.python.org/3.5", None),
+    "PIL": ("http://pillow.readthedocs.io/en/3.2.x", None),
     }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -162,8 +162,8 @@ pygments_style = 'sphinx'
 
 # -- Options for HTML output ----------------------------------------------
 
-# on_rtd is whether we are on readthedocs.org, this line of code grabbed
-# from docs.readthedocs.org
+# on_rtd is whether we are on readthedocs.io, this line of code grabbed
+# from docs.readthedocs.io
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if not on_rtd:  # only import and set the theme if we're building docs locally
@@ -173,13 +173,13 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 else:
     html_context = {
         'css_files': [
-            'https://media.readthedocs.org/css/sphinx_rtd_theme.css',
-            'https://media.readthedocs.org/css/readthedocs-doc-embed.css',
+            'https://media.readthedocs.io/css/sphinx_rtd_theme.css',
+            'https://media.readthedocs.io/css/readthedocs-doc-embed.css',
             '_static/toyplot.css',
         ],
     }
 
-# otherwise, readthedocs.org uses their theme by default, so no need to
+# otherwise, readthedocs.io uses their theme by default, so no need to
 # specify it
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

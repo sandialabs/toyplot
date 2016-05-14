@@ -20,7 +20,6 @@ import xml.etree.ElementTree as xml
 import toyplot
 import toyplot.color
 import toyplot.compatibility
-import toyplot.data
 import toyplot.html
 import toyplot.locator
 import toyplot.svg
@@ -48,18 +47,6 @@ except:
 
 ##########################################################################
 # Test fixtures.
-
-def assert_color_equal(a, b):
-    numpy.testing.assert_array_almost_equal(
-        (a["r"], a["g"], a["b"], a["a"]), b)
-
-
-def assert_masked_array(a, dtype, b, mask):
-    nose.tools.assert_is_instance(a, numpy.ma.MaskedArray)
-    nose.tools.assert_equal(a.dtype, dtype)
-    numpy.testing.assert_array_equal(a, b)
-    numpy.testing.assert_array_equal(a.mask, mask)
-
 
 def json_comparison_string(o):
     """Convert a Python object to a JSON string representation that can be used for comparison.
@@ -187,59 +174,6 @@ def assert_canvas_matches(canvas, name):
         raise AssertionError(
             "Test output tests/failed/%s.svg doesn't match tests/reference/%s.svg:\n%s" %
             (name, name, e))
-
-
-def assert_html_matches(html, name):
-    reference_file = "tests/reference/%s.html" % name
-    test_file = "tests/failed/%s.html" % name
-    if os.path.exists(test_file):
-        os.remove(test_file)
-    if os.path.exists(reference_file):
-        reference_html = open(reference_file, "rb").read()
-        if html != reference_html:
-            if not os.path.exists("tests/failed"):
-                os.mkdir("tests/failed")
-            with open(test_file, "wb") as file:
-                file.write(html)
-            raise AssertionError(
-                "Test output %s doesn't match %s." %
-                (test_file, reference_file))
-    else:
-        with open(reference_file, "wb") as file:
-            file.write(html)
-        raise AssertionError(
-            "Created new reference file %s.  You should verify its contents before re-running the test." %
-            (reference_file))
-
-##########################################################################
-# Test test fixtures.
-
-
-def test_xml_comparison_string():
-    nose.tools.assert_equal(
-        xml_comparison_string(xml.fromstring("<svg/>")), "<svg>\n</svg>\n")
-    nose.tools.assert_equal(xml_comparison_string(
-        xml.fromstring("<svg><a/></svg>")), "<svg>\n  <a>\n  </a>\n</svg>\n")
-    nose.tools.assert_equal(
-        xml_comparison_string(
-            xml.fromstring("<svg><a>foo</a></svg>")),
-        "<svg>\n  <a>foo\n  </a>\n</svg>\n")
-    nose.tools.assert_equal(
-        xml_comparison_string(
-            xml.fromstring("<svg><a b='c'>foo</a></svg>")),
-        "<svg>\n  <a b='c'>foo\n  </a>\n</svg>\n")
-    nose.tools.assert_equal(
-        xml_comparison_string(
-            xml.fromstring("<svg><a b='.333333333333333'>foo</a></svg>")),
-        "<svg>\n  <a b='0.333333333'>foo\n  </a>\n</svg>\n")
-    nose.tools.assert_equal(
-        xml_comparison_string(
-            xml.fromstring("<svg><a b='.666666666666666'>foo</a></svg>")),
-        "<svg>\n  <a b='0.666666667'>foo\n  </a>\n</svg>\n")
-    nose.tools.assert_equal(
-        xml_comparison_string(
-            xml.fromstring("<svg><a id='1234'/></svg>")),
-        "<svg>\n  <a>\n  </a>\n</svg>\n")
 
 ##########################################################################
 # toyplot
@@ -828,39 +762,6 @@ def test_axes_rect():
     assert_canvas_matches(canvas, "axes-rect")
 
 
-def test_axes_text():
-    canvas = toyplot.Canvas()
-    axes = canvas.cartesian()
-    x = numpy.linspace(0, 1)
-    y = numpy.sin(x * 10)
-    text = ["s%s" % index for index in range(len(x))]
-    axes.text(x, y, text, annotation=False)
-    assert_canvas_matches(canvas, "axes-text")
-
-
-def test_axes_text_angle_fill():
-    x = numpy.zeros(10)
-    y = x
-    angle = numpy.linspace(-90, 0, len(x), endpoint=True)
-    color = numpy.linspace(1, 0, len(x))
-
-    canvas = toyplot.Canvas(400, 400)
-    axes = canvas.cartesian(xmin=-0.25, xmax=0.5, ymin=-0.5, ymax=0.25)
-    axes.text(
-        x,
-        y,
-        text="Toyplot!",
-        angle=angle,
-        color=color,
-        style={
-            "font-size": "36px",
-            "font-weight": "bold",
-            "stroke": "white",
-            "text-anchor": "start"})
-
-    assert_canvas_matches(canvas, "axes-text-angle-fill")
-
-
 def test_animation_frame_sanity_checks():
     frame = toyplot.canvas.AnimationFrame(
         index=1,
@@ -888,22 +789,4 @@ def test_canvas_time():
     nose.tools.assert_equal(frame.time(), 0.3)
     numpy.testing.assert_almost_equal(frame.duration(), 0.1)
     nose.tools.assert_equal(frame.index(), 5)
-
-
-##########################################################################
-# toyplot.html
-
-
-def test_html_render_animation():
-    canvas = toyplot.Canvas()
-    axes = canvas.cartesian()
-    text = canvas.text(100, 100, "")
-    scatterplot = axes.scatterplot(numpy.arange(10))
-
-    def callback(frame):
-        frame.set_mark_style(text, {"fill-opacity": frame.time()})
-        frame.set_datum_style(scatterplot, 0, frame.index(), {"stroke": "none"})
-    canvas.animate(10, callback)
-    dom = toyplot.html.render(canvas)
-
 

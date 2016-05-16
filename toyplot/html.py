@@ -1189,12 +1189,23 @@ def _render(canvas, axis, context):
                     title=title,
                     )
 
+        location = axis._label_location
+        alignment_baseline = "alphabetic" if location == "above" else "hanging"
+        text_anchor = "middle"
+        y = axis._label_offset if location == "below" else -axis._label_offset
+
         _draw_text(
             root=axis_xml,
             text=axis.label.text,
             x=length * 0.5,
-            y=0,
-            style=toyplot.style.combine({"baseline-shift": axis._label_baseline_shift}, axis.label.style),
+            y=y,
+            style=toyplot.style.combine(
+                {
+                    "alignment-baseline": alignment_baseline,
+                    "text-anchor": text_anchor,
+                },
+                axis.label.style,
+            ),
             )
 
         if axis.interactive.coordinates.show:

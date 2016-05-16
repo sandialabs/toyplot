@@ -378,20 +378,20 @@ class Axis(object):
 
     class LabelHelper(object):
         def __init__(self, text, style):
-            self._offset = 0
+            self._location = None
+            self._offset = None
             self._style = {}
             self._text = None
 
             self.style = {
-                "alignment-baseline": "middle",
                 "font-size": "12px",
                 "font-weight": "bold",
                 "stroke": "none",
-                "text-anchor": "middle",
                 }
             self.style = style
             self.text = text
 
+        location = _create_location_property()
         offset = _create_offset_property()
         style = _create_text_style_property()
         text = _create_text_property()
@@ -635,7 +635,23 @@ class Axis(object):
                 return toyplot.locator.Log(base=base)
         raise RuntimeError("Unable to create an appropriate locator.") # pragma: no cover
 
-    def _finalize(self, x1, x2, y1, y2, offset, domain_min, domain_max, tick_locations, tick_labels, tick_titles, default_tick_location, default_ticks_near, default_ticks_far, label_baseline_shift):
+    def _finalize(
+            self,
+            x1,
+            x2,
+            y1,
+            y2,
+            offset,
+            domain_min,
+            domain_max,
+            tick_locations,
+            tick_labels,
+            tick_titles,
+            default_tick_location,
+            default_ticks_near,
+            default_ticks_far,
+            default_label_location,
+        ):
         self._x1 = x1
         self._x2 = x2
         self._y1 = y1
@@ -651,8 +667,9 @@ class Axis(object):
         self._ticks_far = self.ticks.far if self.ticks.far is not None else default_ticks_far
         self._tick_labels_location = self.ticks.labels.location if self.ticks.labels.location is not None else self._tick_location
         self._tick_labels_offset = self.ticks.labels.offset if self.ticks.labels.offset is not None else 6
+        self._label_location = self.label.location if self.label.location is not None else default_label_location
+        self._label_offset = self.label.offset if self.label.offset is not None else 24
         self._interactive_coordinates_location = self.interactive.coordinates.location if self.interactive.coordinates.location is not None else _opposite_location(self._tick_labels_location)
-        self._label_baseline_shift = label_baseline_shift
 
         endpoints = numpy.row_stack(((x1, y1), (x2, y2)))
         length = numpy.linalg.norm(endpoints[1] - endpoints[0])
@@ -961,21 +978,21 @@ class Cartesian(object):
             x_ticks_near = 0
             x_ticks_far = 5
             x_tick_location = "below"
-            x_label_baseline_shift = "-200%"
+            x_label_location = "below"
         elif self.x.spine.position == "high":
             x_offset = -self.padding
             x_spine_y = self._ymin_range
             x_ticks_near = 5
             x_ticks_far = 0
             x_tick_location = "above"
-            x_label_baseline_shift = "200%"
+            x_label_location = "above"
         else:
             x_offset = 0
             x_spine_y = self._y_projection(self.x.spine.position)
             x_ticks_near = 3
             x_ticks_far = 3
             x_tick_location = "below"
-            x_label_baseline_shift = "-200%"
+            x_label_location = "below"
 
         if self.y.spine._position == "low":
             y_offset = -self.padding
@@ -983,21 +1000,21 @@ class Cartesian(object):
             y_ticks_near = 0
             y_ticks_far = 5
             y_tick_location = "above"
-            y_label_baseline_shift = "200%"
+            y_label_location = "above"
         elif self.y.spine._position == "high":
             y_offset = self.padding
             y_spine_x = self._xmax_range
             y_ticks_near = 0
             y_ticks_far = 5
             y_tick_location = "below"
-            y_label_baseline_shift = "-200%"
+            y_label_location = "below"
         else:
             y_offset = 0
             y_spine_x = self._x_projection(self.y.spine._position)
             y_ticks_near = 3
             y_ticks_far = 3
             y_tick_location = "below"
-            y_label_baseline_shift = "200%"
+            y_label_location = "below"
 
         # Finalize the axes.
         self.x._finalize(
@@ -1014,7 +1031,7 @@ class Cartesian(object):
             default_tick_location=x_tick_location,
             default_ticks_far=x_ticks_far,
             default_ticks_near=x_ticks_near,
-            label_baseline_shift=x_label_baseline_shift,
+            default_label_location=x_label_location,
             )
         self.y._finalize(
             x1=y_spine_x,
@@ -1030,7 +1047,7 @@ class Cartesian(object):
             default_tick_location=y_tick_location,
             default_ticks_far=y_ticks_far,
             default_ticks_near=y_ticks_near,
-            label_baseline_shift=y_label_baseline_shift,
+            default_label_location=y_label_location,
             )
 
     def _project_x(self, x):
@@ -2668,7 +2685,8 @@ class Numberline(object):
             default_tick_location="below",
             default_ticks_near=3,
             default_ticks_far=3,
-            label_baseline_shift="-200%",
+            default_label_location="below",
+            #label_baseline_shift="-200%",
             )
 
 

@@ -387,6 +387,7 @@ class Axis(object):
                 "font-size": "12px",
                 "font-weight": "bold",
                 "stroke": "none",
+                "text-anchor":"middle",
                 }
             self.style = style
             self.text = text
@@ -668,7 +669,7 @@ class Axis(object):
         self._tick_labels_location = self.ticks.labels.location if self.ticks.labels.location is not None else self._tick_location
         self._tick_labels_offset = self.ticks.labels.offset if self.ticks.labels.offset is not None else 6
         self._label_location = self.label.location if self.label.location is not None else default_label_location
-        self._label_offset = self.label.offset if self.label.offset is not None else 24
+        self._label_offset = self.label.offset if self.label.offset is not None else 22
         self._interactive_coordinates_location = self.interactive.coordinates.location if self.interactive.coordinates.location is not None else _opposite_location(self._tick_labels_location)
 
         endpoints = numpy.row_stack(((x1, y1), (x2, y2)))
@@ -692,6 +693,24 @@ class Cartesian(object):
     Do not create Cartesian instances directly.  Use factory methods such
     as :meth:`toyplot.canvas.Canvas.axes` instead.
     """
+
+    class LabelHelper(object):
+        def __init__(self, text, style):
+            self._style = {}
+            self._text = None
+
+            self.style = {
+                "baseline-shift": "100%",
+                "font-size": "14px",
+                "font-weight": "bold",
+                "stroke": "none",
+                "text-anchor":"middle",
+                }
+            self.style = style
+            self.text = text
+
+        style = _create_text_style_property()
+        text = _create_text_property()
 
     def __init__(
             self,
@@ -745,9 +764,9 @@ class Cartesian(object):
 
         self._show = show
 
-        self.label = Axis.LabelHelper(
+        self.label = Cartesian.LabelHelper(
             text=label,
-            style={"font-size": "14px", "baseline-shift": "100%"},
+            style={},
             )
 
         if xaxis is None:

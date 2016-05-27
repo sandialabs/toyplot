@@ -7,6 +7,37 @@
 Release Notes
 =============
 
+Toyplot 0.12.0 - May 27, 2016
+-----------------------------
+
+* Pandas data frame indices (including hierarchical indices) can optionally be included when converting to `toyplot.data.Table`.
+* Fixed a Python 3 portability issue.
+* Table coordinates didn't format NaN values properly when using a custom formatting string.
+* The `arrow` module is only imported when needed.
+* New documentation on grouping table rows.
+* Documented platform-specific timezone naming issues.
+* Improved documentation of the color factory objects in `toyplot.color`.
+* Use consistent naming for numberline coordinates.
+* Made it easier to iterate over `toyplot.data.Table` rows.
+* Interactive mouse coordinates work correctly with numberlines and shared axes, and are only displayed by click / touch events.
+* Position ticks relative to axes with a `location` property, and deprecate the tick labels `location` property.
+* Fixed a problem rendering bars with a log scale and nonzero domain minimum.
+* Removed the API to change text during animation.
+* Significant cleanup and organization of HTML backend code and generated markup.
+* Renamed the `toyplot.axes` module to `toyplot.coordinates` for consistency, clarity.
+* Added `toyplot.canvas.Canvas.cartesian()` and deprecated `toyplot.canvas.Canvas.axes()`.
+* Added `toyplot.locator.Uniform` and deprecated `toyplot.locator.Basic`.
+* Added documentation links to external libraries, where practical.
+* Added `text-shadow` to the list of valid CSS text attributes.
+* Updated dependencies to require numpy >= 1.8.0, and eliminated code that inadvertently depended on numpy >= 1.9.
+* Experimental support for displaying `PIL` and `scikit-image` images.
+* Added a `style` property to `toyplot.canvas.Canvas`.
+* Deprecated implicit conversion from palettes to colormaps for matrix visualization.
+* Provide better error messages if a caller passes anything but a canvas to a rendering backend.
+* Add support for multi-series marks in legends.
+* Updated links to point to our new documentation domain, `http://toyplot.readthedocs.io`.
+* Axis labels support the same `location` and `offset` parameterization as axis ticks / tick labels.
+
 Toyplot 0.11.0 - February 18, 2016
 ----------------------------------
 

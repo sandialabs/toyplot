@@ -81,12 +81,6 @@ class Uniform(TickLocator):
         return locations, labels, titles
 
 
-class Basic(Uniform):
-    def __init__(self, count=5, format="{:g}"):
-        toyplot.log.warning("toyplot.locator.Basic is deprecated, use toyplot.locator.Uniform instead.")
-        Uniform.__init__(self, count=count, format=format)
-
-
 class Explicit(TickLocator):
 
     """Explicitly specify a collection of tick locations and labels for an axis.

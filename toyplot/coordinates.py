@@ -499,7 +499,6 @@ class Axis(object):
         def __init__(self, angle):
             self._angle = angle
             self._label = Axis.PerTickHelper(toyplot.require.style.text)
-            self._location = None
             self._offset = None
             self._show = True
             self._style = {
@@ -523,15 +522,6 @@ class Axis(object):
         @property
         def label(self):
             return self._label
-
-        @property
-        def location(self):
-            return self._location
-
-        @location.setter
-        def location(self, value):
-            toyplot.log.warn("<axis>.ticks.labels.location is deprecated, use <axis>.ticks.location instead.")
-            self._location = toyplot.require.value_in(value, [None, "above", "below"])
 
 
     def __init__(
@@ -666,7 +656,7 @@ class Axis(object):
         self._tick_location = self.ticks.location if self.ticks.location is not None else default_tick_location
         self._ticks_near = self.ticks.near if self.ticks.near is not None else default_ticks_near
         self._ticks_far = self.ticks.far if self.ticks.far is not None else default_ticks_far
-        self._tick_labels_location = self.ticks.labels.location if self.ticks.labels.location is not None else self._tick_location
+        self._tick_labels_location = self._tick_location
         self._tick_labels_offset = self.ticks.labels.offset if self.ticks.labels.offset is not None else 6
         self._label_location = self.label.location if self.label.location is not None else default_label_location
         self._label_offset = self.label.offset if self.label.offset is not None else 22

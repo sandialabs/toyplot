@@ -505,22 +505,12 @@ class Canvas(object):
         -------
         axes: :class:`toyplot.coordinates.Table`
         """
-        colormap = None
-        palette = None
         if isinstance(data, tuple):
-            data, colors = data
-            matrix = toyplot.require.scalar_matrix(data)
-            if isinstance(colors, toyplot.color.Palette):
-                toyplot.log.warn("Implicit conversion from palettes to colormaps for color mapping is deprecated.  Use a toyplot.color.Map instead.")
-                palette = colors
-            elif isinstance(colors, toyplot.color.Map):
-                colormap = colors
+            matrix = toyplot.require.scalar_matrix(data[0])
+            colormap = toyplot.require.instance(data[1], toyplot.color.Map)
         else:
             matrix = toyplot.require.scalar_matrix(data)
-
-        if colormap is None:
-            if palette is None:
-                palette = toyplot.color.brewer.palette("BlueRed")
+            palette = toyplot.color.brewer.palette("BlueRed")
             colormap = toyplot.color.LinearMap(
                 palette=palette,
                 domain_min=matrix.min(),

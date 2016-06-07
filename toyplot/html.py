@@ -50,12 +50,13 @@ class _RenderContext(object):
         self._coordinate_systems.add(coordinate_system)
 
     def add_data_table(self, mark, table, title, filename):
-        self._data_tables.append({
-            "mark": mark,
-            "title": title,
-            "table": table,
-            "filename": filename,
-            })
+        if not mark.annotation:
+            self._data_tables.append({
+                "mark": mark,
+                "title": title,
+                "table": table,
+                "filename": filename,
+                })
 
     def add_visible_axis(self, axis):
         self._visible_axes.add(axis)

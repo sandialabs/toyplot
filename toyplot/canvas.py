@@ -1005,7 +1005,9 @@ class Canvas(object):
                 opacity=["opacity"],
                 title=["title"],
                 style=style,
-                filename=None))
+                annotation=True,
+                filename=None,
+                ))
         return self._children[-1]
 
     def time(self, begin, end, index=None):

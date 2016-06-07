@@ -1390,6 +1390,7 @@ class Cartesian(object):
             opacity=1.0,
             title=None,
             style=None,
+            annotation=False,
             filename=None):
         """Fill multiple regions separated by curves.
 
@@ -1408,6 +1409,8 @@ class Cartesian(object):
         style: dict, optional
           Collection of CSS styles to apply to the mark.  See
           :class:`toyplot.mark.FillBoundaries` for a list of useful styles.
+        annotation: boolean, optional
+          Set to True if this mark should be considered an annotation.
 
         Returns
         -------
@@ -1456,10 +1459,10 @@ class Cartesian(object):
                 )
 
             if along == "x":
-                self._update_domain(position, series)
+                self._update_domain(position, series, display=True, data=not annotation)
                 coordinate_axes = ["x", "y"]
             elif along == "y":
-                self._update_domain(series, position)
+                self._update_domain(series, position, display=True, data=not annotation)
                 coordinate_axes = ["y", "x"]
 
             table = toyplot.data.Table()
@@ -1482,6 +1485,7 @@ class Cartesian(object):
                     opacity=opacity,
                     title=title,
                     style=style,
+                    annotation=annotation,
                     filename=filename))
             return self._children[-1]
         else:  # baseline is not None
@@ -1532,10 +1536,10 @@ class Cartesian(object):
             boundaries = numpy.ma.cumsum(
                 numpy.ma.column_stack((baseline, series)), axis=1)
             if along == "x":
-                self._update_domain(position, boundaries)
+                self._update_domain(position, boundaries, display=True, data=not annotation)
                 coordinate_axes = ["x", "y"]
             elif along == "y":
-                self._update_domain(boundaries, position)
+                self._update_domain(boundaries, position, display=True, data=not annotation)
                 coordinate_axes = ["y", "x"]
 
             table = toyplot.data.Table()
@@ -1560,6 +1564,7 @@ class Cartesian(object):
                     opacity=opacity,
                     title=title,
                     style=style,
+                    annotation=annotation,
                     filename=filename))
             return self._children[-1]
 
@@ -1735,7 +1740,7 @@ class Cartesian(object):
         """
         table = toyplot.data.Table()
         table["y"] = toyplot.require.scalar_vector(y)
-        _mark_exportable(table, "y", not annotation)
+        _mark_exportable(table, "y")
         color = toyplot.color.broadcast(
             colors=color,
             shape=(table.shape[0], 1),
@@ -1756,7 +1761,9 @@ class Cartesian(object):
                 stroke=["color"],
                 opacity=["opacity"],
                 title=["title"],
-                style=style))
+                style=style,
+                annotation=annotation,
+                ))
         return self._children[-1]
 
     def legend(
@@ -2303,11 +2310,11 @@ class Cartesian(object):
         """
         table = toyplot.data.Table()
         table["x"] = toyplot.require.scalar_vector(a)
-        _mark_exportable(table, "x", not annotation)
+        _mark_exportable(table, "x")
         table["y"] = toyplot.require.scalar_vector(b, table.shape[0])
-        _mark_exportable(table, "y", not annotation)
+        _mark_exportable(table, "y")
         table["text"] = toyplot.broadcast.object(text, table.shape[0])
-        _mark_exportable(table, "text", not annotation)
+        _mark_exportable(table, "text")
         table["angle"] = toyplot.broadcast.scalar(angle, table.shape[0])
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
@@ -2347,6 +2354,7 @@ class Cartesian(object):
                 opacity=["opacity"],
                 title=["title"],
                 style=style,
+                annotation=annotation,
                 filename=filename))
         return self._children[-1]
 
@@ -2383,7 +2391,7 @@ class Cartesian(object):
         """
         table = toyplot.data.Table()
         table["x"] = toyplot.require.scalar_vector(x)
-        _mark_exportable(table, "x", not annotation)
+        _mark_exportable(table, "x")
         color = toyplot.color.broadcast(
             colors=color,
             shape=(table.shape[0], 1),
@@ -2404,7 +2412,9 @@ class Cartesian(object):
                 stroke=["color"],
                 opacity=["opacity"],
                 title=["title"],
-                style=style))
+                style=style,
+                annotation=annotation,
+                ))
         return self._children[-1]
 
 

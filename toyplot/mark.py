@@ -18,8 +18,18 @@ class Mark(object):
     """Base class for all Toyplot marks.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, annotation=False):
+        self._annotation = False
+        self.annotation = annotation
+
+    @property
+    def annotation(self):
+        return self._annotation
+
+    @annotation.setter
+    def annotation(self, value):
+        self._annotation = True if value else False
+
 
 class AxisLines(Mark):
 
@@ -38,8 +48,9 @@ class AxisLines(Mark):
             opacity,
             title,
             style,
+            annotation,
         ):
-        Mark.__init__(self)
+        Mark.__init__(self, annotation)
 
         # 1 axis identifier
         self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=1)
@@ -170,9 +181,10 @@ class FillBoundaries(Mark):
             opacity,
             title,
             style,
+            annotation,
             filename,
         ):
-        Mark.__init__(self)
+        Mark.__init__(self, annotation)
 
         # 2 axis identifiers
         self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=2)
@@ -214,9 +226,10 @@ class FillMagnitudes(Mark):
             opacity,
             title,
             style,
+            annotation,
             filename,
         ):
-        Mark.__init__(self)
+        Mark.__init__(self, annotation)
 
         # 2 axis identifiers
         self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=2)
@@ -611,9 +624,10 @@ class Text(Mark):
             opacity,
             title,
             style,
+            annotation,
             filename,
         ):
-        Mark.__init__(self)
+        Mark.__init__(self, annotation)
 
         # D axis identifiers
         self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, min_length=1)

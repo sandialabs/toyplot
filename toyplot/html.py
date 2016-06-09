@@ -1110,7 +1110,7 @@ def _render(canvas, axis, context):
         if axis.spine.show:
             x1 = 0
             x2 = length
-            if axis._data_min is not None and axis._data_max is not None:
+            if axis.domain.show and axis._data_min is not None and axis._data_max is not None:
                 x1 = max(
                     x1, axis.projection(axis._data_min))
                 x2 = min(

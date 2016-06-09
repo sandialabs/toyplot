@@ -285,6 +285,7 @@ class Axis(object):
         def __init__(self, min, max):
             self._min = min
             self._max = max
+            self._show = True
 
         @property
         def min(self):
@@ -307,6 +308,18 @@ class Axis(object):
         @max.setter
         def max(self, value):
             self._max = value
+
+        @property
+        def show(self):
+            """Control whether the domain should be made visible using the
+            axis spine.
+            """
+            return self._show
+
+        @show.setter
+        def show(self, value):
+            toyplot.log.warning("Altering <axis>.domain.show is experimental.")
+            self._show = True if value else False
 
 
     class InteractiveCoordinatesLabelHelper(object):

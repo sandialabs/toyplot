@@ -338,7 +338,8 @@ def read_csv(fobj, convert=False):
     fobj: file-like object or string, required
         The file to read.  Use a string filepath, an open file, or a file-like object.
     convert: boolean, optional
-        If True, convert column types from string to float where possible.
+        By default, the columns in a table will contain strings.  If True,
+        convert column types to integers and floats where possible.
 
     Returns
     -------
@@ -361,9 +362,12 @@ def read_csv(fobj, convert=False):
     if convert:
         for name in result.keys():
             try:
-                result[name] = result[name].astype("float64")
+                result[name] = result[name].astype("int")
             except:
-                pass
+                try:
+                    result[name] = result[name].astype("float")
+                except:
+                    pass
 
     return result
 

@@ -333,7 +333,8 @@ def step_impl(context):
 def step_impl(context):
     nose.tools.assert_equal(context.data.shape, (362, 6))
     nose.tools.assert_equal(list(context.data.keys()), ['STATION', 'STATION_NAME', 'DATE', 'TMAX', 'TMIN', 'TOBS'])
-    nose.tools.assert_equal([column.dtype for column in context.data.values()], ["S17", "S15", "S8", "S3", "S4", "S4"])
+    for column in context.data.values():
+        nose.tools.assert_true(issubclass(column.dtype.type, numpy.character))
 
 
 @when(u'toyplot.data.Table is initialized with a csv file and conversion')
@@ -345,7 +346,8 @@ def step_impl(context):
 def step_impl(context):
     nose.tools.assert_equal(context.data.shape, (362, 6))
     nose.tools.assert_equal(list(context.data.keys()), ['STATION', 'STATION_NAME', 'DATE', 'TMAX', 'TMIN', 'TOBS'])
-    nose.tools.assert_equal([column.dtype for column in context.data.values()], ["S17", "S15", "int64", "int64", "int64", "int64"])
+    for column, column_type in zip(context.data.values(), [numpy.character, numpy.character, numpy.integer, numpy.integer, numpy.integer, numpy.integer]):
+        nose.tools.assert_true(issubclass(column.dtype.type, column_type))
 
 
 @when(u'toyplot.data.Table is initialized with a pandas dataframe')

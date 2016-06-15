@@ -496,7 +496,7 @@ class Plot(Mark):
         self._mlstyle = toyplot.require.style(mlstyle, allowed=toyplot.require.style.text)
         # Export filename
         self._filename = toyplot.require.filename(filename)
-        
+
 
 class Rect(Mark):
 

@@ -603,7 +603,7 @@ class Canvas(object):
         for i, row in enumerate(matrix):
             for j, value in enumerate(row):
                 cell = table.body.cell(i, j)
-                cell.bstyle = {"stroke": "none", "fill": colormap.css(value)}
+                cell.style = {"stroke": "none", "fill": colormap.css(value)}
                 cell.title = value
 
         self._children.append(table)

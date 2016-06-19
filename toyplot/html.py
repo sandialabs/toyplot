@@ -1499,8 +1499,6 @@ def _render(canvas, axes, context):
 @dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Table, _RenderContext)
 def _render(canvas, axes, context):
     axes._finalize()
-    column_boundaries = axes._column_boundaries
-    row_boundaries = axes._row_boundaries
 
     axes_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         axes), attrib={"class": "toyplot-coordinates-Table"})
@@ -1524,18 +1522,19 @@ def _render(canvas, axes, context):
         # Render the cell background.
         cell_style = axes._cell_style[cell_selection][0]
         if cell_style is not None:
-            column_left = column_boundaries[column_min]
-            column_right = column_boundaries[column_max + 1]
-            row_top = row_boundaries[row_min]
-            row_bottom = row_boundaries[row_max + 1]
+            # Compute the cell boundaries.
+            cell_top = axes._cell_top[row_min]
+            cell_bottom = axes._cell_bottom[row_max]
+            cell_left = axes._cell_left[column_min]
+            cell_right = axes._cell_right[column_max]
 
             cell_xml = xml.SubElement(
                 axes_xml,
                 "rect",
-                x=repr(column_left),
-                y=repr(row_top),
-                width=repr(column_right - column_left),
-                height=repr(row_bottom - row_top),
+                x=repr(cell_left),
+                y=repr(cell_top),
+                width=repr(cell_right - cell_left),
+                height=repr(cell_bottom - cell_top),
                 style=_css_style(cell_style),
                 )
 
@@ -1546,17 +1545,12 @@ def _render(canvas, axes, context):
         # Render the cell data.
         cell_data = axes._cell_data[cell_selection][0]
         if cell_data is not None:
-
             # Compute the cell boundaries.
             padding = 5
-
-            column_left = column_boundaries[column_min] + padding
-            column_right = column_boundaries[column_max + 1] - padding
-            column_center = (column_left + column_right) / 2
-
-            row_top = row_boundaries[row_min]
-            row_bottom = row_boundaries[row_max + 1]
-            row_center = (row_top + row_bottom) / 2
+            cell_top = axes._cell_top[row_min]
+            cell_bottom = axes._cell_bottom[row_max]
+            cell_left = axes._cell_left[column_min] + padding
+            cell_right = axes._cell_right[column_max] - padding
 
             # Compute the text placement within the cell boundaries.
             cell_column_offset = axes._cell_column_offset[cell_selection][0]
@@ -1565,7 +1559,7 @@ def _render(canvas, axes, context):
             if cell_align is None:
                 cell_align = "left"
             cell_angle = axes._cell_angle[cell_selection][0]
-            y = row_center + cell_row_offset
+            y = ((cell_top + cell_bottom) / 2) + cell_row_offset
 
             # Format the cell data.
             cell_format = axes._cell_format[cell_selection][0]
@@ -1576,7 +1570,7 @@ def _render(canvas, axes, context):
 
             # Render the cell data.
             if cell_align == "left":
-                x = column_left + cell_column_offset
+                x = cell_left + cell_column_offset
                 _draw_text(
                     root=axes_xml,
                     x=x,
@@ -1585,7 +1579,7 @@ def _render(canvas, axes, context):
                     text=prefix + separator + suffix,
                     )
             elif cell_align == "center":
-                x = column_center + cell_column_offset
+                x = ((cell_left + cell_right) / 2) + cell_column_offset
                 _draw_text(
                     root=axes_xml,
                     x=x,
@@ -1595,7 +1589,7 @@ def _render(canvas, axes, context):
                     text=prefix + separator + suffix,
                     )
             elif cell_align == "right":
-                x = column_right + cell_column_offset
+                x = cell_right + cell_column_offset
                 _draw_text(
                     root=axes_xml,
                     x=x,
@@ -1604,7 +1598,7 @@ def _render(canvas, axes, context):
                     text=prefix + separator + suffix,
                     )
             elif cell_align is "separator":
-                x = column_center + cell_column_offset
+                x = ((cell_left + cell_right) / 2) + cell_column_offset
                 _draw_text(
                     root=axes_xml,
                     x=x - 2,
@@ -1633,6 +1627,9 @@ def _render(canvas, axes, context):
             _render(axes._parent, child, context.copy(parent=axes_xml))
 
     # Render grid lines.
+    row_boundaries = axes._row_boundaries
+    column_boundaries = axes._column_boundaries
+
     separation = axes._separation / 2
 
     def contiguous(a):

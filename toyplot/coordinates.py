@@ -843,6 +843,22 @@ class Cartesian(object):
     def padding(self, value):
         self._padding = toyplot.units.convert(value, target="px", default="px")
 
+    def _set_xmin_range(self, value):
+        self._xmin_range = value
+    xmin_range = property(fset = _set_xmin_range)
+
+    def _set_xmax_range(self, value):
+        self._xmax_range = value
+    xmax_range = property(fset = _set_xmax_range)
+
+    def _set_ymin_range(self, value):
+        self._ymin_range = value
+    ymin_range = property(fset = _set_ymin_range)
+
+    def _set_ymax_range(self, value):
+        self._ymax_range = value
+    ymax_range = property(fset = _set_ymax_range)
+
     def _update_domain(self, x, y, display=True, data=True):
         self.x.update_domain(x, display=display, data=data)
         self.y.update_domain(y, display=display, data=data)
@@ -2821,7 +2837,7 @@ class Table(object):
             value = numpy.array(value)
             if self._column_end - self._column_begin == 1 and value.ndim == 1:
                 value = value.reshape(-1, 1)
-            self._table._data[self._row_begin : self._row_end, self._column_begin : self._column_end] = value
+            self._table._cell_data[self._row_begin : self._row_end, self._column_begin : self._column_end] = value
         data = property(fset=_set_data)
 
 #        def _set_title(self, value):
@@ -2829,12 +2845,11 @@ class Table(object):
 #                    [self._cells, value], flags=["refs_ok"], op_flags=[["readwrite"], ["readonly"]]):
 #                left[()]._title = right[()]
 #        title = property(fset=_set_title)
-#
-#        def _set_format(self, value):
-#            for cell in self._cells.flat:
-#                cell._format = value
-#        format = property(fset=_set_format)
-#
+
+        def _set_format(self, value):
+            self._table._cell_format[self._row_begin : self._row_end, self._column_begin : self._column_end] = value
+        format = property(fset=_set_format)
+
 #        def _set_align(self, value):
 #            for cell in self._cells.flat:
 #                cell._align = value
@@ -2877,77 +2892,65 @@ class Table(object):
 #            for cell in self._cells.flat:
 #                cell._row_offset = value
 #        row_offset = property(fset=_set_row_offset)
-#
-#        def axes(
-#                self,
-#                xmin=None,
-#                xmax=None,
-#                ymin=None,
-#                ymax=None,
-#                aspect=None,
-#                show=False,
-#                xshow=True,
-#                yshow=True,
-#                label=None,
-#                xlabel=None,
-#                ylabel=None,
-#                xticklocator=None,
-#                yticklocator=None,
-#                xscale="linear",
-#                yscale="linear",
-#                padding=5,
-#                cell_padding=0,
-#            ):
-#            self._table._finalize()
-#            left = numpy.min([cell.left for cell in self._cells.flat]) + cell_padding
-#            right = numpy.max([cell.right for cell in self._cells.flat]) - cell_padding
-#            top = numpy.min([cell.top for cell in self._cells.flat]) + cell_padding
-#            bottom = numpy.max([cell.bottom for cell in self._cells.flat]) - cell_padding
-#
-#            axes = toyplot.coordinates.Cartesian(
-#                left,
-#                right,
-#                top,
-#                bottom,
-#                xmin=xmin,
-#                xmax=xmax,
-#                ymin=ymin,
-#                ymax=ymax,
-#                aspect=aspect,
-#                show=show,
-#                xshow=xshow,
-#                yshow=yshow,
-#                label=label,
-#                xlabel=xlabel,
-#                ylabel=ylabel,
-#                xticklocator=xticklocator,
-#                yticklocator=yticklocator,
-#                xscale=xscale,
-#                yscale=yscale,
-#                padding=padding,
-#                parent=self._table._parent,
-#                )
-#            #axes.coordinates.show = False
-#            self._table._children.append(axes)
-#            return axes
-#
-#        def merge(self):
-#            source = self._cells.flat[0]
-#            merged_cell = Table.Cell(align=source._align, style=source._style)
-#            merged_cell._parents = self._cells
-#
-#            rows = numpy.unique([cell._row for cell in self._cells.flat])
-#            columns = numpy.unique([cell._column for cell in self._cells.flat])
-#
-#            if len(rows) > 1:
-#                self._table._hmask[rows[1:], columns] = True
-#            if len(columns) > 1:
-#                self._table._vmask[rows, columns[1:]] = True
-#
-#            for cell in self._cells.flat:
-#                self._table._visible_cells.remove(cell)
-#            self._table._visible_cells.add(merged_cell)
-#            return Table.CellReference(self._table, numpy.array(merged_cell))
+
+        def axes(
+                self,
+                xmin=None,
+                xmax=None,
+                ymin=None,
+                ymax=None,
+                aspect=None,
+                show=False,
+                xshow=True,
+                yshow=True,
+                label=None,
+                xlabel=None,
+                ylabel=None,
+                xticklocator=None,
+                yticklocator=None,
+                xscale="linear",
+                yscale="linear",
+                padding=5,
+                cell_padding=0,
+            ):
+
+            axes = toyplot.coordinates.Cartesian(
+                xmin_range=0, # These will be calculated for real in _finalize().
+                xmax_range=1,
+                ymin_range=0,
+                ymax_range=1,
+                xmin=xmin,
+                xmax=xmax,
+                ymin=ymin,
+                ymax=ymax,
+                aspect=aspect,
+                show=show,
+                xshow=xshow,
+                yshow=yshow,
+                label=label,
+                xlabel=xlabel,
+                ylabel=ylabel,
+                xticklocator=xticklocator,
+                yticklocator=yticklocator,
+                xscale=xscale,
+                yscale=yscale,
+                padding=padding,
+                parent=self._table._parent,
+                )
+            #axes.coordinates.show = False
+            #self._table._children.append(axes)
+            self._table._cell_axes[self._row_begin:self._row_end, self._column_begin:self._column_end] = axes
+            return axes
+
+        def merge(self):
+            self._table._cell_group[self._row_begin:self._row_end, self._column_begin:self._column_end] = numpy.unique(self._table._cell_group).max() + 1
+
+            if self._row_end - self._row_begin > 1:
+                self._table._hlines_show[self._row_begin+1:self._row_end, self._column_begin:self._column_end] = False
+            if self._column_end - self._column_begin > 1:
+                self._table._vlines_show[self._row_begin:self._row_end, self._column_begin+1:self._column_end] = False
+
+            return self
 #
 #    class GapReference(object):
 #
@@ -3059,7 +3062,7 @@ class Table(object):
 
         @property
         def data(self):
-            return self._table._data[self._row_begin : self._row_end, self._column_begin : self._column_end]
+            return self._table._cell_data[self._row_begin : self._row_end, self._column_begin : self._column_end]
 
         @property
         def align(self):
@@ -3098,15 +3101,16 @@ class Table(object):
 
         shape = (trows + rows + brows, lcolumns + columns + rcolumns)
 
-        self._data = numpy.empty(shape, dtype="object")
+        self._cell_data = numpy.empty(shape, dtype="object")
         self._cell_show = numpy.ones(shape, dtype="bool")
         self._cell_format = numpy.tile(toyplot.format.DefaultFormatter(), shape)
         self._cell_align = numpy.empty(shape, dtype="object")
         self._cell_angle = numpy.zeros(shape, dtype="float")
-        self._cell_groups = numpy.arange(shape[0] * shape[1]).reshape(shape)
+        self._cell_group = numpy.arange(shape[0] * shape[1]).reshape(shape)
         self._cell_row_offset = numpy.zeros(shape, dtype="float")
         self._cell_column_offset = numpy.zeros(shape, dtype="float")
         self._cell_style = numpy.empty(shape, dtype="object")
+        self._cell_axes = numpy.empty(shape, dtype="object")
 
         self._hlines = numpy.empty((shape[0] + 1, shape[1]), dtype="object")
         self._hlines_show = numpy.ones((shape[0] + 1, shape[1]), dtype="bool")
@@ -3258,16 +3262,24 @@ class Table(object):
         gap_cell_heights[2::2] = row_heights
         gap_cell_row_boundaries = numpy.cumsum(gap_cell_heights)
 
-#        # Assign coordinates to grid cells.
-#        for cell in self._cells.flat:
-#            cell._left = gap_cell_column_boundaries[cell._column * 2 + 1]
-#            cell._right = gap_cell_column_boundaries[cell._column * 2 + 2]
-#            cell._top = gap_cell_row_boundaries[cell._row * 2 + 1]
-#            cell._bottom = gap_cell_row_boundaries[cell._row * 2 + 2]
-
         # Compute grid boundaries.
         self._column_boundaries = (
             gap_cell_column_boundaries[0::2] + gap_cell_column_boundaries[1::2]) / 2
         self._row_boundaries = (
             gap_cell_row_boundaries[0::2] + gap_cell_row_boundaries[1::2]) / 2
+
+        # Assign ranges to embedded coordinate systems.
+        for axes in numpy.unique(self._cell_axes):
+            if axes is not None:
+                axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
+                row_min = axes_rows.min()
+                row_max = axes_rows.max()
+                column_min = axes_columns.min()
+                column_max = axes_columns.max()
+
+                if isinstance(axes, toyplot.coordinates.Cartesian):
+                    axes.xmin_range = self._column_boundaries[column_min]
+                    axes.xmax_range = self._column_boundaries[column_max+1]
+                    axes.ymin_range = self._row_boundaries[row_min]
+                    axes.ymax_range = self._row_boundaries[row_max+1]
 

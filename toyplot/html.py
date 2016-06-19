@@ -1506,8 +1506,8 @@ def _render(canvas, axes, context):
         axes), attrib={"class": "toyplot-coordinates-Table"})
 
     # For each unique group of cells.
-    for cell_group in numpy.unique(axes._cell_groups):
-        cell_selection = (axes._cell_groups == cell_group)
+    for cell_group in numpy.unique(axes._cell_group):
+        cell_selection = (axes._cell_group == cell_group)
 
         # Skip hidden groups.
         cell_show = axes._cell_show[cell_selection][0]
@@ -1535,7 +1535,7 @@ def _render(canvas, axes, context):
 #                xml.SubElement(cell_xml, "title").text = str(cell._title)
 
         # Render the cell data.
-        cell_data = axes._data[cell_selection][0]
+        cell_data = axes._cell_data[cell_selection][0]
         if cell_data is not None:
 
             # Identify the closed range of rows and columns that contain the cell.
@@ -1626,8 +1626,9 @@ def _render(canvas, axes, context):
                     )
 
     # Render children.
-    for child in axes._children:
-        _render(axes._parent, child, context.copy(parent=axes_xml))
+    for child in numpy.unique(axes._cell_axes):
+        if child is not None:
+            _render(axes._parent, child, context.copy(parent=axes_xml))
 
     # Render grid lines.
     separation = axes._separation / 2

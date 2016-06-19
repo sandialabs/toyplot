@@ -1503,6 +1503,15 @@ def _render(canvas, axes, context):
     axes_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         axes), attrib={"class": "toyplot-coordinates-Table"})
 
+    # Render title
+    _draw_text(
+        root=axes_xml,
+        text=axes._label._text,
+        x=(axes._xmin_range + axes._xmax_range) * 0.5,
+        y=axes._ymin_range,
+        style=axes._label._style,
+        )
+
     # For each unique group of cells.
     for cell_group in numpy.unique(axes._cell_group):
         cell_selection = (axes._cell_group == cell_group)
@@ -1622,9 +1631,8 @@ def _render(canvas, axes, context):
                     )
 
     # Render children.
-    for child in numpy.unique(axes._cell_axes):
-        if child is not None:
-            _render(axes._parent, child, context.copy(parent=axes_xml))
+    for child in axes._children:
+        _render(axes._parent, child, context.copy(parent=axes_xml))
 
     # Render grid lines.
     row_boundaries = axes._row_boundaries
@@ -1719,15 +1727,6 @@ def _render(canvas, axes, context):
                     y2=repr(row_boundaries[end]),
                     style=_css_style(axes._gstyle),
                     )
-
-    # Render title
-    _draw_text(
-        root=axes_xml,
-        text=axes._label._text,
-        x=(axes._xmin_range + axes._xmax_range) * 0.5,
-        y=axes._ymin_range,
-        style=axes._label._style,
-        )
 
 
 @dispatch((toyplot.mark.BarBoundaries, toyplot.mark.BarMagnitudes))

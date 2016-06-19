@@ -2774,14 +2774,9 @@ class Table(object):
             self._column_end = column_end
             self._shape = (slice(row_begin, row_end), slice(column_begin, column_end))
 
-#        def _set_show(self, value):
-#            if value:
-#                for cell in self._cells.flat:
-#                    self._table._visible_cells.add(cell)
-#            else:
-#                for cell in self._cells.flat:
-#                    self._table._visible_cells.remove(cell)
-#        show = property(fset=_set_show)
+        def _set_show(self, value):
+            self._table._cell_show[self._shape] = True if value else False
+        show = property(fset=_set_show)
 
         def _set_data(self, value):
             value = numpy.array(value)
@@ -2808,10 +2803,12 @@ class Table(object):
             self._table._cell_align[self._shape] = value
         align = property(fset=_set_align)
 
-#        def _set_angle(self, value):
-#            for cell in self._cells.flat:
-#                cell._angle = value
-#        angle = property(fset=_set_angle)
+        def _set_angle(self, value):
+            value = numpy.array(value)
+            if self._column_end - self._column_begin == 1 and value.ndim == 1:
+                value = value.reshape(-1, 1)
+            self._table._cell_angle[self._shape] = value
+        angle = property(fset=_set_angle)
 
         def _set_style(self, value):
             value = toyplot.require.style(value, allowed=toyplot.require.style.fill)
@@ -2833,15 +2830,13 @@ class Table(object):
             self._table._row_heights[self._row_begin : self._row_end] = toyplot.units.convert(value, "px", "px")
         height = property(fset=_set_height)
 
-#        def _set_column_offset(self, value):
-#            for cell in self._cells.flat:
-#                cell._column_offset = value
-#        column_offset = property(fset=_set_column_offset)
-#
-#        def _set_row_offset(self, value):
-#            for cell in self._cells.flat:
-#                cell._row_offset = value
-#        row_offset = property(fset=_set_row_offset)
+        def _set_column_offset(self, value):
+            self._table._cell_column_offset[:, self._column_begin : self._column_end] = toyplot.units.convert(value, "px", "px")
+        column_offset = property(fset=_set_column_offset)
+
+        def _set_row_offset(self, value):
+            self._table._cell_row_offset[self._row_begin : self._row_end, :] = toyplot.units.convert(value, "px", "px")
+        row_offset = property(fset=_set_row_offset)
 
         def axes(
                 self,
@@ -2891,6 +2886,8 @@ class Table(object):
                 )
 
             self._table._cell_axes[self._row_begin:self._row_end, self._column_begin:self._column_end] = axes
+            self._table._children.append(axes)
+
             return axes
 
         def merge(self):
@@ -2943,24 +2940,24 @@ class Table(object):
         def vlines(self):
             return self._vlines
 
-#        @property
-#        def separation(self):
-#            return self._table._separation
-#
-#        @separation.setter
-#        def separation(self, value):
-#            self._table._separation = value
-#
-#        @property
-#        def style(self):
-#            return self._table._gstyle
-#
-#        @style.setter
-#        def style(self, value):
-#            self._table._gstyle = toyplot.style.combine(
-#                self._table._gstyle,
-#                toyplot.require.style(value, toyplot.require.style.line),
-#                )
+        @property
+        def separation(self):
+            return self._table._separation
+
+        @separation.setter
+        def separation(self, value):
+            self._table._separation = value
+
+        @property
+        def style(self):
+            return self._table._gstyle
+
+        @style.setter
+        def style(self, value):
+            self._table._gstyle = toyplot.style.combine(
+                self._table._gstyle,
+                toyplot.require.style(value, toyplot.require.style.line),
+                )
 
     class Region(object):
 
@@ -3010,17 +3007,17 @@ class Table(object):
                 self._column_begin + column + colspan,
                 )
 
-#        @property
-#        def shape(self):
-#            return self._cells.shape
-#
-#        @property
-#        def rows(self):
-#            return self._cells.shape[0]
-#
-#        @property
-#        def columns(self):
-#            return self._cells.shape[1]
+        @property
+        def shape(self):
+            return (self.row_end - self.row_begin, self._column_end - self._column_begin)
+
+        @property
+        def rows(self):
+            return self.shape[0]
+
+        @property
+        def columns(self):
+            return self.shape[1]
 
         @property
         def cells(self):
@@ -3124,23 +3121,22 @@ class Table(object):
         self._cell_label_style[trows : trows + rows, lcolumns : lcolumns + columns] = style
         self._cell_align[trows : trows + rows, lcolumns : lcolumns + columns] = "left"
 
-#        self._visible_cells = _ordered_set(numpy.ravel(self._cells))
-#
-#    @property
-#    def label(self):
-#        return self._label
-#
-#    @property
-#    def shape(self):
-#        return self._cells.shape
-#
-#    @property
-#    def rows(self):
-#        return self._cells.shape[0]
-#
-#    @property
-#    def columns(self):
-#        return self._cells.shape[1]
+
+    @property
+    def label(self):
+        return self._label
+
+    @property
+    def shape(self):
+        return (self._trows + self._rows + self._brows, self._lcolumns + self.columns + self._rcolumns)
+
+    @property
+    def rows(self):
+        return self.shape[0]
+
+    @property
+    def columns(self):
+        return self.shape[1]
 
     @property
     def cells(self):
@@ -3246,17 +3242,16 @@ class Table(object):
             ))
 
         # Assign ranges to embedded coordinate systems.
-        for axes in numpy.unique(self._cell_axes):
-            if axes is not None:
-                axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
-                row_min = axes_rows.min()
-                row_max = axes_rows.max()
-                column_min = axes_columns.min()
-                column_max = axes_columns.max()
+        for axes in self._children:
+            axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
+            row_min = axes_rows.min()
+            row_max = axes_rows.max()
+            column_min = axes_columns.min()
+            column_max = axes_columns.max()
 
-                if isinstance(axes, toyplot.coordinates.Cartesian):
-                    axes.xmin_range = self._cell_left[column_min]
-                    axes.xmax_range = self._cell_right[column_max]
-                    axes.ymin_range = self._cell_top[row_min]
-                    axes.ymax_range = self._cell_bottom[row_max]
+            if isinstance(axes, toyplot.coordinates.Cartesian):
+                axes.xmin_range = self._cell_left[column_min]
+                axes.xmax_range = self._cell_right[column_max]
+                axes.ymin_range = self._cell_top[row_min]
+                axes.ymax_range = self._cell_bottom[row_max]
 

@@ -32,40 +32,40 @@ def step_impl(context):
 
 @then(u'the table can be rendered with header styles')
 def step_impl(context):
-    context.table_axes.header.column(1).style = {"fill": "red"}
+    context.table_axes.header.column(1).lstyle = {"fill": "red"}
 
 
 @then(u'the table can be rendered with column styles')
 def step_impl(context):
-    context.table_axes.column(1).style = {"fill": "red"}
+    context.table_axes.column(1).lstyle = {"fill": "red"}
 
 
 @then(u'the table can be rendered with row styles')
 def step_impl(context):
-    context.table_axes.row(1).style = {"fill": "green"}
+    context.table_axes.row(1).lstyle = {"fill": "green"}
 
 
 @then(u'the table can be rendered with cell styles')
 def step_impl(context):
-    context.table_axes.cell(1, 1).style = {"fill": "blue"}
+    context.table_axes.cell(1, 1).lstyle = {"fill": "blue"}
 
 
 @then(u'the table can be rendered and row styles override column styles')
 def step_impl(context):
-    context.table_axes.column(1).style = {"fill": "red"}
-    context.table_axes.row(1).style = {"fill": "green"}
+    context.table_axes.column(1).lstyle = {"fill": "red"}
+    context.table_axes.row(1).lstyle = {"fill": "green"}
 
 
 @then(u'the table can be rendered and cell styles override row styles')
 def step_impl(context):
-    context.table_axes.row(1).style = {"fill": "green"}
-    context.table_axes.cell(1, 1).style = {"fill": "blue"}
+    context.table_axes.row(1).lstyle = {"fill": "green"}
+    context.table_axes.cell(1, 1).lstyle = {"fill": "blue"}
 
 
 @then(u'the table can be rendered and cell styles override column styles')
 def step_impl(context):
-    context.table_axes.column(1).style = {"fill": "red"}
-    context.table_axes.cell(1, 1).style = {"fill": "blue"}
+    context.table_axes.column(1).lstyle = {"fill": "red"}
+    context.table_axes.cell(1, 1).lstyle = {"fill": "blue"}
 
 
 @then(u'the table can be rendered with extra horizontal lines')
@@ -108,6 +108,7 @@ def step_impl(context):
 def step_impl(context):
     context.table_axes.column(0).column_offset = -50
     context.table_axes.column(2).column_offset = 50
+    toyplot.log.warning(context.table_axes._cell_column_offset)
 
 
 @then(u'the table can be rendered with custom header content')

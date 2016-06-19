@@ -1499,116 +1499,137 @@ def _render(canvas, axes, context):
 @dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Table, _RenderContext)
 def _render(canvas, axes, context):
     axes._finalize()
+    column_boundaries = axes._column_boundaries
+    row_boundaries = axes._row_boundaries
 
     axes_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         axes), attrib={"class": "toyplot-coordinates-Table"})
 
-    # Render title
-    _draw_text(
-        root=axes_xml,
-        text=axes._label._text,
-        x=(axes._xmin_range + axes._xmax_range) * 0.5,
-        y=axes._ymin_range,
-        style=axes._label._style,
-        )
+    # For each unique group of cells.
+    for cell_group in numpy.unique(axes._cell_groups):
+        cell_selection = (axes._cell_groups == cell_group)
+
+        # Skip hidden groups.
+        cell_show = axes._cell_show[cell_selection][0]
+        if not cell_show:
+            continue
+
+        # Render the cell background.
+#        if cell._bstyle is not None:
+#            cell_xml = xml.SubElement(
+#                axes_xml,
+#                "rect",
+#                x=repr(
+#                    cell.left),
+#                y=repr(
+#                    cell.top),
+#                width=repr(
+#                    cell.right -
+#                    cell.left),
+#                height=repr(
+#                    cell.bottom -
+#                    cell.top),
+#                style=_css_style(
+#                    cell._bstyle))
+#            if cell._title is not None:
+#                xml.SubElement(cell_xml, "title").text = str(cell._title)
+
+        # Render the cell data.
+        cell_data = axes._data[cell_selection][0]
+        if cell_data is not None:
+
+            # Identify the closed range of rows and columns that contain the cell.
+            cell_rows, cell_columns = numpy.nonzero(cell_selection)
+            row_min = cell_rows.min()
+            row_max = cell_rows.max()
+            column_min = cell_columns.min()
+            column_max = cell_columns.max()
+
+            # Compute the cell boundaries.
+            padding = 5
+
+            column_left = column_boundaries[column_min] + padding
+            column_right = column_boundaries[column_max + 1] - padding
+            column_center = (column_left + column_right) / 2
+
+            row_top = row_boundaries[row_min]
+            row_bottom = row_boundaries[row_max + 1]
+            row_center = (row_top + row_bottom) / 2
+
+            # Compute the text placement within the cell boundaries.
+            cell_column_offset = axes._cell_column_offset[cell_selection][0]
+            cell_row_offset = axes._cell_row_offset[cell_selection][0]
+            cell_align = axes._cell_align[cell_selection][0]
+            if cell_align is None:
+                cell_align = "left"
+            cell_angle = axes._cell_angle[cell_selection][0]
+            y = row_center + cell_row_offset
+
+            # Format the cell data.
+            cell_format = axes._cell_format[cell_selection][0]
+            prefix, separator, suffix = cell_format.format(cell_data)
+
+            # Get the cell style.
+            cell_style = axes._cell_style[cell_selection][0]
+
+            # Render the cell data.
+            if cell_align == "left":
+                x = column_left + cell_column_offset
+                _draw_text(
+                    root=axes_xml,
+                    x=x,
+                    y=y,
+                    style=toyplot.style.combine(cell_style, {"text-anchor": "begin"}),
+                    text=prefix + separator + suffix,
+                    )
+            elif cell_align == "center":
+                x = column_center + cell_column_offset
+                _draw_text(
+                    root=axes_xml,
+                    x=x,
+                    y=y,
+                    angle=cell_angle,
+                    style=toyplot.style.combine(cell_style, {"text-anchor": "middle"}),
+                    text=prefix + separator + suffix,
+                    )
+            elif cell_align == "right":
+                x = column_right + cell_column_offset
+                _draw_text(
+                    root=axes_xml,
+                    x=x,
+                    y=y,
+                    style=toyplot.style.combine(cell_style, {"text-anchor": "end"}),
+                    text=prefix + separator + suffix,
+                    )
+            elif cell_align is "separator":
+                x = column_center + cell_column_offset
+                _draw_text(
+                    root=axes_xml,
+                    x=x - 2,
+                    y=y,
+                    style=toyplot.style.combine(cell_style, {"text-anchor": "end"}),
+                    text=prefix,
+                    )
+                _draw_text(
+                    root=axes_xml,
+                    x=x,
+                    y=y,
+                    style=toyplot.style.combine(cell_style, {"text-anchor": "middle"}),
+                    text=separator,
+                    )
+                _draw_text(
+                    root=axes_xml,
+                    x=x + 2,
+                    y=y,
+                    style=toyplot.style.combine(cell_style, {"text-anchor": "begin"}),
+                    text=suffix,
+                    )
 
     # Render children.
     for child in axes._children:
         _render(axes._parent, child, context.copy(parent=axes_xml))
 
-    # Render visible cells.
-    for cell in axes._visible_cells:
-        if cell._bstyle is not None:
-            cell_xml = xml.SubElement(
-                axes_xml,
-                "rect",
-                x=repr(
-                    cell.left),
-                y=repr(
-                    cell.top),
-                width=repr(
-                    cell.right -
-                    cell.left),
-                height=repr(
-                    cell.bottom -
-                    cell.top),
-                style=_css_style(
-                    cell._bstyle))
-            if cell._title is not None:
-                xml.SubElement(cell_xml, "title").text = str(cell._title)
-
-        if cell._data is None:
-            continue
-
-        prefix, separator, suffix = cell._format.format(cell._data)
-
-        padding = 5
-
-        column_left = cell.left + padding
-        column_right = cell.right - padding
-        column_center = (cell.left + cell.right) / 2
-
-        row_top = cell.top
-        row_bottom = cell.bottom
-        row_center = (cell.top + cell.bottom) / 2
-
-        y = row_center + cell._row_offset
-
-        if cell._align == "left":
-            x = column_left + cell._column_offset
-            _draw_text(
-                root=axes_xml,
-                x=x,
-                y=y,
-                style=toyplot.style.combine(cell._style, {"text-anchor": "begin"}),
-                text=prefix + separator + suffix,
-                )
-        elif cell._align == "center":
-            x = column_center + cell._column_offset
-            _draw_text(
-                root=axes_xml,
-                x=x,
-                y=y,
-                angle=cell._angle,
-                style=toyplot.style.combine(cell._style, {"text-anchor": "middle"}),
-                text=prefix + separator + suffix,
-                )
-        elif cell._align == "right":
-            x = column_right + cell._column_offset
-            _draw_text(
-                root=axes_xml,
-                x=x,
-                y=y,
-                style=toyplot.style.combine(cell._style, {"text-anchor": "end"}),
-                text=prefix + separator + suffix,
-                )
-        elif cell._align is "separator":
-            x = column_center + cell._column_offset
-            _draw_text(
-                root=axes_xml,
-                x=x - 2,
-                y=y,
-                style=toyplot.style.combine(cell._style, {"text-anchor": "end"}),
-                text=prefix,
-                )
-            _draw_text(
-                root=axes_xml,
-                x=x,
-                y=y,
-                style=toyplot.style.combine(cell._style, {"text-anchor": "middle"}),
-                text=separator,
-                )
-            _draw_text(
-                root=axes_xml,
-                x=x + 2,
-                y=y,
-                style=toyplot.style.combine(cell._style, {"text-anchor": "begin"}),
-                text=suffix,
-                )
-
     # Render grid lines.
-    column_boundaries = axes._column_boundaries
-    row_boundaries = axes._row_boundaries
     separation = axes._separation / 2
 
     def contiguous(a):
@@ -1622,7 +1643,7 @@ def _render(canvas, axes, context):
         return result
 
     hlines = numpy.copy(axes._hlines)
-    hlines[axes._hmask] = False
+    hlines[numpy.logical_not(axes._hlines_show)] = False
     for row_index, row in enumerate(hlines):
         y = row_boundaries[row_index]
         for start, end, line_type in contiguous(row):
@@ -1665,7 +1686,7 @@ def _render(canvas, axes, context):
                         axes._gstyle))
 
     vlines = numpy.copy(axes._vlines)
-    vlines[axes._vmask] = False
+    vlines[numpy.logical_not(axes._vlines_show)] = False
     for column_index, column in enumerate(vlines.T):
         x = column_boundaries[column_index]
         for start, end, line_type in contiguous(column):
@@ -1698,6 +1719,15 @@ def _render(canvas, axes, context):
                     y2=repr(row_boundaries[end]),
                     style=_css_style(axes._gstyle),
                     )
+
+    # Render title
+    _draw_text(
+        root=axes_xml,
+        text=axes._label._text,
+        x=(axes._xmin_range + axes._xmax_range) * 0.5,
+        y=axes._ymin_range,
+        style=axes._label._style,
+        )
 
 
 @dispatch((toyplot.mark.BarBoundaries, toyplot.mark.BarMagnitudes))

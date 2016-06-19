@@ -477,8 +477,8 @@ def table(
         columns=None,
         hrows=None,
         brows=None,
-        lcols=None,
-        rcols=None,
+        lcolumns=None,
+        rcolumns=None,
         label=None,
         width=None,
         height=None,
@@ -502,7 +502,7 @@ def table(
         columns=columns,
         hrows=hrows,
         brows=brows,
-        lcols=lcols,
-        rcols=rcols,
+        lcolumns=lcolumns,
+        rcolumns=rcolumns,
         label=label)
     return canvas, axes

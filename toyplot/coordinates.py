@@ -2749,219 +2749,220 @@ class Table(object):
         text = _create_text_property()
 
 
-    class Cell(object):
-        def __init__(self, row=None, column=None, align=None, style=None):
-            self._row = row
-            self._column = column
-            self._format = Table.Cell.default_format
-            self._align = align
-            self._angle = 0
-            self._style = style
-            self._bstyle = None
-            self._data = None
-            self._title = None
-            self._width = None
-            self._height = None
-            self._left = None
-            self._right = None
-            self._top = None
-            self._bottom = None
-            self._column_offset = 0
-            self._row_offset = 0
-            self._parents = None
-
-        @property
-        def left(self):
-            if self._left is None and self._parents is not None:
-                self._left = numpy.min(
-                    [parent._left for parent in self._parents.flat])
-            return self._left
-
-        @property
-        def right(self):
-            if self._right is None and self._parents is not None:
-                self._right = numpy.max(
-                    [parent._right for parent in self._parents.flat])
-            return self._right
-
-        @property
-        def top(self):
-            if self._top is None and self._parents is not None:
-                self._top = numpy.min(
-                    [parent._top for parent in self._parents.flat])
-            return self._top
-
-        @property
-        def bottom(self):
-            if self._bottom is None and self._parents is not None:
-                self._bottom = numpy.max(
-                    [parent._bottom for parent in self._parents.flat])
-            return self._bottom
-
-        default_format = toyplot.format.DefaultFormatter()
+#    class Cell(object):
+#        def __init__(self, row=None, column=None, align=None, style=None):
+#            self._row = row
+#            self._column = column
+#            self._format = Table.Cell.default_format
+#            self._align = align
+#            self._angle = 0
+#            self._style = style
+#            self._bstyle = None
+#            self._data = None
+#            self._title = None
+#            self._width = None
+#            self._height = None
+#            self._left = None
+#            self._right = None
+#            self._top = None
+#            self._bottom = None
+#            self._column_offset = 0
+#            self._row_offset = 0
+#            self._parents = None
+#
+#        @property
+#        def left(self):
+#            if self._left is None and self._parents is not None:
+#                self._left = numpy.min(
+#                    [parent._left for parent in self._parents.flat])
+#            return self._left
+#
+#        @property
+#        def right(self):
+#            if self._right is None and self._parents is not None:
+#                self._right = numpy.max(
+#                    [parent._right for parent in self._parents.flat])
+#            return self._right
+#
+#        @property
+#        def top(self):
+#            if self._top is None and self._parents is not None:
+#                self._top = numpy.min(
+#                    [parent._top for parent in self._parents.flat])
+#            return self._top
+#
+#        @property
+#        def bottom(self):
+#            if self._bottom is None and self._parents is not None:
+#                self._bottom = numpy.max(
+#                    [parent._bottom for parent in self._parents.flat])
+#            return self._bottom
+#
+#        default_format = toyplot.format.DefaultFormatter()
 
     class CellReference(object):
-        def __init__(self, table, cells):
+        def __init__(self, table, row_begin, row_end, column_begin, column_end):
             self._table = table
-            self._cells = cells
+            self._row_begin = row_begin
+            self._row_end = row_end
+            self._column_begin = column_begin
+            self._column_end = column_end
 
-        def _set_show(self, value):
-            if value:
-                for cell in self._cells.flat:
-                    self._table._visible_cells.add(cell)
-            else:
-                for cell in self._cells.flat:
-                    self._table._visible_cells.remove(cell)
-        show = property(fset=_set_show)
+#        def _set_show(self, value):
+#            if value:
+#                for cell in self._cells.flat:
+#                    self._table._visible_cells.add(cell)
+#            else:
+#                for cell in self._cells.flat:
+#                    self._table._visible_cells.remove(cell)
+#        show = property(fset=_set_show)
 
         def _set_data(self, value):
-            for left, right in numpy.nditer(
-                    [self._cells, value], flags=["refs_ok"], op_flags=[["readwrite"], ["readonly"]]):
-                left[()]._data = right[()]
+            value = numpy.array(value)
+            if self._column_end - self._column_begin == 1 and value.ndim == 1:
+                value = value.reshape(-1, 1)
+            self._table._data[self._row_begin : self._row_end, self._column_begin : self._column_end] = value
         data = property(fset=_set_data)
 
-        def _set_title(self, value):
-            for left, right in numpy.nditer(
-                    [self._cells, value], flags=["refs_ok"], op_flags=[["readwrite"], ["readonly"]]):
-                left[()]._title = right[()]
-        title = property(fset=_set_title)
-
-        def _set_format(self, value):
-            for cell in self._cells.flat:
-                cell._format = value
-        format = property(fset=_set_format)
-
-        def _set_align(self, value):
-            for cell in self._cells.flat:
-                cell._align = value
-        align = property(fset=_set_align)
-
-        def _set_angle(self, value):
-            for cell in self._cells.flat:
-                cell._angle = value
-        angle = property(fset=_set_angle)
-
-        def _set_style(self, value):
-            value = toyplot.require.style(value, allowed=toyplot.require.style.text)
-            for cell in self._cells.flat:
-                cell._style = toyplot.style.combine(cell._style, value)
-        style = property(fset=_set_style)
-
-        def _set_bstyle(self, value):
-            value = toyplot.require.style(value, allowed=toyplot.require.style.fill)
-            for cell in self._cells.flat:
-                cell._bstyle = toyplot.style.combine(cell._bstyle, value)
-        bstyle = property(fset=_set_bstyle)
-
+#        def _set_title(self, value):
+#            for left, right in numpy.nditer(
+#                    [self._cells, value], flags=["refs_ok"], op_flags=[["readwrite"], ["readonly"]]):
+#                left[()]._title = right[()]
+#        title = property(fset=_set_title)
+#
+#        def _set_format(self, value):
+#            for cell in self._cells.flat:
+#                cell._format = value
+#        format = property(fset=_set_format)
+#
+#        def _set_align(self, value):
+#            for cell in self._cells.flat:
+#                cell._align = value
+#        align = property(fset=_set_align)
+#
+#        def _set_angle(self, value):
+#            for cell in self._cells.flat:
+#                cell._angle = value
+#        angle = property(fset=_set_angle)
+#
+#        def _set_style(self, value):
+#            value = toyplot.require.style(value, allowed=toyplot.require.style.text)
+#            for cell in self._cells.flat:
+#                cell._style = toyplot.style.combine(cell._style, value)
+#        style = property(fset=_set_style)
+#
+#        def _set_bstyle(self, value):
+#            value = toyplot.require.style(value, allowed=toyplot.require.style.fill)
+#            for cell in self._cells.flat:
+#                cell._bstyle = toyplot.style.combine(cell._bstyle, value)
+#        bstyle = property(fset=_set_bstyle)
+#
         def _set_width(self, value):
-            if self._table._finalized:
-                raise ValueError("Cannot set cell widths after inserting axes into the table.")
-            for cell in self._cells.flat:
-                cell._width = toyplot.units.convert(value, "px", "px")
+            self._table._column_widths[self._column_begin : self._column_end] = toyplot.units.convert(value, "px", "px")
         width = property(fset=_set_width)
 
-        def _set_height(self, value):
-            if self._table._finalized:
-                raise ValueError("Cannot set cell heights after inserting axes into the table.")
-            for cell in self._cells.flat:
-                cell._height = toyplot.units.convert(value, "px", "px")
-        height = property(fset=_set_height)
-
-        def _set_column_offset(self, value):
-            for cell in self._cells.flat:
-                cell._column_offset = value
-        column_offset = property(fset=_set_column_offset)
-
-        def _set_row_offset(self, value):
-            for cell in self._cells.flat:
-                cell._row_offset = value
-        row_offset = property(fset=_set_row_offset)
-
-        def axes(
-                self,
-                xmin=None,
-                xmax=None,
-                ymin=None,
-                ymax=None,
-                aspect=None,
-                show=False,
-                xshow=True,
-                yshow=True,
-                label=None,
-                xlabel=None,
-                ylabel=None,
-                xticklocator=None,
-                yticklocator=None,
-                xscale="linear",
-                yscale="linear",
-                padding=5,
-                cell_padding=0,
-            ):
-            self._table._finalize()
-            left = numpy.min([cell.left for cell in self._cells.flat]) + cell_padding
-            right = numpy.max([cell.right for cell in self._cells.flat]) - cell_padding
-            top = numpy.min([cell.top for cell in self._cells.flat]) + cell_padding
-            bottom = numpy.max([cell.bottom for cell in self._cells.flat]) - cell_padding
-
-            axes = toyplot.coordinates.Cartesian(
-                left,
-                right,
-                top,
-                bottom,
-                xmin=xmin,
-                xmax=xmax,
-                ymin=ymin,
-                ymax=ymax,
-                aspect=aspect,
-                show=show,
-                xshow=xshow,
-                yshow=yshow,
-                label=label,
-                xlabel=xlabel,
-                ylabel=ylabel,
-                xticklocator=xticklocator,
-                yticklocator=yticklocator,
-                xscale=xscale,
-                yscale=yscale,
-                padding=padding,
-                parent=self._table._parent,
-                )
-            #axes.coordinates.show = False
-            self._table._children.append(axes)
-            return axes
-
-        def merge(self):
-            source = self._cells.flat[0]
-            merged_cell = Table.Cell(align=source._align, style=source._style)
-            merged_cell._parents = self._cells
-
-            rows = numpy.unique([cell._row for cell in self._cells.flat])
-            columns = numpy.unique([cell._column for cell in self._cells.flat])
-
-            if len(rows) > 1:
-                self._table._hmask[rows[1:], columns] = True
-            if len(columns) > 1:
-                self._table._vmask[rows, columns[1:]] = True
-
-            for cell in self._cells.flat:
-                self._table._visible_cells.remove(cell)
-            self._table._visible_cells.add(merged_cell)
-            return Table.CellReference(self._table, numpy.array(merged_cell))
-
-    class GapReference(object):
-
-        def __init__(self, rgaps, cgaps):
-            self._rgaps = rgaps
-            self._cgaps = cgaps
-
-        @property
-        def rows(self):
-            return self._rgaps
-
-        @property
-        def columns(self):
-            return self._cgaps
-
+#        def _set_height(self, value):
+#            if self._table._finalized:
+#                raise ValueError("Cannot set cell heights after inserting axes into the table.")
+#            for cell in self._cells.flat:
+#                cell._height = toyplot.units.convert(value, "px", "px")
+#        height = property(fset=_set_height)
+#
+#        def _set_column_offset(self, value):
+#            for cell in self._cells.flat:
+#                cell._column_offset = value
+#        column_offset = property(fset=_set_column_offset)
+#
+#        def _set_row_offset(self, value):
+#            for cell in self._cells.flat:
+#                cell._row_offset = value
+#        row_offset = property(fset=_set_row_offset)
+#
+#        def axes(
+#                self,
+#                xmin=None,
+#                xmax=None,
+#                ymin=None,
+#                ymax=None,
+#                aspect=None,
+#                show=False,
+#                xshow=True,
+#                yshow=True,
+#                label=None,
+#                xlabel=None,
+#                ylabel=None,
+#                xticklocator=None,
+#                yticklocator=None,
+#                xscale="linear",
+#                yscale="linear",
+#                padding=5,
+#                cell_padding=0,
+#            ):
+#            self._table._finalize()
+#            left = numpy.min([cell.left for cell in self._cells.flat]) + cell_padding
+#            right = numpy.max([cell.right for cell in self._cells.flat]) - cell_padding
+#            top = numpy.min([cell.top for cell in self._cells.flat]) + cell_padding
+#            bottom = numpy.max([cell.bottom for cell in self._cells.flat]) - cell_padding
+#
+#            axes = toyplot.coordinates.Cartesian(
+#                left,
+#                right,
+#                top,
+#                bottom,
+#                xmin=xmin,
+#                xmax=xmax,
+#                ymin=ymin,
+#                ymax=ymax,
+#                aspect=aspect,
+#                show=show,
+#                xshow=xshow,
+#                yshow=yshow,
+#                label=label,
+#                xlabel=xlabel,
+#                ylabel=ylabel,
+#                xticklocator=xticklocator,
+#                yticklocator=yticklocator,
+#                xscale=xscale,
+#                yscale=yscale,
+#                padding=padding,
+#                parent=self._table._parent,
+#                )
+#            #axes.coordinates.show = False
+#            self._table._children.append(axes)
+#            return axes
+#
+#        def merge(self):
+#            source = self._cells.flat[0]
+#            merged_cell = Table.Cell(align=source._align, style=source._style)
+#            merged_cell._parents = self._cells
+#
+#            rows = numpy.unique([cell._row for cell in self._cells.flat])
+#            columns = numpy.unique([cell._column for cell in self._cells.flat])
+#
+#            if len(rows) > 1:
+#                self._table._hmask[rows[1:], columns] = True
+#            if len(columns) > 1:
+#                self._table._vmask[rows, columns[1:]] = True
+#
+#            for cell in self._cells.flat:
+#                self._table._visible_cells.remove(cell)
+#            self._table._visible_cells.add(merged_cell)
+#            return Table.CellReference(self._table, numpy.array(merged_cell))
+#
+#    class GapReference(object):
+#
+#        def __init__(self, rgaps, cgaps):
+#            self._row_gaps = rgaps
+#            self._column_gaps = cgaps
+#
+#        @property
+#        def rows(self):
+#            return self._row_gaps
+#
+#        @property
+#        def columns(self):
+#            return self._column_gaps
+#
     class GridReference(object):
 
         def __init__(self, table, hlines, vlines):
@@ -2977,73 +2978,97 @@ class Table(object):
         def vlines(self):
             return self._vlines
 
-        @property
-        def separation(self):
-            return self._table._separation
-
-        @separation.setter
-        def separation(self, value):
-            self._table._separation = value
-
-        @property
-        def style(self):
-            return self._table._gstyle
-
-        @style.setter
-        def style(self, value):
-            self._table._gstyle = toyplot.style.combine(
-                self._table._gstyle,
-                toyplot.require.style(value, toyplot.require.style.line),
-                )
+#        @property
+#        def separation(self):
+#            return self._table._separation
+#
+#        @separation.setter
+#        def separation(self, value):
+#            self._table._separation = value
+#
+#        @property
+#        def style(self):
+#            return self._table._gstyle
+#
+#        @style.setter
+#        def style(self, value):
+#            self._table._gstyle = toyplot.style.combine(
+#                self._table._gstyle,
+#                toyplot.require.style(value, toyplot.require.style.line),
+#                )
 
     class Region(object):
 
-        def __init__(self, table, cells, hlines, vlines, rgaps, cgaps):
+        def __init__(self, table, row_begin, row_end, column_begin, column_end):
             self._table = table
-            self._cells = cells
-            self._hlines = hlines
-            self._vlines = vlines
-            self._rgaps = rgaps
-            self._cgaps = cgaps
+            self._row_begin = row_begin
+            self._row_end = row_end
+            self._column_begin = column_begin
+            self._column_end = column_end
 
-        @property
-        def gaps(self):
-            return Table.GapReference(self._rgaps, self._cgaps)
-
-        @property
-        def grid(self):
-            return Table.GridReference(self._table, self._hlines, self._vlines)
+#        @property
+#        def gaps(self):
+#            return Table.GapReference(self._row_gaps, self._column_gaps)
+#
+#        @property
+#        def grid(self):
+#            return Table.GridReference(self._table, self._hlines, self._vlines)
 
         def column(self, column):
-            return Table.CellReference(self._table, self._cells.T[column])
+            return Table.CellReference(
+                self._table,
+                self._row_begin,
+                self._row_end,
+                self._column_begin + column,
+                self._column_begin + column + 1,
+                )
 
         def row(self, row):
-            return Table.CellReference(self._table, self._cells[row])
+            return Table.CellReference(
+                self._table,
+                self._row_begin + row,
+                self._row_begin + row + 1,
+                self._column_begin,
+                self._column_end,
+                )
 
         def cell(self, row, column, rowspan=1, colspan=1):
             return Table.CellReference(
                 self._table,
-                self._cells[
-                    row: row +
-                    rowspan,
-                    column: column +
-                    colspan])
+                self._row_begin + row,
+                self._row_begin + row + rowspan,
+                self._column_begin + column,
+                self._column_begin + column + colspan,
+                )
+
+#        @property
+#        def shape(self):
+#            return self._cells.shape
+#
+#        @property
+#        def rows(self):
+#            return self._cells.shape[0]
+#
+#        @property
+#        def columns(self):
+#            return self._cells.shape[1]
+#
+#        @property
+#        def cells(self):
+#            return Table.CellReference(self._table, self._cells)
 
         @property
-        def shape(self):
-            return self._cells.shape
+        def data(self):
+            return self._table._data[self._row_begin : self._row_end, self._column_begin : self._column_end]
 
         @property
-        def rows(self):
-            return self._cells.shape[0]
+        def align(self):
+            return self._table._cell_align[self._row_begin : self._row_end, self._column_begin : self._column_end]
 
         @property
-        def columns(self):
-            return self._cells.shape[1]
+        def format(self):
+            return self._table._cell_format[self._row_begin : self._row_end, self._column_begin : self._column_end]
 
-        @property
-        def cells(self):
-            return Table.CellReference(self._table, self._cells)
 
     def __init__(
             self,
@@ -3055,8 +3080,8 @@ class Table(object):
             columns,
             trows,
             brows,
-            lcols,
-            rcols,
+            lcolumns,
+            rcolumns,
             label,
             parent):
         self._xmin_range = xmin_range
@@ -3067,101 +3092,81 @@ class Table(object):
         self._columns = columns
         self._trows = trows
         self._brows = brows
-        self._lcols = lcols
-        self._rcols = rcols
+        self._lcolumns = lcolumns
+        self._rcolumns = rcolumns
         self._parent = parent
+
+        shape = (trows + rows + brows, lcolumns + columns + rcolumns)
+
+        self._data = numpy.empty(shape, dtype="object")
+        self._cell_show = numpy.ones(shape, dtype="bool")
+        self._cell_format = numpy.tile(toyplot.format.DefaultFormatter(), shape)
+        self._cell_align = numpy.empty(shape, dtype="object")
+        self._cell_angle = numpy.zeros(shape, dtype="float")
+        self._cell_groups = numpy.arange(shape[0] * shape[1]).reshape(shape)
+        self._cell_row_offset = numpy.zeros(shape, dtype="float")
+        self._cell_column_offset = numpy.zeros(shape, dtype="float")
+        self._cell_style = numpy.empty(shape, dtype="object")
+
+        self._hlines = numpy.empty((shape[0] + 1, shape[1]), dtype="object")
+        self._hlines_show = numpy.ones((shape[0] + 1, shape[1]), dtype="bool")
+        self._vlines = numpy.empty((shape[0], shape[1] + 1), dtype="object")
+        self._vlines_show = numpy.ones((shape[0], shape[1] + 1), dtype="bool")
+
+        self._row_heights = numpy.zeros(shape[0], dtype="float")
+        self._row_gaps = numpy.zeros(shape[0] + 1, dtype="float")
+        self._column_widths = numpy.zeros(shape[1], dtype="float")
+        self._column_gaps = numpy.zeros(shape[1] + 1, dtype="float")
+
         self._children = []
 
         self._label = Table.Label(
             label, style={"font-size": "14px", "baseline-shift": "100%"})
 
-        self._hlines = numpy.empty(
-            (trows +
-             rows +
-             brows +
-             1,
-             lcols +
-             columns +
-             rcols +
-             0),
-            dtype=object)
-        self._vlines = numpy.empty(
-            (trows +
-             rows +
-             brows +
-             0,
-             lcols +
-             columns +
-             rcols +
-             1),
-            dtype=object)
-        self._hmask = numpy.zeros(
-            (trows +
-             rows +
-             brows +
-             1,
-             lcols +
-             columns +
-             rcols +
-             0),
-            dtype=bool)
-        self._vmask = numpy.zeros(
-            (trows +
-             rows +
-             brows +
-             0,
-             lcols +
-             columns +
-             rcols +
-             1),
-            dtype=bool)
         self._separation = 2
-        self._gstyle = {
-            "stroke": toyplot.color.near_black, "stroke-width": 0.5}
-
-        self._rgaps = numpy.zeros(trows + rows + brows + 1)
-        self._cgaps = numpy.zeros(lcols + columns + rcols + 1)
+        self._gstyle = {"stroke": toyplot.color.near_black, "stroke-width": 0.5}
 
         hstyle = {
             "font-size": "12px",
             "stroke": "none",
             "fill": toyplot.color.near_black,
             "alignment-baseline": "middle",
-            "font-weight": "bold"}
-        style = {"font-size": "12px", "stroke": "none", "fill":
-                 toyplot.color.near_black, "alignment-baseline": "middle"}
+            "font-weight": "bold",
+            }
+        style = {
+            "font-size": "12px",
+            "stroke": "none",
+            "fill": toyplot.color.near_black,
+            "alignment-baseline": "middle",
+            }
 
-        self._cells = numpy.empty(
-            (trows + rows + brows, lcols + columns + rcols), dtype="object")
-        for row in range(trows + rows + brows):
-            for column in range(lcols + columns + rcols):
-                if row < trows or row >= trows + \
-                        rows or column < lcols or column >= lcols + columns:
-                    self._cells[row, column] = Table.Cell(
-                        row, column, "center", hstyle)
-                else:
-                    self._cells[row, column] = Table.Cell(
-                        row, column, "left", style)
+        self._cell_style[...] = hstyle
+        self._cell_align[...] = "center"
 
-        self._visible_cells = _ordered_set(numpy.ravel(self._cells))
+        self._cell_style[trows : trows + rows, lcolumns : lcolumns + columns] = style
+        self._cell_align[trows : trows + rows, lcolumns : lcolumns + columns] = "left"
 
-        self._finalized = False
+#        self._visible_cells = _ordered_set(numpy.ravel(self._cells))
+#
+#    @property
+#    def label(self):
+#        return self._label
+#
+#    @property
+#    def shape(self):
+#        return self._cells.shape
+#
+#    @property
+#    def rows(self):
+#        return self._cells.shape[0]
+#
+#    @property
+#    def columns(self):
+#        return self._cells.shape[1]
 
     @property
-    def label(self):
-        return self._label
-
-    @property
-    def shape(self):
-        return self._cells.shape
-
-    @property
-    def rows(self):
-        return self._cells.shape[0]
-
-    @property
-    def columns(self):
-        return self._cells.shape[1]
+    def cells(self):
+        return Table.Region(self, 0, self._trows + self._rows + self._brows, 0, self._lcolumns + self._columns + self._rcolumns)
 
     @property
     def header(self):
@@ -3173,224 +3178,96 @@ class Table(object):
 
     @property
     def top(self):
-        region = Table.Region(
-            self,
-            self._cells[
-                0: self._trows, self._lcols: self._lcols + self._columns],
-            self._hlines[
-                0: self._trows + 1, self._lcols: self._lcols + self._columns],
-            self._vlines[
-                0: self._trows, self._lcols: self._lcols + self._columns + 1],
-            self._rgaps[0: self._trows + 1],
-            self._cgaps[self._lcols: self._lcols + self._columns],
-        )
-
-        region.left = Table.Region(
-            self,
-            self._cells[0: self._trows, 0: self._lcols],
-            self._hlines[0: self._trows + 1, 0: self._lcols],
-            self._vlines[0: self._trows, 0: self._lcols + 1],
-            self._rgaps[0: self._trows + 1],
-            self._cgaps[0: self._lcols],
-        )
-
-        region.right = Table.Region(
-            self,
-            self._cells[0: self._trows, self._lcols + self._columns:],
-            self._hlines[0: self._trows + 1, self._lcols + self._columns:],
-            self._vlines[0: self._trows, self._lcols + self._columns:],
-            self._rgaps[0: self._trows + 1],
-            self._cgaps[self._lcols + self._columns:],
-        )
-
+        region = Table.Region(self, 0, self._trows, 0, self._lcolumns + self._columns + self._rcolumns)
+        region.left = Table.Region(self, 0, self._trows, 0, self._lcolumns)
+        region.right = Table.Region(self, 0, self._trows, self._lcolumns + self._columns, + self._rcolumns)
         return region
 
     @property
     def left(self):
-        return Table.Region(
-            self,
-            self._cells[self._trows: self._trows + self._rows, 0: self._lcols],
-            self._hlines[
-                self._trows: self._trows + self._rows + 1, 0: self._lcols],
-            self._vlines[
-                self._trows: self._trows + self._rows, 0: self._lcols + 1],
-            self._rgaps[self._trows: self._trows + self._rows + 1],
-            self._cgaps[0: self._lcols],
-        )
-
-    @property
-    def body(self):
-        return Table.Region(
-            self,
-            self._cells[self._trows: self._trows + self._rows,
-                        self._lcols: self._lcols + self._columns],
-            self._hlines[self._trows: self._trows + self._rows +
-                         1, self._lcols: self._lcols + self._columns],
-            self._vlines[self._trows: self._trows + self._rows,
-                         self._lcols: self._lcols + self._columns + 1],
-            self._rgaps[self._trows: self._trows + self._rows],
-            self._cgaps[self._lcols: self._lcols + self._columns],
-        )
-
-    @property
-    def right(self):
-        return Table.Region(
-            self,
-            self._cells[
-                self._trows: self._trows +
-                self._rows,
-                self._lcols +
-                self._columns:],
-            self._hlines[
-                self._trows: self._trows +
-                self._rows +
-                1,
-                self._lcols +
-                self._columns:],
-            self._vlines[
-                self._trows: self._trows +
-                self._rows,
-                self._lcols +
-                self._columns:],
-            self._rgaps[
-                self._trows: self._trows +
-                self._rows +
-                1],
-            self._cgaps[
-                self._lcols +
-                self._columns:],
-        )
-
-    @property
-    def bottom(self):
-        region = Table.Region(
-            self,
-            self._cells[
-                self._trows +
-                self._rows:,
-                self._lcols: self._lcols +
-                self._columns],
-            self._hlines[
-                self._trows +
-                self._rows:,
-                self._lcols: self._lcols +
-                self._columns],
-            self._vlines[
-                self._trows +
-                self._rows:,
-                self._lcols: self._lcols +
-                self._columns +
-                1],
-            self._rgaps[
-                self._trows +
-                self._rows:],
-            self._cgaps[
-                self._lcols: self._lcols +
-                self._columns],
-        )
-
-        region.left = Table.Region(
-            self,
-            self._cells[self._trows + self._rows:, 0: self._lcols],
-            self._hlines[self._trows + self._rows:, 0: self._lcols],
-            self._vlines[self._trows + self._rows:, 0: self._lcols + 1],
-            self._rgaps[self._trows + self._rows:],
-            self._cgaps[0: self._lcols],
-        )
-
-        region.right = Table.Region(
-            self,
-            self._cells[
-                self._trows + self._rows:, self._lcols + self._columns:],
-            self._hlines[
-                self._trows + self._rows:, self._lcols + self._columns:],
-            self._vlines[
-                self._trows + self._rows:, self._lcols + self._columns:],
-            self._rgaps[self._trows + self._rows:],
-            self._cgaps[self._lcols + self._columns:],
-        )
-
+        region = Table.Region(self, self._trows, self._trows + self._rows, 0, self._lcolumns)
         return region
 
     @property
-    def gaps(self):
-        return Table.GapReference(self._rgaps, self._cgaps)
+    def body(self):
+        region = Table.Region(self, self._trows, self._trows + self._rows, self._lcolumns, self._lcolumns + self._columns)
+        return region
+
+    @property
+    def right(self):
+        region = Table.Region(self, self._trows, self._trows + self._rows, self._lcolumns + self._columns, self._lcolumns + self._columns + self._rcolumns)
+        return region
+
+    @property
+    def bottom(self):
+        region = Table.Region(self, self._trows + self._rows, self._trows + self._rows + self._brows, 0, self._lcolumns + self._columns + self._rcolumns)
+        region.left = Table.Region(self, self._trows + self._rows, self._trows + self._rows + self._brows, 0, self._lcolumns)
+        region.right = Table.Region(self, self._trows + self._rows, self._trows + self._rows + self._brows, self._lcolumns + self._columns, + self._rcolumns)
+        return region
+
+#    @property
+#    def gaps(self):
+#        return Table.GapReference(self._row_gaps, self._column_gaps)
 
     @property
     def grid(self):
         return Table.GridReference(self, self._hlines, self._vlines)
 
-    def column(self, column):
-        return Table.CellReference(self, self._cells.T[column])
-
-    def row(self, row):
-        return Table.CellReference(self, self._cells[row])
-
-    def cell(self, row, column, rowspan=1, colspan=1):
-        return Table.CellReference(
-            self,
-            self._cells[
-                row: row +
-                rowspan,
-                column: column +
-                colspan])
-
+#    def column(self, column):
+#        return Table.CellReference(self, self._cells.T[column])
+#
+#    def row(self, row):
+#        return Table.CellReference(self, self._cells[row])
+#
+#    def cell(self, row, column, rowspan=1, colspan=1):
+#        return Table.CellReference(
+#            self,
+#            self._cells[
+#                row: row +
+#                rowspan,
+#                column: column +
+#                colspan])
+#
     def _finalize(self):
-        if self._finalized:
-            return
-        self._finalized = True
-
         # Collect explicit column widths and row heights.
-        column_widths = numpy.zeros(self._cells.shape[1])
-        for cell in self._cells.flat:
-            if cell._width is not None:
-                column_widths[cell._column] = max(
-                    column_widths[cell._column], cell._width)
-
-        row_heights = numpy.zeros(self._cells.shape[0])
-        for cell in self._cells.flat:
-            if cell._height is not None:
-                row_heights[cell._row] = max(
-                    row_heights[cell._row], cell._height)
+        row_heights = self._row_heights
+        column_widths = self._column_widths
 
         # Compute implicit column widths and row heights for the remaining
         # cells.
         table_width = self._xmax_range - self._xmin_range
-        available_width = table_width - \
-            numpy.sum(column_widths) - numpy.sum(self._cgaps)
-        default_width = available_width / \
-            numpy.count_nonzero(column_widths == 0)
+        available_width = table_width - numpy.sum(column_widths) - numpy.sum(self._column_gaps)
+        default_width = available_width / numpy.count_nonzero(column_widths == 0)
         column_widths[column_widths == 0] = default_width
 
         table_height = self._ymax_range - self._ymin_range
-        available_height = table_height - \
-            numpy.sum(row_heights) - numpy.sum(self._rgaps)
-        default_height = available_height / \
-            numpy.count_nonzero(row_heights == 0)
+        available_height = table_height - numpy.sum(row_heights) - numpy.sum(self._row_gaps)
+        default_height = available_height / numpy.count_nonzero(row_heights == 0)
         row_heights[row_heights == 0] = default_height
 
         # Compute cell-gap boundaries (cumulative sums of gaps and cells).
-        gap_cell_widths = numpy.empty(2 * len(self._cgaps))
+        gap_cell_widths = numpy.empty(2 * len(self._column_gaps))
         gap_cell_widths[0] = self._xmin_range
-        gap_cell_widths[1::2] = self._cgaps
+        gap_cell_widths[1::2] = self._column_gaps
         gap_cell_widths[2::2] = column_widths
         gap_cell_column_boundaries = numpy.cumsum(gap_cell_widths)
 
-        gap_cell_heights = numpy.empty(2 * len(self._rgaps))
+        gap_cell_heights = numpy.empty(2 * len(self._row_gaps))
         gap_cell_heights[0] = self._ymin_range
-        gap_cell_heights[1::2] = self._rgaps
+        gap_cell_heights[1::2] = self._row_gaps
         gap_cell_heights[2::2] = row_heights
         gap_cell_row_boundaries = numpy.cumsum(gap_cell_heights)
 
-        # Assign coordinates to grid cells.
-        for cell in self._cells.flat:
-            cell._left = gap_cell_column_boundaries[cell._column * 2 + 1]
-            cell._right = gap_cell_column_boundaries[cell._column * 2 + 2]
-            cell._top = gap_cell_row_boundaries[cell._row * 2 + 1]
-            cell._bottom = gap_cell_row_boundaries[cell._row * 2 + 2]
+#        # Assign coordinates to grid cells.
+#        for cell in self._cells.flat:
+#            cell._left = gap_cell_column_boundaries[cell._column * 2 + 1]
+#            cell._right = gap_cell_column_boundaries[cell._column * 2 + 2]
+#            cell._top = gap_cell_row_boundaries[cell._row * 2 + 1]
+#            cell._bottom = gap_cell_row_boundaries[cell._row * 2 + 2]
 
         # Compute grid boundaries.
         self._column_boundaries = (
             gap_cell_column_boundaries[0::2] + gap_cell_column_boundaries[1::2]) / 2
         self._row_boundaries = (
             gap_cell_row_boundaries[0::2] + gap_cell_row_boundaries[1::2]) / 2
+

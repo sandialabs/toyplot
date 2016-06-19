@@ -527,8 +527,8 @@ class Canvas(object):
             ymax_range,
             trows=2,
             brows=2,
-            lcols=2,
-            rcols=2,
+            lcolumns=2,
+            rcolumns=2,
             rows=matrix.shape[0],
             columns=matrix.shape[1],
             label=label,
@@ -805,8 +805,8 @@ class Canvas(object):
             columns=None,
             hrows=None,
             brows=None,
-            lcols=None,
-            rcols=None,
+            lcolumns=None,
+            rcolumns=None,
             label=None,
             bounds=None,
             rect=None,
@@ -835,10 +835,10 @@ class Canvas(object):
             hrows = 0
         if brows is None:
             brows = 0
-        if lcols is None:
-            lcols = 0
-        if rcols is None:
-            rcols = 0
+        if lcolumns is None:
+            lcolumns = 0
+        if rcolumns is None:
+            rcolumns = 0
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
@@ -852,26 +852,26 @@ class Canvas(object):
             label=label,
             trows=hrows,
             brows=brows,
-            lcols=lcols,
-            rcols=rcols,
+            lcolumns=lcolumns,
+            rcolumns=rcolumns,
             parent=self)
 
         if data is not None:
             for j, (key, column) in enumerate(data.items()):
                 if hrows:
-                    table.header.cell(hrows - 1, j).data = key
+                    table.header.data[hrows - 1, j] = key
                 for i, (value, mask) in enumerate(zip(column, numpy.ma.getmaskarray(column))):
                     if not mask:
-                        table.body.cell(i, j).data = value
+                        table.body.data[i, j] = value
                 if issubclass(column._data.dtype.type, numpy.floating):
                     if hrows:
-                        table.header.cell(0, j).align = "center"
-                    table.body.column(j).format = toyplot.format.FloatFormatter()
-                    table.body.column(j).align = "separator"
+                        table.header.align[0, j] = "center"
+                    table.body.format[:,j] = toyplot.format.FloatFormatter()
+                    table.body.align[:,j] = "separator"
                 elif issubclass(column._data.dtype.type, numpy.character):
-                    table.column(j).align = "left"
+                    table.cells.align[:,j] = "left"
                 elif issubclass(column._data.dtype.type, numpy.integer):
-                    table.column(j).align = "right"
+                    table.cells.align[:,j] = "right"
 
         # Enable a single horizontal line between header and body.
         if hrows:

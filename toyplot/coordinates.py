@@ -2856,6 +2856,47 @@ class Table(object):
                 padding=5,
                 cell_padding=0,
             ):
+            toyplot.log.warning("axes() is deprecated, use cartesian() instead.")
+            return self.cartesian(
+                xmin=xmin,
+                xmax=xmax,
+                ymin=ymin,
+                ymax=ymax,
+                aspect=aspect,
+                show=show,
+                xshow=xshow,
+                yshow=yshow,
+                label=label,
+                xlabel=xlabel,
+                ylabel=ylabel,
+                xticklocator=xticklocator,
+                yticklocator=yticklocator,
+                xscale=xscale,
+                yscale=yscale,
+                padding=padding,
+                cell_padding=cell_padding,
+                )
+
+        def cartesian(
+                self,
+                xmin=None,
+                xmax=None,
+                ymin=None,
+                ymax=None,
+                aspect=None,
+                show=False,
+                xshow=True,
+                yshow=True,
+                label=None,
+                xlabel=None,
+                ylabel=None,
+                xticklocator=None,
+                yticklocator=None,
+                xscale="linear",
+                yscale="linear",
+                padding=5,
+                cell_padding=0,
+            ):
 
             # TODO: Handle cell_padding
 

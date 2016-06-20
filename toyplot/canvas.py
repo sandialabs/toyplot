@@ -871,7 +871,7 @@ class Canvas(object):
 
         # Enable a single horizontal line between top and body.
         if hrows:
-            table.grid.hlines[hrows] = "single"
+            table.cells.grid.hlines[hrows] = "single"
 
         self._children.append(table)
         return table

@@ -3034,24 +3034,6 @@ class Table(object):
         def cell(self):
             return Table.Region.CellReference(self)
 
-#        def column(self, column):
-#            return Table.CellReference(
-#                self._table,
-#                (slice(self._row_begin, self._row_end), slice(self._column_begin + column, self._column_begin + column + 1)),
-#                )
-#
-#        def row(self, row):
-#            return Table.CellReference(
-#                self._table,
-#                (slice(self._row_begin + row, self._row_begin + row + 1), slice(self._column_begin, self._column_end)),
-#                )
-#
-#        def cell(self, row, column, rowspan=1, colspan=1):
-#            return Table.CellReference(
-#                self._table,
-#                (slice(self._row_begin + row, self._row_begin + row + rowspan), slice(self._column_begin + column, self._column_begin + column + colspan)),
-#                )
-
         @property
         def shape(self):
             return (self.row_end - self.row_begin, self._column_end - self._column_begin)
@@ -3222,11 +3204,13 @@ class Table(object):
 
     @property
     def gaps(self):
-        return Table.GapReference(self._row_gaps, self._column_gaps)
+        toyplot.log.warning("table.gaps is deprecated, use table.cells.gaps instead.")
+        return self.cells.gaps
 
     @property
     def grid(self):
-        return Table.GridReference(self, self._hlines, self._vlines)
+        toyplot.log.warning("table.grid is deprecated, use table.cells.grid instead.")
+        return self.cells.grid
 
     def _finalize(self):
         # Collect explicit row heights, column widths, and gaps.

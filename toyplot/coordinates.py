@@ -2822,6 +2822,11 @@ class Table(object):
                 style[()] = toyplot.style.combine(style[()], value)
         lstyle = property(fset=_set_lstyle)
 
+        def _set_bstyle(self, value):
+            toyplot.log.warning("The bstyle property is deprecated, use style instead.")
+            self.style = value
+        bstyle = property(fset=_set_bstyle)
+
         def _set_width(self, value):
             self._table._column_widths[self._column_begin : self._column_end] = toyplot.units.convert(value, "px", "px")
         width = property(fset=_set_width)

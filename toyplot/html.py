@@ -1562,13 +1562,11 @@ def _render(canvas, axes, context):
             cell_right = axes._cell_right[column_max] - padding
 
             # Compute the text placement within the cell boundaries.
-            cell_column_offset = axes._cell_column_offset[cell_selection][0]
-            cell_row_offset = axes._cell_row_offset[cell_selection][0]
             cell_align = axes._cell_align[cell_selection][0]
             if cell_align is None:
                 cell_align = "left"
             cell_angle = axes._cell_angle[cell_selection][0]
-            y = ((cell_top + cell_bottom) / 2) + cell_row_offset
+            y = (cell_top + cell_bottom) / 2
 
             # Format the cell data.
             cell_format = axes._cell_format[cell_selection][0]
@@ -1579,7 +1577,7 @@ def _render(canvas, axes, context):
 
             # Render the cell data.
             if cell_align == "left":
-                x = cell_left + cell_column_offset
+                x = cell_left
                 _draw_text(
                     root=axes_xml,
                     x=x,
@@ -1588,7 +1586,7 @@ def _render(canvas, axes, context):
                     text=prefix + separator + suffix,
                     )
             elif cell_align == "center":
-                x = ((cell_left + cell_right) / 2) + cell_column_offset
+                x = (cell_left + cell_right) / 2
                 _draw_text(
                     root=axes_xml,
                     x=x,
@@ -1598,7 +1596,7 @@ def _render(canvas, axes, context):
                     text=prefix + separator + suffix,
                     )
             elif cell_align == "right":
-                x = cell_right + cell_column_offset
+                x = cell_right
                 _draw_text(
                     root=axes_xml,
                     x=x,
@@ -1607,7 +1605,7 @@ def _render(canvas, axes, context):
                     text=prefix + separator + suffix,
                     )
             elif cell_align is "separator":
-                x = ((cell_left + cell_right) / 2) + cell_column_offset
+                x = (cell_left + cell_right) / 2
                 _draw_text(
                     root=axes_xml,
                     x=x - 2,

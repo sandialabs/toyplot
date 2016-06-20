@@ -859,13 +859,13 @@ class Canvas(object):
         if data is not None:
             for j, (key, column) in enumerate(data.items()):
                 if hrows:
-                    table.header.data[hrows - 1, j] = key
+                    table.top.data[hrows - 1, j] = key
                 for i, (value, mask) in enumerate(zip(column, numpy.ma.getmaskarray(column))):
                     if not mask:
                         table.body.data[i, j] = value
                 if issubclass(column._data.dtype.type, numpy.floating):
                     if hrows:
-                        table.header.align[0, j] = "center"
+                        table.top.align[0, j] = "center"
                     table.body.format[:,j] = toyplot.format.FloatFormatter()
                     table.body.align[:,j] = "separator"
                 elif issubclass(column._data.dtype.type, numpy.character):
@@ -873,7 +873,7 @@ class Canvas(object):
                 elif issubclass(column._data.dtype.type, numpy.integer):
                     table.cells.align[:,j] = "right"
 
-        # Enable a single horizontal line between header and body.
+        # Enable a single horizontal line between top and body.
         if hrows:
             table.grid.hlines[hrows] = "single"
 

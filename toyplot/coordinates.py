@@ -2766,81 +2766,82 @@ class Table(object):
 
 
     class CellReference(object):
-        def __init__(self, table, row_begin, row_end, column_begin, column_end):
+        def __init__(self, table, selection):
             self._table = table
-            self._row_begin = row_begin
-            self._row_end = row_end
-            self._column_begin = column_begin
-            self._column_end = column_end
-            self._shape = (slice(row_begin, row_end), slice(column_begin, column_end))
+            self._selection = selection
+
+        def _selection_coordinates(self):
+            selection = numpy.zeros(self._table._shape, dtype="bool")
+            selection[self._selection] = True
+            return numpy.nonzero(selection)
+
+        def _allow_column_vector(self, value):
+#            value = numpy.array(value)
+#            row_indices, column_indices = self._selection_coordinates()
+#            print row_indices, column_indices, value.ndim, value.shape
+#            if (column_indices.max() - column_indices.min() == 0) and (value.ndim == 1:
+#                value = value.reshape(-1, 1)
+            return value
 
         def _set_show(self, value):
-            self._table._cell_show[self._shape] = True if value else False
+            self._table._cell_show[self._selection] = True if value else False
         show = property(fset=_set_show)
 
         def _set_data(self, value):
-            value = numpy.array(value)
-            if self._column_end - self._column_begin == 1 and value.ndim == 1:
-                value = value.reshape(-1, 1)
-            self._table._cell_data[self._shape] = value
+            self._table._cell_data[self._selection] = self._allow_column_vector(value)
         data = property(fset=_set_data)
 
         def _set_title(self, value):
-            value = numpy.array(value)
-            if self._column_end - self._column_begin == 1 and value.ndim == 1:
-                value = value.reshape(-1, 1)
-            self._table._cell_title[self._shape] = value
+            self._table._cell_title[self._selection] = self._allow_column_vector(value)
         title = property(fset=_set_title)
 
         def _set_format(self, value):
-            self._table._cell_format[self._shape] = value
+            self._table._cell_format[self._selection] = value
         format = property(fset=_set_format)
 
         def _set_align(self, value):
-            value = numpy.array(value)
-            if self._column_end - self._column_begin == 1 and value.ndim == 1:
-                value = value.reshape(-1, 1)
-            self._table._cell_align[self._shape] = value
+            self._table._cell_align[self._selection] = value
         align = property(fset=_set_align)
 
         def _set_angle(self, value):
-            value = numpy.array(value)
-            if self._column_end - self._column_begin == 1 and value.ndim == 1:
-                value = value.reshape(-1, 1)
-            self._table._cell_angle[self._shape] = value
+            self._table._cell_angle[self._selection] = self._allow_column_vector(value)
         angle = property(fset=_set_angle)
 
         def _set_style(self, value):
             value = toyplot.require.style(value, allowed=toyplot.require.style.fill)
-            for style in numpy.nditer(self._table._cell_style[self._shape], op_flags=['readwrite'], flags=["refs_ok"]):
+            for style in numpy.nditer(self._table._cell_style[self._selection], op_flags=['readwrite'], flags=["refs_ok"]):
                 style[()] = toyplot.style.combine(style[()], value)
         style = property(fset=_set_style)
 
         def _set_lstyle(self, value):
             value = toyplot.require.style(value, allowed=toyplot.require.style.text)
-            for style in numpy.nditer(self._table._cell_label_style[self._shape], op_flags=['readwrite'], flags=["refs_ok"]):
+            for style in numpy.nditer(self._table._cell_label_style[self._selection], op_flags=['readwrite'], flags=["refs_ok"]):
                 style[()] = toyplot.style.combine(style[()], value)
         lstyle = property(fset=_set_lstyle)
 
         def _set_bstyle(self, value):
-            toyplot.log.warning("The bstyle property is deprecated, use style instead.")
+            toyplot.log.warning("The bstyle property is deprecated, use style instead (use lstyle for text label styles).")
             self.style = value
         bstyle = property(fset=_set_bstyle)
 
         def _set_width(self, value):
-            self._table._column_widths[self._column_begin : self._column_end] = toyplot.units.convert(value, "px", "px")
+            row_indices, column_indices = self._selection_coordinates()
+            self._table._column_widths[column_indices] = toyplot.units.convert(value, "px", "px")
         width = property(fset=_set_width)
 
         def _set_height(self, value):
-            self._table._row_heights[self._row_begin : self._row_end] = toyplot.units.convert(value, "px", "px")
+            row_indices, column_indices = self._selection_coordinates()
+            self._table._row_heights[row_indices] = toyplot.units.convert(value, "px", "px")
         height = property(fset=_set_height)
 
         def _set_column_offset(self, value):
-            self._table._cell_column_offset[:, self._column_begin : self._column_end] = toyplot.units.convert(value, "px", "px")
+            toyplot.log.warning("The column_offset property is deprecated, use an lstyle with '-toyplot-anchor-shift' instead.")
+            self.lstyle = {"-toyplot-anchor-shift": value}
         column_offset = property(fset=_set_column_offset)
 
         def _set_row_offset(self, value):
-            self._table._cell_row_offset[self._row_begin : self._row_end, :] = toyplot.units.convert(value, "px", "px")
+            toyplot.log.warning("The row_offset property is deprecated, use an lstyle with 'baseline-shift' instead.")
+            self.lstyle = {"baseline-shift": value}
         row_offset = property(fset=_set_row_offset)
 
         def axes(
@@ -2890,18 +2891,20 @@ class Table(object):
                 parent=self._table._parent,
                 )
 
-            self._table._cell_axes[self._row_begin:self._row_end, self._column_begin:self._column_end] = axes
+            self._table._cell_axes[self._selection] = axes
             self._table._children.append(axes)
 
             return axes
 
         def merge(self):
-            self._table._cell_group[self._row_begin:self._row_end, self._column_begin:self._column_end] = numpy.unique(self._table._cell_group).max() + 1
+            self._table._cell_group[self._selection] = numpy.unique(self._table._cell_group).max() + 1
 
-            if self._row_end - self._row_begin > 1:
-                self._table._hlines_show[self._row_begin+1:self._row_end, self._column_begin:self._column_end] = False
-            if self._column_end - self._column_begin > 1:
-                self._table._vlines_show[self._row_begin:self._row_end, self._column_begin+1:self._column_end] = False
+            # TODO: Handle non-rectangular shapes here
+            row_indices, column_indices = self._selection_coordinates()
+            if row_indices.max() - row_indices.min() > 0:
+                self._table._hlines_show[row_indices.min() + 1 : row_indices.max() + 1, column_indices.min() : column_indices.max() + 1] = False
+            if column_indices.max() - column_indices.min() > 0:
+                self._table._vlines_show[row_indices.min() : row_indices.max() + 1, column_indices.min() + 1 : column_indices.max() + 1] = False
 
             return self
 
@@ -2966,6 +2969,34 @@ class Table(object):
 
     class Region(object):
 
+        class ColumnReference(object):
+            def __init__(self, region):
+                self._region = region
+
+            def __call__(self, column):
+                toyplot.log.warning("column() is deprecated, use column[] instead.")
+                return self[column]
+
+            def __getitem__(self, selection):
+                return Table.CellReference(
+                    self._region._table,
+                    (slice(self._region._row_begin, self._region._row_end), selection),
+                    )
+
+        class RowReference(object):
+            def __init__(self, region):
+                self._region = region
+
+            def __call__(self, row):
+                toyplot.log.warning("row() is deprecated, use row[] instead.")
+                return self[row]
+
+            def __getitem__(self, selection):
+                return Table.CellReference(
+                    self._region._table,
+                    (selection, slice(self._region._column_begin, self._region._column_end)),
+                    )
+
         def __init__(self, table, row_begin, row_end, column_begin, column_end):
             self._table = table
             self._row_begin = row_begin
@@ -2985,31 +3016,30 @@ class Table(object):
                 self._table._vlines[self._row_begin:self._row_end, self._column_begin:self._column_end+1],
                 )
 
+#        @property
+#        def column(self):
+#            return Table.Region.ColumnReference(self)
+#
+#        @property
+#        def row(self):
+#            return Table.Region.RowReference(self)
+
         def column(self, column):
             return Table.CellReference(
                 self._table,
-                self._row_begin,
-                self._row_end,
-                self._column_begin + column,
-                self._column_begin + column + 1,
+                (slice(self._row_begin, self._row_end), slice(self._column_begin + column, self._column_begin + column + 1)),
                 )
 
         def row(self, row):
             return Table.CellReference(
                 self._table,
-                self._row_begin + row,
-                self._row_begin + row + 1,
-                self._column_begin,
-                self._column_end,
+                (slice(self._row_begin + row, self._row_begin + row + 1), slice(self._column_begin, self._column_end)),
                 )
 
         def cell(self, row, column, rowspan=1, colspan=1):
             return Table.CellReference(
                 self._table,
-                self._row_begin + row,
-                self._row_begin + row + rowspan,
-                self._column_begin + column,
-                self._column_begin + column + colspan,
+                (slice(self._row_begin + row, self._row_begin + row + rowspan), slice(self._column_begin + column, self._column_begin + column + colspan)),
                 )
 
         @property
@@ -3028,10 +3058,7 @@ class Table(object):
         def cells(self):
             return Table.CellReference(
                 self._table,
-                self._row_begin,
-                self._row_end,
-                self._column_begin,
-                self._column_end,
+                (slice(self._row_begin, self._row_end), slice(self._column_begin, self._column_end)),
                 )
 
         @property
@@ -3073,30 +3100,28 @@ class Table(object):
         self._rcolumns = rcolumns
         self._parent = parent
 
-        shape = (trows + rows + brows, lcolumns + columns + rcolumns)
+        self._shape = (trows + rows + brows, lcolumns + columns + rcolumns)
 
-        self._cell_data = numpy.empty(shape, dtype="object")
-        self._cell_show = numpy.ones(shape, dtype="bool")
-        self._cell_format = numpy.tile(toyplot.format.DefaultFormatter(), shape)
-        self._cell_align = numpy.empty(shape, dtype="object")
-        self._cell_angle = numpy.zeros(shape, dtype="float")
-        self._cell_group = numpy.arange(shape[0] * shape[1]).reshape(shape)
-        self._cell_row_offset = numpy.zeros(shape, dtype="float")
-        self._cell_column_offset = numpy.zeros(shape, dtype="float")
-        self._cell_style = numpy.empty(shape, dtype="object")
-        self._cell_label_style = numpy.empty(shape, dtype="object")
-        self._cell_axes = numpy.empty(shape, dtype="object")
-        self._cell_title = numpy.empty(shape, dtype="object")
+        self._cell_data = numpy.empty(self._shape, dtype="object")
+        self._cell_show = numpy.ones(self._shape, dtype="bool")
+        self._cell_format = numpy.tile(toyplot.format.DefaultFormatter(), self._shape)
+        self._cell_align = numpy.empty(self._shape, dtype="object")
+        self._cell_angle = numpy.zeros(self._shape, dtype="float")
+        self._cell_group = numpy.arange(self._shape[0] * self._shape[1]).reshape(self._shape)
+        self._cell_style = numpy.empty(self._shape, dtype="object")
+        self._cell_label_style = numpy.empty(self._shape, dtype="object")
+        self._cell_axes = numpy.empty(self._shape, dtype="object")
+        self._cell_title = numpy.empty(self._shape, dtype="object")
 
-        self._hlines = numpy.empty((shape[0] + 1, shape[1]), dtype="object")
-        self._hlines_show = numpy.ones((shape[0] + 1, shape[1]), dtype="bool")
-        self._vlines = numpy.empty((shape[0], shape[1] + 1), dtype="object")
-        self._vlines_show = numpy.ones((shape[0], shape[1] + 1), dtype="bool")
+        self._hlines = numpy.empty((self._shape[0] + 1, self._shape[1]), dtype="object")
+        self._hlines_show = numpy.ones((self._shape[0] + 1, self._shape[1]), dtype="bool")
+        self._vlines = numpy.empty((self._shape[0], self._shape[1] + 1), dtype="object")
+        self._vlines_show = numpy.ones((self._shape[0], self._shape[1] + 1), dtype="bool")
 
-        self._row_heights = numpy.zeros(shape[0], dtype="float")
-        self._row_gaps = numpy.zeros(shape[0] - 1, dtype="float")
-        self._column_widths = numpy.zeros(shape[1], dtype="float")
-        self._column_gaps = numpy.zeros(shape[1] - 1, dtype="float")
+        self._row_heights = numpy.zeros(self._shape[0], dtype="float")
+        self._row_gaps = numpy.zeros(self._shape[0] - 1, dtype="float")
+        self._column_widths = numpy.zeros(self._shape[1], dtype="float")
+        self._column_gaps = numpy.zeros(self._shape[1] - 1, dtype="float")
 
         self._children = []
 
@@ -3149,10 +3174,12 @@ class Table(object):
 
     @property
     def header(self):
+        toyplot.log.warning("table.header is deprecated, use table.top instead.")
         return self.top
 
     @property
     def footer(self):
+        toyplot.log.warning("table.footer is deprecated, use table.bottom instead.")
         return self.bottom
 
     @property
@@ -3185,15 +3212,15 @@ class Table(object):
         return region
 
     def column(self, column):
-        toyplot.log.warning("table.column() is deprecated, use table.cells.column() instead.")
+        toyplot.log.warning("table.column is deprecated, use table.cells.column instead.")
         return self.cells.column(column)
 
     def row(self, row):
-        toyplot.log.warning("table.row() is deprecated, use table.cells.row() instead.")
+        toyplot.log.warning("table.row is deprecated, use table.cells.row instead.")
         return self.cells.row(row)
 
     def cell(self, row, column, rowspan=1, colspan=1):
-        toyplot.log.warning("table.cell() is deprecated, use table.cells.cell() instead.")
+        toyplot.log.warning("table.cell is deprecated, use table.cells.cell instead.")
         return self.cells.cell(row, column, rowspan, colspan)
 
     @property

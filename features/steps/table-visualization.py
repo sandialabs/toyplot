@@ -108,7 +108,6 @@ def step_impl(context):
 def step_impl(context):
     context.table_axes.column(0).column_offset = -50
     context.table_axes.column(2).column_offset = 50
-    toyplot.log.warning(context.table_axes._cell_column_offset)
 
 
 @then(u'the table can be rendered with custom header content')

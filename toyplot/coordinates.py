@@ -2884,7 +2884,8 @@ class Table(object):
                 )
 
             self._table._cell_axes[self._selection] = axes
-            self._table._children.append(axes)
+            self._table._axes.append(axes)
+            self._table._axes_padding.append(cell_padding)
 
             return axes
 
@@ -3102,7 +3103,8 @@ class Table(object):
         self._column_widths = numpy.zeros(self._shape[1], dtype="float")
         self._column_gaps = numpy.zeros(self._shape[1] - 1, dtype="float")
 
-        self._children = []
+        self._axes = []
+        self._axes_padding = []
 
         self._label = Table.Label(
             label, style={"font-size": "14px", "baseline-shift": "100%"})
@@ -3255,7 +3257,7 @@ class Table(object):
             ))
 
         # Assign ranges to embedded coordinate systems.
-        for axes in self._children:
+        for axes, padding in zip(self._axes, self._axes_padding):
             axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
             row_min = axes_rows.min()
             row_max = axes_rows.max()
@@ -3263,8 +3265,8 @@ class Table(object):
             column_max = axes_columns.max()
 
             if isinstance(axes, toyplot.coordinates.Cartesian):
-                axes.xmin_range = self._cell_left[column_min]
-                axes.xmax_range = self._cell_right[column_max]
-                axes.ymin_range = self._cell_top[row_min]
-                axes.ymax_range = self._cell_bottom[row_max]
+                axes.xmin_range = self._cell_left[column_min] + padding
+                axes.xmax_range = self._cell_right[column_max] - padding
+                axes.ymin_range = self._cell_top[row_min] + padding
+                axes.ymax_range = self._cell_bottom[row_max] - padding
 

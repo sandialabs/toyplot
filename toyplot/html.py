@@ -1629,7 +1629,7 @@ def _render(canvas, axes, context):
                     )
 
     # Render children.
-    for child in axes._children:
+    for child in axes._axes:
         _render(axes._parent, child, context.copy(parent=axes_xml))
 
     # Render grid lines.

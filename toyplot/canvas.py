@@ -534,34 +534,30 @@ class Canvas(object):
             label=label,
             parent=self)
 
-        table.top.row(0).height = 20
-        table.top.row(1).height = 20
-        table.bottom.row(0).height = 20
-        table.bottom.row(1).height = 20
-        table.left.column(0).width = 20
-        table.left.column(1).width = 20
-        table.right.column(0).width = 20
-        table.right.column(1).width = 20
+        table.top.row[[0, 1]].height = 20
+        table.bottom.row[[0, 1]].height = 20
+        table.left.column[[0, 1]].width = 20
+        table.right.column[[0, 1]].width = 20
 
-        table.left.column(1).align = "right"
-        table.right.column(0).align = "left"
+        table.left.column[1].align = "right"
+        table.right.column[0].align = "left"
 
         if tlabel is not None:
-            cell = table.top.row(0).merge()
+            cell = table.top.row[0].merge()
             cell.data = tlabel
 
         if llabel is not None:
-            cell = table.left.column(0).merge()
+            cell = table.left.column[0].merge()
             cell.data = llabel
             cell.angle = 90
 
         if rlabel is not None:
-            cell = table.right.column(1).merge()
+            cell = table.right.column[1].merge()
             cell.data = rlabel
             cell.angle = 90
 
         if blabel is not None:
-            cell = table.bottom.row(1).merge()
+            cell = table.bottom.row[1].merge()
             cell.data = blabel
 
         if tshow is None:
@@ -570,8 +566,8 @@ class Canvas(object):
             if tlocator is None:
                 tlocator = toyplot.locator.Integer(step=step)
             for j, label, title in zip(*tlocator.ticks(0, matrix.shape[1] - 1)):
-                table.top.cell(1, j).data = label
-                #table.top.cell(1, j).title = title
+                table.top.cell[1, j].data = label
+                #table.top.cell[1, j].title = title
 
         if lshow is None:
             lshow = True
@@ -579,8 +575,8 @@ class Canvas(object):
             if llocator is None:
                 llocator = toyplot.locator.Integer(step=step)
             for i, label, title in zip(*llocator.ticks(0, matrix.shape[0] - 1)):
-                table.left.cell(i, 1).data = label
-                #table.left.cell(i, 1).title = title
+                table.left.cell[i, 1].data = label
+                #table.left.cell[i, 1].title = title
 
         if rshow is None and rlocator is not None:
             rshow = True
@@ -588,8 +584,8 @@ class Canvas(object):
             if rlocator is None:
                 rlocator = toyplot.locator.Integer(step=step)
             for i, label, title in zip(*rlocator.ticks(0, matrix.shape[0] - 1)):
-                table.right.cell(i, 0).data = label
-                #table.right.cell(i, 0).title = title
+                table.right.cell[i, 0].data = label
+                #table.right.cell[i, 0].title = title
 
         if bshow is None and blocator is not None:
             bshow = True
@@ -597,12 +593,12 @@ class Canvas(object):
             if blocator is None:
                 blocator = toyplot.locator.Integer(step=step)
             for j, label, title in zip(*blocator.ticks(0, matrix.shape[1] - 1)):
-                table.bottom.cell(0, j).data = label
-                #table.bottom.cell(0, j).title = title
+                table.bottom.cell[0, j].data = label
+                #table.bottom.cell[0, j].title = title
 
         for i, row in enumerate(matrix):
             for j, value in enumerate(row):
-                cell = table.body.cell(i, j)
+                cell = table.body.cell[i, j]
                 cell.style = {"stroke": "none", "fill": colormap.css(value)}
                 cell.title = value
 
@@ -859,19 +855,19 @@ class Canvas(object):
         if data is not None:
             for j, (key, column) in enumerate(data.items()):
                 if hrows:
-                    table.top.data[hrows - 1, j] = key
+                    table.top.cell[hrows - 1, j].data = key
                 for i, (value, mask) in enumerate(zip(column, numpy.ma.getmaskarray(column))):
                     if not mask:
-                        table.body.data[i, j] = value
+                        table.body.cell[i, j].data = value
                 if issubclass(column._data.dtype.type, numpy.floating):
                     if hrows:
-                        table.top.align[0, j] = "center"
-                    table.body.format[:,j] = toyplot.format.FloatFormatter()
-                    table.body.align[:,j] = "separator"
+                        table.top.cell[0, j].align = "center"
+                    table.body.cell[:,j].format = toyplot.format.FloatFormatter()
+                    table.body.cell[:,j].align = "separator"
                 elif issubclass(column._data.dtype.type, numpy.character):
-                    table.cells.align[:,j] = "left"
+                    table.cells.cell[:,j].align = "left"
                 elif issubclass(column._data.dtype.type, numpy.integer):
-                    table.cells.align[:,j] = "right"
+                    table.cells.cell[:,j].align = "right"
 
         # Enable a single horizontal line between top and body.
         if hrows:

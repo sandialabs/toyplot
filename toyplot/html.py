@@ -1544,7 +1544,7 @@ def _render(canvas, axes, context):
                 y=repr(cell_top),
                 width=repr(cell_right - cell_left),
                 height=repr(cell_bottom - cell_top),
-                style=_css_style(cell_style),
+                style=_css_style({"fill":"none", "stroke":"none"}, cell_style),
                 )
 
             cell_title = axes._cell_title[cell_selection][0]

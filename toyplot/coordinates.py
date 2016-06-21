@@ -2784,7 +2784,7 @@ class Table(object):
         data = property(fset=_set_data)
 
         def _set_title(self, value):
-            self._table._cell_title[self._selection] = value
+            self._table._cell_title[self._selection] = str(value)
         title = property(fset=_set_title)
 
         def _set_format(self, value):

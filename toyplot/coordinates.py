@@ -2898,8 +2898,6 @@ class Table(object):
                 cell_padding=0,
             ):
 
-            # TODO: Handle cell_padding
-
             axes = toyplot.coordinates.Cartesian(
                 xmin_range=0, # These will be calculated for real in _finalize().
                 xmax_range=1,
@@ -2929,6 +2927,7 @@ class Table(object):
             self._table._axes_padding.append(cell_padding)
 
             return axes
+
 
         def merge(self):
             self._table._cell_group[self._selection] = numpy.unique(self._table._cell_group).max() + 1
@@ -3053,6 +3052,25 @@ class Table(object):
             self._column_end = column_end
 
         @property
+        def cell(self):
+            return Table.Region.CellReference(self)
+
+        @property
+        def cells(self):
+            region_selection = numpy.zeros(self._table._shape, dtype="bool")
+            region_selection[self._row_begin:self._row_end, self._column_begin:self._column_end] = True
+            return Table.CellReference(self._table, region_selection)
+
+        @property
+        def column(self):
+            return Table.Region.ColumnReference(self)
+
+        @property
+        def columns(self):
+            toyplot.log.warning("columns property is deprecated, use shape instead.")
+            return self.shape[1]
+
+        @property
         def gaps(self):
             return Table.GapReference(self._table._row_gaps[self._row_begin:self._row_end-1], self._table._column_gaps[self._column_begin: self._column_end-1])
 
@@ -3065,34 +3083,17 @@ class Table(object):
                 )
 
         @property
-        def column(self):
-            return Table.Region.ColumnReference(self)
-
-        @property
         def row(self):
             return Table.Region.RowReference(self)
 
         @property
-        def cell(self):
-            return Table.Region.CellReference(self)
+        def rows(self):
+            toyplot.log.warning("rows property is deprecated, use shape instead.")
+            return self.shape[0]
 
         @property
         def shape(self):
             return (self.row_end - self.row_begin, self._column_end - self._column_begin)
-
-        @property
-        def rows(self):
-            return self.shape[0]
-
-        @property
-        def columns(self):
-            return self.shape[1]
-
-        @property
-        def cells(self):
-            region_selection = numpy.zeros(self._table._shape, dtype="bool")
-            region_selection[self._row_begin:self._row_end, self._column_begin:self._column_end] = True
-            return Table.CellReference(self._table, region_selection)
 
 
     def __init__(
@@ -3175,55 +3176,8 @@ class Table(object):
 
 
     @property
-    def label(self):
-        return self._label
-
-    @property
-    def shape(self):
-        return (self._trows + self._rows + self._brows, self._lcolumns + self.columns + self._rcolumns)
-
-    @property
-    def rows(self):
-        return self.shape[0]
-
-    @property
-    def columns(self):
-        return self.shape[1]
-
-    @property
-    def cells(self):
-        return Table.Region(self, 0, self._trows + self._rows + self._brows, 0, self._lcolumns + self._columns + self._rcolumns)
-
-    @property
-    def header(self):
-        toyplot.log.warning("table.header is deprecated, use table.top instead.")
-        return self.top
-
-    @property
-    def footer(self):
-        toyplot.log.warning("table.footer is deprecated, use table.bottom instead.")
-        return self.bottom
-
-    @property
-    def top(self):
-        region = Table.Region(self, 0, self._trows, self._lcolumns, self._lcolumns + self._columns)
-        region.left = Table.Region(self, 0, self._trows, 0, self._lcolumns)
-        region.right = Table.Region(self, 0, self._trows, self._lcolumns + self._columns, self._lcolumns + self._columns + self._rcolumns)
-        return region
-
-    @property
-    def left(self):
-        region = Table.Region(self, self._trows, self._trows + self._rows, 0, self._lcolumns)
-        return region
-
-    @property
     def body(self):
         region = Table.Region(self, self._trows, self._trows + self._rows, self._lcolumns, self._lcolumns + self._columns)
-        return region
-
-    @property
-    def right(self):
-        region = Table.Region(self, self._trows, self._trows + self._rows, self._lcolumns + self._columns, self._lcolumns + self._columns + self._rcolumns)
         return region
 
     @property
@@ -3233,17 +3187,19 @@ class Table(object):
         region.right = Table.Region(self, self._trows + self._rows, self._trows + self._rows + self._brows, self._lcolumns + self._columns, self._lcolumns + self._columns + self._rcolumns)
         return region
 
-    def column(self, column):
-        toyplot.log.warning("table.column is deprecated, use table.cells.column instead.")
-        return self.cells.column(column)
+    @property
+    def cells(self):
+        return Table.Region(self, 0, self._trows + self._rows + self._brows, 0, self._lcolumns + self._columns + self._rcolumns)
 
-    def row(self, row):
-        toyplot.log.warning("table.row is deprecated, use table.cells.row instead.")
-        return self.cells.row(row)
+    @property
+    def columns(self):
+        toyplot.log.warning("table.columns is deprecated, use table.shape[0] instead.")
+        return self.shape[1]
 
-    def cell(self, row, column, rowspan=1, colspan=1):
-        toyplot.log.warning("table.cell is deprecated, use table.cells.cell instead.")
-        return self.cells.cell(row, column, rowspan, colspan)
+    @property
+    def footer(self):
+        toyplot.log.warning("table.footer is deprecated, use table.bottom instead.")
+        return self.bottom
 
     @property
     def gaps(self):
@@ -3254,6 +3210,53 @@ class Table(object):
     def grid(self):
         toyplot.log.warning("table.grid is deprecated, use table.cells.grid instead.")
         return self.cells.grid
+
+    @property
+    def header(self):
+        toyplot.log.warning("table.header is deprecated, use table.top instead.")
+        return self.top
+
+    @property
+    def label(self):
+        return self._label
+
+    @property
+    def left(self):
+        region = Table.Region(self, self._trows, self._trows + self._rows, 0, self._lcolumns)
+        return region
+
+    @property
+    def right(self):
+        region = Table.Region(self, self._trows, self._trows + self._rows, self._lcolumns + self._columns, self._lcolumns + self._columns + self._rcolumns)
+        return region
+
+    @property
+    def rows(self):
+        toyplot.log.warning("table.rows is deprecated, use table.shape[0] instead.")
+        return self.shape[0]
+
+    @property
+    def shape(self):
+        return (self._trows + self._rows + self._brows, self._lcolumns + self.columns + self._rcolumns)
+
+    @property
+    def top(self):
+        region = Table.Region(self, 0, self._trows, self._lcolumns, self._lcolumns + self._columns)
+        region.left = Table.Region(self, 0, self._trows, 0, self._lcolumns)
+        region.right = Table.Region(self, 0, self._trows, self._lcolumns + self._columns, self._lcolumns + self._columns + self._rcolumns)
+        return region
+
+    def cell(self, row, column, rowspan=1, colspan=1):
+        toyplot.log.warning("table.cell is deprecated, use table.cells.cell instead.")
+        return self.cells.cell(row, column, rowspan, colspan)
+
+    def column(self, column):
+        toyplot.log.warning("table.column is deprecated, use table.cells.column instead.")
+        return self.cells.column(column)
+
+    def row(self, row):
+        toyplot.log.warning("table.row is deprecated, use table.cells.row instead.")
+        return self.cells.row(row)
 
     def _finalize(self):
         # Collect explicit row heights, column widths, and gaps.

@@ -1573,7 +1573,7 @@ def _render(canvas, axes, context):
             prefix, separator, suffix = cell_format.format(cell_data)
 
             # Get the cell style.
-            cell_label_style = axes._cell_label_style[cell_selection][0]
+            cell_lstyle = axes._cell_lstyle[cell_selection][0]
 
             # Render the cell data.
             if cell_align == "left":
@@ -1582,7 +1582,7 @@ def _render(canvas, axes, context):
                     root=axes_xml,
                     x=x,
                     y=y,
-                    style=toyplot.style.combine(cell_label_style, {"text-anchor": "begin"}),
+                    style=toyplot.style.combine(cell_lstyle, {"text-anchor": "begin"}),
                     text=prefix + separator + suffix,
                     )
             elif cell_align == "center":
@@ -1592,7 +1592,7 @@ def _render(canvas, axes, context):
                     x=x,
                     y=y,
                     angle=cell_angle,
-                    style=toyplot.style.combine(cell_label_style, {"text-anchor": "middle"}),
+                    style=toyplot.style.combine(cell_lstyle, {"text-anchor": "middle"}),
                     text=prefix + separator + suffix,
                     )
             elif cell_align == "right":
@@ -1601,7 +1601,7 @@ def _render(canvas, axes, context):
                     root=axes_xml,
                     x=x,
                     y=y,
-                    style=toyplot.style.combine(cell_label_style, {"text-anchor": "end"}),
+                    style=toyplot.style.combine(cell_lstyle, {"text-anchor": "end"}),
                     text=prefix + separator + suffix,
                     )
             elif cell_align is "separator":
@@ -1610,21 +1610,21 @@ def _render(canvas, axes, context):
                     root=axes_xml,
                     x=x - 2,
                     y=y,
-                    style=toyplot.style.combine(cell_label_style, {"text-anchor": "end"}),
+                    style=toyplot.style.combine(cell_lstyle, {"text-anchor": "end"}),
                     text=prefix,
                     )
                 _draw_text(
                     root=axes_xml,
                     x=x,
                     y=y,
-                    style=toyplot.style.combine(cell_label_style, {"text-anchor": "middle"}),
+                    style=toyplot.style.combine(cell_lstyle, {"text-anchor": "middle"}),
                     text=separator,
                     )
                 _draw_text(
                     root=axes_xml,
                     x=x + 2,
                     y=y,
-                    style=toyplot.style.combine(cell_label_style, {"text-anchor": "begin"}),
+                    style=toyplot.style.combine(cell_lstyle, {"text-anchor": "begin"}),
                     text=suffix,
                     )
 

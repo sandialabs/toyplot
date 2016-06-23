@@ -2771,22 +2771,6 @@ class Table(object):
             self._selection = selection
 
 
-        def _delete_cell_data(self, indices, axis):
-            self._table._cell_align = numpy.delete(self._table._cell_align, indices, axis=axis)
-            self._table._cell_angle = numpy.delete(self._table._cell_angle, indices, axis=axis)
-            self._table._cell_axes = numpy.delete(self._table._cell_axes, indices, axis=axis)
-            self._table._cell_data = numpy.delete(self._table._cell_data, indices, axis=axis)
-            self._table._cell_format = numpy.delete(self._table._cell_format, indices, axis=axis)
-            self._table._cell_group = numpy.delete(self._table._cell_group, indices, axis=axis)
-            self._table._cell_lstyle = numpy.delete(self._table._cell_lstyle, indices, axis=axis)
-            self._table._cell_region = numpy.delete(self._table._cell_region, indices, axis=axis)
-            self._table._cell_show = numpy.delete(self._table._cell_show, indices, axis=axis)
-            self._table._cell_style = numpy.delete(self._table._cell_style, indices, axis=axis)
-            self._table._cell_title = numpy.delete(self._table._cell_title, indices, axis=axis)
-
-            self._table._shape = self._table._cell_align
-
-
         def _selection_coordinates(self):
             selection = numpy.zeros(self._table._shape, dtype="bool")
             selection[self._selection] = True
@@ -2980,16 +2964,7 @@ class Table(object):
         def delete(self):
             row_indices, column_indices = self._selection_coordinates()
             column_indices = numpy.unique(column_indices)
-            self._delete_cell_data(column_indices, axis=1)
-
-            self._table._hlines = numpy.delete(self._table._hlines, column_indices, axis=1)
-            self._table._hlines_show = numpy.delete(self._table._hlines_show, column_indices, axis=1)
-
-            self._table._vlines = numpy.delete(self._table._vlines, column_indices, axis=1)
-            self._table._vlines_show = numpy.delete(self._table._vlines_show, column_indices, axis=1)
-
-            self._table._column_widths = numpy.delete(self._table._column_widths, column_indices)
-            self._table._column_gaps = numpy.delete(self._table._column_gaps, column_indices)
+            self._table._delete_cell_data(column_indices, axis=1)
 
     class RowCellReference(CellReference):
         def __init__(self, table, selection):
@@ -2998,17 +2973,7 @@ class Table(object):
         def delete(self):
             row_indices, column_indices = self._selection_coordinates()
             row_indices = numpy.unique(row_indices)
-            self._delete_cell_data(row_indices, axis=0)
-
-            self._table._hlines = numpy.delete(self._table._hlines, row_indices, axis=0)
-            self._table._hlines_show = numpy.delete(self._table._hlines_show, row_indices, axis=0)
-
-            self._table._vlines = numpy.delete(self._table._vlines, row_indices, axis=0)
-            self._table._vlines_show = numpy.delete(self._table._vlines_show, row_indices, axis=0)
-
-            self._table._row_heights = numpy.delete(self._table._row_heights, row_indices)
-            self._table._row_gaps = numpy.delete(self._table._row_gaps, row_indices)
-
+            self._table._delete_cell_data(row_indices, axis=0)
 
     class DistanceArrayReference(object):
         def __init__(self, array):
@@ -3083,6 +3048,10 @@ class Table(object):
                 region_selection[Ellipsis, selection] = True
                 return Table.ColumnCellReference(self._region._table, table_selection)
 
+            def insert(self, before=None, after=None):
+                self._region._table._insert_cell_data(before=before, after=after, axis=1)
+
+
         class RowAccessor(object):
             def __init__(self, region):
                 self._region = region
@@ -3096,6 +3065,10 @@ class Table(object):
                 region_selection = table_selection[self._region._row_begin:self._region._row_end, self._region._column_begin:self._region._column_end]
                 region_selection[selection, Ellipsis] = True
                 return Table.RowCellReference(self._region._table, table_selection)
+
+            def insert(self, before=None, after=None):
+                self._region._table._insert_cell_data(before=before, after=after, axis=0)
+
 
         class CellAccessor(object):
             def __init__(self, region):
@@ -3254,6 +3227,71 @@ class Table(object):
             return (rows.min(), rows.max() + 1, columns.min(), columns.max() + 1)
         return (0, 0, 0, 0)
 
+
+    def _delete_cell_data(self, indices, axis):
+        self._cell_align = numpy.delete(self._cell_align, indices, axis=axis)
+        self._cell_angle = numpy.delete(self._cell_angle, indices, axis=axis)
+        self._cell_axes = numpy.delete(self._cell_axes, indices, axis=axis)
+        self._cell_data = numpy.delete(self._cell_data, indices, axis=axis)
+        self._cell_format = numpy.delete(self._cell_format, indices, axis=axis)
+        self._cell_group = numpy.delete(self._cell_group, indices, axis=axis)
+        self._cell_lstyle = numpy.delete(self._cell_lstyle, indices, axis=axis)
+        self._cell_region = numpy.delete(self._cell_region, indices, axis=axis)
+        self._cell_show = numpy.delete(self._cell_show, indices, axis=axis)
+        self._cell_style = numpy.delete(self._cell_style, indices, axis=axis)
+        self._cell_title = numpy.delete(self._cell_title, indices, axis=axis)
+
+        self._hlines = numpy.delete(self._hlines, indices, axis=axis)
+        self._hlines_show = numpy.delete(self._hlines_show, indices, axis=axis)
+
+        self._vlines = numpy.delete(self._vlines, indices, axis=axis)
+        self._vlines_show = numpy.delete(self._vlines_show, indices, axis=axis)
+
+        if axis == 1:
+            self._column_widths = numpy.delete(self._column_widths, indices)
+            self._column_gaps = numpy.delete(self._column_gaps, indices)
+        if axis == 0:
+            self._row_heights = numpy.delete(self._row_heights, indices)
+            self._row_gaps = numpy.delete(self._row_gaps, indices)
+
+        self._shape = self._cell_align.shape
+
+    def _insert_cell_data(self, before, after, axis):
+        selection = numpy.zeros(self.shape[axis] + 1, dtype="bool")
+        if before is not None:
+            selection[before] = True
+        if after is not None:
+            selection[1:][after] = True
+
+        toyplot.log.debug("insert %s: %s" % (axis, selection))
+        selection = numpy.flatnonzero(selection)
+
+        self._cell_align = numpy.insert(self._cell_align, selection, None, axis=axis)
+        self._cell_angle = numpy.insert(self._cell_angle, selection, 0, axis=axis)
+        self._cell_axes = numpy.insert(self._cell_axes, selection, None, axis=axis)
+        self._cell_data = numpy.insert(self._cell_data, selection, None, axis=axis)
+        self._cell_format = numpy.insert(self._cell_format, selection, toyplot.format.DefaultFormatter(), axis=axis)
+        self._cell_group = numpy.insert(self._cell_group, selection, 0, axis=axis)
+        self._cell_lstyle = numpy.insert(self._cell_lstyle, selection, None, axis=axis)
+        self._cell_region = numpy.insert(self._cell_region, selection, 4, axis=axis)
+        self._cell_show = numpy.insert(self._cell_show, selection, True, axis=axis)
+        self._cell_style = numpy.insert(self._cell_style, selection, None, axis=axis)
+        self._cell_title = numpy.insert(self._cell_title, selection, None, axis=axis)
+
+        self._hlines = numpy.insert(self._hlines, selection, "single", axis=axis)
+        self._hlines_show = numpy.insert(self._hlines_show, selection, "single", axis=axis)
+
+        self._vlines = numpy.insert(self._vlines, selection, "single", axis=axis)
+        self._vlines_show = numpy.insert(self._vlines_show, selection, "single", axis=axis)
+
+        if axis == 1:
+            self._column_widths = numpy.insert(self._column_widths, 0, selection)
+            self._column_gaps = numpy.insert(self._column_gaps, 0, selection)
+        if axis == 0:
+            self._row_heights = numpy.insert(self._row_heights, 0, selection)
+            self._row_gaps = numpy.insert(self._row_gaps, 0, selection)
+
+        self._shape = self._cell_align.shape
 
     @property
     def body(self):

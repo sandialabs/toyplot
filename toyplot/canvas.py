@@ -799,7 +799,7 @@ class Canvas(object):
             data=None,
             rows=None,
             columns=None,
-            hrows=None,
+            trows=None,
             brows=None,
             lcolumns=None,
             rcolumns=None,
@@ -823,12 +823,12 @@ class Canvas(object):
             rows = data.shape[0] if rows is None else max(rows, data.shape[0])
             columns = data.shape[1] if columns is None else max(
                 columns, data.shape[1])
-            if hrows is None:
-                hrows = 1
+            if trows is None:
+                trows = 1
         if rows is None or columns is None: # pragma: no cover
             raise ValueError("You must specify data, or rows and columns.")
-        if hrows is None:
-            hrows = 0
+        if trows is None:
+            trows = 0
         if brows is None:
             brows = 0
         if lcolumns is None:
@@ -846,7 +846,7 @@ class Canvas(object):
             rows=rows,
             columns=columns,
             label=label,
-            trows=hrows,
+            trows=trows,
             brows=brows,
             lcolumns=lcolumns,
             rcolumns=rcolumns,
@@ -854,13 +854,13 @@ class Canvas(object):
 
         if data is not None:
             for j, (key, column) in enumerate(data.items()):
-                if hrows:
-                    table.top.cell[hrows - 1, j].data = key
+                if trows:
+                    table.top.cell[trows - 1, j].data = key
                 for i, (value, mask) in enumerate(zip(column, numpy.ma.getmaskarray(column))):
                     if not mask:
                         table.body.cell[i, j].data = value
                 if issubclass(column._data.dtype.type, numpy.floating):
-                    if hrows:
+                    if trows:
                         table.top.cell[0, j].align = "center"
                     table.body.cell[:,j].format = toyplot.format.FloatFormatter()
                     table.body.cell[:,j].align = "separator"
@@ -870,8 +870,8 @@ class Canvas(object):
                     table.cells.cell[:,j].align = "right"
 
         # Enable a single horizontal line between top and body.
-        if hrows:
-            table.cells.grid.hlines[hrows] = "single"
+        if trows:
+            table.cells.grid.hlines[trows] = "single"
 
         self._children.append(table)
         return table

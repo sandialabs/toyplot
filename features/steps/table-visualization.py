@@ -175,7 +175,7 @@ def step_impl(context):
 @then(u'an instance of toyplot.coordinates.Table can be rendered without a header')
 def step_impl(context):
     context.canvas = toyplot.Canvas()
-    context.table_axes = context.canvas.table(context.data, hrows=0)
+    context.table_axes = context.canvas.table(context.data, trows=0)
 
 @then(u'the table can be rendered using the convenience API')
 def step_impl(context):

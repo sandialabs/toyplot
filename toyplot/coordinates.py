@@ -2800,7 +2800,7 @@ class Table(object):
 
 
         def _set_data(self, value):
-            self._table._cell_data[self._selection] = value
+            self._table._cell_data[self._selection] = numpy.array(value).flat
         data = property(fset=_set_data)
 
 
@@ -3204,25 +3204,14 @@ class Table(object):
         self._separation = 2
         self._gstyle = {"stroke": toyplot.color.near_black, "stroke-width": 0.5}
 
-        hstyle = {
-            "font-size": "12px",
-            "stroke": "none",
-            "fill": toyplot.color.near_black,
-            "alignment-baseline": "middle",
-            "font-weight": "bold",
-            }
-        style = {
+        lstyle = {
             "font-size": "12px",
             "stroke": "none",
             "fill": toyplot.color.near_black,
             "alignment-baseline": "middle",
             }
-
-        self._cell_lstyle[...] = hstyle
+        self._cell_lstyle[...] = lstyle
         self._cell_align[...] = "center"
-
-        self._cell_lstyle[trows : trows + rows, lcolumns : lcolumns + columns] = style
-        self._cell_align[trows : trows + rows, lcolumns : lcolumns + columns] = "left"
 
 
     def _region_bounds(self, region):

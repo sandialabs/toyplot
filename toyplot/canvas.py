@@ -542,6 +542,9 @@ class Canvas(object):
         table.left.column[1].align = "right"
         table.right.column[0].align = "left"
 
+        table.cells.column[[0, -1]].lstyle = {"font-weight":"bold"}
+        table.cells.row[[0, -1]].lstyle = {"font-weight":"bold"}
+
         if tlabel is not None:
             cell = table.top.row[0].merge()
             cell.data = tlabel
@@ -869,9 +872,11 @@ class Canvas(object):
                 elif issubclass(column._data.dtype.type, numpy.integer):
                     table.cells.cell[:,j].align = "right"
 
-        # Enable a single horizontal line between top and body.
-        if trows:
-            table.cells.grid.hlines[trows] = "single"
+            if trows:
+                # Format top cells for use as a header
+                table.top.cells.lstyle = {"font-weight": "bold"}
+                # Enable a single horizontal line between top and body.
+                table.cells.grid.hlines[trows] = "single"
 
         self._children.append(table)
         return table

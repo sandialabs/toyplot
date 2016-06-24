@@ -3261,39 +3261,51 @@ class Table(object):
         self._shape = self._cell_align.shape
 
     def _insert_cell_data(self, before, after, axis):
-        selection = numpy.zeros(self.shape[axis] + 1, dtype="bool")
+        # Create a selection for the source row / column.
+        source = numpy.zeros(self.shape[axis], dtype="bool")
         if before is not None:
-            selection[before] = True
+            source[before] = True
         if after is not None:
-            selection[1:][after] = True
-
-        selection = numpy.flatnonzero(selection)
-
-        self._cell_align = numpy.insert(self._cell_align, selection, None, axis=axis)
-        self._cell_angle = numpy.insert(self._cell_angle, selection, 0, axis=axis)
-        self._cell_axes = numpy.insert(self._cell_axes, selection, None, axis=axis)
-        self._cell_data = numpy.insert(self._cell_data, selection, None, axis=axis)
-        self._cell_format = numpy.insert(self._cell_format, selection, toyplot.format.DefaultFormatter(), axis=axis)
-        self._cell_group = numpy.insert(self._cell_group, selection, -1, axis=axis)
-        self._cell_group[self._cell_group == -1] = numpy.unique(self._cell_group).max() + 1 + numpy.arange(numpy.count_nonzero(self._cell_group == -1))
-        self._cell_lstyle = numpy.insert(self._cell_lstyle, selection, None, axis=axis)
-        self._cell_region = numpy.insert(self._cell_region, selection, 4, axis=axis)
-        self._cell_show = numpy.insert(self._cell_show, selection, True, axis=axis)
-        self._cell_style = numpy.insert(self._cell_style, selection, None, axis=axis)
-        self._cell_title = numpy.insert(self._cell_title, selection, None, axis=axis)
-
-        self._hlines = numpy.insert(self._hlines, selection, "single", axis=axis)
-        self._hlines_show = numpy.insert(self._hlines_show, selection, "single", axis=axis)
-
-        self._vlines = numpy.insert(self._vlines, selection, "single", axis=axis)
-        self._vlines_show = numpy.insert(self._vlines_show, selection, "single", axis=axis)
-
-        if axis == 1:
-            self._column_widths = numpy.insert(self._column_widths, selection, 0)
-            self._column_gaps = numpy.insert(self._column_gaps, selection, 0)
+            source[after] = True
+        source = numpy.flatnonzero(source)
         if axis == 0:
-            self._row_heights = numpy.insert(self._row_heights, selection, 0)
-            self._row_gaps = numpy.insert(self._row_gaps, selection, 0)
+            source = (source, Ellipsis)
+        if axis == 1:
+            source = (Ellipsis, source)
+
+        # Numpy always inserts *before* a given row / column, so convert everything into strictly "before" indices.
+        position = numpy.zeros(self.shape[axis] + 1, dtype="bool")
+        if before is not None:
+            position[before] = True
+        if after is not None:
+            position[1:][after] = True
+        position = numpy.flatnonzero(position)
+
+        self._cell_align = numpy.insert(self._cell_align, position, None, axis=axis)
+        self._cell_angle = numpy.insert(self._cell_angle, position, 0, axis=axis)
+        self._cell_axes = numpy.insert(self._cell_axes, position, None, axis=axis)
+        self._cell_data = numpy.insert(self._cell_data, position, None, axis=axis)
+        self._cell_format = numpy.insert(self._cell_format, position, toyplot.format.DefaultFormatter(), axis=axis)
+        self._cell_group = numpy.insert(self._cell_group, position, -1, axis=axis)
+        self._cell_group[self._cell_group == -1] = numpy.unique(self._cell_group).max() + 1 + numpy.arange(numpy.count_nonzero(self._cell_group == -1))
+        self._cell_lstyle = numpy.insert(self._cell_lstyle, position, None, axis=axis)
+        self._cell_region = numpy.insert(self._cell_region, position, self._cell_region[source], axis=axis)
+        self._cell_show = numpy.insert(self._cell_show, position, True, axis=axis)
+        self._cell_style = numpy.insert(self._cell_style, position, None, axis=axis)
+        self._cell_title = numpy.insert(self._cell_title, position, None, axis=axis)
+
+        self._hlines = numpy.insert(self._hlines, position, self._hlines[source], axis=axis)
+        self._hlines_show = numpy.insert(self._hlines_show, position, True, axis=axis)
+
+        self._vlines = numpy.insert(self._vlines, position, self._vlines[source], axis=axis)
+        self._vlines_show = numpy.insert(self._vlines_show, position, True, axis=axis)
+
+        if axis == 0:
+            self._row_heights = numpy.insert(self._row_heights, position, 0)
+            self._row_gaps = numpy.insert(self._row_gaps, position, 0)
+        if axis == 1:
+            self._column_widths = numpy.insert(self._column_widths, position, 0)
+            self._column_gaps = numpy.insert(self._column_gaps, position, 0)
 
         self._shape = self._cell_align.shape
 

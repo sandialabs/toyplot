@@ -3049,6 +3049,8 @@ class Table(object):
                 return Table.ColumnCellReference(self._region._table, table_selection)
 
             def insert(self, before=None, after=None):
+                if (before is None) + (after is None) != 1:
+                    raise ValueError("Specify either before or after.")
                 self._region._table._insert_cell_data(before=before, after=after, axis=1)
 
 
@@ -3067,6 +3069,8 @@ class Table(object):
                 return Table.RowCellReference(self._region._table, table_selection)
 
             def insert(self, before=None, after=None):
+                if (before is None) + (after is None) != 1:
+                    raise ValueError("Specify either before or after.")
                 self._region._table._insert_cell_data(before=before, after=after, axis=0)
 
 
@@ -3263,7 +3267,6 @@ class Table(object):
         if after is not None:
             selection[1:][after] = True
 
-        toyplot.log.debug("insert %s: %s" % (axis, selection))
         selection = numpy.flatnonzero(selection)
 
         self._cell_align = numpy.insert(self._cell_align, selection, None, axis=axis)
@@ -3271,7 +3274,8 @@ class Table(object):
         self._cell_axes = numpy.insert(self._cell_axes, selection, None, axis=axis)
         self._cell_data = numpy.insert(self._cell_data, selection, None, axis=axis)
         self._cell_format = numpy.insert(self._cell_format, selection, toyplot.format.DefaultFormatter(), axis=axis)
-        self._cell_group = numpy.insert(self._cell_group, selection, 0, axis=axis)
+        self._cell_group = numpy.insert(self._cell_group, selection, -1, axis=axis)
+        self._cell_group[self._cell_group == -1] = numpy.unique(self._cell_group).max() + 1 + numpy.arange(numpy.count_nonzero(self._cell_group == -1))
         self._cell_lstyle = numpy.insert(self._cell_lstyle, selection, None, axis=axis)
         self._cell_region = numpy.insert(self._cell_region, selection, 4, axis=axis)
         self._cell_show = numpy.insert(self._cell_show, selection, True, axis=axis)
@@ -3285,11 +3289,11 @@ class Table(object):
         self._vlines_show = numpy.insert(self._vlines_show, selection, "single", axis=axis)
 
         if axis == 1:
-            self._column_widths = numpy.insert(self._column_widths, 0, selection)
-            self._column_gaps = numpy.insert(self._column_gaps, 0, selection)
+            self._column_widths = numpy.insert(self._column_widths, selection, 0)
+            self._column_gaps = numpy.insert(self._column_gaps, selection, 0)
         if axis == 0:
-            self._row_heights = numpy.insert(self._row_heights, 0, selection)
-            self._row_gaps = numpy.insert(self._row_gaps, 0, selection)
+            self._row_heights = numpy.insert(self._row_heights, selection, 0)
+            self._row_gaps = numpy.insert(self._row_gaps, selection, 0)
 
         self._shape = self._cell_align.shape
 

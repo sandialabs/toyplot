@@ -195,3 +195,50 @@ def step_impl(context):
     context.table_axes.cells.grid.hlines[...] = "single"
     context.table_axes.cells.grid.vlines[...] = "single"
 
+@given(u'an instance of toyplot.coordinates.Table with every region enabled')
+def step_impl(context):
+    context.table_axes = context.canvas.table(trows=3, rows=3, brows=3, lcolumns=3, columns=3, rcolumns=3)
+    context.table_axes.cells.cells.data = numpy.arange(81).reshape(9, 9)
+
+@given(u'every grid line is enabled')
+def step_impl(context):
+    context.table_axes.cells.grid.hlines[...] = "single"
+    context.table_axes.cells.grid.vlines[...] = "single"
+
+@given(u'the first row is deleted')
+def step_impl(context):
+    context.table_axes.cells.row[0].delete()
+
+@given(u'every region is colored')
+def step_impl(context):
+    context.table_axes.top.left.cells.style = {"fill":"red", "opacity":0.2}
+    context.table_axes.top.cells.style = {"fill":"orange", "opacity":0.2}
+    context.table_axes.top.right.cells.style = {"fill":"yellow", "opacity":0.2}
+    context.table_axes.right.cells.style = {"fill":"greenyellow", "opacity":0.2}
+    context.table_axes.bottom.right.cells.style = {"fill":"green", "opacity":0.2}
+    context.table_axes.bottom.cells.style = {"fill":"aqua", "opacity":0.2}
+    context.table_axes.bottom.left.cells.style = {"fill":"blue", "opacity":0.2}
+    context.table_axes.left.cells.style = {"fill":"purple", "opacity":0.2}
+
+
+@given(u'a middle row is deleted')
+def step_impl(context):
+    context.table_axes.cells.row[4].delete()
+
+@given(u'the last row is deleted')
+def step_impl(context):
+    context.table_axes.cells.row[-1].delete()
+
+@given(u'the first column is deleted')
+def step_impl(context):
+    context.table_axes.cells.column[0].delete()
+
+@given(u'a middle column is deleted')
+def step_impl(context):
+    context.table_axes.cells.column[4].delete()
+
+@given(u'the last column is deleted')
+def step_impl(context):
+    context.table_axes.cells.column[-1].delete()
+
+

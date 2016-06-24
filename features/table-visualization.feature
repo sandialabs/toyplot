@@ -60,3 +60,20 @@ Feature: Table axes
         Examples:
             | dimensions | reference |
             | 4 rows and 3 columns | table-four-rows-three-columns |
+
+    Scenario Outline: Table deletion
+        Given a default canvas
+        And an instance of toyplot.coordinates.Table with every region enabled
+        And every grid line is enabled
+        And <selection> is deleted
+        And every region is colored
+        Then the visualization should match the <reference> reference image
+
+        Examples:
+            | selection | reference |
+            | the first row | table-delete-first-row |
+            | a middle row | table-delete-middle-row |
+            | the last row | table-delete-last-row |
+            | the first column | table-delete-first-column |
+            | a middle column | table-delete-middle-column |
+            | the last column | table-delete-last-column |

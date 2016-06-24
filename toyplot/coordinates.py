@@ -2963,7 +2963,6 @@ class Table(object):
 
         def delete(self):
             row_indices, column_indices = self._selection_coordinates()
-            column_indices = numpy.unique(column_indices)
             self._table._delete_cell_data(column_indices, axis=1)
 
     class RowCellReference(CellReference):
@@ -2972,7 +2971,6 @@ class Table(object):
 
         def delete(self):
             row_indices, column_indices = self._selection_coordinates()
-            row_indices = numpy.unique(row_indices)
             self._table._delete_cell_data(row_indices, axis=0)
 
     class DistanceArrayReference(object):
@@ -3222,6 +3220,8 @@ class Table(object):
 
 
     def _delete_cell_data(self, indices, axis):
+        indices = numpy.unique(indices)
+
         self._cell_align = numpy.delete(self._cell_align, indices, axis=axis)
         self._cell_angle = numpy.delete(self._cell_angle, indices, axis=axis)
         self._cell_axes = numpy.delete(self._cell_axes, indices, axis=axis)
@@ -3240,12 +3240,15 @@ class Table(object):
         self._vlines = numpy.delete(self._vlines, indices, axis=axis)
         self._vlines_show = numpy.delete(self._vlines_show, indices, axis=axis)
 
-        if axis == 1:
-            self._column_widths = numpy.delete(self._column_widths, indices)
-            self._column_gaps = numpy.delete(self._column_gaps, indices)
         if axis == 0:
             self._row_heights = numpy.delete(self._row_heights, indices)
-            self._row_gaps = numpy.delete(self._row_gaps, indices)
+        if axis == 1:
+            self._column_widths = numpy.delete(self._column_widths, indices)
+
+        if axis == 0:
+            self._row_gaps = self._row_gaps[len(indices):]
+        if axis == 1:
+            self._column_gaps = self._column_gaps[len(indices):]
 
         self._shape = self._cell_align.shape
 

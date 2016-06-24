@@ -3137,7 +3137,7 @@ class Table(object):
 
         @property
         def shape(self):
-            return (self.row_end - self.row_begin, self._column_end - self._column_begin)
+            return (self._row_end - self._row_begin, self._column_end - self._column_begin)
 
 
     def __init__(

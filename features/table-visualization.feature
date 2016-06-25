@@ -61,6 +61,23 @@ Feature: Table axes
             | dimensions | reference |
             | 4 rows and 3 columns | table-four-rows-three-columns |
 
+    @wip
+    Scenario Outline: Table merging
+        Given a default canvas
+        And an instance of toyplot.coordinates.Table with every region enabled
+        And every grid line is enabled
+        And every region is colored
+        And <region> <selection> is merged
+        Then the visualization should match the <reference> reference image
+
+        Examples:
+            | region   | selection | reference                 |
+            | cells    | 0,2,0,2   | table-merge-cells-0-2-0-2 |
+            | cells    | 2,4,2,4   | table-merge-cells-2-4-2-4 |
+            | cells    | 6,8,6,8   | table-merge-cells-6-8-6-8 |
+            | top-left | 0,3,0,3   | table-merge-top-left-0-3-0-3 |
+
+
     Scenario Outline: Table deletion
         Given a default canvas
         And an instance of toyplot.coordinates.Table with every region enabled

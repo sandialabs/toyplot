@@ -270,3 +270,26 @@ def step_impl(context, region, celltype, position, selection):
     else:
         raise ValueError("Unknown position: %s" % position)
 
+@given(u'{region} {selection} is merged')
+def step_impl(context, region, selection):
+    if region == "top":
+        region = context.table_axes.top
+    elif region == "top-left":
+        region = context.table_axes.top.left
+    elif region == "body":
+        region = context.table_axes.body
+    elif region == "bottom":
+        region = context.table_axes.bottom
+    elif region == "left":
+        region = context.table_axes.left
+    elif region == "right":
+        region = context.table_axes.right
+    elif region == "cells":
+        region = context.table_axes.cells
+    else:
+        raise ValueError("Unknown region: %s" % region)
+
+    row_begin, row_end, column_begin, column_end = eval(selection)
+
+    region.cell[row_begin:row_end,column_begin:column_end].merge()
+

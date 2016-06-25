@@ -34,7 +34,7 @@ def show(canvases, title="Toyplot Figure"):
     import webbrowser
 
     if not isinstance(canvases, (toyplot.canvas.Canvas, collections.Iterable)):
-        raise ValueError("Expected one or more instances of %s, received %s." % (toyplot.canvas.Canvas, type(canvases)))
+        raise ValueError("Expected one or more instances of %s, received %s." % (toyplot.canvas.Canvas, type(canvases))) # pragma: no cover
 
     if isinstance(canvases, toyplot.canvas.Canvas):
         canvases = [canvases]

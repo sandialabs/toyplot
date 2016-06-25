@@ -5,7 +5,7 @@
 import numpy
 import toyplot.color
 
-def plot_luma(a, b=None):
+def plot_luma(a, b=None): #pragma: no cover
     if b is not None:
         colormaps = [(a, b)]
     else:

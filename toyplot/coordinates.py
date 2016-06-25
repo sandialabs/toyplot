@@ -2787,13 +2787,13 @@ class Table(object):
         angle = property(fset=_set_angle)
 
 
-        def _set_bstyle(self, value):
+        def _set_bstyle(self, value): # pragma: no cover
             toyplot.log.warning("The bstyle property is deprecated, use style instead (use lstyle for text label styles).")
             self.style = value
         bstyle = property(fset=_set_bstyle)
 
 
-        def _set_column_offset(self, value):
+        def _set_column_offset(self, value): # pragma: no cover
             toyplot.log.warning("The column_offset property is deprecated, use an lstyle with '-toyplot-anchor-shift' instead.")
             self.lstyle = {"-toyplot-anchor-shift": value}
         column_offset = property(fset=_set_column_offset)
@@ -2822,7 +2822,7 @@ class Table(object):
         lstyle = property(fset=_set_lstyle)
 
 
-        def _set_row_offset(self, value):
+        def _set_row_offset(self, value): # pragma: no cover
             toyplot.log.warning("The row_offset property is deprecated, use an lstyle with 'baseline-shift' instead.")
             self.lstyle = {"baseline-shift": value}
         row_offset = property(fset=_set_row_offset)
@@ -2870,7 +2870,7 @@ class Table(object):
                 yscale="linear",
                 padding=5,
                 cell_padding=0,
-            ):
+            ): # pragma: no cover
             toyplot.log.warning("axes() is deprecated, use cartesian() instead.")
             return self.cartesian(
                 xmin=xmin,
@@ -3038,7 +3038,7 @@ class Table(object):
             def __init__(self, region):
                 self._region = region
 
-            def __call__(self, column):
+            def __call__(self, column): # pragma: no cover
                 toyplot.log.warning("column() is deprecated, use column[] instead.")
                 return self[column]
 
@@ -3067,7 +3067,7 @@ class Table(object):
             def __init__(self, region):
                 self._region = region
 
-            def __call__(self, row):
+            def __call__(self, row): # pragma: no cover
                 toyplot.log.warning("row() is deprecated, use row[] instead.")
                 return self[row]
 
@@ -3096,7 +3096,7 @@ class Table(object):
             def __init__(self, region):
                 self._region = region
 
-            def __call__(self, row, column, rowspan=1, colspan=1):
+            def __call__(self, row, column, rowspan=1, colspan=1): # pragma: no cover
                 toyplot.log.warning("cell() is deprecated, use cell[] instead.")
                 return self[row:row + rowspan, column:column + colspan]
 
@@ -3132,7 +3132,7 @@ class Table(object):
             return Table.Region.ColumnAccessor(self)
 
         @property
-        def columns(self):
+        def columns(self): # pragma: no cover
             toyplot.log.warning("columns property is deprecated, use shape instead.")
             return self.shape[1]
 
@@ -3153,7 +3153,7 @@ class Table(object):
             return Table.Region.RowAccessor(self)
 
         @property
-        def rows(self):
+        def rows(self): # pragma: no cover
             toyplot.log.warning("rows property is deprecated, use shape instead.")
             return self.shape[0]
 
@@ -3350,27 +3350,27 @@ class Table(object):
         return Table.Region(self, 0, self.shape[0], 0, self.shape[1])
 
     @property
-    def columns(self):
+    def columns(self): # pragma: no cover
         toyplot.log.warning("table.columns is deprecated, use table.shape[0] instead.")
         return self.shape[1]
 
     @property
-    def footer(self):
+    def footer(self): # pragma: no cover
         toyplot.log.warning("table.footer is deprecated, use table.bottom instead.")
         return self.bottom
 
     @property
-    def gaps(self):
+    def gaps(self): # pragma: no cover
         toyplot.log.warning("table.gaps is deprecated, use table.cells.gaps instead.")
         return self.cells.gaps
 
     @property
-    def grid(self):
+    def grid(self): # pragma: no cover
         toyplot.log.warning("table.grid is deprecated, use table.cells.grid instead.")
         return self.cells.grid
 
     @property
-    def header(self):
+    def header(self): # pragma: no cover
         toyplot.log.warning("table.header is deprecated, use table.top instead.")
         return self.top
 
@@ -3389,7 +3389,7 @@ class Table(object):
         return region
 
     @property
-    def rows(self):
+    def rows(self): # pragma: no cover
         toyplot.log.warning("table.rows is deprecated, use table.shape[0] instead.")
         return self.shape[0]
 
@@ -3404,15 +3404,15 @@ class Table(object):
         region.right = Table.Region(self, *self._region_bounds(2))
         return region
 
-    def cell(self, row, column, rowspan=1, colspan=1):
+    def cell(self, row, column, rowspan=1, colspan=1): # pragma: no cover
         toyplot.log.warning("table.cell is deprecated, use table.cells.cell instead.")
         return self.cells.cell(row, column, rowspan, colspan)
 
-    def column(self, column):
+    def column(self, column): # pragma: no cover
         toyplot.log.warning("table.column is deprecated, use table.cells.column instead.")
         return self.cells.column(column)
 
-    def row(self, row):
+    def row(self, row): # pragma: no cover
         toyplot.log.warning("table.row is deprecated, use table.cells.row instead.")
         return self.cells.row(row)
 

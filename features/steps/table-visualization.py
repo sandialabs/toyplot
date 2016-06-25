@@ -241,4 +241,32 @@ def step_impl(context):
 def step_impl(context):
     context.table_axes.cells.column[-1].delete()
 
+@given(u'a {region} {celltype} is inserted {position} {selection}')
+def step_impl(context, region, celltype, position, selection):
+    if region == "top":
+        region = context.table_axes.top
+    elif region == "body":
+        region = context.table_axes.body
+    elif region == "bottom":
+        region = context.table_axes.bottom
+    elif region == "left":
+        region = context.table_axes.left
+    elif region == "right":
+        region = context.table_axes.right
+    else:
+        raise ValueError("Unknown region: %s" % region)
+
+    if celltype == "row":
+        accessor = region.row
+    elif celltype == "column":
+        accessor = region.column
+    else:
+        raise ValueError("Unknown cell type: %s" % celltype)
+
+    if position == "before":
+        accessor.insert(before=selection)
+    elif position == "after":
+        accessor.insert(after=selection)
+    else:
+        raise ValueError("Unknown position: %s" % position)
 

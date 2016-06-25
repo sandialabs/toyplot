@@ -77,3 +77,27 @@ Feature: Table axes
             | the first column | table-delete-first-column |
             | a middle column | table-delete-middle-column |
             | the last column | table-delete-last-column |
+
+    Scenario Outline: Table insertion
+        Given a default canvas
+        And an instance of toyplot.coordinates.Table with every region enabled
+        And every grid line is enabled
+        And every region is colored
+        And a <region> <celltype> is inserted <position> <selection>
+        Then the visualization should match the <reference> reference image
+
+        Examples:
+            | region | celltype | position  | selection | reference                        |
+            | top    | row      | before    | 0         | table-insert-top-row-before-0    |
+            | top    | row      | after     | 2         | table-insert-top-row-after-2     |
+            | body   | row      | before    | 0         | table-insert-body-row-before-0   |
+            | body   | row      | after     | 2         | table-insert-body-row-after-2    |
+            | bottom | row      | before    | 0         | table-insert-bottom-row-before-0   |
+            | bottom | row      | after     | 2         | table-insert-bottom-row-after-2    |
+
+            | left   | column      | before    | 0         | table-insert-left-column-before-0    |
+            | left   | column      | after     | 2         | table-insert-left-column-after-2     |
+            | body   | column      | before    | 0         | table-insert-body-column-before-0   |
+            | body   | column      | after     | 2         | table-insert-body-column-after-2    |
+            | right  | column      | before    | 0         | table-insert-right-column-before-0   |
+            | right  | column      | after     | 2         | table-insert-right-column-after-2    |

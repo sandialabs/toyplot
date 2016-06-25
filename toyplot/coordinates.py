@@ -3041,14 +3041,23 @@ class Table(object):
                 return self[column]
 
             def __getitem__(self, selection):
-                table_selection = numpy.zeros(self._region._table._shape, dtype="bool")
-                region_selection = table_selection[self._region._row_begin:self._region._row_end, self._region._column_begin:self._region._column_end]
-                region_selection[Ellipsis, selection] = True
-                return Table.ColumnCellReference(self._region._table, table_selection)
+                table, region = self._region._selection()
+                region[Ellipsis, selection] = True
+                return Table.ColumnCellReference(self._region._table, table)
 
             def insert(self, before=None, after=None):
                 if (before is None) + (after is None) != 1:
                     raise ValueError("Specify either before or after.")
+                if before is not None:
+                    table, region = self._region._selection()
+                    region[Ellipsis, before] = True
+                    rows, columns = numpy.nonzero(table)
+                    before = numpy.unique(columns)
+                if after is not None:
+                    table, region = self._region._selection()
+                    region[Ellipsis, after] = True
+                    rows, columns = numpy.nonzero(table)
+                    after = numpy.unique(columns)
                 self._region._table._insert_cell_data(before=before, after=after, axis=1)
 
 
@@ -3061,14 +3070,23 @@ class Table(object):
                 return self[row]
 
             def __getitem__(self, selection):
-                table_selection = numpy.zeros(self._region._table._shape, dtype="bool")
-                region_selection = table_selection[self._region._row_begin:self._region._row_end, self._region._column_begin:self._region._column_end]
-                region_selection[selection, Ellipsis] = True
-                return Table.RowCellReference(self._region._table, table_selection)
+                table, region = self._region._selection()
+                region[selection, Ellipsis] = True
+                return Table.RowCellReference(self._region._table, table)
 
             def insert(self, before=None, after=None):
                 if (before is None) + (after is None) != 1:
                     raise ValueError("Specify either before or after.")
+                if before is not None:
+                    table, region = self._region._selection()
+                    region[before, Ellipsis] = True
+                    rows, columns = numpy.nonzero(table)
+                    before = numpy.unique(rows)
+                if after is not None:
+                    table, region = self._region._selection()
+                    region[after, Ellipsis] = True
+                    rows, columns = numpy.nonzero(table)
+                    after = numpy.unique(rows)
                 self._region._table._insert_cell_data(before=before, after=after, axis=0)
 
 
@@ -3081,10 +3099,9 @@ class Table(object):
                 return self[row:row + rowspan, column:column + colspan]
 
             def __getitem__(self, selection):
-                table_selection = numpy.zeros(self._region._table._shape, dtype="bool")
-                region_selection = table_selection[self._region._row_begin:self._region._row_end, self._region._column_begin:self._region._column_end]
-                region_selection[selection] = True
-                return Table.CellReference(self._region._table, table_selection)
+                table, region = self._region._selection()
+                region[selection] = True
+                return Table.CellReference(self._region._table, table)
 
         def __init__(self, table, row_begin, row_end, column_begin, column_end):
             self._table = table
@@ -3092,6 +3109,11 @@ class Table(object):
             self._row_end = row_end
             self._column_begin = column_begin
             self._column_end = column_end
+
+        def _selection(self):
+            table = numpy.zeros(self._table._shape, dtype="bool")
+            region = table[self._row_begin:self._row_end, self._column_begin:self._column_end]
+            return table, region
 
         @property
         def cell(self):
@@ -3245,6 +3267,7 @@ class Table(object):
         if axis == 1:
             self._column_widths = numpy.delete(self._column_widths, indices)
 
+        # TODO: handle this better
         if axis == 0:
             self._row_gaps = self._row_gaps[len(indices):]
         if axis == 1:
@@ -3283,7 +3306,7 @@ class Table(object):
         self._cell_lstyle = numpy.insert(self._cell_lstyle, position, None, axis=axis)
         self._cell_region = numpy.insert(self._cell_region, position, self._cell_region[source], axis=axis)
         self._cell_show = numpy.insert(self._cell_show, position, True, axis=axis)
-        self._cell_style = numpy.insert(self._cell_style, position, None, axis=axis)
+        self._cell_style = numpy.insert(self._cell_style, position, self._cell_style[source], axis=axis)
         self._cell_title = numpy.insert(self._cell_title, position, None, axis=axis)
 
         self._hlines = numpy.insert(self._hlines, position, self._hlines[source], axis=axis)
@@ -3294,10 +3317,14 @@ class Table(object):
 
         if axis == 0:
             self._row_heights = numpy.insert(self._row_heights, position, 0)
-            self._row_gaps = numpy.insert(self._row_gaps, position, 0)
         if axis == 1:
             self._column_widths = numpy.insert(self._column_widths, position, 0)
-            self._column_gaps = numpy.insert(self._column_gaps, position, 0)
+
+        # TODO: handle this better
+        if axis == 0:
+            self._row_gaps = numpy.concatenate((self._row_gaps, numpy.zeros(len(position))))
+        if axis == 1:
+            self._column_gaps = numpy.concatenate((self._column_gaps, numpy.zeros(len(position))))
 
         self._shape = self._cell_align.shape
 

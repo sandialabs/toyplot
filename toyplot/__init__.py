@@ -270,6 +270,7 @@ def matrix(
         colorshow=False,
         width=None,
         height=None,
+        filename=None,
         ):
     """Convenience function to create a matrix visualization in a single call.
 
@@ -301,6 +302,7 @@ def matrix(
         rlocator=rlocator,
         blocator=blocator,
         colorshow=colorshow,
+        filename=filename,
         )
     return canvas, axes
 

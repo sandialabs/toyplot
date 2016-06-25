@@ -2947,6 +2947,8 @@ class Table(object):
         def merge(self):
             self._table._cell_group[self._selection] = numpy.unique(self._table._cell_group).max() + 1
 
+            self._table._cell_data[self._selection] = self._table._cell_data[self._selection][0]
+
             # TODO: Handle non-rectangular shapes here
             row_indices, column_indices = self._selection_coordinates()
             if row_indices.max() - row_indices.min() > 0:

@@ -482,6 +482,7 @@ def table(
         label=None,
         width=None,
         height=None,
+        filename=None,
         ):
     """Convenience function to create a table visualization in a single call.
 
@@ -504,5 +505,7 @@ def table(
         brows=brows,
         lcolumns=lcolumns,
         rcolumns=rcolumns,
-        label=label)
+        label=label,
+        filename=filename,
+        )
     return canvas, axes

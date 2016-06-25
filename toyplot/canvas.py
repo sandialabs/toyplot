@@ -811,7 +811,9 @@ class Canvas(object):
             rect=None,
             corner=None,
             grid=None,
-            gutter=50):
+            gutter=50,
+            filename=None,
+            ):
         """Add a set of table axes to the canvas.
 
         Parameters
@@ -853,7 +855,9 @@ class Canvas(object):
             brows=brows,
             lcolumns=lcolumns,
             rcolumns=rcolumns,
-            parent=self)
+            parent=self,
+            filename=filename,
+            )
 
         if data is not None:
             for j, (key, column) in enumerate(data.items()):

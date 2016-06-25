@@ -3175,12 +3175,15 @@ class Table(object):
             lcolumns,
             rcolumns,
             label,
-            parent):
+            parent,
+            filename,
+            ):
         self._xmin_range = xmin_range
         self._xmax_range = xmax_range
         self._ymin_range = ymin_range
         self._ymax_range = ymax_range
         self._parent = parent
+        self._filename = toyplot.require.filename(filename)
 
         self._shape = (trows + rows + brows, lcolumns + columns + rcolumns)
 

@@ -2937,6 +2937,7 @@ class Table(object):
                 parent=self._table._parent,
                 )
 
+            self._table._cell_data[self._selection] = None
             self._table._cell_axes[self._selection] = axes
             self._table._axes.append(axes)
             self._table._axes_padding.append(cell_padding)

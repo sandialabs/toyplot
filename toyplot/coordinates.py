@@ -2763,6 +2763,10 @@ class Table(object):
         style = _create_text_style_property()
         text = _create_text_property()
 
+    class BarPlot(object):
+        def __init__(self):
+            pass
+
     class CellReference(object):
         def __init__(self, table, selection):
             self._table = table
@@ -2869,6 +2873,42 @@ class Table(object):
                 padding=padding,
                 cell_padding=cell_padding,
                 )
+
+        def bars(
+                self,
+                ):
+            self._table._merge_cells(self._selection)
+
+            axes = toyplot.coordinates.Cartesian(
+                xmin_range=0, # These will be calculated for real in _finalize().
+                xmax_range=1,
+                ymin_range=0,
+                ymax_range=1,
+                xmin=None,
+                xmax=None,
+                ymin=None,
+                ymax=None,
+                aspect=None,
+                show=True,
+                xshow=True,
+                yshow=False,
+                label=None,
+                xlabel=None,
+                ylabel=None,
+                xticklocator=None,
+                yticklocator=None,
+                xscale="linear",
+                yscale="linear",
+                padding=5,
+                parent=self._table._parent,
+                )
+
+            self._table._cell_axes[self._selection] = axes
+            self._table._axes.append(axes)
+            self._table._axes_padding.append(0)
+
+            auto_plot = Table.BarPlot()
+            self._table._auto_plot[auto_plot] = axes
 
         def cartesian(
                 self,
@@ -3186,6 +3226,8 @@ class Table(object):
         self._axes = []
         self._axes_padding = []
 
+        self._auto_plot = {}
+
         self._label = Table.Label(
             label, style={"font-size": "14px", "baseline-shift": "100%"})
 
@@ -3447,4 +3489,22 @@ class Table(object):
                 axes.xmax_range = self._cell_right[column_max] - padding
                 axes.ymin_range = self._cell_top[row_min] + padding
                 axes.ymax_range = self._cell_bottom[row_max] - padding
+            else:
+                raise NotImplementedError("Unknown coordinate system: %s" % axes)
+
+        # Generate "auto plots".
+        for auto_plot, axes in self._auto_plot.items():
+            if isinstance(auto_plot, Table.BarPlot):
+                axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
+                left = -self._cell_top[axes_rows]
+                right = -self._cell_bottom[axes_rows]
+                series = self._cell_data[self._cell_axes == axes]
+
+                toyplot.log.debug(left)
+                toyplot.log.debug(right)
+                toyplot.log.debug(series)
+
+                axes.bars(left, right, series, along="y")
+            else:
+                raise NotImplementedError("Unknown plot: %s" % auto_plot)
 

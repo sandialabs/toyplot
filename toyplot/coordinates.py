@@ -2741,7 +2741,6 @@ class Numberline(object):
 ##########################################################################
 # Table
 
-
 class Table(object):
     """Experimental table coordinate system.
     """
@@ -2764,56 +2763,41 @@ class Table(object):
         style = _create_text_style_property()
         text = _create_text_property()
 
-
     class CellReference(object):
         def __init__(self, table, selection):
             self._table = table
             self._selection = selection
 
-
-        def _selection_coordinates(self):
-            selection = numpy.zeros(self._table._shape, dtype="bool")
-            selection[self._selection] = True
-            return numpy.nonzero(selection)
-
-
         def _set_align(self, value):
             self._table._cell_align[self._selection] = value
         align = property(fset=_set_align)
 
-
         def _set_angle(self, value):
             self._table._cell_angle[self._selection] = value
         angle = property(fset=_set_angle)
-
 
         def _set_bstyle(self, value): # pragma: no cover
             toyplot.log.warning("The bstyle property is deprecated, use style instead (use lstyle for text label styles).")
             self.style = value
         bstyle = property(fset=_set_bstyle)
 
-
         def _set_column_offset(self, value): # pragma: no cover
             toyplot.log.warning("The column_offset property is deprecated, use an lstyle with '-toyplot-anchor-shift' instead.")
             self.lstyle = {"-toyplot-anchor-shift": value}
         column_offset = property(fset=_set_column_offset)
 
-
         def _set_data(self, value):
             self._table._cell_data[self._selection] = numpy.array(value).flat
         data = property(fset=_set_data)
-
 
         def _set_format(self, value):
             self._table._cell_format[self._selection] = value
         format = property(fset=_set_format)
 
-
         def _set_height(self, value):
-            row_indices, column_indices = self._selection_coordinates()
+            row_indices, column_indices = self._table._selection_coordinates(self._selection)
             self._table._row_heights[row_indices] = toyplot.units.convert(value, "px", "px")
         height = property(fset=_set_height)
-
 
         def _set_lstyle(self, value):
             value = toyplot.require.style(value, allowed=toyplot.require.style.text)
@@ -2821,17 +2805,14 @@ class Table(object):
             self._table._cell_lstyle[self._selection] = value
         lstyle = property(fset=_set_lstyle)
 
-
         def _set_row_offset(self, value): # pragma: no cover
             toyplot.log.warning("The row_offset property is deprecated, use an lstyle with 'baseline-shift' instead.")
             self.lstyle = {"baseline-shift": value}
         row_offset = property(fset=_set_row_offset)
 
-
         def _set_show(self, value):
             self._table._cell_show[self._selection] = True if value else False
         show = property(fset=_set_show)
-
 
         def _set_style(self, value):
             value = toyplot.require.style(value, allowed=toyplot.require.style.fill)
@@ -2839,17 +2820,14 @@ class Table(object):
             self._table._cell_style[self._selection] = value
         style = property(fset=_set_style)
 
-
         def _set_title(self, value):
             self._table._cell_title[self._selection] = str(value)
         title = property(fset=_set_title)
 
-
         def _set_width(self, value):
-            row_indices, column_indices = self._selection_coordinates()
+            row_indices, column_indices = self._table._selection_coordinates(self._selection)
             self._table._column_widths[column_indices] = toyplot.units.convert(value, "px", "px")
         width = property(fset=_set_width)
-
 
         def axes(
                 self,
@@ -2944,37 +2922,26 @@ class Table(object):
 
             return axes
 
-
         def merge(self):
-            self._table._cell_group[self._selection] = numpy.unique(self._table._cell_group).max() + 1
-
+            self._table._merge_cells(self._selection)
             self._table._cell_data[self._selection] = self._table._cell_data[self._selection][0]
-
-            # TODO: Handle non-rectangular shapes here
-            row_indices, column_indices = self._selection_coordinates()
-            if row_indices.max() - row_indices.min() > 0:
-                self._table._hlines_show[row_indices.min() + 1 : row_indices.max() + 1, column_indices.min() : column_indices.max() + 1] = False
-            if column_indices.max() - column_indices.min() > 0:
-                self._table._vlines_show[row_indices.min() : row_indices.max() + 1, column_indices.min() + 1 : column_indices.max() + 1] = False
-
             return self
-
 
     class ColumnCellReference(CellReference):
         def __init__(self, table, selection):
             Table.CellReference.__init__(self, table, selection)
 
         def delete(self):
-            row_indices, column_indices = self._selection_coordinates()
-            self._table._delete_cell_data(column_indices, axis=1)
+            row_indices, column_indices = self._table._selection_coordinates(self._selection)
+            self._table._delete_cells(column_indices, axis=1)
 
     class RowCellReference(CellReference):
         def __init__(self, table, selection):
             Table.CellReference.__init__(self, table, selection)
 
         def delete(self):
-            row_indices, column_indices = self._selection_coordinates()
-            self._table._delete_cell_data(row_indices, axis=0)
+            row_indices, column_indices = self._table._selection_coordinates(self._selection)
+            self._table._delete_cells(row_indices, axis=0)
 
     class DistanceArrayReference(object):
         def __init__(self, array):
@@ -2985,7 +2952,6 @@ class Table(object):
 
         def __setitem__(self, key, value):
             self._array[key] = toyplot.units.convert(value, "px", "px")
-
 
     class GapReference(object):
         def __init__(self, row_gaps, column_gaps):
@@ -2999,7 +2965,6 @@ class Table(object):
         @property
         def columns(self):
             return Table.DistanceArrayReference(self._column_gaps)
-
 
     class GridReference(object):
         def __init__(self, table, hlines, vlines):
@@ -3061,8 +3026,7 @@ class Table(object):
                     region[Ellipsis, after] = True
                     rows, columns = numpy.nonzero(table)
                     after = numpy.unique(columns)
-                self._region._table._insert_cell_data(before=before, after=after, axis=1)
-
+                self._region._table._insert_cells(before=before, after=after, axis=1)
 
         class RowAccessor(object):
             def __init__(self, region):
@@ -3090,8 +3054,7 @@ class Table(object):
                     region[after, Ellipsis] = True
                     rows, columns = numpy.nonzero(table)
                     after = numpy.unique(rows)
-                self._region._table._insert_cell_data(before=before, after=after, axis=0)
-
+                self._region._table._insert_cells(before=before, after=after, axis=0)
 
         class CellAccessor(object):
             def __init__(self, region):
@@ -3161,7 +3124,6 @@ class Table(object):
         @property
         def shape(self):
             return (self._row_end - self._row_begin, self._column_end - self._column_begin)
-
 
     def __init__(
             self,
@@ -3239,15 +3201,28 @@ class Table(object):
         self._cell_lstyle[...] = lstyle
         self._cell_align[...] = "center"
 
-
     def _region_bounds(self, region):
         rows, columns = numpy.nonzero(self._cell_region == region)
         if len(rows) and len(columns):
             return (rows.min(), rows.max() + 1, columns.min(), columns.max() + 1)
         return (0, 0, 0, 0)
 
+    def _selection_coordinates(self, selection):
+        table_selection = numpy.zeros(self._shape, dtype="bool")
+        table_selection[selection] = True
+        return numpy.nonzero(table_selection)
 
-    def _delete_cell_data(self, indices, axis):
+    def _merge_cells(self, selection):
+        self._cell_group[selection] = numpy.unique(self._cell_group).max() + 1
+
+        # TODO: Handle non-rectangular shapes here
+        row_indices, column_indices = self._selection_coordinates(selection)
+        if row_indices.max() - row_indices.min() > 0:
+            self._hlines_show[row_indices.min() + 1 : row_indices.max() + 1, column_indices.min() : column_indices.max() + 1] = False
+        if column_indices.max() - column_indices.min() > 0:
+            self._vlines_show[row_indices.min() : row_indices.max() + 1, column_indices.min() + 1 : column_indices.max() + 1] = False
+
+    def _delete_cells(self, indices, axis):
         indices = numpy.unique(indices)
 
         self._cell_align = numpy.delete(self._cell_align, indices, axis=axis)
@@ -3281,7 +3256,7 @@ class Table(object):
 
         self._shape = self._cell_align.shape
 
-    def _insert_cell_data(self, before, after, axis):
+    def _insert_cells(self, before, after, axis):
         # Create a selection for the source row / column.
         source = numpy.zeros(self.shape[axis], dtype="bool")
         if before is not None:

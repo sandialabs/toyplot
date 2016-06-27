@@ -536,7 +536,6 @@ class Axis(object):
         def label(self):
             return self._label
 
-
     def __init__(
             self,
             label=None,
@@ -547,6 +546,7 @@ class Axis(object):
             tick_angle=0,
             tick_locator=None,
         ):
+        self._finalized = False
         self._data_max = None
         self._data_min = None
         self._display_max = None
@@ -656,6 +656,10 @@ class Axis(object):
             default_ticks_far,
             default_label_location,
         ):
+        if self._finalized:
+            return
+        self._finalized = True
+
         self._x1 = x1
         self._x2 = x2
         self._y1 = y1
@@ -740,6 +744,8 @@ class Cartesian(object):
             parent,
             xaxis=None,
             yaxis=None):
+        self._finalized = False
+
         self._xmin_range = xmin_range
         self._xmax_range = xmax_range
         self._ymin_range = ymin_range
@@ -880,6 +886,10 @@ class Cartesian(object):
             (self._expand_domain_range_bottom, bottom))
 
     def _finalize(self):
+        if self._finalized:
+            return
+        self._finalized = True
+
         # Begin with the implicit domain defined by our data.
         xdomain_min = self.x._display_min
         xdomain_max = self.x._display_max
@@ -2473,6 +2483,8 @@ class Numberline(object):
             parent,
         ):
 
+        self._finalized = False
+
         self._axis = Axis(
             show=show,
             label=label,
@@ -2679,6 +2691,10 @@ class Numberline(object):
         return mark
 
     def _finalize(self):
+        if self._finalized:
+            return
+        self._finalized = True
+
         # Begin with the implicit domain defined by our data.
         domain_min = self.axis._display_min
         domain_max = self.axis._display_max
@@ -2764,8 +2780,11 @@ class Table(object):
         text = _create_text_property()
 
     class BarPlot(object):
-        def __init__(self):
-            pass
+        def __init__(
+                self,
+                width,
+                ):
+            self._width = width
 
     class CellReference(object):
         def __init__(self, table, selection):
@@ -2907,7 +2926,9 @@ class Table(object):
             self._table._axes.append(axes)
             self._table._axes_padding.append(0)
 
-            auto_plot = Table.BarPlot()
+            auto_plot = Table.BarPlot(
+                width=0.5,
+                )
             self._table._auto_plot[auto_plot] = axes
 
         def cartesian(
@@ -3181,6 +3202,8 @@ class Table(object):
             parent,
             filename,
             ):
+        self._finalized = False
+
         self._xmin_range = xmin_range
         self._xmax_range = xmax_range
         self._ymin_range = ymin_range
@@ -3435,6 +3458,10 @@ class Table(object):
         return self.cells.row(row)
 
     def _finalize(self):
+        if self._finalized:
+            return
+        self._finalized = True
+
         # Collect explicit row heights, column widths, and gaps.
         row_heights = numpy.zeros(len(self._row_heights) + len(self._row_gaps))
         row_heights[0::2] = self._row_heights
@@ -3476,7 +3503,19 @@ class Table(object):
             column_boundaries[-1:],
             ))
 
-        # Assign ranges to embedded coordinate systems.
+        # Generate "auto plots".
+        for auto_plot, axes in self._auto_plot.items():
+            if isinstance(auto_plot, Table.BarPlot):
+                #axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
+                #left = -self._cell_top[axes_rows]
+                #right = -self._cell_bottom[axes_rows]
+                series = self._cell_data[self._cell_axes == axes][::-1]
+
+                axes.bars(series, along="y")
+            else:
+                raise NotImplementedError("Unknown plot: %s" % auto_plot)
+
+        # Assign ranges and finalize embedded coordinate systems.
         for axes, padding in zip(self._axes, self._axes_padding):
             axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
             row_min = axes_rows.min()
@@ -3492,19 +3531,5 @@ class Table(object):
             else:
                 raise NotImplementedError("Unknown coordinate system: %s" % axes)
 
-        # Generate "auto plots".
-        for auto_plot, axes in self._auto_plot.items():
-            if isinstance(auto_plot, Table.BarPlot):
-                axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
-                left = -self._cell_top[axes_rows]
-                right = -self._cell_bottom[axes_rows]
-                series = self._cell_data[self._cell_axes == axes]
-
-                toyplot.log.debug(left)
-                toyplot.log.debug(right)
-                toyplot.log.debug(series)
-
-                axes.bars(left, right, series, along="y")
-            else:
-                raise NotImplementedError("Unknown plot: %s" % auto_plot)
+            axes._finalize()
 

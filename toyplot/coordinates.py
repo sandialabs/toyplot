@@ -2789,10 +2789,27 @@ class Table(object):
             self._series = toyplot.require.value_in(series, ["columns", "rows"])
 
     class BarPlot(AutoPlot):
-        def __init__(self, series, width, padding):
+        def __init__(self,
+                baseline,
+                color,
+                filename,
+                opacity,
+                padding,
+                series,
+                style,
+                title,
+                width,
+                ):
             Table.AutoPlot.__init__(self, series)
-            self._width = toyplot.require.scalar(width)
+
+            self._baseline = baseline
+            self._color = color
+            self._filename = filename
+            self._opacity = opacity
             self._padding = toyplot.units.convert(padding, "px", "px")
+            self._style = style
+            self._title = title
+            self._width = toyplot.require.scalar(width)
 
 
     class CellReference(object):
@@ -2904,9 +2921,15 @@ class Table(object):
 
         def bars(
                 self,
-                series="columns",
-                width=0.66,
+                baseline="stacked",
+                color=None,
+                filename=None,
+                opacity=1.0,
                 padding=5,
+                series="columns",
+                style=None,
+                title=None,
+                width=0.66,
                 ):
             self._table._merge_cells(self._selection)
 
@@ -2921,7 +2944,7 @@ class Table(object):
                 ymax=None,
                 aspect=None,
                 show=True,
-                xshow=True,
+                xshow=False,
                 yshow=False,
                 label=None,
                 xlabel=None,
@@ -2939,9 +2962,15 @@ class Table(object):
             self._table._axes_padding.append(0)
 
             auto_plot = Table.BarPlot(
-                series=series,
-                width=width,
+                baseline=baseline,
+                color=color,
+                filename=filename,
+                opacity=opacity,
                 padding=padding,
+                series=series,
+                style=style,
+                title=title,
+                width=width,
                 )
             self._table._auto_plot[auto_plot] = axes
 
@@ -3532,6 +3561,7 @@ class Table(object):
                 cell_indices = numpy.unique(rows)
                 along = "y"
                 along_axis = axes.y
+                series = self._cell_data[self._cell_axes == axes].reshape(shape).astype("float64")
             elif auto_plot._series == "rows":
                 shape = (column_max + 1 - column_min, row_max + 1 - row_min)
                 cell_begin = self._cell_left
@@ -3539,8 +3569,7 @@ class Table(object):
                 cell_indices = numpy.unique(columns)
                 along = "x"
                 along_axis = axes.x
-
-            series = self._cell_data[self._cell_axes == axes].reshape(shape)
+                series = self._cell_data[self._cell_axes == axes].reshape(shape).astype("float64")[:,::-1]
 
             if isinstance(auto_plot, Table.BarPlot):
                 width = min(0.5 - numpy.finfo("float32").eps, 0.5 * auto_plot._width)
@@ -3563,7 +3592,22 @@ class Table(object):
                 projection = toyplot.projection.Piecewise(segments)
                 along_axis._scale = projection
 
-                axes.bars(begin, end, series, along=along)
+                color = auto_plot._color
+                if isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
+                    color = (series, color[1])
+
+                axes.bars(
+                    begin,
+                    end,
+                    series,
+                    along=along,
+                    baseline=auto_plot._baseline,
+                    color=color,
+                    filename=auto_plot._filename,
+                    opacity=auto_plot._opacity,
+                    style=auto_plot._style,
+                    title=auto_plot._title,
+                    )
             else:
                 raise NotImplementedError("Unknown plot: %s" % auto_plot)
 

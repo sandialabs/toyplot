@@ -24,7 +24,16 @@ def _in_range(a, x, b):
     return result
 
 
-class Piecewise(object):
+class Projection(object):
+    """Base class for objects that can map from domain to range and range to domain."""
+    def __call__(self, domain_values):
+        raise NotImplementedError()
+
+    def inverse(self, range_values):
+        raise NotImplementedError()
+
+
+class Piecewise(Projection):
     """Compute a projection from an arbitrary collection of linear and log segments."""
     class Segment(object):
         class Container(object):

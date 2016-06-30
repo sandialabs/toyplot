@@ -696,7 +696,6 @@ class Axis(object):
 # Cartesian
 
 class Cartesian(object):
-
     """Standard two-dimensional Cartesian coordinate system.
 
     Do not create Cartesian instances directly.  Use factory methods such
@@ -2760,7 +2759,10 @@ class Numberline(object):
 # Table
 
 class Table(object):
-    """Experimental table coordinate system.
+    """Row and column-based table coordinate system.
+
+    Do not create Table instances directly.  Use factory methods such
+    as :meth:`toyplot.canvas.Canvas.table` instead.
     """
     class Label(object):
         def __init__(self, text, style):
@@ -2781,12 +2783,19 @@ class Table(object):
         style = _create_text_style_property()
         text = _create_text_property()
 
-    class BarPlot(object):
-        def __init__(
-                self,
-                width,
-                ):
-            self._width = width
+
+    class AutoPlot(object):
+        def __init__(self, series):
+            self._series = toyplot.require.value_in(series, ["columns", "rows"])
+
+        @property
+        def series(self):
+            return self._series
+
+    class BarPlot(AutoPlot):
+        def __init__(self, series):
+            Table.AutoPlot.__init__(self, series)
+
 
     class CellReference(object):
         def __init__(self, table, selection):
@@ -2897,6 +2906,7 @@ class Table(object):
 
         def bars(
                 self,
+                series="columns",
                 ):
             self._table._merge_cells(self._selection)
 
@@ -2911,7 +2921,7 @@ class Table(object):
                 ymax=None,
                 aspect=None,
                 show=True,
-                xshow=True,
+                xshow=False,
                 yshow=False,
                 label=None,
                 xlabel=None,
@@ -2929,7 +2939,7 @@ class Table(object):
             self._table._axes_padding.append(0)
 
             auto_plot = Table.BarPlot(
-                width=0.5,
+                series=series,
                 )
             self._table._auto_plot[auto_plot] = axes
 
@@ -3507,35 +3517,50 @@ class Table(object):
 
         # Generate "auto plots".
         for auto_plot, axes in self._auto_plot.items():
-            axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
-            row_min = axes_rows.min()
-            row_max = axes_rows.max()
-            column_min = axes_columns.min()
-            column_max = axes_columns.max()
-            plot_shape = (row_max + 1 - row_min, column_max + 1 - column_min)
+            rows, columns = numpy.nonzero(self._cell_axes == axes)
+            row_min = rows.min()
+            row_max = rows.max()
+            column_min = columns.min()
+            column_max = columns.max()
+
+            if auto_plot.series == "columns":
+                shape = (row_max + 1 - row_min, column_max + 1 - column_min)
+                cell_begin = self._cell_top
+                cell_end = self._cell_bottom
+                cell_indices = numpy.unique(rows)
+                along = "y"
+                along_axis = axes.y
+            elif auto_plot.series == "rows":
+                shape = (column_max + 1 - column_min, row_max + 1 - row_min)
+                cell_begin = self._cell_left
+                cell_end = self._cell_right
+                cell_indices = numpy.unique(columns)
+                along = "x"
+                along_axis = axes.x
+
+            series = self._cell_data[self._cell_axes == axes].reshape(shape)
 
             if isinstance(auto_plot, Table.BarPlot):
-                series = self._cell_data[self._cell_axes == axes].reshape(plot_shape)
-                left = numpy.arange(len(series)) - 0.33
-                right = numpy.arange(len(series)) + 0.33
+                begin = numpy.arange(shape[0]) - 0.5 + numpy.finfo("float32").eps
+                end = numpy.arange(shape[0]) + 0.5 - numpy.finfo("float32").eps
 
                 segments = []
-                for index, row in enumerate(numpy.unique(axes_rows)):
+                for index, cell_index in enumerate(cell_indices):
                     segments.append(toyplot.projection.Piecewise.Segment(
                         "linear",
                         index - 0.5,
                         index - 0.5,
                         index + 0.5,
                         index + 0.5,
-                        self._cell_top[row],
-                        self._cell_top[row],
-                        self._cell_bottom[row],
-                        self._cell_bottom[row],
+                        cell_begin[cell_index],
+                        cell_begin[cell_index],
+                        cell_end[cell_index],
+                        cell_end[cell_index],
                         ))
                 projection = toyplot.projection.Piecewise(segments)
-                axes.y._scale = projection
+                along_axis._scale = projection
 
-                axes.bars(left, right, series, along="y")
+                axes.bars(begin, end, series, along=along)
             else:
                 raise NotImplementedError("Unknown plot: %s" % auto_plot)
 

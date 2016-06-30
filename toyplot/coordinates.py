@@ -3507,13 +3507,19 @@ class Table(object):
 
         # Generate "auto plots".
         for auto_plot, axes in self._auto_plot.items():
+            axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
+            row_min = axes_rows.min()
+            row_max = axes_rows.max()
+            column_min = axes_columns.min()
+            column_max = axes_columns.max()
+            plot_shape = (row_max + 1 - row_min, column_max + 1 - column_min)
+
             if isinstance(auto_plot, Table.BarPlot):
-                series = self._cell_data[self._cell_axes == axes][::-1]
+                series = self._cell_data[self._cell_axes == axes].reshape(plot_shape)
                 left = numpy.arange(len(series)) - 0.33
                 right = numpy.arange(len(series)) + 0.33
 
                 segments = []
-                axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
                 for index, row in enumerate(numpy.unique(axes_rows)):
                     segments.append(toyplot.projection.Piecewise.Segment(
                         "linear",

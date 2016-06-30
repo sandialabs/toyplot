@@ -2812,6 +2812,39 @@ class Table(object):
             self._width = toyplot.require.scalar(width)
 
 
+    class LinePlot(AutoPlot):
+        def __init__(self,
+                area,
+                color,
+                filename,
+                marker,
+                mfill,
+                mlstyle,
+                mopacity,
+                mstyle,
+                opacity,
+                series,
+                size,
+                stroke_width,
+                style,
+                title,
+                ):
+            Table.AutoPlot.__init__(self, series)
+            self._area = area
+            self._color = color
+            self._filename = filename
+            self._marker = marker
+            self._mfill = mfill
+            self._mlstyle = mlstyle
+            self._mopacity = mopacity
+            self._mstyle = mstyle
+            self._opacity = opacity
+            self._size = size
+            self._stroke_width = stroke_width
+            self._style = style
+            self._title = title
+
+
     class CellReference(object):
         def __init__(self, table, selection):
             self._table = table
@@ -3030,6 +3063,73 @@ class Table(object):
             self._table._merge_cells(self._selection)
             self._table._cell_data[self._selection] = self._table._cell_data[self._selection][0]
             return self
+
+        def plot(
+                self,
+                area=None,
+                color=None,
+                filename=None,
+                marker=None,
+                mfill=None,
+                mlstyle=None,
+                mopacity=1.0,
+                mstyle=None,
+                mtitle=None,
+                opacity=1.0,
+                series="columns",
+                size=None,
+                stroke_width=2.0,
+                style=None,
+                title=None,
+                ):
+            self._table._merge_cells(self._selection)
+
+            axes = toyplot.coordinates.Cartesian(
+                xmin_range=0, # These will be calculated for real in _finalize().
+                xmax_range=1,
+                ymin_range=0,
+                ymax_range=1,
+                xmin=None,
+                xmax=None,
+                ymin=None,
+                ymax=None,
+                aspect=None,
+                show=True,
+                xshow=False,
+                yshow=False,
+                label=None,
+                xlabel=None,
+                ylabel=None,
+                xticklocator=None,
+                yticklocator=None,
+                xscale="linear",
+                yscale="linear",
+                padding=5,
+                parent=self._table._parent,
+                )
+
+            self._table._cell_axes[self._selection] = axes
+            self._table._axes.append(axes)
+            self._table._axes_padding.append(0)
+
+            auto_plot = Table.LinePlot(
+                area=area,
+                color=color,
+                filename=filename,
+                marker=marker,
+                mfill=mfill,
+                mlstyle=mlstyle,
+                mopacity=mopacity,
+                mstyle=mstyle,
+                opacity=opacity,
+                series=series,
+                size=size,
+                stroke_width=stroke_width,
+                style=style,
+                title=title,
+                )
+            self._table._auto_plot[auto_plot] = axes
+
 
     class ColumnCellReference(CellReference):
         def __init__(self, table, selection):
@@ -3655,6 +3755,48 @@ class Table(object):
                     color=color,
                     filename=auto_plot._filename,
                     opacity=auto_plot._opacity,
+                    style=auto_plot._style,
+                    title=auto_plot._title,
+                    )
+            elif isinstance(auto_plot, Table.LinePlot):
+                segments = []
+                for index, cell_index in enumerate(cell_indices):
+                    segments.append(toyplot.projection.Piecewise.Segment(
+                        "linear",
+                        index - 0.5,
+                        index - 0.5,
+                        index + 0.5,
+                        index + 0.5,
+                        cell_begin[cell_index],
+                        cell_begin[cell_index],
+                        cell_end[cell_index],
+                        cell_end[cell_index],
+                        ))
+                projection = toyplot.projection.Piecewise(segments)
+                along_axis._scale = projection
+
+                color = auto_plot._color
+                if isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
+                    color = (series, color[1])
+
+                mfill = auto_plot._mfill
+                if isinstance(mfill, tuple) and len(mfill) == 2 and mfill[0] == "datum":
+                    mfill = (series, mfill[1])
+
+                axes.plot(
+                    series,
+                    along=along,
+                    area=auto_plot._area,
+                    color=color,
+                    filename=auto_plot._filename,
+                    marker=auto_plot._marker,
+                    mfill=mfill,
+                    mlstyle=auto_plot._mlstyle,
+                    mopacity=auto_plot._mopacity,
+                    mstyle=auto_plot._mstyle,
+                    opacity=auto_plot._opacity,
+                    size=auto_plot._size,
+                    stroke_width=auto_plot._stroke_width,
                     style=auto_plot._style,
                     title=auto_plot._title,
                     )

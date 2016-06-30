@@ -3035,6 +3035,31 @@ class Table(object):
         def __init__(self, table, selection):
             Table.CellReference.__init__(self, table, selection)
 
+        def bars(
+                self,
+                baseline="stacked",
+                color=None,
+                filename=None,
+                opacity=1.0,
+                padding=5,
+                series="columns",
+                style=None,
+                title=None,
+                width=0.66,
+                ):
+            return Table.CellReference.bars(
+                self,
+                baseline=baseline,
+                color=color,
+                filename=filename,
+                opacity=opacity,
+                padding=padding,
+                series=series,
+                style=style,
+                title=title,
+                width=width,
+                )
+
         def delete(self):
             row_indices, column_indices = self._table._selection_coordinates(self._selection)
             self._table._delete_cells(column_indices, axis=1)
@@ -3042,6 +3067,31 @@ class Table(object):
     class RowCellReference(CellReference):
         def __init__(self, table, selection):
             Table.CellReference.__init__(self, table, selection)
+
+        def bars(
+                self,
+                baseline="stacked",
+                color=None,
+                filename=None,
+                opacity=1.0,
+                padding=5,
+                series="rows",
+                style=None,
+                title=None,
+                width=0.66,
+                ):
+            return Table.CellReference.bars(
+                self,
+                baseline=baseline,
+                color=color,
+                filename=filename,
+                opacity=opacity,
+                padding=padding,
+                series=series,
+                style=style,
+                title=title,
+                width=width,
+                )
 
         def delete(self):
             row_indices, column_indices = self._table._selection_coordinates(self._selection)

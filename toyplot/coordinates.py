@@ -2788,13 +2788,11 @@ class Table(object):
         def __init__(self, series):
             self._series = toyplot.require.value_in(series, ["columns", "rows"])
 
-        @property
-        def series(self):
-            return self._series
-
     class BarPlot(AutoPlot):
-        def __init__(self, series):
+        def __init__(self, series, width, padding):
             Table.AutoPlot.__init__(self, series)
+            self._width = toyplot.require.scalar(width)
+            self._padding = toyplot.units.convert(padding, "px", "px")
 
 
     class CellReference(object):
@@ -2907,6 +2905,8 @@ class Table(object):
         def bars(
                 self,
                 series="columns",
+                width=0.66,
+                padding=5,
                 ):
             self._table._merge_cells(self._selection)
 
@@ -2921,7 +2921,7 @@ class Table(object):
                 ymax=None,
                 aspect=None,
                 show=True,
-                xshow=False,
+                xshow=True,
                 yshow=False,
                 label=None,
                 xlabel=None,
@@ -2940,6 +2940,8 @@ class Table(object):
 
             auto_plot = Table.BarPlot(
                 series=series,
+                width=width,
+                padding=padding,
                 )
             self._table._auto_plot[auto_plot] = axes
 
@@ -3523,14 +3525,14 @@ class Table(object):
             column_min = columns.min()
             column_max = columns.max()
 
-            if auto_plot.series == "columns":
+            if auto_plot._series == "columns":
                 shape = (row_max + 1 - row_min, column_max + 1 - column_min)
                 cell_begin = self._cell_top
                 cell_end = self._cell_bottom
                 cell_indices = numpy.unique(rows)
                 along = "y"
                 along_axis = axes.y
-            elif auto_plot.series == "rows":
+            elif auto_plot._series == "rows":
                 shape = (column_max + 1 - column_min, row_max + 1 - row_min)
                 cell_begin = self._cell_left
                 cell_end = self._cell_right
@@ -3541,8 +3543,9 @@ class Table(object):
             series = self._cell_data[self._cell_axes == axes].reshape(shape)
 
             if isinstance(auto_plot, Table.BarPlot):
-                begin = numpy.arange(shape[0]) - 0.5 + numpy.finfo("float32").eps
-                end = numpy.arange(shape[0]) + 0.5 - numpy.finfo("float32").eps
+                width = min(0.5 - numpy.finfo("float32").eps, 0.5 * auto_plot._width)
+                begin = numpy.arange(shape[0]) - width
+                end = numpy.arange(shape[0]) + width
 
                 segments = []
                 for index, cell_index in enumerate(cell_indices):
@@ -3552,10 +3555,10 @@ class Table(object):
                         index - 0.5,
                         index + 0.5,
                         index + 0.5,
-                        cell_begin[cell_index],
-                        cell_begin[cell_index],
-                        cell_end[cell_index],
-                        cell_end[cell_index],
+                        cell_begin[cell_index] + auto_plot._padding,
+                        cell_begin[cell_index] + auto_plot._padding,
+                        cell_end[cell_index] - auto_plot._padding,
+                        cell_end[cell_index] - auto_plot._padding,
                         ))
                 projection = toyplot.projection.Piecewise(segments)
                 along_axis._scale = projection

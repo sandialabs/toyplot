@@ -2965,6 +2965,7 @@ class Table(object):
                 width=0.66,
                 ):
             self._table._merge_cells(self._selection)
+            self._table._cell_format[self._selection] = toyplot.format.NullFormatter()
 
             axes = toyplot.coordinates.Cartesian(
                 xmin_range=0, # These will be calculated for real in _finalize().
@@ -3083,6 +3084,7 @@ class Table(object):
                 title=None,
                 ):
             self._table._merge_cells(self._selection)
+            self._table._cell_format[self._selection] = toyplot.format.NullFormatter()
 
             axes = toyplot.coordinates.Cartesian(
                 xmin_range=0, # These will be calculated for real in _finalize().

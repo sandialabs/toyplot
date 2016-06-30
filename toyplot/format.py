@@ -30,6 +30,12 @@ class Formatter(object):
         raise NotImplementedError() # pragma: no cover
 
 
+class NullFormatter(Formatter):
+    """Do-nothing formatter that returns empty strings."""
+    def format(self, value):
+        return "", "", ""
+
+
 class DefaultFormatter(Formatter):
     """Formats data using its default string representation."""
     def format(self, value):

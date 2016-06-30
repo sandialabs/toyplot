@@ -268,6 +268,8 @@ def _create_text_style_property():
 
 
 def _create_projection(scale, domain_min, domain_max, range_min, range_max):
+    if isinstance(scale, toyplot.projection.Projection):
+        return scale
     if scale == "linear":
         return toyplot.projection.linear(domain_min, domain_max, range_min, range_max)
     scale, base = scale
@@ -3506,12 +3508,28 @@ class Table(object):
         # Generate "auto plots".
         for auto_plot, axes in self._auto_plot.items():
             if isinstance(auto_plot, Table.BarPlot):
-                #axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
-                #left = -self._cell_top[axes_rows]
-                #right = -self._cell_bottom[axes_rows]
                 series = self._cell_data[self._cell_axes == axes][::-1]
+                left = numpy.arange(len(series)) - 0.33
+                right = numpy.arange(len(series)) + 0.33
 
-                axes.bars(series, along="y")
+                segments = []
+                axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
+                for index, row in enumerate(numpy.unique(axes_rows)):
+                    segments.append(toyplot.projection.Piecewise.Segment(
+                        "linear",
+                        index - 0.5,
+                        index - 0.5,
+                        index + 0.5,
+                        index + 0.5,
+                        self._cell_top[row],
+                        self._cell_top[row],
+                        self._cell_bottom[row],
+                        self._cell_bottom[row],
+                        ))
+                projection = toyplot.projection.Piecewise(segments)
+                axes.y._scale = projection
+
+                axes.bars(left, right, series, along="y")
             else:
                 raise NotImplementedError("Unknown plot: %s" % auto_plot)
 

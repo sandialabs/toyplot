@@ -624,7 +624,7 @@ def _render(canvas, context):
         id=context.get_id(canvas))
 
     for child in canvas._children:
-        _render(canvas, child, context.copy(parent=svg_xml))
+        _render(canvas, child._finalize(), context.copy(parent=svg_xml))
 
     interactive_xml = xml.SubElement(
         context.parent,
@@ -1253,8 +1253,6 @@ def _render(canvas, axis, context):
 
 @dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Numberline, _RenderContext)
 def _render(canvas, numberline, context):
-    numberline._finalize()
-
     context.add_coordinate_system(numberline)
 
     numberline_xml = xml.SubElement(context.parent, "g", id=context.get_id(
@@ -1289,7 +1287,7 @@ def _render(canvas, numberline, context):
         )
 
     for child in numberline._children:
-        _render(numberline, child, context.copy(parent=children_xml))
+        _render(numberline, child._finalize(), context.copy(parent=children_xml))
 
     _render(canvas, numberline.axis, context.copy(parent=numberline_xml))
 
@@ -1488,7 +1486,7 @@ def _render(canvas, axes, context):
         )
 
     for child in axes._children:
-        _render(axes, child, context.copy(parent=children_xml))
+        _render(axes, child._finalize(), context.copy(parent=children_xml))
 
     if axes._show:
         _render(canvas, axes.x, context.copy(parent=cartesian_xml))
@@ -1638,7 +1636,7 @@ def _render(canvas, axes, context):
 
     # Render children.
     for child in axes._axes:
-        _render(axes._parent, child, context.copy(parent=axes_xml))
+        _render(axes._parent, child._finalize(), context.copy(parent=axes_xml))
 
     # Render grid lines.
     row_boundaries = axes._row_boundaries

@@ -319,6 +319,9 @@ class Map(object):
     def __init__(self, domain_min, domain_max):
         self._domain = toyplot.color.Map.DomainHelper(domain_min, domain_max)
 
+    def _finalize(self):
+        return self
+
     @property
     def domain(self):
         return self._domain

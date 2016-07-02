@@ -22,6 +22,9 @@ class Mark(object):
         self._annotation = False
         self.annotation = annotation
 
+    def _finalize(self):
+        return self
+
     @property
     def annotation(self):
         return self._annotation

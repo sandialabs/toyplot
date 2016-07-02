@@ -548,7 +548,7 @@ class Axis(object):
             tick_angle=0,
             tick_locator=None,
         ):
-        self._finalized = False
+        self._finalized = None
         self._data_max = None
         self._data_min = None
         self._display_max = None
@@ -658,38 +658,38 @@ class Axis(object):
             default_ticks_far,
             default_label_location,
         ):
-        if self._finalized:
-            return
-        self._finalized = True
+        if self._finalized is None:
+            self._x1 = x1
+            self._x2 = x2
+            self._y1 = y1
+            self._y2 = y2
+            self._offset = offset
+            self._domain_min = domain_min
+            self._domain_max = domain_max
+            self._tick_locations = tick_locations
+            self._tick_labels = tick_labels
+            self._tick_titles = tick_titles
+            self._tick_location = self.ticks.location if self.ticks.location is not None else default_tick_location
+            self._ticks_near = self.ticks.near if self.ticks.near is not None else default_ticks_near
+            self._ticks_far = self.ticks.far if self.ticks.far is not None else default_ticks_far
+            self._tick_labels_location = self._tick_location
+            self._tick_labels_offset = self.ticks.labels.offset if self.ticks.labels.offset is not None else 6
+            self._label_location = self.label.location if self.label.location is not None else default_label_location
+            self._label_offset = self.label.offset if self.label.offset is not None else 22
+            self._interactive_coordinates_location = self.interactive.coordinates.location if self.interactive.coordinates.location is not None else _opposite_location(self._tick_labels_location)
 
-        self._x1 = x1
-        self._x2 = x2
-        self._y1 = y1
-        self._y2 = y2
-        self._offset = offset
-        self._domain_min = domain_min
-        self._domain_max = domain_max
-        self._tick_locations = tick_locations
-        self._tick_labels = tick_labels
-        self._tick_titles = tick_titles
-        self._tick_location = self.ticks.location if self.ticks.location is not None else default_tick_location
-        self._ticks_near = self.ticks.near if self.ticks.near is not None else default_ticks_near
-        self._ticks_far = self.ticks.far if self.ticks.far is not None else default_ticks_far
-        self._tick_labels_location = self._tick_location
-        self._tick_labels_offset = self.ticks.labels.offset if self.ticks.labels.offset is not None else 6
-        self._label_location = self.label.location if self.label.location is not None else default_label_location
-        self._label_offset = self.label.offset if self.label.offset is not None else 22
-        self._interactive_coordinates_location = self.interactive.coordinates.location if self.interactive.coordinates.location is not None else _opposite_location(self._tick_labels_location)
+            endpoints = numpy.row_stack(((x1, y1), (x2, y2)))
+            length = numpy.linalg.norm(endpoints[1] - endpoints[0])
+            self.projection = _create_projection(
+                scale=self.scale,
+                domain_min=domain_min,
+                domain_max=domain_max,
+                range_min=0.0,
+                range_max=length,
+                )
 
-        endpoints = numpy.row_stack(((x1, y1), (x2, y2)))
-        length = numpy.linalg.norm(endpoints[1] - endpoints[0])
-        self.projection = _create_projection(
-            scale=self.scale,
-            domain_min=domain_min,
-            domain_max=domain_max,
-            range_min=0.0,
-            range_max=length,
-            )
+            self._finalized = self
+        return self._finalized
 
 
 ##########################################################################
@@ -745,7 +745,7 @@ class Cartesian(object):
             parent,
             xaxis=None,
             yaxis=None):
-        self._finalized = False
+        self._finalized = None
 
         self._xmin_range = xmin_range
         self._xmax_range = xmax_range
@@ -887,217 +887,216 @@ class Cartesian(object):
             (self._expand_domain_range_bottom, bottom))
 
     def _finalize(self):
-        if self._finalized:
-            return
-        self._finalized = True
+        if self._finalized is None:
+            # Begin with the implicit domain defined by our data.
+            xdomain_min = self.x._display_min
+            xdomain_max = self.x._display_max
+            ydomain_min = self.y._display_min
+            ydomain_max = self.y._display_max
 
-        # Begin with the implicit domain defined by our data.
-        xdomain_min = self.x._display_min
-        xdomain_max = self.x._display_max
-        ydomain_min = self.y._display_min
-        ydomain_max = self.y._display_max
+            # If there is no implicit domain (we don't have any data), default
+            # to the origin.
+            if xdomain_min is None:
+                xdomain_min = 0
+            if xdomain_max is None:
+                xdomain_max = 0
+            if ydomain_min is None:
+                ydomain_min = 0
+            if ydomain_max is None:
+                ydomain_max = 0
 
-        # If there is no implicit domain (we don't have any data), default
-        # to the origin.
-        if xdomain_min is None:
-            xdomain_min = 0
-        if xdomain_max is None:
-            xdomain_max = 0
-        if ydomain_min is None:
-            ydomain_min = 0
-        if ydomain_max is None:
-            ydomain_max = 0
+            # Ensure that the domain is never empty.
+            if xdomain_min == xdomain_max:
+                xdomain_min -= 0.5
+                xdomain_max += 0.5
+            if ydomain_min == ydomain_max:
+                ydomain_min -= 0.5
+                ydomain_max += 0.5
 
-        # Ensure that the domain is never empty.
-        if xdomain_min == xdomain_max:
-            xdomain_min -= 0.5
-            xdomain_max += 0.5
-        if ydomain_min == ydomain_max:
-            ydomain_min -= 0.5
-            ydomain_max += 0.5
+            # Optionally expand the domain in range-space (used to make room for text).
+            if self._expand_domain_range_x is not None:
+                x_projection = _create_projection(
+                    self.x.scale,
+                    domain_min=xdomain_min,
+                    domain_max=xdomain_max,
+                    range_min=self._xmin_range,
+                    range_max=self._xmax_range,
+                    )
+                y_projection = _create_projection(
+                    self.y.scale,
+                    domain_min=ydomain_min,
+                    domain_max=ydomain_max,
+                    range_min=self._ymax_range,
+                    range_max=self._ymin_range,
+                    )
 
-        # Optionally expand the domain in range-space (used to make room for text).
-        if self._expand_domain_range_x is not None:
-            x_projection = _create_projection(
-                self.x.scale,
+                range_x = x_projection(self._expand_domain_range_x)
+                range_y = y_projection(self._expand_domain_range_y)
+                range_left = range_x + self._expand_domain_range_left
+                range_right = range_x + self._expand_domain_range_right
+                range_top = range_y + self._expand_domain_range_top
+                range_bottom = range_y + self._expand_domain_range_bottom
+
+                domain_left = x_projection.inverse(range_left)
+                domain_right = x_projection.inverse(range_right)
+                domain_top = y_projection.inverse(range_top)
+                domain_bottom = y_projection.inverse(range_bottom)
+
+                xdomain_min = _null_min(domain_left.min(), xdomain_min)
+                xdomain_max = _null_max(domain_right.max(), xdomain_max)
+                ydomain_min = _null_min(domain_bottom.min(), ydomain_min)
+                ydomain_max = _null_max(domain_top.max(), ydomain_max)
+
+            # Optionally expand the domain to match the aspect ratio of the range.
+            if self._aspect == "fit-range":
+                dwidth = (xdomain_max - xdomain_min)
+                dheight = (ydomain_max - ydomain_min)
+                daspect = dwidth / dheight
+                raspect = (self._xmax_range - self._xmin_range) / (self._ymax_range - self._ymin_range)
+
+                if daspect < raspect:
+                    offset = ((dwidth * (raspect / daspect)) - dwidth) * 0.5
+                    xdomain_min -= offset
+                    xdomain_max += offset
+                elif daspect > raspect:
+                    offset = ((dheight * (daspect / raspect)) - dheight) * 0.5
+                    ydomain_min -= offset
+                    ydomain_max += offset
+
+            # Allow users to override the domain.
+            if self.x.domain.min is not None:
+                xdomain_min = self.x.domain.min
+            if self.x.domain.max is not None:
+                xdomain_max = self.x.domain.max
+            if self.y.domain.min is not None:
+                ydomain_min = self.y.domain.min
+            if self.y.domain.max is not None:
+                ydomain_max = self.y.domain.max
+
+            # Ensure that the domain is never empty.
+            if xdomain_min == xdomain_max:
+                xdomain_min -= 0.5
+                xdomain_max += 0.5
+            if ydomain_min == ydomain_max:
+                ydomain_min -= 0.5
+                ydomain_max += 0.5
+
+            # Calculate tick locations and labels.
+            xtick_locations = []
+            xtick_labels = []
+            xtick_titles = []
+            if self.show and self.x.show:
+                xtick_locations, xtick_labels, xtick_titles = self.x._locator().ticks(xdomain_min, xdomain_max)
+            ytick_locations = []
+            ytick_labels = []
+            ytick_titles = []
+            if self.show and self.y.show:
+                ytick_locations, ytick_labels, ytick_titles = self.y._locator().ticks(ydomain_min, ydomain_max)
+
+            # Allow tick locations to grow (never shrink) the domain.
+            if len(xtick_locations):
+                xdomain_min = numpy.amin((xdomain_min, xtick_locations[0]))
+                xdomain_max = numpy.amax((xdomain_max, xtick_locations[-1]))
+            if len(ytick_locations):
+                ydomain_min = numpy.amin((ydomain_min, ytick_locations[0]))
+                ydomain_max = numpy.amax((ydomain_max, ytick_locations[-1]))
+
+            # Create projections for each axis.
+            self._x_projection = _create_projection(
+                scale=self.x.scale,
                 domain_min=xdomain_min,
                 domain_max=xdomain_max,
                 range_min=self._xmin_range,
                 range_max=self._xmax_range,
                 )
-            y_projection = _create_projection(
-                self.y.scale,
+            self._y_projection = _create_projection(
+                scale=self.y.scale,
                 domain_min=ydomain_min,
                 domain_max=ydomain_max,
                 range_min=self._ymax_range,
                 range_max=self._ymin_range,
                 )
 
-            range_x = x_projection(self._expand_domain_range_x)
-            range_y = y_projection(self._expand_domain_range_y)
-            range_left = range_x + self._expand_domain_range_left
-            range_right = range_x + self._expand_domain_range_right
-            range_top = range_y + self._expand_domain_range_top
-            range_bottom = range_y + self._expand_domain_range_bottom
+            # Finalize positions for all axis components.
+            if self.x.spine.position == "low":
+                x_offset = self.padding
+                x_spine_y = self._ymax_range
+                x_ticks_near = 0
+                x_ticks_far = 5
+                x_tick_location = "below"
+                x_label_location = "below"
+            elif self.x.spine.position == "high":
+                x_offset = -self.padding
+                x_spine_y = self._ymin_range
+                x_ticks_near = 5
+                x_ticks_far = 0
+                x_tick_location = "above"
+                x_label_location = "above"
+            else:
+                x_offset = 0
+                x_spine_y = self._y_projection(self.x.spine.position)
+                x_ticks_near = 3
+                x_ticks_far = 3
+                x_tick_location = "below"
+                x_label_location = "below"
 
-            domain_left = x_projection.inverse(range_left)
-            domain_right = x_projection.inverse(range_right)
-            domain_top = y_projection.inverse(range_top)
-            domain_bottom = y_projection.inverse(range_bottom)
+            if self.y.spine._position == "low":
+                y_offset = -self.padding
+                y_spine_x = self._xmin_range
+                y_ticks_near = 0
+                y_ticks_far = 5
+                y_tick_location = "above"
+                y_label_location = "above"
+            elif self.y.spine._position == "high":
+                y_offset = self.padding
+                y_spine_x = self._xmax_range
+                y_ticks_near = 0
+                y_ticks_far = 5
+                y_tick_location = "below"
+                y_label_location = "below"
+            else:
+                y_offset = 0
+                y_spine_x = self._x_projection(self.y.spine._position)
+                y_ticks_near = 3
+                y_ticks_far = 3
+                y_tick_location = "below"
+                y_label_location = "below"
 
-            xdomain_min = _null_min(domain_left.min(), xdomain_min)
-            xdomain_max = _null_max(domain_right.max(), xdomain_max)
-            ydomain_min = _null_min(domain_bottom.min(), ydomain_min)
-            ydomain_max = _null_max(domain_top.max(), ydomain_max)
-
-        # Optionally expand the domain to match the aspect ratio of the range.
-        if self._aspect == "fit-range":
-            dwidth = (xdomain_max - xdomain_min)
-            dheight = (ydomain_max - ydomain_min)
-            daspect = dwidth / dheight
-            raspect = (self._xmax_range - self._xmin_range) / (self._ymax_range - self._ymin_range)
-
-            if daspect < raspect:
-                offset = ((dwidth * (raspect / daspect)) - dwidth) * 0.5
-                xdomain_min -= offset
-                xdomain_max += offset
-            elif daspect > raspect:
-                offset = ((dheight * (daspect / raspect)) - dheight) * 0.5
-                ydomain_min -= offset
-                ydomain_max += offset
-
-        # Allow users to override the domain.
-        if self.x.domain.min is not None:
-            xdomain_min = self.x.domain.min
-        if self.x.domain.max is not None:
-            xdomain_max = self.x.domain.max
-        if self.y.domain.min is not None:
-            ydomain_min = self.y.domain.min
-        if self.y.domain.max is not None:
-            ydomain_max = self.y.domain.max
-
-        # Ensure that the domain is never empty.
-        if xdomain_min == xdomain_max:
-            xdomain_min -= 0.5
-            xdomain_max += 0.5
-        if ydomain_min == ydomain_max:
-            ydomain_min -= 0.5
-            ydomain_max += 0.5
-
-        # Calculate tick locations and labels.
-        xtick_locations = []
-        xtick_labels = []
-        xtick_titles = []
-        if self.show and self.x.show:
-            xtick_locations, xtick_labels, xtick_titles = self.x._locator().ticks(xdomain_min, xdomain_max)
-        ytick_locations = []
-        ytick_labels = []
-        ytick_titles = []
-        if self.show and self.y.show:
-            ytick_locations, ytick_labels, ytick_titles = self.y._locator().ticks(ydomain_min, ydomain_max)
-
-        # Allow tick locations to grow (never shrink) the domain.
-        if len(xtick_locations):
-            xdomain_min = numpy.amin((xdomain_min, xtick_locations[0]))
-            xdomain_max = numpy.amax((xdomain_max, xtick_locations[-1]))
-        if len(ytick_locations):
-            ydomain_min = numpy.amin((ydomain_min, ytick_locations[0]))
-            ydomain_max = numpy.amax((ydomain_max, ytick_locations[-1]))
-
-        # Create projections for each axis.
-        self._x_projection = _create_projection(
-            scale=self.x.scale,
-            domain_min=xdomain_min,
-            domain_max=xdomain_max,
-            range_min=self._xmin_range,
-            range_max=self._xmax_range,
-            )
-        self._y_projection = _create_projection(
-            scale=self.y.scale,
-            domain_min=ydomain_min,
-            domain_max=ydomain_max,
-            range_min=self._ymax_range,
-            range_max=self._ymin_range,
-            )
-
-        # Finalize positions for all axis components.
-        if self.x.spine.position == "low":
-            x_offset = self.padding
-            x_spine_y = self._ymax_range
-            x_ticks_near = 0
-            x_ticks_far = 5
-            x_tick_location = "below"
-            x_label_location = "below"
-        elif self.x.spine.position == "high":
-            x_offset = -self.padding
-            x_spine_y = self._ymin_range
-            x_ticks_near = 5
-            x_ticks_far = 0
-            x_tick_location = "above"
-            x_label_location = "above"
-        else:
-            x_offset = 0
-            x_spine_y = self._y_projection(self.x.spine.position)
-            x_ticks_near = 3
-            x_ticks_far = 3
-            x_tick_location = "below"
-            x_label_location = "below"
-
-        if self.y.spine._position == "low":
-            y_offset = -self.padding
-            y_spine_x = self._xmin_range
-            y_ticks_near = 0
-            y_ticks_far = 5
-            y_tick_location = "above"
-            y_label_location = "above"
-        elif self.y.spine._position == "high":
-            y_offset = self.padding
-            y_spine_x = self._xmax_range
-            y_ticks_near = 0
-            y_ticks_far = 5
-            y_tick_location = "below"
-            y_label_location = "below"
-        else:
-            y_offset = 0
-            y_spine_x = self._x_projection(self.y.spine._position)
-            y_ticks_near = 3
-            y_ticks_far = 3
-            y_tick_location = "below"
-            y_label_location = "below"
-
-        # Finalize the axes.
-        self.x._finalize(
-            x1=self._xmin_range,
-            x2=self._xmax_range,
-            y1=x_spine_y,
-            y2=x_spine_y,
-            offset=x_offset,
-            domain_min=xdomain_min,
-            domain_max=xdomain_max,
-            tick_locations=xtick_locations,
-            tick_labels=xtick_labels,
-            tick_titles=xtick_titles,
-            default_tick_location=x_tick_location,
-            default_ticks_far=x_ticks_far,
-            default_ticks_near=x_ticks_near,
-            default_label_location=x_label_location,
-            )
-        self.y._finalize(
-            x1=y_spine_x,
-            x2=y_spine_x,
-            y1=self._ymax_range,
-            y2=self._ymin_range,
-            offset=y_offset,
-            domain_min=ydomain_min,
-            domain_max=ydomain_max,
-            tick_locations=ytick_locations,
-            tick_labels=ytick_labels,
-            tick_titles=ytick_titles,
-            default_tick_location=y_tick_location,
-            default_ticks_far=y_ticks_far,
-            default_ticks_near=y_ticks_near,
-            default_label_location=y_label_location,
-            )
+            # Finalize the axes.
+            self.x._finalize(
+                x1=self._xmin_range,
+                x2=self._xmax_range,
+                y1=x_spine_y,
+                y2=x_spine_y,
+                offset=x_offset,
+                domain_min=xdomain_min,
+                domain_max=xdomain_max,
+                tick_locations=xtick_locations,
+                tick_labels=xtick_labels,
+                tick_titles=xtick_titles,
+                default_tick_location=x_tick_location,
+                default_ticks_far=x_ticks_far,
+                default_ticks_near=x_ticks_near,
+                default_label_location=x_label_location,
+                )
+            self.y._finalize(
+                x1=y_spine_x,
+                x2=y_spine_x,
+                y1=self._ymax_range,
+                y2=self._ymin_range,
+                offset=y_offset,
+                domain_min=ydomain_min,
+                domain_max=ydomain_max,
+                tick_locations=ytick_locations,
+                tick_labels=ytick_labels,
+                tick_titles=ytick_titles,
+                default_tick_location=y_tick_location,
+                default_ticks_far=y_ticks_far,
+                default_ticks_near=y_ticks_near,
+                default_label_location=y_label_location,
+                )
+            self._finalized = self
+        return self._finalized
 
     def _project_x(self, x):
         return self._x_projection(x)
@@ -2484,7 +2483,7 @@ class Numberline(object):
             parent,
         ):
 
-        self._finalized = False
+        self._finalized = None
 
         self._axis = Axis(
             show=show,
@@ -2692,67 +2691,66 @@ class Numberline(object):
         return mark
 
     def _finalize(self):
-        if self._finalized:
-            return
-        self._finalized = True
+        if self._finalized is None:
+            # Begin with the implicit domain defined by our data.
+            domain_min = self.axis._display_min
+            domain_max = self.axis._display_max
 
-        # Begin with the implicit domain defined by our data.
-        domain_min = self.axis._display_min
-        domain_max = self.axis._display_max
+            # If there is no implicit domain (we don't have any data), default
+            # to the origin.
+            if domain_min is None:
+                domain_min = 0
+            if domain_max is None:
+                domain_max = 0
 
-        # If there is no implicit domain (we don't have any data), default
-        # to the origin.
-        if domain_min is None:
-            domain_min = 0
-        if domain_max is None:
-            domain_max = 0
+            # Ensure that the domain is never empty.
+            if domain_min == domain_max:
+                domain_min -= 0.5
+                domain_max += 0.5
 
-        # Ensure that the domain is never empty.
-        if domain_min == domain_max:
-            domain_min -= 0.5
-            domain_max += 0.5
+            # Allow users to override the domain.
+            if self.axis.domain.min is not None:
+                domain_min = self.axis.domain.min
+            if self.axis.domain.max is not None:
+                domain_max = self.axis.domain.max
 
-        # Allow users to override the domain.
-        if self.axis.domain.min is not None:
-            domain_min = self.axis.domain.min
-        if self.axis.domain.max is not None:
-            domain_max = self.axis.domain.max
+            # Ensure that the domain is never empty.
+            if domain_min == domain_max:
+                domain_min -= 0.5
+                domain_max += 0.5
 
-        # Ensure that the domain is never empty.
-        if domain_min == domain_max:
-            domain_min -= 0.5
-            domain_max += 0.5
+            # Calculate tick locations and labels.
+            tick_locations = []
+            tick_labels = []
+            tick_titles = []
+            if self.axis.show:
+                tick_locations, tick_labels, tick_titles = self.axis._locator().ticks(domain_min, domain_max)
 
-        # Calculate tick locations and labels.
-        tick_locations = []
-        tick_labels = []
-        tick_titles = []
-        if self.axis.show:
-            tick_locations, tick_labels, tick_titles = self.axis._locator().ticks(domain_min, domain_max)
+            # Allow tick locations to grow (never shrink) the domain.
+            if len(tick_locations):
+                domain_min = numpy.amin((domain_min, tick_locations[0]))
+                domain_max = numpy.amax((domain_max, tick_locations[-1]))
 
-        # Allow tick locations to grow (never shrink) the domain.
-        if len(tick_locations):
-            domain_min = numpy.amin((domain_min, tick_locations[0]))
-            domain_max = numpy.amax((domain_max, tick_locations[-1]))
-
-        # Finalize the axis.
-        self.axis._finalize(
-            x1=self._x1,
-            x2=self._x2,
-            y1=self._y1,
-            y2=self._y2,
-            offset=self.padding,
-            domain_min=domain_min,
-            domain_max=domain_max,
-            tick_locations=tick_locations,
-            tick_labels=tick_labels,
-            tick_titles=tick_titles,
-            default_tick_location="below",
-            default_ticks_near=3,
-            default_ticks_far=3,
-            default_label_location="below",
-            #label_baseline_shift="-200%",
-            )
+            # Finalize the axis.
+            self.axis._finalize(
+                x1=self._x1,
+                x2=self._x2,
+                y1=self._y1,
+                y2=self._y2,
+                offset=self.padding,
+                domain_min=domain_min,
+                domain_max=domain_max,
+                tick_locations=tick_locations,
+                tick_labels=tick_labels,
+                tick_titles=tick_titles,
+                default_tick_location="below",
+                default_ticks_near=3,
+                default_ticks_far=3,
+                default_label_location="below",
+                #label_baseline_shift="-200%",
+                )
+            self._finalized = self
+        return self._finalized
 
 
 ##########################################################################
@@ -3397,7 +3395,7 @@ class Table(object):
             parent,
             filename,
             ):
-        self._finalized = False
+        self._finalized = None
 
         self._xmin_range = xmin_range
         self._xmax_range = xmax_range
@@ -3653,173 +3651,172 @@ class Table(object):
         return self.cells.row(row)
 
     def _finalize(self):
-        if self._finalized:
-            return
-        self._finalized = True
+        if self._finalized is None:
+            # Collect explicit row heights, column widths, and gaps.
+            row_heights = numpy.zeros(len(self._row_heights) + len(self._row_gaps))
+            row_heights[0::2] = self._row_heights
+            row_heights[1::2] = self._row_gaps
 
-        # Collect explicit row heights, column widths, and gaps.
-        row_heights = numpy.zeros(len(self._row_heights) + len(self._row_gaps))
-        row_heights[0::2] = self._row_heights
-        row_heights[1::2] = self._row_gaps
+            column_widths = numpy.zeros(len(self._column_widths) + len(self._column_gaps))
+            column_widths[0::2] = self._column_widths
+            column_widths[1::2] = self._column_gaps
 
-        column_widths = numpy.zeros(len(self._column_widths) + len(self._column_gaps))
-        column_widths[0::2] = self._column_widths
-        column_widths[1::2] = self._column_gaps
+            # Compute implicit heights and widths for the remaining rows and columns.
+            table_height = self._ymax_range - self._ymin_range
+            available_height = table_height - numpy.sum(row_heights)
+            default_height = available_height / numpy.count_nonzero(row_heights[0::2] == 0)
+            row_heights[0::2][row_heights[0::2] == 0] = default_height
 
-        # Compute implicit heights and widths for the remaining rows and columns.
-        table_height = self._ymax_range - self._ymin_range
-        available_height = table_height - numpy.sum(row_heights)
-        default_height = available_height / numpy.count_nonzero(row_heights[0::2] == 0)
-        row_heights[0::2][row_heights[0::2] == 0] = default_height
+            table_width = self._xmax_range - self._xmin_range
+            available_width = table_width - numpy.sum(column_widths)
+            default_width = available_width / numpy.count_nonzero(column_widths[0::2] == 0)
+            column_widths[0::2][column_widths[0::2] == 0] = default_width
 
-        table_width = self._xmax_range - self._xmin_range
-        available_width = table_width - numpy.sum(column_widths)
-        default_width = available_width / numpy.count_nonzero(column_widths[0::2] == 0)
-        column_widths[0::2][column_widths[0::2] == 0] = default_width
+            row_boundaries = self._ymin_range + numpy.cumsum(numpy.concatenate(([0], row_heights)))
+            column_boundaries = self._xmin_range + numpy.cumsum(numpy.concatenate(([0], column_widths)))
 
-        row_boundaries = self._ymin_range + numpy.cumsum(numpy.concatenate(([0], row_heights)))
-        column_boundaries = self._xmin_range + numpy.cumsum(numpy.concatenate(([0], column_widths)))
+            # Compute cell boundaries.
+            self._cell_top = row_boundaries[0::2]
+            self._cell_bottom = row_boundaries[1::2]
+            self._cell_left = column_boundaries[0::2]
+            self._cell_right = column_boundaries[1::2]
 
-        # Compute cell boundaries.
-        self._cell_top = row_boundaries[0::2]
-        self._cell_bottom = row_boundaries[1::2]
-        self._cell_left = column_boundaries[0::2]
-        self._cell_right = column_boundaries[1::2]
+            # Compute grid boundaries.
+            self._row_boundaries = numpy.concatenate((
+                row_boundaries[0:1],
+                (row_boundaries[1:-1:2] + row_boundaries[2:-1:2]) / 2,
+                row_boundaries[-1:],
+                ))
+            self._column_boundaries = numpy.concatenate((
+                column_boundaries[0:1],
+                (column_boundaries[1:-1:2] + column_boundaries[2:-1:2]) / 2,
+                column_boundaries[-1:],
+                ))
 
-        # Compute grid boundaries.
-        self._row_boundaries = numpy.concatenate((
-            row_boundaries[0:1],
-            (row_boundaries[1:-1:2] + row_boundaries[2:-1:2]) / 2,
-            row_boundaries[-1:],
-            ))
-        self._column_boundaries = numpy.concatenate((
-            column_boundaries[0:1],
-            (column_boundaries[1:-1:2] + column_boundaries[2:-1:2]) / 2,
-            column_boundaries[-1:],
-            ))
+            # Generate "auto plots".
+            for auto_plot, axes in self._auto_plot.items():
+                rows, columns = numpy.nonzero(self._cell_axes == axes)
+                row_min = rows.min()
+                row_max = rows.max()
+                column_min = columns.min()
+                column_max = columns.max()
 
-        # Generate "auto plots".
-        for auto_plot, axes in self._auto_plot.items():
-            rows, columns = numpy.nonzero(self._cell_axes == axes)
-            row_min = rows.min()
-            row_max = rows.max()
-            column_min = columns.min()
-            column_max = columns.max()
+                if auto_plot._series == "columns":
+                    shape = (row_max + 1 - row_min, column_max + 1 - column_min)
+                    cell_begin = self._cell_top
+                    cell_end = self._cell_bottom
+                    cell_indices = numpy.unique(rows)
+                    along = "y"
+                    along_axis = axes.y
+                    series = self._cell_data[self._cell_axes == axes].reshape(shape).astype("float64")
+                elif auto_plot._series == "rows":
+                    shape = (column_max + 1 - column_min, row_max + 1 - row_min)
+                    cell_begin = self._cell_left
+                    cell_end = self._cell_right
+                    cell_indices = numpy.unique(columns)
+                    along = "x"
+                    along_axis = axes.x
+                    series = self._cell_data[self._cell_axes == axes].reshape(shape).astype("float64")[:,::-1]
 
-            if auto_plot._series == "columns":
-                shape = (row_max + 1 - row_min, column_max + 1 - column_min)
-                cell_begin = self._cell_top
-                cell_end = self._cell_bottom
-                cell_indices = numpy.unique(rows)
-                along = "y"
-                along_axis = axes.y
-                series = self._cell_data[self._cell_axes == axes].reshape(shape).astype("float64")
-            elif auto_plot._series == "rows":
-                shape = (column_max + 1 - column_min, row_max + 1 - row_min)
-                cell_begin = self._cell_left
-                cell_end = self._cell_right
-                cell_indices = numpy.unique(columns)
-                along = "x"
-                along_axis = axes.x
-                series = self._cell_data[self._cell_axes == axes].reshape(shape).astype("float64")[:,::-1]
+                if isinstance(auto_plot, Table.BarPlot):
+                    width = min(0.5 - numpy.finfo("float32").eps, 0.5 * auto_plot._width)
+                    begin = numpy.arange(shape[0]) - width
+                    end = numpy.arange(shape[0]) + width
 
-            if isinstance(auto_plot, Table.BarPlot):
-                width = min(0.5 - numpy.finfo("float32").eps, 0.5 * auto_plot._width)
-                begin = numpy.arange(shape[0]) - width
-                end = numpy.arange(shape[0]) + width
+                    segments = []
+                    for index, cell_index in enumerate(cell_indices):
+                        segments.append(toyplot.projection.Piecewise.Segment(
+                            "linear",
+                            index - 0.5,
+                            index - 0.5,
+                            index + 0.5,
+                            index + 0.5,
+                            cell_begin[cell_index] + auto_plot._padding,
+                            cell_begin[cell_index] + auto_plot._padding,
+                            cell_end[cell_index] - auto_plot._padding,
+                            cell_end[cell_index] - auto_plot._padding,
+                            ))
+                    projection = toyplot.projection.Piecewise(segments)
+                    along_axis._scale = projection
 
-                segments = []
-                for index, cell_index in enumerate(cell_indices):
-                    segments.append(toyplot.projection.Piecewise.Segment(
-                        "linear",
-                        index - 0.5,
-                        index - 0.5,
-                        index + 0.5,
-                        index + 0.5,
-                        cell_begin[cell_index] + auto_plot._padding,
-                        cell_begin[cell_index] + auto_plot._padding,
-                        cell_end[cell_index] - auto_plot._padding,
-                        cell_end[cell_index] - auto_plot._padding,
-                        ))
-                projection = toyplot.projection.Piecewise(segments)
-                along_axis._scale = projection
+                    color = auto_plot._color
+                    if isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
+                        color = (series, color[1])
 
-                color = auto_plot._color
-                if isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
-                    color = (series, color[1])
+                    axes.bars(
+                        begin,
+                        end,
+                        series,
+                        along=along,
+                        baseline=auto_plot._baseline,
+                        color=color,
+                        filename=auto_plot._filename,
+                        opacity=auto_plot._opacity,
+                        style=auto_plot._style,
+                        title=auto_plot._title,
+                        )
+                elif isinstance(auto_plot, Table.LinePlot):
+                    segments = []
+                    for index, cell_index in enumerate(cell_indices):
+                        segments.append(toyplot.projection.Piecewise.Segment(
+                            "linear",
+                            index - 0.5,
+                            index - 0.5,
+                            index + 0.5,
+                            index + 0.5,
+                            cell_begin[cell_index],
+                            cell_begin[cell_index],
+                            cell_end[cell_index],
+                            cell_end[cell_index],
+                            ))
+                    projection = toyplot.projection.Piecewise(segments)
+                    along_axis._scale = projection
 
-                axes.bars(
-                    begin,
-                    end,
-                    series,
-                    along=along,
-                    baseline=auto_plot._baseline,
-                    color=color,
-                    filename=auto_plot._filename,
-                    opacity=auto_plot._opacity,
-                    style=auto_plot._style,
-                    title=auto_plot._title,
-                    )
-            elif isinstance(auto_plot, Table.LinePlot):
-                segments = []
-                for index, cell_index in enumerate(cell_indices):
-                    segments.append(toyplot.projection.Piecewise.Segment(
-                        "linear",
-                        index - 0.5,
-                        index - 0.5,
-                        index + 0.5,
-                        index + 0.5,
-                        cell_begin[cell_index],
-                        cell_begin[cell_index],
-                        cell_end[cell_index],
-                        cell_end[cell_index],
-                        ))
-                projection = toyplot.projection.Piecewise(segments)
-                along_axis._scale = projection
+                    color = auto_plot._color
+                    if isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
+                        color = (series, color[1])
 
-                color = auto_plot._color
-                if isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
-                    color = (series, color[1])
+                    mfill = auto_plot._mfill
+                    if isinstance(mfill, tuple) and len(mfill) == 2 and mfill[0] == "datum":
+                        mfill = (series, mfill[1])
 
-                mfill = auto_plot._mfill
-                if isinstance(mfill, tuple) and len(mfill) == 2 and mfill[0] == "datum":
-                    mfill = (series, mfill[1])
+                    axes.plot(
+                        series,
+                        along=along,
+                        area=auto_plot._area,
+                        color=color,
+                        filename=auto_plot._filename,
+                        marker=auto_plot._marker,
+                        mfill=mfill,
+                        mlstyle=auto_plot._mlstyle,
+                        mopacity=auto_plot._mopacity,
+                        mstyle=auto_plot._mstyle,
+                        opacity=auto_plot._opacity,
+                        size=auto_plot._size,
+                        stroke_width=auto_plot._stroke_width,
+                        style=auto_plot._style,
+                        title=auto_plot._title,
+                        )
+                else:
+                    raise NotImplementedError("Unknown plot: %s" % auto_plot)
 
-                axes.plot(
-                    series,
-                    along=along,
-                    area=auto_plot._area,
-                    color=color,
-                    filename=auto_plot._filename,
-                    marker=auto_plot._marker,
-                    mfill=mfill,
-                    mlstyle=auto_plot._mlstyle,
-                    mopacity=auto_plot._mopacity,
-                    mstyle=auto_plot._mstyle,
-                    opacity=auto_plot._opacity,
-                    size=auto_plot._size,
-                    stroke_width=auto_plot._stroke_width,
-                    style=auto_plot._style,
-                    title=auto_plot._title,
-                    )
-            else:
-                raise NotImplementedError("Unknown plot: %s" % auto_plot)
+            # Assign ranges and finalize embedded coordinate systems.
+            for axes, padding in zip(self._axes, self._axes_padding):
+                axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
+                row_min = axes_rows.min()
+                row_max = axes_rows.max()
+                column_min = axes_columns.min()
+                column_max = axes_columns.max()
 
-        # Assign ranges and finalize embedded coordinate systems.
-        for axes, padding in zip(self._axes, self._axes_padding):
-            axes_rows, axes_columns = numpy.nonzero(self._cell_axes == axes)
-            row_min = axes_rows.min()
-            row_max = axes_rows.max()
-            column_min = axes_columns.min()
-            column_max = axes_columns.max()
+                if isinstance(axes, toyplot.coordinates.Cartesian):
+                    axes.xmin_range = self._cell_left[column_min] + padding
+                    axes.xmax_range = self._cell_right[column_max] - padding
+                    axes.ymin_range = self._cell_top[row_min] + padding
+                    axes.ymax_range = self._cell_bottom[row_max] - padding
+                else:
+                    raise NotImplementedError("Unknown coordinate system: %s" % axes)
 
-            if isinstance(axes, toyplot.coordinates.Cartesian):
-                axes.xmin_range = self._cell_left[column_min] + padding
-                axes.xmax_range = self._cell_right[column_max] - padding
-                axes.ymin_range = self._cell_top[row_min] + padding
-                axes.ymax_range = self._cell_bottom[row_max] - padding
-            else:
-                raise NotImplementedError("Unknown coordinate system: %s" % axes)
+                axes._finalize()
 
-            axes._finalize()
-
+            self._finalized = self
+        return self._finalized

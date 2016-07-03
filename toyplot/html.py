@@ -1756,6 +1756,11 @@ def _legend_markers(mark):
     return markers
 
 
+@dispatch(toyplot.coordinates.Cartesian, type(None), _RenderContext)
+def _render(axes, mark, context):
+    pass
+
+
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.BarBoundaries, _RenderContext)
 def _render(axes, mark, context):
     left = mark._table[mark._left[0]]

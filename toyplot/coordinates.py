@@ -25,32 +25,6 @@ import time
 ##########################################################################
 # Helpers
 
-def _null_min(a, b):
-    """Return the minimum of two values, with special logic to handle None."""
-    if a is None:
-        return b # pragma: no cover
-    if b is None:
-        return a
-    return min(a, b)
-
-
-def _null_max(a, b):
-    """Return the maximum of two values, with special logic to handle None."""
-    if a is None:
-        return b # pragma: no cover
-    if b is None:
-        return a
-    return max(a, b)
-
-
-def _flat_non_null(array):
-    if isinstance(array, numpy.ma.MaskedArray):
-        array = array.compressed()
-    elif isinstance(array, numpy.ndarray):
-        array = array.ravel()
-    array = array[numpy.invert(numpy.isnan(array))]
-    return array
-
 
 def _mark_exportable(table, column, exportable=True):
     table.metadata(column)["toyplot:exportable"] = exportable
@@ -616,19 +590,11 @@ class Axis(object):
         return self._ticks
 
     def update_domain(self, values, display=True, data=True):
-        values = _flat_non_null(values)
+        if display:
+            self._display_min, self._display_max = toyplot.data.minmax(self._display_min, self._display_max, values)
 
-        if len(values) and display:
-            self._display_min = _null_min(
-                values.min(), self._display_min)
-            self._display_max = _null_max(
-                values.max(), self._display_max)
-
-        if len(values) and data:
-            self._data_min = _null_min(
-                values.min(), self._data_min)
-            self._data_max = _null_max(
-                values.max(), self._data_max)
+        if data:
+            self._data_min, self._data_max = toyplot.data.minmax(self._data_min, self._data_max, values)
 
     def _locator(self):
         if self.ticks.locator is not None:
@@ -942,10 +908,8 @@ class Cartesian(object):
                 domain_top = y_projection.inverse(range_top)
                 domain_bottom = y_projection.inverse(range_bottom)
 
-                xdomain_min = _null_min(domain_left.min(), xdomain_min)
-                xdomain_max = _null_max(domain_right.max(), xdomain_max)
-                ydomain_min = _null_min(domain_bottom.min(), ydomain_min)
-                ydomain_max = _null_max(domain_top.max(), ydomain_max)
+                xdomain_min, xdomain_max = toyplot.data.minmax(xdomain_min, xdomain_max, domain_left, domain_right)
+                ydomain_min, ydomain_max = toyplot.data.minmax(ydomain_min, ydomain_max, domain_top, domain_bottom)
 
             # Optionally expand the domain to match the aspect ratio of the range.
             if self._aspect == "fit-range":

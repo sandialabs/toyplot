@@ -18,6 +18,38 @@ try:
 except: # pragma: no cover
     pass
 
+def minmax(*args):
+    """Compute the minimum and maximum of an arbitrary collection of array-like objects.
+
+    The input to minmax() can be any combination of `None`, scalars, numpy
+    arrays, or numpy masked arrays.  None, NaN, masked values, and empty arrays
+    are all handled correctly.  Returns `(None, None)` if the inputs don't
+    contain any usable values.
+
+    Returns
+    -------
+    min: minimum value of the input arrays, or None.
+    max: maximum value of the input arrays, or None.
+    """
+    def array(value):
+        if isinstance(value, numpy.ma.MaskedArray):
+            return value
+        if isinstance(value, numpy.ndarray):
+            return numpy.ma.array(value)
+        if value is None:
+            return numpy.ma.array([])
+        return numpy.ma.array([value])
+
+    if len(args) == 0:
+        return (None, None)
+
+    combined = numpy.ma.concatenate([array(arg).ravel() for arg in args])
+    mask = numpy.ma.getmaskarray(combined)
+    mask = numpy.logical_or(mask, numpy.isnan(combined).data)
+    selection = numpy.logical_not(mask)
+    if numpy.count_nonzero(selection):
+        return (combined[selection].min(), combined[selection].max())
+    return (None, None)
 
 def contiguous(a):
     """Split an array into a collection of contiguous ranges.

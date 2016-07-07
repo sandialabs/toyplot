@@ -2782,9 +2782,19 @@ class Table(object):
         text = _create_text_property()
 
 
+    class EmbeddedBarPlot(object):
+        def __init__(self):
+            toyplot.log.debug("EmbeddedBarPlot.__init__()")
+
+        def _finalize(self):
+            toyplot.log.debug("EmbeddedBarPlot._finalize()")
+            return None
+
+
     class AutoPlot(object):
         def __init__(self, series):
             self._series = toyplot.require.value_in(series, ["columns", "rows"])
+
 
     class BarPlot(AutoPlot):
         def __init__(self,
@@ -2950,6 +2960,43 @@ class Table(object):
                 cell_padding=cell_padding,
                 )
 
+        def test(self):
+            self._table._merge_cells(self._selection)
+            self._table._cell_format[self._selection] = toyplot.format.NullFormatter()
+
+            axes = toyplot.coordinates.Cartesian(
+                xmin_range=0, # These will be calculated for real in _finalize().
+                xmax_range=1,
+                ymin_range=0,
+                ymax_range=1,
+                xmin=None,
+                xmax=None,
+                ymin=None,
+                ymax=None,
+                aspect=None,
+                show=True,
+                xshow=False,
+                yshow=False,
+                label=None,
+                xlabel=None,
+                ylabel=None,
+                xticklocator=None,
+                yticklocator=None,
+                xscale="linear",
+                yscale="linear",
+                padding=5,
+                parent=self._table._parent,
+                )
+
+            self._table._cell_axes[self._selection] = axes
+            self._table._axes.append(axes)
+            self._table._axes_padding.append(0)
+
+            mark = Table.EmbeddedBarPlot()
+            axes._children.append(mark)
+
+            return axes
+
         def bars(
                 self,
                 baseline="stacked",
@@ -3025,6 +3072,7 @@ class Table(object):
                 yscale="linear",
                 padding=5,
                 cell_padding=0,
+                clear_data=True,
             ):
 
             axes = toyplot.coordinates.Cartesian(

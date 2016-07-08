@@ -22,9 +22,6 @@ class Mark(object):
         self._annotation = False
         self.annotation = annotation
 
-    def _finalize(self):
-        return self
-
     @property
     def annotation(self):
         return self._annotation
@@ -32,6 +29,13 @@ class Mark(object):
     @annotation.setter
     def annotation(self, value):
         self._annotation = True if value else False
+
+    def finalize(self):
+        return self
+
+    def domain(self, axis):
+#        raise NotImplementedError()
+        return (None, None)
 
 
 class AxisLines(Mark):
@@ -499,6 +503,12 @@ class Plot(Mark):
         self._mlstyle = toyplot.require.style(mlstyle, allowed=toyplot.require.style.text)
         # Export filename
         self._filename = toyplot.require.filename(filename)
+
+    def domain(self, axis):
+        if axis == self._coordinate_axes[0]:
+            return toyplot.data.minmax(self._table[self._coordinates])
+        if axis == self._coordinate_axes[1]:
+            return toyplot.data.minmax(*[self._table[key] for key in self._series])
 
 
 class Rect(Mark):

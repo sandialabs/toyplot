@@ -2042,16 +2042,8 @@ class Cartesian(object):
 
         if along == "x":
             coordinate_axes = ["x", "y"]
-            self._update_domain(
-                numpy.concatenate((table["left"], table["right"])),
-                numpy.concatenate((table["top"], table["bottom"])),
-            )
         elif along == "y":
             coordinate_axes = ["y", "x"]
-            self._update_domain(
-                numpy.concatenate((table["top"], table["bottom"])),
-                numpy.concatenate((table["left"], table["right"])),
-            )
 
         self._children.append(
             toyplot.mark.Rect(

@@ -604,6 +604,12 @@ class Rect(Mark):
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
+    def domain(self, axis):
+        if axis == self._coordinate_axes[0]:
+            return toyplot.data.minmax(self._table[self._left], self._table[self._right])
+        if axis == self._coordinate_axes[1]:
+            return toyplot.data.minmax(self._table[self._top], self._table[self._bottom])
+
 
 class Scatterplot(Mark):
 

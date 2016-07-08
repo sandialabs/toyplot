@@ -34,7 +34,19 @@ class Mark(object):
         return self
 
     def domain(self, axis):
-#        raise NotImplementedError()
+        """Return minimum and maximum domain values for the given axis.
+
+        Parameters
+        ----------
+        axis: string, required
+            Name of an axis along which to return domain values.
+
+        Returns
+        -------
+        minimum: minimum domain value along the given axis, or `None`.
+        maximum: maximum domain value along the given axis, or `None`.
+        """
+        #raise NotImplementedError()
         return (None, None)
 
 
@@ -74,6 +86,10 @@ class AxisLines(Mark):
         # Line style
         self._style = toyplot.require.style(style, allowed=toyplot.require.style.line)
 
+    def domain(self, axis):
+        if axis == self._coordinate_axes:
+            return toyplot.data.minmax(self._table[self._coordinates])
+        return (None, None)
 
 
 class BarBoundaries(Mark):
@@ -120,6 +136,12 @@ class BarBoundaries(Mark):
         self._style = toyplot.require.style(style, allowed=toyplot.require.style.fill)
         # Export filename
         self._filename = toyplot.require.filename(filename)
+
+    def domain(self, axis):
+        if axis == self._coordinate_axes[0]:
+            return toyplot.data.minmax(self._table[self._left], self._table[self._right])
+        if axis == self._coordinate_axes[1]:
+            return toyplot.data.minmax(*[self._table[key] for key in self._boundaries])
 
 
 class BarMagnitudes(Mark):
@@ -169,6 +191,15 @@ class BarMagnitudes(Mark):
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
+    def domain(self, axis):
+        if axis == self._coordinate_axes[0]:
+            return toyplot.data.minmax(self._table[self._left], self._table[self._right])
+        if axis == self._coordinate_axes[1]:
+            boundaries = numpy.column_stack([self._table[key] for key in self._magnitudes])
+            boundaries = numpy.column_stack((self._table[self._baseline], boundaries))
+            boundaries = numpy.cumsum(boundaries, axis=1)
+            return toyplot.data.minmax(boundaries)
+
 
 class FillBoundaries(Mark):
 
@@ -213,6 +244,11 @@ class FillBoundaries(Mark):
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
+    def domain(self, axis):
+        if axis == self._coordinate_axes[0]:
+            return toyplot.data.minmax(self._table[self._position])
+        if axis == self._coordinate_axes[1]:
+            return toyplot.data.minmax(*[self._table[key] for key in self._boundaries])
 
 class FillMagnitudes(Mark):
 
@@ -260,6 +296,15 @@ class FillMagnitudes(Mark):
         self._style = toyplot.require.style(style, allowed=toyplot.require.style.fill)
         # Export filename
         self._filename = toyplot.require.filename(filename)
+
+    def domain(self, axis):
+        if axis == self._coordinate_axes[0]:
+            return toyplot.data.minmax(self._table[self._position])
+        if axis == self._coordinate_axes[1]:
+            boundaries = numpy.column_stack([self._table[key] for key in self._magnitudes])
+            boundaries = numpy.column_stack((self._table[self._baseline], boundaries))
+            boundaries = numpy.cumsum(boundaries, axis=1)
+            return toyplot.data.minmax(boundaries)
 
 
 class Graph(Mark): # pragma: no cover

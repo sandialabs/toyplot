@@ -591,10 +591,10 @@ class Axis(object):
 
     def update_domain(self, values, display=True, data=True):
         if display:
-            self._display_min, self._display_max = toyplot.data.minmax(self._display_min, self._display_max, values)
+            self._display_min, self._display_max = toyplot.data.minmax(self._display_min, self._display_max, *values)
 
         if data:
-            self._data_min, self._data_max = toyplot.data.minmax(self._data_min, self._data_max, values)
+            self._data_min, self._data_max = toyplot.data.minmax(self._data_min, self._data_max, *values)
 
     def _locator(self):
         if self.ticks.locator is not None:
@@ -833,8 +833,8 @@ class Cartesian(object):
     ymax_range = property(fset = _set_ymax_range)
 
     def _update_domain(self, x, y, display=True, data=True):
-        self.x.update_domain(x, display=display, data=data)
-        self.y.update_domain(y, display=display, data=data)
+        self.x.update_domain([x], display=display, data=data)
+        self.y.update_domain([y], display=display, data=data)
 
     def _expand_domain_range(self, x, y, extents):
         left, right, top, bottom = extents
@@ -855,10 +855,10 @@ class Cartesian(object):
     def finalize(self):
         if self._finalized is None:
             # Begin with the implicit domain defined by our children.
-#            for child in self._children:
-#                child = child.finalize()
-#                self.x.update_domain(child.domain("x"), display=True, data=not child.annotation)
-#                self.y.update_domain(child.domain("y"), display=True, data=not child.annotation)
+            for child in self._children:
+                child = child.finalize()
+                self.x.update_domain(child.domain("x"), display=True, data=not child.annotation)
+                self.y.update_domain(child.domain("y"), display=True, data=not child.annotation)
 
             # Begin with the implicit domain defined by our data.
             xdomain_min = self.x._display_min
@@ -1193,10 +1193,8 @@ class Cartesian(object):
                 )
 
             if along == "x":
-                self._update_domain(position, series)
                 coordinate_axes = ["x", "y"]
             elif along == "y":
-                self._update_domain(series, position)
                 coordinate_axes = ["y", "x"]
 
             table = toyplot.data.Table()
@@ -1298,13 +1296,9 @@ class Cartesian(object):
                         baseline += series.T[j]
                 baseline *= -(1.0 / (n + 1))
 
-            boundaries = numpy.cumsum(
-                numpy.column_stack((baseline, series)), axis=1)
             if along == "x":
-                self._update_domain(position, boundaries)
                 coordinate_axes = ["x", "y"]
             elif along == "y":
-                self._update_domain(boundaries, position)
                 coordinate_axes = ["y", "x"]
 
             table = toyplot.data.Table()
@@ -1469,10 +1463,8 @@ class Cartesian(object):
                 )
 
             if along == "x":
-                self._update_domain(position, series, display=True, data=not annotation)
                 coordinate_axes = ["x", "y"]
             elif along == "y":
-                self._update_domain(series, position, display=True, data=not annotation)
                 coordinate_axes = ["y", "x"]
 
             table = toyplot.data.Table()
@@ -1543,13 +1535,9 @@ class Cartesian(object):
                             baseline += series.T[j]
                     baseline *= -(1.0 / (n + 1))
 
-            boundaries = numpy.ma.cumsum(
-                numpy.ma.column_stack((baseline, series)), axis=1)
             if along == "x":
-                self._update_domain(position, boundaries, display=True, data=not annotation)
                 coordinate_axes = ["x", "y"]
             elif along == "y":
-                self._update_domain(boundaries, position, display=True, data=not annotation)
                 coordinate_axes = ["y", "x"]
 
             table = toyplot.data.Table()
@@ -1761,8 +1749,6 @@ class Cartesian(object):
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.require.style(style, allowed=toyplot.require.style.line)
 
-        self._update_domain(numpy.array([]), table["y"], display=True, data=not annotation)
-
         self._children.append(
             toyplot.mark.AxisLines(
                 coordinate_axes=["y"],
@@ -1969,10 +1955,8 @@ class Cartesian(object):
         mlstyle = toyplot.require.style(mlstyle, allowed=toyplot.require.style.text)
 
         if along == "x":
-            self._update_domain(position, series)
             coordinate_axes = ["x", "y"]
         elif along == "y":
-            self._update_domain(series, position)
             coordinate_axes = ["y", "x"]
 
         table = toyplot.data.Table()
@@ -2412,8 +2396,6 @@ class Cartesian(object):
         table["title"] = toyplot.broadcast.object(title, table.shape[0])
         style = toyplot.require.style(style, allowed=toyplot.require.style.line)
 
-        self._update_domain(table["x"], numpy.array([]), display=True, data=not annotation)
-
         self._children.append(
             toyplot.mark.AxisLines(
                 coordinate_axes=["x"],
@@ -2529,7 +2511,7 @@ class Numberline(object):
         self._spacing = toyplot.units.convert(value, target="px", default="px")
 
     def update_domain(self, values, display=True, data=True):
-        self.axis.update_domain(values, display=display, data=data)
+        self.axis.update_domain([values], display=display, data=data)
 
     def colormap(self, colormap, offset=None, width=10, style=None):
         if not isinstance(colormap, toyplot.color.Map):

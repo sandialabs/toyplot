@@ -404,6 +404,11 @@ class Graph(Mark): # pragma: no cover
         # Edge style
         self._estyle = toyplot.require.style(estyle, allowed=toyplot.require.style.line)
 
+    def domain(self, axis):
+        index = numpy.flatnonzero(self._coordinate_axes == axis)[0]
+        return toyplot.data.minimax([self._vtable[self._vcoordinates[index]], self._ecoordinates[:, index]])
+
+
     @property
     def vcount(self):
         """Return the number of vertices in the graph."""
@@ -671,7 +676,8 @@ class Scatterplot(Mark):
         self._filename = toyplot.require.filename(filename)
 
     def domain(self, axis):
-        return toyplot.data.minimax([self._table[coordinate_key] for coordinate_axis, coordinate_key in zip(itertools.cycle(self._coordinate_axes), self._coordinates) if coordinate_axis == axis])
+        columns = [coordinate_column for coordinate_axis, coordinate_column in zip(itertools.cycle(self._coordinate_axes), self._coordinates) if coordinate_axis == axis]
+        return toyplot.data.minimax([self._table[column] for column in columns])
 
 
 class Text(Mark):

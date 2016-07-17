@@ -1649,12 +1649,8 @@ class Cartesian(object):
         estyle = toyplot.require.style(estyle, allowed=toyplot.require.style.line)
 
         if along == "x":
-            self._update_domain(layout.vcoordinates.T[0], layout.vcoordinates.T[1])
-            self._update_domain(layout.ecoordinates.T[0], layout.ecoordinates.T[1])
             coordinate_axes = ["x", "y"]
         elif along == "y":
-            self._update_domain(layout.vcoordinates.T[1], layout.vcoordinates.T[0])
-            self._update_domain(layout.ecoordinates.T[1], layout.ecoordinates.T[0])
             coordinate_axes = ["y", "x"]
 
         vtable = toyplot.data.Table()

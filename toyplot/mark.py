@@ -88,7 +88,7 @@ class AxisLines(Mark):
 
     def domain(self, axis):
         if axis == self._coordinate_axes:
-            return toyplot.data.minimax([self._table[self._coordinates]])
+            return toyplot.data.minimax([self._table[self._coordinates[0]]])
         return (None, None)
 
 
@@ -139,7 +139,7 @@ class BarBoundaries(Mark):
 
     def domain(self, axis):
         if axis == self._coordinate_axes[0]:
-            return toyplot.data.minimax([self._table[self._left], self._table[self._right]])
+            return toyplot.data.minimax([self._table[self._left[0]], self._table[self._right[0]]])
         if axis == self._coordinate_axes[1]:
             return toyplot.data.minimax([self._table[key] for key in self._boundaries])
 
@@ -193,7 +193,7 @@ class BarMagnitudes(Mark):
 
     def domain(self, axis):
         if axis == self._coordinate_axes[0]:
-            return toyplot.data.minimax([self._table[self._left], self._table[self._right]])
+            return toyplot.data.minimax([self._table[self._left[0]], self._table[self._right[0]]])
         if axis == self._coordinate_axes[1]:
             boundaries = numpy.column_stack([self._table[key] for key in self._magnitudes])
             boundaries = numpy.column_stack((self._table[self._baseline], boundaries))
@@ -246,7 +246,7 @@ class FillBoundaries(Mark):
 
     def domain(self, axis):
         if axis == self._coordinate_axes[0]:
-            return toyplot.data.minimax([self._table[self._position]])
+            return toyplot.data.minimax([self._table[self._position[0]]])
         if axis == self._coordinate_axes[1]:
             return toyplot.data.minimax([self._table[key] for key in self._boundaries])
 
@@ -299,7 +299,7 @@ class FillMagnitudes(Mark):
 
     def domain(self, axis):
         if axis == self._coordinate_axes[0]:
-            return toyplot.data.minimax([self._table[self._position]])
+            return toyplot.data.minimax([self._table[self._position[0]]])
         if axis == self._coordinate_axes[1]:
             boundaries = numpy.column_stack([self._table[key] for key in self._magnitudes])
             boundaries = numpy.column_stack((self._table[self._baseline], boundaries))
@@ -551,7 +551,7 @@ class Plot(Mark):
 
     def domain(self, axis):
         if axis == self._coordinate_axes[0]:
-            return toyplot.data.minimax([self._table[self._coordinates]])
+            return toyplot.data.minimax([self._table[self._coordinates[0]]])
         if axis == self._coordinate_axes[1]:
             return toyplot.data.minimax([self._table[key] for key in self._series])
 
@@ -606,9 +606,9 @@ class Rect(Mark):
 
     def domain(self, axis):
         if axis == self._coordinate_axes[0]:
-            return toyplot.data.minimax([self._table[self._left], self._table[self._right]])
+            return toyplot.data.minimax([self._table[self._left[0]], self._table[self._right[0]]])
         if axis == self._coordinate_axes[1]:
-            return toyplot.data.minimax([self._table[self._top], self._table[self._bottom]])
+            return toyplot.data.minimax([self._table[self._top[0]], self._table[self._bottom[0]]])
 
 
 class Scatterplot(Mark):

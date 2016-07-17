@@ -591,10 +591,10 @@ class Axis(object):
 
     def update_domain(self, values, display=True, data=True):
         if display:
-            self._display_min, self._display_max = toyplot.data.minmax(self._display_min, self._display_max, *values)
+            self._display_min, self._display_max = toyplot.data.minimax(itertools.chain([self._display_min, self._display_max], values))
 
         if data:
-            self._data_min, self._data_max = toyplot.data.minmax(self._data_min, self._data_max, *values)
+            self._data_min, self._data_max = toyplot.data.minimax(itertools.chain([self._data_min, self._data_max], values))
 
     def _locator(self):
         if self.ticks.locator is not None:
@@ -914,8 +914,8 @@ class Cartesian(object):
                 domain_top = y_projection.inverse(range_top)
                 domain_bottom = y_projection.inverse(range_bottom)
 
-                xdomain_min, xdomain_max = toyplot.data.minmax(xdomain_min, xdomain_max, domain_left, domain_right)
-                ydomain_min, ydomain_max = toyplot.data.minmax(ydomain_min, ydomain_max, domain_top, domain_bottom)
+                xdomain_min, xdomain_max = toyplot.data.minimax([xdomain_min, xdomain_max, domain_left, domain_right])
+                ydomain_min, ydomain_max = toyplot.data.minimax([ydomain_min, ydomain_max, domain_top, domain_bottom])
 
             # Optionally expand the domain to match the aspect ratio of the range.
             if self._aspect == "fit-range":

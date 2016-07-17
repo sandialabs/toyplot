@@ -18,13 +18,13 @@ try:
 except: # pragma: no cover
     pass
 
-def minmax(*args):
-    """Compute the minimum and maximum of an arbitrary collection of array-like objects.
+def minimax(items):
+    """Compute the minimum and maximum of an arbitrary collection of scalar- or array-like items.
 
-    The input to minmax() can be any combination of `None`, scalars, numpy
-    arrays, or numpy masked arrays.  None, NaN, masked values, and empty arrays
-    are all handled correctly.  Returns `(None, None)` if the inputs don't
-    contain any usable values.
+    The `items` parameter must be an iterable containing any combination of
+    `None`, scalars, numpy arrays, or numpy masked arrays.  None, NaN, masked
+    values, and empty arrays are all handled correctly.  Returns `(None, None)`
+    if the inputs don't contain any usable values.
 
     Returns
     -------
@@ -38,12 +38,15 @@ def minmax(*args):
             return numpy.ma.array(value)
         if value is None:
             return numpy.ma.array([])
+        print value, type(value)
         return numpy.ma.array([value])
 
-    if len(args) == 0:
+    items = list(items)
+
+    if len(items) == 0:
         return (None, None)
 
-    combined = numpy.ma.concatenate([array(arg).ravel() for arg in args])
+    combined = numpy.ma.concatenate([array(item).ravel() for item in items])
     mask = numpy.ma.getmaskarray(combined)
     mask = numpy.logical_or(mask, numpy.isnan(combined).data)
     selection = numpy.logical_not(mask)

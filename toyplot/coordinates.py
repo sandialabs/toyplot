@@ -2142,10 +2142,8 @@ class Cartesian(object):
         mlstyle = allowed=toyplot.require.style(mlstyle, toyplot.require.style.text)
 
         if along == "x":
-            self._update_domain(position, series)
             coordinate_axes = ["x", "y"]
         elif along == "y":
-            self._update_domain(series, position)
             coordinate_axes = ["y", "x"]
 
         table = toyplot.data.Table()

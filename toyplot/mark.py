@@ -5,6 +5,7 @@
 from __future__ import division
 
 import collections
+import itertools
 import numpy
 import toyplot.color
 import toyplot.require
@@ -196,7 +197,7 @@ class BarMagnitudes(Mark):
             return toyplot.data.minimax([self._table[self._left[0]], self._table[self._right[0]]])
         if axis == self._coordinate_axes[1]:
             boundaries = numpy.column_stack([self._table[key] for key in self._magnitudes])
-            boundaries = numpy.column_stack((self._table[self._baseline], boundaries))
+            boundaries = numpy.column_stack((self._table[self._baseline[0]], boundaries))
             boundaries = numpy.cumsum(boundaries, axis=1)
             return toyplot.data.minimax([boundaries])
 
@@ -302,7 +303,7 @@ class FillMagnitudes(Mark):
             return toyplot.data.minimax([self._table[self._position[0]]])
         if axis == self._coordinate_axes[1]:
             boundaries = numpy.column_stack([self._table[key] for key in self._magnitudes])
-            boundaries = numpy.column_stack((self._table[self._baseline], boundaries))
+            boundaries = numpy.column_stack((self._table[self._baseline[0]], boundaries))
             boundaries = numpy.cumsum(boundaries, axis=1)
             return toyplot.data.minimax([boundaries])
 
@@ -668,6 +669,10 @@ class Scatterplot(Mark):
         self._mlstyle = toyplot.require.style(mlstyle, allowed=toyplot.require.style.text)
         # Export filename
         self._filename = toyplot.require.filename(filename)
+
+    def domain(self, axis):
+        return toyplot.data.minimax([self._table[coordinate_key] for coordinate_axis, coordinate_key in zip(itertools.cycle(self._coordinate_axes), self._coordinates) if coordinate_axis == axis])
+
 
 class Text(Mark):
 

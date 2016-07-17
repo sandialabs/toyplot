@@ -31,28 +31,44 @@ def minimax(items):
     min: minimum value of the input arrays, or None.
     max: maximum value of the input arrays, or None.
     """
-    def array(value):
-        if isinstance(value, numpy.ma.MaskedArray):
-            return value
-        if isinstance(value, numpy.ndarray):
-            return numpy.ma.array(value)
-        if value is None:
-            return numpy.ma.array([])
-        print value, type(value)
-        return numpy.ma.array([value])
+    group_min = None
+    group_max = None
 
-    items = list(items)
+    for item in items:
+        item_min = None
+        item_max = None
+        if isinstance(item, toyplot.data.Table):
+            raise ValueError("toyplot.data.Table is not allowed.")
+        elif isinstance(item, numpy.ma.MaskedArray):
+            pass
+        elif isinstance(item, numpy.ndarray):
+            item = numpy.ma.array(item)
+        elif item is None:
+            item = numpy.ma.array([])
+        else:
+            item = numpy.ma.array([item])
 
-    if len(items) == 0:
-        return (None, None)
+        selection = numpy.ma.getmaskarray(item)
+        selection = numpy.logical_or(selection, numpy.isnan(item).data)
+        selection = numpy.logical_not(selection)
+        if numpy.count_nonzero(selection):
+            item_min = item[selection].min()
+            item_max = item[selection].max()
 
-    combined = numpy.ma.concatenate([array(item).ravel() for item in items])
-    mask = numpy.ma.getmaskarray(combined)
-    mask = numpy.logical_or(mask, numpy.isnan(combined).data)
-    selection = numpy.logical_not(mask)
-    if numpy.count_nonzero(selection):
-        return (combined[selection].min(), combined[selection].max())
-    return (None, None)
+        if group_min is None:
+            group_min = item_min
+        else:
+            if item_min is not None:
+                group_min = min(group_min, item_min)
+
+        if group_max is None:
+            group_max = item_max
+        else:
+            if item_max is not None:
+                group_max = max(group_max, item_max)
+
+    return group_min, group_max
+
 
 def contiguous(a):
     """Split an array into a collection of contiguous ranges.

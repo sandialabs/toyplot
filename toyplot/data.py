@@ -48,8 +48,11 @@ def minimax(items):
         else:
             item = numpy.ma.array([item])
 
+        # Ignore null values
         selection = numpy.ma.getmaskarray(item)
-        selection = numpy.logical_or(selection, numpy.isnan(item).data)
+        # Ignore NaN values
+        if issubclass(item.dtype.type, numpy.number):
+            selection = numpy.logical_or(selection, numpy.isnan(item).data)
         selection = numpy.logical_not(selection)
         if numpy.count_nonzero(selection):
             item_min = item[selection].min()

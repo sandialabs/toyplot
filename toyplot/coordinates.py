@@ -589,7 +589,7 @@ class Axis(object):
         """:class:`toyplot.coordinates.Axis.TicksHelper` instance."""
         return self._ticks
 
-    def update_domain(self, values, display=True, data=True):
+    def _update_domain(self, values, display=True, data=True):
         if display:
             self._display_min, self._display_max = toyplot.data.minimax(itertools.chain([self._display_min, self._display_max], values))
 
@@ -832,36 +832,27 @@ class Cartesian(object):
         self._ymax_range = value
     ymax_range = property(fset = _set_ymax_range)
 
-    def _update_domain(self, x, y, display=True, data=True):
-        self.x.update_domain([x], display=display, data=data)
-        self.y.update_domain([y], display=display, data=data)
-
-    def _expand_domain_range(self, x, y, extents):
-        left, right, top, bottom = extents
-
-        self._expand_domain_range_x = x if self._expand_domain_range_x is None else numpy.concatenate(
-            (self._expand_domain_range_x, x))
-        self._expand_domain_range_y = y if self._expand_domain_range_y is None else numpy.concatenate(
-            (self._expand_domain_range_y, y))
-        self._expand_domain_range_left = left if self._expand_domain_range_left is None else numpy.concatenate(
-            (self._expand_domain_range_left, left))
-        self._expand_domain_range_right = right if self._expand_domain_range_right is None else numpy.concatenate(
-            (self._expand_domain_range_right, right))
-        self._expand_domain_range_top = top if self._expand_domain_range_top is None else numpy.concatenate(
-            (self._expand_domain_range_top, top))
-        self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
-            (self._expand_domain_range_bottom, bottom))
-
     def finalize(self):
         if self._finalized is None:
             # Begin with the implicit domain defined by our children.
             for child in self._children:
                 child = child.finalize()
-                self.x.update_domain(child.domain("x"), display=True, data=not child.annotation)
-                self.y.update_domain(child.domain("y"), display=True, data=not child.annotation)
+                self.x._update_domain(child.domain("x"), display=True, data=not child.annotation)
+                self.y._update_domain(child.domain("y"), display=True, data=not child.annotation)
 
-                coordinates, extents = child.extents(["x", "y"])
-                self._expand_domain_range(coordinates[0], coordinates[1], extents)
+                (x, y), (left, right, top, bottom) = child.extents(["x", "y"])
+                self._expand_domain_range_x = x if self._expand_domain_range_x is None else numpy.concatenate(
+                    (self._expand_domain_range_x, x))
+                self._expand_domain_range_y = y if self._expand_domain_range_y is None else numpy.concatenate(
+                    (self._expand_domain_range_y, y))
+                self._expand_domain_range_left = left if self._expand_domain_range_left is None else numpy.concatenate(
+                    (self._expand_domain_range_left, left))
+                self._expand_domain_range_right = right if self._expand_domain_range_right is None else numpy.concatenate(
+                    (self._expand_domain_range_right, right))
+                self._expand_domain_range_top = top if self._expand_domain_range_top is None else numpy.concatenate(
+                    (self._expand_domain_range_top, top))
+                self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
+                    (self._expand_domain_range_bottom, bottom))
 
             # Begin with the implicit domain defined by our data.
             xdomain_min = self.x._display_min
@@ -2321,11 +2312,6 @@ class Cartesian(object):
             )
         table["fill"] = color[:, 0]
 
-        self._update_domain(
-            table["x"], table["y"], display=True, data=not annotation)
-        self._expand_domain_range(table["x"], table["y"], toyplot.text.extents(
-            table["text"], table["angle"], style))
-
         self._children.append(
             toyplot.mark.Text(
                 coordinate_axes=["x", "y"],
@@ -2499,8 +2485,8 @@ class Numberline(object):
     def spacing(self, value):
         self._spacing = toyplot.units.convert(value, target="px", default="px")
 
-    def update_domain(self, values, display=True, data=True):
-        self.axis.update_domain([values], display=display, data=data)
+    def _update_domain(self, values, display=True, data=True):
+        self.axis._update_domain([values], display=display, data=data)
 
     def colormap(self, colormap, offset=None, width=10, style=None):
         if not isinstance(colormap, toyplot.color.Map):
@@ -2511,7 +2497,7 @@ class Numberline(object):
         if offset is None:
             offset = len(self._children) * self._spacing
 
-        self.update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=True)
+        self._update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=True)
         self._children.append(colormap)
         self._child_offset[colormap] = offset
         self._child_width[colormap] = width
@@ -2579,7 +2565,7 @@ class Numberline(object):
         mstyle = toyplot.require.style(mstyle, allowed=toyplot.require.style.marker)
         mlstyle = toyplot.require.style(mlstyle, allowed=toyplot.require.style.text)
 
-        self.update_domain(coordinates)
+        self._update_domain(coordinates)
         coordinate_axes = ["x"]
 
         table = toyplot.data.Table()

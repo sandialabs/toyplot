@@ -748,6 +748,17 @@ class Text(Mark):
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
+    def domain(self, axis):
+        for index, coordinate_axis in enumerate(self._coordinate_axes):
+            if coordinate_axis == axis:
+                return toyplot.data.minimax(self._table[self._coordinates[index]])
+
+    def extents(self, axes):
+        axis_map = {key: index for index, key in enumerate(self._coordinate_axes)}
+        coordinates = tuple([self._table[self._coordinates[axis_map[axis]]] for axis in axes])
+        extents = toyplot.text.extents(self._table[self._text[0]], self._table[self._angle[0]], self._style)
+        return coordinates, extents
+
 
 ##########################################################################
 # More specialized marks

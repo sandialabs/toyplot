@@ -35,7 +35,7 @@ class Mark(object):
         return self
 
     def domain(self, axis):
-        """Return minimum and maximum domain values for the given axis.
+        """Return minimum and maximum domain values for the mark along the given axis.
 
         Parameters
         ----------
@@ -47,9 +47,23 @@ class Mark(object):
         minimum: minimum domain value along the given axis, or `None`.
         maximum: maximum domain value along the given axis, or `None`.
         """
-        #raise NotImplementedError()
         return (None, None)
 
+    def extents(self, axes):
+        """Return range extents for the mark using the given axes.
+
+        Parameters
+        ----------
+        axes: sequence of strings, required
+            Specifies the order in which domain coordinates must be returned.
+
+        Returns
+        -------
+        coordinates: tuple containing arrays of coordinates, in the order specified by the `axes` parameter.
+        extents: (left, right, top, bottom) tuple of arrays containing the extents of each datum in range-space, relative to the domain coordinates.
+        """
+        empty = numpy.array([])
+        return tuple([empty] * len(axes)), tuple([empty] * 4)
 
 class AxisLines(Mark):
 

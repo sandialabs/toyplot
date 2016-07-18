@@ -860,6 +860,9 @@ class Cartesian(object):
                 self.x.update_domain(child.domain("x"), display=True, data=not child.annotation)
                 self.y.update_domain(child.domain("y"), display=True, data=not child.annotation)
 
+                coordinates, extents = child.extents(["x", "y"])
+                self._expand_domain_range(coordinates[0], coordinates[1], extents)
+
             # Begin with the implicit domain defined by our data.
             xdomain_min = self.x._display_min
             xdomain_max = self.x._display_max

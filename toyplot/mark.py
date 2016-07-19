@@ -31,7 +31,7 @@ class Mark(object):
     def annotation(self, value):
         self._annotation = True if value else False
 
-    def finalize(self):
+    def _finalize(self):
         return self
 
     def domain(self, axis):

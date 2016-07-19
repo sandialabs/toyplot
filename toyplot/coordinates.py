@@ -607,7 +607,7 @@ class Axis(object):
                 return toyplot.locator.Log(base=base)
         raise RuntimeError("Unable to create an appropriate locator.") # pragma: no cover
 
-    def finalize(
+    def _finalize(
             self,
             x1,
             x2,
@@ -832,27 +832,28 @@ class Cartesian(object):
         self._ymax_range = value
     ymax_range = property(fset = _set_ymax_range)
 
-    def finalize(self):
+    def _finalize(self):
         if self._finalized is None:
             # Begin with the implicit domain defined by our children.
             for child in self._children:
-                child = child.finalize()
-                self.x._update_domain(child.domain("x"), display=True, data=not child.annotation)
-                self.y._update_domain(child.domain("y"), display=True, data=not child.annotation)
+                child = child._finalize()
+                if child is not None:
+                    self.x._update_domain(child.domain("x"), display=True, data=not child.annotation)
+                    self.y._update_domain(child.domain("y"), display=True, data=not child.annotation)
 
-                (x, y), (left, right, top, bottom) = child.extents(["x", "y"])
-                self._expand_domain_range_x = x if self._expand_domain_range_x is None else numpy.concatenate(
-                    (self._expand_domain_range_x, x))
-                self._expand_domain_range_y = y if self._expand_domain_range_y is None else numpy.concatenate(
-                    (self._expand_domain_range_y, y))
-                self._expand_domain_range_left = left if self._expand_domain_range_left is None else numpy.concatenate(
-                    (self._expand_domain_range_left, left))
-                self._expand_domain_range_right = right if self._expand_domain_range_right is None else numpy.concatenate(
-                    (self._expand_domain_range_right, right))
-                self._expand_domain_range_top = top if self._expand_domain_range_top is None else numpy.concatenate(
-                    (self._expand_domain_range_top, top))
-                self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
-                    (self._expand_domain_range_bottom, bottom))
+                    (x, y), (left, right, top, bottom) = child.extents(["x", "y"])
+                    self._expand_domain_range_x = x if self._expand_domain_range_x is None else numpy.concatenate(
+                        (self._expand_domain_range_x, x))
+                    self._expand_domain_range_y = y if self._expand_domain_range_y is None else numpy.concatenate(
+                        (self._expand_domain_range_y, y))
+                    self._expand_domain_range_left = left if self._expand_domain_range_left is None else numpy.concatenate(
+                        (self._expand_domain_range_left, left))
+                    self._expand_domain_range_right = right if self._expand_domain_range_right is None else numpy.concatenate(
+                        (self._expand_domain_range_right, right))
+                    self._expand_domain_range_top = top if self._expand_domain_range_top is None else numpy.concatenate(
+                        (self._expand_domain_range_top, top))
+                    self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
+                        (self._expand_domain_range_bottom, bottom))
 
             # Begin with the implicit domain defined by our data.
             xdomain_min = self.x._display_min
@@ -1027,7 +1028,7 @@ class Cartesian(object):
                 y_label_location = "below"
 
             # Finalize the axes.
-            self.x.finalize(
+            self.x._finalize(
                 x1=self._xmin_range,
                 x2=self._xmax_range,
                 y1=x_spine_y,
@@ -1043,7 +1044,7 @@ class Cartesian(object):
                 default_ticks_near=x_ticks_near,
                 default_label_location=x_label_location,
                 )
-            self.y.finalize(
+            self.y._finalize(
                 x1=y_spine_x,
                 x2=y_spine_x,
                 y1=self._ymax_range,
@@ -2618,7 +2619,7 @@ class Numberline(object):
 
         return mark
 
-    def finalize(self):
+    def _finalize(self):
         if self._finalized is None:
             # Begin with the implicit domain defined by our data.
             domain_min = self.axis._display_min
@@ -2660,7 +2661,7 @@ class Numberline(object):
                 domain_max = numpy.amax((domain_max, tick_locations[-1]))
 
             # Finalize the axis.
-            self.axis.finalize(
+            self.axis._finalize(
                 x1=self._x1,
                 x2=self._x2,
                 y1=self._y1,
@@ -2678,10 +2679,6 @@ class Numberline(object):
                 #label_baseline_shift="-200%",
                 )
             self._finalized = self
-
-            # Finalize children
-            for child in self._children:
-                child.finalize()
 
         return self._finalized
 
@@ -2719,8 +2716,8 @@ class Table(object):
         def __init__(self, series):
             self._series = toyplot.require.value_in(series, ["columns", "rows"])
 
-        def finalize(self):
-            toyplot.log.debug("toyplot.coordinates.Table.CellMark.finalize()")
+        def _finalize(self):
+            toyplot.log.debug("toyplot.coordinates.Table.CellMark._finalize()")
             return None
 
     class CellBarMark(CellMark):
@@ -2944,7 +2941,7 @@ class Table(object):
             ):
 
             axes = toyplot.coordinates.Table.EmbeddedCartesian(
-                xmin_range=0, # These will be calculated for real in finalize().
+                xmin_range=0, # These will be calculated for real in _finalize().
                 xmax_range=1,
                 ymin_range=0,
                 ymax_range=1,
@@ -3002,7 +2999,7 @@ class Table(object):
 #            self._table._cell_format[self._selection] = toyplot.format.NullFormatter()
 #
 #            axes = toyplot.coordinates.Cartesian(
-#                xmin_range=0, # These will be calculated for real in finalize().
+#                xmin_range=0, # These will be calculated for real in _finalize().
 #                xmax_range=1,
 #                ymin_range=0,
 #                ymax_range=1,
@@ -3567,7 +3564,7 @@ class Table(object):
         toyplot.log.warning("table.row is deprecated, use table.cells.row instead.")
         return self.cells.row(row)
 
-    def finalize(self):
+    def _finalize(self):
         if self._finalized is None:
             # Collect explicit row heights, column widths, and gaps.
             row_heights = numpy.zeros(len(self._row_heights) + len(self._row_gaps))
@@ -3732,8 +3729,6 @@ class Table(object):
                     axes.ymax_range = self._cell_bottom[row_max] - padding
                 else:
                     raise NotImplementedError("Unknown coordinate system: %s" % axes)
-
-                axes.finalize()
 
             self._finalized = self
         return self._finalized

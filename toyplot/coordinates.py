@@ -2812,38 +2812,109 @@ class Table(object):
 
             return self._finalized
 
-#    class LinePlot(CellMark):
-#        def __init__(self,
-#                area,
-#                color,
-#                filename,
-#                marker,
-#                mfill,
-#                mlstyle,
-#                mopacity,
-#                mstyle,
-#                opacity,
-#                series,
-#                size,
-#                stroke_width,
-#                style,
-#                title,
-#                ):
-#            Table.CellMark.__init__(self, series)
-#            self._area = area
-#            self._color = color
-#            self._filename = filename
-#            self._marker = marker
-#            self._mfill = mfill
-#            self._mlstyle = mlstyle
-#            self._mopacity = mopacity
-#            self._mstyle = mstyle
-#            self._opacity = opacity
-#            self._size = size
-#            self._stroke_width = stroke_width
-#            self._style = style
-#            self._title = title
+    class CellPlotMark(CellMark):
+        def __init__(self,
+                table,
+                axes,
+                area,
+                color,
+                filename,
+                marker,
+                mfill,
+                mlstyle,
+                mopacity,
+                mstyle,
+                opacity,
+                series,
+                size,
+                stroke_width,
+                style,
+                title,
+                ):
+            Table.CellMark.__init__(self, table, axes, series)
+            self._area = area
+            self._color = color
+            self._filename = filename
+            self._marker = marker
+            self._mfill = mfill
+            self._mlstyle = mlstyle
+            self._mopacity = mopacity
+            self._mstyle = mstyle
+            self._opacity = opacity
+            self._size = size
+            self._stroke_width = stroke_width
+            self._style = style
+            self._title = title
 
+        def _finalize(self):
+            if self._finalized is None:
+                rows, columns = numpy.nonzero(self._table._cell_axes == self._axes)
+                row_min = rows.min()
+                row_max = rows.max()
+                column_min = columns.min()
+                column_max = columns.max()
+
+                if self._series == "columns":
+                    shape = (row_max + 1 - row_min, column_max + 1 - column_min)
+                    cell_begin = self._table._cell_top
+                    cell_end = self._table._cell_bottom
+                    cell_indices = numpy.unique(rows)
+                    along = "y"
+                    along_axis = self._axes.y
+                    series = self._table._cell_data[self._table._cell_axes == self._axes].reshape(shape).astype("float64")
+                elif self._series == "rows":
+                    shape = (column_max + 1 - column_min, row_max + 1 - row_min)
+                    cell_begin = self._table._cell_left
+                    cell_end = self._table._cell_right
+                    cell_indices = numpy.unique(columns)
+                    along = "x"
+                    along_axis = self._axes.x
+                    series = self._table._cell_data[self._table._cell_axes == self._axes].reshape(shape).astype("float64")[:,::-1]
+
+                segments = []
+                for index, cell_index in enumerate(cell_indices):
+                    segments.append(toyplot.projection.Piecewise.Segment(
+                        "linear",
+                        index - 0.5,
+                        index - 0.5,
+                        index + 0.5,
+                        index + 0.5,
+                        cell_begin[cell_index],
+                        cell_begin[cell_index],
+                        cell_end[cell_index],
+                        cell_end[cell_index],
+                        ))
+                projection = toyplot.projection.Piecewise(segments)
+                along_axis._scale = projection
+
+                color = self._color
+                if isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
+                    color = (series, color[1])
+
+                mfill = self._mfill
+                if isinstance(mfill, tuple) and len(mfill) == 2 and mfill[0] == "datum":
+                    mfill = (series, mfill[1])
+
+                self._axes.plot(
+                    series,
+                    along=along,
+                    area=self._area,
+                    color=color,
+                    filename=self._filename,
+                    marker=self._marker,
+                    mfill=mfill,
+                    mlstyle=self._mlstyle,
+                    mopacity=self._mopacity,
+                    mstyle=self._mstyle,
+                    opacity=self._opacity,
+                    size=self._size,
+                    stroke_width=self._stroke_width,
+                    style=self._style,
+                    title=self._title,
+                    )
+                self._finalized = self._axes._children.pop()
+
+            return self._finalized
 
     class EmbeddedCartesian(Cartesian):
         def __init__(self, table, *args, **kwargs):
@@ -2877,6 +2948,47 @@ class Table(object):
                 width=width,
                 )
 
+            self._children.append(mark)
+            return mark
+
+
+        def cell_plot(
+                self,
+                area=None,
+                color=None,
+                filename=None,
+                marker=None,
+                mfill=None,
+                mlstyle=None,
+                mopacity=1.0,
+                mstyle=None,
+                mtitle=None,
+                opacity=1.0,
+                series="columns",
+                size=None,
+                stroke_width=2.0,
+                style=None,
+                title=None,
+                ):
+
+            mark = toyplot.coordinates.Table.CellPlotMark(
+                table=self._table,
+                axes=self,
+                area=area,
+                color=color,
+                filename=filename,
+                marker=marker,
+                mfill=mfill,
+                mlstyle=mlstyle,
+                mopacity=mopacity,
+                mstyle=mstyle,
+                opacity=opacity,
+                series=series,
+                size=size,
+                stroke_width=stroke_width,
+                style=style,
+                title=title,
+                )
             self._children.append(mark)
             return mark
 
@@ -3045,102 +3157,9 @@ class Table(object):
             self._table._cell_data[self._selection] = self._table._cell_data[self._selection][0]
             return self
 
-#        def plot(
-#                self,
-#                area=None,
-#                color=None,
-#                filename=None,
-#                marker=None,
-#                mfill=None,
-#                mlstyle=None,
-#                mopacity=1.0,
-#                mstyle=None,
-#                mtitle=None,
-#                opacity=1.0,
-#                series="columns",
-#                size=None,
-#                stroke_width=2.0,
-#                style=None,
-#                title=None,
-#                ):
-#            self._table._merge_cells(self._selection)
-#            self._table._cell_format[self._selection] = toyplot.format.NullFormatter()
-#
-#            axes = toyplot.coordinates.Cartesian(
-#                xmin_range=0, # These will be calculated for real in _finalize().
-#                xmax_range=1,
-#                ymin_range=0,
-#                ymax_range=1,
-#                xmin=None,
-#                xmax=None,
-#                ymin=None,
-#                ymax=None,
-#                aspect=None,
-#                show=True,
-#                xshow=False,
-#                yshow=False,
-#                label=None,
-#                xlabel=None,
-#                ylabel=None,
-#                xticklocator=None,
-#                yticklocator=None,
-#                xscale="linear",
-#                yscale="linear",
-#                padding=5,
-#                parent=self._table._parent,
-#                )
-#
-#            self._table._cell_axes[self._selection] = axes
-#            self._table._axes.append(axes)
-#            self._table._axes_padding.append(0)
-#
-#            auto_plot = Table.LinePlot(
-#                area=area,
-#                color=color,
-#                filename=filename,
-#                marker=marker,
-#                mfill=mfill,
-#                mlstyle=mlstyle,
-#                mopacity=mopacity,
-#                mstyle=mstyle,
-#                opacity=opacity,
-#                series=series,
-#                size=size,
-#                stroke_width=stroke_width,
-#                style=style,
-#                title=title,
-#                )
-#            self._table._auto_plot[auto_plot] = axes
-
-
     class ColumnCellReference(CellReference):
         def __init__(self, table, selection):
             Table.CellReference.__init__(self, table, selection)
-
-        def bars(
-                self,
-                baseline="stacked",
-                color=None,
-                filename=None,
-                opacity=1.0,
-                padding=5,
-                series="columns",
-                style=None,
-                title=None,
-                width=0.66,
-                ):
-            return Table.CellReference.bars(
-                self,
-                baseline=baseline,
-                color=color,
-                filename=filename,
-                opacity=opacity,
-                padding=padding,
-                series=series,
-                style=style,
-                title=title,
-                width=width,
-                )
 
         def delete(self):
             row_indices, column_indices = self._table._selection_coordinates(self._selection)
@@ -3149,31 +3168,6 @@ class Table(object):
     class RowCellReference(CellReference):
         def __init__(self, table, selection):
             Table.CellReference.__init__(self, table, selection)
-
-        def bars(
-                self,
-                baseline="stacked",
-                color=None,
-                filename=None,
-                opacity=1.0,
-                padding=5,
-                series="rows",
-                style=None,
-                title=None,
-                width=0.66,
-                ):
-            return Table.CellReference.bars(
-                self,
-                baseline=baseline,
-                color=color,
-                filename=filename,
-                opacity=opacity,
-                padding=padding,
-                series=series,
-                style=style,
-                title=title,
-                width=width,
-                )
 
         def delete(self):
             row_indices, column_indices = self._table._selection_coordinates(self._selection)
@@ -3672,76 +3666,6 @@ class Table(object):
                 (column_boundaries[1:-1:2] + column_boundaries[2:-1:2]) / 2,
                 column_boundaries[-1:],
                 ))
-
-#            # Generate "auto plots".
-#            for auto_plot, axes in self._auto_plot.items():
-#                rows, columns = numpy.nonzero(self._cell_axes == axes)
-#                row_min = rows.min()
-#                row_max = rows.max()
-#                column_min = columns.min()
-#                column_max = columns.max()
-#
-#                if auto_plot._series == "columns":
-#                    shape = (row_max + 1 - row_min, column_max + 1 - column_min)
-#                    cell_begin = self._cell_top
-#                    cell_end = self._cell_bottom
-#                    cell_indices = numpy.unique(rows)
-#                    along = "y"
-#                    along_axis = axes.y
-#                    series = self._cell_data[self._cell_axes == axes].reshape(shape).astype("float64")
-#                elif auto_plot._series == "rows":
-#                    shape = (column_max + 1 - column_min, row_max + 1 - row_min)
-#                    cell_begin = self._cell_left
-#                    cell_end = self._cell_right
-#                    cell_indices = numpy.unique(columns)
-#                    along = "x"
-#                    along_axis = axes.x
-#                    series = self._cell_data[self._cell_axes == axes].reshape(shape).astype("float64")[:,::-1]
-#
-#                if isinstance(auto_plot, Table.LinePlot):
-#                    segments = []
-#                    for index, cell_index in enumerate(cell_indices):
-#                        segments.append(toyplot.projection.Piecewise.Segment(
-#                            "linear",
-#                            index - 0.5,
-#                            index - 0.5,
-#                            index + 0.5,
-#                            index + 0.5,
-#                            cell_begin[cell_index],
-#                            cell_begin[cell_index],
-#                            cell_end[cell_index],
-#                            cell_end[cell_index],
-#                            ))
-#                    projection = toyplot.projection.Piecewise(segments)
-#                    along_axis._scale = projection
-#
-#                    color = auto_plot._color
-#                    if isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
-#                        color = (series, color[1])
-#
-#                    mfill = auto_plot._mfill
-#                    if isinstance(mfill, tuple) and len(mfill) == 2 and mfill[0] == "datum":
-#                        mfill = (series, mfill[1])
-#
-#                    axes.plot(
-#                        series,
-#                        along=along,
-#                        area=auto_plot._area,
-#                        color=color,
-#                        filename=auto_plot._filename,
-#                        marker=auto_plot._marker,
-#                        mfill=mfill,
-#                        mlstyle=auto_plot._mlstyle,
-#                        mopacity=auto_plot._mopacity,
-#                        mstyle=auto_plot._mstyle,
-#                        opacity=auto_plot._opacity,
-#                        size=auto_plot._size,
-#                        stroke_width=auto_plot._stroke_width,
-#                        style=auto_plot._style,
-#                        title=auto_plot._title,
-#                        )
-#                else:
-#                    raise NotImplementedError("Unknown plot: %s" % auto_plot)
 
             # Assign ranges and finalize embedded coordinate systems.
             for axes, padding in zip(self._axes, self._axes_padding):

@@ -2713,15 +2713,19 @@ class Table(object):
 
 
     class CellMark(object):
-        def __init__(self, series):
+        def __init__(self, table, axes, series):
+            self._table = table
+            self._axes = axes
             self._series = toyplot.require.value_in(series, ["columns", "rows"])
+            self._finalized = None
 
         def _finalize(self):
-            toyplot.log.debug("toyplot.coordinates.Table.CellMark._finalize()")
-            return None
+            raise NotImplementedError()
 
     class CellBarMark(CellMark):
         def __init__(self,
+                table,
+                axes,
                 baseline,
                 color,
                 filename,
@@ -2732,7 +2736,7 @@ class Table(object):
                 title,
                 width,
                 ):
-            Table.CellMark.__init__(self, series)
+            Table.CellMark.__init__(self, table, axes, series)
 
             self._baseline = baseline
             self._color = color
@@ -2743,6 +2747,70 @@ class Table(object):
             self._title = title
             self._width = toyplot.require.scalar(width)
 
+        def _finalize(self):
+            if self._finalized is None:
+                rows, columns = numpy.nonzero(self._table._cell_axes == self._axes)
+                row_min = rows.min()
+                row_max = rows.max()
+                column_min = columns.min()
+                column_max = columns.max()
+
+                if self._series == "columns":
+                    shape = (row_max + 1 - row_min, column_max + 1 - column_min)
+                    cell_begin = self._table._cell_top
+                    cell_end = self._table._cell_bottom
+                    cell_indices = numpy.unique(rows)
+                    along = "y"
+                    along_axis = self._axes.y
+                    series = self._table._cell_data[self._table._cell_axes == self._axes].reshape(shape).astype("float64")
+                elif self._series == "rows":
+                    shape = (column_max + 1 - column_min, row_max + 1 - row_min)
+                    cell_begin = self._table._cell_left
+                    cell_end = self._table._cell_right
+                    cell_indices = numpy.unique(columns)
+                    along = "x"
+                    along_axis = self._axes.x
+                    series = self._table._cell_data[self._table._cell_axes == self._axes].reshape(shape).astype("float64")[:,::-1]
+
+                width = min(0.5 - numpy.finfo("float32").eps, 0.5 * self._width)
+                begin = numpy.arange(shape[0]) - width
+                end = numpy.arange(shape[0]) + width
+
+                segments = []
+                for index, cell_index in enumerate(cell_indices):
+                    segments.append(toyplot.projection.Piecewise.Segment(
+                        "linear",
+                        index - 0.5,
+                        index - 0.5,
+                        index + 0.5,
+                        index + 0.5,
+                        cell_begin[cell_index] + self._padding,
+                        cell_begin[cell_index] + self._padding,
+                        cell_end[cell_index] - self._padding,
+                        cell_end[cell_index] - self._padding,
+                        ))
+                projection = toyplot.projection.Piecewise(segments)
+                along_axis._scale = projection
+
+                color = self._color
+                if isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
+                    color = (series, color[1])
+
+                self._axes.bars(
+                    begin,
+                    end,
+                    series,
+                    along=along,
+                    baseline=self._baseline,
+                    color=color,
+                    filename=self._filename,
+                    opacity=self._opacity,
+                    style=self._style,
+                    title=self._title,
+                    )
+                self._finalized = self._axes._children.pop()
+
+            return self._finalized
 
 #    class LinePlot(CellMark):
 #        def __init__(self,
@@ -2778,8 +2846,9 @@ class Table(object):
 
 
     class EmbeddedCartesian(Cartesian):
-        def __init__(self, *args, **kwargs):
-            toyplot.coordinates.Cartesian.__init__(self, *args, **kwargs)
+        def __init__(self, table, *args, **kwargs):
+            toyplot.coordinates.Cartesian.__init__(self, *args, xmin_range=0, xmax_range=1, ymin_range=0, ymax_range=1, **kwargs)
+            self._table = table
 
         def cell_bars(
                 self,
@@ -2795,6 +2864,8 @@ class Table(object):
                 ):
 
             mark = toyplot.coordinates.Table.CellBarMark(
+                table=self._table,
+                axes=self,
                 baseline=baseline,
                 color=color,
                 filename=filename,
@@ -2941,10 +3012,7 @@ class Table(object):
             ):
 
             axes = toyplot.coordinates.Table.EmbeddedCartesian(
-                xmin_range=0, # These will be calculated for real in _finalize().
-                xmax_range=1,
-                ymin_range=0,
-                ymax_range=1,
+                table = self._table,
                 xmin=xmin,
                 xmax=xmax,
                 ymin=ymin,
@@ -3356,8 +3424,6 @@ class Table(object):
         self._axes = []
         self._axes_padding = []
 
-#        self._auto_plot = {}
-
         self._label = Table.Label(
             label, style={"font-size": "14px", "baseline-shift": "100%"})
 
@@ -3632,44 +3698,7 @@ class Table(object):
 #                    along_axis = axes.x
 #                    series = self._cell_data[self._cell_axes == axes].reshape(shape).astype("float64")[:,::-1]
 #
-#                if isinstance(auto_plot, Table.BarPlot):
-#                    width = min(0.5 - numpy.finfo("float32").eps, 0.5 * auto_plot._width)
-#                    begin = numpy.arange(shape[0]) - width
-#                    end = numpy.arange(shape[0]) + width
-#
-#                    segments = []
-#                    for index, cell_index in enumerate(cell_indices):
-#                        segments.append(toyplot.projection.Piecewise.Segment(
-#                            "linear",
-#                            index - 0.5,
-#                            index - 0.5,
-#                            index + 0.5,
-#                            index + 0.5,
-#                            cell_begin[cell_index] + auto_plot._padding,
-#                            cell_begin[cell_index] + auto_plot._padding,
-#                            cell_end[cell_index] - auto_plot._padding,
-#                            cell_end[cell_index] - auto_plot._padding,
-#                            ))
-#                    projection = toyplot.projection.Piecewise(segments)
-#                    along_axis._scale = projection
-#
-#                    color = auto_plot._color
-#                    if isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
-#                        color = (series, color[1])
-#
-#                    axes.bars(
-#                        begin,
-#                        end,
-#                        series,
-#                        along=along,
-#                        baseline=auto_plot._baseline,
-#                        color=color,
-#                        filename=auto_plot._filename,
-#                        opacity=auto_plot._opacity,
-#                        style=auto_plot._style,
-#                        title=auto_plot._title,
-#                        )
-#                elif isinstance(auto_plot, Table.LinePlot):
+#                if isinstance(auto_plot, Table.LinePlot):
 #                    segments = []
 #                    for index, cell_index in enumerate(cell_indices):
 #                        segments.append(toyplot.projection.Piecewise.Segment(

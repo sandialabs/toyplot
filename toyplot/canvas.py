@@ -603,6 +603,9 @@ class Canvas(object):
                 table.bottom.cell[0, j].data = label
                 #table.bottom.cell[0, j].title = title
 
+        table.body.cells.data = matrix
+        table.body.cells.format = toyplot.format.NullFormatter()
+
         for i, row in enumerate(matrix):
             for j, value in enumerate(row):
                 cell = table.body.cell[i, j]

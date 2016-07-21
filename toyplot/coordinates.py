@@ -601,6 +601,8 @@ class Axis(object):
             return self.ticks.locator
         if self.scale == "linear":
             return toyplot.locator.Extended()
+        if isinstance(self.scale, toyplot.projection.Projection):
+            return toyplot.locator.Null()
         else:
             scale, base = self.scale
             if scale == "log":
@@ -2793,7 +2795,9 @@ class Table(object):
                 along_axis._scale = projection
 
                 color = self._color
-                if isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
+                if color == "datum":
+                    color = series
+                elif isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
                     color = (series, color[1])
 
                 self._axes.bars(
@@ -2888,11 +2892,15 @@ class Table(object):
                 along_axis._scale = projection
 
                 color = self._color
-                if isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
+                if color == "datum":
+                    color = series
+                elif isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
                     color = (series, color[1])
 
                 mfill = self._mfill
-                if isinstance(mfill, tuple) and len(mfill) == 2 and mfill[0] == "datum":
+                if mfill == "datum":
+                    mfill = series
+                elif isinstance(mfill, tuple) and len(mfill) == 2 and mfill[0] == "datum":
                     mfill = (series, mfill[1])
 
                 self._axes.plot(
@@ -2927,11 +2935,11 @@ class Table(object):
                 color=None,
                 filename=None,
                 opacity=1.0,
-                padding=5,
+                padding=0,
                 series="columns",
                 style=None,
                 title=None,
-                width=0.66,
+                width=0.5,
                 ):
 
             mark = toyplot.coordinates.Table.CellBarMark(
@@ -3066,9 +3074,9 @@ class Table(object):
                 ymin=None,
                 ymax=None,
                 aspect=None,
-                show=False,
-                xshow=True,
-                yshow=True,
+                show=True,
+                xshow=False,
+                yshow=False,
                 label=None,
                 xlabel=None,
                 ylabel=None,
@@ -3076,8 +3084,8 @@ class Table(object):
                 yticklocator=None,
                 xscale="linear",
                 yscale="linear",
-                padding=5,
-                cell_padding=0,
+                padding=3,
+                cell_padding=3,
             ): # pragma: no cover
             toyplot.log.warning("axes() is deprecated, use cartesian() instead.")
             return self.cartesian(
@@ -3108,9 +3116,9 @@ class Table(object):
                 ymin=None,
                 ymax=None,
                 aspect=None,
-                show=False,
-                xshow=True,
-                yshow=True,
+                show=True,
+                xshow=False,
+                yshow=False,
                 label=None,
                 xlabel=None,
                 ylabel=None,
@@ -3118,8 +3126,8 @@ class Table(object):
                 yticklocator=None,
                 xscale="linear",
                 yscale="linear",
-                padding=5,
-                cell_padding=0,
+                padding=3,
+                cell_padding=3,
             ):
 
             axes = toyplot.coordinates.Table.EmbeddedCartesian(

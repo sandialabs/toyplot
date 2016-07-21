@@ -123,12 +123,12 @@ def step_impl(context):
 @then(u'the table can be rendered with embedded plots')
 def step_impl(context):
     numpy.random.seed(1234)
-    context.table_axes.body.cell[0, 3].axes().plot(numpy.sin(numpy.linspace(0, 10)))
-    context.table_axes.body.cell[1, 3].axes().bars(
+    context.table_axes.body.cell[0, 3].cartesian().plot(numpy.sin(numpy.linspace(0, 10)))
+    context.table_axes.body.cell[1, 3].cartesian().bars(
         numpy.random.uniform(0.1, 1, size=10))
-    context.table_axes.body.cell[2, 3].axes().bars(numpy.random.choice(
+    context.table_axes.body.cell[2, 3].cartesian().bars(numpy.random.choice(
         [-1, 1], size=30), color=numpy.random.choice(["red", "blue"], size=30))
-    context.table_axes.body.cell[3:5, 3].axes().fill(
+    context.table_axes.body.cell[3:5, 3].cartesian().fill(
         3 + numpy.cos(numpy.linspace(0, 5)) + numpy.sin(numpy.linspace(0, 20)))
 
 
@@ -161,8 +161,8 @@ def step_impl(context):
 @then(u'the table can be rendered with multiple embedded axes in merged cells')
 def step_impl(context):
     numpy.random.seed(1234)
-    context.table_axes.body.column[2].merge().axes().bars(numpy.random.random(20), along="y")
-    context.table_axes.body.column[3].merge().axes().bars(numpy.random.random(20), along="y")
+    context.table_axes.body.column[2].merge().cartesian().bars(numpy.random.random(20), along="y")
+    context.table_axes.body.column[3].merge().cartesian().bars(numpy.random.random(20), along="y")
 
 
 @then(u'the table can be rendered with real world units')

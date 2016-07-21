@@ -61,7 +61,6 @@ Feature: Table axes
             | dimensions | reference |
             | 4 rows and 3 columns | table-four-rows-three-columns |
 
-    @wip
     Scenario Outline: Table merging
         Given a default canvas
         And an instance of toyplot.coordinates.Table with every region enabled

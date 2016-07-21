@@ -3120,7 +3120,6 @@ class Table(object):
                 yscale="linear",
                 padding=5,
                 cell_padding=0,
-                clear_data=True,
             ):
 
             axes = toyplot.coordinates.Table.EmbeddedCartesian(

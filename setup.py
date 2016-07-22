@@ -34,7 +34,7 @@ setup(
   * Create the best possible data graphics "out-of-the-box", maximizing data ink and minimizing chartjunk.
   * Provide a clean, minimalist interface that scientists and engineers will love.
 
-  See the Toyplot documentation at http://toyplot.readthedocs.org, and the Toyplot sources at http://github.com/sandialabs/toyplot""",
+  See the Toyplot documentation at http://toyplot.readthedocs.io, and the Toyplot sources at http://github.com/sandialabs/toyplot""",
     maintainer="Timothy M. Shead",
     maintainer_email="tshead@sandia.gov",
     url="http://toyplot.readthedocs.org",

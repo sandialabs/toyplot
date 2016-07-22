@@ -7,6 +7,22 @@
 Release Notes
 =============
 
+Toyplot 0.13.0 - July 22, 2016
+------------------------------
+
+* Allow fill marks to be used as annotation.
+* Explicitly disable data export from annotation marks.
+* Add an experimental `<axis>.domain.show` parameter to control whether the domain is displayed using axis spines.
+* `toyplot.data.read_csv(convert=True)` will try to parse integer as well as floating-point types.
+* Completely rewrote the table coordinates implementation.
+* Table coordinates support advanced, numpy-style indexing for all rows, columns, cells, gridlines, and gaps.
+* Added API to delete table coordinate rows and columns.
+* Added API to insert table coordinate rows and columns.
+* By default, all table cells are vertically and horizontally centered with a default font.
+* Matrix visualizations no longer bold row and column indices by default.
+* End-users can export CSV data from table coordinates and matrix visualizations.
+* Added table-cell bar plots and line plots that use the data already contained in the table.
+
 Toyplot 0.12.0 - May 27, 2016
 -----------------------------
 

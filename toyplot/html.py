@@ -1539,8 +1539,17 @@ def _render(canvas, axes, context):
             cell_left = axes._cell_left[column_min]
             cell_right = axes._cell_right[column_max]
 
+            cell_parent_xml = axes_xml
+            cell_link = axes._cell_link[cell_selection][0]
+            if cell_link is not None:
+                cell_parent_xml = xml.SubElement(
+                    cell_parent_xml,
+                    "a",
+                    attrib={"xlink:href": cell_link},
+                    )
+
             cell_xml = xml.SubElement(
-                axes_xml,
+                cell_parent_xml,
                 "rect",
                 x=repr(cell_left),
                 y=repr(cell_top),

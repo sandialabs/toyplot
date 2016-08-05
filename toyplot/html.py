@@ -1530,9 +1530,11 @@ def _render(canvas, axes, context):
         column_min = cell_columns.min()
         column_max = cell_columns.max()
 
-        # Render the cell background.
+        # Optionally render the cell background.
         cell_style = axes._cell_style[cell_selection][0]
-        if cell_style is not None:
+        cell_link = axes._cell_link[cell_selection][0]
+        cell_title = axes._cell_title[cell_selection][0]
+        if cell_style is not None or cell_link is not None or cell_title is not None:
             # Compute the cell boundaries.
             cell_top = axes._cell_top[row_min]
             cell_bottom = axes._cell_bottom[row_max]
@@ -1540,7 +1542,6 @@ def _render(canvas, axes, context):
             cell_right = axes._cell_right[column_max]
 
             cell_parent_xml = axes_xml
-            cell_link = axes._cell_link[cell_selection][0]
             if cell_link is not None:
                 cell_parent_xml = xml.SubElement(
                     cell_parent_xml,
@@ -1555,10 +1556,9 @@ def _render(canvas, axes, context):
                 y=repr(cell_top),
                 width=repr(cell_right - cell_left),
                 height=repr(cell_bottom - cell_top),
-                style=_css_style({"fill":"none", "stroke":"none"}, cell_style),
+                style=_css_style({"fill":"transparent", "stroke":"none"}, cell_style),
                 )
 
-            cell_title = axes._cell_title[cell_selection][0]
             if cell_title is not None:
                 xml.SubElement(cell_xml, "title").text = str(cell_title)
 

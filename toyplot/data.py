@@ -202,14 +202,10 @@ class Table(object):
         if isinstance(index, toyplot.compatibility.string_type):
             column = index
             column_slice = slice(None, None, None)
+        # table["a", 10], table["a", 10:20], table["a", [10, 12, 18]], etc.
         elif isinstance(index, tuple) and isinstance(index[0], toyplot.compatibility.string_type):
             column = index[0]
-            # table["a", 10]
-            if isinstance(index[1], numbers.Integral):
-                column_slice = slice(index[1], index[1] + 1)
-            # table["a", 10:20], table["a", [10, 12, 18]], etc.
-            else:
-                column_slice = index[1]
+            column_slice = index[1]
 
         if column is not None and column_slice is not None:
             return self._columns[column][column_slice]

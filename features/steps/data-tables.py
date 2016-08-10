@@ -27,7 +27,6 @@ def pandas_available(context):
 
     context.scenario.skip(reason="The pandas library is not available.")
     return False
-     
 
 root_dir = os.path.dirname(os.path.dirname(__file__))
 
@@ -68,7 +67,7 @@ def step_impl(context):
 
 @then(u'partial columns can be retrieved by name and index')
 def step_impl(context):
-    numpy.testing.assert_array_equal(context.data["a", 5], [5])
+    nose.tools.assert_equal(context.data["a", 5], 5)
 
 
 @then(u'partial columns can be retrieved by name and slice')

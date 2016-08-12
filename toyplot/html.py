@@ -358,7 +358,7 @@ def _draw_text(
 
     baseline_shift = 0
     if alignment_baseline == "hanging":
-        baseline_shift = font_size
+        baseline_shift = 0.75 * font_size
     elif alignment_baseline == "central":
         baseline_shift = font_size * 0.35
     elif alignment_baseline == "middle":

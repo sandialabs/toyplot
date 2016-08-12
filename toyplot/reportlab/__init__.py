@@ -130,8 +130,6 @@ def render(svg, canvas):
             if declaration == "":
                 continue
             key, value = declaration.split(":")
-            if key == "dominant-baseline" and value == "inherit":
-                continue
             current_style[key] = value
         styles.append(current_style)
 
@@ -344,18 +342,6 @@ def render(svg, canvas):
 
                 x = text_state["x"]
                 y = text_state["y"]
-
-                dominant_baseline = current_style.get("dominant-baseline", "middle")
-                if dominant_baseline == "hanging":
-                    y += ascent
-                elif dominant_baseline == "central":
-                    y += ascent * 0.5
-                elif dominant_baseline == "middle":
-                    y += (ascent + descent) * 0.5
-                elif dominant_baseline == "alphabetic":
-                    pass
-                else:
-                    raise ValueError("Unsupported dominant-baseline: %s" % dominant_baseline) # pragma: no cover
 
                 baseline_shift = current_style.get("baseline-shift", "0").strip()
                 baseline_shift = toyplot.units.convert(baseline_shift, "px", "px", ascent - descent)

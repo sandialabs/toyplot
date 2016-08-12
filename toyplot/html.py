@@ -270,7 +270,6 @@ class _HTMLParser(HTMLParser.HTMLParser):
         if node.tag == "text":
             attributes = copy.copy(attributes)
             style = copy.copy(style)
-            style["dominant-baseline"] = "inherit"
             x = global_state.pop("x", None)
             if x is not None:
                 attributes["x"] = x
@@ -355,9 +354,18 @@ def _draw_text(
     style = copy.copy(style)
 
     font_size = toyplot.units.convert(style["font-size"], target="px", default="px")
-    style["dominant-baseline"] = style.pop("alignment-baseline", "middle")
+    alignment_baseline = style.pop("alignment-baseline", "middle")
 
-    baseline_shift = -toyplot.units.convert(style.pop("baseline-shift", 0), target="px", default="px", reference=font_size)
+    baseline_shift = 0
+    if alignment_baseline == "hanging":
+        baseline_shift = font_size
+    elif alignment_baseline == "central":
+        baseline_shift = font_size * 0.35
+    elif alignment_baseline == "middle":
+        baseline_shift = font_size * 0.25
+    elif alignment_baseline == "alphabetic":
+        pass
+    baseline_shift -= toyplot.units.convert(style.pop("baseline-shift", 0), target="px", default="px", reference=font_size)
     anchor_shift = toyplot.units.convert(style.pop("-toyplot-anchor-shift", 0), target="px", default="px", reference=font_size)
 
     transform = "translate(%r,%r)" % (x, y)

@@ -277,10 +277,9 @@ class _HTMLParser(HTMLParser.HTMLParser):
             if new_y != global_state["current-y"]:
                 attributes["dy"] = new_y - global_state["current-y"]
                 global_state["current-y"] = new_y
-            tspan = xml.SubElement(self._element, "tspan")
+            tspan = xml.SubElement(self._element, "tspan", attrib=_css_attrib(style))
             for key, value in attributes.items():
                 tspan.set(key, str(value))
-            tspan.set("style", _css_style(style))
             tspan.text = node.text
         else:
             attributes = copy.copy(attributes)
@@ -360,9 +359,9 @@ def _draw_text(
     if alignment_baseline == "hanging":
         baseline_shift = 0.75 * font_size
     elif alignment_baseline == "central":
-        baseline_shift = font_size * 0.35
+        baseline_shift = font_size * 0.375
     elif alignment_baseline == "middle":
-        baseline_shift = font_size * 0.25
+        baseline_shift = font_size * 0.28125
     elif alignment_baseline == "alphabetic":
         pass
     baseline_shift -= toyplot.units.convert(style.pop("baseline-shift", 0), target="px", default="px", reference=font_size)

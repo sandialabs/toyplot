@@ -2,6 +2,9 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Implements the :class:`toyplot.canvas.Canvas` class, which defines the space that is available for creating plots.
+"""
+
 from __future__ import division
 
 import collections
@@ -140,7 +143,7 @@ class Canvas(object):
         self.autorender(autorender, autoformat)
 
     def _repr_html_(self):
-        import toyplot.html
+        from . import html
         import xml.etree.ElementTree as xml
         return toyplot.compatibility.unicode_type(
             xml.tostring(
@@ -150,7 +153,7 @@ class Canvas(object):
             encoding="utf-8")
 
     def _repr_png_(self):
-        import toyplot.png
+        from . import png
         return toyplot.png.render(self)
 
     @property
@@ -497,7 +500,7 @@ class Canvas(object):
             grid=None,
             gutter=50,
             filename=None,
-            ):
+        ):
         """Add a matrix visualization to the canvas.
 
         Parameters
@@ -820,7 +823,7 @@ class Canvas(object):
             grid=None,
             gutter=50,
             filename=None,
-            ):
+        ):
         """Add a set of table axes to the canvas.
 
         Parameters
@@ -876,12 +879,12 @@ class Canvas(object):
                 if issubclass(column._data.dtype.type, numpy.floating):
                     if trows:
                         table.top.cell[0, j].align = "center"
-                    table.body.cell[:,j].format = toyplot.format.FloatFormatter()
-                    table.body.cell[:,j].align = "separator"
+                    table.body.cell[:, j].format = toyplot.format.FloatFormatter()
+                    table.body.cell[:, j].align = "separator"
                 elif issubclass(column._data.dtype.type, numpy.character):
-                    table.cells.cell[:,j].align = "left"
+                    table.cells.cell[:, j].align = "left"
                 elif issubclass(column._data.dtype.type, numpy.integer):
-                    table.cells.cell[:,j].align = "right"
+                    table.cells.cell[:, j].align = "right"
 
             if trows:
                 # Format top cells for use as a header
@@ -938,7 +941,6 @@ class Canvas(object):
           all of the absolute units described in :ref:`units`.
         """
         colormap = None
-        palette = None
         if isinstance(data, tuple):
             data, colormap = data
             if not isinstance(colormap, toyplot.color.Map):

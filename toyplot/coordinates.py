@@ -820,19 +820,19 @@ class Cartesian(object):
 
     def _set_xmin_range(self, value):
         self._xmin_range = value
-    xmin_range = property(fset = _set_xmin_range)
+    xmin_range = property(fset=_set_xmin_range)
 
     def _set_xmax_range(self, value):
         self._xmax_range = value
-    xmax_range = property(fset = _set_xmax_range)
+    xmax_range = property(fset=_set_xmax_range)
 
     def _set_ymin_range(self, value):
         self._ymin_range = value
-    ymin_range = property(fset = _set_ymin_range)
+    ymin_range = property(fset=_set_ymin_range)
 
     def _set_ymax_range(self, value):
         self._ymax_range = value
-    ymax_range = property(fset = _set_ymax_range)
+    ymax_range = property(fset=_set_ymax_range)
 
     def _finalize(self):
         if self._finalized is None:
@@ -1343,7 +1343,7 @@ class Cartesian(object):
             tick_locator=None,
             width=10,
             padding=10,
-            ):
+        ):
         """Add a color scale to the axes.
 
         The color scale displays a mapping from scalar values to colors, for
@@ -1392,7 +1392,8 @@ class Cartesian(object):
             title=None,
             style=None,
             annotation=False,
-            filename=None):
+            filename=None,
+        ):
         """Fill multiple regions separated by curves.
 
         Parameters
@@ -1764,7 +1765,8 @@ class Cartesian(object):
             grid=None,
             gutter=50,
             style=None,
-            label_style=None):
+            label_style=None,
+        ):
         """Add a legend to the axes.
 
         Parameters
@@ -1843,7 +1845,8 @@ class Cartesian(object):
             style=None,
             mstyle=None,
             mlstyle=None,
-            filename=None):
+            filename=None,
+        ):
         """Add bivariate line plots to the axes.
 
         Parameters
@@ -2067,7 +2070,8 @@ class Cartesian(object):
             style=None,
             mstyle=None,
             mlstyle=None,
-            filename=None):
+            filename=None,
+        ):
         """Add a bivariate plot to the axes.
 
         Parameters
@@ -2132,7 +2136,7 @@ class Cartesian(object):
         mtitle = toyplot.broadcast.object(title, series.shape)
         style = toyplot.require.style(style, allowed=set())
         mstyle = toyplot.require.style(mstyle, allowed=toyplot.require.style.marker)
-        mlstyle = allowed=toyplot.require.style(mlstyle, toyplot.require.style.text)
+        mlstyle = toyplot.require.style(mlstyle, allowed=toyplot.require.style.text)
 
         if along == "x":
             coordinate_axes = ["x", "y"]
@@ -2263,7 +2267,8 @@ class Cartesian(object):
             title=None,
             style=None,
             filename=None,
-            annotation=True):
+            annotation=True,
+        ):
         """Add text to the axes.
 
         Parameters
@@ -2725,7 +2730,8 @@ class Table(object):
             raise NotImplementedError()
 
     class CellBarMark(CellMark):
-        def __init__(self,
+        def __init__(
+                self,
                 table,
                 axes,
                 baseline,
@@ -2737,7 +2743,7 @@ class Table(object):
                 style,
                 title,
                 width,
-                ):
+            ):
             Table.CellMark.__init__(self, table, axes, series)
 
             self._baseline = baseline
@@ -2772,7 +2778,7 @@ class Table(object):
                     cell_indices = numpy.unique(columns)
                     along = "x"
                     along_axis = self._axes.x
-                    series = self._table._cell_data[self._table._cell_axes == self._axes].reshape(shape).astype("float64")[:,::-1]
+                    series = self._table._cell_data[self._table._cell_axes == self._axes].reshape(shape).astype("float64")[:, ::-1]
 
                 width = min(0.5 - numpy.finfo("float32").eps, 0.5 * self._width)
                 begin = numpy.arange(shape[0]) - width
@@ -2817,7 +2823,8 @@ class Table(object):
             return self._finalized
 
     class CellPlotMark(CellMark):
-        def __init__(self,
+        def __init__(
+                self,
                 table,
                 axes,
                 area,
@@ -2834,7 +2841,7 @@ class Table(object):
                 stroke_width,
                 style,
                 title,
-                ):
+            ):
             Table.CellMark.__init__(self, table, axes, series)
             self._area = area
             self._color = color
@@ -2873,7 +2880,7 @@ class Table(object):
                     cell_indices = numpy.unique(columns)
                     along = "x"
                     along_axis = self._axes.x
-                    series = self._table._cell_data[self._table._cell_axes == self._axes].reshape(shape).astype("float64")[:,::-1]
+                    series = self._table._cell_data[self._table._cell_axes == self._axes].reshape(shape).astype("float64")[:, ::-1]
 
                 segments = []
                 for index, cell_index in enumerate(cell_indices):
@@ -2940,7 +2947,7 @@ class Table(object):
                 style=None,
                 title=None,
                 width=0.5,
-                ):
+            ):
 
             mark = toyplot.coordinates.Table.CellBarMark(
                 table=self._table,
@@ -2977,7 +2984,7 @@ class Table(object):
                 stroke_width=2.0,
                 style=None,
                 title=None,
-                ):
+            ):
 
             mark = toyplot.coordinates.Table.CellPlotMark(
                 table=self._table,
@@ -3120,7 +3127,7 @@ class Table(object):
             ):
 
             axes = toyplot.coordinates.Table.EmbeddedCartesian(
-                table = self._table,
+                table=self._table,
                 xmin=xmin,
                 xmax=xmax,
                 ymin=ymin,
@@ -3344,7 +3351,7 @@ class Table(object):
             label,
             parent,
             filename,
-            ):
+        ):
         self._finalized = None
 
         self._xmin_range = xmin_range

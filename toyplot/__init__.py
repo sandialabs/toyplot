@@ -42,7 +42,7 @@ def bars(
         padding=10,
         width=None,
         height=None,
-        ):
+    ):
     """Convenience function for creating a bar plot in a single call.
 
     See :meth:`toyplot.coordinates.Cartesian.bars`,
@@ -113,7 +113,7 @@ def fill(
         padding=10,
         width=None,
         height=None,
-        ):
+    ):
     """Convenience function for creating a fill plot in a single call.
 
     See :meth:`toyplot.coordinates.Cartesian.fill`,
@@ -183,7 +183,7 @@ def graph(
         padding=20,
         width=None,
         height=None,
-        ): # pragma: no cover
+    ): # pragma: no cover
     """Convenience function for creating a graph plot in a single call.
 
     See :meth:`toyplot.coordinates.Cartesian.graph`,
@@ -231,7 +231,7 @@ def image(
         data,
         width=None,
         height=None,
-        ): # pragma: no cover
+    ): # pragma: no cover
     """Convenience function for displaying an image in a single call.
 
     See :meth:`toyplot.canvas.Canvas.image`, and :class:`toyplot.canvas.Canvas`
@@ -271,7 +271,7 @@ def matrix(
         width=None,
         height=None,
         filename=None,
-        ):
+    ):
     """Convenience function to create a matrix visualization in a single call.
 
     See :meth:`toyplot.canvas.Canvas.matrix`, and
@@ -341,7 +341,7 @@ def plot(
         padding=10,
         width=None,
         height=None,
-        ):
+    ):
     """Convenience function for creating a line plot in a single call.
 
     See :meth:`toyplot.coordinates.Cartesian.plot`,
@@ -424,7 +424,7 @@ def scatterplot(
         padding=10,
         width=None,
         height=None,
-        ):
+    ):
     """Convenience function for creating a scatter plot in a single call.
 
     See :meth:`toyplot.coordinates.Cartesian.scatterplot`,
@@ -485,7 +485,7 @@ def table(
         width=None,
         height=None,
         filename=None,
-        ):
+    ):
     """Convenience function to create a table visualization in a single call.
 
     See :meth:`toyplot.canvas.Canvas.table`, and :class:`toyplot.canvas.Canvas`

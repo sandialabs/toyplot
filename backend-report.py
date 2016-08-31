@@ -24,7 +24,6 @@ for module in [
     "toyplot.mp4",
     "toyplot.pdf",
     "toyplot.png",
-    "toyplot.qt",
     "toyplot.reportlab",
     "toyplot.reportlab.pdf",
     "toyplot.reportlab.png",

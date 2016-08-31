@@ -29,7 +29,6 @@ Contents:
    toyplot.pdf.rst
    toyplot.png.rst
    toyplot.projection.rst
-   toyplot.qt.rst
    toyplot.reportlab.pdf.rst
    toyplot.reportlab.png.rst
    toyplot.reportlab.rst

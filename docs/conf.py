@@ -47,12 +47,7 @@ for module_name in [
         "numpy",
         "numpy.ma",
         "numpy.testing",
-        "PyQt5",
-        "PyQt5.QtCore",
-        "PyQt5.QtGui",
-        "PyQt5.QtPrintSupport",
-        "PyQt5.QtWebKitWidgets",
-        "PyQt5.QtWidgets"]:
+        ]:
     sys.modules[module_name] = module_proxy()
 
 # If extensions (or modules to document with autodoc) are in another directory,

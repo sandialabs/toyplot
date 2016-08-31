@@ -66,14 +66,6 @@ the PNG Export dependencies for exporting PNG files, plus ffmpeg:
 
 * ffmpeg - cross-platform video conversion - https://www.ffmpeg.org
 
-Qt Interactive Display
-----------------------
-
-Displaying interactive Toyplot figures in a window implemented with
-the Qt graphical user interface toolkit requires the following:
-
-* PyQt5 - https://pypi.python.org/pypi/PyQt5
-
 Source Installation
 -------------------
 

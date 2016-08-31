@@ -333,7 +333,7 @@ class _HTMLParser(HTMLParser.HTMLParser):
 
     def close(self):
         HTMLParser.HTMLParser.close(self)
-        self.walk_tree(self._root_node, attributes={}, style={}, stack_state={"dy":0,"font-size":self._font_size}, global_state={"line-y":0, "current-y":0})
+        self.walk_tree(self._root_node, attributes={}, style={}, stack_state={"dy":0, "font-size":self._font_size}, global_state={"line-y":0, "current-y":0})
 
 
 def _draw_text(
@@ -345,7 +345,7 @@ def _draw_text(
         angle=None,
         title=None,
         attributes={},
-        ):
+    ):
 
     if not text:
         return
@@ -578,7 +578,7 @@ def _draw_marker(
             text=shape_label,
             x=cx,
             y=cy,
-            style = toyplot.style.combine(
+            style=toyplot.style.combine(
                 {
                     "stroke": "none",
                     "fill": toyplot.color.near_black,
@@ -600,7 +600,7 @@ def _axis_transform(x1, y1, x2, y2, offset, return_length=False):
     basis = p[1] - p[0]
     length = numpy.linalg.norm(basis)
     theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))
-    transform=str()
+    transform = str()
     if p[0][0] or p[0][1]:
         transform += "translate(%s,%s)" % (p[0][0], p[0][1])
     if theta:
@@ -766,8 +766,7 @@ def _render_interactive_mouse_coordinates(context):
         key = context.get_id(axis)
         visible_axes[key] = list()
         for segment in axis.projection._segments:
-            visible_axes[key].append(
-            {
+            visible_axes[key].append({
                 "scale": segment.scale,
                 "domain":
                 {
@@ -886,8 +885,8 @@ def _render_interactive_mouse_coordinates(context):
             svg.addEventListener("click", display_coordinates);
         })();
         """).substitute(
-        root_id=context.root.get("id"),
-        visible_axes=json.dumps(visible_axes, cls=_NumpyJSONEncoder, sort_keys=True),
+            root_id=context.root.get("id"),
+            visible_axes=json.dumps(visible_axes, cls=_NumpyJSONEncoder, sort_keys=True),
         )
 
 
@@ -953,7 +952,7 @@ def _render(frames, context):
                 </svg>
             </button>
         </div>""".format(
-            frames = len(times) - 2,
+            frames=len(times) - 2,
             near_black=toyplot.color.near_black,
             )))
 
@@ -1184,7 +1183,7 @@ def _render(canvas, axis, context):
                 ):
                 x = axis.projection(location)
 
-                style=toyplot.style.combine(
+                style = toyplot.style.combine(
                     {
                         "alignment-baseline": alignment_baseline,
                         "text-anchor": text_anchor,
@@ -1753,8 +1752,7 @@ def _legend_markers(mark):
             [mark._table[key] for key in mark._fill],
             [mark._table[key] for key in mark._opacity],
         ):
-        markers.append(
-        {
+        markers.append({
             "shape": "s",
             "mstyle": toyplot.style.combine(
                 {
@@ -1931,8 +1929,7 @@ def _legend_markers(mark):
             mark._opacity,
         ):
 
-        markers.append(
-        {
+        markers.append({
             "shape": "s",
             "mstyle": toyplot.style.combine(
                 {
@@ -2272,8 +2269,7 @@ def _legend_markers(mark):
     markers = []
 
     for stroke, stroke_width, stroke_opacity in zip(mark._stroke.T, mark._stroke_width.T, mark._stroke_opacity.T):
-        markers.append(
-        {
+        markers.append({
             "shape": "/",
             "mstyle": toyplot.style.combine(
                 {
@@ -2591,12 +2587,12 @@ def _render(parent, mark, context):
     if data.dtype == toyplot.color.dtype:
         data = numpy.dstack((data["r"], data["g"], data["b"], data["a"]))
     if issubclass(data.dtype.type, numpy.bool_):
-        bitdepth=1
+        bitdepth = 1
     elif issubclass(data.dtype.type, numpy.floating):
         data = (data * 255.0).astype("uint8")
-        bitdepth=8
+        bitdepth = 8
     else:
-        bitdepth=8
+        bitdepth = 8
 
     width = data.shape[1]
     height = data.shape[0]

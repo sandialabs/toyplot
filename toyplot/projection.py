@@ -50,7 +50,7 @@ class Piecewise(Projection):
                 range_min,
                 range_max,
                 range_bounds_max,
-                ):
+            ):
             self.scale = scale
             self.domain = Piecewise.Segment.Container()
             self.domain.bounds = Piecewise.Segment.Container()
@@ -166,7 +166,7 @@ def log(
         range_max,
         linear_domain_min=-1,
         linear_domain_max=1,
-        ):
+    ):
     """Return an instance of :class:`toyplot.projection.Piecewise` that performs a log projection.
 
     The returned projection will work correctly with both positive, negative,

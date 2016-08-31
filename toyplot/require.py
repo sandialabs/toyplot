@@ -14,7 +14,7 @@ def style(style, allowed):
 
     """Verify that the given object is usable as a style."""
     if not isinstance(style, dict):
-        raise ValueError( "Expected a dictionary of CSS styles or None, received %s." % style) # pragma: no cover
+        raise ValueError("Expected a dictionary of CSS styles or None, received %s." % style) # pragma: no cover
 
     for key in style:
         if key not in allowed:
@@ -84,7 +84,7 @@ def table_keys(table, keys, length=None, min_length=None, modulus=None):
     allowed = list(table.keys())
     for key in keys:
         if key not in allowed:
-            raise ValueError( "Table key must match one of %s, received %s." % (", ".join(allowed), key)) # pragma: no cover
+            raise ValueError("Table key must match one of %s, received %s." % (", ".join(allowed), key)) # pragma: no cover
     return keys
 
 
@@ -108,13 +108,13 @@ def vector(value, length=None, min_length=None, modulus=None):
         raise ValueError("Expected a vector.") # pragma: no cover
     if length is not None:
         if len(array) != length:
-            raise ValueError( "Expected %s values, received %s" % (length, len(array))) # pragma: no cover
+            raise ValueError("Expected %s values, received %s" % (length, len(array))) # pragma: no cover
     if min_length is not None:
         if len(array) < min_length:
-            raise ValueError( "Expected %s or more values, received %s" % (min_length, len(array))) # pragma: no cover
+            raise ValueError("Expected %s or more values, received %s" % (min_length, len(array))) # pragma: no cover
     if modulus is not None:
         if len(array) % modulus != 0:
-            raise ValueError( "Expected a multiple of %s values, received %s" % (modulus, len(array))) # pragma: no cover
+            raise ValueError("Expected a multiple of %s values, received %s" % (modulus, len(array))) # pragma: no cover
     return array
 
 
@@ -139,13 +139,13 @@ def scalar_matrix(value, rows=None, columns=None):
             raise ValueError("Expected %s rows, received %s." % (rows, array.shape[0])) # pragma: no cover
     if columns is not None:
         if array.shape[1] != columns:
-            raise ValueError( "Expected %s columns, received %s." % (columns, array.shape[1])) # pragma: no cover
+            raise ValueError("Expected %s columns, received %s." % (columns, array.shape[1])) # pragma: no cover
     return array
 
 
 def optional_string(value):
     if not isinstance(value, (toyplot.compatibility.string_type, type(None))):
-        raise ValueError( "Expected a string value or None, received %s." % value) # pragma: no cover
+        raise ValueError("Expected a string value or None, received %s." % value) # pragma: no cover
     return value
 
 

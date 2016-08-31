@@ -8,10 +8,11 @@ many plots using a single compact statement.
 
 from __future__ import division
 
-__version__ = "0.14.0-dev"
+import logging
 
 from toyplot.canvas import Canvas
-import logging
+
+__version__ = "0.14.0-dev"
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)

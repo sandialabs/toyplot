@@ -552,6 +552,7 @@ class Canvas(object):
         table.cells.column[[0, -1]].lstyle = {"font-weight":"bold"}
         table.cells.row[[0, -1]].lstyle = {"font-weight":"bold"}
 
+        # pylint: disable=redefined-variable-type
         if tlabel is not None:
             cell = table.top.row[0].merge()
             cell.data = tlabel
@@ -575,7 +576,7 @@ class Canvas(object):
         if tshow:
             if tlocator is None:
                 tlocator = toyplot.locator.Integer(step=step)
-            for j, label, title in zip(*tlocator.ticks(0, matrix.shape[1] - 1)):
+            for j, label, title in zip(*tlocator.ticks(0, matrix.shape[1] - 1)): # pylint: disable=unused-variable
                 table.top.cell[1, j].data = label
                 #table.top.cell[1, j].title = title
 
@@ -584,7 +585,7 @@ class Canvas(object):
         if lshow:
             if llocator is None:
                 llocator = toyplot.locator.Integer(step=step)
-            for i, label, title in zip(*llocator.ticks(0, matrix.shape[0] - 1)):
+            for i, label, title in zip(*llocator.ticks(0, matrix.shape[0] - 1)): # pylint: disable=unused-variable
                 table.left.cell[i, 1].data = label
                 #table.left.cell[i, 1].title = title
 
@@ -593,7 +594,7 @@ class Canvas(object):
         if rshow:
             if rlocator is None:
                 rlocator = toyplot.locator.Integer(step=step)
-            for i, label, title in zip(*rlocator.ticks(0, matrix.shape[0] - 1)):
+            for i, label, title in zip(*rlocator.ticks(0, matrix.shape[0] - 1)): # pylint: disable=unused-variable
                 table.right.cell[i, 0].data = label
                 #table.right.cell[i, 0].title = title
 
@@ -602,7 +603,7 @@ class Canvas(object):
         if bshow:
             if blocator is None:
                 blocator = toyplot.locator.Integer(step=step)
-            for j, label, title in zip(*blocator.ticks(0, matrix.shape[1] - 1)):
+            for j, label, title in zip(*blocator.ticks(0, matrix.shape[1] - 1)): # pylint: disable=unused-variable
                 table.bottom.cell[0, j].data = label
                 #table.bottom.cell[0, j].title = title
 
@@ -618,7 +619,7 @@ class Canvas(object):
         self._children.append(table)
 
         if colorshow:
-            axis = self.color_scale(
+            self.color_scale(
                 colormap=colormap,
                 x1=xmax_range,
                 y1=ymax_range,

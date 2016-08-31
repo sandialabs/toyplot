@@ -1238,7 +1238,7 @@ def _render(canvas, axis, context): # pylint: disable=unused-argument
                 y1 *= 0.5
                 y2 = -axis._tick_labels_offset if axis._interactive_coordinates_location == "below" else axis._tick_labels_offset
                 y2 *= 0.75
-                marker_xml = xml.SubElement(
+                xml.SubElement(
                     coordinates_xml, "line",
                     x1="0",
                     x2="0",
@@ -1250,7 +1250,7 @@ def _render(canvas, axis, context): # pylint: disable=unused-argument
             if axis.interactive.coordinates.label.show:
                 y = axis._tick_labels_offset if axis._interactive_coordinates_location == "below" else -axis._tick_labels_offset
                 alignment_baseline = "hanging" if axis._interactive_coordinates_location == "below" else "alphabetic"
-                text_xml = xml.SubElement(
+                xml.SubElement(
                     coordinates_xml, "text",
                     x="0",
                     y=repr(y),
@@ -1457,7 +1457,7 @@ def _render(numberline, mark, context):
                     "opacity": dopacity,
                 },
                 mark._mstyle)
-            datum_xml = _draw_marker(
+            _draw_marker(
                 series_xml,
                 dx,
                 0,
@@ -2178,7 +2178,7 @@ def _render(axes, mark, context): # pragma: no cover
 
     coordinate_index = 0
     edge_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Edges"})
-    for esource, etarget, eshape, ecolor, ewidth, eopacity in zip(
+    for esource, etarget, eshape, ecolor, ewidth, eopacity in zip( # pylint: disable=unused-variable
             mark._etable[mark._esource[0]],
             mark._etable[mark._etarget[0]],
             mark._etable[mark._eshape[0]],
@@ -2345,7 +2345,7 @@ def _render(axes, mark, context):
 
         d = []
         for segment in segments:
-            start, stop, step = segment.indices(len(not_null))
+            start, stop, step = segment.indices(len(not_null)) # pylint: disable=unused-variable
             for i in range(start, start + 1):
                 d.append("M %r %r" % (x[i], y[i]))
             for i in range(start + 1, stop):
@@ -2371,7 +2371,7 @@ def _render(axes, mark, context):
                     "stroke": toyplot.color.to_css(dstroke),
                     "opacity": dopacity},
                 mark._mstyle)
-            datum_xml = _draw_marker(
+            _draw_marker(
                 series_xml,
                 dx,
                 dy,
@@ -2524,7 +2524,7 @@ def _render(axes, mark, context):
                     "opacity": dopacity,
                 },
                 mark._mstyle)
-            datum_xml = _draw_marker(
+            _draw_marker(
                 series_xml,
                 dx,
                 dy,

@@ -280,6 +280,8 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
     # Apply the layout algorithm to whatever's left.
     start = time.time()
     if layout is None:
+        # pylint: disable=redefined-variable-type
+
         # If there are unspecified coordinates, use a force-directed layout.
         if numpy.ma.is_masked(ivcoordinates):
             layout = toyplot.layout.FruchtermanReingold()
@@ -339,7 +341,7 @@ def _add_at(target, target_indices, source):
 
 def _adjacency_list(vcount, edges):
     """Return an adjacency list representation of a graph."""
-    targets = [[] for i in numpy.arange(vcount)]
+    targets = [[] for i in numpy.arange(vcount)] # pylint: disable=unused-variable
     for source, target in edges:
         targets[source].append(target)
     return targets
@@ -490,7 +492,7 @@ class GraphLayout(object):
         ecoordinates : matrix containing two columns
             Contains coordinates for each of the edge shape strings, in drawing-code order.
         """
-        raise NotImplementedError() # pragma: no cover 
+        raise NotImplementedError() # pragma: no cover
 
 
 class IgnoreVertices(GraphLayout):
@@ -571,7 +573,7 @@ class Eades(GraphLayout):
 
         # Repeatedly apply attract / repel forces to the vertices
         vertices = numpy.column_stack(numpy.triu_indices(n=len(vcoordinates), k=1))
-        for iteration in numpy.arange(self._M):
+        for iteration in numpy.arange(self._M): # pylint: disable=unused-variable
             offsets = numpy.zeros_like(vcoordinates)
 
             # Repel
@@ -680,9 +682,12 @@ class Buchheim(GraphLayout):
 
     Note: this layout currently ignores preexisting vertex coordinates.
     """
-    def __init__(self, edges=None, basis=[[1, 0], [0, -1]]):
+    def __init__(self, edges=None, basis=None):
         if edges is None:
             edges = StraightEdges()
+
+        if basis is None:
+            basis = [[1, 0], [0, -1]]
 
         self._edges = edges
         self._basis = numpy.array(basis)
@@ -691,7 +696,7 @@ class Buchheim(GraphLayout):
         # Convert the graph to an adjacency list
         children = _adjacency_list(len(vcoordinates), edges)
         # Ensure we actually have a tree
-        root, depth = _require_tree(children)
+        root, depth = _require_tree(children) # pylint: disable=unused-variable
 
         # Get rid of the mask, it complicates things.
         vcoordinates = numpy.array(vcoordinates)

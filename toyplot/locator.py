@@ -255,10 +255,11 @@ class Extended(TickLocator):
         def legibility(lmin, lmax, lstep): # pylint: disable=unused-argument
             return 1
 
-        def legibility_max(lmin, lmax, lstep): # pylint: disable=unused-argument
+        def legibility_max(lmin, lmax, lstep): # pylint: disable=unused-argument,unused-variable
             return 1  # pragma: no cover
 
         def extended(dmin, dmax, m, Q, only_inside, w):
+            # pylint: disable=unused-variable
             n = len(Q)
             best_score = -2.0
 
@@ -320,6 +321,7 @@ class Extended(TickLocator):
                 j = j + 1
             return best
 
+        # pylint: disable=unused-variable
         lmin, lmax, lstep, q, k = extended(
             domain_min, domain_max, self._count - 1, self._steps, self._only_inside, self._weights)
         locations = numpy.arange(k) * lstep + lmin
@@ -680,7 +682,7 @@ class Timestamp(TickLocator):
     """
 
     def __init__(self, count=None, interval=None, timezone="utc", format=None): # pylint: disable=redefined-builtin
-
+        # pylint: disable=redefined-variable-type
         if interval is not None:
             if isinstance(interval, toyplot.compatibility.string_type):
                 interval = (1, interval)

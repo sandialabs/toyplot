@@ -501,6 +501,8 @@ class Axis(object):
 
     @scale.setter
     def scale(self, value):
+        # pylint: disable=redefined-variable-type
+
         if value == "linear":
             self._scale = "linear"
             return
@@ -1854,8 +1856,7 @@ class Cartesian(object):
                 series = a
                 position = numpy.ma.arange(series.shape[0])
 
-        default_color = [next(self._plot_colors)
-                         for i in range(series.shape[1])]
+        default_color = [next(self._plot_colors) for i in range(series.shape[1])] # pylint: disable=unused-variable
         stroke = toyplot.color.broadcast(
             colors=color,
             shape=(series.shape[1],),
@@ -1875,7 +1876,7 @@ class Cartesian(object):
             msize = numpy.sqrt(toyplot.broadcast.scalar(area, series.shape))
         else:
             toyplot.log.warning("Plot size parameter overrides area.")
-            msize = toyplot.broadcast.scalar(size, coordinates.shape)
+            msize = toyplot.broadcast.scalar(size, series.shape)
 
         mfill = toyplot.color.broadcast(
             colors=mfill,
@@ -2051,8 +2052,7 @@ class Cartesian(object):
                 series = a
                 position = numpy.ma.arange(series.shape[0])
 
-        default_color = [next(self._scatterplot_colors)
-                         for i in range(series.shape[1])]
+        default_color = [next(self._scatterplot_colors) for i in range(series.shape[1])] # pylint: disable=unused-variable
         mfill = toyplot.color.broadcast(
             colors=color,
             shape=series.shape,
@@ -2068,7 +2068,7 @@ class Cartesian(object):
             msize = numpy.sqrt(toyplot.broadcast.scalar(area, series.shape))
         else:
             toyplot.log.warning("Scatterplot size parameter overrides area.")
-            msize = toyplot.broadcast.scalar(size, coordinates.shape)
+            msize = toyplot.broadcast.scalar(size, series.shape)
 
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
@@ -2486,8 +2486,7 @@ class Numberline(object):
         elif coordinates.ndim == 2:
             pass
 
-        default_color = [next(self._scatterplot_colors)
-                         for i in range(coordinates.shape[1])]
+        default_color = [next(self._scatterplot_colors) for i in range(coordinates.shape[1])] # pylint: disable=unused-variable
         mfill = toyplot.color.broadcast(
             colors=color,
             shape=coordinates.shape,
@@ -2969,7 +2968,7 @@ class Table(object):
         format = property(fset=_set_format)
 
         def _set_height(self, value):
-            row_indices, column_indices = self._table._selection_coordinates(self._selection)
+            row_indices, column_indices = self._table._selection_coordinates(self._selection) # pylint: disable=unused-variable
             self._table._row_heights[row_indices] = toyplot.units.convert(value, "px", "px")
         height = property(fset=_set_height)
 
@@ -2998,7 +2997,7 @@ class Table(object):
         link = property(fset=_set_link)
 
         def _set_width(self, value):
-            row_indices, column_indices = self._table._selection_coordinates(self._selection)
+            row_indices, column_indices = self._table._selection_coordinates(self._selection) # pylint: disable=unused-variable
             self._table._column_widths[column_indices] = toyplot.units.convert(value, "px", "px")
         width = property(fset=_set_width)
 
@@ -3104,7 +3103,7 @@ class Table(object):
             Table.CellReference.__init__(self, table, selection)
 
         def delete(self):
-            row_indices, column_indices = self._table._selection_coordinates(self._selection)
+            row_indices, column_indices = self._table._selection_coordinates(self._selection) # pylint: disable=unused-variable
             self._table._delete_cells(column_indices, axis=1)
 
     class RowCellReference(CellReference):
@@ -3112,7 +3111,7 @@ class Table(object):
             Table.CellReference.__init__(self, table, selection)
 
         def delete(self):
-            row_indices, column_indices = self._table._selection_coordinates(self._selection)
+            row_indices, column_indices = self._table._selection_coordinates(self._selection) # pylint: disable=unused-variable
             self._table._delete_cells(row_indices, axis=0)
 
     class DistanceArrayReference(object):
@@ -3187,12 +3186,12 @@ class Table(object):
                 if before is not None:
                     table, region = self._region._selection()
                     region[Ellipsis, before] = True
-                    rows, columns = numpy.nonzero(table)
+                    rows, columns = numpy.nonzero(table) # pylint: disable=unused-variable
                     before = numpy.unique(columns)
                 if after is not None:
                     table, region = self._region._selection()
                     region[Ellipsis, after] = True
-                    rows, columns = numpy.nonzero(table)
+                    rows, columns = numpy.nonzero(table) # pylint: disable=unused-variable
                     after = numpy.unique(columns)
                 self._region._table._insert_cells(before=before, after=after, axis=1)
 
@@ -3211,12 +3210,12 @@ class Table(object):
                 if before is not None:
                     table, region = self._region._selection()
                     region[before, Ellipsis] = True
-                    rows, columns = numpy.nonzero(table)
+                    rows, columns = numpy.nonzero(table) # pylint: disable=unused-variable
                     before = numpy.unique(rows)
                 if after is not None:
                     table, region = self._region._selection()
                     region[after, Ellipsis] = True
-                    rows, columns = numpy.nonzero(table)
+                    rows, columns = numpy.nonzero(table) # pylint: disable=unused-variable
                     after = numpy.unique(rows)
                 self._region._table._insert_cells(before=before, after=after, axis=0)
 

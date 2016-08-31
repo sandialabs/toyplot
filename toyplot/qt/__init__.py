@@ -9,6 +9,9 @@
 """Support functions for rendering using Qt.
 """
 
+import sys
+import xml.etree.ElementTree as xml
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtPrintSupport import *
@@ -16,10 +19,9 @@ from PyQt5.QtWebKitWidgets import *
 from PyQt5.QtWidgets import *
 
 import numpy
-import sys
+
 import toyplot.html
 import toyplot.require
-import xml.etree.ElementTree as xml
 
 def application():
     """Return a singleton QApplication instance.

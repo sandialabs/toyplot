@@ -27,7 +27,7 @@ def scalar(value, shape):
 #    return numpy.broadcast_arrays(array, numpy.empty(shape))[0]
 
 
-def object(value, shape):
+def pyobject(value, shape):
     array = numpy.array(value)
     # As a special-case, allow a vector with shape M to be matched-up with an
     # M x 1 matrix.
@@ -35,5 +35,5 @@ def object(value, shape):
             shape) == 2 and array.shape[0] == shape[0] and shape[1] == 1:
         return numpy.reshape(array, shape)
     result = numpy.empty(shape, dtype="object")
-    result.flat = [u for u, v in numpy.broadcast(array, result)]
+    result.flat = [u for u, _ in numpy.broadcast(array, result)]
     return result

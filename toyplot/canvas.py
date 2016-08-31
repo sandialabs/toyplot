@@ -642,13 +642,14 @@ class Canvas(object):
             x2=None,
             y2=None,
             width=10,
+            offset=None,
             bounds=None,
             rect=None,
             corner=None,
             grid=None,
             gutter=50,
-            min=None,
-            max=None,
+            min=None, # pylint: disable=redefined-builtin
+            max=None, # pylint: disable=redefined-builtin
             show=True,
             label=None,
             ticklocator=None,
@@ -700,7 +701,11 @@ class Canvas(object):
             padding=padding,
             )
 
-        axes.colormap(colormap)
+        axes.colormap(
+            colormap=colormap,
+            width=width,
+            offset=offset,
+        )
 
         return axes
 
@@ -715,8 +720,8 @@ class Canvas(object):
             corner=None,
             grid=None,
             gutter=50,
-            min=None,
-            max=None,
+            min=None, # pylint: disable=redefined-builtin
+            max=None, # pylint: disable=redefined-builtin
             show=True,
             label=None,
             ticklocator=None,
@@ -996,16 +1001,16 @@ class Canvas(object):
         table = toyplot.data.Table()
         table["x"] = toyplot.require.scalar_vector(x)
         table["y"] = toyplot.require.scalar_vector(y, table.shape[0])
-        table["text"] = toyplot.broadcast.object(text, table.shape[0])
+        table["text"] = toyplot.broadcast.pyobject(text, table.shape[0])
         table["angle"] = toyplot.broadcast.scalar(angle, table.shape[0])
-        table["fill"] = toyplot.broadcast.object(fill, table.shape[0])
+        table["fill"] = toyplot.broadcast.pyobject(fill, table.shape[0])
         table["toyplot:fill"] = toyplot.color.broadcast(
             colors=fill,
             shape=(table.shape[0],),
             default=toyplot.color.near_black,
             )
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
-        table["title"] = toyplot.broadcast.object(title, table.shape[0])
+        table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])
         style = toyplot.require.style(style, allowed=toyplot.require.style.text)
 
         self._children.append(

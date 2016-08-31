@@ -2,23 +2,17 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+# pylint: disable=function-redefined
+
 from __future__ import division, absolute_import
 
-from multipledispatch import dispatch
 import base64
 import collections
 import copy
 import io
 import itertools
 import json
-import numbers
-import numpy
 import string
-import toyplot.coordinates
-import toyplot.canvas
-import toyplot.color
-import toyplot.compatibility
-import toyplot.mark
 import uuid
 import xml.etree.ElementTree as xml
 
@@ -26,6 +20,16 @@ try:
     import HTMLParser
 except: # pragma: no cover
     import html.parser as HTMLParser
+
+from multipledispatch import dispatch
+import numpy
+
+import toyplot.coordinates
+import toyplot.canvas
+import toyplot.color
+import toyplot.compatibility
+import toyplot.mark
+
 
 class _NumpyJSONEncoder(json.JSONEncoder):
 
@@ -186,8 +190,8 @@ def render(canvas, fobj=None, animation=False):
 
     # Return / write the results.
     if isinstance(fobj, toyplot.compatibility.string_type):
-        with open(fobj, "wb") as file:
-            file.write(xml.tostring(root_xml, method="html"))
+        with open(fobj, "wb") as stream:
+            stream.write(xml.tostring(root_xml, method="html"))
     elif fobj is not None:
         fobj.write(xml.tostring(root_xml, method="html"))
     else:
@@ -318,15 +322,15 @@ class _HTMLParser(HTMLParser.HTMLParser):
         elif tag in ["b", "code", "em", "i", "small", "strong", "sub", "sup"]:
             self.push_node(tag)
         else:
-            toyplot.log.warning("Ignoring unknown <%s> tag." % tag) # pragma: no cover
+            toyplot.log.warning("Ignoring unknown <%s> tag.", tag) # pragma: no cover
 
     def handle_endtag(self, tag):
         if tag in ["br"]:
-            toyplot.log.warning("%s must not have an end tag." % tag) # pragma: no cover
+            toyplot.log.warning("%s must not have an end tag.", tag) # pragma: no cover
         elif tag in ["b", "code", "em", "i", "small", "strong", "sub", "sup"]:
             self.pop_node()
         else:
-            toyplot.log.warning("Ignoring unknown </%s> tag." % tag) # pragma: no cover
+            toyplot.log.warning("Ignoring unknown </%s> tag.", tag) # pragma: no cover
 
     def handle_data(self, text):
         xml.SubElement(self._current_node, "text").text = text
@@ -897,9 +901,9 @@ def _render(frames, context):
         # Ensure we have an entry for every time, even if there aren't any
         # changes.
         context.animation[time]
-        for type, type_changes in time_changes.items():
+        for frame_type, type_changes in time_changes.items():
             for change in type_changes:
-                context.animation[time][type].append(
+                context.animation[time][frame_type].append(
                     [context.get_id(change[0])] + list(change[1:]))
 
     if len(context.animation) < 2:
@@ -1102,7 +1106,7 @@ def _render(frames, context):
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Axis, _RenderContext)
-def _render(canvas, axis, context):
+def _render(canvas, axis, context): # pylint: disable=unused-argument
     if context.already_rendered(axis):
         return
 
@@ -1505,7 +1509,7 @@ def _render(canvas, axes, context):
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Table, _RenderContext)
-def _render(canvas, axes, context):
+def _render(canvas, axes, context): # pylint: disable=unused-argument
     axes_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         axes), attrib={"class": "toyplot-coordinates-Table"})
 
@@ -1767,7 +1771,7 @@ def _legend_markers(mark):
 
 
 @dispatch(toyplot.coordinates.Cartesian, type(None), _RenderContext)
-def _render(axes, mark, context):
+def _render(axes, mark, context): # pylint: disable=unused-argument
     pass
 
 
@@ -2090,12 +2094,12 @@ def _render(axes, mark, context):
 
 
 @dispatch(toyplot.mark.Mark)
-def _legend_markers(mark):
+def _legend_markers(mark): # pylint: disable=unused-argument
     return []
 
 
 @dispatch((toyplot.canvas.Canvas, toyplot.coordinates.Cartesian), toyplot.mark.Legend, _RenderContext)
-def _render(canvas, legend, context):
+def _render(canvas, legend, context): # pylint: disable=unused-argument
     if not legend._entries:
         return
 
@@ -2576,9 +2580,9 @@ def _render(parent, mark, context):
 
 
 @dispatch((toyplot.canvas.Canvas), toyplot.mark.Image, _RenderContext)
-def _render(parent, mark, context):
+def _render(parent, mark, context): # pylint: disable=unused-argument
     import png
-    buffer = io.BytesIO()
+    stream = io.BytesIO()
 
     data = mark._data
 
@@ -2600,8 +2604,8 @@ def _render(parent, mark, context):
     alpha = data.shape[2] == 2 or data.shape[2] == 4
 
     writer = png.Writer(width=width, height=height, greyscale=greyscale, alpha=alpha, bitdepth=bitdepth)
-    writer.write(buffer, numpy.reshape(data, (-1, data.shape[1] * data.shape[2])))
-    encoded = base64.standard_b64encode(buffer.getvalue()).decode("ascii")
+    writer.write(stream, numpy.reshape(data, (-1, data.shape[1] * data.shape[2])))
+    encoded = base64.standard_b64encode(stream.getvalue()).decode("ascii")
 
     mark_xml = xml.SubElement(
         context.parent,

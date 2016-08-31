@@ -9,7 +9,9 @@ from __future__ import division
 
 import collections
 import itertools
+
 import numpy
+
 import toyplot.broadcast
 import toyplot.color
 import toyplot.data
@@ -20,80 +22,17 @@ import toyplot.mark
 import toyplot.projection
 import toyplot.require
 import toyplot.text
-import time
 
 ##########################################################################
 # Helpers
-
 
 def _mark_exportable(table, column, exportable=True):
     table.metadata(column)["toyplot:exportable"] = exportable
 
 
-class _ordered_set(collections.MutableSet):
-
-    """Python recipe from http://code.activestate.com/recipes/576694-orderedset
-    """
-
-    def __init__(self, iterable=None):
-        self.end = end = []
-        end += [None, end, end]         # sentinel node for doubly linked list
-        self.map = {}                   # key --> [key, prev, next]
-        if iterable is not None:
-            self |= iterable
-
-    def __len__(self): # pragma: no cover
-        return len(self.map)
-
-    def __contains__(self, key):
-        return key in self.map
-
-    def add(self, key):
-        if key not in self.map:
-            end = self.end
-            curr = end[1]
-            curr[2] = end[1] = self.map[key] = [key, curr, end]
-
-    def discard(self, key):
-        if key in self.map:
-            key, prev, next = self.map.pop(key)
-            prev[2] = next
-            next[1] = prev
-
-    def __iter__(self):
-        end = self.end
-        curr = end[2]
-        while curr is not end:
-            yield curr[0]
-            curr = curr[2]
-
-    def __reversed__(self): # pragma: no cover
-        end = self.end
-        curr = end[1]
-        while curr is not end:
-            yield curr[0]
-            curr = curr[1]
-
-    def pop(self, last=True): # pragma: no cover
-        if not self:
-            raise KeyError('set is empty')
-        key = self.end[1][0] if last else self.end[2][0]
-        self.discard(key)
-        return key
-
-    def __repr__(self): # pragma: no cover
-        if not self:
-            return '%s()' % (self.__class__.__name__,)
-        return '%s(%r)' % (self.__class__.__name__, list(self))
-
-    def __eq__(self, other): # pragma: no cover
-        if isinstance(other, _ordered_set):
-            return len(self) == len(other) and list(self) == list(other)
-        return set(self) == set(other)
-
-
 def _opposite_location(location):
     return "above" if location == "below" else "below"
+
 
 def _create_far_property():
     def getter(self):
@@ -258,9 +197,9 @@ class Axis(object):
     """
     class DomainHelper(object):
         """Controls domain related behavior for this axis."""
-        def __init__(self, min, max):
-            self._min = min
-            self._max = max
+        def __init__(self, domain_min, domain_max):
+            self._min = domain_min
+            self._max = domain_max
             self._show = True
 
         @property
@@ -1182,7 +1121,7 @@ class Cartesian(object):
                 )
             opacity = toyplot.broadcast.scalar(
                 opacity, (series.shape[0], series.shape[1] - 1))
-            title = toyplot.broadcast.object(
+            title = toyplot.broadcast.pyobject(
                 title, (series.shape[0], series.shape[1] - 1))
             style = toyplot.style.combine(
                 {"stroke": "white", "stroke-width": 1.0},
@@ -1275,7 +1214,7 @@ class Cartesian(object):
                 default=default_color,
                 )
             opacity = toyplot.broadcast.scalar(opacity, series.shape)
-            title = toyplot.broadcast.object(title, series.shape)
+            title = toyplot.broadcast.pyobject(title, series.shape)
             style = toyplot.style.combine(
                 {"stroke": "white", "stroke-width": 1.0},
                 toyplot.require.style(style, allowed=toyplot.require.style.fill),
@@ -1454,7 +1393,7 @@ class Cartesian(object):
                 default=default_color,
                 )
             opacity = toyplot.broadcast.scalar(opacity, series.shape[1] - 1)
-            title = toyplot.broadcast.object(title, series.shape[1] - 1)
+            title = toyplot.broadcast.pyobject(title, series.shape[1] - 1)
             style = toyplot.style.combine(
                 {"stroke": "none"},
                 toyplot.require.style(style, allowed=toyplot.require.style.fill),
@@ -1512,7 +1451,7 @@ class Cartesian(object):
                 default=default_color,
                 )
             opacity = toyplot.broadcast.scalar(opacity, series.shape[1])
-            title = toyplot.broadcast.object(title, series.shape[1])
+            title = toyplot.broadcast.pyobject(title, series.shape[1])
             style = toyplot.style.combine(
                 {"stroke": "none"},
                 toyplot.require.style(style, allowed=toyplot.require.style.fill),
@@ -1611,7 +1550,7 @@ class Cartesian(object):
             default=default_color,
             )
 
-        vmarker = toyplot.broadcast.object(vmarker, layout.vcount)
+        vmarker = toyplot.broadcast.pyobject(vmarker, layout.vcount)
 
         if varea is None and vsize is None:
             vsize = toyplot.broadcast.scalar(4, layout.vcount)
@@ -1624,7 +1563,7 @@ class Cartesian(object):
             vsize = toyplot.broadcast.scalar(vsize, layout.vcount)
 
         vopacity = toyplot.broadcast.scalar(vopacity, layout.vcount)
-        vtitle = toyplot.broadcast.object(vtitle, layout.vcount)
+        vtitle = toyplot.broadcast.pyobject(vtitle, layout.vcount)
         vstyle = toyplot.require.style(vstyle, allowed=toyplot.require.style.marker)
         vlstyle = toyplot.style.combine(
             {
@@ -1740,7 +1679,7 @@ class Cartesian(object):
             )
         table["color"] = color[:, 0]
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
-        table["title"] = toyplot.broadcast.object(title, table.shape[0])
+        table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])
         style = toyplot.require.style(style, allowed=toyplot.require.style.line)
 
         self._children.append(
@@ -1925,8 +1864,8 @@ class Cartesian(object):
         stroke_width = toyplot.broadcast.scalar(stroke_width, series.shape[1])
         stroke_opacity = toyplot.broadcast.scalar(
             opacity, series.shape[1])
-        stroke_title = toyplot.broadcast.object(title, series.shape[1])
-        marker = toyplot.broadcast.object(marker, series.shape)
+        stroke_title = toyplot.broadcast.pyobject(title, series.shape[1])
+        marker = toyplot.broadcast.pyobject(marker, series.shape)
 
         if area is None and size is None:
             msize = toyplot.broadcast.scalar(4, series.shape)
@@ -1945,7 +1884,7 @@ class Cartesian(object):
             )
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
         mopacity = toyplot.broadcast.scalar(mopacity, series.shape)
-        mtitle = toyplot.broadcast.object(mtitle, series.shape)
+        mtitle = toyplot.broadcast.pyobject(mtitle, series.shape)
         style = toyplot.require.style(style, allowed=toyplot.require.style.line)
         mstyle = toyplot.require.style(mstyle, allowed=toyplot.require.style.marker)
         mlstyle = toyplot.require.style(mlstyle, allowed=toyplot.require.style.text)
@@ -2026,7 +1965,7 @@ class Cartesian(object):
         table["bottom"] = toyplot.require.scalar_vector(
             d, length=table.shape[0])
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
-        table["title"] = toyplot.broadcast.object(title, table.shape[0])
+        table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])
         style = toyplot.require.style(style, allowed=toyplot.require.style.fill)
 
         default_color = [next(self._rect_colors)]
@@ -2119,7 +2058,7 @@ class Cartesian(object):
             shape=series.shape,
             default=default_color,
             )
-        marker = toyplot.broadcast.object(marker, series.shape)
+        marker = toyplot.broadcast.pyobject(marker, series.shape)
 
         if area is None and size is None:
             msize = toyplot.broadcast.scalar(4, series.shape)
@@ -2133,7 +2072,7 @@ class Cartesian(object):
 
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
-        mtitle = toyplot.broadcast.object(title, series.shape)
+        mtitle = toyplot.broadcast.pyobject(title, series.shape)
         style = toyplot.require.style(style, allowed=set())
         mstyle = toyplot.require.style(mstyle, allowed=toyplot.require.style.marker)
         mlstyle = toyplot.require.style(mlstyle, allowed=toyplot.require.style.text)
@@ -2295,11 +2234,11 @@ class Cartesian(object):
         _mark_exportable(table, "x")
         table["y"] = toyplot.require.scalar_vector(b, table.shape[0])
         _mark_exportable(table, "y")
-        table["text"] = toyplot.broadcast.object(text, table.shape[0])
+        table["text"] = toyplot.broadcast.pyobject(text, table.shape[0])
         _mark_exportable(table, "text")
         table["angle"] = toyplot.broadcast.scalar(angle, table.shape[0])
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
-        table["title"] = toyplot.broadcast.object(title, table.shape[0])
+        table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])
         style = toyplot.style.combine(
             {
                 "alignment-baseline": "middle",
@@ -2376,7 +2315,7 @@ class Cartesian(object):
             )
         table["color"] = color[:, 0]
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
-        table["title"] = toyplot.broadcast.object(title, table.shape[0])
+        table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])
         style = toyplot.require.style(style, allowed=toyplot.require.style.line)
 
         self._children.append(
@@ -2410,8 +2349,8 @@ class Numberline(object):
             y2,
             padding,
             spacing,
-            min,
-            max,
+            min, # pylint: disable=redefined-builtin
+            max, # pylint: disable=redefined-builtin
             show,
             label,
             ticklocator,
@@ -2554,7 +2493,7 @@ class Numberline(object):
             shape=coordinates.shape,
             default=default_color,
             )
-        marker = toyplot.broadcast.object(marker, coordinates.shape)
+        marker = toyplot.broadcast.pyobject(marker, coordinates.shape)
 
         if area is None and size is None:
             msize = toyplot.broadcast.scalar(4, coordinates.shape)
@@ -2568,7 +2507,7 @@ class Numberline(object):
 
         mstroke = toyplot.color.broadcast(colors=mfill, shape=coordinates.shape)
         mopacity = toyplot.broadcast.scalar(opacity, coordinates.shape)
-        mtitle = toyplot.broadcast.object(title, coordinates.shape)
+        mtitle = toyplot.broadcast.pyobject(title, coordinates.shape)
         style = toyplot.require.style(style, allowed=set())
         mstyle = toyplot.require.style(mstyle, allowed=toyplot.require.style.marker)
         mlstyle = toyplot.require.style(mlstyle, allowed=toyplot.require.style.text)

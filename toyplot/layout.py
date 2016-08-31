@@ -7,11 +7,10 @@
 
 from __future__ import division
 
-import io
-import numbers
-import numpy
-import subprocess
 import time
+
+import numpy
+
 import toyplot.compatibility
 import toyplot.units
 
@@ -49,12 +48,12 @@ def region(
 
     gutter = toyplot.units.convert(gutter, "px", default="px")
 
-    def convert(min, max, value):
+    def convert(vmin, vmax, value):
         value = toyplot.units.convert(
-            value, "px", default="px", reference=max - min)
+            value, "px", default="px", reference=vmax - vmin)
         if value < 0:
-            return float(max + value)
-        return float(min + value)
+            return float(vmax + value)
+        return float(vmin + value)
 
     # Specify explicit bounds for the region
     if bounds is not None:
@@ -288,7 +287,7 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
             # Otherwise, we can ignore the vertices and just create edges.
             layout = toyplot.layout.IgnoreVertices()
     vcoordinates, eshapes, ecoordinates = layout.graph(ivcoordinates, edges)
-    toyplot.log.info("Graph layout time: %s ms" % ((time.time() - start) * 1000))
+    toyplot.log.info("Graph layout time: %s ms", (time.time() - start) * 1000)
 
     if numpy.ma.is_masked(vcoordinates):
         raise RuntimeError("Graph layout cannot return masked vertex coordinates.") # pragma: no cover
@@ -416,7 +415,7 @@ class StraightEdges(EdgeLayout):
     def edges(self, vcoordinates, edges):
         loops = edges.T[0] == edges.T[1]
         if numpy.any(loops):
-            toyplot.log.warning("Graph contains %s loop edges that will not be visible." % numpy.count_nonzero(loops))
+            toyplot.log.warning("Graph contains %s loop edges that will not be visible.", numpy.count_nonzero(loops))
 
         eshapes = numpy.tile("ML", len(edges))
         ecoordinates = numpy.empty((len(edges) * 2, 2))
@@ -441,7 +440,7 @@ class CurvedEdges(EdgeLayout):
     def edges(self, vcoordinates, edges):
         loops = edges.T[0] == edges.T[1]
         if numpy.any(loops):
-            toyplot.log.warning("Graph contains %s loop edges that will not be visible." % numpy.count_nonzero(loops))
+            toyplot.log.warning("Graph contains %s loop edges that will not be visible.", numpy.count_nonzero(loops))
 
         eshapes = numpy.tile("MQ", len(edges))
         ecoordinates = numpy.empty((len(edges) * 3, 2))

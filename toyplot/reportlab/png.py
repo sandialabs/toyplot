@@ -8,11 +8,12 @@
 from __future__ import absolute_import
 from __future__ import division
 
-
 import io
 import os.path
-import reportlab.pdfgen.canvas
 import subprocess
+
+import reportlab.pdfgen.canvas
+
 import toyplot.reportlab
 import toyplot.require
 import toyplot.svg

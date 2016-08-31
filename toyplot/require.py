@@ -2,25 +2,42 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Functions for validating inputs.
+"""
+
 from __future__ import division
 
 import numbers
 import numpy
 import toyplot.compatibility
 
-def style(style, allowed):
-    if style is None:
-        return style
+def style(value, allowed):
+    """Validate that an object is usable as CSS style information.
 
-    """Verify that the given object is usable as a style."""
-    if not isinstance(style, dict):
-        raise ValueError("Expected a dictionary of CSS styles or None, received %s." % style) # pragma: no cover
+    Parameters
+    ----------
+    value: dict or None
+        The style object to be validated.  An exception will be raised if it is
+        not a valid style object.
+    allowed: sequence of strings
+        The set of allowed style keys.  An exception will be raised if `value`
+        contains any keys that aren't in this sequence.
 
-    for key in style:
+    Returns
+    -------
+    style: the validated style object.
+    """
+    if value is None:
+        return value
+
+    if not isinstance(value, dict):
+        raise ValueError("Expected a dictionary of CSS styles or None, received %s." % value) # pragma: no cover
+
+    for key in value:
         if key not in allowed:
             raise ValueError("Not an allowed CSS style: %s" % key) # pragma: no cover
 
-    return style
+    return value
 
 style.fill = set([
     "fill",

@@ -9,10 +9,12 @@ from __future__ import division
 
 import base64
 import io
-import numpy
 import re
+
+import numpy
 import reportlab.pdfgen.canvas
 import reportlab.pdfbase
+
 import toyplot.color
 import toyplot.units
 
@@ -144,12 +146,12 @@ def render(svg, canvas):
             if "transform" in element.attrib:
                 for transformation in element.get("transform").split(")")[::1]:
                     if transformation:
-                        type, arguments = transformation.split("(")
+                        transform, arguments = transformation.split("(")
                         arguments = arguments.split(",")
-                        if type.strip() == "translate":
+                        if transform.strip() == "translate":
                             if len(arguments) == 2:
                                 canvas.translate(float(arguments[0]), float(arguments[1]))
-                        elif type.strip() == "rotate":
+                        elif transform.strip() == "rotate":
                             if len(arguments) == 1:
                                 canvas.rotate(float(arguments[0]))
                             if len(arguments) == 3:
@@ -189,7 +191,7 @@ def render(svg, canvas):
                             path.close()
                             canvas.clipPath(path, stroke=0, fill=1)
                         else:
-                            toyplot.log.error("Unhandled clip tag: %s" % child.tag) # pragma: no cover
+                            toyplot.log.error("Unhandled clip tag: %s", child.tag) # pragma: no cover
 
                 for child in element:
                     render_element(root, child, canvas, styles)
@@ -267,7 +269,7 @@ def render(svg, canvas):
                         offset = float(stop.get("offset"))
                         color = toyplot.color.css(stop.get("stop-color"))
                         opacity = float(stop.get("stop-opacity"))
-                        pdf_colors.append(reportlab.lib.colors.Color(color["r"], color["g"], color["b"], color["a"]))
+                        pdf_colors.append(reportlab.lib.colors.Color(color["r"], color["g"], color["b"], color["a"] * opacity))
                         pdf_offsets.append(offset)
                     canvas.saveState()
                     canvas.clipPath(path, stroke=0, fill=1)

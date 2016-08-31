@@ -7,10 +7,11 @@
 
 from __future__ import division
 
+import xml.etree.ElementTree as xml
+
 import toyplot.compatibility
 import toyplot.html
 import toyplot.require
-import xml.etree.ElementTree as xml
 
 
 def apply_changes(svg, changes):

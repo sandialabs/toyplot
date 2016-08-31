@@ -7,16 +7,18 @@ from __future__ import division
 import collections
 import itertools
 import numbers
-import numpy
 import sys
-import toyplot.color
-import toyplot.compatibility
 import xml.etree.ElementTree as xml
 
+import numpy
 try:
     import pandas
 except: # pragma: no cover
     pass
+
+import toyplot.color
+import toyplot.compatibility
+
 
 def minimax(items):
     """Compute the minimum and maximum of an arbitrary collection of scalar- or array-like items.
@@ -296,7 +298,7 @@ class Table(object):
                 style="text-align:left;border:none;padding-right:1em;").text = toyplot.compatibility.unicode_type(name)
 
         iterators = [iter(column) for column in self._columns.values()]
-        for row_index in numpy.arange(len(self)):
+        for _ in numpy.arange(len(self)):
             for index, iterator in enumerate(iterators):
                 value = next(iterator)
                 if index == 0:

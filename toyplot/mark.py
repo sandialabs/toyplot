@@ -4,9 +4,10 @@
 
 from __future__ import division
 
-import collections
 import itertools
+
 import numpy
+
 import toyplot.color
 import toyplot.require
 
@@ -34,7 +35,7 @@ class Mark(object):
     def _finalize(self):
         return self
 
-    def domain(self, axis):
+    def domain(self, axis): # pylint: disable=unused-argument,no-self-use
         """Return minimum and maximum domain values for the mark along the given axis.
 
         Parameters
@@ -49,7 +50,7 @@ class Mark(object):
         """
         return (None, None)
 
-    def extents(self, axes):
+    def extents(self, axes): # pylint: disable=no-self-use
         """Return range extents for the mark using the given axes.
 
         Parameters

@@ -5,12 +5,13 @@
 from __future__ import division
 
 import collections
-import colorsys
-import numpy
 import re
-import toyplot.compatibility
 import xml.etree.ElementTree as xml
 
+import colorsys
+import numpy
+
+import toyplot.compatibility
 
 near_black = "#292724"
 
@@ -42,7 +43,7 @@ def _jupyter_color_swatches(colors):
 
 
 try: # pragma: no cover
-    import IPython
+    import IPython # pylint: disable=wrong-import-position,wrong-import-order
     ip = IPython.get_ipython()
     html_formatter = ip.display_formatter.formatters['text/html']
     html_formatter.for_type_by_name('numpy', 'ndarray', _jupyter_color_swatches)
@@ -85,7 +86,7 @@ def lab(L, a, b):
     from colormath.color_objects import sRGBColor, LabColor
     from colormath.color_conversions import convert_color
     RGB = convert_color(LabColor(L, a, b), sRGBColor)
-    return rgb(*RGB.get_value_tuple())
+    return rgb(*RGB.get_value_tuple()) # pylint: disable=no-value-for-parameter
 
 
 def to_lab(color):
@@ -151,7 +152,6 @@ def broadcast(colors, shape, default=None):
     if not 0 < len(shape) < 3:
         raise ValueError("Shape parameter must be a tuple with length 1 or 2.") # pragma: no cover
 
-    per_series = len(shape) == 1
     per_datum = len(shape) == 2
 
     # Supply default color(s).
@@ -296,9 +296,9 @@ def spread(color, count=5, lightness=0.9, reverse=False):
 
 class Map(object):
     class DomainHelper(object):
-        def __init__(self, min, max):
-            self._min = min
-            self._max = max
+        def __init__(self, domain_min, domain_max):
+            self._min = domain_min
+            self._max = domain_max
 
         @property
         def min(self):
@@ -347,7 +347,7 @@ class CategoricalMap(Map):
         self._palette = palette
         toyplot.color.Map.__init__(self, domain_min=0, domain_max=len(palette))
 
-    def colors(self, values, domain_min=None, domain_max=None):
+    def colors(self, values, domain_min=None, domain_max=None): # pylint: disable=unused-argument
         """Convert a sequence of categorical (nonnegative integer) values to colors.
 
         Each value is mapped to a color in the underlying palette.  Note that the
@@ -451,8 +451,8 @@ class DivergingMap(Map):
         if high is None:
             high = rgb(0.706, 0.016, 0.150)
 
-        self._low = _lab_to_msh(*to_lab(low))
-        self._high = _lab_to_msh(*to_lab(high))
+        self._low = _lab_to_msh(*to_lab(low)) # pylint: disable=no-value-for-parameter
+        self._high = _lab_to_msh(*to_lab(high)) # pylint: disable=no-value-for-parameter
         self._mid_low = middle(self._low)
         self._mid_high = middle(self._high)
 
@@ -2768,7 +2768,7 @@ class LinearFactory(object):
         -------
         map: :class:`toyplot.color.LinearMap`
         """
-        palette = Palette([rgb(red, green, blue) for position, red, green, blue in self._data[name]])
+        palette = Palette([rgb(red, green, blue) for _, red, green, blue in self._data[name]])
         return LinearMap(palette=palette, domain_min=domain_min, domain_max=domain_max)
 
     def maps(self):

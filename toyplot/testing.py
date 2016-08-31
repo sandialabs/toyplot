@@ -9,14 +9,16 @@ import io
 import json
 import os
 import numbers
-import numpy.testing
-import png
 import re
 import subprocess
 import sys
+import xml.etree.ElementTree as xml
+
+import numpy.testing
+import png
+
 import toyplot.html
 import toyplot.svg
-import xml.etree.ElementTree as xml
 
 try:
     import toyplot.pdf
@@ -53,14 +55,14 @@ def _assert_string_equal(content, test_file, reference_file, encoding="utf-8"):
         if content != reference:
             if not os.path.exists(failed_dir):
                 os.mkdir(failed_dir)
-            with open(test_file, "wb") as file:
-                file.write(content.encode(encoding))
+            with open(test_file, "wb") as stream:
+                stream.write(content.encode(encoding))
             raise AssertionError(
                 "Test output %s doesn't match %s." %
                 (test_file, reference_file))
     else:
-        with open(reference_file, "wb") as file:
-            file.write(content.encode(encoding))
+        with open(reference_file, "wb") as stream:
+            stream.write(content.encode(encoding))
         raise AssertionError(
             "Created new reference file %s.  You should verify its contents before re-running the test." %
             (reference_file))
@@ -99,8 +101,8 @@ def _xml_comparison_string(element):
         except:
             return value
 
-    def write_element(element, buffer, indent):
-        buffer.write(u"%s<%s" % (indent, element.tag))
+    def write_element(element, stream, indent):
+        stream.write(u"%s<%s" % (indent, element.tag))
         for key, value in element.items():
             if key in ["id", "clip-path"]:
                 continue
@@ -108,30 +110,30 @@ def _xml_comparison_string(element):
                 value = re.sub("fill:url[(]#.*[)]", "fill:url(#)", value)
 
             if key == "d" and element.tag == "{http://www.w3.org/2000/svg}path":
-                buffer.write(
+                stream.write(
                     u" %s='%s'" % (key, " ".join([format_value(d) for d in value.split(" ")])))
             elif key == "transform":
-                buffer.write(u" %s='%s'" % (
-                    key, "".join([format_value(d) for d in re.split("(,|\(|\))", value)])))
+                stream.write(u" %s='%s'" % (
+                    key, "".join([format_value(d) for d in re.split(r"(,|\(|\))", value)])))
             elif key == "points" and element.tag == "{http://www.w3.org/2000/svg}polygon":
-                buffer.write(u" %s='%s'" % (key, " ".join(
+                stream.write(u" %s='%s'" % (key, " ".join(
                     [",".join([format_value(i) for i in p.split(",")]) for p in value.split(" ")])))
             else:
-                buffer.write(u" %s='%s'" % (key, format_value(value)))
+                stream.write(u" %s='%s'" % (key, format_value(value)))
 
         text = element.text if element.text is not None else ""
         if element.tag in [
                 "{http://www.sandia.gov/toyplot}data-table",
                 "{http://www.sandia.gov/toyplot}coordinates"]:
             text = str(_json_comparison_string(json.loads(element.text)))
-        buffer.write(u">%s\n" % text)
+        stream.write(u">%s\n" % text)
         for child in list(element):
-            write_element(child, buffer, indent + "  ")
-        buffer.write(u"%s</%s>\n" % (indent, element.tag))
+            write_element(child, stream, indent + "  ")
+        stream.write(u"%s</%s>\n" % (indent, element.tag))
 
-    buffer = io.StringIO()
-    write_element(element, buffer, indent="")
-    return buffer.getvalue()
+    stream = io.StringIO()
+    write_element(element, stream, indent="")
+    return stream.getvalue()
 
 
 def assert_color_equal(a, b):
@@ -191,8 +193,8 @@ def assert_canvas_equal(canvas, name):
 
     for module in ["toyplot.pdf", "toyplot.png", "toyplot.reportlab.pdf", "toyplot.reportlab.png"]:
         if module in sys.modules:
-            buffer = io.BytesIO()
-            sys.modules[module].render(canvas, buffer)
+            stream = io.BytesIO()
+            sys.modules[module].render(canvas, stream)
 
     # Get rid of any past failures ...
     if os.path.exists(test_file):
@@ -200,8 +202,8 @@ def assert_canvas_equal(canvas, name):
 
     # If there's no stored SVG reference for this canvas, create one ...
     if not os.path.exists(reference_file):
-        with open(reference_file, "wb") as file:
-            file.write(svg.getvalue())
+        with open(reference_file, "wb") as stream:
+            stream.write(svg.getvalue())
         raise AssertionError(
             "Created new reference file %s ... you should verify its contents before re-running the test." %
             reference_file)
@@ -216,8 +218,8 @@ def assert_canvas_equal(canvas, name):
     if svg_string != reference_string:
         if not os.path.exists(failed_dir):
             os.mkdir(failed_dir)
-        with open(test_file, "wb") as file:
-            file.write(svg.getvalue())
+        with open(test_file, "wb") as stream:
+            stream.write(svg.getvalue())
         reference = subprocess.Popen(["xmldiff", test_file, reference_file], stdout=subprocess.PIPE)
         test = subprocess.Popen(["xmldiff", reference_file, test_file], stdout=subprocess.PIPE)
         message = "Test output %s doesn't match %s:\n\n*** Test -> Reference ***\n%s\n*** Reference -> Test ***\n%s\n" % (
@@ -240,6 +242,6 @@ def read_png(fobj):
     if meta["bitdepth"] == 1:
         image = numpy.resize(numpy.vstack(pixels), (height, width, planes))
     elif meta["bitdepth"] == 8:
-        image = numpy.resize(numpy.vstack(map(numpy.uint8, pixels)), (height, width, planes))
+        image = numpy.resize(numpy.vstack(map(numpy.uint8, pixels)), (height, width, planes)) # pylint: disable=bad-builtin
     return image
 

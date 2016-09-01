@@ -1955,7 +1955,7 @@ class Cartesian(object):
             color=None,
             opacity=1.0,
             title=None,
-            style={"stroke": "none"},
+            style=None,
             filename=None,
         ):
         table = toyplot.data.Table()
@@ -1967,7 +1967,10 @@ class Cartesian(object):
             d, length=table.shape[0])
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])
-        style = toyplot.require.style(style, allowed=toyplot.require.style.fill)
+        style = toyplot.style.combine(
+            {"stroke": "none"},
+            toyplot.require.style(style, allowed=toyplot.require.style.fill),
+            )
 
         default_color = [next(self._rect_colors)]
         table["toyplot:fill"] = toyplot.color.broadcast(
@@ -2773,6 +2776,7 @@ class Table(object):
                 mlstyle,
                 mopacity,
                 mstyle,
+                mtitle,
                 opacity,
                 series,
                 size,
@@ -2789,6 +2793,7 @@ class Table(object):
             self._mlstyle = mlstyle
             self._mopacity = mopacity
             self._mstyle = mstyle
+            self._mtitle = mtitle
             self._opacity = opacity
             self._size = size
             self._stroke_width = stroke_width
@@ -2859,6 +2864,7 @@ class Table(object):
                     mlstyle=self._mlstyle,
                     mopacity=self._mopacity,
                     mstyle=self._mstyle,
+                    mtitle=self._mtitle,
                     opacity=self._opacity,
                     size=self._size,
                     stroke_width=self._stroke_width,
@@ -2935,6 +2941,7 @@ class Table(object):
                 mlstyle=mlstyle,
                 mopacity=mopacity,
                 mstyle=mstyle,
+                mtitle=mtitle,
                 opacity=opacity,
                 series=series,
                 size=size,

@@ -32,7 +32,7 @@ import toyplot.mark
 
 
 class _NumpyJSONEncoder(json.JSONEncoder):
-
+    # pylint: disable=method-hidden
     def default(self, obj): # pragma: no cover
         if isinstance(obj, numpy.generic):
             return numpy.asscalar(obj)
@@ -186,7 +186,7 @@ def render(canvas, fobj=None, animation=False):
 
     # Render the canvas.
     context = _RenderContext(root=root_xml)
-    _render(canvas, context.copy(parent=root_xml))
+    _render(canvas, context.copy(parent=root_xml)) # pylint: disable=no-value-for-parameter
 
     # Return / write the results.
     if isinstance(fobj, toyplot.compatibility.string_type):
@@ -348,11 +348,14 @@ def _draw_text(
         style=None,
         angle=None,
         title=None,
-        attributes={},
+        attributes=None,
     ):
 
     if not text:
         return
+
+    if attributes is None:
+        attributes = {}
 
     style = copy.copy(style)
 
@@ -646,7 +649,7 @@ def _render(canvas, context):
     _render_data_table_export(context.copy(parent=interactive_xml))
     _render_data_cursors(context.copy(parent=interactive_xml))
     _render_interactive_mouse_coordinates(context.copy(parent=interactive_xml))
-    _render(canvas._animation, context.copy(parent=interactive_xml))
+    _render(canvas._animation, context.copy(parent=interactive_xml)) # pylint: disable=no-value-for-parameter
 
 
 def _render_data_table_export(context):

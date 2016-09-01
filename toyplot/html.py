@@ -316,7 +316,7 @@ class _HTMLParser(HTMLParser.HTMLParser):
             for child in node:
                 self.walk_tree(child, attributes, style, stack_state, global_state)
 
-    def handle_starttag(self, tag, attrs):
+    def handle_starttag(self, tag, attrs): # pylint: disable=unused-argument
         if tag == "br":
             self.push_node("br")
         elif tag in ["b", "code", "em", "i", "small", "strong", "sub", "sup"]:

@@ -169,7 +169,7 @@ class Table(object):
             key_counts = numpy.array(list(key_counter.values()))
 
             if numpy.any(key_counts > 1):
-                toyplot.log.warn("Altering duplicate column names to make them unique.")
+                toyplot.log.warning("Altering duplicate column names to make them unique.")
 
             # "Reserve" all of the keys that aren't duplicated.
             reserved_keys = set([key for key, count in zip(key_dictionary, key_counts) if count == 1])
@@ -214,6 +214,8 @@ class Table(object):
 
         row_slice = None
         columns = None
+
+        # pylint: disable=redefined-variable-type
 
         # table[10]
         if isinstance(index, numbers.Integral):

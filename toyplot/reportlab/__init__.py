@@ -356,6 +356,8 @@ def render(svg, canvas):
                 text_state["x"] += string_width
 
             elif element.tag == "image":
+                # pylint: disable=redefined-variable-type
+
                 import PIL.Image
                 image = element.get("xlink:href")
                 if not image.startswith("data:image/png;base64,"):

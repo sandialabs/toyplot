@@ -361,7 +361,7 @@ def render(svg, canvas):
                 import PIL.Image
                 image = element.get("xlink:href")
                 if not image.startswith("data:image/png;base64,"):
-                    raise ValueError("Unsupported image type.")
+                    raise ValueError("Unsupported image type.") # pragma: no cover
                 image = base64.standard_b64decode(image[22:])
                 image = io.BytesIO(image)
                 image = PIL.Image.open(image)

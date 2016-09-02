@@ -9,7 +9,7 @@ import datetime
 import numpy
 try:
     import arrow
-except:
+except: # pragma: no cover
     pass
 
 import toyplot.broadcast

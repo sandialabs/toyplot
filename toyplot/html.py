@@ -308,7 +308,7 @@ def _draw_text(
         dy = node.get("dy", 0)
         style = toyplot.style.parse(node.get("style", ""))
         if "font-size" in style:
-            font_size = toyplot.units.convert(style["font-size"], target="px", default="px", reference=font_size)
+            font_size = toyplot.units.convert(style.pop("font-size"), target="px", default="px", reference=font_size)
 
         if node.tag in ["b", "strong"]:
             style = toyplot.style.combine(style, {"font-weight":"bold"})
@@ -324,39 +324,44 @@ def _draw_text(
         elif node.tag == "sup":
             dy += -0.3 * font_size
             font_size *= 0.7
-        style["font-size"] = "%spx" % font_size
         node.set("dy", dy)
         node.set("style", style)
+        node.set("font-size", font_size)
         for child in node:
             cascade_styles(child, font_size)
 
     def render_tree(tree, text_xml):
         y = 0
         current_y = 0
-        dy_stack = [0]
-        style_stack = [None]
         attributes = []
+        stack = [{"dy": 0, "style": None}]
+
         for item in _walk_tree(tree):
-            #toyplot.log.debug(item)
+            toyplot.log.debug(item)
             if item["type"] == "start":
-                dy_stack.append(dy_stack[-1] + item["attrib"]["dy"])
-                style_stack.append(toyplot.style.combine(style_stack[-1], item["attrib"]["style"]))
+                font_size = item["attrib"]["font-size"]
+                stack.append({
+                    "dy": stack[-1]["dy"] + item["attrib"]["dy"],
+                    "style": toyplot.style.combine(stack[-1]["style"], item["attrib"]["style"]),
+                })
+                stack[-1]["style"]["font-size"] = "%spx" % font_size
                 if item["tag"] == "br":
-                    font_size = toyplot.units.convert(style["font-size"], target="px", default="px")
                     attributes.append(("x", 0))
                     y += 1.2 * font_size
             elif item["type"] == "text":
-                if y + dy_stack[-1] != current_y:
-                    attributes.append(("dy", y + dy_stack[-1] - current_y))
-                    current_y = y + dy_stack[-1]
-                tspan_xml = xml.SubElement(text_xml, "tspan", style=_css_style(style_stack[-1]))
+                new_y = y + stack[-1]["dy"]
+                if new_y != current_y:
+                    attributes.append(("dy", new_y - current_y))
+                    current_y = new_y
+                style = stack[-1]["style"]
+
+                tspan_xml = xml.SubElement(text_xml, "tspan", attrib=_css_attrib(style))
                 tspan_xml.text = item["text"]
                 for key, value in attributes:
                     tspan_xml.set(key, str(value))
                 attributes = []
             elif item["type"] == "end":
-                dy_stack.pop()
-                style_stack.pop()
+                stack.pop()
 
     tree = xml.fromstring("<root>" + text + "</root>")
     cascade_styles(tree, font_size)

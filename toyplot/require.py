@@ -85,6 +85,7 @@ style.text = set([
 style.rich_text = set([
     "fill",
     "fill-opacity",
+    "font-family",
     "font-size",
     "font-weight",
     "opacity",

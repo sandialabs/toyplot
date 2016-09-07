@@ -16,11 +16,6 @@ import string
 import uuid
 import xml.etree.ElementTree as xml
 
-try:
-    import HTMLParser
-except: # pragma: no cover
-    import html.parser as HTMLParser
-
 from multipledispatch import dispatch
 import numpy
 
@@ -248,97 +243,16 @@ def _flat_contiguous(a):
     return result
 
 
-class _HTMLParser(HTMLParser.HTMLParser):
-    def __init__(self, element, font_size):
-        HTMLParser.HTMLParser.__init__(self)
-        self._element = element
-        self._font_size = font_size
-        self._root_node = xml.Element("root")
-        self._current_node = self._root_node
-        self._parent_map = {self._root_node: self._root_node}
-
-    def push_node(self, tag, **kwargs):
-        node = xml.SubElement(self._current_node, tag, **kwargs)
-        self._parent_map[node] = self._current_node
-        self._current_node = node
-
-    def pop_node(self):
-        while self._current_node.tag == "br":
-            self._current_node = self._parent_map[self._current_node]
-        while True:
-            self._current_node = self._parent_map[self._current_node]
-            if self._current_node.tag != "br":
-                break
-
-    def walk_tree(self, node, attributes, style, stack_state, global_state):
-        if node.tag == "text":
-            attributes = copy.copy(attributes)
-            style = copy.copy(style)
-            x = global_state.pop("x", None)
-            if x is not None:
-                attributes["x"] = x
-            new_y = global_state["line-y"] + stack_state["dy"]
-            if new_y != global_state["current-y"]:
-                attributes["dy"] = new_y - global_state["current-y"]
-                global_state["current-y"] = new_y
-            tspan = xml.SubElement(self._element, "tspan", attrib=_css_attrib(style))
-            for key, value in attributes.items():
-                tspan.set(key, str(value))
-            tspan.text = node.text
-        else:
-            attributes = copy.copy(attributes)
-            style = copy.copy(style)
-            stack_state = copy.copy(stack_state)
-            if node.tag in ["b", "strong"]:
-                style["font-weight"] = "bold"
-            elif node.tag == "br":
-                font_size = stack_state["font-size"]
-                global_state["x"] = 0
-                global_state["line-y"] += font_size * 1.2
-            elif node.tag == "code":
-                style["font-family"] = "monospace"
-            elif node.tag in ["em", "i"]:
-                style["font-style"] = "italic"
-            elif node.tag == "small":
-                font_size = stack_state["font-size"]
-                stack_state["font-size"] = font_size * 0.8
-                style["font-size"] = "%spx" % (font_size * 0.8)
-            elif node.tag == "sub":
-                font_size = stack_state["font-size"]
-                stack_state["font-size"] = font_size * 0.7
-                style["font-size"] = "%spx" % (font_size * 0.7)
-                stack_state["dy"] += font_size * 0.2
-            elif node.tag == "sup":
-                font_size = stack_state["font-size"]
-                stack_state["font-size"] = font_size * 0.7
-                style["font-size"] = "%spx" % (font_size * 0.7)
-                stack_state["dy"] -= font_size * 0.3
-            for child in node:
-                self.walk_tree(child, attributes, style, stack_state, global_state)
-
-    def handle_starttag(self, tag, attrs): # pylint: disable=unused-argument
-        if tag == "br":
-            self.push_node("br")
-        elif tag in ["b", "code", "em", "i", "small", "strong", "sub", "sup"]:
-            self.push_node(tag)
-        else:
-            toyplot.log.warning("Ignoring unknown <%s> tag.", tag) # pragma: no cover
-
-    def handle_endtag(self, tag):
-        if tag in ["br"]:
-            toyplot.log.warning("%s must not have an end tag.", tag) # pragma: no cover
-        elif tag in ["b", "code", "em", "i", "small", "strong", "sub", "sup"]:
-            self.pop_node()
-        else:
-            toyplot.log.warning("Ignoring unknown </%s> tag.", tag) # pragma: no cover
-
-    def handle_data(self, text):
-        xml.SubElement(self._current_node, "text").text = text
-
-    def close(self):
-        HTMLParser.HTMLParser.close(self)
-        self.walk_tree(self._root_node, attributes={}, style={}, stack_state={"dy":0, "font-size":self._font_size}, global_state={"line-y":0, "current-y":0})
-
+def _walk_tree(node):
+    yield {"type":"start", "tag":node.tag, "attrib":node.attrib}
+    if node.text:
+        yield {"type":"text", "text":node.text}
+    for child in node:
+        for item in _walk_tree(child):
+            yield item
+    yield {"type":"end", "tag":node.tag}
+    if node.tail:
+        yield {"type":"text", "text":node.tail}
 
 def _draw_text(
         root,
@@ -390,10 +304,63 @@ def _draw_text(
     if title is not None:
         xml.SubElement(text_xml, "title").text = str(title)
 
-    parser = _HTMLParser(text_xml, font_size)
-    parser.feed(text)
-    parser.close()
+    def cascade_styles(node, font_size):
+        dy = node.get("dy", 0)
+        style = toyplot.style.parse(node.get("style", ""))
+        if "font-size" in style:
+            font_size = toyplot.units.convert(style["font-size"], target="px", default="px", reference=font_size)
 
+        if node.tag in ["b", "strong"]:
+            style = toyplot.style.combine(style, {"font-weight":"bold"})
+        elif node.tag == "code":
+            style = toyplot.style.combine(style, {"font-family":"monospace"})
+        elif node.tag in ["em", "i"]:
+            style = toyplot.style.combine(style, {"font-style":"italic"})
+        elif node.tag == "small":
+            font_size *= 0.8
+        elif node.tag == "sub":
+            dy += 0.2 * font_size
+            font_size *= 0.7
+        elif node.tag == "sup":
+            dy += -0.3 * font_size
+            font_size *= 0.7
+        style["font-size"] = "%spx" % font_size
+        node.set("dy", dy)
+        node.set("style", style)
+        for child in node:
+            cascade_styles(child, font_size)
+
+    def render_tree(tree, text_xml):
+        y = 0
+        current_y = 0
+        dy_stack = [0]
+        style_stack = [None]
+        attributes = []
+        for item in _walk_tree(tree):
+            #toyplot.log.debug(item)
+            if item["type"] == "start":
+                dy_stack.append(dy_stack[-1] + item["attrib"]["dy"])
+                style_stack.append(toyplot.style.combine(style_stack[-1], item["attrib"]["style"]))
+                if item["tag"] == "br":
+                    font_size = toyplot.units.convert(style["font-size"], target="px", default="px")
+                    attributes.append(("x", 0))
+                    y += 1.2 * font_size
+            elif item["type"] == "text":
+                if y + dy_stack[-1] != current_y:
+                    attributes.append(("dy", y + dy_stack[-1] - current_y))
+                    current_y = y + dy_stack[-1]
+                tspan_xml = xml.SubElement(text_xml, "tspan", style=_css_style(style_stack[-1]))
+                tspan_xml.text = item["text"]
+                for key, value in attributes:
+                    tspan_xml.set(key, str(value))
+                attributes = []
+            elif item["type"] == "end":
+                dy_stack.pop()
+                style_stack.pop()
+
+    tree = xml.fromstring("<root>" + text + "</root>")
+    cascade_styles(tree, font_size)
+    render_tree(tree, text_xml)
 
 def _draw_marker(
         root,

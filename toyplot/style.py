@@ -23,3 +23,13 @@ def combine(*styles):
         if style is not None:
             computed_style.update(style)
     return computed_style
+
+def parse(css):
+    """Parse a CSS style into a dict."""
+    result = {}
+    for declaration in css.split(";"):
+        if declaration:
+            key, value = declaration.split(":")
+            result[key] = value
+    return result
+

@@ -82,6 +82,16 @@ style.text = set([
     "-toyplot-anchor-shift",
     ])
 
+style.rich_text = set([
+    "fill",
+    "fill-opacity",
+    "font-size",
+    "font-weight",
+    "opacity",
+    "stroke",
+    "stroke-opacity",
+    "stroke-width",
+    ])
 
 def instance(value, types):
     """Verify the type of a value."""

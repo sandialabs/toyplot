@@ -306,7 +306,7 @@ def _draw_text(
 
     def cascade_styles(node, font_size):
         dy = node.get("dy", 0)
-        style = toyplot.style.parse(node.get("style", ""))
+        style = toyplot.require.style(toyplot.style.parse(node.get("style", "")), allowed=toyplot.require.style.rich_text)
         if "font-size" in style:
             font_size = toyplot.units.convert(style.pop("font-size"), target="px", default="px", reference=font_size)
 

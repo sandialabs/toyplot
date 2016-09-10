@@ -18,6 +18,7 @@ import xml.etree.ElementTree as xml
 
 from multipledispatch import dispatch
 import numpy
+import reportlab.pdfbase.pdfmetrics
 
 import toyplot.coordinates
 import toyplot.canvas
@@ -246,13 +247,13 @@ def _flat_contiguous(a):
 def _walk_tree(node):
     yield ("start", node.tag, node.attrib)
     if node.text:
-        yield ("text", node.text)
+        yield ("text", node.text, node.attrib)
     for child in node:
         for item in _walk_tree(child):
             yield item
     yield ("end", node.tag)
     if node.tail:
-        yield ("text", node.tail)
+        yield ("text", node.tail, node.attrib)
 
 def _draw_text(
         root,
@@ -331,9 +332,8 @@ def _draw_text(
             cascade_styles(child, font_size)
 
     def render_tree(tree, text_xml):
+        x = 0
         y = 0
-        current_y = 0
-        attributes = []
         stack = [{"dy": 0, "style": None}]
 
         for item in _walk_tree(tree):
@@ -346,21 +346,23 @@ def _draw_text(
                 stack.append({"dy": dy, "style": style})
 
                 if item[1] == "br":
-                    attributes.append(("x", 0))
+                    x = 0
                     y += 1.2 * font_size
 
             elif item[0] == "text":
-                new_y = y + stack[-1]["dy"]
-                if new_y != current_y:
-                    attributes.append(("dy", new_y - current_y))
-                    current_y = new_y
+                current_y = y + stack[-1]["dy"]
                 style = stack[-1]["style"]
 
-                tspan_xml = xml.SubElement(text_xml, "tspan", attrib=_css_attrib(style))
+                tspan_xml = xml.SubElement(text_xml, "tspan", x=str(x), y=str(current_y), attrib=_css_attrib(style))
                 tspan_xml.text = item[1]
-                for key, value in attributes:
-                    tspan_xml.set(key, str(value))
-                attributes = []
+
+                font_family = style.get("font-family", "Helvetica")
+                if font_family == "monospace":
+                    font_family = "Courier"
+                if font_family == "times":
+                    font_family = "Times-Roman"
+                font_size = 72.0 / 96.0 * item[2]["font-size"]
+                x += 96.0 / 72.0 * reportlab.pdfbase.pdfmetrics.stringWidth(item[1], font_family, font_size)
             elif item[0] == "end":
                 stack.pop()
 

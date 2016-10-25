@@ -99,7 +99,8 @@ def ascent_descent(font_family, font_size):
         descent of the font in CSS pixels.
     """
     font_size = toyplot.units.convert(font_size, target="pt", default="px")
-    ascent, decent = reportlab.pdfbase.pdfmetrics.getAscentDescent(font_family, font_size)
+    ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(font_family, font_size)
     ascent = toyplot.units.convert(ascent, target="px", default="pt")
     descent = toyplot.units.convert(descent, target="px", default="pt")
-    return width
+    return ascent, descent
+

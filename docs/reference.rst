@@ -19,6 +19,7 @@ Contents:
    toyplot.config.rst
    toyplot.data.rst
    toyplot.docs.rst
+   toyplot.font.rst
    toyplot.format.rst
    toyplot.generate.rst
    toyplot.html.rst

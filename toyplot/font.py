@@ -104,17 +104,17 @@ class ReportlabMetrics(Metrics):
         Font size for the measurement.  Defaults to CSS pixel units, and
         supports all toyplot :ref:`units`.
     """
-    def __init__(self, family, size):
+    def __init__(self, family, size): # pylint: disable=redefined-outer-name
         self._family = family
         self._size = toyplot.units.convert(size, target="pt", default="px")
 
     def ascent(self):
-        ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(self._family, self._size)
+        ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(self._family, self._size) # pylint: disable=unused-variable
         ascent = toyplot.units.convert(ascent, target="px", default="pt")
         return ascent
 
     def descent(self):
-        ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(self._family, self._size)
+        ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(self._family, self._size) # pylint: disable=unused-variable
         descent = toyplot.units.convert(descent, target="px", default="pt")
         return descent
 

@@ -55,52 +55,71 @@ family.substitutions = {
     "times": "times",
     }
 
-def string_width(string, font_family, font_size):
-    """Return the width of a string.
+class Metrics(object):
+    """Base class for objects that can return font metrics information."""
+    def ascent(self):
+        """Return the ascent for the given font.
+
+        Returns
+        -------
+        ascent: number
+            ascent of the font in CSS pixels.
+        """
+        raise NotImplementedError()
+
+    def descent(self):
+        """Return the descent for the given font.
+
+        Returns
+        -------
+        descent: number
+            descent of the font in CSS pixels.
+        """
+        raise NotImplementedError()
+
+    def width(self, string):
+        """Return the width of a string.
+
+        Parameters
+        ----------
+        string: str
+            The text to be measured.
+
+        Returns
+        -------
+        width: number
+            Width of the string in CSS pixels, if rendered using the given font and
+            font size.
+        """
+        raise NotImplementedError()
+
+class ReportlabMetrics(Metrics):
+    """Use Reportlab to access the metrics for a font.
 
     Parameters
     ----------
-    string: str
-        The text to be measured.
     font_family: str
         PDF font family to use for measurement.
     font_size: number
         Font size for the measurement.  Defaults to CSS pixel units, and
         supports all toyplot :ref:`units`.
-
-    Returns
-    -------
-    width: number
-        Width of the string in CSS pixels, if rendered using the given font and
-        font size.
     """
+    def __init__(self, family, size):
+        self._family = family
+        self._size = toyplot.units.convert(size, target="pt", default="px")
 
-    font_size = toyplot.units.convert(font_size, target="pt", default="px")
-    width = reportlab.pdfbase.pdfmetrics.stringWidth(string, font_family, font_size)
-    width = toyplot.units.convert(width, target="px", default="pt")
-    return width
+    def ascent(self):
+        ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(self._family, self._size)
+        ascent = toyplot.units.convert(ascent, target="px", default="pt")
+        return ascent
 
-def ascent_descent(font_family, font_size):
-    """Return the ascent and descent for the given font.
+    def descent(self):
+        ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(self._family, self._size)
+        descent = toyplot.units.convert(descent, target="px", default="pt")
+        return descent
 
-    Parameters
-    ----------
-    font_family: str
-        PDF font family to use for measurement.
-    font_size: number
-        Font size for the measurement.  Defaults to CSS pixel units, and
-        supports all toyplot :ref:`units`.
-
-    Returns
-    -------
-    ascent: number
-        ascent of the font in CSS pixels.
-    descent: number
-        descent of the font in CSS pixels.
-    """
-    font_size = toyplot.units.convert(font_size, target="pt", default="px")
-    ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(font_family, font_size)
-    ascent = toyplot.units.convert(ascent, target="px", default="pt")
-    descent = toyplot.units.convert(descent, target="px", default="pt")
-    return ascent, descent
+    def width(self, string):
+        width = reportlab.pdfbase.pdfmetrics.stringWidth(string, self._family, self._size)
+        width = toyplot.units.convert(width, target="px", default="pt")
+        return width
 

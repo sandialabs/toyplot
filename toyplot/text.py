@@ -6,7 +6,11 @@
 
 from __future__ import division
 
+import sys
+import xml.etree.ElementTree as xml
+
 import numpy
+
 import toyplot.broadcast
 import toyplot.require
 import toyplot.transform
@@ -92,3 +96,108 @@ def extents(text, angle, style):
             corner2.T[1], numpy.minimum(corner3.T[1], corner4.T[1])))
 
     return (left, right, top, bottom)
+
+
+class Box(object):
+    def __init__(self):
+        self.children = []
+
+    def __repr__(self):
+        return "<toyplot.text.Box>"
+
+class BlockBox(Box):
+    def __init__(self):
+        Box.__init__(self)
+
+    def __repr__(self):
+        return "<toyplot.text.BlockBox>"
+
+class InlineBox(Box):
+    def __init__(self):
+        Box.__init__(self)
+
+    def __repr__(self):
+        return "<toyplot.text.InlineBox>"
+
+class Newline(InlineBox):
+    def __init__(self):
+        InlineBox.__init__(self)
+
+    def __repr__(self):
+        return "<toyplot.text.Newline>"
+
+class TextBox(InlineBox):
+    def __init__(self, text):
+        InlineBox.__init__(self)
+        self._text = text
+
+    def __repr__(self):
+        return "<toyplot.text.TextBox '%s'>" % self._text
+
+
+def layout(string):
+    def cascade_styles(node):
+        for child in node:
+            cascade_styles(child)
+
+    def block_wrap(box):
+        if isinstance(box, BlockBox):
+            return box
+        wrapper = BlockBox()
+        wrapper.children.append(box)
+        return wrapper
+
+    def inline_wrap(box):
+        if isinstance(box, InlineBox):
+            return box
+        wrapper = InlineBox()
+        wrapper.children.append(box)
+        return wrapper
+
+    def build_formatting_model(node):
+        print node
+
+        if node.tag in ["body", "p"]:
+            box = BlockBox()
+        elif node.tag in ["b", "code", "i", "em", "small", "span", "strong", "sub", "sup"]:
+            box = InlineBox() # pylint: disable=redefined-variable-type
+        elif node.tag == "br":
+            box = Newline() # pylint: disable=redefined-variable-type
+        else:
+            raise ValueError("Unknown tag: %s" % node.tag)
+
+        if node.text:
+            box.children.append(TextBox(node.text))
+        for child in node:
+            box.children.append(build_formatting_model(child))
+            if child.tail:
+                box.children.append(TextBox(child.tail))
+
+        block_context = numpy.any([isinstance(child, BlockBox) for child in box.children])
+        if block_context:
+            box.children = [block_wrap(child) for child in box.children]
+        else:
+            box.children = [inline_wrap(child) for child in box.children]
+
+        return box
+
+    def compute_layout(box):
+        for child in box.children:
+            compute_layout(child)
+
+    dom = xml.fromstring(("<body>" + string + "</body>").encode("utf-8"))
+    cascade_styles(dom)
+
+    box = build_formatting_model(dom)
+    compute_layout(box)
+
+    return box
+
+def dump(box, stream=None, level=0, indent="  "):
+    if stream is None:
+        stream = sys.stdout
+    stream.write(indent * level)
+    stream.write("%r\n" % box)
+    for child in box.children:
+        dump(child, stream, level+1, indent)
+

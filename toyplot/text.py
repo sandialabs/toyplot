@@ -106,9 +106,11 @@ class Box(object):
         self.children = []
         self.content_width = None
         self.content_height = None
+        self.left = None
+        self.top = None
 
     def __repr__(self):
-        return "<%s.%s %s %sx%s>" % (self.__module__, self.__class__.__name__, self.style, self.content_width, self.content_height)
+        return "<%s.%s %s (%s,%s) %sx%s>" % (self.__module__, self.__class__.__name__, self.style, self.left, self.top, self.content_width, self.content_height)
 
 class BlockBox(Box):
     def __init__(self, style):
@@ -128,7 +130,7 @@ class TextBox(InlineBox):
         self._text = text
 
     def __repr__(self):
-        return "<%s.%s %s %sx%s '%s'>" % (self.__module__, self.__class__.__name__, self.style, self.content_width, self.content_height, self.text)
+        return "<%s.%s %s (%s,%s) %sx%s '%s'>" % (self.__module__, self.__class__.__name__, self.style, self.left, self.top, self.content_width, self.content_height, self.text)
 
     @property
     def text(self):
@@ -189,9 +191,9 @@ def layout(text, style, fonts):
 
         return box
 
-    def compute_layout(fonts, box):
+    def compute_size(fonts, box):
         for child in box.children:
-            compute_layout(fonts, child)
+            compute_size(fonts, child)
 
         if isinstance(box, TextBox):
             font = fonts.font(box.style)
@@ -214,6 +216,18 @@ def layout(text, style, fonts):
                     box.content_width = 0
                     box.content_height = 0
 
+    def compute_layout(box, left, top):
+        box.left = left
+        box.top = top
+        box.right = box.left + box.content_width
+        box.bottom = box.top + box.content_height
+        for child in box.children:
+            compute_layout(child, left, top)
+            if isinstance(child, BlockBox):
+                top += child.content_height
+            elif isinstance(child, InlineBox):
+                left += child.content_width
+
     if "font-family" not in style:
         raise ValueError("style must specify font-family")
     if "font-size" not in style:
@@ -223,7 +237,8 @@ def layout(text, style, fonts):
     dom = xml.fromstring(("<body>" + text + "</body>").encode("utf-8"))
     cascade_style(style, dom)
     box = build_formatting_model(dom)
-    compute_layout(fonts, box)
+    compute_size(fonts, box)
+    compute_layout(box, left=0, top=0)
 
     return box
 

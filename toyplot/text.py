@@ -6,6 +6,7 @@
 
 from __future__ import division
 
+import copy
 import sys
 import xml.etree.ElementTree as xml
 
@@ -13,6 +14,7 @@ import numpy
 
 import toyplot.broadcast
 import toyplot.require
+import toyplot.style
 import toyplot.transform
 import toyplot.units
 
@@ -132,8 +134,15 @@ class TextBox(InlineBox):
     def text(self):
         return self._text
 
-def layout(string, style, fonts):
+def layout(text, style, fonts):
     def cascade_style(style, node):
+        if "style" in node.attrib:
+            new_style = toyplot.require.style(toyplot.style.parse(node.attrib["style"]), toyplot.require.style.text)
+            if "font-size" in new_style:
+                reference = toyplot.units.convert(style["font-size"], target="px", default="px")
+                new_style["font-size"] = toyplot.units.convert(new_style["font-size"], target="px", default="px", reference=reference)
+            style = copy.deepcopy(style)
+            style.update(new_style)
         node.style = style
         for child in node:
             cascade_style(style, child)
@@ -170,7 +179,7 @@ def layout(string, style, fonts):
         for child in node:
             box.children.append(build_formatting_model(child))
             if child.tail:
-                box.children.append(TextBox(child.tail, child.style))
+                box.children.append(TextBox(child.tail, node.style)) # Note: the tail doesn't get the child's style
 
         block_context = numpy.any([isinstance(child, BlockBox) for child in box.children])
         if block_context:
@@ -205,7 +214,13 @@ def layout(string, style, fonts):
                     box.content_width = 0
                     box.content_height = 0
 
-    dom = xml.fromstring(("<body>" + string + "</body>").encode("utf-8"))
+    if "font-family" not in style:
+        raise ValueError("style must specify font-family")
+    if "font-size" not in style:
+        raise ValueError("style must specify font-size")
+    style["font-size"] = toyplot.units.convert(style["font-size"], target="px", default="px")
+
+    dom = xml.fromstring(("<body>" + text + "</body>").encode("utf-8"))
     cascade_style(style, dom)
     box = build_formatting_model(dom)
     compute_layout(fonts, box)

@@ -99,97 +99,116 @@ def extents(text, angle, style):
 
 
 class Box(object):
-    def __init__(self):
+    def __init__(self, style):
+        self.style = style
         self.children = []
+        self.content_width = None
+        self.content_height = None
 
     def __repr__(self):
-        return "<toyplot.text.Box>"
+        return "<%s.%s %s %sx%s>" % (self.__module__, self.__class__.__name__, self.style, self.content_width, self.content_height)
 
 class BlockBox(Box):
-    def __init__(self):
-        Box.__init__(self)
-
-    def __repr__(self):
-        return "<toyplot.text.BlockBox>"
+    def __init__(self, style):
+        Box.__init__(self, style)
 
 class InlineBox(Box):
-    def __init__(self):
-        Box.__init__(self)
-
-    def __repr__(self):
-        return "<toyplot.text.InlineBox>"
+    def __init__(self, style):
+        Box.__init__(self, style)
 
 class Newline(InlineBox):
-    def __init__(self):
-        InlineBox.__init__(self)
-
-    def __repr__(self):
-        return "<toyplot.text.Newline>"
+    def __init__(self, style):
+        InlineBox.__init__(self, style)
 
 class TextBox(InlineBox):
-    def __init__(self, text):
-        InlineBox.__init__(self)
+    def __init__(self, text, style):
+        InlineBox.__init__(self, style)
         self._text = text
 
     def __repr__(self):
-        return "<toyplot.text.TextBox '%s'>" % self._text
+        return "<%s.%s %s %sx%s '%s'>" % (self.__module__, self.__class__.__name__, self.style, self.content_width, self.content_height, self.text)
 
+    @property
+    def text(self):
+        return self._text
 
-def layout(string):
-    def cascade_styles(node):
+def layout(string, style, fonts):
+    def cascade_style(style, node):
+        node.style = style
         for child in node:
-            cascade_styles(child)
+            cascade_style(style, child)
 
-    def block_wrap(box):
+    def block_wrap(box, style):
         if isinstance(box, BlockBox):
             return box
-        wrapper = BlockBox()
+        wrapper = BlockBox(style)
         wrapper.children.append(box)
         return wrapper
 
-    def inline_wrap(box):
+    def inline_wrap(box, style):
         if isinstance(box, InlineBox):
             return box
-        wrapper = InlineBox()
+        wrapper = InlineBox(style)
         wrapper.children.append(box)
         return wrapper
 
     def build_formatting_model(node):
-        print node
+        toyplot.log.debug(node)
 
         if node.tag in ["body", "p"]:
-            box = BlockBox()
+            box = BlockBox(node.style)
         elif node.tag in ["b", "code", "i", "em", "small", "span", "strong", "sub", "sup"]:
-            box = InlineBox() # pylint: disable=redefined-variable-type
+            box = InlineBox(node.style) # pylint: disable=redefined-variable-type
         elif node.tag == "br":
-            box = Newline() # pylint: disable=redefined-variable-type
+            #box = Newline(node.style) # pylint: disable=redefined-variable-type
+            box = BlockBox(node.style)
         else:
             raise ValueError("Unknown tag: %s" % node.tag)
 
         if node.text:
-            box.children.append(TextBox(node.text))
+            box.children.append(TextBox(node.text, node.style))
         for child in node:
             box.children.append(build_formatting_model(child))
             if child.tail:
-                box.children.append(TextBox(child.tail))
+                box.children.append(TextBox(child.tail, child.style))
 
         block_context = numpy.any([isinstance(child, BlockBox) for child in box.children])
         if block_context:
-            box.children = [block_wrap(child) for child in box.children]
+            box.children = [block_wrap(child, node.style) for child in box.children]
         else:
-            box.children = [inline_wrap(child) for child in box.children]
+            box.children = [inline_wrap(child, node.style) for child in box.children]
 
         return box
 
-    def compute_layout(box):
+    def compute_layout(fonts, box):
         for child in box.children:
-            compute_layout(child)
+            compute_layout(fonts, child)
+
+        if isinstance(box, TextBox):
+            font = fonts.font(box.style)
+            box.content_width = font.width(box.text)
+            box.content_height = font.ascent - font.descent
+        else:
+            block_context = numpy.any([isinstance(child, BlockBox) for child in box.children])
+            if block_context:
+                if box.children:
+                    box.content_width = numpy.max([child.content_width for child in box.children])
+                    box.content_height = numpy.sum([child.content_height for child in box.children])
+                else:
+                    box.content_width = 0
+                    box.content_height = 0
+            else: # Inline context
+                if box.children:
+                    box.content_width = numpy.sum([child.content_width for child in box.children])
+                    box.content_height = numpy.max([child.content_height for child in box.children])
+                else:
+                    box.content_width = 0
+                    box.content_height = 0
 
     dom = xml.fromstring(("<body>" + string + "</body>").encode("utf-8"))
-    cascade_styles(dom)
-
+    cascade_style(style, dom)
     box = build_formatting_model(dom)
-    compute_layout(box)
+    compute_layout(fonts, box)
 
     return box
 

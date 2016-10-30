@@ -145,7 +145,7 @@ def layout(text, style, fonts):
             style = copy.deepcopy(style)
 
         node.style = style
-        toyplot.log.debug("%s %s", node, node.style)
+        toyplot.log.debug("%s %s %r %r", node.tag, node.style, node.text, node.tail)
         for child in node:
             cascade_styles(style, child)
 
@@ -161,7 +161,7 @@ def layout(text, style, fonts):
         node.style["font-size"] = font_size
         node.style["line-height"] = line_height
 
-        toyplot.log.debug("%s %s", node, node.style)
+        toyplot.log.debug("%s %s %r %r", node.tag, node.style, node.text, node.tail)
         for child in node:
             compute_styles(font_size, child)
 
@@ -212,8 +212,8 @@ def layout(text, style, fonts):
         if isinstance(box, TextBox):
             font = fonts.font(box.style)
             box.content_width = font.width(box.text)
-            #box.content_height = font.ascent - font.descent
             box.content_height = box.style["line-height"]
+            box.text_height = font.ascent - font.descent
         else:
             block_context = numpy.any([isinstance(child, BlockBox) for child in box.children])
             if block_context:

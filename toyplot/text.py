@@ -137,17 +137,33 @@ class TextBox(InlineBox):
         return self._text
 
 def layout(text, style, fonts):
-    def cascade_style(style, node):
+    def cascade_styles(style, node):
         if "style" in node.attrib:
-            new_style = toyplot.require.style(toyplot.style.parse(node.attrib["style"]), toyplot.require.style.text)
-            if "font-size" in new_style:
-                reference = toyplot.units.convert(style["font-size"], target="px", default="px")
-                new_style["font-size"] = toyplot.units.convert(new_style["font-size"], target="px", default="px", reference=reference)
+            node_style = toyplot.require.style(toyplot.style.parse(node.attrib["style"]), toyplot.require.style.text)
+            style = toyplot.style.combine(style, node_style)
+        else:
             style = copy.deepcopy(style)
-            style.update(new_style)
+
         node.style = style
+        toyplot.log.debug("%s %s", node, node.style)
         for child in node:
-            cascade_style(style, child)
+            cascade_styles(style, child)
+
+    def compute_styles(reference_font_size, node):
+        font_size = node.style["font-size"]
+        font_size = toyplot.units.convert(font_size, target="px", default="px", reference=reference_font_size)
+
+        line_height = node.style["line-height"]
+        if line_height == "normal":
+            line_height = "120%"
+        line_height = toyplot.units.convert(line_height, target="px", default="px", reference=font_size)
+
+        node.style["font-size"] = font_size
+        node.style["line-height"] = line_height
+
+        toyplot.log.debug("%s %s", node, node.style)
+        for child in node:
+            compute_styles(font_size, child)
 
     def block_wrap(box, style):
         if isinstance(box, BlockBox):
@@ -164,8 +180,6 @@ def layout(text, style, fonts):
         return wrapper
 
     def build_formatting_model(node):
-        toyplot.log.debug(node)
-
         if node.tag in ["body", "p"]:
             box = BlockBox(node.style)
         elif node.tag in ["b", "code", "i", "em", "small", "span", "strong", "sub", "sup"]:
@@ -198,7 +212,8 @@ def layout(text, style, fonts):
         if isinstance(box, TextBox):
             font = fonts.font(box.style)
             box.content_width = font.width(box.text)
-            box.content_height = font.ascent - font.descent
+            #box.content_height = font.ascent - font.descent
+            box.content_height = box.style["line-height"]
         else:
             block_context = numpy.any([isinstance(child, BlockBox) for child in box.children])
             if block_context:
@@ -232,10 +247,18 @@ def layout(text, style, fonts):
         raise ValueError("style must specify font-family")
     if "font-size" not in style:
         raise ValueError("style must specify font-size")
-    style["font-size"] = toyplot.units.convert(style["font-size"], target="px", default="px")
 
     dom = xml.fromstring(("<body>" + text + "</body>").encode("utf-8"))
-    cascade_style(style, dom)
+
+    default_style = {
+        "line-height": "normal",
+    }
+    style = toyplot.style.combine(default_style, style)
+    reference_font_size = toyplot.units.convert(style["font-size"], target="px", default="px")
+
+    cascade_styles(style, dom)
+    compute_styles(reference_font_size, dom)
+
     box = build_formatting_model(dom)
     compute_size(fonts, box)
     compute_layout(box, left=0, top=0)

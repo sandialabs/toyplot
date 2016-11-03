@@ -101,36 +101,39 @@ def extents(text, angle, style):
 
 
 class Box(object):
+    """Abstract base class for all boxes."""
     def __init__(self, style):
         self.style = style
-        self.children = []
         self.content_width = None
         self.content_height = None
         self.left = None
         self.top = None
 
-    def __repr__(self):
-        return "<%s.%s %s (%s,%s) %sx%s>" % (self.__module__, self.__class__.__name__, self.style, self.left, self.top, self.content_width, self.content_height)
-
-class BlockBox(Box):
+class ParentBox(Box):
+    """Box that has children."""
     def __init__(self, style):
         Box.__init__(self, style)
+        self.children = []
 
-class InlineBox(Box):
+class BlockBox(ParentBox):
+    """Box that contains only BlockBox or only LineBox children."""
     def __init__(self, style):
-        Box.__init__(self, style)
+        ParentBox.__init__(self, style)
 
-class Newline(InlineBox):
+class LineBox(ParentBox):
+    """Box that represents a line of text, and contains only InlineBox and TextBox children."""
     def __init__(self, style):
-        InlineBox.__init__(self, style)
+        ParentBox.__init__(self, style)
+
+class InlineBox(ParentBox):
+    """Box that contains only InlineBox and TextBox children."""
+    def __init__(self, style):
+        ParentBox.__init__(self, style)
 
 class TextBox(InlineBox):
     def __init__(self, text, style):
         InlineBox.__init__(self, style)
         self._text = text
-
-    def __repr__(self):
-        return "<%s.%s %s (%s,%s) %sx%s '%s'>" % (self.__module__, self.__class__.__name__, self.style, self.left, self.top, self.content_width, self.content_height, self.text)
 
     @property
     def text(self):
@@ -145,7 +148,7 @@ def layout(text, style, fonts):
             style = copy.deepcopy(style)
 
         node.style = style
-        toyplot.log.debug("%s %s %r %r", node.tag, node.style, node.text, node.tail)
+        #toyplot.log.debug("%s %s %r %r", node.tag, node.style, node.text, node.tail)
         for child in node:
             cascade_styles(style, child)
 
@@ -161,7 +164,7 @@ def layout(text, style, fonts):
         node.style["font-size"] = font_size
         node.style["line-height"] = line_height
 
-        toyplot.log.debug("%s %s %r %r", node.tag, node.style, node.text, node.tail)
+        #toyplot.log.debug("%s %s %r %r", node.tag, node.style, node.text, node.tail)
         for child in node:
             compute_styles(font_size, child)
 
@@ -252,6 +255,7 @@ def layout(text, style, fonts):
 
     default_style = {
         "line-height": "normal",
+        "vertical-align": "baseline",
     }
     style = toyplot.style.combine(default_style, style)
     reference_font_size = toyplot.units.convert(style["font-size"], target="px", default="px")
@@ -265,11 +269,20 @@ def layout(text, style, fonts):
 
     return box
 
-def dump(box, stream=None, level=0, indent="  "):
+def dump(box, stream=None, text=True, style=False, location=False, size=True, level=0, indent="  "):
     if stream is None:
         stream = sys.stdout
     stream.write(indent * level)
-    stream.write("%r\n" % box)
+    stream.write("%s.%s" % (box.__module__, box.__class__.__name__))
+    if text and isinstance(box, TextBox):
+        stream.write(" %r" % box.text)
+    if style:
+        stream.write(" %r" % box.style)
+    if location:
+        stream.write(" %s,%s" % (box.left, box.top))
+    if size:
+        stream.write(" %sx%s" % (box.content_width, box.content_height))
+    stream.write("\n")
     for child in box.children:
-        dump(child, stream, level+1, indent)
+        dump(box=child, stream=stream, text=text, style=style, location=location, size=size, level=level+1, indent=indent)
 

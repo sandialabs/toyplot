@@ -54,7 +54,7 @@ class Font(object):
 
 class Library(object):
     """Base class for objects that can manage information about a collection of fonts."""
-    def metrics(style):
+    def font(self, style):
         """Lookup a font using CSS style information and return a corresponding Metrics object.
 
         Parameters
@@ -63,7 +63,7 @@ class Library(object):
 
         Returns
         -------
-        metrics: instance of :class:`toyplot.font.Metrics`
+        font: instance of :class:`toyplot.font.Font`
         """
         raise NotImplementedError()
 
@@ -100,9 +100,10 @@ class ReportlabFont(Font):
         width = toyplot.units.convert(width, target="px", default="pt")
         return width
 
+
 class ReportlabLibrary(Library):
     """Use Reportlab to provide information about standard PDF fonts."""
-    def family(self, style):
+    def family(self, style): # pylint: disable=no-self-use
         """Extract the name of a standard PDF font family from a CSS style dict.
 
         Parameters

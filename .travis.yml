@@ -26,7 +26,7 @@ install:
     - ffmpeg -version
 script:
     - coverage run --source toyplot --omit toyplot/testing.py,toyplot/qt/*.py -m nose --exclude-dir toyplot
-    - coverage run --append --source toyplot --omit toyplot/testing.py,toyplot/qt/*.py -m behave
+    - coverage run --append --source toyplot --omit toyplot/testing.py,toyplot/qt/*.py -m behave --tags=~webm
     - coverage report
     - python backend-report.py
 after_script:

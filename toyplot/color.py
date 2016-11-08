@@ -585,7 +585,7 @@ class LinearMap(Map):
             palette = brewer.palette("BlueRed")
         if stops is None:
             stops = numpy.linspace(0, 1, len(palette), endpoint=True)
-        stops = numpy.array(stops)
+        stops = numpy.array(stops) # pylint: disable=redefined-variable-type
 
         if stops.shape != palette._colors.shape:
             raise ValueError("Number of stops must match palette length.")

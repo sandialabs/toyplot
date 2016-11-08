@@ -3372,7 +3372,7 @@ class Table(object):
         return numpy.nonzero(table_selection)
 
     def _merge_cells(self, selection):
-        self._cell_group[selection] = numpy.unique(self._cell_group).max() + 1
+        self._cell_group[selection] = numpy.unique(self._cell_group).max() + 1 # pylint: disable=no-member
 
         # TODO: Handle non-rectangular shapes here
         row_indices, column_indices = self._selection_coordinates(selection)
@@ -3443,7 +3443,7 @@ class Table(object):
         self._cell_data = numpy.insert(self._cell_data, position, None, axis=axis)
         self._cell_format = numpy.insert(self._cell_format, position, toyplot.format.DefaultFormatter(), axis=axis)
         self._cell_group = numpy.insert(self._cell_group, position, -1, axis=axis)
-        self._cell_group[self._cell_group == -1] = numpy.unique(self._cell_group).max() + 1 + numpy.arange(numpy.count_nonzero(self._cell_group == -1))
+        self._cell_group[self._cell_group == -1] = numpy.unique(self._cell_group).max() + 1 + numpy.arange(numpy.count_nonzero(self._cell_group == -1)) # pylint: disable=no-member
         self._cell_lstyle = numpy.insert(self._cell_lstyle, position, None, axis=axis)
         self._cell_region = numpy.insert(self._cell_region, position, self._cell_region[source], axis=axis)
         self._cell_show = numpy.insert(self._cell_show, position, True, axis=axis)

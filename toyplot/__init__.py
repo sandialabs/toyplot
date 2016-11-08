@@ -248,6 +248,7 @@ def image(
     canvas = Canvas(width=width, height=height)
     mark = canvas.image(
         data=data,
+        gutter=0,
         )
     return canvas, mark
 

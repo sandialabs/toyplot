@@ -163,49 +163,38 @@ def layout(text, style, fonts):
         for child in node:
             compute_styles(font_size, child)
 
+    def build_formatting_model(node, parent=None, page=None):
+        toyplot.log.debug("build formatting model: %s", node)
 
-    def build_formatting_model(node):
-        def add_node(page, parent, node):
-            toyplot.log.debug("build formatting model: %s", node)
+        if node.tag in ["body"]:
+            page = Page(node.style)
+            page.children.append(Line(node.style))
+            parent = page.children[-1]
 
-            if node.tag in ["body"]:
-                page = Page(node.style)
-                page.children.append(Line(node.style))
-                parent = page.children[-1]
+            if node.text:
+                parent.children.append(TextBox(node.text, node.style))
+            for child in node:
+                build_formatting_model(child, parent, page)
+                if child.tail:
+                    parent.children.append(TextBox(child.tail, node.style)) # Note: the tail doesn't get the child's style
+            return page
 
-                if node.text:
-                    parent.children.append(TextBox(node.text, node.style))
-                for child in node:
-                    add_node(page, parent, child)
-                    if child.tail:
-                        parent.children.append(TextBox(child.tail, node.style)) # Note: the tail doesn't get the child's style
-                return page
+        if node.tag in ["b", "code", "i", "em", "small", "span", "strong", "sub", "sup"]:
+            parent.children.append(Box(node.style))
+            parent = parent.children[-1]
+            if node.text:
+                parent.children.append(TextBox(node.text, node.style))
+            for child in node:
+                build_formatting_model(child, parent, page)
+                if child.tail:
+                    parent.children.append(TextBox(child.tail, node.style)) # Note: the tail doesn't get the child's style
+            return
 
-            if node.tag in ["b", "code", "i", "em", "small", "span", "strong", "sub", "sup"]:
-                parent.children.append(Box(node.style))
-                parent = parent.children[-1]
-                if node.text:
-                    parent.children.append(TextBox(node.text, node.style))
-                for child in node:
-                    add_node(page, parent, child)
-                    if child.tail:
-                        parent.children.append(TextBox(child.tail, node.style)) # Note: the tail doesn't get the child's style
-                return
+        if node.tag == "br":
+            parent.children.append(Newline(node.style))
+            return
 
-            if node.tag == "br":
-                parent.children.append(Newline(node.style))
-                return
-
-            raise ValueError("Unknown tag: %s" % node.tag)
-
-        return add_node(None, None, node)
-
-
-    def break_lines(page):
-        lines = []
-        for line in page.children:
-            lines.append(line)
-        page.children = lines
+        raise ValueError("Unknown tag: %s" % node.tag)
 
     def compute_size(fonts, box):
         toyplot.log.debug("compute size: %s", box)
@@ -260,7 +249,6 @@ def layout(text, style, fonts):
     compute_styles(reference_font_size, dom)
 
     page = build_formatting_model(dom)
-    break_lines(page)
     compute_size(fonts, page)
     compute_layout(page, left=0, top=0)
 

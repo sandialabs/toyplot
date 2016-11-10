@@ -100,44 +100,39 @@ def extents(text, angle, style):
     return (left, right, top, bottom)
 
 
-class Box(object):
-    """Abstract base class for all boxes."""
+class Page(object):
+    """Container for one-or-more lines of text."""
     def __init__(self, style):
         self.style = style
-        self.content_width = None
-        self.content_height = None
-        self.left = None
-        self.top = None
-
-class ParentBox(Box):
-    """Box that has children."""
-    def __init__(self, style):
-        Box.__init__(self, style)
         self.children = []
 
-class BlockBox(ParentBox):
-    """Box that contains only BlockBox or only LineBox children."""
-    def __init__(self, style):
-        ParentBox.__init__(self, style)
 
-class LineBox(ParentBox):
-    """Box that represents a line of text, and contains only InlineBox and TextBox children."""
+class Line(object):
+    """Container for one line of text."""
     def __init__(self, style):
-        ParentBox.__init__(self, style)
+        self.style = style
+        self.children = []
 
-class InlineBox(ParentBox):
-    """Box that contains only InlineBox and TextBox children."""
+
+class Box(object):
+    """Container for (optionally nested) text content."""
     def __init__(self, style):
-        ParentBox.__init__(self, style)
+        self.style = style
+        self.children = []
 
-class TextBox(InlineBox):
+
+class Newline(Box):
+    """Newline inserted in a line of text."""
+    def __init__(self, style):
+        Box.__init__(self, style)
+
+
+class TextBox(Box):
+    """Box that contains text."""
     def __init__(self, text, style):
-        InlineBox.__init__(self, style)
-        self._text = text
+        Box.__init__(self, style)
+        self.text = text
 
-    @property
-    def text(self):
-        return self._text
 
 def layout(text, style, fonts):
     def cascade_styles(style, node):
@@ -168,71 +163,72 @@ def layout(text, style, fonts):
         for child in node:
             compute_styles(font_size, child)
 
-    def block_wrap(box, style):
-        if isinstance(box, BlockBox):
-            return box
-        wrapper = BlockBox(style)
-        wrapper.children.append(box)
-        return wrapper
-
-    def inline_wrap(box, style):
-        if isinstance(box, InlineBox):
-            return box
-        wrapper = InlineBox(style)
-        wrapper.children.append(box)
-        return wrapper
 
     def build_formatting_model(node):
-        if node.tag in ["body", "p"]:
-            box = BlockBox(node.style)
-        elif node.tag in ["b", "code", "i", "em", "small", "span", "strong", "sub", "sup"]:
-            box = InlineBox(node.style) # pylint: disable=redefined-variable-type
-        elif node.tag == "br":
-            #box = Newline(node.style) # pylint: disable=redefined-variable-type
-            box = BlockBox(node.style)
-        else:
+        def add_node(page, parent, node):
+            toyplot.log.debug("build formatting model: %s", node)
+
+            if node.tag in ["body"]:
+                page = Page(node.style)
+                page.children.append(Line(node.style))
+                parent = page.children[-1]
+
+                if node.text:
+                    parent.children.append(TextBox(node.text, node.style))
+                for child in node:
+                    add_node(page, parent, child)
+                    if child.tail:
+                        parent.children.append(TextBox(child.tail, node.style)) # Note: the tail doesn't get the child's style
+                return page
+
+            if node.tag in ["b", "code", "i", "em", "small", "span", "strong", "sub", "sup"]:
+                parent.children.append(Box(node.style))
+                parent = parent.children[-1]
+                if node.text:
+                    parent.children.append(TextBox(node.text, node.style))
+                for child in node:
+                    add_node(page, parent, child)
+                    if child.tail:
+                        parent.children.append(TextBox(child.tail, node.style)) # Note: the tail doesn't get the child's style
+                return
+
+            if node.tag == "br":
+                parent.children.append(Newline(node.style))
+                return
+
             raise ValueError("Unknown tag: %s" % node.tag)
 
-        if node.text:
-            box.children.append(TextBox(node.text, node.style))
-        for child in node:
-            box.children.append(build_formatting_model(child))
-            if child.tail:
-                box.children.append(TextBox(child.tail, node.style)) # Note: the tail doesn't get the child's style
+        return add_node(None, None, node)
 
-        block_context = numpy.any([isinstance(child, BlockBox) for child in box.children])
-        if block_context:
-            box.children = [block_wrap(child, node.style) for child in box.children]
-        else:
-            box.children = [inline_wrap(child, node.style) for child in box.children]
 
-        return box
+    def break_lines(page):
+        lines = []
+        for line in page.children:
+            lines.append(line)
+        page.children = lines
 
     def compute_size(fonts, box):
+        toyplot.log.debug("compute size: %s", box)
+
         for child in box.children:
             compute_size(fonts, child)
 
-        if isinstance(box, TextBox):
+        if isinstance(box, Page):
+            box.content_width = numpy.max([child.content_width for child in box.children]) if box.children else 0
+            box.content_height = numpy.sum([child.content_height for child in box.children]) if box.children else 0
+        elif isinstance(box, Line):
+            box.content_width = numpy.sum([child.content_width for child in box.children]) if box.children else 0
+            box.content_height = numpy.max([child.content_height for child in box.children]) if box.children else 0
+        elif isinstance(box, TextBox): # This must come before Box
             font = fonts.font(box.style)
             box.content_width = font.width(box.text)
             box.content_height = box.style["line-height"]
             box.text_height = font.ascent - font.descent
+        elif isinstance(box, Box):
+            box.content_width = numpy.sum([child.content_width for child in box.children]) if box.children else 0
+            box.content_height = numpy.max([child.content_height for child in box.children]) if box.children else 0
         else:
-            block_context = numpy.any([isinstance(child, BlockBox) for child in box.children])
-            if block_context:
-                if box.children:
-                    box.content_width = numpy.max([child.content_width for child in box.children])
-                    box.content_height = numpy.sum([child.content_height for child in box.children])
-                else:
-                    box.content_width = 0
-                    box.content_height = 0
-            else: # Inline context
-                if box.children:
-                    box.content_width = numpy.sum([child.content_width for child in box.children])
-                    box.content_height = numpy.max([child.content_height for child in box.children])
-                else:
-                    box.content_width = 0
-                    box.content_height = 0
+            raise Exception("Unknown box type: %s" % box)
 
     def compute_layout(box, left, top):
         box.left = left
@@ -241,9 +237,9 @@ def layout(text, style, fonts):
         box.bottom = box.top + box.content_height
         for child in box.children:
             compute_layout(child, left, top)
-            if isinstance(child, BlockBox):
+            if isinstance(child, Line):
                 top += child.content_height
-            elif isinstance(child, InlineBox):
+            elif isinstance(child, Box):
                 left += child.content_width
 
     if "font-family" not in style:
@@ -263,11 +259,13 @@ def layout(text, style, fonts):
     cascade_styles(style, dom)
     compute_styles(reference_font_size, dom)
 
-    box = build_formatting_model(dom)
-    compute_size(fonts, box)
-    compute_layout(box, left=0, top=0)
+    page = build_formatting_model(dom)
+    break_lines(page)
+    compute_size(fonts, page)
+    compute_layout(page, left=0, top=0)
 
-    return box
+    return page
+
 
 def dump(box, stream=None, text=True, style=False, location=False, size=True, level=0, indent="  "):
     if stream is None:

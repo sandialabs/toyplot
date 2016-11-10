@@ -23,9 +23,10 @@ install:
     - mkdir ffmpeg
     - tar xf ffmpeg-release-64bit-static.tar.xz --strip-components 1 -C ffmpeg
     - export PATH=$TRAVIS_BUILD_DIR/ffmpeg:$PATH
+    - ffmpeg -version
 script:
     - coverage run --source toyplot --omit toyplot/testing.py,toyplot/qt/*.py -m nose --exclude-dir toyplot
-    - coverage run --append --source toyplot --omit toyplot/testing.py,toyplot/qt/*.py -m behave
+    - coverage run --append --source toyplot --omit toyplot/testing.py,toyplot/qt/*.py -m behave --tags=~webm
     - coverage report
     - python backend-report.py
 after_script:

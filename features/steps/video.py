@@ -7,6 +7,7 @@ import nose.tools
 
 import io
 import json
+import logging
 import numpy
 import os
 import subprocess
@@ -64,6 +65,7 @@ def step_impl(context, type):
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = ffprobe.communicate()
     video_metadata = json.loads(stdout.decode())
+    logging.info("video metadata: %s", video_metadata)
     video_format = video_metadata["format"]
     nose.tools.assert_equal(video_format["nb_streams"], 1)
     nose.tools.assert_in(type, video_format["format_name"])

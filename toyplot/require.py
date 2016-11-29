@@ -71,6 +71,7 @@ style.text = set([
     "baseline-shift",
     "fill",
     "fill-opacity",
+    "font-family",
     "font-size",
     "font-weight",
     "opacity",

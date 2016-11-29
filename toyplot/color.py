@@ -10,13 +10,13 @@ import logging
 import re
 import xml.etree.ElementTree as xml
 
+logging.getLogger("colormath").setLevel(logging.INFO) # colormath produces obnoxious amounts of debug logging
 import colormath.color_objects
 import colormath.color_conversions
 import numpy
 
 import toyplot.compatibility
 
-logging.getLogger("colormath").setLevel(logging.INFO) # colormath produces obnoxious amounts of debug logging
 
 near_black = "#292724"
 

@@ -48,4 +48,6 @@ Feature: Text
           | normal <code>code</code>              | text-rich-text-code                |
           | normal <small>small</small>           | text-rich-text-small               |
           | foo <strong>bar<br/>baz</strong> blah | text-rich-text-nested-break        |
+          | foo &lt; bar &gt; baz                 | text-rich-text-brackets            |
+          | foo &amp; baz                         | text-rich-text-ampersand           |
 

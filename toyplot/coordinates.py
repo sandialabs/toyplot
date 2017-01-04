@@ -1222,17 +1222,19 @@ class Cartesian(object):
                 toyplot.require.style(style, allowed=toyplot.require.style.fill),
                 )
 
-            if baseline == "stacked":
-                baseline = numpy.zeros(series.shape[0])
-            elif baseline == "symmetric":
-                baseline = -0.5 * numpy.sum(series, axis=1)
-            elif baseline == "wiggle":
-                n = series.shape[1]
-                baseline = numpy.zeros(series.shape[0])
-                for i in range(n):
-                    for j in range(i):
-                        baseline += series.T[j]
-                baseline *= -(1.0 / (n + 1))
+            if isinstance(baseline, toyplot.compatibility.string_type):
+                baseline = toyplot.require.value_in(baseline, ["stacked", "symmetric", "wiggle"])
+                if baseline == "stacked":
+                    baseline = numpy.zeros(series.shape[0])
+                elif baseline == "symmetric":
+                    baseline = -0.5 * numpy.sum(series, axis=1)
+                elif baseline == "wiggle":
+                    n = series.shape[1]
+                    baseline = numpy.zeros(series.shape[0])
+                    for i in range(n):
+                        for j in range(i):
+                            baseline += series.T[j]
+                    baseline *= -(1.0 / (n + 1))
 
             if along == "x":
                 coordinate_axes = ["x", "y"]
@@ -1460,8 +1462,7 @@ class Cartesian(object):
                 )
 
             if isinstance(baseline, toyplot.compatibility.string_type):
-                baseline = toyplot.require.value_in(
-                    baseline, ["stacked", "symmetric", "wiggle"])
+                baseline = toyplot.require.value_in(baseline, ["stacked", "symmetric", "wiggle"])
                 if baseline == "stacked":
                     baseline = numpy.ma.zeros(series.shape[0])
                 elif baseline == "symmetric":

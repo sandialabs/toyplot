@@ -1545,6 +1545,8 @@ class Cartesian(object):
 
         if vlabel is None:
             vlabel = layout.vids
+        elif vlabel == False:
+            vlabel = [""] * layout.vcount
 
         default_color = [next(self._graph_colors)]
         vcolor = toyplot.color.broadcast(

@@ -53,6 +53,7 @@ style.line = set([
     "opacity",
     "stroke",
     "stroke-dasharray",
+    "stroke-linecap",
     "stroke-opacity",
     "stroke-width",
     ])

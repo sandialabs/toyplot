@@ -242,6 +242,5 @@ def read_png(fobj):
     if meta["bitdepth"] == 1:
         image = numpy.resize(numpy.vstack(pixels), (height, width, planes))
     elif meta["bitdepth"] == 8:
-        image = numpy.resize(numpy.vstack(map(numpy.uint8, pixels)), (height, width, planes)) # pylint: disable=bad-builtin
+        image = numpy.resize(numpy.vstack(map(numpy.uint8, pixels)), (height, width, planes))
     return image
-

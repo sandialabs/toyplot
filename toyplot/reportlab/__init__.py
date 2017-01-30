@@ -403,4 +403,3 @@ def render(svg, canvas):
         canvas.restoreState()
 
     render_element(svg, svg, canvas, [])
-

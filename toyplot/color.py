@@ -11,11 +11,11 @@ import re
 import xml.etree.ElementTree as xml
 
 logging.getLogger("colormath").setLevel(logging.INFO) # colormath produces obnoxious amounts of debug logging
-import colormath.color_objects
-import colormath.color_conversions
-import numpy
+import colormath.color_objects # pylint: disable=wrong-import-position
+import colormath.color_conversions # pylint: disable=wrong-import-position
+import numpy # pylint: disable=wrong-import-position
 
-import toyplot.compatibility
+import toyplot.compatibility # pylint: disable=wrong-import-position
 
 
 near_black = "#292724"
@@ -348,7 +348,7 @@ class CategoricalMap(Map):
         self._palette = palette
         toyplot.color.Map.__init__(self, domain_min=0, domain_max=len(palette))
 
-    def colors(self, values, domain_min=None, domain_max=None): # pylint: disable=unused-argument
+    def colors(self, values, domain_min=None, domain_max=None):
         """Convert a sequence of categorical (nonnegative integer) values to colors.
 
         Each value is mapped to a color in the underlying palette.  Note that the

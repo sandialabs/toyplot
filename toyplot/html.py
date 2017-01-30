@@ -1092,7 +1092,7 @@ def _render(frames, context):
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Axis, _RenderContext)
-def _render(canvas, axis, context): # pylint: disable=unused-argument
+def _render(canvas, axis, context):
     if context.already_rendered(axis):
         return
 
@@ -1495,7 +1495,7 @@ def _render(canvas, axes, context):
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Table, _RenderContext)
-def _render(canvas, axes, context): # pylint: disable=unused-argument
+def _render(canvas, axes, context):
     axes_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         axes), attrib={"class": "toyplot-coordinates-Table"})
 
@@ -1757,7 +1757,7 @@ def _legend_markers(mark):
 
 
 @dispatch(toyplot.coordinates.Cartesian, type(None), _RenderContext)
-def _render(axes, mark, context): # pylint: disable=unused-argument
+def _render(axes, mark, context):
     pass
 
 
@@ -2080,12 +2080,12 @@ def _render(axes, mark, context):
 
 
 @dispatch(toyplot.mark.Mark)
-def _legend_markers(mark): # pylint: disable=unused-argument
+def _legend_markers(mark):
     return []
 
 
 @dispatch((toyplot.canvas.Canvas, toyplot.coordinates.Cartesian), toyplot.mark.Legend, _RenderContext)
-def _render(canvas, legend, context): # pylint: disable=unused-argument
+def _render(canvas, legend, context):
     if not legend._entries:
         return
 
@@ -2164,7 +2164,7 @@ def _render(axes, mark, context): # pragma: no cover
 
     coordinate_index = 0
     edge_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Edges"})
-    for esource, etarget, eshape, ecolor, ewidth, eopacity in zip( # pylint: disable=unused-variable
+    for esource, etarget, eshape, ecolor, ewidth, eopacity in zip(
             mark._etable[mark._esource[0]],
             mark._etable[mark._etarget[0]],
             mark._etable[mark._eshape[0]],
@@ -2331,7 +2331,7 @@ def _render(axes, mark, context):
 
         d = []
         for segment in segments:
-            start, stop, step = segment.indices(len(not_null)) # pylint: disable=unused-variable
+            start, stop, step = segment.indices(len(not_null))
             for i in range(start, start + 1):
                 d.append("M %r %r" % (x[i], y[i]))
             for i in range(start + 1, stop):
@@ -2566,7 +2566,7 @@ def _render(parent, mark, context):
 
 
 @dispatch((toyplot.canvas.Canvas), toyplot.mark.Image, _RenderContext)
-def _render(parent, mark, context): # pylint: disable=unused-argument
+def _render(parent, mark, context):
     import png
     stream = io.BytesIO()
 
@@ -2609,4 +2609,3 @@ def _render(parent, mark, context): # pylint: disable=unused-argument
         height=repr(mark._ymax_range - mark._ymin_range),
         attrib={"xlink:href": "data:image/png;base64," + encoded},
         )
-

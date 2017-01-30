@@ -181,4 +181,3 @@ def optional_string(value):
 
 def filename(value):
     return optional_string(value)
-

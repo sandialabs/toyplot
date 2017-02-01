@@ -760,4 +760,3 @@ class Timestamp(TickLocator):
         labels = [label_format.format(arrow.get(location).to(self._timezone)) for location in locations]
         titles = numpy.repeat(None, len(labels))
         return locations, labels, titles
-

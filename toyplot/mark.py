@@ -797,5 +797,3 @@ class Legend(Mark):
             },
             toyplot.require.style(lstyle, allowed=toyplot.require.style.text),
             )
-
-

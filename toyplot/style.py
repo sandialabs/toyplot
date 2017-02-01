@@ -32,4 +32,3 @@ def parse(css):
             key, value = declaration.split(":")
             result[key] = value
     return result
-

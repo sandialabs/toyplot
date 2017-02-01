@@ -157,4 +157,3 @@ def render_frames(canvas, width=None, height=None, scale=None):
             stderr=subprocess.PIPE)
         stdout, stderr = gs.communicate(pdf.getvalue()) # pylint: disable=unused-variable
         yield stdout
-

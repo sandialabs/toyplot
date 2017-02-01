@@ -11,11 +11,11 @@ import re
 import xml.etree.ElementTree as xml
 
 logging.getLogger("colormath").setLevel(logging.INFO) # colormath produces obnoxious amounts of debug logging
-import colormath.color_objects
-import colormath.color_conversions
-import numpy
+import colormath.color_objects # pylint: disable=wrong-import-position
+import colormath.color_conversions # pylint: disable=wrong-import-position
+import numpy # pylint: disable=wrong-import-position
 
-import toyplot.compatibility
+import toyplot.compatibility # pylint: disable=wrong-import-position
 
 
 near_black = "#292724"

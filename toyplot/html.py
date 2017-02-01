@@ -2609,4 +2609,3 @@ def _render(parent, mark, context): # pylint: disable=unused-argument
         height=repr(mark._ymax_range - mark._ymin_range),
         attrib={"xlink:href": "data:image/png;base64," + encoded},
         )
-

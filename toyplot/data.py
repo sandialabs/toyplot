@@ -424,4 +424,3 @@ def read_csv(fobj, convert=False):
                     pass
 
     return result
-

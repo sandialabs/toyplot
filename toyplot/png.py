@@ -84,3 +84,4 @@ def render_frames(canvas, width=None, height=None, scale=None):
     """
     canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
     return implementation.render_frames(canvas, width, height, scale)
+

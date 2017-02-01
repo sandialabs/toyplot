@@ -70,3 +70,4 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     surface.save()
     if fobj is None:
         return stream.getvalue()
+

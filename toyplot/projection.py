@@ -350,3 +350,4 @@ def log(
             range_max,
             numpy.inf),
         ])
+

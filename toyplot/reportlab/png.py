@@ -8,6 +8,7 @@
 from __future__ import absolute_import
 from __future__ import division
 
+import distutils.version
 import io
 import os.path
 import subprocess
@@ -18,9 +19,12 @@ import toyplot.reportlab
 import toyplot.require
 import toyplot.svg
 
-
 for path in os.environ["PATH"].split(os.pathsep):
     if os.path.exists(os.path.join(path, "gs")):
+        gs_version = subprocess.check_output(["gs", "--version"])
+        _downscale = distutils.version.StrictVersion(gs_version) >= "9.10"
+        if not _downscale:
+            toyplot.log.warning("For better output PNG quality, install ghostscript >= 9.10.")
         break
 else:
     raise Exception("The gs executable is required.")  # pragma: no cover
@@ -72,12 +76,21 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
         "-dNOPAUSE",
         "-dQUIET",
         "-sOutputFile=-",
-        "-r%s" % (96 * 4),
         "-dMaxBitmap=2147483647",
         "-dTextAlphaBits=4",
         "-dGraphicsAlphaBits=4",
         "-sDEVICE=pngalpha",
-        "-dDownScaleFactor=4",
+        ]
+    if _downscale:
+        command += [
+            "-r%s" % (96 * 4),
+            "-dDownScaleFactor=4",
+            ]
+    else:
+        command += [
+            "-r%s" % (96),
+            ]
+    command += [
         "-",
         ]
 

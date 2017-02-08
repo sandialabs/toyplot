@@ -12,6 +12,7 @@ import distutils.version
 import io
 import os.path
 import subprocess
+import sys
 
 import reportlab.pdfgen.canvas
 
@@ -19,16 +20,19 @@ import toyplot.reportlab
 import toyplot.require
 import toyplot.svg
 
-for path in os.environ["PATH"].split(os.pathsep):
-    if os.path.exists(os.path.join(path, "gs")):
-        gs_version = subprocess.check_output(["gs", "--version"]).decode(encoding="utf-8")
-        _downscale = distutils.version.StrictVersion(gs_version) >= "9.10"
-        if not _downscale:
-            toyplot.log.warning("For better output PNG quality, install ghostscript >= 9.10.")
-        break
-else:
-    raise Exception("The gs executable is required.")  # pragma: no cover
+_executable = None
+for executable in ["gs", "gswin64.exe", "gswin32.exe"]:
+    for path in os.environ["PATH"].split(os.pathsep):
+        if os.path.exists(os.path.join(path, executable)):
+            _executable = os.path.join(path, executable)
 
+if _executable is None:
+    raise Exception("A ghostscript executable is required.")  # pragma: no cover
+
+gs_version = subprocess.check_output([_executable, "--version"]).decode(encoding="utf-8")
+_downscale = distutils.version.StrictVersion(gs_version) >= "9.10"
+if not _downscale:
+    toyplot.log.warning("For better output PNG quality, install ghostscript >= 9.10.")
 
 def render(canvas, fobj=None, width=None, height=None, scale=None):
     """Render the PNG bitmap representation of a canvas using ReportLab and Ghostscript.
@@ -70,7 +74,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     surface.save()
 
     command = [
-        "gs",
+        _executable,
         "-dSAFER",
         "-dBATCH",
         "-dNOPAUSE",

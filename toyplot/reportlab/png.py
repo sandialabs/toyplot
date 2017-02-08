@@ -10,6 +10,7 @@ from __future__ import division
 
 import distutils.version
 import io
+import itertools
 import os.path
 import subprocess
 import sys
@@ -21,10 +22,11 @@ import toyplot.require
 import toyplot.svg
 
 _executable = None
-for executable in ["gs", "gswin64.exe", "gswin32.exe"]:
-    for path in os.environ["PATH"].split(os.pathsep):
-        if os.path.exists(os.path.join(path, executable)):
-            _executable = os.path.join(path, executable)
+for path, command in itertools.product(os.environ["PATH"].split(os.pathsep), ["gs", "gswin64c.exe", "gswin32c.exe"]):
+        executable = os.path.join(path, command)
+        if os.path.exists(executable):
+            _executable = executable
+            break
 
 if _executable is None:
     raise Exception("A ghostscript executable is required.")  # pragma: no cover

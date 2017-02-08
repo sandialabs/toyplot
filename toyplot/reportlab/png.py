@@ -21,7 +21,7 @@ import toyplot.svg
 
 for path in os.environ["PATH"].split(os.pathsep):
     if os.path.exists(os.path.join(path, "gs")):
-        gs_version = subprocess.check_output(["gs", "--version"])
+        gs_version = subprocess.check_output(["gs", "--version"]).decode(encoding="utf-8")
         _downscale = distutils.version.StrictVersion(gs_version) >= "9.10"
         if not _downscale:
             toyplot.log.warning("For better output PNG quality, install ghostscript >= 9.10.")

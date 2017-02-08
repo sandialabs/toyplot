@@ -143,7 +143,7 @@ class Canvas(object):
         self.autorender(autorender, autoformat)
 
     def _repr_html_(self):
-        from . import html
+        from . import html # pylint: disable=unused-variable
         import xml.etree.ElementTree as xml
         return toyplot.compatibility.unicode_type(
             xml.tostring(
@@ -153,7 +153,7 @@ class Canvas(object):
             encoding="utf-8")
 
     def _repr_png_(self):
-        from . import png
+        from . import png # pylint: disable=unused-variable
         return toyplot.png.render(self)
 
     @property
@@ -576,7 +576,7 @@ class Canvas(object):
         if tshow:
             if tlocator is None:
                 tlocator = toyplot.locator.Integer(step=step)
-            for j, label, title in zip(*tlocator.ticks(0, matrix.shape[1] - 1)):
+            for j, label, title in zip(*tlocator.ticks(0, matrix.shape[1] - 1)): # pylint: disable=unused-variable
                 table.top.cell[1, j].data = label
                 #table.top.cell[1, j].title = title
 
@@ -585,7 +585,7 @@ class Canvas(object):
         if lshow:
             if llocator is None:
                 llocator = toyplot.locator.Integer(step=step)
-            for i, label, title in zip(*llocator.ticks(0, matrix.shape[0] - 1)):
+            for i, label, title in zip(*llocator.ticks(0, matrix.shape[0] - 1)): # pylint: disable=unused-variable
                 table.left.cell[i, 1].data = label
                 #table.left.cell[i, 1].title = title
 
@@ -594,7 +594,7 @@ class Canvas(object):
         if rshow:
             if rlocator is None:
                 rlocator = toyplot.locator.Integer(step=step)
-            for i, label, title in zip(*rlocator.ticks(0, matrix.shape[0] - 1)):
+            for i, label, title in zip(*rlocator.ticks(0, matrix.shape[0] - 1)): # pylint: disable=unused-variable
                 table.right.cell[i, 0].data = label
                 #table.right.cell[i, 0].title = title
 
@@ -603,7 +603,7 @@ class Canvas(object):
         if bshow:
             if blocator is None:
                 blocator = toyplot.locator.Integer(step=step)
-            for j, label, title in zip(*blocator.ticks(0, matrix.shape[1] - 1)):
+            for j, label, title in zip(*blocator.ticks(0, matrix.shape[1] - 1)): # pylint: disable=unused-variable
                 table.bottom.cell[0, j].data = label
                 #table.bottom.cell[0, j].title = title
 
@@ -649,8 +649,8 @@ class Canvas(object):
             corner=None,
             grid=None,
             gutter=50,
-            min=None,
-            max=None,
+            min=None, # pylint: disable=redefined-builtin
+            max=None, # pylint: disable=redefined-builtin
             show=True,
             label=None,
             ticklocator=None,
@@ -721,8 +721,8 @@ class Canvas(object):
             corner=None,
             grid=None,
             gutter=50,
-            min=None,
-            max=None,
+            min=None, # pylint: disable=redefined-builtin
+            max=None, # pylint: disable=redefined-builtin
             show=True,
             label=None,
             ticklocator=None,

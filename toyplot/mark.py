@@ -35,7 +35,7 @@ class Mark(object):
     def _finalize(self):
         return self
 
-    def domain(self, axis): #pylint: disable=no-self-use
+    def domain(self, axis): # pylint: disable=unused-argument,no-self-use
         """Return minimum and maximum domain values for the mark along the given axis.
 
         Parameters

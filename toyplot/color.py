@@ -348,7 +348,7 @@ class CategoricalMap(Map):
         self._palette = palette
         toyplot.color.Map.__init__(self, domain_min=0, domain_max=len(palette))
 
-    def colors(self, values, domain_min=None, domain_max=None):
+    def colors(self, values, domain_min=None, domain_max=None): # pylint: disable=unused-argument
         """Convert a sequence of categorical (nonnegative integer) values to colors.
 
         Each value is mapped to a color in the underlying palette.  Note that the

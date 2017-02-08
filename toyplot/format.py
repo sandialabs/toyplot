@@ -52,6 +52,7 @@ class FloatFormatter(Formatter):
     nanshow: bool, optional
         Set to `False` to hide NaN values.
     """
+    # pylint: disable=redefined-builtin
     def __init__(self, format="{:.6g}", nanshow=True):
         self._format = format
         self._nanshow = nanshow

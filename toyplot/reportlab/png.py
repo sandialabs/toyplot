@@ -67,13 +67,17 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
     command = [
         "gs",
-        "-dNOPAUSE",
+        "-dSAFER",
         "-dBATCH",
+        "-dNOPAUSE",
         "-dQUIET",
-        "-dMaxBitmap=2147483647",
-        "-sDEVICE=pngalpha",
-        "-r%s" % 96,
         "-sOutputFile=-",
+        "-r%s" % (96 * 4),
+        "-dMaxBitmap=2147483647",
+        "-dTextAlphaBits=4",
+        "-dGraphicsAlphaBits=4",
+        "-sDEVICE=pngalpha",
+        "-dDownScaleFactor=4",
         "-",
         ]
 

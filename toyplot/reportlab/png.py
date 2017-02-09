@@ -22,7 +22,7 @@ import toyplot.require
 import toyplot.svg
 
 _executable = None
-for path, command in itertools.product(os.environ["PATH"].split(os.pathsep), ["gs", "gswin64c.exe", "gswin32c.exe"]):
+for path, command in itertools.product(os.environ["PATH"].split(os.pathsep), ["gs", "gswin64c.exe", "gswin32c.exe", "gs.exe"]):
         executable = os.path.join(path, command)
         if os.path.exists(executable):
             _executable = executable

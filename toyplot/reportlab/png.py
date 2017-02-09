@@ -21,20 +21,25 @@ import toyplot.reportlab
 import toyplot.require
 import toyplot.svg
 
-_executable = None
-for path, command in itertools.product(os.environ["PATH"].split(os.pathsep), ["gs", "gswin64c.exe", "gswin32c.exe", "gs.exe"]):
-        executable = os.path.join(path, command)
-        if os.path.exists(executable):
-            _executable = executable
-            break
+# Verify that ghostscript is installed, and check the version
+_gs_command = None
+_gs_version = None
+for command in ["gs", "gswin64c", "gswin32c"]:
+    try:
+        _gs_version = subprocess.check_output([command, "--version"]).decode(encoding="utf-8").strip()
+        _gs_command = command
+    except:
+        pass
 
-if _executable is None:
+if _gs_command is None:
     raise Exception("A ghostscript executable is required.")  # pragma: no cover
 
-gs_version = subprocess.check_output([_executable, "--version"]).decode(encoding="utf-8")
-_downscale = distutils.version.StrictVersion(gs_version) >= "9.10"
-if not _downscale:
+if distutils.version.StrictVersion(_gs_version) >= "9.10":
+    _gs_resolution = ["-r%s" % (96 * 4), "-dDownScaleFactor=4"]
+else:
+    _gs_resolution = ["-r%s" % (96)]
     toyplot.log.warning("For better output PNG quality, install ghostscript >= 9.10.")
+
 
 def render(canvas, fobj=None, width=None, height=None, scale=None):
     """Render the PNG bitmap representation of a canvas using ReportLab and Ghostscript.
@@ -76,7 +81,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     surface.save()
 
     command = [
-        _executable,
+        _gs_command,
         "-dSAFER",
         "-dBATCH",
         "-dNOPAUSE",
@@ -86,19 +91,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
         "-dTextAlphaBits=4",
         "-dGraphicsAlphaBits=4",
         "-sDEVICE=pngalpha",
-        ]
-    if _downscale:
-        command += [
-            "-r%s" % (96 * 4),
-            "-dDownScaleFactor=4",
-            ]
-    else:
-        command += [
-            "-r%s" % (96),
-            ]
-    command += [
-        "-",
-        ]
+        ] + _gs_resolution + ["-"]
 
     gs = subprocess.Popen(
         command,

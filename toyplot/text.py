@@ -100,38 +100,38 @@ def extents(text, angle, style):
     return (left, right, top, bottom)
 
 
-class Page(object):
-    """Container for one-or-more lines of text."""
-    def __init__(self, style):
-        self.style = style
-        self.children = []
-
-
-class Line(object):
-    """Container for one line of text."""
-    def __init__(self, style):
-        self.style = style
-        self.children = []
-
-
 class Box(object):
-    """Container for (optionally nested) text content."""
-    def __init__(self, style):
-        self.style = style
-        self.children = []
+    """Generic container for all content."""
+    def __init__(self, children=None):
+        if children is None:
+            children = []
+        self.children = children
 
 
-class Newline(Box):
-    """Newline inserted in a line of text."""
-    def __init__(self, style):
-        Box.__init__(self, style)
+class Layout(Box):
+    """Top-level container for one-or-more lines of text."""
+    def __init__(self):
+        super(Layout, self).__init__()
+
+
+class LineBox(Box):
+    """Container for one line of text."""
+    def __init__(self, children=None):
+        super(LineBox, self).__init__(children=children)
 
 
 class TextBox(Box):
-    """Box that contains text."""
+    """Container for text."""
     def __init__(self, text, style):
-        Box.__init__(self, style)
+        super(TextBox, self).__init__()
         self.text = text
+        self.style = style
+
+
+class Newline(Box):
+    """Representation for a single line break."""
+    def __init__(self):
+        super(Newline, self).__init__()
 
 
 def layout(text, style, fonts):
@@ -163,38 +163,44 @@ def layout(text, style, fonts):
         for child in node:
             compute_styles(font_size, child)
 
-    def build_formatting_model(node, parent=None, page=None):
+    def build_formatting_model(node, root=None):
         toyplot.log.debug("build formatting model: %s", node)
 
         if node.tag in ["body"]:
-            page = Page(node.style)
-            page.children.append(Line(node.style))
-            parent = page.children[-1]
+            root = Layout()
 
             if node.text:
-                parent.children.append(TextBox(node.text, node.style))
+                root.children.append(TextBox(node.text, node.style))
             for child in node:
-                build_formatting_model(child, parent, page)
+                build_formatting_model(child, root)
                 if child.tail:
-                    parent.children.append(TextBox(child.tail, node.style)) # Note: the tail doesn't get the child's style
-            return page
+                    root.children.append(TextBox(child.tail, node.style)) # Note: the tail doesn't get the child's style
+            return root
 
         if node.tag in ["b", "code", "i", "em", "small", "span", "strong", "sub", "sup"]:
-            parent.children.append(Box(node.style))
-            parent = parent.children[-1]
             if node.text:
-                parent.children.append(TextBox(node.text, node.style))
+                root.children.append(TextBox(node.text, node.style))
             for child in node:
-                build_formatting_model(child, parent, page)
+                build_formatting_model(child, root)
                 if child.tail:
-                    parent.children.append(TextBox(child.tail, node.style)) # Note: the tail doesn't get the child's style
+                    root.children.append(TextBox(child.tail, node.style)) # Note: the tail doesn't get the child's style
             return
 
         if node.tag == "br":
-            parent.children.append(Newline(node.style))
+            root.children.append(Newline())
             return
 
         raise ValueError("Unknown tag: %s" % node.tag)
+
+    def create_lines(root):
+        toyplot.log.debug("create lines")
+        children = root.children
+        root.children = [LineBox()]
+        for child in children:
+            if isinstance(child, Newline):
+                root.children.append(LineBox())
+            else:
+                root.children[-1].children.append(child)
 
     def compute_size(fonts, box):
         toyplot.log.debug("compute size: %s", box)
@@ -202,10 +208,10 @@ def layout(text, style, fonts):
         for child in box.children:
             compute_size(fonts, child)
 
-        if isinstance(box, Page):
+        if isinstance(box, Layout):
             box.content_width = numpy.max([child.content_width for child in box.children]) if box.children else 0
             box.content_height = numpy.sum([child.content_height for child in box.children]) if box.children else 0
-        elif isinstance(box, Line):
+        elif isinstance(box, LineBox):
             box.content_width = numpy.sum([child.content_width for child in box.children]) if box.children else 0
             box.content_height = numpy.max([child.content_height for child in box.children]) if box.children else 0
         elif isinstance(box, TextBox): # This must come before Box
@@ -217,7 +223,7 @@ def layout(text, style, fonts):
             box.content_width = numpy.sum([child.content_width for child in box.children]) if box.children else 0
             box.content_height = numpy.max([child.content_height for child in box.children]) if box.children else 0
         else:
-            raise Exception("Unknown box type: %s" % box)
+            raise Exception("Unexpected box type: %s" % box)
 
     def compute_layout(box, left, top):
         box.left = left
@@ -226,7 +232,7 @@ def layout(text, style, fonts):
         box.bottom = box.top + box.content_height
         for child in box.children:
             compute_layout(child, left, top)
-            if isinstance(child, Line):
+            if isinstance(child, LineBox):
                 top += child.content_height
             elif isinstance(child, Box):
                 left += child.content_width
@@ -248,11 +254,12 @@ def layout(text, style, fonts):
     cascade_styles(style, dom)
     compute_styles(reference_font_size, dom)
 
-    page = build_formatting_model(dom)
-    compute_size(fonts, page)
-    compute_layout(page, left=0, top=0)
+    root = build_formatting_model(dom)
+    create_lines(root)
+    compute_size(fonts, root)
+    compute_layout(root, left=0, top=0)
 
-    return page
+    return root
 
 
 def dump(box, stream=None, text=True, style=False, location=False, size=True, level=0, indent="  "):
@@ -262,11 +269,11 @@ def dump(box, stream=None, text=True, style=False, location=False, size=True, le
     stream.write("%s.%s" % (box.__module__, box.__class__.__name__))
     if text and isinstance(box, TextBox):
         stream.write(" %r" % box.text)
-    if style:
+    if style and hasattr(box, "style"):
         stream.write(" %r" % box.style)
     if location:
         stream.write(" %s,%s" % (box.left, box.top))
-    if size:
+    if size and hasattr(box, "content_width") and hasattr(box, "content_height"):
         stream.write(" %sx%s" % (box.content_width, box.content_height))
     stream.write("\n")
     for child in box.children:

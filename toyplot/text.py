@@ -176,13 +176,10 @@ def layout(text, style, fonts):
         node.style["font-size"] = font_size
         node.style["line-height"] = line_height
 
-        #toyplot.log.debug("%s %s %r %r", node.tag, node.style, node.text, node.tail)
         for child in node:
             compute_styles(font_size, child)
 
     def build_formatting_model(node, root=None):
-        #toyplot.log.debug("build formatting model: %s", node)
-
         if node.tag == "body":
             root = Layout()
 
@@ -201,8 +198,7 @@ def layout(text, style, fonts):
 
         raise ValueError("Unknown tag: %s" % node.tag)
 
-    def create_lines(root):
-        #toyplot.log.debug("create lines")
+    def split_lines(root):
         children = root.children
         root.children = [LineBox()]
         for child in children:
@@ -212,8 +208,6 @@ def layout(text, style, fonts):
                 root.children[-1].children.append(child)
 
     def compute_size(fonts, box):
-        #toyplot.log.debug("compute size: %s", box)
-
         for child in box.children:
             compute_size(fonts, child)
 
@@ -287,7 +281,7 @@ def layout(text, style, fonts):
     compute_styles(reference_font_size, dom)
 
     root = build_formatting_model(dom)
-    create_lines(root)
+    split_lines(root)
     compute_size(fonts, root)
     compute_position(root)
     compute_baseline(fonts, root)
@@ -299,16 +293,21 @@ def dump(box, stream=None, text=True, style=False, location=False, size=True, le
     if stream is None:
         stream = sys.stdout
     stream.write(indent * level)
-    stream.write("%s.%s" % (box.__module__, box.__class__.__name__))
-    if text and isinstance(box, TextBox):
-        stream.write(" %r" % box.text)
-    if style and hasattr(box, "style"):
-        stream.write(" %r" % box.style)
-    if location:
-        stream.write(" %s,%s" % (box.left, box.top))
-    if size and hasattr(box, "width") and hasattr(box, "height"):
-        stream.write(" %sx%s" % (box.width, box.height))
-    stream.write("\n")
+    stream.write("%s.%s\n" % (box.__module__, box.__class__.__name__))
+    stream.write(indent * (level + 1))
+    stream.write("location: %s, %s\n" % (box.left, box.top))
+    stream.write(indent * (level + 1))
+    stream.write("size: %s x %s\n" % (box.width, box.height))
+    if isinstance(box, TextBox):
+        stream.write(indent * (level + 1))
+        stream.write("text: %r\n" % box.text)
+    if hasattr(box, "style"):
+        stream.write(indent * (level + 1))
+        stream.write("style:\n")
+        for pair in box.style.items():
+            stream.write(indent * (level + 2))
+            stream.write("%s: %s\n" % pair)
+
     for child in box.children:
         dump(box=child, stream=stream, text=text, style=style, location=location, size=size, level=level+1, indent=indent)
 

@@ -2,7 +2,7 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-from __future__ import division
+from __future__ import absolute_import, division
 
 import itertools
 
@@ -497,6 +497,38 @@ class Image(Mark):
             raise ValueError("Unsupported image dtype: %s" % data.dtype)
 
         self._data = data
+
+    def to_png(self):
+        import io
+        import png
+        stream = io.BytesIO()
+
+        data = self._data
+
+        toyplot.log.debug("Image data: %s %s", data.shape, data.dtype)
+
+        if data.dtype == toyplot.color.dtype:
+            data = numpy.dstack((data["r"], data["g"], data["b"], data["a"]))
+        if issubclass(data.dtype.type, numpy.bool_):
+            bitdepth = 1
+        elif issubclass(data.dtype.type, numpy.floating):
+            data = (data * 255.0).astype("uint8")
+            bitdepth = 8
+        else:
+            bitdepth = 8
+
+        width = data.shape[1]
+        height = data.shape[0]
+        greyscale = data.shape[2] < 3
+        alpha = data.shape[2] == 2 or data.shape[2] == 4
+
+        writer = png.Writer(width=width, height=height, greyscale=greyscale, alpha=alpha, bitdepth=bitdepth)
+        writer.write(stream, numpy.reshape(data, (-1, data.shape[1] * data.shape[2])))
+        return stream.getvalue()
+
+    def to_data_url(self):
+        import base64
+        return "data:image/png;base64," + base64.standard_b64encode(self.to_png()).decode("ascii")
 
 
 class Plot(Mark):

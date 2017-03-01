@@ -229,17 +229,17 @@ def layout(text, style, fonts):
             raise Exception("Unexpected box type: %s" % box)
 
     def compute_position(root):
-        left = 0
-        top = 0
-
-        root.left = left
-        root.top = top
-        root.right = root.left + root.width
-        root.bottom = root.top + root.height
-
-        top = 0
+        top = -root.height * 0.5
         for line in root.children:
-            left = 0
+            text_anchor = line.children[-1].style.get("text-anchor", "middle") if line.children else "middle"
+            if text_anchor == "start":
+                anchor_offset = 0
+            elif text_anchor == "middle":
+                anchor_offset = -line.width * 0.5
+            elif text_anchor == "end":
+                anchor_offset = -line.width
+
+            left = anchor_offset
             line.left = left
             line.top = top
             line.right = line.left + line.width
@@ -258,8 +258,11 @@ def layout(text, style, fonts):
             baseline = numpy.min([child.baseline for child in line.children]) if line.children else 0
             for child in line.children:
                 child.baseline = baseline - child.style["baseline-shift"]
+
+    def cleanup_styles(root):
         for line in root.children:
             for child in line.children:
+                child.style.pop("text-anchor", None)
                 child.style.pop("baseline-shift", None)
 
     if "font-family" not in style:
@@ -272,6 +275,7 @@ def layout(text, style, fonts):
     default_style = {
         "baseline-shift": "0",
         "line-height": "normal",
+        "text-anchor": "middle",
         "vertical-align": "baseline",
     }
     style = toyplot.style.combine(default_style, style)
@@ -285,6 +289,7 @@ def layout(text, style, fonts):
     compute_size(fonts, root)
     compute_position(root)
     compute_baseline(fonts, root)
+    cleanup_styles(root)
 
     return root
 
@@ -295,7 +300,8 @@ def dump(box, stream=None, text=True, style=False, location=False, size=True, le
     stream.write(indent * level)
     stream.write("%s.%s\n" % (box.__module__, box.__class__.__name__))
     stream.write(indent * (level + 1))
-    stream.write("location: %s, %s\n" % (box.left, box.top))
+    if hasattr(box, "left") and hasattr(box, "top"):
+        stream.write("location: %s, %s\n" % (box.left, box.top))
     stream.write(indent * (level + 1))
     stream.write("size: %s x %s\n" % (box.width, box.height))
     if isinstance(box, TextBox):

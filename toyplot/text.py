@@ -153,12 +153,15 @@ def layout(text, style, fonts):
             cascade_styles(style, child)
 
     def compute_styles(reference_font_size, node):
-        """Compute explicit numeric CSS pixel values for the baseline-shift, font-size, and line-height properties, for each node in an XML DOM."""
+        """Compute explicit numeric CSS pixel values for the baseline-shift, font-size, line-height, and -toyplot-text-anchor-shift properties."""
         font_size = node.style["font-size"]
         font_size = toyplot.units.convert(font_size, target="px", default="px", reference=reference_font_size)
 
         baseline_shift = node.style["baseline-shift"]
         baseline_shift = toyplot.units.convert(baseline_shift, target="px", default="px", reference=reference_font_size)
+
+        toyplot_text_anchor_shift = node.style["-toyplot-text-anchor-shift"]
+        toyplot_text_anchor_shift = toyplot.units.convert(toyplot_text_anchor_shift, target="px", default="px", reference=reference_font_size)
 
         if node.tag == "small":
             font_size *= 0.8
@@ -177,6 +180,7 @@ def layout(text, style, fonts):
         node.style["baseline-shift"] = baseline_shift
         node.style["font-size"] = font_size
         node.style["line-height"] = line_height
+        node.style["-toyplot-text-anchor-shift"] = toyplot_text_anchor_shift
 
         for child in node:
             compute_styles(font_size, child)
@@ -266,7 +270,7 @@ def layout(text, style, fonts):
             line.baseline = line.bottom - line.baseline
 
             for child in line.children:
-                child.left = left
+                child.left = left + child.style["-toyplot-text-anchor-shift"]
                 child.top = line_top
                 child.right = child.left + child.width
                 child.bottom = child.top + line.height
@@ -278,8 +282,9 @@ def layout(text, style, fonts):
         """Remove style properties that we don't want rendered (because their effect is already baked into box positions."""
         for line in root.children:
             for child in line.children:
-                child.style.pop("text-anchor", None)
+                child.style.pop("-toyplot-text-anchor-shift", None)
                 child.style.pop("baseline-shift", None)
+                child.style.pop("text-anchor", None)
 
     if "font-family" not in style:
         raise ValueError("style must specify font-family")
@@ -289,6 +294,7 @@ def layout(text, style, fonts):
     dom = xml.fromstring(("<body>" + text + "</body>").encode("utf-8"))
 
     default_style = {
+        "-toyplot-text-anchor-shift": "0",
         "baseline-shift": "0",
         "line-height": "normal",
         "text-anchor": "middle",

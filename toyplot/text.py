@@ -128,14 +128,15 @@ class TextBox(Box):
         self.style = style
 
 
-class Newline(Box):
+class LineBreak(Box):
     """Representation for a single line break."""
     def __init__(self):
-        super(Newline, self).__init__()
+        super(LineBreak, self).__init__()
 
 
 def layout(text, style, fonts):
     def cascade_styles(style, node):
+        """Cascades style information so that each node in an XML DOM has an explicit representation of each property/value pair."""
         if node.tag in ["b", "strong"]:
             style = toyplot.style.combine(style, {"font-weight": "bold"})
         elif node.tag in ["code"]:
@@ -152,6 +153,7 @@ def layout(text, style, fonts):
             cascade_styles(style, child)
 
     def compute_styles(reference_font_size, node):
+        """Compute explicit numeric CSS pixel values for the baseline-shift, font-size, and line-height properties, for each node in an XML DOM."""
         font_size = node.style["font-size"]
         font_size = toyplot.units.convert(font_size, target="px", default="px", reference=reference_font_size)
 
@@ -180,6 +182,7 @@ def layout(text, style, fonts):
             compute_styles(font_size, child)
 
     def build_formatting_model(node, root=None):
+        """Convert the XML DOM into a flat layout containing text boxes and line breaks."""
         if node.tag == "body":
             root = Layout()
 
@@ -193,21 +196,23 @@ def layout(text, style, fonts):
             return root
 
         if node.tag == "br":
-            root.children.append(Newline())
+            root.children.append(LineBreak())
             return root
 
         raise ValueError("Unknown tag: %s" % node.tag)
 
     def split_lines(root):
+        """Convert a flat layout into a two level hierarchy of line boxes containing text boxes."""
         children = root.children
         root.children = [LineBox()]
         for child in children:
-            if isinstance(child, Newline):
+            if isinstance(child, LineBreak):
                 root.children.append(LineBox())
             else:
                 root.children[-1].children.append(child)
 
     def compute_size(fonts, box):
+        """Compute width + height for the layout + line boxes + text boxes."""
         for child in box.children:
             compute_size(fonts, child)
 
@@ -222,13 +227,11 @@ def layout(text, style, fonts):
             box.width = font.width(box.text)
             box.height = box.style["line-height"]
             box.baseline = (box.height - (font.ascent - font.descent)) * 0.5
-        elif isinstance(box, Box):
-            box.width = numpy.sum([child.width for child in box.children]) if box.children else 0
-            box.height = numpy.max([child.height for child in box.children]) if box.children else 0
         else:
             raise Exception("Unexpected box type: %s" % box)
 
     def compute_position(root):
+        """Compute top + bottom + left + right coordinates for line boxes + text boxes, relative to the layout anchor."""
         top = -root.height * 0.5
         for line in root.children:
             text_anchor = line.children[-1].style.get("text-anchor", "middle") if line.children else "middle"
@@ -254,12 +257,14 @@ def layout(text, style, fonts):
             top += line.height
 
     def compute_baseline(fonts, root):
+        """Choose a common baseline for each line box + its text boxes."""
         for line in root.children:
             baseline = numpy.min([child.baseline for child in line.children]) if line.children else 0
             for child in line.children:
                 child.baseline = baseline - child.style["baseline-shift"]
 
     def cleanup_styles(root):
+        """Remove style properties that we don't want rendered (because their effect is already baked into box positions."""
         for line in root.children:
             for child in line.children:
                 child.style.pop("text-anchor", None)

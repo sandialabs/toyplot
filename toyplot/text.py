@@ -230,9 +230,25 @@ def layout(text, style, fonts):
         else:
             raise Exception("Unexpected box type: %s" % box)
 
+    def compute_baseline(root):
+        """Choose a common baseline for each line box."""
+        for line in root.children:
+            line.baseline = numpy.min([child.baseline for child in line.children]) if line.children else 0
+            for child in line.children:
+                child.baseline = line.baseline - child.style["baseline-shift"]
+
     def compute_position(root):
         """Compute top + bottom + left + right coordinates for line boxes + text boxes, relative to the layout anchor."""
-        top = -root.height * 0.5
+
+        # Center the layout vertically on the anchor, or ...
+        #line_top = -root.height * 0.5
+        # ... align the top of the layout with the anchor, or ...
+        #line_top = 0
+        # ... align the bottom of the layout with the anchor, or ...
+        #line_top = -root.height
+        # ... align the first line's baseline with the anchor.
+        line_top = -root.children[0].height + root.children[0].baseline
+
         for line in root.children:
             text_anchor = line.children[-1].style.get("text-anchor", "middle") if line.children else "middle"
             if text_anchor == "start":
@@ -244,24 +260,19 @@ def layout(text, style, fonts):
 
             left = anchor_offset
             line.left = left
-            line.top = top
+            line.top = line_top
             line.right = line.left + line.width
             line.bottom = line.top + line.height
+            line.baseline = line.bottom - line.baseline
 
             for child in line.children:
                 child.left = left
-                child.top = top
+                child.top = line_top
                 child.right = child.left + child.width
                 child.bottom = child.top + line.height
+                child.baseline = child.bottom - child.baseline
                 left += child.width
-            top += line.height
-
-    def compute_baseline(fonts, root):
-        """Choose a common baseline for each line box + its text boxes."""
-        for line in root.children:
-            baseline = numpy.min([child.baseline for child in line.children]) if line.children else 0
-            for child in line.children:
-                child.baseline = baseline - child.style["baseline-shift"]
+            line_top += line.height
 
     def cleanup_styles(root):
         """Remove style properties that we don't want rendered (because their effect is already baked into box positions."""
@@ -292,26 +303,43 @@ def layout(text, style, fonts):
     root = build_formatting_model(dom)
     split_lines(root)
     compute_size(fonts, root)
+    compute_baseline(root)
     compute_position(root)
-    compute_baseline(fonts, root)
     cleanup_styles(root)
 
     return root
 
 
-def dump(box, stream=None, text=True, style=False, location=False, size=True, level=0, indent="  "):
+def dump(box, stream=None, level=0, indent="  "):
     if stream is None:
         stream = sys.stdout
     stream.write(indent * level)
     stream.write("%s.%s\n" % (box.__module__, box.__class__.__name__))
-    stream.write(indent * (level + 1))
-    if hasattr(box, "left") and hasattr(box, "top"):
-        stream.write("location: %s, %s\n" % (box.left, box.top))
-    stream.write(indent * (level + 1))
-    stream.write("size: %s x %s\n" % (box.width, box.height))
-    if isinstance(box, TextBox):
+
+    if hasattr(box, "text"):
         stream.write(indent * (level + 1))
         stream.write("text: %r\n" % box.text)
+
+    stream.write(indent * (level + 1))
+    stream.write("size: %s x %s\n" % (box.width, box.height))
+
+    if hasattr(box, "left"):
+        stream.write(indent * (level + 1))
+        stream.write("left: %s\n" % box.left)
+    if hasattr(box, "right"):
+        stream.write(indent * (level + 1))
+        stream.write("right: %s\n" % box.right)
+    if hasattr(box, "top"):
+        stream.write(indent * (level + 1))
+        stream.write("top: %s\n" % box.top)
+    if hasattr(box, "bottom"):
+        stream.write(indent * (level + 1))
+        stream.write("bottom: %s\n" % box.bottom)
+
+    if hasattr(box, "baseline"):
+        stream.write(indent * (level + 1))
+        stream.write("baseline: %s\n" % box.baseline)
+
     if hasattr(box, "style"):
         stream.write(indent * (level + 1))
         stream.write("style:\n")
@@ -319,6 +347,8 @@ def dump(box, stream=None, text=True, style=False, location=False, size=True, le
             stream.write(indent * (level + 2))
             stream.write("%s: %s\n" % pair)
 
+    stream.write("\n")
+
     for child in box.children:
-        dump(box=child, stream=stream, text=text, style=style, location=location, size=size, level=level+1, indent=indent)
+        dump(box=child, stream=stream, level=level+1, indent=indent)
 

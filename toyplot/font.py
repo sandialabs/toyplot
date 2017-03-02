@@ -83,17 +83,22 @@ class ReportlabFont(Font):
         self._family = family
         self._size = toyplot.units.convert(size, target="pt", default="px")
 
+        ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(self._family, self._size) # pylint: disable=unused-variable
+        self._ascent = toyplot.units.convert(ascent, target="px", default="pt")
+        self._descent = toyplot.units.convert(descent, target="px", default="pt")
+
+        print self
+
+    def __repr__(self):
+        return "<toyplot.font.ReportlabFont family=%r size=%r ascent=%r descent=%r>" % (self._family, self._size, self.ascent, self.descent)
+
     @property
     def ascent(self):
-        ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(self._family, self._size) # pylint: disable=unused-variable
-        ascent = toyplot.units.convert(ascent, target="px", default="pt")
-        return ascent
+        return self._ascent
 
     @property
     def descent(self):
-        ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(self._family, self._size) # pylint: disable=unused-variable
-        descent = toyplot.units.convert(descent, target="px", default="pt")
-        return descent
+        return self._descent
 
     def width(self, string):
         width = reportlab.pdfbase.pdfmetrics.stringWidth(string, self._family, self._size)
@@ -103,27 +108,39 @@ class ReportlabFont(Font):
 
 class ReportlabLibrary(Library):
     """Use Reportlab to provide information about standard PDF fonts."""
-    def family(self, style): # pylint: disable=no-self-use
-        """Extract the name of a standard PDF font family from a CSS style dict.
+    def __init__(self):
+        self._cache = dict()
 
-        Parameters
-        ----------
-        style: dict containing CSS key-value pairs.
-        """
-        if "font-family" not in style:
-            raise ValueError("No font family specified: %s" % style)
-
+    def font(self, style):
+        size = style["font-size"]
         bold = True if style.get("font-weight", "") == "bold" else False
         italic = True if style.get("font-style", "") == "italic" else False
+
         for font_family in style["font-family"].split(","):
             font_family = font_family.lower()
-            if font_family in ReportlabLibrary.family._substitutions:
-                font_family = ReportlabLibrary.family._substitutions[font_family]
-                return ReportlabLibrary.family._font_table[(font_family, bold, italic)]
+            if font_family not in ReportlabLibrary.font._substitutions:
+                continue
+
+            font_family = ReportlabLibrary.font._substitutions[font_family]
+            key = (font_family, bold, italic, size)
+            if key not in self._cache:
+                family = ReportlabLibrary.font._font_table[(font_family, bold, italic)]
+                self._cache[key] = ReportlabFont(family, size)
+
+            return self._cache[key]
 
         raise ValueError("Unknown font family: %s" % style) # pragma: no cover
 
-    family._font_table = {
+    font._substitutions = {
+        "courier": "courier",
+        "helvetica": "helvetica",
+        "monospace": "courier",
+        "sans-serif": "helvetica",
+        "serif": "times",
+        "times": "times",
+        }
+
+    font._font_table = {
         ("courier", False, False): "Courier",
         ("courier", True, False): "Courier-Bold",
         ("courier", False, True): "Courier-Oblique",
@@ -137,17 +154,4 @@ class ReportlabLibrary(Library):
         ("times", False, True): "Times-Italic",
         ("times", True, True): "Times-BoldItalic",
         }
-
-    family._substitutions = {
-        "courier": "courier",
-        "helvetica": "helvetica",
-        "monospace": "courier",
-        "sans-serif": "helvetica",
-        "serif": "times",
-        "times": "times",
-        }
-
-    def font(self, style):
-        family = self.family(style)
-        return ReportlabFont(family, style["font-size"])
 

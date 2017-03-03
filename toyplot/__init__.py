@@ -16,6 +16,8 @@ __version__ = "0.14.0-dev"
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)
+log.addHandler(logging.NullHandler())
+
 
 def bars(
         a,

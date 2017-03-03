@@ -50,4 +50,3 @@ def show(canvases, title="Toyplot Figure"):
     with os.fdopen(fd, "wb") as stream:
         stream.write(xml.tostring(html, method="html"))
     webbrowser.open("file://" + path, new=1, autoraise=True)
-

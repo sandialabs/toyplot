@@ -76,6 +76,16 @@ def render(svg, canvas):
             color["a"] * stroke_opacity * opacity,
             )
 
+    def get_line_cap(style):
+        if "stroke-linecap" not in style:
+            return 0
+        elif style["stroke-linecap"] == "butt":
+            return 0
+        elif style["stroke-linecap"] == "round":
+            return 1
+        elif style["stroke-linecap"] == "square":
+            return 2
+
     def get_font_family(style):
         if "font-family" not in style:
             return None # pragma: no cover
@@ -203,6 +213,7 @@ def render(svg, canvas):
                 stroke = get_stroke(current_style)
                 if stroke is not None:
                     set_stroke_color(canvas, stroke)
+                    canvas.setLineCap(get_line_cap(current_style))
                     canvas.line(
                         float(element.get("x1")),
                         float(element.get("y1")),
@@ -213,6 +224,7 @@ def render(svg, canvas):
                 stroke = get_stroke(current_style)
                 if stroke is not None:
                     set_stroke_color(canvas, stroke)
+                    canvas.setLineCap(get_line_cap(current_style))
                     path = canvas.beginPath()
                     commands = element.get("d").split()
                     while len(commands):
@@ -391,4 +403,3 @@ def render(svg, canvas):
         canvas.restoreState()
 
     render_element(svg, svg, canvas, [])
-

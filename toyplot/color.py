@@ -5,13 +5,18 @@
 from __future__ import division
 
 import collections
+import colorsys
+import logging
 import re
 import xml.etree.ElementTree as xml
 
-import colorsys
-import numpy
+logging.getLogger("colormath").setLevel(logging.INFO) # colormath produces obnoxious amounts of debug logging
+import colormath.color_objects # pylint: disable=wrong-import-position
+import colormath.color_conversions # pylint: disable=wrong-import-position
+import numpy # pylint: disable=wrong-import-position
 
-import toyplot.compatibility
+import toyplot.compatibility # pylint: disable=wrong-import-position
+
 
 near_black = "#292724"
 
@@ -83,18 +88,14 @@ def lab(L, a, b):
     -------
     color: :class:`numpy.ndarray` scalar containing RGBA values with dtype = :data:`toyplot.color.dtype`.
     """
-    from colormath.color_objects import sRGBColor, LabColor
-    from colormath.color_conversions import convert_color
-    RGB = convert_color(LabColor(L, a, b), sRGBColor)
+    RGB = colormath.color_conversions.convert_color(colormath.color_objects.LabColor(L, a, b), colormath.color_objects.sRGBColor)
     return rgb(*RGB.get_value_tuple()) # pylint: disable=no-value-for-parameter
 
 
 def to_lab(color):
     """Convert a Toyplot color to Lab values."""
-    from colormath.color_objects import sRGBColor, LabColor
-    from colormath.color_conversions import convert_color
-    Lab = convert_color(
-        sRGBColor(color["r"], color["g"], color["b"]), LabColor)
+    Lab = colormath.color_conversions.convert_color(
+        colormath.color_objects.sRGBColor(color["r"], color["g"], color["b"]), colormath.color_objects.LabColor)
     return Lab.get_value_tuple()
 
 

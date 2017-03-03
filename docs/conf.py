@@ -45,6 +45,7 @@ class module_proxy(object):
 
 for module_name in [
         "numpy",
+        "numpy.linalg",
         "numpy.ma",
         "numpy.testing",
         ]:

@@ -9,4 +9,3 @@ import os
 
 autorender = True
 autoformat = os.environ.get("TOYPLOT_AUTOFORMAT", "html")
-

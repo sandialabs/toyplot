@@ -143,7 +143,7 @@ class Canvas(object):
         self.autorender(autorender, autoformat)
 
     def _repr_html_(self):
-        from . import html
+        from . import html # pylint: disable=unused-variable
         import xml.etree.ElementTree as xml
         return toyplot.compatibility.unicode_type(
             xml.tostring(
@@ -153,7 +153,7 @@ class Canvas(object):
             encoding="utf-8")
 
     def _repr_png_(self):
-        from . import png
+        from . import png # pylint: disable=unused-variable
         return toyplot.png.render(self)
 
     @property

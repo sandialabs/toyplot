@@ -8,9 +8,12 @@
 from __future__ import absolute_import
 from __future__ import division
 
+import distutils.version
 import io
+import itertools
 import os.path
 import subprocess
+import sys
 
 import reportlab.pdfgen.canvas
 
@@ -18,12 +21,24 @@ import toyplot.reportlab
 import toyplot.require
 import toyplot.svg
 
+# Verify that ghostscript is installed, and check the version
+_gs_command = None
+_gs_version = None
+for command in ["gs", "gswin64c", "gswin32c"]:
+    try:
+        _gs_version = subprocess.check_output([command, "--version"]).decode(encoding="utf-8").strip()
+        _gs_command = command
+    except:
+        pass
 
-for path in os.environ["PATH"].split(os.pathsep):
-    if os.path.exists(os.path.join(path, "gs")):
-        break
+if _gs_command is None:
+    raise Exception("A ghostscript executable is required.")  # pragma: no cover
+
+if distutils.version.StrictVersion(_gs_version) >= "9.10":
+    _gs_resolution = ["-r%s" % (96 * 4), "-dDownScaleFactor=4"]
 else:
-    raise Exception("The gs executable is required.")  # pragma: no cover
+    _gs_resolution = ["-r%s" % (96)]
+    toyplot.log.warning("For better output PNG quality, install ghostscript >= 9.10.")
 
 
 def render(canvas, fobj=None, width=None, height=None, scale=None):
@@ -66,16 +81,17 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     surface.save()
 
     command = [
-        "gs",
-        "-dNOPAUSE",
+        _gs_command,
+        "-dSAFER",
         "-dBATCH",
+        "-dNOPAUSE",
         "-dQUIET",
-        "-dMaxBitmap=2147483647",
-        "-sDEVICE=pngalpha",
-        "-r%s" % 96,
         "-sOutputFile=-",
-        "-",
-        ]
+        "-dMaxBitmap=2147483647",
+        "-dTextAlphaBits=4",
+        "-dGraphicsAlphaBits=4",
+        "-sDEVICE=pngalpha",
+        ] + _gs_resolution + ["-"]
 
     gs = subprocess.Popen(
         command,
@@ -157,4 +173,3 @@ def render_frames(canvas, width=None, height=None, scale=None):
             stderr=subprocess.PIPE)
         stdout, stderr = gs.communicate(pdf.getvalue()) # pylint: disable=unused-variable
         yield stdout
-

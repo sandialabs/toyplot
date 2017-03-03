@@ -818,4 +818,3 @@ class Buchheim(GraphLayout):
 
         eshapes, ecoordinates = self._edges.edges(vcoordinates, edges)
         return vcoordinates, eshapes, ecoordinates
-

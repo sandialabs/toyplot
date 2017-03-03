@@ -228,11 +228,20 @@ def layout(text, style, fonts):
             box.ascent = numpy.max([child.ascent for child in box.children]) if box.children else 0
             box.descent = numpy.min([child.descent for child in box.children]) if box.children else 0
             box.height = box.ascent - box.descent
-        elif isinstance(box, TextBox): # This must come before Box
+        elif isinstance(box, TextBox):
             font = fonts.font(box.style)
             box.width = font.width(box.text)
-            box.ascent = font.ascent
-            box.descent = font.descent
+
+            alignment_baseline = box.style["alignment-baseline"]
+            if alignment_baseline == "alpha":
+                box.baseline = 0 # Align the text baseline with the line baseline
+            elif alignment_baseline == "hanging":
+                box.baseline = font.ascent
+            elif alignment_baseline == "middle":
+                box.baseline = 0
+
+            box.ascent = box.baseline + font.ascent
+            box.descent = box.baseline + font.descent
 
             text_height = font.ascent - font.descent
             line_height = box.style["line-height"]
@@ -253,11 +262,12 @@ def layout(text, style, fonts):
         # Center the layout vertically on the anchor, or ...
         #line_top = -root.height * 0.5
         # ... align the top of the layout with the anchor, or ...
-        line_top = 0
+        #line_top = 0
         # ... align the bottom of the layout with the anchor, or ...
         #line_top = -root.height
         # ... align the first line's baseline with the anchor.
         #line_top = -root.children[0].height + root.children[0].baseline
+        line_top = -root.children[0].ascent
 
         for line in root.children:
             text_anchor = line.children[-1].style.get("text-anchor", "middle") if line.children else "middle"
@@ -280,7 +290,7 @@ def layout(text, style, fonts):
                 child.top = line.baseline - child.ascent
                 child.right = child.left + child.width
                 child.bottom = line.baseline - child.descent
-                child.baseline = line.baseline + child.style["baseline-shift"]
+                child.baseline = line.baseline + child.baseline - child.style["baseline-shift"]
                 left += child.width
             line_top += line.height
 
@@ -289,6 +299,7 @@ def layout(text, style, fonts):
         for line in root.children:
             for child in line.children:
                 child.style.pop("-toyplot-text-anchor-shift", None)
+                child.style.pop("alignment-baseline", None)
                 child.style.pop("baseline-shift", None)
                 child.style.pop("text-anchor", None)
 
@@ -301,6 +312,7 @@ def layout(text, style, fonts):
 
     default_style = {
         "-toyplot-text-anchor-shift": "0",
+        "alignment-baseline": "middle",
         "baseline-shift": "0",
         "line-height": "normal",
         "text-anchor": "middle",

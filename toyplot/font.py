@@ -55,7 +55,7 @@ class Font(object):
 class Library(object):
     """Base class for objects that can manage information about a collection of fonts."""
     def font(self, style):
-        """Lookup a font using CSS style information and return a corresponding Metrics object.
+        """Lookup a font using CSS style information and return a corresponding Font object.
 
         Parameters
         ----------

@@ -233,12 +233,16 @@ def layout(text, style, fonts):
             box.width = font.width(box.text)
 
             alignment_baseline = box.style["alignment-baseline"]
-            if alignment_baseline == "alpha":
-                box.baseline = 0 # Align the text baseline with the line baseline
-            elif alignment_baseline == "hanging":
-                box.baseline = font.ascent
-            elif alignment_baseline == "middle":
+            if alignment_baseline == "alphabetic":
                 box.baseline = 0
+            elif alignment_baseline == "central":
+                box.baseline = -font.ascent * 0.5
+            elif alignment_baseline == "hanging":
+                box.baseline = -font.ascent
+            elif alignment_baseline == "middle":
+                box.baseline = -font.ascent * 0.35
+            else:
+                raise ValueError("Unknown alignment-baseline: %s" % alignment_baseline)
 
             box.ascent = box.baseline + font.ascent
             box.descent = box.baseline + font.descent
@@ -249,8 +253,6 @@ def layout(text, style, fonts):
             if line_extra > 0:
                 box.ascent += line_extra
                 box.descent -= line_extra
-
-            box.height = box.ascent - box.descent
 
         else:
             raise Exception("Unexpected box type: %s" % box)
@@ -280,17 +282,13 @@ def layout(text, style, fonts):
 
             left = anchor_offset
             line.left = left
-            line.top = line_top
             line.right = line.left + line.width
-            line.bottom = line.top + line.height
-            line.baseline = line.top + line.ascent
+            line.baseline = line_top + line.ascent
 
             for child in line.children:
                 child.left = left + child.style["-toyplot-text-anchor-shift"]
-                child.top = line.baseline - child.ascent
                 child.right = child.left + child.width
-                child.bottom = line.baseline - child.descent
-                child.baseline = line.baseline + child.baseline - child.style["baseline-shift"]
+                child.baseline = line.baseline - child.baseline - child.style["baseline-shift"]
                 left += child.width
             line_top += line.height
 

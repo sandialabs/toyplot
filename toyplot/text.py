@@ -315,6 +315,7 @@ def layout(text, style, fonts):
         "line-height": "normal",
         "text-anchor": "middle",
         "vertical-align": "baseline",
+        "white-space": "pre",
     }
     style = toyplot.style.combine(default_style, style)
     reference_font_size = toyplot.units.convert(style["font-size"], target="px", default="px")

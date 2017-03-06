@@ -213,34 +213,37 @@ def layout(text, style, fonts):
                     font = fonts.font(box.style)
                     box.width = font.width(box.text)
 
+                    # Box baseline is its relative offset from the line baseline in canvas coordinates (positive = down)
                     alignment_baseline = box.style["alignment-baseline"]
                     if alignment_baseline == "alphabetic":
                         box.baseline = 0
                     elif alignment_baseline == "central":
-                        box.baseline = -font.ascent * 0.5
+                        box.baseline = font.ascent * 0.5
                     elif alignment_baseline == "hanging":
-                        box.baseline = -font.ascent
+                        box.baseline = font.ascent
                     elif alignment_baseline == "middle":
-                        box.baseline = -font.ascent * 0.35
+                        box.baseline = font.ascent * 0.35
                     else:
                         raise ValueError("Unknown alignment-baseline: %s" % alignment_baseline)
 
-                    box.ascent = box.baseline + font.ascent
-                    box.descent = box.baseline + font.descent
+                    # Box ascent is the relative offset from the box baseline to the box top in canvas coordinates (positive = down)
+                    box.ascent = box.baseline - font.ascent
+                    # Box descent is the relative offset from the box baseline to the box bottom in canvas coordinates (positive = down)
+                    box.descent = box.baseline - font.descent
 
-                    text_height = font.ascent - font.descent
+                    text_height = box.descent - box.ascent
                     line_height = box.style["line-height"]
                     line_extra = (line_height - text_height) * 0.5
                     if line_extra > 0:
-                        box.ascent += line_extra
-                        box.descent -= line_extra
+                        box.ascent -= line_extra
+                        box.descent += line_extra
                 else:
                     raise Exception("Unexpected box type: %s" % box)
 
             line.width = numpy.sum([child.width for child in line.children]) if line.children else 0
-            line.ascent = numpy.max([child.ascent for child in line.children]) if line.children else 0
-            line.descent = numpy.min([child.descent for child in line.children]) if line.children else 0
-            line.height = line.ascent - line.descent
+            line.ascent = numpy.min([child.ascent for child in line.children]) if line.children else 0
+            line.descent = numpy.max([child.descent for child in line.children]) if line.children else 0
+            line.height = line.descent - line.ascent
 
         layout.width = numpy.max([line.width for line in layout.children]) if layout.children else 0
         layout.height = numpy.sum([line.height for line in layout.children]) if layout.children else 0
@@ -257,7 +260,7 @@ def layout(text, style, fonts):
         #line_top = -layout.height
         # ... align the first line's baseline with the anchor.
         #line_top = -layout.children[0].height + layout.children[0].baseline
-        line_top = -layout.children[0].ascent
+        line_top = layout.children[0].ascent
 
         layout.top = line_top
 
@@ -273,12 +276,12 @@ def layout(text, style, fonts):
             left = anchor_offset
             line.left = left
             line.right = line.left + line.width
-            line.baseline = line_top + line.ascent
+            line.baseline = line_top - line.ascent
 
             for child in line.children:
                 child.left = left + child.style["-toyplot-text-anchor-shift"]
                 child.right = child.left + child.width
-                child.baseline = line.baseline - child.baseline - child.style["baseline-shift"]
+                child.baseline = line.baseline + child.baseline - child.style["baseline-shift"]
                 left += child.width
             line_top += line.height
 

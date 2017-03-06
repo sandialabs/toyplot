@@ -100,38 +100,28 @@ def extents(text, angle, style):
     return (left, right, top, bottom)
 
 
-class Box(object):
-    """Generic container for all content."""
-    def __init__(self, children=None):
-        if children is None:
-            children = []
-        self.children = children
-
-
-class Layout(Box):
+class Layout(object):
     """Top-level container for one-or-more lines of text."""
     def __init__(self):
-        super(Layout, self).__init__()
+        self.children = []
 
 
-class LineBox(Box):
+class LineBox(object):
     """Container for one line of text."""
-    def __init__(self, children=None):
-        super(LineBox, self).__init__(children=children)
+    def __init__(self):
+        self.children = []
 
 
-class TextBox(Box):
+class TextBox(object):
     """Container for text."""
     def __init__(self, text, style):
-        super(TextBox, self).__init__()
         self.text = text
         self.style = style
 
 
-class LineBreak(Box):
+class LineBreak(object):
     """Representation for a single line break."""
-    def __init__(self):
-        super(LineBreak, self).__init__()
+    pass
 
 
 def layout(text, style, fonts):
@@ -205,73 +195,71 @@ def layout(text, style, fonts):
 
         raise ValueError("Unknown tag: %s" % node.tag)
 
-    def split_lines(root):
+    def split_lines(layout):
         """Convert a flat layout into a two level hierarchy of line boxes containing text boxes."""
-        children = root.children
-        root.children = [LineBox()]
+        children = layout.children
+        layout.children = [LineBox()]
         for child in children:
             if isinstance(child, LineBreak):
-                root.children.append(LineBox())
+                layout.children.append(LineBox())
             else:
-                root.children[-1].children.append(child)
+                layout.children[-1].children.append(child)
 
-    def compute_size(fonts, box):
+    def compute_size(fonts, layout):
         """Compute width + height for the layout + line boxes + text boxes."""
-        for child in box.children:
-            compute_size(fonts, child)
+        for line in layout.children:
+            for box in line.children:
+                if isinstance(box, TextBox):
+                    font = fonts.font(box.style)
+                    box.width = font.width(box.text)
 
-        if isinstance(box, Layout):
-            box.width = numpy.max([child.width for child in box.children]) if box.children else 0
-            box.height = numpy.sum([child.height for child in box.children]) if box.children else 0
-        elif isinstance(box, LineBox):
-            box.width = numpy.sum([child.width for child in box.children]) if box.children else 0
-            box.ascent = numpy.max([child.ascent for child in box.children]) if box.children else 0
-            box.descent = numpy.min([child.descent for child in box.children]) if box.children else 0
-            box.height = box.ascent - box.descent
-        elif isinstance(box, TextBox):
-            font = fonts.font(box.style)
-            box.width = font.width(box.text)
+                    alignment_baseline = box.style["alignment-baseline"]
+                    if alignment_baseline == "alphabetic":
+                        box.baseline = 0
+                    elif alignment_baseline == "central":
+                        box.baseline = -font.ascent * 0.5
+                    elif alignment_baseline == "hanging":
+                        box.baseline = -font.ascent
+                    elif alignment_baseline == "middle":
+                        box.baseline = -font.ascent * 0.35
+                    else:
+                        raise ValueError("Unknown alignment-baseline: %s" % alignment_baseline)
 
-            alignment_baseline = box.style["alignment-baseline"]
-            if alignment_baseline == "alphabetic":
-                box.baseline = 0
-            elif alignment_baseline == "central":
-                box.baseline = -font.ascent * 0.5
-            elif alignment_baseline == "hanging":
-                box.baseline = -font.ascent
-            elif alignment_baseline == "middle":
-                box.baseline = -font.ascent * 0.35
-            else:
-                raise ValueError("Unknown alignment-baseline: %s" % alignment_baseline)
+                    box.ascent = box.baseline + font.ascent
+                    box.descent = box.baseline + font.descent
 
-            box.ascent = box.baseline + font.ascent
-            box.descent = box.baseline + font.descent
+                    text_height = font.ascent - font.descent
+                    line_height = box.style["line-height"]
+                    line_extra = (line_height - text_height) * 0.5
+                    if line_extra > 0:
+                        box.ascent += line_extra
+                        box.descent -= line_extra
+                else:
+                    raise Exception("Unexpected box type: %s" % box)
 
-            text_height = font.ascent - font.descent
-            line_height = box.style["line-height"]
-            line_extra = (line_height - text_height) * 0.5
-            if line_extra > 0:
-                box.ascent += line_extra
-                box.descent -= line_extra
+            line.width = numpy.sum([child.width for child in line.children]) if line.children else 0
+            line.ascent = numpy.max([child.ascent for child in line.children]) if line.children else 0
+            line.descent = numpy.min([child.descent for child in line.children]) if line.children else 0
+            line.height = line.ascent - line.descent
 
-        else:
-            raise Exception("Unexpected box type: %s" % box)
+        layout.width = numpy.max([child.width for child in layout.children]) if layout.children else 0
+        layout.height = numpy.sum([child.height for child in layout.children]) if layout.children else 0
 
 
-    def compute_position(root):
+    def compute_position(layout):
         """Compute top + bottom + left + right coordinates for line boxes + text boxes, relative to the layout anchor."""
 
         # Center the layout vertically on the anchor, or ...
-        #line_top = -root.height * 0.5
+        #line_top = -layout.height * 0.5
         # ... align the top of the layout with the anchor, or ...
         #line_top = 0
         # ... align the bottom of the layout with the anchor, or ...
-        #line_top = -root.height
+        #line_top = -layout.height
         # ... align the first line's baseline with the anchor.
-        #line_top = -root.children[0].height + root.children[0].baseline
-        line_top = -root.children[0].ascent
+        #line_top = -layout.children[0].height + layout.children[0].baseline
+        line_top = -layout.children[0].ascent
 
-        for line in root.children:
+        for line in layout.children:
             text_anchor = line.children[-1].style.get("text-anchor", "middle") if line.children else "middle"
             if text_anchor == "start":
                 anchor_offset = 0
@@ -292,9 +280,9 @@ def layout(text, style, fonts):
                 left += child.width
             line_top += line.height
 
-    def cleanup_styles(root):
+    def cleanup_styles(layout):
         """Remove style properties that we don't want rendered (because their effect is already baked into box positions."""
-        for line in root.children:
+        for line in layout.children:
             for child in line.children:
                 child.style.pop("-toyplot-text-anchor-shift", None)
                 child.style.pop("alignment-baseline", None)
@@ -356,6 +344,7 @@ def dump(box, stream=None, level=0, indent="  "):
 
     stream.write("\n")
 
-    for child in box.children:
-        dump(box=child, stream=stream, level=level+1, indent=indent)
+    if hasattr(box, "children"):
+        for child in box.children:
+            dump(box=child, stream=stream, level=level+1, indent=indent)
 

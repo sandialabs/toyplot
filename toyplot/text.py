@@ -157,10 +157,10 @@ def layout(text, style, fonts):
             font_size *= 0.8
         elif node.tag == "sub":
             font_size *= 0.7
-            baseline_shift += 0.2 * font_size
+            baseline_shift -= 0.2 * font_size
         elif node.tag == "sup":
             font_size *= 0.7
-            baseline_shift -= 0.3 * font_size
+            baseline_shift += 0.3 * font_size
 
         line_height = node.style["line-height"]
         if line_height == "normal":
@@ -242,8 +242,8 @@ def layout(text, style, fonts):
             line.descent = numpy.min([child.descent for child in line.children]) if line.children else 0
             line.height = line.ascent - line.descent
 
-        layout.width = numpy.max([child.width for child in layout.children]) if layout.children else 0
-        layout.height = numpy.sum([child.height for child in layout.children]) if layout.children else 0
+        layout.width = numpy.max([line.width for line in layout.children]) if layout.children else 0
+        layout.height = numpy.sum([line.height for line in layout.children]) if layout.children else 0
 
 
     def compute_position(layout):
@@ -258,6 +258,8 @@ def layout(text, style, fonts):
         # ... align the first line's baseline with the anchor.
         #line_top = -layout.children[0].height + layout.children[0].baseline
         line_top = -layout.children[0].ascent
+
+        layout.top = line_top
 
         for line in layout.children:
             text_anchor = line.children[-1].style.get("text-anchor", "middle") if line.children else "middle"
@@ -279,6 +281,10 @@ def layout(text, style, fonts):
                 child.baseline = line.baseline - child.baseline - child.style["baseline-shift"]
                 left += child.width
             line_top += line.height
+
+        layout.bottom = line_top
+        layout.left = numpy.min([line.left for line in layout.children]) if layout.children else 0
+        layout.right = numpy.max([line.right for line in layout.children]) if layout.children else 0
 
     def cleanup_styles(layout):
         """Remove style properties that we don't want rendered (because their effect is already baked into box positions."""

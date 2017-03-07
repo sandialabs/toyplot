@@ -19,6 +19,37 @@ import toyplot.transform
 import toyplot.units
 
 
+def extent(layout, angle=0):
+    """Compute canvas coordinate extents for a text layout using the given angle.
+
+    Parameters
+    ----------
+    layout: :class:`toyplot.text.Layout`
+        Precomputed text layout.
+    angle: number, optional
+        Text rotation in degrees counter-clockwise.
+
+    Results
+    -------
+    left, right, top, bottom: number
+        Relative offsets from the layout anchor in canvas coordinates.
+    """
+    left, right, top, bottom = layout.left, layout.right, layout.top, layout.bottom
+    if angle:
+        transformation = toyplot.transform.rotation(angle)
+        corner1 = (left, top) * transformation
+        corner2 = (right, top) * transformation
+        corner3 = (right, bottom) * transformation
+        corner4 = (left, bottom) * transformation
+
+        left = min((corner1[0,0], corner2[0,0], corner3[0,0], corner4[0,0]))
+        right = max((corner1[0,0], corner2[0,0], corner3[0,0], corner4[0,0]))
+        top = min((corner1[0,1], corner2[0,1], corner3[0,1], corner4[0,1]))
+        bottom = max((corner1[0,1], corner2[0,1], corner3[0,1], corner4[0,1]))
+
+    return (left, right, top, bottom)
+
+
 def extents(text, angle, style):
     """Compute (inexact) extents for a text string, based on the given coordinates and style.
     """
@@ -89,12 +120,9 @@ def extents(text, angle, style):
         corner2.T[0], numpy.minimum(corner3.T[0], corner4.T[0])))
     right = numpy.maximum(corner1.T[0], numpy.maximum(
         corner2.T[0], numpy.maximum(corner3.T[0], corner4.T[0])))
-    top = -numpy.maximum(corner1.T[1],
-                         numpy.maximum(corner2.T[1],
-                                       numpy.maximum(corner3.T[1],
-                                                     corner4.T[1])))
-    bottom = - \
-        numpy.minimum(corner1.T[1], numpy.minimum(
+    top = -numpy.maximum(corner1.T[1], numpy.maximum(
+        corner2.T[1], numpy.maximum(corner3.T[1], corner4.T[1])))
+    bottom = -numpy.minimum(corner1.T[1], numpy.minimum(
             corner2.T[1], numpy.minimum(corner3.T[1], corner4.T[1])))
 
     return (left, right, top, bottom)
@@ -113,13 +141,13 @@ class LineBox(object):
 
 
 class TextBox(object):
-    """Container for text."""
+    """Container for a block of text that shares a single style."""
     def __init__(self, text, style):
         self.text = text
         self.style = style
 
 
-class LineBreak(object):
+class _LineBreak(object):
     """Representation for a single line break."""
     pass
 
@@ -191,7 +219,7 @@ def layout(text, style, fonts):
             return root
 
         if node.tag == "br":
-            root.children.append(LineBreak())
+            root.children.append(_LineBreak())
             return root
 
         raise ValueError("Unknown tag: %s" % node.tag)
@@ -201,7 +229,7 @@ def layout(text, style, fonts):
         children = layout.children
         layout.children = [LineBox()]
         for child in children:
-            if isinstance(child, LineBreak):
+            if isinstance(child, _LineBreak):
                 layout.children.append(LineBox())
             else:
                 layout.children[-1].children.append(child)
@@ -341,7 +369,7 @@ def layout(text, style, fonts):
     return root
 
 
-def dump(box, stream=None, level=0, indent="  "):
+def dump(box, stream=None, level=0, indent="  ", recursive=True):
     if stream is None:
         stream = sys.stdout
     stream.write(indent * level)
@@ -365,7 +393,7 @@ def dump(box, stream=None, level=0, indent="  "):
 
     stream.write("\n")
 
-    if hasattr(box, "children"):
+    if recursive and hasattr(box, "children"):
         for child in box.children:
             dump(box=child, stream=stream, level=level+1, indent=indent)
 

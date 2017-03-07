@@ -771,6 +771,7 @@ class Text(Mark):
         self._style = toyplot.style.combine(
             {
                 "alignment-baseline": "middle",
+                "font-family": "helvetica",
                 "font-size": "12px",
                 "font-weight": "normal",
                 "stroke": "none",

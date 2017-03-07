@@ -13,101 +13,33 @@ import xml.etree.ElementTree as xml
 import numpy
 
 import toyplot.broadcast
+import toyplot.font
 import toyplot.require
 import toyplot.style
 import toyplot.transform
 import toyplot.units
 
 
-def extent(layout, angle=0):
-    """Compute canvas coordinate extents for a text layout using the given angle.
-
-    Parameters
-    ----------
-    layout: :class:`toyplot.text.Layout`
-        Precomputed text layout.
-    angle: number, optional
-        Text rotation in degrees counter-clockwise.
-
-    Results
-    -------
-    left, right, top, bottom: number
-        Relative offsets from the layout anchor in canvas coordinates.
-    """
-    left, right, top, bottom = layout.left, layout.right, layout.top, layout.bottom
-    if angle:
-        transformation = toyplot.transform.rotation(angle)
-        corner1 = (left, top) * transformation
-        corner2 = (right, top) * transformation
-        corner3 = (right, bottom) * transformation
-        corner4 = (left, bottom) * transformation
-
-        left = min((corner1[0,0], corner2[0,0], corner3[0,0], corner4[0,0]))
-        right = max((corner1[0,0], corner2[0,0], corner3[0,0], corner4[0,0]))
-        top = min((corner1[0,1], corner2[0,1], corner3[0,1], corner4[0,1]))
-        bottom = max((corner1[0,1], corner2[0,1], corner3[0,1], corner4[0,1]))
-
-    return (left, right, top, bottom)
-
-
 def extents(text, angle, style):
-    """Compute (inexact) extents for a text string, based on the given coordinates and style.
+    """Compute canvas coordinate extents for a text string, based on the given angle and style.
     """
     text = toyplot.require.string_vector(text)
-    lengths = numpy.array([len(string) for string in text])
+    angle = toyplot.require.scalar_vector(angle)
+    style = toyplot.require.style(style, toyplot.require.style.text)
 
-    font_size = toyplot.units.convert(style["font-size"], target="px")
-    anchor_shift = toyplot.units.convert(
-        style.get(
-            "-toyplot-anchor-shift",
-            "0px"),
-        target="px",
-        reference=font_size)
-    text_anchor = style["text-anchor"]
-    baseline_shift = toyplot.units.convert(
-        style.get("baseline-shift", "0px"), target="px", reference=font_size)
-    alignment_baseline = style["alignment-baseline"]
+    # TODO: don't hard-code this.
+    fonts = toyplot.font.ReportlabLibrary()
 
-    x = toyplot.broadcast.scalar(anchor_shift, text.shape)
-    y = toyplot.broadcast.scalar(-baseline_shift, text.shape)
+    layouts = numpy.array([toyplot.text.layout(string, style, fonts) for string in text])
+    left = numpy.array([layout.left for layout in layouts])
+    right = numpy.array([layout.right for layout in layouts])
+    top = numpy.array([layout.top for layout in layouts])
+    bottom = numpy.array([layout.bottom for layout in layouts])
 
-    # Because we don't have any metrics for the font, assume that the average
-    # character width and height match the font size.
-    width = font_size * lengths
-    height = font_size
-
-    # Compute left/right extents relative to the text anchor.
-    if text_anchor == "start":
-        left = x
-        right = x + width
-    elif text_anchor == "middle":
-        left = x - width / 2
-        right = x + width / 2
-    elif text_anchor == "end":
-        left = x - width
-        right = x
-    else:
-        raise ValueError("Unknown text-anchor value: %s" % text_anchor)
-
-    # Compute top/bottom extents relative to the text baseline.
-    if alignment_baseline == "hanging":
-        top = y
-        bottom = y + height
-    elif alignment_baseline == "middle" or alignment_baseline == "central":
-        top = y - height / 2
-        bottom = y + height / 2
-    elif alignment_baseline == "alphabetic":
-        top = y - height
-        bottom = y
-    else:
-        raise ValueError(
-            "Unknown alignment-baseline value: %s" % alignment_baseline)
-
-    # Compute axis-aligned extents regardless of the text rotation angle.
-    corner1 = numpy.column_stack((left, -top))
-    corner2 = numpy.column_stack((right, -top))
-    corner3 = numpy.column_stack((right, -bottom))
-    corner4 = numpy.column_stack((left, -bottom))
+    corner1 = numpy.column_stack((left, top))
+    corner2 = numpy.column_stack((right, top))
+    corner3 = numpy.column_stack((right, bottom))
+    corner4 = numpy.column_stack((left, bottom))
 
     for index, theta in enumerate(angle):
         transformation = toyplot.transform.rotation(theta)

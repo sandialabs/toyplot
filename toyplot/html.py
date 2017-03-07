@@ -268,105 +268,135 @@ def _draw_text(
     if not text:
         return
 
+    style = toyplot.style.combine({"font-family": "helvetica"}, style)
+
     if attributes is None:
         attributes = {}
 
-    style = copy.copy(style)
-
-    font_size = toyplot.units.convert(style.pop("font-size"), target="px", default="px")
-    alignment_baseline = style.pop("alignment-baseline", "middle")
-
-    baseline_shift = 0
-    if alignment_baseline == "hanging":
-        baseline_shift = 0.75 * font_size
-    elif alignment_baseline == "central":
-        baseline_shift = font_size * 0.375
-    elif alignment_baseline == "middle":
-        baseline_shift = font_size * 0.28125
-    elif alignment_baseline == "alphabetic":
-        pass
-    baseline_shift -= toyplot.units.convert(style.pop("baseline-shift", 0), target="px", default="px", reference=font_size)
-    anchor_shift = toyplot.units.convert(style.pop("-toyplot-anchor-shift", 0), target="px", default="px", reference=font_size)
+    fonts = toyplot.font.ReportlabLibrary()
+    layout = text if isinstance(text, toyplot.text.Layout) else toyplot.text.layout(text, style, fonts)
 
     transform = "translate(%r,%r)" % (x, y)
     if angle:
         transform += "rotate(%r)" % (-angle)
-    if baseline_shift or anchor_shift:
-        transform += "translate(%r,%r)" % (anchor_shift, baseline_shift)
 
-    text_xml = xml.SubElement(
+    group = xml.SubElement(
         root,
-        "text",
+        "g",
         transform=transform,
-        style=_css_style(style),
         attrib=attributes,
         )
+
     if title is not None:
         xml.SubElement(text_xml, "title").text = str(title)
 
-    def cascade_styles(node, font_size):
-        dy = node.get("dy", 0)
-        style = toyplot.require.style(toyplot.style.parse(node.get("style", "")), allowed=toyplot.require.style.rich_text)
-        if "font-size" in style:
-            font_size = toyplot.units.convert(style.pop("font-size"), target="px", default="px", reference=font_size)
+    for line in layout.children:
+        for box in line.children:
+            if isinstance(box, toyplot.text.TextBox):
+                xml.SubElement(
+                    group,
+                    "text",
+                    x=str(box.left),
+                    y=str(box.baseline),
+                    style=toyplot.style.to_css(box.style),
+                    ).text = box.text
 
-        if node.tag in ["b", "strong"]:
-            style = toyplot.style.combine(style, {"font-weight":"bold"})
-        elif node.tag == "code":
-            style = toyplot.style.combine(style, {"font-family":"monospace"})
-        elif node.tag in ["em", "i"]:
-            style = toyplot.style.combine(style, {"font-style":"italic"})
-        elif node.tag == "small":
-            font_size *= 0.8
-        elif node.tag == "sub":
-            dy += 0.2 * font_size
-            font_size *= 0.7
-        elif node.tag == "sup":
-            dy += -0.3 * font_size
-            font_size *= 0.7
-        node.set("dy", dy)
-        node.set("style", style)
-        node.set("font-size", font_size)
-        for child in node:
-            cascade_styles(child, font_size)
-
-    def render_tree(tree, text_xml):
-        y = 0
-        current_y = 0
-        attributes = []
-        stack = [{"dy": 0, "style": None}]
-
-        for item in _walk_tree(tree):
-            #toyplot.log.debug(item)
-            if item[0] == "start":
-                dy = stack[-1]["dy"] + item[2]["dy"]
-                font_size = item[2]["font-size"]
-                style = toyplot.style.combine(stack[-1]["style"], item[2]["style"])
-                style["font-size"] = "%spx" % font_size
-                stack.append({"dy": dy, "style": style})
-
-                if item[1] == "br":
-                    attributes.append(("x", 0))
-                    y += 1.2 * font_size
-
-            elif item[0] == "text":
-                new_y = y + stack[-1]["dy"]
-                if new_y != current_y:
-                    attributes.append(("dy", new_y - current_y))
-                    current_y = new_y
-                style = stack[-1]["style"]
-
-                tspan_xml = xml.SubElement(text_xml, "tspan", attrib=_css_attrib(style))
-                tspan_xml.text = item[1]
-                for key, value in attributes:
-                    tspan_xml.set(key, str(value))
-                attributes = []
-            elif item[0] == "end":
-                stack.pop()
-
-    tree = xml.fromstring(("<root>" + text + "</root>").encode("utf-8"))
-    cascade_styles(tree, font_size)
-    render_tree(tree, text_xml)
+#    style = copy.copy(style)
+#
+#    font_size = toyplot.units.convert(style.pop("font-size"), target="px", default="px")
+#    alignment_baseline = style.pop("alignment-baseline", "middle")
+#
+#    baseline_shift = 0
+#    if alignment_baseline == "hanging":
+#        baseline_shift = 0.75 * font_size
+#    elif alignment_baseline == "central":
+#        baseline_shift = font_size * 0.375
+#    elif alignment_baseline == "middle":
+#        baseline_shift = font_size * 0.28125
+#    elif alignment_baseline == "alphabetic":
+#        pass
+#    baseline_shift -= toyplot.units.convert(style.pop("baseline-shift", 0), target="px", default="px", reference=font_size)
+#    anchor_shift = toyplot.units.convert(style.pop("-toyplot-anchor-shift", 0), target="px", default="px", reference=font_size)
+#
+#    transform = "translate(%r,%r)" % (x, y)
+#    if angle:
+#        transform += "rotate(%r)" % (-angle)
+#    if baseline_shift or anchor_shift:
+#        transform += "translate(%r,%r)" % (anchor_shift, baseline_shift)
+#
+#    text_xml = xml.SubElement(
+#        root,
+#        "text",
+#        transform=transform,
+#        style=_css_style(style),
+#        attrib=attributes,
+#        )
+#    if title is not None:
+#        xml.SubElement(text_xml, "title").text = str(title)
+#
+#    def cascade_styles(node, font_size):
+#        dy = node.get("dy", 0)
+#        style = toyplot.require.style(toyplot.style.parse(node.get("style", "")), allowed=toyplot.require.style.rich_text)
+#        if "font-size" in style:
+#            font_size = toyplot.units.convert(style.pop("font-size"), target="px", default="px", reference=font_size)
+#
+#        if node.tag in ["b", "strong"]:
+#            style = toyplot.style.combine(style, {"font-weight":"bold"})
+#        elif node.tag == "code":
+#            style = toyplot.style.combine(style, {"font-family":"monospace"})
+#        elif node.tag in ["em", "i"]:
+#            style = toyplot.style.combine(style, {"font-style":"italic"})
+#        elif node.tag == "small":
+#            font_size *= 0.8
+#        elif node.tag == "sub":
+#            dy += 0.2 * font_size
+#            font_size *= 0.7
+#        elif node.tag == "sup":
+#            dy += -0.3 * font_size
+#            font_size *= 0.7
+#        node.set("dy", dy)
+#        node.set("style", style)
+#        node.set("font-size", font_size)
+#        for child in node:
+#            cascade_styles(child, font_size)
+#
+#    def render_tree(tree, text_xml):
+#        y = 0
+#        current_y = 0
+#        attributes = []
+#        stack = [{"dy": 0, "style": None}]
+#
+#        for item in _walk_tree(tree):
+#            #toyplot.log.debug(item)
+#            if item[0] == "start":
+#                dy = stack[-1]["dy"] + item[2]["dy"]
+#                font_size = item[2]["font-size"]
+#                style = toyplot.style.combine(stack[-1]["style"], item[2]["style"])
+#                style["font-size"] = "%spx" % font_size
+#                stack.append({"dy": dy, "style": style})
+#
+#                if item[1] == "br":
+#                    attributes.append(("x", 0))
+#                    y += 1.2 * font_size
+#
+#            elif item[0] == "text":
+#                new_y = y + stack[-1]["dy"]
+#                if new_y != current_y:
+#                    attributes.append(("dy", new_y - current_y))
+#                    current_y = new_y
+#                style = stack[-1]["style"]
+#
+#                tspan_xml = xml.SubElement(text_xml, "tspan", attrib=_css_attrib(style))
+#                tspan_xml.text = item[1]
+#                for key, value in attributes:
+#                    tspan_xml.set(key, str(value))
+#                attributes = []
+#            elif item[0] == "end":
+#                stack.pop()
+#
+#    tree = xml.fromstring(("<root>" + text + "</root>").encode("utf-8"))
+#    cascade_styles(tree, font_size)
+#    render_tree(tree, text_xml)
 
 def _draw_marker(
         root,

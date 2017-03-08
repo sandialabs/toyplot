@@ -132,7 +132,7 @@ def render(svg, canvas):
         canvas.setStrokeColorRGB(color["r"], color["g"], color["b"])
         canvas.setStrokeAlpha(numpy.asscalar(color["a"]))
 
-    def render_element(root, element, canvas, styles, text_state=None):
+    def render_element(root, element, canvas, styles):
         canvas.saveState()
 
         current_style = {}
@@ -312,60 +312,24 @@ def render(svg, canvas):
                 r = float(element.get("r"))
                 canvas.circle(cx, cy, r, stroke=stroke is not None, fill=fill is not None)
             elif element.tag == "text":
-                text_state = {"x": 0, "y": 0, "chunks": [[]]}
-                for child in element:
-                    render_element(root, child, canvas, styles, text_state)
-                for chunk in text_state["chunks"]:
-                    width = sum([span[7] for span in chunk])
-
-                    dx = 0
-                    text_anchor = current_style.get("text-anchor", "start")
-                    if text_anchor == "middle":
-                        dx = -width * 0.5
-                    elif text_anchor == "end":
-                        dx = -width
-
-                    for x, y, fill, stroke, font_family, font_size, text, width in chunk:
-                        canvas.saveState()
-                        canvas.setFont(font_family, font_size)
-                        if fill is not None:
-                            set_fill_color(canvas, fill)
-                        if stroke is not None:
-                            set_stroke_color(canvas, stroke)
-                        canvas.translate(x + dx, y)
-                        canvas.scale(1, -1)
-                        canvas.drawString(0, 0, text)
-                        canvas.restoreState()
-
-            elif element.tag == "tspan":
-#                    if "font-weight" in current_style:
-#                        font_description.set_weight(
-#                            pango.WEIGHT_BOLD if current_style["font-weight"] == "bold" else pango.WEIGHT_NORMAL)
-                font_family = get_font_family(current_style)
-                font_size = toyplot.units.convert(current_style["font-size"].strip(), "px")
-
-                string_width = reportlab.pdfbase.pdfmetrics.stringWidth(element.text, font_family, font_size)
-                ascent, descent = reportlab.pdfbase.pdfmetrics.getAscentDescent(font_family, font_size)
-
-                if "x" in element.attrib:
-                    text_state["x"] = float(element.get("x"))
-                    text_state["chunks"].append([])
-
-                if "dy" in element.attrib:
-                    text_state["y"] += float(element.get("dy"))
-
-                x = text_state["x"]
-                y = text_state["y"]
-
-                baseline_shift = current_style.get("baseline-shift", "0").strip()
-                baseline_shift = toyplot.units.convert(baseline_shift, "px", "px", ascent - descent)
-                y -= baseline_shift
-
-                fill, fill_gradient = get_fill(root, current_style)
+                x = float(element.get("x"))
+                y = float(element.get("y"))
+                fill, fill_gradient = get_fill(element, current_style)
                 stroke = get_stroke(current_style)
+                font_family = get_font_family(current_style)
+                font_size = float(current_style["font-size"].strip())
+                text = element.text
 
-                text_state["chunks"][-1].append((x, y, fill, stroke, font_family, font_size, element.text, string_width))
-                text_state["x"] += string_width
+                canvas.saveState()
+                canvas.setFont(font_family, font_size)
+                if fill is not None:
+                    set_fill_color(canvas, fill)
+                if stroke is not None:
+                    set_stroke_color(canvas, stroke)
+                canvas.translate(x, y)
+                canvas.scale(1, -1)
+                canvas.drawString(0, 0, text)
+                canvas.restoreState()
 
             elif element.tag == "image":
                 # pylint: disable=redefined-variable-type

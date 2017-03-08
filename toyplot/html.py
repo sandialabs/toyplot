@@ -2565,11 +2565,9 @@ def _render(parent, mark, context):
     mark_xml = xml.SubElement(
         context.parent,
         "g",
-        style=_css_style(
-            mark._style),
         id=context.get_id(mark),
-        attrib={
-            "class": "toyplot-mark-Text"})
+        attrib={"class": "toyplot-mark-Text"},
+        )
     context.add_data(mark, mark._table, title="Text Data", filename=mark._filename)
     series_xml = xml.SubElement(
         mark_xml, "g", attrib={"class": "toyplot-Series"})

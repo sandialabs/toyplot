@@ -110,8 +110,8 @@ def layout(text, style, fonts):
         baseline_shift = node.style["baseline-shift"]
         baseline_shift = toyplot.units.convert(baseline_shift, target="px", default="px", reference=reference_font_size)
 
-        toyplot_text_anchor_shift = node.style["-toyplot-text-anchor-shift"]
-        toyplot_text_anchor_shift = toyplot.units.convert(toyplot_text_anchor_shift, target="px", default="px", reference=reference_font_size)
+        toyplot_anchor_shift = node.style["-toyplot-anchor-shift"]
+        toyplot_anchor_shift = toyplot.units.convert(toyplot_anchor_shift, target="px", default="px", reference=reference_font_size)
 
         # Note that baseline shift is the opposite of canvas coordinates (positive values shift UP)
         if node.tag == "small":
@@ -131,7 +131,7 @@ def layout(text, style, fonts):
         node.style["baseline-shift"] = baseline_shift
         node.style["font-size"] = font_size
         node.style["line-height"] = line_height
-        node.style["-toyplot-text-anchor-shift"] = toyplot_text_anchor_shift
+        node.style["-toyplot-anchor-shift"] = toyplot_anchor_shift
 
         for child in node:
             compute_styles(font_size, child)
@@ -247,7 +247,7 @@ def layout(text, style, fonts):
 
             for child in line.children:
                 # Child left/right/bottom/top are relative offsets from the layout anchor in canvas coordinates.
-                child.left = current_x + child.style["-toyplot-text-anchor-shift"]
+                child.left = current_x + child.style["-toyplot-anchor-shift"]
                 child.right = child.left + child.width
                 # Note that baseline-shift is the opposite of canvas coordinates (positive values shift UP)
                 child.baseline = line.baseline + child.baseline - child.style["baseline-shift"]
@@ -265,7 +265,7 @@ def layout(text, style, fonts):
         """Remove style properties that we don't want rendered (because their effect is already baked into box positions."""
         for line in layout.children:
             for child in line.children:
-                child.style.pop("-toyplot-text-anchor-shift", None)
+                child.style.pop("-toyplot-anchor-shift", None)
                 child.style.pop("alignment-baseline", None)
                 child.style.pop("baseline-shift", None)
                 child.style.pop("text-anchor", None)
@@ -278,7 +278,7 @@ def layout(text, style, fonts):
     dom = xml.fromstring(("<body>" + text + "</body>").encode("utf-8"))
 
     default_style = {
-        "-toyplot-text-anchor-shift": "0",
+        "-toyplot-anchor-shift": "0",
         "alignment-baseline": "middle",
         "baseline-shift": "0",
         "line-height": "normal",

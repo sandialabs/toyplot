@@ -270,17 +270,14 @@ def layout(text, style, fonts):
                 child.style.pop("baseline-shift", None)
                 child.style.pop("text-anchor", None)
 
-    if "font-family" not in style:
-        raise ValueError("style must specify font-family")
-    if "font-size" not in style:
-        raise ValueError("style must specify font-size")
-
     dom = xml.fromstring(("<body>" + text + "</body>").encode("utf-8"))
 
     default_style = {
         "-toyplot-anchor-shift": "0",
         "alignment-baseline": "middle",
         "baseline-shift": "0",
+        "font-family": "helvetica",
+        "font-size": "12px",
         "line-height": "normal",
         "text-anchor": "middle",
         "vertical-align": "baseline",

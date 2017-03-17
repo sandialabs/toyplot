@@ -293,6 +293,19 @@ def _draw_text(
     for line in layout.children:
         for box in line.children:
             if isinstance(box, toyplot.text.TextBox):
+                if box.style.get("-toyplot-text-baseline", None) == "visible":
+                    xml.SubElement(
+                        group,
+                        "line",
+                        x1=str(box.left),
+                        y1=str(box.baseline),
+                        x2=str(box.right),
+                        y2=str(box.baseline),
+                        stroke="black",
+                        fill="none",
+                        opacity="0.5",
+                        )
+
                 xml.SubElement(
                     group,
                     "text",

@@ -82,6 +82,7 @@ style.text = set([
     "text-anchor",
     "text-shadow",
     "-toyplot-anchor-shift",
+    "-toyplot-text-baseline",
     ])
 
 style.rich_text = set([

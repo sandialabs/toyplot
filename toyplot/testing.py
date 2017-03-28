@@ -180,7 +180,7 @@ def assert_html_equal(html, name):
     _assert_string_equal(html, test_file, reference_file)
 
 
-def assert_canvas_equal(canvas, name):
+def assert_canvas_equal(canvas, name, show_diff=True):
     test_file = os.path.join(failed_dir, "%s.svg" % name)
     reference_file = os.path.join(reference_dir, "%s.svg" % name)
 
@@ -220,14 +220,17 @@ def assert_canvas_equal(canvas, name):
             os.mkdir(failed_dir)
         with open(test_file, "wb") as stream:
             stream.write(svg.getvalue())
-        reference = subprocess.Popen(["xmldiff", test_file, reference_file], stdout=subprocess.PIPE)
-        test = subprocess.Popen(["xmldiff", reference_file, test_file], stdout=subprocess.PIPE)
-        message = "Test output %s doesn't match %s:\n\n*** Test -> Reference ***\n%s\n*** Reference -> Test ***\n%s\n" % (
-            test_file,
-            reference_file,
-            reference.communicate()[0],
-            test.communicate()[0],
-            )
+        if show_diff:
+            reference = subprocess.Popen(["xmldiff", test_file, reference_file], stdout=subprocess.PIPE)
+            test = subprocess.Popen(["xmldiff", reference_file, test_file], stdout=subprocess.PIPE)
+            message = "Test output %s doesn't match %s:\n\n*** Test -> Reference ***\n%s\n*** Reference -> Test ***\n%s\n" % (
+                test_file,
+                reference_file,
+                reference.communicate()[0],
+                test.communicate()[0],
+                )
+        else:
+            message = "Test output %s doesn't match %s.\n" % (test_file, reference_file)
         raise AssertionError(message)
 
 def read_png(fobj):

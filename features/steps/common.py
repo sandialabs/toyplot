@@ -15,7 +15,6 @@ def step_impl(context):
 
 @given(u'a set of cartesian axes')
 def step_impl(context):
-    context.canvas = toyplot.Canvas()
     context.axes = context.canvas.cartesian()
 
 
@@ -26,5 +25,6 @@ def step_impl(context):
 
 @then(u'the visualization should match the {reference} reference image')
 def step_impl(context, reference):
-    toyplot.testing.assert_canvas_equal(context.canvas, reference)
+    show_diff = context.config.userdata.getbool("show_diff", default=True)
+    toyplot.testing.assert_canvas_equal(context.canvas, reference, show_diff=show_diff)
 

@@ -1,6 +1,7 @@
 Feature: Color Broadcasting
     Scenario Outline: Color broadcasting use-cases
-        Given a set of cartesian axes
+        Given a default canvas
+        And a set of cartesian axes
         And a set of diverging series
         And a set of per-series values
         And a set of per-series colors

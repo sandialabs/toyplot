@@ -12,7 +12,7 @@ Feature: Color scale
 
   Scenario Outline: Canvas color scales
     Given a default canvas
-    And a set of default axes
+    And a set of cartesian axes
     And a <colormap>
     Then a <scale> can be added to the axes
     And the visualization should match the <reference> reference image

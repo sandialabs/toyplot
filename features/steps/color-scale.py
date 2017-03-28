@@ -23,10 +23,6 @@ def step_impl(context):
 def step_impl(context):
     context.canvas.color_scale(context.colormap, x1=100, x2=-100, y1=-100, y2=100)
 
-@given(u'a set of default axes')
-def step_impl(context):
-    context.axes = context.canvas.cartesian()
-
 @then(u'a color scale can be added to the axes')
 def step_impl(context):
     context.axes.color_scale(context.colormap)

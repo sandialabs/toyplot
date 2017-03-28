@@ -1,6 +1,7 @@
 Feature: Backends
   Scenario Outline: Render a canvas with a backend
     Given that the <backend> backend is available
+    And a default canvas
     And a set of cartesian axes
     And a sample plot
     Then the canvas can be rendered to <output>

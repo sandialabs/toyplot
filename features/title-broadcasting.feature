@@ -1,6 +1,7 @@
 Feature: Title Broadcasting
     Scenario Outline: Title broadcasting use-cases
-        Given a set of cartesian axes
+        Given a default canvas
+        And a set of cartesian axes
         And a set of diverging series
         And a set of per-series title values
         And a set of per-datum title values
@@ -31,7 +32,8 @@ Feature: Title Broadcasting
             | vlines                       | per-datum titles                 | title-broadcast-vlines-per-datum-titles |
 
     Scenario: Per-datum title broadcasting with one series
-        Given a set of cartesian axes
+        Given a default canvas
+        And a set of cartesian axes
         Then bars can be rendered with a single series and per-datum titles
         And the generated figure will match title-broadcast-bars-single-series-per-datum-titles
 

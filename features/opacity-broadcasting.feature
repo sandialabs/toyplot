@@ -1,6 +1,7 @@
 Feature: Opacity Broadcasting
     Scenario Outline: Opacity broadcasting use-cases
-        Given a set of cartesian axes
+        Given a default canvas
+        And a set of cartesian axes
         And a set of diverging series
         And a set of per-series opacity values
         And a set of per-datum opacity values
@@ -29,7 +30,8 @@ Feature: Opacity Broadcasting
             | vlines         | per-datum opacities   | opacity-broadcast-vlines-per-datum-opacities        |
 
     Scenario: Per-datum opacity broadcasting with one series
-        Given a set of cartesian axes
+        Given a default canvas
+        And a set of cartesian axes
         Then bars can be rendered with a single series and per-datum opacities
         And the generated figure will match opacity-broadcast-bars-single-series-per-datum-opacities
 

@@ -1,6 +1,7 @@
 Feature: Cartesian axes
     Scenario Outline: Cartesian axes API
-        Given a set of cartesian axes
+        Given a default canvas
+        And a set of cartesian axes
         And a sample plot
         Then the cartesian axes can be rendered <phrase>
         And the generated figure will match <reference>
@@ -58,7 +59,8 @@ Feature: Cartesian axes
         | with explicit y axis domain                           | axes-cartesian-y-domain |
 
     Scenario: Shared axis
-        Given a set of cartesian axes
+        Given a default canvas
+        And a set of cartesian axes
         And a sample plot
         And a shared axis
         Then the generated figure will match axes-cartesian-shared-x-axis

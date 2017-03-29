@@ -76,7 +76,8 @@ Feature: Color Broadcasting
             | vlines           | per-datum value + colormap colors           | color-broadcast-vlines-per-datum-values-colormap |
 
     Scenario Outline: Color broadcasting types
-        Given a set of cartesian axes
+        Given a default canvas
+        And a set of cartesian axes
         And a set of diverging series
         Then <mark> can be rendered with <type>
         And the generated figure will match <reference>

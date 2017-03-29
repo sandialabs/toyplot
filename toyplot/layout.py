@@ -23,7 +23,8 @@ def region(
         rect=None,
         corner=None,
         grid=None,
-        gutter=40):
+        gutter=None,
+        margin=None):
     """Specify a rectangular target region relative to a parent region.
 
     Parameters
@@ -36,9 +37,9 @@ def region(
       Minimum Y boundary of the parent region, specified in CSS pixel units.
     ymax: number, required
       Maximum Y boundary of the parent region, specified in CSS pixel units.
-    gutter: number, string, or (number, string) tuple, optional
+    margin: number, string, (number, string) tuple, or tuple containing between one and four numbers, strings, or (number, string) tuples, optional
       Padding around the target region, specified in real-world units.  Defaults
-      to CSS pixel units.  See :ref:`units` for details.
+      to CSS pixel units.  See :ref:`units` for details.  Follows the same behavior as the CSS margin property.
 
     Returns
     -------
@@ -46,7 +47,30 @@ def region(
       The boundaries of the target region, specified in CSS pixel units.
     """
 
-    gutter = toyplot.units.convert(gutter, "px", default="px")
+    if gutter is not None:
+        toyplot.log.warning("The gutter parameter is deprecated, use margin instead.")
+        margin = gutter
+
+    if margin is None:
+        margin = 0
+
+    if isinstance(margin, tuple):
+        if len(margin) == 4:
+            margin_top = toyplot.units.convert(margin[0], "px", default="px")
+            margin_right = toyplot.units.convert(margin[1], "px", default="px")
+            margin_bottom = toyplot.units.convert(margin[2], "px", default="px")
+            margin_left = toyplot.units.convert(margin[3], "px", default="px")
+        elif len(margin) == 3:
+            margin_top = toyplot.units.convert(margin[0], "px", default="px")
+            margin_left = margin_right = toyplot.units.convert(margin[1], "px", default="px")
+            margin_bottom = toyplot.units.convert(margin[2], "px", default="px")
+        elif len(margin) == 2:
+            margin_top = margin_bottom = toyplot.units.convert(margin[0], "px", default="px")
+            margin_left = margin_right = toyplot.units.convert(margin[1], "px", default="px")
+        elif len(margin) == 1:
+            margin_top = margin_bottom = margin_left = margin_right = toyplot.units.convert(margin[0], "px", default="px")
+    else:
+        margin_top = margin_bottom = margin_left = margin_right = toyplot.units.convert(margin, "px", default="px")
 
     def convert(vmin, vmax, value):
         value = toyplot.units.convert(
@@ -179,13 +203,13 @@ def region(
         cell_height = (ymax - ymin) / M
 
         return (
-            (j * cell_width) + gutter,
-            ((j + colspan) * cell_width) - gutter,
-            (i * cell_height) + gutter,
-            ((i + rowspan) * cell_height) - gutter,
+            (j * cell_width) + margin_left,
+            ((j + colspan) * cell_width) - margin_right,
+            (i * cell_height) + margin_top,
+            ((i + rowspan) * cell_height) - margin_bottom,
         )
     # If nothing else fits, consume the entire region
-    return (xmin + gutter, xmax - gutter, ymin + gutter, ymax - gutter)
+    return (xmin + margin_left, xmax - margin_right, ymin + margin_top, ymax - margin_bottom)
 
 
 class Graph(object):

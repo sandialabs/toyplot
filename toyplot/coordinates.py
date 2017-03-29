@@ -1709,7 +1709,8 @@ class Cartesian(object):
             rect=None,
             corner=None,
             grid=None,
-            gutter=50,
+            gutter=None,
+            margin=50,
             style=None,
             label_style=None,
         ): # pylint: disable=no-self-use

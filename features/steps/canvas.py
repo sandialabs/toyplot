@@ -28,8 +28,8 @@ def step_impl(context):
 def step_impl(context):
     context.canvas.cartesian(grid=(3, 3, 0), label="3x3")
     context.canvas.cartesian(grid=(3, 3, 0, 1, 1, 2), label="3x3 colspan=2")
-    context.canvas.cartesian(grid=(3, 3, 1, 0), gutter=30, label="3x3 gutter=30")
-    context.canvas.cartesian(grid=(3, 3, 1, 1), gutter=30, label="3x3 gutter=30")
+    context.canvas.cartesian(grid=(3, 3, 1, 0), margin=30, label="3x3 margin=30")
+    context.canvas.cartesian(grid=(3, 3, 1, 1), margin=30, label="3x3 margin=30")
     context.canvas.cartesian(
         grid=(
             3,
@@ -38,8 +38,8 @@ def step_impl(context):
             2,
             2,
             1),
-        gutter=30,
-        label="3x3 gutter=30 rowspan=2")
+        margin=30,
+        label="3x3 margin=30 rowspan=2")
 
 @then(u'axes can be added to the canvas using corner layout.')
 def step_impl(context):

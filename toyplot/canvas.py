@@ -248,7 +248,8 @@ class Canvas(object):
             rect=None,
             corner=None,
             grid=None,
-            gutter=50,
+            gutter=None,
+            margin=50,
             xmin=None,
             xmax=None,
             ymin=None,
@@ -275,6 +276,7 @@ class Canvas(object):
             corner=corner,
             grid=grid,
             gutter=gutter,
+            margin=margin,
             xmin=xmin,
             xmax=xmax,
             ymin=ymin,
@@ -299,7 +301,8 @@ class Canvas(object):
             rect=None,
             corner=None,
             grid=None,
-            gutter=50,
+            gutter=None,
+            margin=50,
             xmin=None,
             xmax=None,
             ymin=None,
@@ -347,7 +350,7 @@ class Canvas(object):
           left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
           a set of i, column-span, j, row-span coordinates so the legend can cover
           more than one cell.
-        gutter: size of the gutter around grid cells, optional
+        margin: size of the margin around grid cells, optional
           Specifies the amount of empty space to leave between grid cells When using the
           `grid` parameter for positioning.  Assumes CSS pixels by default, and supports
           all of the absolute units described in :ref:`units`.
@@ -378,7 +381,7 @@ class Canvas(object):
         axes: :class:`toyplot.coordinates.Cartesian`
         """
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
-            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter, margin=margin)
         self._children.append(
             toyplot.coordinates.Cartesian(
                 xmin_range,
@@ -412,7 +415,8 @@ class Canvas(object):
             rect=None,
             corner=None,
             grid=None,
-            gutter=50,
+            gutter=None,
+            margin=50,
             label=None,
             style=None,
             label_style=None,
@@ -451,7 +455,7 @@ class Canvas(object):
           left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
           a set of i, column-span, j, row-span coordinates so the legend can cover
           more than one cell.
-        gutter: size of the gutter around grid cells, optional
+        margin: size of the margin around grid cells, optional
           Specifies the amount of empty space to leave between grid cells When using the
           `grid` parameter to position the legend.
         style: dict, optional
@@ -461,15 +465,13 @@ class Canvas(object):
         -------
         legend: :class:`toyplot.coordinates.Table`
         """
-        gutter = toyplot.require.scalar(gutter)
-
         if style is not None:
             toyplot.log.warning("The style parameter is deprecated and ignored, use the table API to alter legend appearance instead.")
         if label_style is not None:
             toyplot.log.warning("The label_style parameter is deprecated and ignored, use the table API to alter legend appearance instead.")
 
         xmin, xmax, ymin, ymax = toyplot.layout.region(
-            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter, margin=margin)
 
         table = toyplot.coordinates.Table(
             xmin,
@@ -531,7 +533,8 @@ class Canvas(object):
             rect=None,
             corner=None,
             grid=None,
-            gutter=50,
+            gutter=None,
+            margin=50,
             filename=None,
         ):
         """Add a matrix visualization to the canvas.
@@ -556,7 +559,7 @@ class Canvas(object):
                 )
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
-            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter, margin=margin)
 
         table = toyplot.coordinates.Table(
             xmin_range,
@@ -682,7 +685,8 @@ class Canvas(object):
             rect=None,
             corner=None,
             grid=None,
-            gutter=50,
+            gutter=None,
+            margin=50,
             min=None,
             max=None,
             show=True,
@@ -727,6 +731,7 @@ class Canvas(object):
             corner=corner,
             grid=grid,
             gutter=gutter,
+            margin=margin,
             min=min,
             max=max,
             show=show,
@@ -754,7 +759,8 @@ class Canvas(object):
             rect=None,
             corner=None,
             grid=None,
-            gutter=50,
+            gutter=None,
+            margin=50,
             min=None,
             max=None,
             show=True,
@@ -794,7 +800,7 @@ class Canvas(object):
         axes: :class:`toyplot.coordinates.Cartesian`
         """
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
-            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter, margin=margin)
 
         if x1 is None:
             x1 = xmin_range
@@ -861,7 +867,8 @@ class Canvas(object):
             rect=None,
             corner=None,
             grid=None,
-            gutter=50,
+            gutter=None,
+            margin=50,
             annotation=False,
             filename=None,
         ):
@@ -893,7 +900,7 @@ class Canvas(object):
             rcolumns = 0
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
-            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter, margin=margin)
         table = toyplot.coordinates.Table(
             xmin_range,
             xmax_range,
@@ -944,7 +951,8 @@ class Canvas(object):
             rect=None,
             corner=None,
             grid=None,
-            gutter=50,
+            gutter=None,
+            margin=50,
         ):
         """Add an image to the canvas.
 
@@ -977,7 +985,7 @@ class Canvas(object):
           left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
           a set of i, column-span, j, row-span coordinates so the legend can cover
           more than one cell.
-        gutter: size of the gutter around grid cells, optional
+        margin: size of the margin around grid cells, optional
           Specifies the amount of empty space to leave between grid cells When using the
           `grid` parameter for positioning.  Assumes CSS pixels by default, and supports
           all of the absolute units described in :ref:`units`.
@@ -993,7 +1001,7 @@ class Canvas(object):
             data = colormap.colors(data)
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
-            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
+            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter, margin=margin)
 
         self._children.append(
             toyplot.mark.Image(

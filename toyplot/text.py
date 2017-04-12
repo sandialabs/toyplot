@@ -176,7 +176,7 @@ def layout(text, style, fonts):
                     font = fonts.font(box.style)
                     box.width = font.width(box.text)
 
-                    # Box baseline is its relative offset from the line baseline in canvas coordinates
+                    # Box baseline is the relative offset from the line baseline in canvas coordinates
                     alignment_baseline = box.style["alignment-baseline"]
                     if alignment_baseline == "alphabetic":
                         box.baseline = 0
@@ -194,12 +194,14 @@ def layout(text, style, fonts):
                     # Box bottom is the relative offset from the line baseline in canvas coordinates
                     box.bottom = box.baseline - font.descent
 
-                    text_height = box.bottom - box.top
-                    line_height = box.style["line-height"]
-                    line_extra = (line_height - text_height) * 0.5
-                    if line_extra > 0:
-                        box.top -= line_extra
-                        box.bottom += line_extra
+#                    text_height = box.bottom - box.top
+#                    line_height = box.style["line-height"]
+#                    line_extra = (line_height - text_height) * 0.5
+#                    if line_extra > 0:
+#                        box.top -= line_extra
+#                        box.bottom += line_extra
+
+                    box.height = box.bottom - box.top
                 else:
                     raise Exception("Unexpected box type: %s" % box)
 
@@ -218,16 +220,16 @@ def layout(text, style, fonts):
         """Compute top + bottom + left + right coordinates for line boxes + text boxes, relative to the layout anchor."""
 
         # Center the layout vertically on the anchor, or ...
-        #current_y = -layout.height * 0.5
+        #current_baseline = -layout.height * 0.5
         # ... align the top of the layout with the anchor, or ...
-        #current_y = 0
+        #current_baseline = 0
         # ... align the bottom of the layout with the anchor, or ...
-        #current_y = -layout.height
+        #current_baseline = -layout.height
         # ... align the first line's baseline with the anchor.
-        current_y = layout.children[0].top
+        current_baseline = 0
 
         # Layout top is the relative offset from the layout anchor in canvas coordinates (positive = down)
-        layout.top = current_y
+        layout.top = current_baseline
 
         for line in layout.children:
             text_anchor = line.children[-1].style.get("text-anchor", "middle") if line.children else "middle"
@@ -243,23 +245,25 @@ def layout(text, style, fonts):
             # Line left/right/bottom/top are relative offsets from the layout anchor in canvas coordinates.
             line.left = current_x
             line.right = current_x + line.width
-            line.baseline = current_y - line.top
-            line.top += line.baseline
-            line.bottom += line.baseline
+            line.top += current_baseline
+            line.baseline = current_baseline
+            line.bottom += current_baseline
 
             for child in line.children:
                 # Child left/right/bottom/top are relative offsets from the layout anchor in canvas coordinates.
                 child.left = current_x + child.style["-toyplot-anchor-shift"]
                 child.right = child.left + child.width
+                child.top += current_baseline
+                child.baseline += current_baseline
+                child.bottom += current_baseline
                 # Note that baseline-shift is the opposite of canvas coordinates (positive values shift UP)
-                child.baseline = line.baseline + child.baseline - child.style["baseline-shift"]
-                child.top += child.baseline
-                child.bottom += child.baseline
+                child.baseline -= child.style["baseline-shift"]
+
                 current_x += child.width
-            current_y += line.height
+            current_baseline += line.height
 
         # Layout left/right/bottom are relative offsets from the layout anchor in canvas coordinates
-        layout.bottom = current_y
+        layout.bottom = current_baseline
         layout.left = numpy.min([line.left for line in layout.children]) if layout.children else 0
         layout.right = numpy.max([line.right for line in layout.children]) if layout.children else 0
 

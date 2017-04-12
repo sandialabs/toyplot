@@ -158,13 +158,15 @@ def layout(text, style, fonts):
 
     def split_lines(layout):
         """Convert a flat layout into a two level hierarchy of line boxes containing text boxes."""
-        children = layout.children
-        layout.children = [LineBox()]
-        for child in children:
+        children = []
+        for child in layout.children:
             if isinstance(child, _LineBreak):
-                layout.children.append(LineBox())
+                children.append(LineBox())
             else:
-                layout.children[-1].children.append(child)
+                if not children:
+                    children.append(LineBox())
+                children[-1].children.append(child)
+        layout.children = children
 
     def compute_size(fonts, layout):
         """Compute width + height for the layout + line boxes + text boxes."""

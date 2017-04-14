@@ -577,7 +577,7 @@ class Canvas(object):
             if tlocator is None:
                 tlocator = toyplot.locator.Integer(step=step)
             for j, label, title in zip(*tlocator.ticks(0, matrix.shape[1] - 1)): # pylint: disable=unused-variable
-                table.top.cell[1, j].data = label
+                table.top.cell[1, int(j)].data = label
                 #table.top.cell[1, j].title = title
 
         if lshow is None:
@@ -586,7 +586,7 @@ class Canvas(object):
             if llocator is None:
                 llocator = toyplot.locator.Integer(step=step)
             for i, label, title in zip(*llocator.ticks(0, matrix.shape[0] - 1)): # pylint: disable=unused-variable
-                table.left.cell[i, 1].data = label
+                table.left.cell[int(i), 1].data = label
                 #table.left.cell[i, 1].title = title
 
         if rshow is None and rlocator is not None:
@@ -595,7 +595,7 @@ class Canvas(object):
             if rlocator is None:
                 rlocator = toyplot.locator.Integer(step=step)
             for i, label, title in zip(*rlocator.ticks(0, matrix.shape[0] - 1)): # pylint: disable=unused-variable
-                table.right.cell[i, 0].data = label
+                table.right.cell[int(i), 0].data = label
                 #table.right.cell[i, 0].title = title
 
         if bshow is None and blocator is not None:
@@ -604,7 +604,7 @@ class Canvas(object):
             if blocator is None:
                 blocator = toyplot.locator.Integer(step=step)
             for j, label, title in zip(*blocator.ticks(0, matrix.shape[1] - 1)): # pylint: disable=unused-variable
-                table.bottom.cell[0, j].data = label
+                table.bottom.cell[0, int(j)].data = label
                 #table.bottom.cell[0, j].title = title
 
         table.body.cells.data = matrix

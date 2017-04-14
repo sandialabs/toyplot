@@ -770,7 +770,7 @@ class Text(Mark):
         # Text style
         self._style = toyplot.style.combine(
             {
-                "alignment-baseline": "middle",
+                "-toyplot-vertical-align": "middle",
                 "font-family": "helvetica",
                 "font-size": "12px",
                 "font-weight": "normal",
@@ -824,7 +824,7 @@ class Legend(Mark):
         # Styles the legend labels
         self._lstyle = toyplot.style.combine(
             {
-                "alignment-baseline": "middle",
+                "-toyplot-vertical-align": "middle",
                 "font-size":"12px",
                 "stroke":"none",
             },

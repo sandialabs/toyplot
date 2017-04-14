@@ -193,7 +193,7 @@ def layout(text, style, fonts):
                     elif alignment_baseline == "middle":
                         box.baseline = font.ascent * 0.35
                     else:
-                        raise ValueError("Unknown alignment-baseline: %s" % alignment_baseline)
+                        raise ValueError("Unknown alignment-baseline value: %s" % alignment_baseline)
 
                     # Box top is the relative offset from the line baseline in canvas coordinates
                     box.top = box.baseline - font.ascent
@@ -225,7 +225,7 @@ def layout(text, style, fonts):
     def compute_position(layout):
         """Compute top + bottom + left + right coordinates for line boxes + text boxes, relative to the layout anchor."""
 
-        toyplot_vertical_align = layout.style.get("-toyplot-vertical-align", "middle")
+        toyplot_vertical_align = layout.style["-toyplot-vertical-align"]
         # Align the first line's baseline with the anchor.
         if toyplot_vertical_align == "baseline":
             offset_y = 0
@@ -239,16 +239,18 @@ def layout(text, style, fonts):
         elif toyplot_vertical_align == "bottom":
             offset_y = -(layout.height + layout.children[0].top)
         else:
-            raise ValueError("Unknown -toyplot-alignment-baseline: %s" % toyplot_vertical_align)
+            raise ValueError("Unknown -toyplot-vertical-align value: %s" % toyplot_vertical_align)
 
         for line in layout.children:
-            text_anchor = line.style.get("text-anchor", "middle") if line.children else "middle"
+            text_anchor = line.style["text-anchor"] if line.children else "middle"
             if text_anchor == "start":
                 anchor_offset = 0
             elif text_anchor == "middle":
                 anchor_offset = -line.width * 0.5
             elif text_anchor == "end":
                 anchor_offset = -line.width
+            else:
+                raise ValueError("Unknown text-anchor value: %s" % text_anchor)
 
             offset_x = anchor_offset
 
@@ -286,6 +288,7 @@ def layout(text, style, fonts):
         for line in layout.children:
             for child in line.children:
                 child.style.pop("-toyplot-anchor-shift", None)
+                child.style.pop("-toyplot-vertical-align", None)
                 child.style.pop("alignment-baseline", None)
                 child.style.pop("baseline-shift", None)
                 child.style.pop("text-anchor", None)
@@ -295,11 +298,14 @@ def layout(text, style, fonts):
 
     default_style = {
         "-toyplot-anchor-shift": "0",
-        "alignment-baseline": "middle",
+        "-toyplot-vertical-align": "middle",
+        "alignment-baseline": "alphabetic",
         "baseline-shift": "0",
         "font-family": "helvetica",
         "font-size": "12px",
+        "font-weight": "normal",
         "line-height": "normal",
+        "stroke": "none",
         "text-anchor": "middle",
         "vertical-align": "baseline",
         "white-space": "pre",

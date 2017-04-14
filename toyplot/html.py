@@ -564,11 +564,11 @@ def _draw_marker(
             y=cy,
             style=toyplot.style.combine(
                 {
-                    "stroke": "none",
+                    "-toyplot-vertical-align": "middle",
                     "fill": toyplot.color.near_black,
-                    "text-anchor": "middle",
-                    "alignment-baseline": "middle",
                     "font-size": "%rpx" % (size * 0.75),
+                    "stroke": "none",
+                    "text-anchor": "middle",
                 },
                 label_style,
                 shape_label_style),
@@ -1156,14 +1156,14 @@ def _render(canvas, axis, context): # pylint: disable=unused-argument
             location = axis._tick_labels_location
 
             if axis.ticks.labels.angle:
-                alignment_baseline = "central"
+                vertical_align = "middle"
 
                 if location == "above":
                     text_anchor = "start" if axis.ticks.labels.angle > 0 else "end"
                 elif location == "below":
                     text_anchor = "end" if axis.ticks.labels.angle > 0 else "start"
             else:
-                alignment_baseline = "alphabetic" if location == "above" else "hanging"
+                vertical_align = "bottom" if location == "above" else "top"
                 text_anchor = "middle"
 
             y = axis._tick_labels_offset if location == "below" else -axis._tick_labels_offset
@@ -1179,7 +1179,7 @@ def _render(canvas, axis, context): # pylint: disable=unused-argument
 
                 style = toyplot.style.combine(
                     {
-                        "alignment-baseline": alignment_baseline,
+                        "-toyplot-vertical-align": vertical_align,
                         "text-anchor": text_anchor,
                     },
                     axis.ticks.labels.style,
@@ -1197,7 +1197,7 @@ def _render(canvas, axis, context): # pylint: disable=unused-argument
                     )
 
         location = axis._label_location
-        alignment_baseline = "alphabetic" if location == "above" else "hanging"
+        vertical_align = "bottom" if location == "above" else "top"
         text_anchor = "middle"
         y = axis._label_offset if location == "below" else -axis._label_offset
 
@@ -1208,7 +1208,7 @@ def _render(canvas, axis, context): # pylint: disable=unused-argument
             y=y,
             style=toyplot.style.combine(
                 {
-                    "alignment-baseline": alignment_baseline,
+                    "-toyplot-vertical-align": vertical_align,
                     "text-anchor": text_anchor,
                 },
                 axis.label.style,
@@ -1593,7 +1593,7 @@ def _render(canvas, axes, context): # pylint: disable=unused-argument
                     root=axes_xml,
                     x=x,
                     y=y,
-                    style=toyplot.style.combine(cell_lstyle, {"text-anchor": "begin"}),
+                    style=toyplot.style.combine(cell_lstyle, {"text-anchor": "start"}),
                     text=prefix + separator + suffix,
                     )
             elif cell_align == "center":
@@ -1635,7 +1635,7 @@ def _render(canvas, axes, context): # pylint: disable=unused-argument
                     root=axes_xml,
                     x=x + 2,
                     y=y,
-                    style=toyplot.style.combine(cell_lstyle, {"text-anchor": "begin"}),
+                    style=toyplot.style.combine(cell_lstyle, {"text-anchor": "start"}),
                     text=suffix,
                     )
 

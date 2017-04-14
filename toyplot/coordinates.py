@@ -1576,7 +1576,7 @@ class Cartesian(object):
                 "font-weight": "normal",
                 "stroke": "none",
                 "text-anchor": "middle",
-                "alignment-baseline": "middle",
+                "-toyplot-vertical-align": "middle",
             },
             toyplot.require.style(vlstyle, allowed=toyplot.require.style.text),
             )
@@ -2245,16 +2245,7 @@ class Cartesian(object):
         table["angle"] = toyplot.broadcast.scalar(angle, table.shape[0])
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])
-        style = toyplot.style.combine(
-            {
-                "alignment-baseline": "middle",
-                "font-size": "12px",
-                "font-weight": "normal",
-                "stroke": "none",
-                "text-anchor": "middle",
-            },
-            toyplot.require.style(style, allowed=toyplot.require.style.text),
-            )
+        style = toyplot.require.style(style, allowed=toyplot.require.style.text)
 
         default_color = [next(self._text_colors)]
 
@@ -2653,9 +2644,6 @@ class Table(object):
 
             self.style = {
                 "font-weight": "bold",
-                "stroke": "none",
-                "text-anchor": "middle",
-                "alignment-baseline": "middle",
                 }
             self.style = style
 

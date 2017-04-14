@@ -83,19 +83,9 @@ style.text = set([
     "text-shadow",
     "-toyplot-anchor-shift",
     "-toyplot-text-baseline",
+    "-toyplot-text-box",
     ])
 
-style.rich_text = set([
-    "fill",
-    "fill-opacity",
-    "font-family",
-    "font-size",
-    "font-weight",
-    "opacity",
-    "stroke",
-    "stroke-opacity",
-    "stroke-width",
-    ])
 
 def instance(value, types):
     """Verify the type of a value."""

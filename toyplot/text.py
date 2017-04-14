@@ -194,12 +194,12 @@ def layout(text, style, fonts):
                     # Box bottom is the relative offset from the line baseline in canvas coordinates
                     box.bottom = box.baseline - font.descent
 
-#                    text_height = box.bottom - box.top
-#                    line_height = box.style["line-height"]
-#                    line_extra = (line_height - text_height) * 0.5
-#                    if line_extra > 0:
-#                        box.top -= line_extra
-#                        box.bottom += line_extra
+                    text_height = box.bottom - box.top
+                    line_height = box.style["line-height"]
+                    line_extra = (line_height - text_height) * 0.5
+                    if line_extra > 0:
+                        box.top -= line_extra
+                        box.bottom += line_extra
 
                     box.height = box.bottom - box.top
                 else:
@@ -219,17 +219,8 @@ def layout(text, style, fonts):
     def compute_position(layout):
         """Compute top + bottom + left + right coordinates for line boxes + text boxes, relative to the layout anchor."""
 
-        # Center the layout vertically on the anchor, or ...
-        #current_baseline = -layout.height * 0.5
-        # ... align the top of the layout with the anchor, or ...
-        #current_baseline = 0
-        # ... align the bottom of the layout with the anchor, or ...
-        #current_baseline = -layout.height
         # ... align the first line's baseline with the anchor.
-        current_baseline = 0
-
-        # Layout top is the relative offset from the layout anchor in canvas coordinates (positive = down)
-        layout.top = current_baseline
+        current_y = 0
 
         for line in layout.children:
             text_anchor = line.children[-1].style.get("text-anchor", "middle") if line.children else "middle"
@@ -245,27 +236,28 @@ def layout(text, style, fonts):
             # Line left/right/bottom/top are relative offsets from the layout anchor in canvas coordinates.
             line.left = current_x
             line.right = current_x + line.width
-            line.top += current_baseline
-            line.baseline = current_baseline
-            line.bottom += current_baseline
+            line.top += current_y
+            line.baseline = current_y
+            line.bottom += current_y
 
             for child in line.children:
                 # Child left/right/bottom/top are relative offsets from the layout anchor in canvas coordinates.
                 child.left = current_x + child.style["-toyplot-anchor-shift"]
                 child.right = child.left + child.width
-                child.top += current_baseline
-                child.baseline += current_baseline
-                child.bottom += current_baseline
+                child.top += current_y
+                child.baseline += current_y
+                child.bottom += current_y
                 # Note that baseline-shift is the opposite of canvas coordinates (positive values shift UP)
                 child.baseline -= child.style["baseline-shift"]
 
                 current_x += child.width
-            current_baseline += line.height
+            current_y += line.height
 
-        # Layout left/right/bottom are relative offsets from the layout anchor in canvas coordinates
-        layout.bottom = current_baseline
+        # Layout top/left/right/bottom are relative offsets from the layout anchor in canvas coordinates
+        layout.top = layout.children[0].top if layout.children else 0
         layout.left = numpy.min([line.left for line in layout.children]) if layout.children else 0
         layout.right = numpy.max([line.right for line in layout.children]) if layout.children else 0
+        layout.bottom = layout.children[-1].bottom if layout.children else 0
 
     def cleanup_styles(layout):
         """Remove style properties that we don't want rendered (because their effect is already baked into box positions."""

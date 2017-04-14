@@ -219,12 +219,24 @@ def layout(text, style, fonts):
             line.width = numpy.sum([child.width for child in line.children]) if line.children else 0
             line.height = line.bottom - line.top
 
+        layout.height = numpy.sum([line.height for line in layout.children]) if layout.children else 0
+
 
     def compute_position(layout):
         """Compute top + bottom + left + right coordinates for line boxes + text boxes, relative to the layout anchor."""
 
-        # ... align the first line's baseline with the anchor.
-        offset_y = 0
+        toyplot_alignment_baseline = layout.style.get("-toyplot-alignment-baseline", "baseline")
+        if toyplot_alignment_baseline == "baseline":
+            # ... align the first line's baseline with the anchor.
+            offset_y = 0
+        elif toyplot_alignment_baseline == "top":
+            offset_y = -layout.children[0].top
+        elif toyplot_alignment_baseline == "middle":
+            offset_y = -((layout.height * 0.5) + layout.children[0].top)
+        elif toyplot_alignment_baseline == "bottom":
+            offset_y = -(layout.height + layout.children[0].top)
+        else:
+            raise ValueError("Unknown -toyplot-alignment-baseline: %s" % toyplot_alignment_baseline)
 
         for line in layout.children:
             text_anchor = line.style.get("text-anchor", "middle") if line.children else "middle"

@@ -82,6 +82,7 @@ style.text = set([
     "stroke-width",
     "text-anchor",
     "text-shadow",
+    "-toyplot-alignment-baseline",
     "-toyplot-anchor-shift",
     "-toyplot-text-layout-visibility",
     "-toyplot-text-layout-line-visibility",

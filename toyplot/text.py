@@ -225,18 +225,21 @@ def layout(text, style, fonts):
     def compute_position(layout):
         """Compute top + bottom + left + right coordinates for line boxes + text boxes, relative to the layout anchor."""
 
-        toyplot_alignment_baseline = layout.style.get("-toyplot-alignment-baseline", "baseline")
-        if toyplot_alignment_baseline == "baseline":
-            # ... align the first line's baseline with the anchor.
+        toyplot_vertical_align = layout.style.get("-toyplot-vertical-align", "middle")
+        # Align the first line's baseline with the anchor.
+        if toyplot_vertical_align == "baseline":
             offset_y = 0
-        elif toyplot_alignment_baseline == "top":
+        # Align the top of the layout with the anchor.
+        elif toyplot_vertical_align == "top":
             offset_y = -layout.children[0].top
-        elif toyplot_alignment_baseline == "middle":
+        # Align the middle of the layout with the anchor.
+        elif toyplot_vertical_align == "middle":
             offset_y = -((layout.height * 0.5) + layout.children[0].top)
-        elif toyplot_alignment_baseline == "bottom":
+        # Align the bottom of the layout with the anchor.
+        elif toyplot_vertical_align == "bottom":
             offset_y = -(layout.height + layout.children[0].top)
         else:
-            raise ValueError("Unknown -toyplot-alignment-baseline: %s" % toyplot_alignment_baseline)
+            raise ValueError("Unknown -toyplot-alignment-baseline: %s" % toyplot_vertical_align)
 
         for line in layout.children:
             text_anchor = line.style.get("text-anchor", "middle") if line.children else "middle"

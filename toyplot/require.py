@@ -75,6 +75,7 @@ style.text = set([
     "font-family",
     "font-size",
     "font-weight",
+    "line-height",
     "opacity",
     "stroke",
     "stroke-opacity",

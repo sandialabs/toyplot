@@ -32,7 +32,7 @@ def parse(css):
     for declaration in css.split(";"):
         if declaration:
             key, value = declaration.split(":")
-            result[key] = value
+            result[key] = value.strip()
     return result
 
 def _color_fixup(styles):

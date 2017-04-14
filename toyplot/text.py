@@ -62,13 +62,15 @@ def extents(text, angle, style):
 
 class Layout(object):
     """Top-level container for one-or-more lines of text."""
-    def __init__(self):
+    def __init__(self, style):
+        self.style = style
         self.children = []
 
 
 class LineBox(object):
     """Container for one line of text."""
-    def __init__(self):
+    def __init__(self, style):
+        self.style = style
         self.children = []
 
 
@@ -139,7 +141,7 @@ def layout(text, style, fonts):
     def build_formatting_model(node, root=None):
         """Convert the XML DOM into a flat layout containing text boxes and line breaks."""
         if node.tag == "body":
-            root = Layout()
+            root = Layout(node.style)
 
         if node.tag in ["body", "b", "code", "i", "em", "small", "span", "strong", "sub", "sup"]:
             if node.text:
@@ -159,13 +161,17 @@ def layout(text, style, fonts):
     def split_lines(layout):
         """Convert a flat layout into a two level hierarchy of line boxes containing text boxes."""
         children = []
+        current_line = None
+
         for child in layout.children:
             if isinstance(child, _LineBreak):
-                children.append(LineBox())
+                current_line = None
             else:
-                if not children:
-                    children.append(LineBox())
-                children[-1].children.append(child)
+                if current_line is None:
+                    current_line = LineBox(child.style)
+                    children.append(current_line)
+                current_line.children.append(child)
+
         layout.children = children
 
     def compute_size(fonts, layout):

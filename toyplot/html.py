@@ -290,8 +290,31 @@ def _draw_text(
     if title is not None:
         xml.SubElement(text_xml, "title").text = str(title)
 
+    if layout.style.get("-toyplot-text-layout-visibility", None) == "visible":
+        xml.SubElement(
+            group,
+            "rect",
+            x=str(layout.left),
+            y=str(layout.top),
+            width=str(layout.width),
+            height=str(layout.height),
+            stroke="red",
+            fill="none",
+            opacity="0.5",
+            )
+        xml.SubElement(
+            group,
+            "circle",
+            x="0",
+            y="0",
+            r="3",
+            stroke="none",
+            fill="red",
+            opacity="0.5",
+            )
+
     for line in layout.children:
-        if True:
+        if line.style.get("-toyplot-text-layout-line-visibility", None) == "visible":
             xml.SubElement(
                 group,
                 "rect",
@@ -299,7 +322,7 @@ def _draw_text(
                 y=str(line.top),
                 width=str(line.width),
                 height=str(line.height),
-                stroke="blue",
+                stroke="green",
                 fill="none",
                 opacity="0.5",
                 )
@@ -310,13 +333,13 @@ def _draw_text(
                 y1=str(line.baseline),
                 x2=str(line.right),
                 y2=str(line.baseline),
-                stroke="blue",
+                stroke="green",
                 fill="none",
                 opacity="0.5",
                 )
         for box in line.children:
             if isinstance(box, toyplot.text.TextBox):
-                if box.style.get("-toyplot-text-box", None) == "visible":
+                if box.style.get("-toyplot-text-layout-box-visibility", None) == "visible":
                     xml.SubElement(
                         group,
                         "rect",
@@ -324,11 +347,10 @@ def _draw_text(
                         y=str(box.top),
                         width=str(box.width),
                         height=str(box.height),
-                        stroke="black",
+                        stroke="blue",
                         fill="none",
                         opacity="0.5",
                         )
-                if box.style.get("-toyplot-text-baseline", None) == "visible":
                     xml.SubElement(
                         group,
                         "line",
@@ -336,7 +358,7 @@ def _draw_text(
                         y1=str(box.baseline),
                         x2=str(box.right),
                         y2=str(box.baseline),
-                        stroke="black",
+                        stroke="blue",
                         fill="none",
                         opacity="0.5",
                         )

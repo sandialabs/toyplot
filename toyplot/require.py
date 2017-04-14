@@ -82,8 +82,9 @@ style.text = set([
     "text-anchor",
     "text-shadow",
     "-toyplot-anchor-shift",
-    "-toyplot-text-baseline",
-    "-toyplot-text-box",
+    "-toyplot-text-layout-visibility",
+    "-toyplot-text-layout-line-visibility",
+    "-toyplot-text-layout-box-visibility",
     ])
 
 

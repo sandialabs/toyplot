@@ -301,6 +301,7 @@ def layout(text, style, fonts):
         "-toyplot-vertical-align": "middle",
         "alignment-baseline": "alphabetic",
         "baseline-shift": "0",
+        "fill": toyplot.color.near_black,
         "font-family": "helvetica",
         "font-size": "12px",
         "font-weight": "normal",

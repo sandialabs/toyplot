@@ -3343,10 +3343,6 @@ class Table(object):
         self._gstyle = {"stroke": toyplot.color.near_black, "stroke-width": 0.5}
 
         lstyle = {
-            "font-size": "12px",
-            "stroke": "none",
-            "fill": toyplot.color.near_black,
-            "alignment-baseline": "middle",
             }
         self._cell_lstyle[...] = lstyle
         self._cell_align[...] = "center"

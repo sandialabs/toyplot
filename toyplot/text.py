@@ -227,8 +227,11 @@ def layout(text, style, fonts):
 
         toyplot_vertical_align = layout.style["-toyplot-vertical-align"]
         # Align the first line's baseline with the anchor.
-        if toyplot_vertical_align == "baseline":
+        if toyplot_vertical_align == "first-baseline":
             offset_y = 0
+        # Align the last line's baseline with the anchor.
+        elif toyplot_vertical_align == "last-baseline":
+            offset_y = -(layout.height + layout.children[0].top - layout.children[-1].bottom)
         # Align the top of the layout with the anchor.
         elif toyplot_vertical_align == "top":
             offset_y = -layout.children[0].top

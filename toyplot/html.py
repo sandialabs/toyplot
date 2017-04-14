@@ -1163,7 +1163,7 @@ def _render(canvas, axis, context): # pylint: disable=unused-argument
                 elif location == "below":
                     text_anchor = "end" if axis.ticks.labels.angle > 0 else "start"
             else:
-                vertical_align = "baseline" if location == "above" else "top"
+                vertical_align = "last-baseline" if location == "above" else "top"
                 text_anchor = "middle"
 
             y = axis._tick_labels_offset if location == "below" else -axis._tick_labels_offset
@@ -1197,7 +1197,7 @@ def _render(canvas, axis, context): # pylint: disable=unused-argument
                     )
 
         location = axis._label_location
-        vertical_align = "bottom" if location == "above" else "top"
+        vertical_align = "last-baseline" if location == "above" else "top"
         text_anchor = "middle"
         y = axis._label_offset if location == "below" else -axis._label_offset
 

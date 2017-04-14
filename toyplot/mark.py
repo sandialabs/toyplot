@@ -824,9 +824,7 @@ class Legend(Mark):
         # Styles the legend labels
         self._lstyle = toyplot.style.combine(
             {
-                "-toyplot-vertical-align": "middle",
-                "font-size":"12px",
-                "stroke":"none",
+                "text-anchor": "start",
             },
             toyplot.require.style(lstyle, allowed=toyplot.require.style.text),
             )

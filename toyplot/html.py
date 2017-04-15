@@ -288,7 +288,7 @@ def _draw_text(
         )
 
     if title is not None:
-        xml.SubElement(text_xml, "title").text = str(title)
+        xml.SubElement(group, "title").text = str(title)
 
     if layout.style.get("-toyplot-text-layout-visibility", None) == "visible":
         xml.SubElement(

@@ -72,51 +72,90 @@ def step_impl(context):
             "-toyplot-anchor-shift": "10px"})
     context.axes.scatterplot(0, 0, color="black")
 
-@given(u'text with hanging alignment')
+@given(u'text with vertical alignment top')
 def step_impl(context):
+    text = """First line<br/>Second line<br/>Third line"""
     context.axes.text(
         0,
         0,
-        "Text!",
+        text,
         style={
             "font-size": "24px",
-            "alignment-baseline": "hanging"})
+            "-toyplot-vertical-align": "top",
+		})
     context.axes.scatterplot(0, 0, color="black")
 
 
-@given(u'text with central alignment')
+@given(u'text with vertical alignment first baseline')
 def step_impl(context):
+    text = """First line<br/>Second line<br/>Third line"""
     context.axes.text(
         0,
         0,
-        "Text!",
+        text,
         style={
             "font-size": "24px",
-            "alignment-baseline": "central"})
+            "-toyplot-vertical-align": "first-baseline",
+		})
     context.axes.scatterplot(0, 0, color="black")
 
 
-@given(u'text with middle alignment')
+@given(u'text with vertical alignment middle')
 def step_impl(context):
+    text = """First line<br/>Second line<br/>Third line"""
     context.axes.text(
         0,
         0,
-        "Text!",
+        text,
         style={
             "font-size": "24px",
-            "alignment-baseline": "middle"})
+            "-toyplot-vertical-align": "middle",
+		})
     context.axes.scatterplot(0, 0, color="black")
 
 
-@given(u'text with alphabetic alignment')
+@given(u'text with vertical alignment last baseline')
 def step_impl(context):
+    text = """First line<br/>Second line<br/>Third line"""
     context.axes.text(
         0,
         0,
-        "Text!",
+        text,
         style={
             "font-size": "24px",
-            "alignment-baseline": "alphabetic"})
+            "-toyplot-vertical-align": "last-baseline",
+		})
+    context.axes.scatterplot(0, 0, color="black")
+
+
+@given(u'text with vertical alignment bottom')
+def step_impl(context):
+    text = """First line<br/>Second line<br/>Third line"""
+    context.axes.text(
+        0,
+        0,
+        text,
+        style={
+            "font-size": "24px",
+            "-toyplot-vertical-align": "bottom",
+		})
+    context.axes.scatterplot(0, 0, color="black")
+
+
+@given(u'text with alignment baselines')
+def step_impl(context):
+    text = """<span style="alignment-baseline:alphabetic">Alphabetic</span>
+<span style="alignment-baseline:middle">Middle</span>
+<span style="alignment-baseline:central">Central</span>
+<span style="alignment-baseline:hanging">Hanging</span>"""
+
+    context.axes.text(
+        0,
+        0,
+        text,
+        style={
+            "font-size": "24px",
+		})
     context.axes.scatterplot(0, 0, color="black")
 
 

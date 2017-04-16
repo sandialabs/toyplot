@@ -15,14 +15,19 @@ Feature: Text
           | angled anchor shift          | text-anchor-shift-angled           |
 
         Examples: Vertical Alignment
+          | phrase                            | reference                              |
+          | vertical alignment top            | text-vertical-alignment-top            |
+          | vertical alignment first baseline | text-vertical-alignment-first-baseline |
+          | vertical alignment middle         | text-vertical-alignment-middle         |
+          | vertical alignment last baseline  | text-vertical-alignment-last-baseline  |
+          | vertical alignment bottom         | text-vertical-alignment-bottom         |
+          | positive baseline shift           | text-baseline-shift-positive           |
+          | negative baseline shift           | text-baseline-shift-negative           |
+          | angled baseline shift             | text-baseline-shift-angled             |
+
+        Examples: Alignment Baseline
           | phrase                       | reference                          |
-          | hanging alignment            | text-alignment-baseline-hanging    |
-          | central alignment            | text-alignment-baseline-central    |
-          | middle alignment             | text-alignment-baseline-middle     |
-          | alphabetic alignment         | text-alignment-baseline-alphabetic |
-          | positive baseline shift      | text-baseline-shift-positive       |
-          | negative baseline shift      | text-baseline-shift-negative       |
-          | angled baseline shift        | text-baseline-shift-angled         |
+          | alignment baselines          | text-alignment-baselines           |
 
     Scenario: Unknown text-anchor value
         Given a set of cartesian axes

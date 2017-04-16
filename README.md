@@ -1,4 +1,5 @@
 # Welcome!
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/sandialabs/toyplot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 <img src="artwork/toyplot.png" width="300" style="float:right"/>
 

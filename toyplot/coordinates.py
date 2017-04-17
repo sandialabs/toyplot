@@ -1859,7 +1859,7 @@ class Cartesian(object):
                 series = a
                 position = numpy.ma.arange(series.shape[0])
 
-        default_color = [next(self._plot_colors) for i in range(series.shape[1])] # pylint: disable=unused-variable
+        default_color = [next(self._plot_colors) for i in range(series.shape[1])]
         stroke = toyplot.color.broadcast(
             colors=color,
             shape=(series.shape[1],),
@@ -2058,7 +2058,7 @@ class Cartesian(object):
                 series = a
                 position = numpy.ma.arange(series.shape[0])
 
-        default_color = [next(self._scatterplot_colors) for i in range(series.shape[1])] # pylint: disable=unused-variable
+        default_color = [next(self._scatterplot_colors) for i in range(series.shape[1])]
         mfill = toyplot.color.broadcast(
             colors=color,
             shape=series.shape,
@@ -2346,8 +2346,8 @@ class Numberline(object):
             y2,
             padding,
             spacing,
-            min, # pylint: disable=redefined-builtin
-            max, # pylint: disable=redefined-builtin
+            min,
+            max,
             show,
             label,
             ticklocator,
@@ -2483,7 +2483,7 @@ class Numberline(object):
         elif coordinates.ndim == 2:
             pass
 
-        default_color = [next(self._scatterplot_colors) for i in range(coordinates.shape[1])] # pylint: disable=unused-variable
+        default_color = [next(self._scatterplot_colors) for i in range(coordinates.shape[1])]
         mfill = toyplot.color.broadcast(
             colors=color,
             shape=coordinates.shape,
@@ -2966,7 +2966,7 @@ class Table(object):
         format = property(fset=_set_format)
 
         def _set_height(self, value):
-            row_indices, column_indices = self._table._selection_coordinates(self._selection) # pylint: disable=unused-variable
+            row_indices, column_indices = self._table._selection_coordinates(self._selection)
             self._table._row_heights[row_indices] = toyplot.units.convert(value, "px", "px")
         height = property(fset=_set_height)
 
@@ -2995,7 +2995,7 @@ class Table(object):
         link = property(fset=_set_link)
 
         def _set_width(self, value):
-            row_indices, column_indices = self._table._selection_coordinates(self._selection) # pylint: disable=unused-variable
+            row_indices, column_indices = self._table._selection_coordinates(self._selection)
             self._table._column_widths[column_indices] = toyplot.units.convert(value, "px", "px")
         width = property(fset=_set_width)
 
@@ -3101,7 +3101,7 @@ class Table(object):
             Table.CellReference.__init__(self, table, selection)
 
         def delete(self):
-            row_indices, column_indices = self._table._selection_coordinates(self._selection) # pylint: disable=unused-variable
+            row_indices, column_indices = self._table._selection_coordinates(self._selection)
             self._table._delete_cells(column_indices, axis=1)
 
     class RowCellReference(CellReference):
@@ -3109,7 +3109,7 @@ class Table(object):
             Table.CellReference.__init__(self, table, selection)
 
         def delete(self):
-            row_indices, column_indices = self._table._selection_coordinates(self._selection) # pylint: disable=unused-variable
+            row_indices, column_indices = self._table._selection_coordinates(self._selection)
             self._table._delete_cells(row_indices, axis=0)
 
     class DistanceArrayReference(object):
@@ -3184,12 +3184,12 @@ class Table(object):
                 if before is not None:
                     table, region = self._region._selection()
                     region[Ellipsis, before] = True
-                    rows, columns = numpy.nonzero(table) # pylint: disable=unused-variable
+                    rows, columns = numpy.nonzero(table)
                     before = numpy.unique(columns)
                 if after is not None:
                     table, region = self._region._selection()
                     region[Ellipsis, after] = True
-                    rows, columns = numpy.nonzero(table) # pylint: disable=unused-variable
+                    rows, columns = numpy.nonzero(table)
                     after = numpy.unique(columns)
                 self._region._table._insert_cells(before=before, after=after, axis=1)
 
@@ -3208,12 +3208,12 @@ class Table(object):
                 if before is not None:
                     table, region = self._region._selection()
                     region[before, Ellipsis] = True
-                    rows, columns = numpy.nonzero(table) # pylint: disable=unused-variable
+                    rows, columns = numpy.nonzero(table)
                     before = numpy.unique(rows)
                 if after is not None:
                     table, region = self._region._selection()
                     region[after, Ellipsis] = True
-                    rows, columns = numpy.nonzero(table) # pylint: disable=unused-variable
+                    rows, columns = numpy.nonzero(table)
                     after = numpy.unique(rows)
                 self._region._table._insert_cells(before=before, after=after, axis=0)
 

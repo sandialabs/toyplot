@@ -10,13 +10,13 @@ without the use of code-modification tools like `2to3`.  The
 from __future__ import division
 
 try:
-    string_type = basestring # pylint: disable=undefined-variable
+    string_type = basestring
 except:  # pragma: no cover
     string_type = str
 
 try:
-    basestring # pylint: disable=undefined-variable
-    unicode_type = unicode # pylint: disable=undefined-variable
+    basestring
+    unicode_type = unicode
 except:  # pragma: no cover
     unicode_type = str
 

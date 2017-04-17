@@ -341,7 +341,7 @@ def _add_at(target, target_indices, source):
 
 def _adjacency_list(vcount, edges):
     """Return an adjacency list representation of a graph."""
-    targets = [[] for i in numpy.arange(vcount)] # pylint: disable=unused-variable
+    targets = [[] for i in numpy.arange(vcount)]
     for source, target in edges:
         targets[source].append(target)
     return targets
@@ -573,7 +573,7 @@ class Eades(GraphLayout):
 
         # Repeatedly apply attract / repel forces to the vertices
         vertices = numpy.column_stack(numpy.triu_indices(n=len(vcoordinates), k=1))
-        for iteration in numpy.arange(self._M): # pylint: disable=unused-variable
+        for iteration in numpy.arange(self._M):
             offsets = numpy.zeros_like(vcoordinates)
 
             # Repel
@@ -696,7 +696,7 @@ class Buchheim(GraphLayout):
         # Convert the graph to an adjacency list
         children = _adjacency_list(len(vcoordinates), edges)
         # Ensure we actually have a tree
-        root, depth = _require_tree(children) # pylint: disable=unused-variable
+        root, depth = _require_tree(children)
 
         # Get rid of the mask, it complicates things.
         vcoordinates = numpy.array(vcoordinates)

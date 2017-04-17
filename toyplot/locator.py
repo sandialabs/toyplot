@@ -55,7 +55,7 @@ class Uniform(TickLocator):
       Format string used to generate labels from tick locations.
     """
 
-    def __init__(self, count=5, format="{:g}"): # pylint: disable=redefined-builtin
+    def __init__(self, count=5, format="{:g}"):
         self._count = count
         self._format = format
 
@@ -109,7 +109,7 @@ class Explicit(TickLocator):
             locations=None,
             labels=None,
             titles=None,
-            format="{:g}"): # pylint: disable=redefined-builtin
+            format="{:g}"):
 
         if locations is not None and labels is not None:
             locations = numpy.array(locations).astype("float64")
@@ -188,7 +188,7 @@ class Extended(TickLocator):
       Format string used to generate labels from tick locations.
     """
 
-    def __init__(self, count=5, steps=None, weights=None, only_inside=False, format="{0:.{digits}f}"): # pylint: disable=redefined-builtin
+    def __init__(self, count=5, steps=None, weights=None, only_inside=False, format="{0:.{digits}f}"):
 
         self._count = count
         self._steps = steps if steps is not None else [1, 5, 2, 2.5, 4, 3]
@@ -252,14 +252,13 @@ class Extended(TickLocator):
             v = 1
             return (n - i) / (n - 1.0) + v - j
 
-        def legibility(lmin, lmax, lstep): # pylint: disable=unused-argument
+        def legibility(lmin, lmax, lstep):
             return 1
 
-        def legibility_max(lmin, lmax, lstep): # pylint: disable=unused-argument,unused-variable
+        def legibility_max(lmin, lmax, lstep):
             return 1  # pragma: no cover
 
         def extended(dmin, dmax, m, Q, only_inside, w):
-            # pylint: disable=unused-variable
             n = len(Q)
             best_score = -2.0
 
@@ -321,7 +320,6 @@ class Extended(TickLocator):
                 j = j + 1
             return best
 
-        # pylint: disable=unused-variable
         lmin, lmax, lstep, q, k = extended(
             domain_min, domain_max, self._count - 1, self._steps, self._only_inside, self._weights)
         locations = numpy.arange(k) * lstep + lmin
@@ -345,7 +343,7 @@ class Heckbert(TickLocator):
       Format string used to generate labels from tick locations.
     """
 
-    def __init__(self, count=5, format="{0:.{digits}f}"): # pylint: disable=redefined-builtin
+    def __init__(self, count=5, format="{0:.{digits}f}"):
 
         self._count = count
         self._format = format
@@ -473,7 +471,7 @@ class Log(TickLocator):
 
     """
 
-    def __init__(self, base=10, format="{base}<sup> {exponent}</sup>"): # pylint: disable=redefined-builtin
+    def __init__(self, base=10, format="{base}<sup> {exponent}</sup>"):
 
         self._base = base
         self._format = format
@@ -681,7 +679,7 @@ class Timestamp(TickLocator):
     >>> toyplot.locator.Timestamp(format="{0:dddd}, {0:MMMM} {0:D}, {0:YYYY}")
     """
 
-    def __init__(self, count=None, interval=None, timezone="utc", format=None): # pylint: disable=redefined-builtin
+    def __init__(self, count=None, interval=None, timezone="utc", format=None):
         # pylint: disable=redefined-variable-type
         if interval is not None:
             if isinstance(interval, toyplot.compatibility.string_type):

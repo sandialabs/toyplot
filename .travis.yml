@@ -2,7 +2,7 @@ sudo: false
 language: python
 python:
     - "2.7"
-    - "3.4"
+    - "3.6"
 addons:
     apt:
         packages:
@@ -17,7 +17,7 @@ install:
     - conda update -q conda
     - conda info -a
     - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION graphviz mock multipledispatch networkx numpy=1.8.2 pandas=0.14.1 pillow pip reportlab
-#    - if [[ $TRAVIS_PYTHON_VERSION != '2.7' ]]; then conda install pylint; fi
+    - conda install pylint=1.6.4
     - source activate test-environment
     - pip install arrow behave "colormath>=2.1.0" coverage coveralls nose-exclude pypng
     - wget http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz

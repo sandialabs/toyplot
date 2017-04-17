@@ -7,6 +7,27 @@
 Release Notes
 =============
 
+Toyplot 0.14.0 - April 17, 2017
+-------------------------------
+
+* Completely new text layout that explicitly positions all text.
+* Experimental support for hyperlinks in table cells.
+* Return a scalar instead of an array when accessing toyplot.data.Table using a single column name and row index.
+* Correct a bug that caused text baselines to be computed incorrectly in PDF output.
+* Add pylint to the regression test suite.
+* Allow font-family to be used in inline rich text styles.
+* Created an API to retrieve font metrics.
+* Disable obnoxious colormath logging by default.
+* Mention XML escaping for rich text in the user guide.
+* The "<" and ">" markers were rendered reversed.
+* Eliminate warnings using a Pandas series as the baseline for a bar plot.
+* Make it easier to disable graph vertex labels.
+* Allow stroke-linecap for CSS line styles.
+* Improve rasterized PNG output quality.
+* Warn when using older versions of ghostscript that produce lower-quality PNG output.
+* Suppress the "No handlers could be found for logger toyplot" warning.
+* Rewrote the logic for detecting Ghostscript.
+
 Toyplot 0.13.0 - July 22, 2016
 ------------------------------
 

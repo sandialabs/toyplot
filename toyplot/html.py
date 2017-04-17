@@ -9,7 +9,6 @@ from __future__ import division, absolute_import
 import base64
 import collections
 import copy
-import io
 import itertools
 import json
 import string

@@ -152,4 +152,3 @@ class ReportlabLibrary(Library):
         ("times", False, True): "Times-Italic",
         ("times", True, True): "Times-BoldItalic",
         }
-

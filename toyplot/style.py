@@ -60,4 +60,3 @@ def _color_fixup(styles):
 def to_css(*styles):
     style = _color_fixup(combine(*styles))
     return ";".join(["%s:%s" % (key, value) for key, value in sorted(style.items())])
-

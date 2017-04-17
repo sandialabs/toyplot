@@ -10,10 +10,7 @@ from __future__ import division
 
 import distutils.version
 import io
-import itertools
-import os.path
 import subprocess
-import sys
 
 import reportlab.pdfgen.canvas
 
@@ -80,7 +77,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     surface.showPage()
     surface.save()
 
-    command = [
+    command = [ # pylint: disable=redefined-outer-name
         _gs_command,
         "-dSAFER",
         "-dBATCH",
@@ -154,7 +151,7 @@ def render_frames(canvas, width=None, height=None, scale=None):
         surface.showPage()
         surface.save()
 
-        command = [
+        command = [ # pylint: disable=redefined-outer-name
             "gs",
             "-dNOPAUSE",
             "-dBATCH",

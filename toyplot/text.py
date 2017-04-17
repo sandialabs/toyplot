@@ -55,7 +55,7 @@ def extents(text, angle, style):
     top = -numpy.maximum(corner1.T[1], numpy.maximum(
         corner2.T[1], numpy.maximum(corner3.T[1], corner4.T[1])))
     bottom = -numpy.minimum(corner1.T[1], numpy.minimum(
-            corner2.T[1], numpy.minimum(corner3.T[1], corner4.T[1])))
+        corner2.T[1], numpy.minimum(corner3.T[1], corner4.T[1])))
 
     return (left, right, top, bottom)
 
@@ -158,7 +158,7 @@ def layout(text, style, fonts):
 
         raise ValueError("Unknown tag: %s" % node.tag)
 
-    def split_lines(layout):
+    def split_lines(layout): # pylint: disable=redefined-outer-name
         """Convert a flat layout into a two level hierarchy of line boxes containing text boxes."""
         children = []
         current_line = None
@@ -174,7 +174,7 @@ def layout(text, style, fonts):
 
         layout.children = children
 
-    def compute_size(fonts, layout):
+    def compute_size(fonts, layout): # pylint: disable=redefined-outer-name
         """Compute width + height for the layout + line boxes + text boxes."""
         for line in layout.children:
             for box in line.children:
@@ -222,7 +222,7 @@ def layout(text, style, fonts):
         layout.height = numpy.sum([line.height for line in layout.children]) if layout.children else 0
 
 
-    def compute_position(layout):
+    def compute_position(layout): # pylint: disable=redefined-outer-name
         """Compute top + bottom + left + right coordinates for line boxes + text boxes, relative to the layout anchor."""
 
         toyplot_vertical_align = layout.style["-toyplot-vertical-align"]
@@ -286,7 +286,7 @@ def layout(text, style, fonts):
         layout.height = layout.bottom - layout.top
 
 
-    def cleanup_styles(layout):
+    def cleanup_styles(layout): # pylint: disable=redefined-outer-name
         """Remove style properties that we don't want rendered (because their effect is already baked into box positions."""
         for line in layout.children:
             for child in line.children:
@@ -356,4 +356,3 @@ def dump(box, stream=None, level=0, indent="  ", recursive=True):
     if recursive and hasattr(box, "children"):
         for child in box.children:
             dump(box=child, stream=stream, level=level+1, indent=indent)
-

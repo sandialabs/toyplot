@@ -100,19 +100,19 @@ def layout(text, style, fonts):
             node_style = toyplot.require.style(toyplot.style.parse(node.attrib["style"]), toyplot.require.style.text)
             style = toyplot.style.combine(style, node_style)
 
-        node.style = copy.deepcopy(style)
+        node.set("style", copy.deepcopy(style))
         for child in node:
             cascade_styles(style, child)
 
     def compute_styles(reference_font_size, node):
         """Compute explicit numeric CSS pixel values for the baseline-shift, font-size, line-height, and -toyplot-text-anchor-shift properties."""
-        font_size = node.style["font-size"]
+        font_size = node.get("style")["font-size"]
         font_size = toyplot.units.convert(font_size, target="px", default="px", reference=reference_font_size)
 
-        baseline_shift = node.style["baseline-shift"]
+        baseline_shift = node.get("style")["baseline-shift"]
         baseline_shift = toyplot.units.convert(baseline_shift, target="px", default="px", reference=reference_font_size)
 
-        toyplot_anchor_shift = node.style["-toyplot-anchor-shift"]
+        toyplot_anchor_shift = node.get("style")["-toyplot-anchor-shift"]
         toyplot_anchor_shift = toyplot.units.convert(toyplot_anchor_shift, target="px", default="px", reference=reference_font_size)
 
         # Note that baseline shift is the opposite of canvas coordinates (positive values shift UP)
@@ -125,15 +125,15 @@ def layout(text, style, fonts):
             font_size *= 0.7
             baseline_shift += 0.3 * font_size
 
-        line_height = node.style["line-height"]
+        line_height = node.get("style")["line-height"]
         if line_height == "normal":
             line_height = "120%"
         line_height = toyplot.units.convert(line_height, target="px", default="px", reference=font_size)
 
-        node.style["baseline-shift"] = baseline_shift
-        node.style["font-size"] = font_size
-        node.style["line-height"] = line_height
-        node.style["-toyplot-anchor-shift"] = toyplot_anchor_shift
+        node.get("style")["baseline-shift"] = baseline_shift
+        node.get("style")["font-size"] = font_size
+        node.get("style")["line-height"] = line_height
+        node.get("style")["-toyplot-anchor-shift"] = toyplot_anchor_shift
 
         for child in node:
             compute_styles(font_size, child)
@@ -141,15 +141,15 @@ def layout(text, style, fonts):
     def build_formatting_model(node, root=None):
         """Convert the XML DOM into a flat layout containing text boxes and line breaks."""
         if node.tag == "body":
-            root = Layout(node.style)
+            root = Layout(node.get("style"))
 
         if node.tag in ["body", "b", "code", "i", "em", "small", "span", "strong", "sub", "sup"]:
             if node.text:
-                root.children.append(TextBox(node.text, node.style))
+                root.children.append(TextBox(node.text, node.get("style")))
             for child in node:
                 build_formatting_model(child, root)
                 if child.tail:
-                    root.children.append(TextBox(child.tail, node.style)) # Note: the tail doesn't get the child's style
+                    root.children.append(TextBox(child.tail, node.get("style"))) # Note: the tail doesn't get the child's style
             return root
 
         if node.tag == "br":

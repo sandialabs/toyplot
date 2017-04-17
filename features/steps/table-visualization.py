@@ -264,9 +264,9 @@ def step_impl(context, region, celltype, position, selection):
         raise ValueError("Unknown cell type: %s" % celltype)
 
     if position == "before":
-        accessor.insert(before=selection)
+        accessor.insert(before=int(selection))
     elif position == "after":
-        accessor.insert(after=selection)
+        accessor.insert(after=int(selection))
     else:
         raise ValueError("Unknown position: %s" % position)
 

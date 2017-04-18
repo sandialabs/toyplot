@@ -338,6 +338,13 @@ def _draw_text(
                 )
         for box in line.children:
             if isinstance(box, toyplot.text.TextBox):
+                xml.SubElement(
+                    group,
+                    "text",
+                    x=str(box.left),
+                    y=str(box.baseline),
+                    style=toyplot.style.to_css(box.style),
+                    ).text = box.text
                 if box.style.get("-toyplot-text-layout-box-visibility", None) == "visible":
                     xml.SubElement(
                         group,
@@ -362,13 +369,38 @@ def _draw_text(
                         opacity="0.5",
                         )
 
-                xml.SubElement(
+            elif isinstance(box, toyplot.text.MarkerBox):
+                _draw_marker(
                     group,
-                    "text",
-                    x=str(box.left),
-                    y=str(box.baseline),
-                    style=toyplot.style.to_css(box.style),
-                    ).text = box.text
+                    cx=(box.left + box.right) * 0.5,
+                    cy=(box.top + box.bottom) * 0.5,
+                    size=box.height,
+                    marker=box.marker.to_dict(),
+                    )
+                if box.style.get("-toyplot-text-layout-box-visibility", None) == "visible":
+                    xml.SubElement(
+                        group,
+                        "rect",
+                        x=str(box.left),
+                        y=str(box.top),
+                        width=str(box.width),
+                        height=str(box.height),
+                        stroke="blue",
+                        fill="none",
+                        opacity="0.5",
+                        )
+                    xml.SubElement(
+                        group,
+                        "line",
+                        x1=str(box.left),
+                        y1=str(box.baseline),
+                        x2=str(box.right),
+                        y2=str(box.baseline),
+                        stroke="blue",
+                        fill="none",
+                        opacity="0.5",
+                        )
+
 
 
 def _draw_marker(

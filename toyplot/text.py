@@ -81,6 +81,13 @@ class TextBox(object):
         self.style = style
 
 
+class MarkerBox(object):
+    """Container for a Toyplot marker specification."""
+    def __init__(self, marker, style):
+        self.marker = marker
+        self.style = style
+
+
 class _LineBreak(object):
     """Representation for a single line break."""
     pass
@@ -152,6 +159,10 @@ def layout(text, style, fonts):
                     root.children.append(TextBox(child.tail, node.get("style"))) # Note: the tail doesn't get the child's style
             return root
 
+        if node.tag == "marker":
+            root.children.append(MarkerBox(toyplot.marker.from_html(node), node.get("style")))
+            return root
+
         if node.tag == "br":
             root.children.append(_LineBreak())
             return root
@@ -201,6 +212,14 @@ def layout(text, style, fonts):
                     box.bottom = box.baseline - font.descent
 
                     box.height = box.bottom - box.top
+                elif isinstance(box, MarkerBox):
+                    font = fonts.font(box.style)
+
+                    box.baseline = 0
+                    box.top = box.baseline - font.ascent
+                    box.bottom = box.baseline - font.descent
+                    box.height = box.bottom - box.top
+                    box.width = box.height
                 else:
                     raise Exception("Unexpected box type: %s" % box)
 

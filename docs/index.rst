@@ -31,6 +31,7 @@ Documentation
    dependencies.rst
    tutorial.rst
    user-guide.rst
+   case-studies.rst
    contributing.rst
    release-notes.rst
    reference.rst

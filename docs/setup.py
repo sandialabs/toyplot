@@ -87,6 +87,7 @@ notebooks = [
         "cartesian-coordinates",
         "colors",
         "color-mapping",
+        "communities-case-study",
         "convenience-api",
         "data-tables",
         "graph-visualization",

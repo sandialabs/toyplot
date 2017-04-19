@@ -7,11 +7,12 @@
 
 from __future__ import absolute_import
 
+import toyplot.compatibility
 import toyplot.style
 
 class Marker(object):
     """Represents the complete specification of a marker's appearance."""
-    def __init__(self, shape=None, label=None, mstyle=None, lstyle=None, angle=None):
+    def __init__(self, shape, label, mstyle, lstyle, angle):
         self.shape = shape
         self.label = label
         self.mstyle = mstyle
@@ -29,23 +30,33 @@ class Marker(object):
 
     def to_html(self):
         """Convert a marker specification to HTML markup that can be embedded with regular text."""
-        return """<marker shape="%s"%s mstyle="%s" lstyle="%s"%s/>""" % (
+        return """<marker shape="%s"%s%s%s%s/>""" % (
             self.shape,
             " label='%s'" % self.label if self.label else "",
-            toyplot.style.to_css(self.mstyle),
-            toyplot.style.to_css(self.lstyle),
+            " mstyle='%s'" % toyplot.style.to_css(self.mstyle) if self.mstyle else "",
+            " lstyle='%s'" % toyplot.style.to_css(self.lstyle) if self.lstyle else "",
             " angle='%s'" % self.angle if self.angle else "",
             )
 
-    def to_dict(self):
-        """Convert a marker specification to a Python dictionary for compatibility with the HTML backend."""
-        return {
-            "shape": self.shape,
-            "label": self.label,
-            "mstyle": self.mstyle,
-            "lstyle": self.lstyle,
-            "angle": self.angle,
-        }
+
+def create(shape, label=None, mstyle=None, lstyle=None, angle=0):
+    """Factory function for creating instances of :class:`toyplot.marker.Marker`."""
+    return Marker(shape=shape, label=label, mstyle=mstyle, lstyle=lstyle, angle=angle)
+
+
+def convert(value):
+    """Construct an instance of :class:`toyplot.marker.Marker` from alternative representations."""
+    if value is None:
+        return value
+    if isinstance(value, Marker):
+        return value
+    if isinstance(value, toyplot.compatibility.string_type):
+        return Marker(shape=value, label=None, mstyle=None, lstyle=None, angle=0)
+    if isinstance(value, dict):
+        toyplot.log.warning("dict marker specifications are deprecated, use an instance of toyplot.marker.Marker instead.")
+        return Marker(shape=value.get("shape", None), label=value.get("label", None), mstyle=value.get("mstyle", None), lstyle=value.get("lstyle", None), angle=value.get("angle", 0))
+    raise ValueError("Can't convert %s to toyplot.marker.Marker." % value)
+
 
 def from_html(html):
     """Convert a parsed xml.etree.ElementTree representation of a marker to a :class:`toyplot.marker.Marker` object."""
@@ -54,5 +65,5 @@ def from_html(html):
         label=html.get("label", ""),
         mstyle=toyplot.style.parse(html.get("mstyle", "")),
         lstyle=toyplot.style.parse(html.get("lstyle", "")),
-        angle=html.get("angle", 0),
+        angle=float(html.get("angle", 0)),
         )

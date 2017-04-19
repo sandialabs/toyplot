@@ -23,6 +23,7 @@ import toyplot.canvas
 import toyplot.color
 import toyplot.compatibility
 import toyplot.mark
+import toyplot.marker
 
 
 class _NumpyJSONEncoder(json.JSONEncoder):
@@ -375,7 +376,7 @@ def _draw_text(
                     cx=(box.left + box.right) * 0.5,
                     cy=(box.top + box.bottom) * 0.5,
                     size=box.height,
-                    marker=box.marker.to_dict(),
+                    marker=box.marker,
                     )
                 if box.style.get("-toyplot-text-layout-box-visibility", None) == "visible":
                     xml.SubElement(
@@ -413,41 +414,36 @@ def _draw_marker(
         label_style=None,
         extra_class=None,
         title=None):
+
+    marker = toyplot.marker.convert(marker)
+
     if marker is None:
         return
-    if isinstance(marker, toyplot.compatibility.string_type):
-        marker = {"shape": marker}
-    shape = marker.get("shape", None)
-    shape_angle = marker.get("angle", 0)
-    shape_style = marker.get("mstyle", None)
-    shape_label = marker.get("label", None)
-    shape_label_style = marker.get("lstyle", None)
 
-    if shape in _draw_marker.variations:
-        variation = _draw_marker.variations[shape]
-        shape = variation[0]
-        shape_angle += variation[1]
+    if marker.shape in _draw_marker.variations:
+        variation = _draw_marker.variations[marker.shape]
+        marker = toyplot.marker.Marker(shape=variation[0], label=marker.label, mstyle=marker.mstyle, lstyle=marker.lstyle, angle=marker.angle + variation[1])
 
-    attrib = _css_attrib(marker_style, shape_style)
+    attrib = _css_attrib(marker_style, marker.mstyle)
     if extra_class is not None:
         attrib["class"] = extra_class
     marker_xml = xml.SubElement(root, "g", attrib=attrib)
     if title is not None:
         xml.SubElement(marker_xml, "title").text = str(title)
-    if shape == "|":
+    if marker.shape == "|":
         xml.SubElement(marker_xml,
                        "line",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle,
                                                          cx,
                                                          cy),
                        x1=repr(cx),
                        x2=repr(cx),
                        y1=repr(cy - (size / 2)),
                        y2=repr(cy + (size / 2)))
-    elif shape == "+":
+    elif marker.shape == "+":
         xml.SubElement(marker_xml,
                        "line",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle,
                                                          cx,
                                                          cy),
                        x1=repr(cx),
@@ -456,17 +452,17 @@ def _draw_marker(
                        y2=repr(cy + (size / 2)))
         xml.SubElement(marker_xml,
                        "line",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle,
                                                          cx,
                                                          cy),
                        x1=repr(cx - (size / 2)),
                        x2=repr(cx + (size / 2)),
                        y1=repr(cy),
                        y2=repr(cy))
-    elif shape == "*":
+    elif marker.shape == "*":
         xml.SubElement(marker_xml,
                        "line",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle,
                                                          cx,
                                                          cy),
                        x1=repr(cx),
@@ -475,7 +471,7 @@ def _draw_marker(
                        y2=repr(cy + (size / 2)))
         xml.SubElement(marker_xml,
                        "line",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle + 60,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle + 60,
                                                          cx,
                                                          cy),
                        x1=repr(cx),
@@ -484,17 +480,17 @@ def _draw_marker(
                        y2=repr(cy + (size / 2)))
         xml.SubElement(marker_xml,
                        "line",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle - 60,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle - 60,
                                                          cx,
                                                          cy),
                        x1=repr(cx),
                        x2=repr(cx),
                        y1=repr(cy - (size / 2)),
                        y2=repr(cy + (size / 2)))
-    elif shape == "^":
+    elif marker.shape == "^":
         xml.SubElement(marker_xml,
                        "polygon",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle,
                                                          cx,
                                                          cy),
                        points=" ".join(["%r,%r" % (xp,
@@ -505,42 +501,42 @@ def _draw_marker(
                                                 cy - (size / 2)),
                                                (cx + (size / 2),
                                                 cy + (size / 2))]]))
-    elif shape == "s":
+    elif marker.shape == "s":
         xml.SubElement(marker_xml,
                        "rect",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle,
                                                          cx,
                                                          cy),
                        x=repr(cx - (size / 2)),
                        y=repr(cy - (size / 2)),
                        width=repr(size),
                        height=repr(size))
-    elif shape == "o":
+    elif marker.shape == "o":
         xml.SubElement(
             marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
-    elif shape == "oo":
+    elif marker.shape == "oo":
         xml.SubElement(
             marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
         xml.SubElement(
             marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 4))
-    elif shape == "o|":
+    elif marker.shape == "o|":
         xml.SubElement(
             marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
         xml.SubElement(marker_xml,
                        "line",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle,
                                                          cx,
                                                          cy),
                        x1=repr(cx),
                        x2=repr(cx),
                        y1=repr(cy - (size / 2)),
                        y2=repr(cy + (size / 2)))
-    elif shape == "o+":
+    elif marker.shape == "o+":
         xml.SubElement(
             marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
         xml.SubElement(marker_xml,
                        "line",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle,
                                                          cx,
                                                          cy),
                        x1=repr(cx),
@@ -549,19 +545,19 @@ def _draw_marker(
                        y2=repr(cy + (size / 2)))
         xml.SubElement(marker_xml,
                        "line",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle,
                                                          cx,
                                                          cy),
                        x1=repr(cx - (size / 2)),
                        x2=repr(cx + (size / 2)),
                        y1=repr(cy),
                        y2=repr(cy))
-    elif shape == "o*":
+    elif marker.shape == "o*":
         xml.SubElement(
             marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(size / 2))
         xml.SubElement(marker_xml,
                        "line",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle,
                                                          cx,
                                                          cy),
                        x1=repr(cx),
@@ -570,7 +566,7 @@ def _draw_marker(
                        y2=repr(cy + (size / 2)))
         xml.SubElement(marker_xml,
                        "line",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle + 60,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle + 60,
                                                          cx,
                                                          cy),
                        x1=repr(cx),
@@ -579,7 +575,7 @@ def _draw_marker(
                        y2=repr(cy + (size / 2)))
         xml.SubElement(marker_xml,
                        "line",
-                       transform="rotate(%r, %r, %r)" % (-shape_angle - 60,
+                       transform="rotate(%r, %r, %r)" % (-marker.angle - 60,
                                                          cx,
                                                          cy),
                        x1=repr(cx),
@@ -587,10 +583,10 @@ def _draw_marker(
                        y1=repr(cy - (size / 2)),
                        y2=repr(cy + (size / 2)))
 
-    if shape_label: # Not technically necessary, but we should avoid computing the style for every marker if we don't have to.
+    if marker.label: # Never compute a text layout unless we have to.
         _draw_text(
             root=marker_xml,
-            text=shape_label,
+            text=marker.label,
             x=cx,
             y=cy,
             style=toyplot.style.combine(
@@ -602,7 +598,7 @@ def _draw_marker(
                     "text-anchor": "middle",
                 },
                 label_style,
-                shape_label_style),
+                marker.lstyle),
             )
     return marker_xml
 

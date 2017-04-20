@@ -617,17 +617,19 @@ class Cartesian(object):
             self._text = None
 
             self.style = {
-                "baseline-shift": "100%",
                 "font-size": "14px",
                 "font-weight": "bold",
                 "stroke": "none",
                 "text-anchor":"middle",
+                "-toyplot-vertical-align":"bottom",
                 }
             self.style = style
             self.text = text
+            self.offset = 8
 
         style = _create_text_style_property()
         text = _create_text_property()
+        offset = _create_offset_property()
 
     def __init__(
             self,

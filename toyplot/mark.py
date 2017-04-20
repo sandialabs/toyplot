@@ -66,6 +66,16 @@ class Mark(object):
         empty = numpy.array([])
         return tuple([empty] * len(axes)), tuple([empty] * 4)
 
+    @property
+    def markers(self): # pylint: disable=no-self-use
+        """Return an ordered set of in-use markers for this mark.
+
+        Returns
+        -------
+        markers: list of :class:`toyplot.marker.Marker` objects.
+        """
+        return []
+
 class AxisLines(Mark):
 
     """Render multiple lines parallel to an axis.
@@ -159,6 +169,25 @@ class BarBoundaries(Mark):
         if axis == self._coordinate_axes[1]:
             return toyplot.data.minimax([self._table[key] for key in self._boundaries])
 
+    @property
+    def markers(self):
+        result = []
+
+        for fill, opacity in zip(
+                [self._table[key] for key in self._fill],
+                [self._table[key] for key in self._opacity],
+            ):
+            result.append(toyplot.marker.create(shape="s", mstyle=toyplot.style.combine(
+                {
+                    "fill": toyplot.color.to_css(fill[0]),
+                    "fill-opacity": opacity[0],
+                },
+                self._style,
+                ),
+            ))
+
+        return result
+
 
 class BarMagnitudes(Mark):
 
@@ -216,6 +245,25 @@ class BarMagnitudes(Mark):
             boundaries = numpy.cumsum(boundaries, axis=1)
             return toyplot.data.minimax([boundaries])
 
+    @property
+    def markers(self):
+        result = []
+
+        for fill, opacity in zip(
+                [self._table[key] for key in self._fill],
+                [self._table[key] for key in self._opacity],
+            ):
+            result.append(toyplot.marker.create(shape="s", mstyle=toyplot.style.combine(
+                {
+                    "fill": toyplot.color.to_css(fill[0]),
+                    "fill-opacity": opacity[0],
+                },
+                self._style,
+                ),
+            ))
+
+        return result
+
 
 class FillBoundaries(Mark):
 
@@ -265,6 +313,27 @@ class FillBoundaries(Mark):
             return toyplot.data.minimax([self._table[self._position[0]]])
         if axis == self._coordinate_axes[1]:
             return toyplot.data.minimax([self._table[key] for key in self._boundaries])
+
+    @property
+    def markers(self):
+        result = []
+
+        for fill, opacity in zip(
+                self._fill,
+                self._opacity,
+            ):
+
+            result.append(toyplot.marker.create(shape="s", mstyle=toyplot.style.combine(
+                    {
+                        "fill": toyplot.color.to_css(fill),
+                        "fill-opacity": opacity,
+                    },
+                    self._style,
+                ),
+            ))
+
+        return result
+
 
 class FillMagnitudes(Mark):
 
@@ -321,6 +390,26 @@ class FillMagnitudes(Mark):
             boundaries = numpy.column_stack((self._table[self._baseline[0]], boundaries))
             boundaries = numpy.cumsum(boundaries, axis=1)
             return toyplot.data.minimax([boundaries])
+
+    @property
+    def markers(self):
+        result = []
+
+        for fill, opacity in zip(
+                self._fill,
+                self._opacity,
+            ):
+
+            result.append(toyplot.marker.create(shape="s", mstyle=toyplot.style.combine(
+                    {
+                        "fill": toyplot.color.to_css(fill),
+                        "fill-opacity": opacity,
+                    },
+                    self._style,
+                ),
+            ))
+
+        return result
 
 
 class Graph(Mark): # pragma: no cover
@@ -608,6 +697,23 @@ class Plot(Mark):
         if axis == self._coordinate_axes[1]:
             return toyplot.data.minimax([self._table[key] for key in self._series])
 
+    @property
+    def markers(self):
+        result = []
+
+        for stroke, stroke_width, stroke_opacity in zip(self._stroke.T, self._stroke_width.T, self._stroke_opacity.T):
+            result.append(toyplot.marker.create(shape="/", mstyle=toyplot.style.combine(
+                    {
+                        "stroke": toyplot.color.to_css(stroke),
+                        "stroke-width": stroke_width,
+                        "stroke-opacity": stroke_opacity,
+                    },
+                    self._style,
+                ),
+            ))
+
+        return result
+
 
 class Rect(Mark):
 
@@ -725,6 +831,34 @@ class Scatterplot(Mark):
     def domain(self, axis):
         columns = [coordinate_column for coordinate_axis, coordinate_column in zip(itertools.cycle(self._coordinate_axes), self._coordinates) if coordinate_axis == axis]
         return toyplot.data.minimax([self._table[column] for column in columns])
+
+    @property
+    def markers(self):
+        result = []
+
+        for marker, mfill, mstroke, mopacity in zip(
+                [self._table[key] for key in self._marker],
+                [self._table[key] for key in self._mfill],
+                [self._table[key] for key in self._mstroke],
+                [self._table[key] for key in self._mopacity],
+            ):
+
+            for dmarker, dfill, dstroke, dopacity in zip(marker, mfill, mstroke, mopacity):
+                mstyle = toyplot.style.combine(
+                {
+                    "fill": toyplot.color.to_css(dfill),
+                    "stroke": toyplot.color.to_css(dstroke),
+                    "opacity": dopacity,
+                },
+                self._mstyle
+                )
+
+                dmarker = toyplot.marker.create(mstyle=mstyle, lstyle=self._mlstyle) + toyplot.marker.convert(dmarker)
+
+                result.append(dmarker)
+                break
+
+        return result
 
 
 class Text(Mark):

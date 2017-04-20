@@ -1739,28 +1739,6 @@ def _render(canvas, axes, context):
                     )
 
 
-@dispatch((toyplot.mark.BarBoundaries, toyplot.mark.BarMagnitudes))
-def _legend_markers(mark):
-    markers = []
-
-    for fill, opacity in zip(
-            [mark._table[key] for key in mark._fill],
-            [mark._table[key] for key in mark._opacity],
-        ):
-        markers.append({
-            "shape": "s",
-            "mstyle": toyplot.style.combine(
-                {
-                    "fill": toyplot.color.to_css(fill[0]),
-                    "fill-opacity": opacity[0],
-                },
-                mark._style,
-            ),
-        })
-
-    return markers
-
-
 @dispatch(toyplot.coordinates.Cartesian, type(None), _RenderContext)
 def _render(axes, mark, context):
     pass
@@ -1915,30 +1893,6 @@ def _render(axes, mark, context):
                 xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
-@dispatch((toyplot.mark.FillBoundaries, toyplot.mark.FillMagnitudes))
-def _legend_markers(mark):
-    markers = []
-
-    for fill, opacity in zip(
-            mark._fill,
-            mark._opacity,
-        ):
-
-        markers.append({
-            "shape": "s",
-            "mstyle": toyplot.style.combine(
-                {
-                    "fill": toyplot.color.to_css(fill),
-                    "fill-opacity": opacity,
-                },
-                mark._style,
-            ),
-        })
-
-    return markers
-
-
-
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.FillBoundaries, _RenderContext)
 def _render(axes, mark, context):
     boundaries = numpy.ma.column_stack(
@@ -2084,11 +2038,6 @@ def _render(axes, mark, context):
             xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
-@dispatch(toyplot.mark.Mark)
-def _legend_markers(mark):
-    return []
-
-
 @dispatch((toyplot.canvas.Canvas, toyplot.coordinates.Cartesian), toyplot.mark.Legend, _RenderContext)
 def _render(canvas, legend, context):
     if not legend._entries:
@@ -2100,7 +2049,7 @@ def _render(canvas, legend, context):
         label, spec = entry
 
         if isinstance(spec, toyplot.mark.Mark):
-            markers = _legend_markers(spec)
+            markers = spec.markers
         elif isinstance(spec, list):
             markers = spec
         else:
@@ -2255,26 +2204,6 @@ def _render(axes, mark, context): # pragma: no cover
                 )
 
 
-@dispatch(toyplot.mark.Plot)
-def _legend_markers(mark):
-    markers = []
-
-    for stroke, stroke_width, stroke_opacity in zip(mark._stroke.T, mark._stroke_width.T, mark._stroke_opacity.T):
-        markers.append({
-            "shape": "/",
-            "mstyle": toyplot.style.combine(
-                {
-                    "stroke": toyplot.color.to_css(stroke),
-                    "stroke-width": stroke_width,
-                    "stroke-opacity": stroke_opacity,
-                },
-                mark._style,
-            ),
-        })
-
-    return markers
-
-
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Plot, _RenderContext)
 def _render(axes, mark, context):
     position = mark._table[mark._coordinates[0]]
@@ -2416,44 +2345,6 @@ def _render(axes, mark, context):
             )
         if dtitle is not None:
             xml.SubElement(datum_xml, "title").text = str(dtitle)
-
-
-@dispatch(toyplot.mark.Scatterplot)
-def _legend_markers(mark):
-    markers = []
-
-    for marker, mfill, mstroke, mopacity in zip(
-            [mark._table[key] for key in mark._marker],
-            [mark._table[key] for key in mark._mfill],
-            [mark._table[key] for key in mark._mstroke],
-            [mark._table[key] for key in mark._mopacity],
-        ):
-
-        for dmarker, dfill, dstroke, dopacity in zip(
-                marker,
-                mfill,
-                mstroke,
-                mopacity,
-            ):
-            if isinstance(dmarker, toyplot.compatibility.string_type):
-                dmarker = {"shape": dmarker}
-            dmarker["mstyle"] = toyplot.style.combine(
-                dmarker.get("mstyle", None),
-                {
-                    "fill": toyplot.color.to_css(dfill),
-                    "stroke": toyplot.color.to_css(dstroke),
-                    "opacity": dopacity,
-                },
-                mark._mstyle,
-                )
-            dmarker["lstyle"] = toyplot.style.combine(
-                dmarker.get("lstyle", None),
-                mark._mlstyle,
-                )
-            markers.append(dmarker)
-            break
-
-    return markers
 
 
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Scatterplot, _RenderContext)

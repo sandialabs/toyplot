@@ -244,63 +244,71 @@ def layout(text, style, fonts):
     def compute_position(layout):
         """Compute top + bottom + left + right coordinates for line boxes + text boxes, relative to the layout anchor."""
 
-        toyplot_vertical_align = layout.style["-toyplot-vertical-align"]
-        # Align the first line's baseline with the anchor.
-        if toyplot_vertical_align == "first-baseline":
-            offset_y = 0
-        # Align the last line's baseline with the anchor.
-        elif toyplot_vertical_align == "last-baseline":
-            offset_y = -(layout.height + layout.children[0].top - layout.children[-1].bottom)
-        # Align the top of the layout with the anchor.
-        elif toyplot_vertical_align == "top":
-            offset_y = -layout.children[0].top
-        # Align the middle of the layout with the anchor.
-        elif toyplot_vertical_align == "middle":
-            offset_y = -((layout.height * 0.5) + layout.children[0].top)
-        # Align the bottom of the layout with the anchor.
-        elif toyplot_vertical_align == "bottom":
-            offset_y = -(layout.height + layout.children[0].top)
-        else:
-            raise ValueError("Unknown -toyplot-vertical-align value: %s" % toyplot_vertical_align)
-
-        for line in layout.children:
-            text_anchor = line.style["text-anchor"] if line.children else "middle"
-            if text_anchor == "start":
-                anchor_offset = 0
-            elif text_anchor == "middle":
-                anchor_offset = -line.width * 0.5
-            elif text_anchor == "end":
-                anchor_offset = -line.width
+        if layout.children:
+            toyplot_vertical_align = layout.style["-toyplot-vertical-align"]
+            # Align the first line's baseline with the anchor.
+            if toyplot_vertical_align == "first-baseline":
+                offset_y = 0
+            # Align the last line's baseline with the anchor.
+            elif toyplot_vertical_align == "last-baseline":
+                offset_y = -(layout.height + layout.children[0].top - layout.children[-1].bottom)
+            # Align the top of the layout with the anchor.
+            elif toyplot_vertical_align == "top":
+                offset_y = -layout.children[0].top
+            # Align the middle of the layout with the anchor.
+            elif toyplot_vertical_align == "middle":
+                offset_y = -((layout.height * 0.5) + layout.children[0].top)
+            # Align the bottom of the layout with the anchor.
+            elif toyplot_vertical_align == "bottom":
+                offset_y = -(layout.height + layout.children[0].top)
             else:
-                raise ValueError("Unknown text-anchor value: %s" % text_anchor)
+                raise ValueError("Unknown -toyplot-vertical-align value: %s" % toyplot_vertical_align)
 
-            offset_x = anchor_offset
+            for line in layout.children:
+                text_anchor = line.style["text-anchor"] if line.children else "middle"
+                if text_anchor == "start":
+                    anchor_offset = 0
+                elif text_anchor == "middle":
+                    anchor_offset = -line.width * 0.5
+                elif text_anchor == "end":
+                    anchor_offset = -line.width
+                else:
+                    raise ValueError("Unknown text-anchor value: %s" % text_anchor)
 
-            # Line left/right/bottom/top are relative offsets from the layout anchor in canvas coordinates.
-            line.left = offset_x
-            line.right = offset_x + line.width
-            line.top += offset_y
-            line.baseline = offset_y
-            line.bottom += offset_y
+                offset_x = anchor_offset
 
-            for child in line.children:
-                # Child left/right/bottom/top are relative offsets from the layout anchor in canvas coordinates.
-                child.left = offset_x + child.style["-toyplot-anchor-shift"]
-                child.right = child.left + child.width
-                child.top += offset_y
-                child.baseline += offset_y
-                child.bottom += offset_y
-                # Note that baseline-shift is the opposite of canvas coordinates (positive values shift UP)
-                child.baseline -= child.style["baseline-shift"]
+                # Line left/right/bottom/top are relative offsets from the layout anchor in canvas coordinates.
+                line.left = offset_x
+                line.right = offset_x + line.width
+                line.top += offset_y
+                line.baseline = offset_y
+                line.bottom += offset_y
 
-                offset_x += child.width
-            offset_y += line.height
+                for child in line.children:
+                    # Child left/right/bottom/top are relative offsets from the layout anchor in canvas coordinates.
+                    child.left = offset_x + child.style["-toyplot-anchor-shift"]
+                    child.right = child.left + child.width
+                    child.top += offset_y
+                    child.baseline += offset_y
+                    child.bottom += offset_y
+                    # Note that baseline-shift is the opposite of canvas coordinates (positive values shift UP)
+                    child.baseline -= child.style["baseline-shift"]
+
+                    offset_x += child.width
+                offset_y += line.height
+
+            layout.top = layout.children[0].top
+            layout.left = numpy.min([line.left for line in layout.children])
+            layout.right = numpy.max([line.right for line in layout.children])
+            layout.bottom = layout.children[-1].bottom
+
+        else:
+            layout.top = 0
+            layout.left = 0
+            layout.right = 0
+            layout.bottom = 0
 
         # Layout top/left/right/bottom are relative offsets from the layout anchor in canvas coordinates
-        layout.top = layout.children[0].top if layout.children else 0
-        layout.left = numpy.min([line.left for line in layout.children]) if layout.children else 0
-        layout.right = numpy.max([line.right for line in layout.children]) if layout.children else 0
-        layout.bottom = layout.children[-1].bottom if layout.children else 0
         layout.width = layout.right - layout.left
         layout.height = layout.bottom - layout.top
 

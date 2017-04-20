@@ -9,8 +9,8 @@ import itertools
 import numpy
 
 import toyplot.color
+import toyplot.marker
 import toyplot.require
-
 
 ##########################################################################
 # Basic Toyplot marks
@@ -704,6 +704,7 @@ class Plot(Mark):
         for stroke, stroke_width, stroke_opacity in zip(self._stroke.T, self._stroke_width.T, self._stroke_opacity.T):
             result.append(toyplot.marker.create(shape="/", mstyle=toyplot.style.combine(
                     {
+                        "fill": toyplot.color.to_css(stroke),
                         "stroke": toyplot.color.to_css(stroke),
                         "stroke-width": stroke_width,
                         "stroke-opacity": stroke_opacity,
@@ -926,39 +927,3 @@ class Text(Mark):
         coordinates = tuple([self._table[self._coordinates[axis_map[axis]]] for axis in axes])
         extents = toyplot.text.extents(self._table[self._text[0]], self._table[self._angle[0]], self._style)
         return coordinates, extents
-
-
-##########################################################################
-# More specialized marks
-
-class Legend(Mark):
-
-    """Render a figure legend (a collection of markers and labels).
-
-    Do not create Legend instances directly.  Use factory methods such as
-    :meth:`toyplot.canvas.Canvas.legend` or :meth:`toyplot.coordinates.Cartesian.legend` instead.
-    """
-
-    def __init__(self, xmin, xmax, ymin, ymax, entries, style, lstyle):
-        Mark.__init__(self)
-        self._xmin = xmin
-        self._xmax = xmax
-        self._ymin = ymin
-        self._ymax = ymax
-        self._gutter = 10
-        self._entries = entries
-        # Styles the box surrounding the legend
-        self._style = toyplot.style.combine(
-            {
-                "fill": "none",
-                "stroke": "none",
-            },
-            toyplot.require.style(style, allowed=toyplot.require.style.fill),
-            )
-        # Styles the legend labels
-        self._lstyle = toyplot.style.combine(
-            {
-                "text-anchor": "start",
-            },
-            toyplot.require.style(lstyle, allowed=toyplot.require.style.text),
-            )

@@ -1712,66 +1712,8 @@ class Cartesian(object):
             gutter=50,
             style=None,
             label_style=None,
-        ):
-        """Add a legend to the axes.
-
-        Parameters
-        ----------
-        entries: sequence of entries to add to the legend Each entry to be
-            displayed in the legend must be either a (label, mark) tuple or a
-            (label, marker) tuple.  Labels are human-readable text, markers are
-            specified using the syntax described in :ref:`markers`, and marks can
-            be any instance of :class:`toyplot.mark.Mark`.
-        bounds: (xmin, xmax, ymin, ymax) tuple, optional
-          Use the bounds property to position / size the legend by specifying the
-          position of each of its boundaries.  The boundaries may be specified in
-          absolute drawing units, or as a percentage of the axes width / height
-          using strings that end with "%".
-        rect: (x, y, width, height) tuple, optional
-          Use the rect property to position / size the legend by specifying its
-          upper-left-hand corner, width, and height.  Each parameter may be specified
-          in absolute drawing units, or as a percentage of the axes width / height
-          using strings that end with "%".
-        corner: (corner, width, height, inset) tuple, optional
-          Use the corner property to position / size the legend by specifying its
-          width and height, plus an inset from a corner of the axes.  Allowed
-          corner values are "top-left", "top", "top-right", "right",
-          "bottom-right", "bottom", "bottom-left", and "left".  The width and
-          height may be specified in absolute drawing units, or as a percentage of
-          the axes width / height using strings that end with "%".  The inset is
-          specified in absolute drawing units.
-        grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
-          Use the grid property to position / size the legend using a collection of
-          grid cells filling the axes.  Specify the number of rows and columns in
-          the grid, then specify either a zero-based cell index (which runs in
-          left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
-          a set of i, column-span, j, row-span coordinates so the legend can cover
-          more than one cell.
-        gutter: size of the gutter around grid cells, optional
-          Specifies the amount of empty space to leave between grid cells When using the
-          `grid` parameter to position the legend.
-        style: dict, optional
-
-        Returns
-        -------
-        legend: :class:`toyplot.mark.Legend`
-        """
-        gutter = toyplot.require.scalar(gutter)
-        style = toyplot.require.style(style, allowed=set())
-        label_style = toyplot.require.style(label_style, allowed=toyplot.require.style.text)
-
-        xmin, xmax, ymin, ymax = toyplot.layout.region(
-            self._xmin_range, self._xmax_range, self._ymin_range, self._ymax_range, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-        self._children.append(
-            toyplot.mark.Legend(
-                xmin,
-                xmax,
-                ymin,
-                ymax,
-                entries,
-                style,
-                label_style))
-        return self._children[-1]
+        ): # pylint: disable=no-self-use
+        toyplot.log.warning("toyplot.coordinates.Cartesian.legend() is deprecated and ignored, use toyplot.canvas.legend() instead.")
 
     def plot(
             self,

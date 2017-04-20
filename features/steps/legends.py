@@ -34,6 +34,8 @@ def step_impl(context):
 
 @given(u'the legend is added to the canvas')
 def step_impl(context):
-    context.canvas.legend(context.entries, corner=("top-left", 50, 50, 25 * len(context.entries)))
+    table = context.canvas.legend(context.entries, corner=("top-left", 50, 100, 25 * len(context.entries)))
+    table.cells.grid.hlines[...] = "single"
+    table.cells.grid.vlines[...] = "single"
 
 

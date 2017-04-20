@@ -2038,69 +2038,6 @@ def _render(axes, mark, context):
             xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
-@dispatch((toyplot.canvas.Canvas, toyplot.coordinates.Cartesian), toyplot.mark.Legend, _RenderContext)
-def _render(canvas, legend, context):
-    if not legend._entries:
-        return
-
-    entries = []
-
-    for entry in legend._entries:
-        label, spec = entry
-
-        if isinstance(spec, toyplot.mark.Mark):
-            markers = spec.markers
-        elif isinstance(spec, list):
-            markers = spec
-        else:
-            markers = [spec]
-
-        entries.append((label, markers))
-
-    x = legend._xmin
-    y = legend._ymin
-    width = legend._xmax - legend._xmin
-    height = legend._ymax - legend._ymin
-    marker_height = (height - (legend._gutter * (len(entries) + 1))) / len(entries)
-    marker_width = marker_height
-
-    label_offset = (numpy.amax([len(markers) for label, markers in entries]) * (legend._gutter + marker_width)) + legend._gutter
-
-    xml.SubElement(
-        context.parent,
-        "rect",
-        x=repr(x),
-        y=repr(y),
-        width=repr(width),
-        height=repr(height),
-        style=_css_style(legend._style),
-        id=context.get_id(legend),
-        attrib={"class": "toyplot-mark-Legend"},
-        )
-
-    for i, (label, markers) in enumerate(entries):
-        marker_y = y + ((i + 1) * legend._gutter) + (i * marker_height)
-
-        for j, marker in enumerate(markers):
-            marker_x = x + label_offset - (len(markers) * (marker_width + legend._gutter)) + (j * (marker_width + legend._gutter))
-
-            _draw_marker(
-                context.parent,
-                cx=marker_x + (marker_width / 2),
-                cy=marker_y + (marker_height / 2),
-                default=toyplot.marker.create(size=min(marker_width, marker_height)),
-                marker=marker,
-                )
-
-        _draw_text(
-            root=context.parent,
-            text=label,
-            x=x + label_offset,
-            y=y + ((i + 1) * legend._gutter) +  (i * marker_height) + (marker_height / 2),
-            style=legend._lstyle,
-            )
-
-
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Graph, _RenderContext)
 def _render(axes, mark, context): # pragma: no cover
     # Project edge coordinates

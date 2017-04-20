@@ -413,8 +413,10 @@ class Canvas(object):
             corner=None,
             grid=None,
             gutter=50,
+            label=None,
             style=None,
-            label_style=None):
+            label_style=None,
+            ):
         """Add a legend to the canvas.
 
         Parameters
@@ -457,24 +459,54 @@ class Canvas(object):
 
         Returns
         -------
-        legend: :class:`toyplot.mark.Legend`
+        legend: :class:`toyplot.coordinates.Table`
         """
         gutter = toyplot.require.scalar(gutter)
-        style = toyplot.require.style(style, allowed=toyplot.require.style.fill)
-        label_style = toyplot.require.style(label_style, allowed=toyplot.require.style.text)
+
+        if style is not None:
+            toyplot.log.warning("The style parameter is deprecated and ignored, use the table API to alter legend appearance instead.")
+        if label_style is not None:
+            toyplot.log.warning("The label_style parameter is deprecated and ignored, use the table API to alter legend appearance instead.")
 
         xmin, xmax, ymin, ymax = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter)
-        self._children.append(
-            toyplot.mark.Legend(
-                xmin,
-                xmax,
-                ymin,
-                ymax,
-                entries,
-                style,
-                label_style))
-        return self._children[-1]
+
+        table = toyplot.coordinates.Table(
+            xmin,
+            xmax,
+            ymin,
+            ymax,
+            rows=len(entries),
+            columns=2,
+            trows=0,
+            brows=0,
+            lcolumns=0,
+            rcolumns=0,
+            label=label,
+            parent=self,
+            filename=None,
+            )
+
+        table.cells.column[0].align = "right"
+        table.cells.column[1].align = "left"
+
+        for index, (label, spec) in enumerate(entries):
+            if isinstance(spec, toyplot.mark.Mark):
+                markers = spec.markers
+            else:
+                markers = [toyplot.marker.convert(spec)]
+            text = ""
+            for marker in markers:
+                if text:
+                    text = text + " "
+                text = text + marker
+
+            table.cells.cell[index, 0].data = text
+            table.cells.cell[index, 1].data = label
+
+        self._children.append(table)
+
+        return table
 
     def matrix(
             self,

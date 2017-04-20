@@ -43,18 +43,14 @@ def step_impl(context):
 
 @then(u'axes can be added to the canvas using corner layout.')
 def step_impl(context):
-    style = {"stroke": toyplot.color.near_black}
-    context.canvas.legend([("top", "^")], style=style, corner=("top", 10, 100, 30))
-    context.canvas.legend([("top-right", "^")], style=style, corner=("top-right", 10, 100, 30))
-    context.canvas.legend([("right", "^")], style=style, corner=("right", 10, 100, 30))
-    context.canvas.legend([("bottom-right", "^")], style=style, corner=("bottom-right", 10, 150, 30))
-    context.canvas.legend([("bottom-right", "^")], style=style, corner=("bottom-right", "2cm", (4,"cm"), "10%"))
-    context.canvas.legend([("bottom", "^")], style=style, corner=("bottom", 10, 100, 30))
-    context.canvas.legend([("bottom-left", "^")], style=style, corner=("bottom-left", 10, 100, 30))
-    context.canvas.legend([("left", "^")], style=style, corner=("left", 10, 100, 30))
-    context.canvas.legend([("top-left", "^")], style=style, corner=("top-left", 10, 100, 30))
-    context.canvas.legend([("top-left", "^")], style=style, corner=("top-left", 50, 100, 30))
-    context.canvas.legend([("top-left", "^")], style=style, corner=("top-left", 100, "20%", "10%"))
+    context.canvas.cartesian(label="top", corner=("top", 30, 100, 30))
+    context.canvas.cartesian(label="top-right", corner=("top-right", 30, 100, 30))
+    context.canvas.cartesian(label="right", corner=("right", 30, 100, 30))
+    context.canvas.cartesian(label="bottom-right", corner=("bottom-right", 30, 100, 30))
+    context.canvas.cartesian(label="bottom", corner=("bottom", 30, 100, 30))
+    context.canvas.cartesian(label="bottom-left", corner=("bottom-left", 30, 100, 30))
+    context.canvas.cartesian(label="left", corner=("left", 30, 100, 30))
+    context.canvas.cartesian(label="top-left", corner=("top-left", 30, 100, 30))
 
 @then(u'axes can be added to the canvas using rect layout.')
 def step_impl(context):

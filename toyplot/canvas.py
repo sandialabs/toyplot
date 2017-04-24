@@ -484,6 +484,7 @@ class Canvas(object):
             rcolumns=0,
             label=label,
             parent=self,
+            annotation=True,
             filename=None,
             )
 
@@ -860,6 +861,7 @@ class Canvas(object):
             corner=None,
             grid=None,
             gutter=50,
+            annotation=False,
             filename=None,
         ):
         """Add a set of table axes to the canvas.
@@ -904,6 +906,7 @@ class Canvas(object):
             lcolumns=lcolumns,
             rcolumns=rcolumns,
             parent=self,
+            annotation=annotation,
             filename=filename,
             )
 

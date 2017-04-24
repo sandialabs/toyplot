@@ -3230,6 +3230,7 @@ class Table(object):
             rcolumns,
             label,
             parent,
+            annotation,
             filename,
         ):
         self._finalized = None
@@ -3239,6 +3240,8 @@ class Table(object):
         self._ymin_range = ymin_range
         self._ymax_range = ymax_range
         self._parent = parent
+        self._annotation = False
+        self.annotation = annotation
         self._filename = toyplot.require.filename(filename)
 
         self._shape = (trows + rows + brows, lcolumns + columns + rcolumns)
@@ -3290,6 +3293,14 @@ class Table(object):
             }
         self._cell_lstyle[...] = lstyle
         self._cell_align[...] = "center"
+
+    @property
+    def annotation(self):
+        return self._annotation
+
+    @annotation.setter
+    def annotation(self, value):
+        self._annotation = True if value else False
 
     def _region_bounds(self, region):
         rows, columns = numpy.nonzero(self._cell_region == region)

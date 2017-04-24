@@ -51,6 +51,8 @@ class _RenderContext(object):
     def add_data(self, item, content, title, filename):
         if isinstance(item, toyplot.mark.Mark) and item.annotation:
             return
+        if isinstance(item, toyplot.coordinates.Table) and item.annotation:
+            return
 
         self._data.append({
             "id": self.get_id(item),

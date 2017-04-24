@@ -571,6 +571,7 @@ class Canvas(object):
             columns=matrix.shape[1],
             label=label,
             parent=self,
+            annotation=False,
             filename=filename,
             )
 

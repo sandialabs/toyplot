@@ -60,3 +60,82 @@ def _color_fixup(styles):
 def to_css(*styles):
     style = _color_fixup(combine(*styles))
     return ";".join(["%s:%s" % (key, value) for key, value in sorted(style.items())])
+
+def require(css, allowed):
+    """Validate that an object is usable as CSS style information.
+
+    Parameters
+    ----------
+    css: dict or None
+        The style object to be validated.  An exception will be raised if it is
+        not a valid style object.
+    allowed: sequence of strings
+        The set of allowed style keys.  An exception will be raised if `css`
+        contains any keys that aren't in this sequence.
+
+    Returns
+    -------
+    style: the validated style object.
+    """
+    if css is None:
+        return css
+
+    if not isinstance(css, dict):
+        raise ValueError("Expected a dictionary of CSS styles or None, received %s." % css) # pragma: no cover
+
+    for key in css:
+        if key not in allowed:
+            raise ValueError("Not an allowed CSS style: %s" % key) # pragma: no cover
+
+    return css
+
+class allowed(object):
+    fill = set([
+        "fill",
+        "fill-opacity",
+        "opacity",
+        "stroke",
+        "stroke-dasharray",
+        "stroke-opacity",
+        "stroke-width",
+        ])
+
+    line = set([
+        "opacity",
+        "stroke",
+        "stroke-dasharray",
+        "stroke-linecap",
+        "stroke-opacity",
+        "stroke-width",
+        ])
+
+    marker = set([
+        "fill",
+        "fill-opacity",
+        "opacity",
+        "stroke",
+        "stroke-opacity",
+        "stroke-width",
+        ])
+
+    text = set([
+        "alignment-baseline",
+        "baseline-shift",
+        "fill",
+        "fill-opacity",
+        "font-family",
+        "font-size",
+        "font-weight",
+        "line-height",
+        "opacity",
+        "stroke",
+        "stroke-opacity",
+        "stroke-width",
+        "text-anchor",
+        "text-shadow",
+        "-toyplot-anchor-shift",
+        "-toyplot-text-layout-box-visibility",
+        "-toyplot-text-layout-line-visibility",
+        "-toyplot-text-layout-visibility",
+        "-toyplot-vertical-align",
+        ])

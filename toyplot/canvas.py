@@ -170,7 +170,7 @@ class Canvas(object):
     def style(self, value):
         self._style = toyplot.style.combine(
             self._style,
-            toyplot.require.style(value, allowed=set(["background-color", "border"])),
+            toyplot.style.require(value, allowed=set(["background-color", "border"])),
             )
 
     @property
@@ -1048,7 +1048,7 @@ class Canvas(object):
             )
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])
-        style = toyplot.require.style(style, allowed=toyplot.require.style.text)
+        style = toyplot.style.require(style, allowed=toyplot.style.allowed.text)
 
         self._children.append(
             toyplot.mark.Text(

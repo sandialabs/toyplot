@@ -25,7 +25,7 @@ def extents(text, angle, style):
     """
     text = toyplot.require.string_vector(text)
     angle = toyplot.require.scalar_vector(angle)
-    style = toyplot.require.style(style, toyplot.require.style.text)
+    style = toyplot.style.require(style, toyplot.style.allowed.text)
 
     # TODO: don't hard-code this.
     fonts = toyplot.font.ReportlabLibrary()
@@ -104,7 +104,7 @@ def layout(text, style, fonts):
             style = toyplot.style.combine(style, {"font-style": "italic"})
 
         if "style" in node.attrib:
-            node_style = toyplot.require.style(toyplot.style.parse(node.attrib["style"]), toyplot.require.style.text)
+            node_style = toyplot.style.require(toyplot.style.parse(node.attrib["style"]), toyplot.style.allowed.text)
             style = toyplot.style.combine(style, node_style)
 
         node.set("style", copy.deepcopy(style))

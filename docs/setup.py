@@ -25,6 +25,11 @@ def convert_notebook(name):
             target) >= os.path.getmtime(source):
         return
 
+    # Some versions of nbconvert produce RST files that don't include source code cells when built on readthedocs.org
+    nbconvert_version = subprocess.check_output(["jupyter", "nbconvert", "--version"]).strip()
+    if nbconvert_version not in ["4.0.0"]:
+        raise Exception("Unsupported nbconvert version: %s" % nbconvert_version)
+
     # Convert the notebook to pure Python, so we can run verify
     # that it runs without any errors.
 

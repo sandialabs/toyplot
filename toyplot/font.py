@@ -22,7 +22,7 @@ class Font(object):
         ascent: number
             ascent of the font in CSS pixels.
         """
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
     @property
     def descent(self):
@@ -33,7 +33,7 @@ class Font(object):
         descent: number
             descent of the font in CSS pixels.
         """
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
     def width(self, string):
         """Return the width of a string.
@@ -49,7 +49,7 @@ class Font(object):
             Width of the string in CSS pixels, if rendered using the given font and
             font size.
         """
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
 
 class Library(object):
@@ -65,7 +65,7 @@ class Library(object):
         -------
         font: instance of :class:`toyplot.font.Font`
         """
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
 
 class ReportlabFont(Font):

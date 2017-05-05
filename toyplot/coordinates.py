@@ -729,7 +729,7 @@ class Cartesian(object):
     @aspect.setter
     def aspect(self, value):
         if value not in [None, "fit-range"]:
-            raise ValueError("Unknown aspect value: %s" % value)
+            raise ValueError("Unknown aspect value: %s" % value) # pragma: no cover
         self._aspect = value
 
     @property
@@ -2379,9 +2379,9 @@ class Numberline(object):
 
     def colormap(self, colormap, offset=None, width=10, style=None):
         if not isinstance(colormap, toyplot.color.Map):
-            raise ValueError("A toyplot.color.Map instance is required.")
+            raise ValueError("A toyplot.color.Map instance is required.") # pragma: no cover
         if colormap.domain.min is None or colormap.domain.max is None:
-            raise ValueError("Cannot create color scale without explicit colormap domain.")
+            raise ValueError("Cannot create color scale without explicit colormap domain.") # pragma: no cover
 
         if offset is None:
             offset = len(self._children) * self._spacing
@@ -2450,7 +2450,7 @@ class Numberline(object):
         mopacity = toyplot.broadcast.scalar(opacity, coordinates.shape)
         mtitle = toyplot.broadcast.pyobject(title, coordinates.shape)
         if style is not None:
-            toyplot.log.warning("style parameter is deprecated and will be ignored.  Use mstyle and mlstyle to style markers and marker labels, respectively.")
+            toyplot.log.warning("style parameter is deprecated and will be ignored.  Use mstyle and mlstyle to style markers and marker labels, respectively.") # pragma: no cover
         mstyle = toyplot.style.require(mstyle, allowed=toyplot.style.allowed.marker)
         mlstyle = toyplot.style.require(mlstyle, allowed=toyplot.style.allowed.text)
 
@@ -2604,7 +2604,7 @@ class Table(object):
             self._finalized = None
 
         def _finalize(self):
-            raise NotImplementedError()
+            raise NotImplementedError() # pragma: no cover
 
     class CellBarMark(CellMark):
         def __init__(
@@ -3511,7 +3511,7 @@ class Table(object):
                     axes.ymin_range = self._cell_top[row_min] + padding
                     axes.ymax_range = self._cell_bottom[row_max] - padding
                 else:
-                    raise NotImplementedError("Unknown coordinate system: %s" % axes)
+                    raise NotImplementedError("Unknown coordinate system: %s" % axes) # pragma: no cover
 
             self._finalized = self
         return self._finalized

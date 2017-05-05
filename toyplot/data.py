@@ -40,7 +40,7 @@ def minimax(items):
         item_min = None
         item_max = None
         if isinstance(item, toyplot.data.Table):
-            raise ValueError("toyplot.data.Table is not allowed.")
+            raise ValueError("toyplot.data.Table is not allowed.") # pragma: no cover
         elif isinstance(item, numpy.ma.MaskedArray):
             pass
         elif isinstance(item, numpy.ndarray):

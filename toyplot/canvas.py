@@ -268,7 +268,7 @@ class Canvas(object):
             padding=10,
         ):
 
-        toyplot.log.warning("toyplot.canvas.Canvas.axes() is deprecated, use toyplot.canvas.Canvas.cartesian() instead.")
+        toyplot.log.warning("toyplot.canvas.Canvas.axes() is deprecated, use toyplot.canvas.Canvas.cartesian() instead.") # pragma: no cover
 
         return self.cartesian(
             bounds=bounds,
@@ -466,9 +466,9 @@ class Canvas(object):
         legend: :class:`toyplot.coordinates.Table`
         """
         if style is not None:
-            toyplot.log.warning("The style parameter is deprecated and ignored, use the table API to alter legend appearance instead.")
+            toyplot.log.warning("The style parameter is deprecated and ignored, use the table API to alter legend appearance instead.") # pragma: no cover
         if label_style is not None:
-            toyplot.log.warning("The label_style parameter is deprecated and ignored, use the table API to alter legend appearance instead.")
+            toyplot.log.warning("The label_style parameter is deprecated and ignored, use the table API to alter legend appearance instead.") # pragma: no cover
 
         xmin, xmax, ymin, ymax = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter, margin=margin)
@@ -994,10 +994,10 @@ class Canvas(object):
         if isinstance(data, tuple):
             data, colormap = data
             if not isinstance(colormap, toyplot.color.Map):
-                raise ValueError("Expected toyplot.color.Map, received %s." % colormap)
+                raise ValueError("Expected toyplot.color.Map, received %s." % colormap) # pragma: no cover
             data = numpy.atleast_3d(data)
             if data.shape[2] != 1:
-                raise ValueError("Expected an image with one channel.")
+                raise ValueError("Expected an image with one channel.") # pragma: no cover
             data = colormap.colors(data)
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(

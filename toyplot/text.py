@@ -167,7 +167,7 @@ def layout(text, style, fonts):
             root.children.append(_LineBreak())
             return root
 
-        raise ValueError("Unknown tag: %s" % node.tag)
+        raise ValueError("Unknown tag: %s" % node.tag) # pragma: no cover
 
     def split_lines(layout):
         """Convert a flat layout into a two level hierarchy of line boxes containing text boxes."""
@@ -221,7 +221,7 @@ def layout(text, style, fonts):
                     box.height = box.bottom - box.top
                     box.width = box.height
                 else:
-                    raise Exception("Unexpected box type: %s" % box)
+                    raise Exception("Unexpected box type: %s" % box) # pragma: no cover
 
             # Line top is the relative offset from the line baseline in canvas coordinates
             line.top = numpy.min([child.top for child in line.children]) if line.children else 0
@@ -262,7 +262,7 @@ def layout(text, style, fonts):
             elif toyplot_vertical_align == "bottom":
                 offset_y = -(layout.height + layout.children[0].top)
             else:
-                raise ValueError("Unknown -toyplot-vertical-align value: %s" % toyplot_vertical_align)
+                raise ValueError("Unknown -toyplot-vertical-align value: %s" % toyplot_vertical_align) # pragma: no cover
 
             for line in layout.children:
                 text_anchor = line.style["text-anchor"] if line.children else "middle"

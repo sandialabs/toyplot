@@ -27,10 +27,10 @@ def _in_range(a, x, b):
 class Projection(object):
     """Base class for objects that can map from domain to range and range to domain."""
     def __call__(self, domain_values):
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
     def inverse(self, range_values):
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
 
 class Piecewise(Projection):

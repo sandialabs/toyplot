@@ -63,7 +63,7 @@ class Marker(object):
             result._lstyle = toyplot.style.combine(result.lstyle, other._lstyle)
             return result
         else:
-            raise ValueError("Can't add toyplot.marker.Marker and %r" % other)
+            raise ValueError("Can't add toyplot.marker.Marker and %r" % other) # pragma: no cover
 
     def __eq__(self, other):
         return self._shape == other._shape and self._mstyle == other._mstyle and self._shape == other._shape and self._angle == other._angle and self._label == other._label and self._lstyle == other._lstyle
@@ -112,7 +112,7 @@ def convert(value):
             label=value.get("label", None),
             lstyle=value.get("lstyle", None),
             )
-    raise ValueError("Can't convert %r to toyplot.marker.Marker." % value)
+    raise ValueError("Can't convert %r to toyplot.marker.Marker." % value) # pragma: no cover
 
 
 def from_html(html):

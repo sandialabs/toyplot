@@ -591,7 +591,7 @@ class LinearMap(Map):
         stops = numpy.array(stops) # pylint: disable=redefined-variable-type
 
         if stops.shape != palette._colors.shape:
-            raise ValueError("Number of stops must match palette length.")
+            raise ValueError("Number of stops must match palette length.") # pragma: no cover
 
         self._palette = palette
         self._stops = stops

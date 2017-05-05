@@ -116,7 +116,7 @@ def _msh_to_lab(M, s, h):
 def _require_color(color):
     if isinstance(color, toyplot.compatibility.string_type):
         return css(color)
-# I'm having a tough time creating a test that will exercise this, which is good sign we don't need it.
+# I'm having a tough time creating a test that will exercise this, which is a good sign we don't need it.
 #    elif isinstance(color, numpy.ndarray) and color.ndim == 0 and issubclass(color.dtype.type, numpy.character):
 #        return css(str(color))
     elif isinstance(color, (numpy.void, numpy.ndarray)) and color.dtype == dtype:
@@ -170,16 +170,18 @@ def broadcast(colors, shape, default=None):
         colors, colormap = colors
 
     # Next, convert the supplied colors into a toyplot color array.
-    if isinstance(colors, numpy.ndarray) and colors.dtype == dtype: # Already an array of colors
-        pass
-    elif isinstance(colors, numpy.ndarray) and issubclass(colors.dtype.type, numpy.character): # Array of strings, so convert to colors
-        colors = numpy.array([_require_color(color) for color in colors.flat], dtype=dtype).reshape(colors.shape)
-    elif isinstance(colors, numpy.ndarray) and issubclass(colors.dtype.type, numpy.number): # Array of numeric values, so map values to colors
-        if colormap is None:
-            colormap = toyplot.color.brewer.map("BlueRed", domain_min=colors.min(), domain_max=colors.max())
-        colors = colormap.colors(colors)
-    elif isinstance(colors, list): # Arbitrary Python sequence, so convert to colors
-        colors = numpy.array([_require_color(color) for color in colors], dtype=dtype)
+    if isinstance(colors, collections.Sequence):
+        colors = numpy.array(colors)
+
+    if isinstance(colors, numpy.ndarray):
+        if colors.dtype == dtype: # Already an array of colors
+            pass
+        elif issubclass(colors.dtype.type, numpy.number): # Array of numeric values, so map values to colors
+            if colormap is None:
+                colormap = toyplot.color.brewer.map("BlueRed", domain_min=colors.min(), domain_max=colors.max())
+            colors = colormap.colors(colors)
+        elif issubclass(colors.dtype.type, numpy.character): # Convert CSS strings to colors.
+            colors = numpy.array([_require_color(color) for color in colors.flat], dtype=dtype).reshape(colors.shape)
     else: # A single value, so convert to a color
         colors = _require_color(colors)
 

@@ -34,7 +34,7 @@ def require(css, allowed):
 
     for key, value in css.items():
         if key not in allowed:
-            raise ValueError("Not an allowed CSS style: %s" % key) # pragma: no cover
+            raise ValueError("Not an allowed CSS style: %s.  Use one of: %s" % (key, ", ".join(allowed))) # pragma: no cover
         if isinstance(value, numpy.ndarray) and value.dtype == toyplot.color.dtype:
             css[key] = toyplot.color.to_css(value)
 

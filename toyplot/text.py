@@ -356,7 +356,7 @@ def layout(text, style, fonts):
     return root
 
 
-def dump(box, stream=None, level=0, indent="  ", recursive=True):
+def dump(box, stream=None, level=0, indent="  ", recursive=True): # pragma: no cover
     if stream is None:
         stream = sys.stdout
     stream.write(indent * level)

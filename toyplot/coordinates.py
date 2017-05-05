@@ -2023,7 +2023,8 @@ class Cartesian(object):
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
         mtitle = toyplot.broadcast.pyobject(title, series.shape)
-        style = toyplot.style.require(style, allowed=set())
+        if style is not None:
+            toyplot.log.warning("style parameter is deprecated and will be ignored.  Use mstyle and mlstyle to style markers and marker labels, respectively.")
         mstyle = toyplot.style.require(mstyle, allowed=toyplot.style.allowed.marker)
         mlstyle = toyplot.style.require(mlstyle, allowed=toyplot.style.allowed.text)
 
@@ -2072,7 +2073,6 @@ class Cartesian(object):
                 mstroke=mstroke_keys,
                 mopacity=mopacity_keys,
                 mtitle=mtitle_keys,
-                style=style,
                 mstyle=mstyle,
                 mlstyle=mlstyle,
                 filename=filename))
@@ -2448,7 +2448,8 @@ class Numberline(object):
         mstroke = toyplot.color.broadcast(colors=mfill, shape=coordinates.shape)
         mopacity = toyplot.broadcast.scalar(opacity, coordinates.shape)
         mtitle = toyplot.broadcast.pyobject(title, coordinates.shape)
-        style = toyplot.style.require(style, allowed=set())
+        if style is not None:
+            toyplot.log.warning("style parameter is deprecated and will be ignored.  Use mstyle and mlstyle to style markers and marker labels, respectively.")
         mstyle = toyplot.style.require(mstyle, allowed=toyplot.style.allowed.marker)
         mlstyle = toyplot.style.require(mlstyle, allowed=toyplot.style.allowed.text)
 
@@ -2494,7 +2495,6 @@ class Numberline(object):
             mstroke=mstroke_keys,
             mopacity=mopacity_keys,
             mtitle=mtitle_keys,
-            style=style,
             mstyle=mstyle,
             mlstyle=mlstyle,
             filename=filename,

@@ -1412,7 +1412,6 @@ def _render(numberline, mark, context):
     mark_xml = xml.SubElement(
         context.parent,
         "g",
-        style=_css_style(mark._style),
         id=context.get_id(mark),
         attrib={"class": "toyplot-mark-Scatterplot"},
         )
@@ -2301,7 +2300,6 @@ def _render(axes, mark, context):
     mark_xml = xml.SubElement(
         context.parent,
         "g",
-        style=_css_style(mark._style),
         id=context.get_id(mark),
         attrib={"class": "toyplot-mark-Scatterplot"},
         )

@@ -791,7 +791,6 @@ class Scatterplot(Mark):
             mstroke,
             mopacity,
             mtitle,
-            style,
             mstyle,
             mlstyle,
             filename,
@@ -820,8 +819,6 @@ class Scatterplot(Mark):
         self._mopacity = toyplot.require.table_keys(table, mopacity, length=N)
         # N marker title columns
         self._mtitle = toyplot.require.table_keys(table, mtitle, length=N)
-        # Global style
-        self._style = toyplot.style.require(style, allowed=set())
         # Marker style
         self._mstyle = toyplot.style.require(mstyle, allowed=toyplot.style.allowed.marker)
         # Marker label style

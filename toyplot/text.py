@@ -88,8 +88,21 @@ class MarkerBox(object):
         self.style = style
 
 
+class PushHyperlink(object):
+    """Marks the beginning of a hyperlink."""
+    def __init__(self, href, style):
+        self.href = href
+        self.style = style
+
+
+class PopHyperlink(object):
+    """Marks the end of a hyperlink."""
+    def __init__(self, style):
+        self.style = style
+
+
 class _LineBreak(object):
-    """Representation for a single line break."""
+    """Marks the position of a line break."""
     pass
 
 
@@ -159,6 +172,17 @@ def layout(text, style, fonts):
                     root.children.append(TextBox(child.tail, node.get("style"))) # Note: the tail doesn't get the child's style
             return root
 
+        if node.tag == "a":
+            root.children.append(PushHyperlink(node.get("href"), node.get("style")))
+            if node.text:
+                root.children.append(TextBox(node.text, node.get("style")))
+            for child in node:
+                build_formatting_model(child, root)
+                if child.tail:
+                    root.children.append(TextBox(child.tail, node.get("style"))) # Note: the tail doesn't get the child's style
+            root.children.append(PopHyperlink(node.get("style")))
+            return root
+
         if node.tag == "marker":
             root.children.append(MarkerBox(toyplot.marker.from_html(node), node.get("style")))
             return root
@@ -220,6 +244,12 @@ def layout(text, style, fonts):
                     box.bottom = box.baseline - font.descent
                     box.height = box.bottom - box.top
                     box.width = box.height
+                elif isinstance(box, (PushHyperlink, PopHyperlink)):
+                    box.baseline = 0
+                    box.top = box.baseline
+                    box.bottom = box.baseline
+                    box.height = box.bottom - box.top
+                    box.width = 0
                 else:
                     raise Exception("Unexpected box type: %s" % box) # pragma: no cover
 

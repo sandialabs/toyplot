@@ -348,6 +348,7 @@ def _draw_text(
             opacity="0.5",
             )
 
+    hyperlink = []
     for line in layout.children:
         if line.style.get("-toyplot-text-layout-line-visibility", None) == "visible":
             xml.SubElement(
@@ -437,6 +438,12 @@ def _draw_text(
                         opacity="0.5",
                         )
 
+            elif isinstance(box, toyplot.text.PushHyperlink):
+                hyperlink.append(group)
+                group = xml.SubElement(group, "a")
+                group.set("xlink:href", box.href)
+            elif isinstance(box, toyplot.text.PopHyperlink):
+                group = hyperlink.pop()
 
 
 def _draw_marker(

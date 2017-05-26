@@ -129,8 +129,8 @@ def apply_changes(html, changes):
                 datum_xml.text = text
 
 
-def render(canvas, fobj=None, animation=False):
-    """Render the HTML representation of a canvas.
+def render(canvas, fobj=None, animation=False, tostring=False):
+    """Convert a canvas to its HTML DOM representation.
 
     Generates HTML markup with an embedded SVG representation of the canvas, plus
     JavaScript code for interactivity.  If the canvas contains animation, the
@@ -195,6 +195,32 @@ def render(canvas, fobj=None, animation=False):
         if animation:
             return root_xml, context.animation
         return root_xml
+
+
+def tostring(canvas):
+    """Convert a canvas to its HTML string representation.
+
+    Generates HTML markup with an embedded SVG representation of the canvas, plus
+    JavaScript code for interactivity.  If the canvas contains animation, the
+    markup will include an HTML user interface to control playback.
+
+    Parameters
+    ----------
+    canvas: :class:`toyplot.canvas.Canvas`
+      The canvas to be rendered.
+
+    Returns
+    -------
+    html: string
+      HTML representation of `canvas` as a string.
+
+    Notes
+    -----
+    The output HTML is a fragment wrapped in a <div>, suitable for embedding in
+    a larger document.  It is the caller's responsibility to supply the <html>,
+    <body> etc. if the result is intended as a standalone HTML document.
+    """
+    return toyplot.compatibility.unicode_type(xml.tostring(render(canvas), encoding="utf-8", method="html"), encoding="utf-8")
 
 
 def _color_fixup(styles):

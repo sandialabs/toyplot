@@ -144,13 +144,7 @@ class Canvas(object):
 
     def _repr_html_(self):
         from . import html
-        import xml.etree.ElementTree as xml
-        return toyplot.compatibility.unicode_type(
-            xml.tostring(
-                toyplot.html.render(self),
-                encoding="utf-8",
-                method="html"),
-            encoding="utf-8")
+        return toyplot.html.tostring(self)
 
     def _repr_png_(self):
         from . import png

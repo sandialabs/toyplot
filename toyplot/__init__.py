@@ -564,4 +564,3 @@ def table(
         trows=trows,
         )
     return canvas, axes
-

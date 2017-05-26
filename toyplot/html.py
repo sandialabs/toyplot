@@ -129,7 +129,7 @@ def apply_changes(html, changes):
                 datum_xml.text = text
 
 
-def render(canvas, fobj=None, animation=False, tostring=False):
+def render(canvas, fobj=None, animation=False, style=None):
     """Convert a canvas to its HTML DOM representation.
 
     Generates HTML markup with an embedded SVG representation of the canvas, plus
@@ -149,6 +149,9 @@ def render(canvas, fobj=None, animation=False, tostring=False):
     animation: boolean, optional
       If `True`, return a representation of the changes to be made to the HTML
       tree for animation.
+
+    style: dict, optional
+      Dictionary of CSS styles that will be applied to the top-level output <div>.
 
     Returns
     -------
@@ -176,10 +179,11 @@ def render(canvas, fobj=None, animation=False, tostring=False):
     # Create the top-level HTML element.
     root_xml = xml.Element(
         "div",
-        align="center",
         attrib={"class": "toyplot"},
         id="t" + uuid.uuid4().hex,
         )
+    if style is not None:
+        root_xml.set("style", toyplot.style.to_css(style))
 
     # Render the canvas.
     context = _RenderContext(root=root_xml)
@@ -197,7 +201,7 @@ def render(canvas, fobj=None, animation=False, tostring=False):
         return root_xml
 
 
-def tostring(canvas):
+def tostring(canvas, style=None):
     """Convert a canvas to its HTML string representation.
 
     Generates HTML markup with an embedded SVG representation of the canvas, plus
@@ -208,6 +212,9 @@ def tostring(canvas):
     ----------
     canvas: :class:`toyplot.canvas.Canvas`
       The canvas to be rendered.
+
+    style: dict, optional
+      Dictionary of CSS styles that will be applied to the top-level output <div>.
 
     Returns
     -------
@@ -220,7 +227,7 @@ def tostring(canvas):
     a larger document.  It is the caller's responsibility to supply the <html>,
     <body> etc. if the result is intended as a standalone HTML document.
     """
-    return toyplot.compatibility.unicode_type(xml.tostring(render(canvas), encoding="utf-8", method="html"), encoding="utf-8")
+    return toyplot.compatibility.unicode_type(xml.tostring(render(canvas=canvas, style=style), encoding="utf-8", method="html"), encoding="utf-8")
 
 
 def _color_fixup(styles):

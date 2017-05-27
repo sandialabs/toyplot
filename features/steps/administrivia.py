@@ -27,7 +27,7 @@ def step_impl(context):
         for filename in filenames:
             if os.path.splitext(filename)[1] not in [".py"]:
                 continue
-            if os.path.basename(directory) == "design" and filename == "decodegraphics.py":
+            if os.path.basename(directory) == "sandbox" and filename == "decodegraphics.py":
                 continue
             if os.path.basename(directory) == "_test":
                 continue

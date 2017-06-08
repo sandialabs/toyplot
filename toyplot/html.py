@@ -9,6 +9,7 @@ from __future__ import division, absolute_import
 import base64
 import collections
 import copy
+import functools
 import itertools
 import json
 import string
@@ -24,6 +25,12 @@ import toyplot.color
 import toyplot.compatibility
 import toyplot.mark
 import toyplot.marker
+
+
+_namespace = dict()
+
+#: Decorator for registering custom rendering code.
+dispatch = functools.partial(dispatch, namespace=_namespace)
 
 
 class _NumpyJSONEncoder(json.JSONEncoder):

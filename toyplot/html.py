@@ -30,6 +30,17 @@ import toyplot.marker
 _namespace = dict()
 
 #: Decorator for registering custom rendering code.
+#:
+#: This is only of use when creating your own custom Toyplot marks.  It is
+#: not intended for end-users.
+#:
+#: Example
+#: -------
+#: To register your own rendering function::
+#:
+#:     @toyplot.html.dispatch(toyplot.coordinates.Cartesian, MyCustomMark, toyplot.html._RenderContext)
+#:     def _render(axes, mark, context):
+#:         # Rendering implementation here
 dispatch = functools.partial(dispatch, namespace=_namespace)
 
 

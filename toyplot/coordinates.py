@@ -1015,6 +1015,32 @@ class Cartesian(object):
     def _project_y(self, y):
         return self._y_projection(y)
 
+    def add_mark(self, mark):
+        """Add a mark to the axes.
+
+        This is only of use when creating your own custom Toyplot marks.  It is
+        not intended for end-users.
+
+        Example
+        -------
+        To add your own custom mark to a set of axes::
+
+            mark = axes.add(MyCustomMark())
+
+        Parameters
+        ----------
+        mark: :class:`toyplot.mark.Mark`, required
+
+        Returns
+        -------
+        mark: :class:`toyplot.mark.Mark`
+        """
+
+        if not isinstance(mark, toyplot.mark.Mark):
+            raise ValueError("Expected toyplot.mark.Mark, received %s" % type(mark))
+        self._children.append(mark)
+        return mark
+
     def bars(
             self,
             a,
@@ -1162,7 +1188,7 @@ class Cartesian(object):
                 table[opacity_keys[-1]] = opacity_column
                 table[title_keys[-1]] = title_column
 
-            self._children.append(
+            return self.add_mark(
                 toyplot.mark.BarBoundaries(
                     coordinate_axes=coordinate_axes,
                     table=table,
@@ -1173,8 +1199,8 @@ class Cartesian(object):
                     opacity=opacity_keys,
                     title=title_keys,
                     style=style,
-                    filename=filename))
-            return self._children[-1]
+                    filename=filename,
+                    ))
         else:  # baseline is not None
             if a is not None and b is not None and c is not None:
                 a = toyplot.require.scalar_vector(a)
@@ -1266,7 +1292,7 @@ class Cartesian(object):
                 table[opacity_keys[-1]] = opacity_column
                 table[title_keys[-1]] = title_column
 
-            self._children.append(
+            return self.add_mark(
                 toyplot.mark.BarMagnitudes(
                     coordinate_axes=coordinate_axes,
                     table=table,
@@ -1278,8 +1304,8 @@ class Cartesian(object):
                     opacity=opacity_keys,
                     title=title_keys,
                     style=style,
-                    filename=filename))
-            return self._children[-1]
+                    filename=filename,
+                    ))
 
     def color_scale(
             self,
@@ -1420,7 +1446,7 @@ class Cartesian(object):
                 _mark_exportable(table, key)
                 boundaries.append(key)
 
-            self._children.append(
+            return self.add_mark(
                 toyplot.mark.FillBoundaries(
                     coordinate_axes=coordinate_axes,
                     table=table,
@@ -1431,8 +1457,8 @@ class Cartesian(object):
                     title=title,
                     style=style,
                     annotation=annotation,
-                    filename=filename))
-            return self._children[-1]
+                    filename=filename,
+                    ))
         else:  # baseline is not None
             if a is not None and b is not None:
                 b = toyplot.require.scalar_array(b)
@@ -1493,7 +1519,7 @@ class Cartesian(object):
                 _mark_exportable(table, key)
                 magnitudes.append(key)
 
-            self._children.append(
+            return self.add_mark(
                 toyplot.mark.FillMagnitudes(
                     coordinate_axes=coordinate_axes,
                     table=table,
@@ -1505,8 +1531,8 @@ class Cartesian(object):
                     title=title,
                     style=style,
                     annotation=annotation,
-                    filename=filename))
-            return self._children[-1]
+                    filename=filename,
+                    ))
 
     def graph(
             self,
@@ -1621,7 +1647,7 @@ class Cartesian(object):
         etable["width"] = ewidth
         etable["opacity"] = eopacity
 
-        self._children.append(
+        return self.add_mark(
             toyplot.mark.Graph(
                 coordinate_axes=coordinate_axes,
                 ecolor=["color"],
@@ -1648,7 +1674,6 @@ class Cartesian(object):
                 vtable=vtable,
                 vtitle=["title"],
                 ))
-        return self._children[-1]
 
     def hlines(
             self,
@@ -1694,7 +1719,7 @@ class Cartesian(object):
         table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])
         style = toyplot.style.require(style, allowed=toyplot.style.allowed.line)
 
-        self._children.append(
+        return self.add_mark(
             toyplot.mark.AxisLines(
                 coordinate_axes=["y"],
                 table=table,
@@ -1705,7 +1730,6 @@ class Cartesian(object):
                 style=style,
                 annotation=annotation,
                 ))
-        return self._children[-1]
 
     def legend(
             self,
@@ -1876,7 +1900,7 @@ class Cartesian(object):
             table[mopacity_keys[-1]] = mopacity_column
             table[mtitle_keys[-1]] = mtitle_column
 
-        self._children.append(
+        return self.add_mark(
             toyplot.mark.Plot(
                 coordinate_axes=coordinate_axes,
                 table=table,
@@ -1895,8 +1919,8 @@ class Cartesian(object):
                 style=style,
                 mstyle=mstyle,
                 mlstyle=mlstyle,
-                filename=filename))
-        return self._children[-1]
+                filename=filename,
+                ))
 
     def rects(
             self,
@@ -1937,7 +1961,7 @@ class Cartesian(object):
         elif along == "y":
             coordinate_axes = ["y", "x"]
 
-        self._children.append(
+        return self.add_mark(
             toyplot.mark.Rect(
                 coordinate_axes,
                 table=table,
@@ -1949,8 +1973,8 @@ class Cartesian(object):
                 opacity=["opacity"],
                 title=["title"],
                 style=style,
-                filename=filename))
-        return self._children[-1]
+                filename=filename,
+                ))
 
     def scatterplot(
             self,
@@ -2068,7 +2092,7 @@ class Cartesian(object):
             table[mopacity_keys[-1]] = mopacity_column
             table[mtitle_keys[-1]] = mtitle_column
 
-        self._children.append(
+        return self.add_mark(
             toyplot.mark.Scatterplot(
                 table=table,
                 coordinate_axes=coordinate_axes,
@@ -2081,8 +2105,8 @@ class Cartesian(object):
                 mtitle=mtitle_keys,
                 mstyle=mstyle,
                 mlstyle=mlstyle,
-                filename=filename))
-        return self._children[-1]
+                filename=filename,
+                ))
 
     def share(
             self,
@@ -2206,7 +2230,7 @@ class Cartesian(object):
             )
         table["fill"] = color[:, 0]
 
-        self._children.append(
+        return self.add_mark(
             toyplot.mark.Text(
                 coordinate_axes=["x", "y"],
                 table=table,
@@ -2218,8 +2242,8 @@ class Cartesian(object):
                 title=["title"],
                 style=style,
                 annotation=annotation,
-                filename=filename))
-        return self._children[-1]
+                filename=filename,
+                ))
 
     def vlines(
             self,
@@ -2265,7 +2289,7 @@ class Cartesian(object):
         table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])
         style = toyplot.style.require(style, allowed=toyplot.style.allowed.line)
 
-        self._children.append(
+        return self.add_mark(
             toyplot.mark.AxisLines(
                 coordinate_axes=["x"],
                 table=table,
@@ -2276,7 +2300,6 @@ class Cartesian(object):
                 style=style,
                 annotation=annotation,
                 ))
-        return self._children[-1]
 
 
 ##########################################################################
@@ -2381,6 +2404,33 @@ class Numberline(object):
 
     def _update_domain(self, values, display=True, data=True):
         self.axis._update_domain([values], display=display, data=data)
+
+    def add_mark(self, mark):
+        """Add a mark to the axes.
+
+        This is only of use when creating your own custom Toyplot marks.  It is
+        not intended for end-users.
+
+        Example
+        -------
+        To add your own custom mark to a set of axes::
+
+            mark = axes.add(MyCustomMark())
+
+        Parameters
+        ----------
+        mark: :class:`toyplot.mark.Mark`, required
+
+        Returns
+        -------
+        mark: :class:`toyplot.mark.Mark`
+        """
+
+        if not isinstance(mark, toyplot.mark.Mark):
+            raise ValueError("Expected toyplot.mark.Mark, received %s" % type(mark))
+        self._children.append(mark)
+        return mark
+
 
     def colormap(self, colormap, offset=None, width=10, style=None):
         if not isinstance(colormap, toyplot.color.Map):
@@ -2506,7 +2556,7 @@ class Numberline(object):
             filename=filename,
             )
 
-        self._children.append(mark)
+        self.add_mark(mark)
         self._child_offset[mark] = offset
 
         return mark
@@ -2834,22 +2884,20 @@ class Table(object):
                 width=0.5,
             ):
 
-            mark = toyplot.coordinates.Table.CellBarMark(
-                table=self._table,
-                axes=self,
-                baseline=baseline,
-                color=color,
-                filename=filename,
-                opacity=opacity,
-                padding=padding,
-                series=series,
-                style=style,
-                title=title,
-                width=width,
-                )
-
-            self._children.append(mark)
-            return mark
+            return self.add_mark(
+                toyplot.coordinates.Table.CellBarMark(
+                    table=self._table,
+                    axes=self,
+                    baseline=baseline,
+                    color=color,
+                    filename=filename,
+                    opacity=opacity,
+                    padding=padding,
+                    series=series,
+                    style=style,
+                    title=title,
+                    width=width,
+                    ))
 
 
         def cell_plot(
@@ -2871,27 +2919,26 @@ class Table(object):
                 title=None,
             ):
 
-            mark = toyplot.coordinates.Table.CellPlotMark(
-                table=self._table,
-                axes=self,
-                area=area,
-                color=color,
-                filename=filename,
-                marker=marker,
-                mfill=mfill,
-                mlstyle=mlstyle,
-                mopacity=mopacity,
-                mstyle=mstyle,
-                mtitle=mtitle,
-                opacity=opacity,
-                series=series,
-                size=size,
-                stroke_width=stroke_width,
-                style=style,
-                title=title,
-                )
-            self._children.append(mark)
-            return mark
+            return self.add_mark(
+                toyplot.coordinates.Table.CellPlotMark(
+                    table=self._table,
+                    axes=self,
+                    area=area,
+                    color=color,
+                    filename=filename,
+                    marker=marker,
+                    mfill=mfill,
+                    mlstyle=mlstyle,
+                    mopacity=mopacity,
+                    mstyle=mstyle,
+                    mtitle=mtitle,
+                    opacity=opacity,
+                    series=series,
+                    size=size,
+                    stroke_width=stroke_width,
+                    style=style,
+                    title=title,
+                    ))
 
 
     class CellReference(object):

@@ -2089,8 +2089,8 @@ def _render(axes, mark, context): # pragma: no cover
             y = axes._project_y(mark._ecoordinates.T[i])
 
     mark_xml = xml.SubElement(context.parent, "g", id=context.get_id(mark), attrib={"class": "toyplot-mark-Graph"})
-    #context.add_data(mark, mark._vtable, title="Graph Vertex Data", filename=mark._vertex_filename)
-    #context.add_data(mark, mark._etable, title="Graph Edge Data", filename=mark._edge_filename)
+    context.add_data(mark, mark._vtable, title="Graph Vertex Data", filename=mark._vfilename)
+    #context.add_data(mark, mark._etable, title="Graph Edge Data", filename=mark._efilename)
 
     coordinate_index = 0
     edge_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Edges"})

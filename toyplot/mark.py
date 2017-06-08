@@ -423,27 +423,29 @@ class Graph(Mark): # pragma: no cover
     def __init__(
             self,
             coordinate_axes,
-            vtable,
+            ecolor,
+            ecoordinates,
+            efilename,
+            eopacity,
+            eshape,
+            esource,
+            estyle,
+            etable,
+            etarget,
+            ewidth,
+            vcolor,
+            vcoordinates,
+            vfilename,
             vid,
             vlabel,
-            vcoordinates,
-            vmarker,
-            vsize,
-            vcolor,
-            vopacity,
-            vtitle,
-            vstyle,
-            vlstyle,
             vlshow,
-            etable,
-            esource,
-            etarget,
-            eshape,
-            ecoordinates,
-            ecolor,
-            ewidth,
-            eopacity,
-            estyle,
+            vlstyle,
+            vmarker,
+            vopacity,
+            vsize,
+            vstyle,
+            vtable,
+            vtitle,
         ):
         Mark.__init__(self)
 
@@ -473,6 +475,8 @@ class Graph(Mark): # pragma: no cover
         self._vlstyle = toyplot.style.require(vlstyle, allowed=toyplot.style.allowed.text)
         # Draw vertex labels
         self._vlshow = vlshow
+        # Export filename
+        self._vfilename = toyplot.require.filename(vfilename)
 
         self._etable = toyplot.require.instance(etable, toyplot.data.Table)
         # 1 edge source column
@@ -507,6 +511,8 @@ class Graph(Mark): # pragma: no cover
         self._eopacity = toyplot.require.table_keys(etable, eopacity, length=1)
         # Edge style
         self._estyle = toyplot.style.require(estyle, allowed=toyplot.style.allowed.line)
+        # Export filename
+        self._efilename = toyplot.require.filename(efilename)
 
     def domain(self, axis):
         index = numpy.flatnonzero(self._coordinate_axes == axis)[0]

@@ -66,6 +66,8 @@ class RenderContext(object):
         self._rendered = set()
         self._root = root
         self._visible_axes = set()
+        self._javascript_modules = dict()
+        self._javascript_calls = list()
 
     def add_data(self, item, content, title, filename):
         if isinstance(item, toyplot.mark.Mark) and item.annotation:
@@ -100,6 +102,40 @@ class RenderContext(object):
         result._parent = parent
         return result
 
+    def define(self, name, requirements, code):
+        """Define a Javascript module that can be embedded in the output markup.
+
+        Multiple calls to `define` with the same `name` argument will be silently
+        ignored.
+
+        Parameters
+        ----------
+        name: string, required
+            Module name.
+        requirements: sequence of strings, required
+            Possibly empty collection of module names that are required by this module.
+        code: string, required
+            Javascript source code for this module, which must be a function
+            that takes the modules listed in `requirements`, in-order, as
+            arguments, and returns the initialized module.
+        """
+        if name in self._javascript_modules:
+            return
+        self._javascript_modules[name] = (requirements, code)
+
+    def require(self, requirements, code):
+        """Embed Javascript code and its dependencies into the output markup.
+
+        Parameters
+        ----------
+        requirements: sequence of strings, required
+            Possibly empty collection of module names that are required by this code.
+        code: string, required
+            Javascript code to be embedded, which must be a function that takes the
+            modules listed in `requirements`, in-order, as arguments.
+        """
+        self._javascript_calls.append((requirements, code))
+
     @property
     def animation(self):
         return self._animation
@@ -117,6 +153,7 @@ class RenderContext(object):
     @property
     def visible_axes(self):
         return self._visible_axes
+
 
 def apply_changes(html, changes):
     for change_type, instructions in changes.items():
@@ -695,9 +732,32 @@ def _render(canvas, context):
         attrib={"class": "toyplot-interactive"},
         )
 
+    _render_javascript(context.copy(parent=interactive_xml))
     _render_data_table_export(context.copy(parent=interactive_xml))
     _render_interactive_mouse_coordinates(context.copy(parent=interactive_xml))
     _render(canvas._animation, context.copy(parent=interactive_xml)) # pylint: disable=no-value-for-parameter
+
+
+def _render_javascript(context):
+    script = """(function()
+{
+var modules={};
+"""
+
+    for requirements, code in context._javascript_calls:
+        toyplot.log.debug("%s %s", requirements, code)
+        script += """("""
+        script += code
+        script += """)("""
+        for index, requirement in enumerate(requirements):
+            if index:
+                script += ""","""
+            script += """modules["%s"]""" % requirement
+        script += """);\n"""
+
+    script += """})();"""
+
+    xml.SubElement(context.parent, "script").text = script
 
 
 def _render_data_table_export(context):

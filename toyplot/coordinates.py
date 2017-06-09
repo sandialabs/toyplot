@@ -1009,11 +1009,12 @@ class Cartesian(object):
 
         return self._finalized
 
-    def _project_x(self, x):
-        return self._x_projection(x)
-
-    def _project_y(self, y):
-        return self._y_projection(y)
+    def project(self, axis, values):
+        if axis == "x":
+            return self._x_projection(values)
+        elif axis == "y":
+            return self._y_projection(values)
+        raise ValueError("Unexpected axis: %s" % axis)
 
     def add_mark(self, mark):
         """Add a mark to the axes.

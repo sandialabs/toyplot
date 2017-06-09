@@ -1815,17 +1815,17 @@ def _render(axes, mark, context):
         axis2 = "y"
         distance1 = "width"
         distance2 = "height"
-        left = axes._project_x(left)
-        right = axes._project_x(right)
-        boundaries = axes._project_y(boundaries)
+        left = axes.project("x", left)
+        right = axes.project("x", right)
+        boundaries = axes.project("y", boundaries)
     elif mark._coordinate_axes.tolist() == ["y", "x"]:
         axis1 = "y"
         axis2 = "x"
         distance1 = "height"
         distance2 = "width"
-        left = axes._project_y(left)
-        right = axes._project_y(right)
-        boundaries = axes._project_x(boundaries)
+        left = axes.project("y", left)
+        right = axes.project("y", right)
+        boundaries = axes.project("x", boundaries)
 
     mark_xml = xml.SubElement(
         context.parent,
@@ -1894,17 +1894,17 @@ def _render(axes, mark, context):
         axis2 = "y"
         distance1 = "width"
         distance2 = "height"
-        left = axes._project_x(left)
-        right = axes._project_x(right)
-        boundaries = axes._project_y(boundaries)
+        left = axes.project("x", left)
+        right = axes.project("x", right)
+        boundaries = axes.project("y", boundaries)
     elif mark._coordinate_axes.tolist() == ["y", "x"]:
         axis1 = "y"
         axis2 = "x"
         distance1 = "height"
         distance2 = "width"
-        left = axes._project_y(left)
-        right = axes._project_y(right)
-        boundaries = axes._project_x(boundaries)
+        left = axes.project("y", left)
+        right = axes.project("y", right)
+        boundaries = axes.project("x", boundaries)
 
     mark_xml = xml.SubElement(
         context.parent,
@@ -1958,11 +1958,11 @@ def _render(axes, mark, context):
         [mark._table[key] for key in mark._boundaries])
 
     if mark._coordinate_axes.tolist() == ["x", "y"]:
-        position = axes._project_x(mark._table[mark._position[0]])
-        boundaries = axes._project_y(boundaries)
+        position = axes.project("x", mark._table[mark._position[0]])
+        boundaries = axes.project("y", boundaries)
     elif mark._coordinate_axes.tolist() == ["y", "x"]:
-        position = axes._project_y(mark._table[mark._position[0]])
-        boundaries = axes._project_x(boundaries)
+        position = axes.project("y", mark._table[mark._position[0]])
+        boundaries = axes.project("x", boundaries)
 
     mark_xml = xml.SubElement(
         context.parent,
@@ -2010,11 +2010,11 @@ def _render(axes, mark, context):
     segments = _flat_contiguous(not_null)
 
     if mark._coordinate_axes.tolist() == ["x", "y"]:
-        position = axes._project_x(mark._table[mark._position[0]])
-        boundaries = axes._project_y(boundaries)
+        position = axes.project("x", mark._table[mark._position[0]])
+        boundaries = axes.project("y", boundaries)
     elif mark._coordinate_axes.tolist() == ["y", "x"]:
-        position = axes._project_y(mark._table[mark._position[0]])
-        boundaries = axes._project_x(boundaries)
+        position = axes.project("y", mark._table[mark._position[0]])
+        boundaries = axes.project("x", boundaries)
 
     mark_xml = xml.SubElement(
         context.parent,
@@ -2052,7 +2052,7 @@ def _render(axes, mark, context):
         p2 = "x2"
         b1 = "y1"
         b2 = "y2"
-        position = axes._project_x(mark._table[mark._coordinates[0]])
+        position = axes.project("x", mark._table[mark._coordinates[0]])
         boundary1 = axes._ymin_range
         boundary2 = axes._ymax_range
     elif mark._coordinate_axes[0] == "y":
@@ -2060,7 +2060,7 @@ def _render(axes, mark, context):
         p2 = "y2"
         b1 = "x1"
         b2 = "x2"
-        position = axes._project_y(mark._table[mark._coordinates[0]])
+        position = axes.project("y", mark._table[mark._coordinates[0]])
         boundary1 = axes._xmin_range
         boundary2 = axes._xmax_range
     mark_xml = xml.SubElement(
@@ -2102,9 +2102,9 @@ def _render(axes, mark, context): # pragma: no cover
     # Project edge coordinates
     for i in range(2):
         if mark._coordinate_axes[i] == "x":
-            x = axes._project_x(mark._ecoordinates.T[i])
+            x = axes.project("x", mark._ecoordinates.T[i])
         elif mark._coordinate_axes[i] == "y":
-            y = axes._project_y(mark._ecoordinates.T[i])
+            y = axes.project("y", mark._ecoordinates.T[i])
 
     mark_xml = xml.SubElement(context.parent, "g", id=context.get_id(mark), attrib={"class": "toyplot-mark-Graph"})
     context.add_data(mark, mark._vtable, title="Graph Vertex Data", filename=mark._vfilename)
@@ -2155,9 +2155,9 @@ def _render(axes, mark, context): # pragma: no cover
     # Project vertex coordinates
     for i in range(2):
         if mark._coordinate_axes[i] == "x":
-            x = axes._project_x(mark._vtable[mark._vcoordinates[i]])
+            x = axes.project("x", mark._vtable[mark._vcoordinates[i]])
         elif mark._coordinate_axes[i] == "y":
-            y = axes._project_y(mark._vtable[mark._vcoordinates[i]])
+            y = axes.project("y", mark._vtable[mark._vcoordinates[i]])
 
     vertex_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Vertices"})
     for vx, vy, vmarker, vsize, vcolor, vopacity, vtitle in zip(
@@ -2206,11 +2206,11 @@ def _render(axes, mark, context):
     series = numpy.ma.column_stack([mark._table[key] for key in mark._series])
 
     if mark._coordinate_axes[0] == "x":
-        position = axes._project_x(position)
-        series = axes._project_y(series)
+        position = axes.project("x", position)
+        series = axes.project("y", series)
     elif mark._coordinate_axes[0] == "y":
-        position = axes._project_y(position)
-        series = axes._project_x(series)
+        position = axes.project("y", position)
+        series = axes.project("x", series)
 
     mark_xml = xml.SubElement(
         context.parent,
@@ -2297,15 +2297,15 @@ def _render(axes, mark, context):
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Rect, _RenderContext)
 def _render(axes, mark, context):
     if mark._coordinate_axes.tolist() == ["x", "y"]:
-        x1 = axes._project_x(mark._table[mark._left[0]])
-        x2 = axes._project_x(mark._table[mark._right[0]])
-        y1 = axes._project_y(mark._table[mark._top[0]])
-        y2 = axes._project_y(mark._table[mark._bottom[0]])
+        x1 = axes.project("x", mark._table[mark._left[0]])
+        x2 = axes.project("x", mark._table[mark._right[0]])
+        y1 = axes.project("y", mark._table[mark._top[0]])
+        y2 = axes.project("y", mark._table[mark._bottom[0]])
     elif mark._coordinate_axes.tolist() == ["y", "x"]:
-        x1 = axes._project_x(mark._table[mark._top[0]])
-        x2 = axes._project_x(mark._table[mark._bottom[0]])
-        y1 = axes._project_y(mark._table[mark._left[0]])
-        y2 = axes._project_y(mark._table[mark._right[0]])
+        x1 = axes.project("x", mark._table[mark._top[0]])
+        x2 = axes.project("x", mark._table[mark._bottom[0]])
+        y1 = axes.project("y", mark._table[mark._left[0]])
+        y2 = axes.project("y", mark._table[mark._right[0]])
     mark_xml = xml.SubElement(
         context.parent,
         "g",
@@ -2349,11 +2349,11 @@ def _render(axes, mark, context):
     dimension2 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates[1::2]])
 
     if mark._coordinate_axes[0] == "x":
-        X = axes._project_x(dimension1)
-        Y = axes._project_y(dimension2)
+        X = axes.project("x", dimension1)
+        Y = axes.project("y", dimension2)
     elif mark._coordinate_axes[0] == "y":
-        X = axes._project_x(dimension2)
-        Y = axes._project_y(dimension1)
+        X = axes.project("x", dimension2)
+        Y = axes.project("y", dimension1)
 
     mark_xml = xml.SubElement(
         context.parent,
@@ -2412,8 +2412,8 @@ def _render(parent, mark, context):
     y = mark._table[mark._coordinates[numpy.where(mark._coordinate_axes == "y")[0][0]]]
 
     if isinstance(parent, toyplot.coordinates.Cartesian):
-        x = parent._project_x(x)
-        y = parent._project_y(y)
+        x = parent.project("x", x)
+        y = parent.project("y", y)
 
     mark_xml = xml.SubElement(
         context.parent,

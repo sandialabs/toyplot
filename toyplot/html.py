@@ -126,7 +126,7 @@ class RenderContext(object):
             return
         self._javascript_modules[name] = (dependencies, factory)
 
-    def require(self, dependencies, code, arguments=[]):
+    def require(self, dependencies, code, arguments=[]): # pylint: disable=dangerous-default-value
         """Embed Javascript code and its dependencies into the output markup.
 
         The given code will be unconditionally embedded in the output markup,

@@ -102,39 +102,50 @@ class RenderContext(object):
         result._parent = parent
         return result
 
-    def define(self, name, requirements, code):
+    def define(self, name, dependencies, factory):
         """Define a Javascript module that can be embedded in the output markup.
 
-        Multiple calls to `define` with the same `name` argument will be silently
-        ignored.
+        The code for this module will only be embedded in the output if this
+        module is a dependency of another module, or code specified using
+        :meth:`require`.
 
         Parameters
         ----------
         name: string, required
-            Module name.
-        requirements: sequence of strings, required
-            Possibly empty collection of module names that are required by this module.
-        code: string, required
-            Javascript source code for this module, which must be a function
-            that takes the modules listed in `requirements`, in-order, as
-            arguments, and returns the initialized module.
+            Module name.  Any string is valid, but alphanumerics separated with
+            slashes are recommended. Multiple calls to `define` with the same
+            name argument will be silently ignored.
+        dependencies: sequence of strings, required
+            Names of modules that are dependencies by this module (if any).
+        factory: string, required
+            Javascript factory for this module, which must be a function that
+            takes the modules listed in `dependencies`, in-order, as arguments,
+            and returns the initialized module.
         """
         if name in self._javascript_modules:
             return
-        self._javascript_modules[name] = (requirements, code)
+        self._javascript_modules[name] = (dependencies, factory)
 
-    def require(self, requirements, code):
+    def require(self, dependencies, code, arguments=[]):
         """Embed Javascript code and its dependencies into the output markup.
+
+        The given code will be unconditionally embedded in the output markup,
+        along with any modules listed as dependencies (plus their dependencies,
+        and-so-on).
 
         Parameters
         ----------
-        requirements: sequence of strings, required
-            Possibly empty collection of module names that are required by this code.
+        dependencies: sequence of strings, required
+            Names of modules that are required by this code.
         code: string, required
             Javascript code to be embedded, which must be a function that takes the
-            modules listed in `requirements`, in-order, as arguments.
+            modules listed in `requirements`, in-order, as arguments, followed by the
+            values listed in `arguments`, in-order.
+        arguments: sequence of literal values, optional
+            Additional arguments to be passed to the Javascript function.
+            These can be strings, numbers, `None`, `True`, or `False`.
         """
-        self._javascript_calls.append((requirements, code))
+        self._javascript_calls.append((dependencies, code, arguments))
 
     @property
     def animation(self):
@@ -741,11 +752,11 @@ def _render(canvas, context):
 def _render_javascript(context):
     # Convert module dependencies into an adjacency list.
     adjacency_list = collections.defaultdict(list)
-    for name, (requirements, _) in context._javascript_modules.items():
+    for name, (requirements, factory) in context._javascript_modules.items():
         for requirement in requirements:
             adjacency_list[name].append(requirement)
 
-    # Sort the modules into topological order.
+    # Identify required modules and sort them into topological order.
     modules = []
     visited = {}
     def search(name, visited, modules):
@@ -754,7 +765,7 @@ def _render_javascript(context):
             if not visited.get(neighbor, False):
                 search(neighbor, visited, modules)
         modules.append((name, context._javascript_modules[name]))
-    for requirements, _ in context._javascript_calls:
+    for requirements, code, arguments in context._javascript_calls:
         for requirement in requirements:
             if not visited.get(requirement, False):
                 search(requirement, visited, modules)
@@ -765,10 +776,10 @@ def _render_javascript(context):
 var modules={};
 """
 
-    # Initialize all modules.
-    for name, (requirements, code) in modules:
+    # Initialize required modules.
+    for name, (requirements, factory) in modules:
         script += """modules["%s"] = (""" % name
-        script += code
+        script += factory
         script += """)("""
         for index, requirement in enumerate(requirements):
             if index:
@@ -777,14 +788,22 @@ var modules={};
         script += """);\n"""
 
     # Make all calls.
-    for requirements, code in context._javascript_calls:
+    def to_javascript(value):
+        if value is None:
+            return "null"
+        if value is True:
+            return "true"
+        if value is False:
+            return "false"
+        return repr(value)
+
+    for requirements, code, arguments in context._javascript_calls:
         script += """("""
         script += code
         script += """)("""
-        for index, requirement in enumerate(requirements):
-            if index:
-                script += ""","""
-            script += """modules["%s"]""" % requirement
+        argument_list = ["""modules["%s"]""" % requirement for requirement in requirements]
+        argument_list += [to_javascript(argument) for argument in arguments]
+        script += ",".join(argument_list)
         script += """);\n"""
 
     script += """})();"""

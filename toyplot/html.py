@@ -739,13 +739,45 @@ def _render(canvas, context):
 
 
 def _render_javascript(context):
+    # Convert module dependencies into an adjacency list.
+    adjacency_list = collections.defaultdict(list)
+    for name, (requirements, _) in context._javascript_modules.items():
+        for requirement in requirements:
+            adjacency_list[name].append(requirement)
+
+    # Sort the modules into topological order.
+    modules = []
+    visited = {}
+    def search(name, visited, modules):
+        visited[name] = True
+        for neighbor in adjacency_list[name]:
+            if not visited.get(neighbor, False):
+                search(neighbor, visited, modules)
+        modules.append((name, context._javascript_modules[name]))
+    for requirements, _ in context._javascript_calls:
+        for requirement in requirements:
+            if not visited.get(requirement, False):
+                search(requirement, visited, modules)
+
+    # Generate the code.
     script = """(function()
 {
 var modules={};
 """
 
+    # Initialize all modules.
+    for name, (requirements, code) in modules:
+        script += """modules["%s"] = (""" % name
+        script += code
+        script += """)("""
+        for index, requirement in enumerate(requirements):
+            if index:
+                script += ""","""
+            script += """modules["%s"]""" % requirement
+        script += """);\n"""
+
+    # Make all calls.
     for requirements, code in context._javascript_calls:
-        toyplot.log.debug("%s %s", requirements, code)
         script += """("""
         script += code
         script += """)("""
@@ -757,6 +789,7 @@ var modules={};
 
     script += """})();"""
 
+    # Create the DOM elements.
     xml.SubElement(context.parent, "script").text = script
 
 

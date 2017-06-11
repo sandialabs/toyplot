@@ -65,7 +65,6 @@ class RenderContext(object):
         self._parent = None
         self._rendered = set()
         self._root = root
-        self._visible_axes = set()
         self._javascript_modules = dict()
         self._javascript_calls = list()
 
@@ -81,9 +80,6 @@ class RenderContext(object):
             "content": content,
             "filename": filename,
             })
-
-    def add_visible_axis(self, axis):
-        self._visible_axes.add(axis)
 
     def already_rendered(self, renderable):
         if renderable in self._rendered:
@@ -102,12 +98,13 @@ class RenderContext(object):
         result._parent = parent
         return result
 
-    def define(self, name, dependencies, factory):
+    def define(self, name, dependencies=None, factory=None, value=None):
         """Define a Javascript module that can be embedded in the output markup.
 
-        The code for this module will only be embedded in the output if this
-        module is a dependency of another module, or code specified using
-        :meth:`require`.
+        The module will only be embedded in the output if it is listed as a
+        dependency of another module, or code specified using :meth:`require`.
+
+        You must specify either `factory` or `value`.
 
         Parameters
         ----------
@@ -117,16 +114,28 @@ class RenderContext(object):
             name argument will be silently ignored.
         dependencies: sequence of strings, required
             Names of modules that are dependencies by this module (if any).
-        factory: string, required
+        factory: string, optional
             Javascript factory for this module, which must be a function that
             takes the modules listed in `dependencies`, in-order, as arguments,
             and returns the initialized module.
+        value: Python object, optional
+            Arbitrary value for this module, which must be a JSON-convertible
+            value (string, number, boolean, None, list, or dict).
         """
         if name in self._javascript_modules:
             return
-        self._javascript_modules[name] = (dependencies, factory)
 
-    def require(self, dependencies, code, arguments=[]): # pylint: disable=dangerous-default-value
+        if dependencies is None:
+            dependencies = []
+
+        if factory is None and value is None:
+            raise ValueError("You must specify either factory or value.")
+        if factory is not None and value is not None:
+            raise ValueError("You must specify either factory or value.")
+
+        self._javascript_modules[name] = (dependencies, factory, value)
+
+    def require(self, dependencies, code, arguments=None):
         """Embed Javascript code and its dependencies into the output markup.
 
         The given code will be unconditionally embedded in the output markup,
@@ -145,6 +154,8 @@ class RenderContext(object):
             Additional arguments to be passed to the Javascript function.
             These can be strings, numbers, `None`, `True`, or `False`.
         """
+        if arguments is None:
+            arguments = []
         self._javascript_calls.append((dependencies, code, arguments))
 
     @property
@@ -160,10 +171,6 @@ class RenderContext(object):
     def root(self):
         """Top-level DOM node."""
         return self._root
-
-    @property
-    def visible_axes(self):
-        return self._visible_axes
 
 
 def apply_changes(html, changes):
@@ -718,6 +725,7 @@ def _axis_transform(x1, y1, x2, y2, offset, return_length=False):
 
 @dispatch(toyplot.canvas.Canvas, RenderContext)
 def _render(canvas, context):
+    # Create the root SVG element.
     svg_xml = xml.SubElement(
         context.parent,
         "svg",
@@ -734,25 +742,30 @@ def _render(canvas, context):
         style=_css_style(canvas._style),
         id=context.get_id(canvas))
 
+    # Render everything on the canvas.
     for child in canvas._children:
         _render(canvas, child._finalize(), context.copy(parent=svg_xml))
 
+    # Create a container for any Javascript code.
     interactive_xml = xml.SubElement(
         context.parent,
         "div",
         attrib={"class": "toyplot-interactive"},
         )
 
+    # Register a module to keep track of the root id
+    context.define("toyplot/canvas/id", value=context.get_id(canvas))
+
+    # Embed Javascript code and dependencies in the container.
     _render_javascript(context.copy(parent=interactive_xml))
     _render_data_table_export(context.copy(parent=interactive_xml))
-    _render_interactive_mouse_coordinates(context.copy(parent=interactive_xml))
     _render(canvas._animation, context.copy(parent=interactive_xml)) # pylint: disable=no-value-for-parameter
 
 
 def _render_javascript(context):
     # Convert module dependencies into an adjacency list.
     adjacency_list = collections.defaultdict(list)
-    for name, (requirements, factory) in context._javascript_modules.items():
+    for name, (requirements, factory, value) in context._javascript_modules.items():
         for requirement in requirements:
             adjacency_list[name].append(requirement)
 
@@ -777,32 +790,27 @@ var modules={};
 """
 
     # Initialize required modules.
-    for name, (requirements, factory) in modules:
-        script += """modules["%s"] = (""" % name
-        script += factory
-        script += """)("""
-        for index, requirement in enumerate(requirements):
-            if index:
-                script += ""","""
-            script += """modules["%s"]""" % requirement
-        script += """);\n"""
+    for name, (requirements, factory, value) in modules:
+        script += """modules["%s"] = """ % name
+
+        if factory is not None:
+            script += "("
+            script += factory
+            script += ")("
+            argument_list = ["""modules["%s"]""" % requirement for requirement in requirements]
+            script += ",".join(argument_list)
+            script += ");\n"
+        if value is not None:
+            script += json.dumps(value, cls=_NumpyJSONEncoder, sort_keys=True)
+            script += ";\n"
 
     # Make all calls.
-    def to_javascript(value):
-        if value is None:
-            return "null"
-        if value is True:
-            return "true"
-        if value is False:
-            return "false"
-        return repr(value)
-
     for requirements, code, arguments in context._javascript_calls:
         script += """("""
         script += code
         script += """)("""
         argument_list = ["""modules["%s"]""" % requirement for requirement in requirements]
-        argument_list += [to_javascript(argument) for argument in arguments]
+        argument_list += [json.dumps(argument, cls=_NumpyJSONEncoder, sort_keys=True) for argument in arguments]
         script += ",".join(argument_list)
         script += """);\n"""
 
@@ -918,139 +926,6 @@ def _render_data_table_export(context):
             root_id=context.root.get("id"),
             data_tables=json.dumps(data_tables),
             )
-
-
-def _render_interactive_mouse_coordinates(context):
-    if not context.visible_axes:
-        return
-
-    visible_axes = dict()
-    for axis in context.visible_axes:
-        key = context.get_id(axis)
-        visible_axes[key] = list()
-        for segment in axis.projection._segments:
-            visible_axes[key].append({
-                "scale": segment.scale,
-                "domain":
-                {
-                    "min": segment.domain.min,
-                    "max": segment.domain.max,
-                    "bounds":
-                    {
-                        "min": segment.domain.bounds.min,
-                        "max": segment.domain.bounds.max,
-                    },
-                },
-                "range":
-                {
-                    "min": segment.range.min,
-                    "max": segment.range.max,
-                    "bounds":
-                    {
-                        "min": segment.range.bounds.min,
-                        "max": segment.range.bounds.max,
-                    },
-                },
-            })
-
-    xml.SubElement(context.parent, "script").text = string.Template("""
-        (function()
-        {
-            function _sign(x)
-            {
-                return x < 0 ? -1 : x > 0 ? 1 : 0;
-            }
-
-            function _mix(a, b, amount)
-            {
-                return ((1.0 - amount) * a) + (amount * b);
-            }
-
-            function _log(x, base)
-            {
-                return Math.log(Math.abs(x)) / Math.log(base);
-            }
-
-            function _in_range(a, x, b)
-            {
-                var left = Math.min(a, b);
-                var right = Math.max(a, b);
-                return left <= x && x <= right;
-            }
-
-            function inside(range, projection)
-            {
-                for(var i = 0; i != projection.length; ++i)
-                {
-                    var segment = projection[i];
-                    if(_in_range(segment.range.min, range, segment.range.max))
-                        return true;
-                }
-                return false;
-            }
-
-            function to_domain(range, projection)
-            {
-                for(var i = 0; i != projection.length; ++i)
-                {
-                    var segment = projection[i];
-                    if(_in_range(segment.range.bounds.min, range, segment.range.bounds.max))
-                    {
-                        if(segment.scale == "linear")
-                        {
-                            var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
-                            return _mix(segment.domain.min, segment.domain.max, amount)
-                        }
-                        else if(segment.scale[0] == "log")
-                        {
-                            var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
-                            var base = segment.scale[1];
-                            return _sign(segment.domain.min) * Math.pow(base, _mix(_log(segment.domain.min, base), _log(segment.domain.max, base), amount));
-                        }
-                    }
-                }
-            }
-
-            function display_coordinates(e)
-            {
-                var current = svg.createSVGPoint();
-                current.x = e.clientX;
-                current.y = e.clientY;
-
-                for(var axis_id in axes)
-                {
-                    var axis = document.querySelector("#" + axis_id);
-                    var coordinates = axis.querySelector(".toyplot-coordinates-Axis-coordinates");
-                    if(coordinates)
-                    {
-                        var projection = axes[axis_id];
-                        var local = current.matrixTransform(axis.getScreenCTM().inverse());
-                        if(inside(local.x, projection))
-                        {
-                            var domain = to_domain(local.x, projection);
-                            coordinates.style.visibility = "visible";
-                            coordinates.setAttribute("transform", "translate(" + local.x + ")");
-                            var text = coordinates.querySelector("text");
-                            text.textContent = domain.toFixed(2);
-                        }
-                        else
-                        {
-                            coordinates.style.visibility= "hidden";
-                        }
-                    }
-                }
-            }
-
-            var root_id = "$root_id";
-            var axes = $visible_axes;
-
-            var svg = document.querySelector("#" + root_id + " svg");
-            svg.addEventListener("click", display_coordinates);
-        })();
-        """).substitute(
-            root_id=context.root.get("id"),
-            visible_axes=json.dumps(visible_axes, cls=_NumpyJSONEncoder, sort_keys=True),
-        )
 
 
 @dispatch(toyplot.canvas.Canvas._AnimationFrames, RenderContext)
@@ -1269,155 +1144,289 @@ def _render(canvas, axis, context):
     if context.already_rendered(axis):
         return
 
-    if axis.show:
-        context.add_visible_axis(axis)
+    if not axis.show:
+        return
 
-        transform, length = _axis_transform(axis._x1, axis._y1, axis._x2, axis._y2, offset=axis._offset, return_length=True)
+    transform, length = _axis_transform(axis._x1, axis._y1, axis._x2, axis._y2, offset=axis._offset, return_length=True)
 
-        axis_xml = xml.SubElement(
-            context.parent,
-            "g",
-            id=context.get_id(axis),
-            transform=transform,
-            attrib={"class": "toyplot-coordinates-Axis"},
-            )
+    axis_xml = xml.SubElement(
+        context.parent,
+        "g",
+        id=context.get_id(axis),
+        transform=transform,
+        attrib={"class": "toyplot-coordinates-Axis"},
+        )
 
-        if axis.spine.show:
-            x1 = 0
-            x2 = length
-            if axis.domain.show and axis._data_min is not None and axis._data_max is not None:
-                x1 = max(
-                    x1, axis.projection(axis._data_min))
-                x2 = min(
-                    x2, axis.projection(axis._data_max))
-            xml.SubElement(
-                axis_xml,
-                "line",
-                x1=repr(x1),
-                y1=repr(0),
-                x2=repr(x2),
-                y2=repr(0),
-                style=_css_style(
-                    axis.spine._style))
+    if axis.spine.show:
+        x1 = 0
+        x2 = length
+        if axis.domain.show and axis._data_min is not None and axis._data_max is not None:
+            x1 = max(
+                x1, axis.projection(axis._data_min))
+            x2 = min(
+                x2, axis.projection(axis._data_max))
+        xml.SubElement(
+            axis_xml,
+            "line",
+            x1=repr(x1),
+            y1=repr(0),
+            x2=repr(x2),
+            y2=repr(0),
+            style=_css_style(
+                axis.spine._style))
 
-            if axis.ticks.show:
-                y1 = axis._ticks_near if axis._tick_location == "below" else -axis._ticks_near
-                y2 = -axis._ticks_far if axis._tick_location == "below" else axis._ticks_far
-
-                ticks_group = xml.SubElement(axis_xml, "g")
-                for location, tick_style in zip(
-                        axis._tick_locations,
-                        axis.ticks.tick.styles(axis._tick_locations),
-                    ):
-                    x = axis.projection(location)
-                    xml.SubElement(
-                        ticks_group,
-                        "line",
-                        x1=repr(x),
-                        y1=repr(y1),
-                        x2=repr(x),
-                        y2=repr(y2),
-                        style=_css_style(
-                            axis.ticks._style,
-                            tick_style))
-
-        if axis.ticks.labels.show:
-            location = axis._tick_labels_location
-
-            if axis.ticks.labels.angle:
-                vertical_align = "middle"
-
-                if location == "above":
-                    text_anchor = "start" if axis.ticks.labels.angle > 0 else "end"
-                elif location == "below":
-                    text_anchor = "end" if axis.ticks.labels.angle > 0 else "start"
-            else:
-                vertical_align = "last-baseline" if location == "above" else "top"
-                text_anchor = "middle"
-
-            y = axis._tick_labels_offset if location == "below" else -axis._tick_labels_offset
+        if axis.ticks.show:
+            y1 = axis._ticks_near if axis._tick_location == "below" else -axis._ticks_near
+            y2 = -axis._ticks_far if axis._tick_location == "below" else axis._ticks_far
 
             ticks_group = xml.SubElement(axis_xml, "g")
-            for location, label, title, label_style in zip(
+            for location, tick_style in zip(
                     axis._tick_locations,
-                    axis._tick_labels,
-                    axis._tick_titles,
-                    axis.ticks.labels.label.styles(axis._tick_locations),
+                    axis.ticks.tick.styles(axis._tick_locations),
                 ):
                 x = axis.projection(location)
+                xml.SubElement(
+                    ticks_group,
+                    "line",
+                    x1=repr(x),
+                    y1=repr(y1),
+                    x2=repr(x),
+                    y2=repr(y2),
+                    style=_css_style(
+                        axis.ticks._style,
+                        tick_style))
 
-                style = toyplot.style.combine(
-                    {
-                        "-toyplot-vertical-align": vertical_align,
-                        "text-anchor": text_anchor,
-                    },
-                    axis.ticks.labels.style,
-                    label_style,
-                )
+    if axis.ticks.labels.show:
+        location = axis._tick_labels_location
 
-                _draw_text(
-                    root=ticks_group,
-                    text=label,
-                    x=x,
-                    y=y,
-                    style=style,
-                    angle=axis.ticks.labels.angle,
-                    title=title,
-                    )
+        if axis.ticks.labels.angle:
+            vertical_align = "middle"
 
-        location = axis._label_location
-        vertical_align = "last-baseline" if location == "above" else "top"
-        text_anchor = "middle"
-        y = axis._label_offset if location == "below" else -axis._label_offset
+            if location == "above":
+                text_anchor = "start" if axis.ticks.labels.angle > 0 else "end"
+            elif location == "below":
+                text_anchor = "end" if axis.ticks.labels.angle > 0 else "start"
+        else:
+            vertical_align = "last-baseline" if location == "above" else "top"
+            text_anchor = "middle"
 
-        _draw_text(
-            root=axis_xml,
-            text=axis.label.text,
-            x=length * 0.5,
-            y=y,
-            style=toyplot.style.combine(
+        y = axis._tick_labels_offset if location == "below" else -axis._tick_labels_offset
+
+        ticks_group = xml.SubElement(axis_xml, "g")
+        for location, label, title, label_style in zip(
+                axis._tick_locations,
+                axis._tick_labels,
+                axis._tick_titles,
+                axis.ticks.labels.label.styles(axis._tick_locations),
+            ):
+            x = axis.projection(location)
+
+            style = toyplot.style.combine(
                 {
                     "-toyplot-vertical-align": vertical_align,
                     "text-anchor": text_anchor,
                 },
-                axis.label.style,
-            ),
+                axis.ticks.labels.style,
+                label_style,
             )
 
-        if axis.interactive.coordinates.show:
-            coordinates_xml = xml.SubElement(
-                axis_xml, "g",
-                attrib={"class": "toyplot-coordinates-Axis-coordinates"},
-                style=_css_style({"visibility": "hidden"}),
-                transform="",
+            _draw_text(
+                root=ticks_group,
+                text=label,
+                x=x,
+                y=y,
+                style=style,
+                angle=axis.ticks.labels.angle,
+                title=title,
                 )
 
-            if axis.interactive.coordinates.tick.show:
-                y1 = axis._tick_labels_offset if axis._interactive_coordinates_location == "below" else -axis._tick_labels_offset
-                y1 *= 0.5
-                y2 = -axis._tick_labels_offset if axis._interactive_coordinates_location == "below" else axis._tick_labels_offset
-                y2 *= 0.75
-                xml.SubElement(
-                    coordinates_xml, "line",
-                    x1="0",
-                    x2="0",
-                    y1=repr(y1),
-                    y2=repr(y2),
-                    style=_css_style(axis.interactive.coordinates.tick.style),
-                    )
+    location = axis._label_location
+    vertical_align = "last-baseline" if location == "above" else "top"
+    text_anchor = "middle"
+    y = axis._label_offset if location == "below" else -axis._label_offset
 
-            if axis.interactive.coordinates.label.show:
-                y = axis._tick_labels_offset if axis._interactive_coordinates_location == "below" else -axis._tick_labels_offset
-                alignment_baseline = "hanging" if axis._interactive_coordinates_location == "below" else "alphabetic"
-                xml.SubElement(
-                    coordinates_xml, "text",
-                    x="0",
-                    y=repr(y),
-                    style=_css_style(toyplot.style.combine(
-                        {"alignment-baseline": alignment_baseline},
-                        axis.interactive.coordinates.label.style,
-                        )),
-                    )
+    _draw_text(
+        root=axis_xml,
+        text=axis.label.text,
+        x=length * 0.5,
+        y=y,
+        style=toyplot.style.combine(
+            {
+                "-toyplot-vertical-align": vertical_align,
+                "text-anchor": text_anchor,
+            },
+            axis.label.style,
+        ),
+        )
+
+    if axis.interactive.coordinates.show:
+        coordinates_xml = xml.SubElement(
+            axis_xml, "g",
+            attrib={"class": "toyplot-coordinates-Axis-coordinates"},
+            style=_css_style({"visibility": "hidden"}),
+            transform="",
+            )
+
+        if axis.interactive.coordinates.tick.show:
+            y1 = axis._tick_labels_offset if axis._interactive_coordinates_location == "below" else -axis._tick_labels_offset
+            y1 *= 0.5
+            y2 = -axis._tick_labels_offset if axis._interactive_coordinates_location == "below" else axis._tick_labels_offset
+            y2 *= 0.75
+            xml.SubElement(
+                coordinates_xml, "line",
+                x1="0",
+                x2="0",
+                y1=repr(y1),
+                y2=repr(y2),
+                style=_css_style(axis.interactive.coordinates.tick.style),
+                )
+
+        if axis.interactive.coordinates.label.show:
+            y = axis._tick_labels_offset if axis._interactive_coordinates_location == "below" else -axis._tick_labels_offset
+            alignment_baseline = "hanging" if axis._interactive_coordinates_location == "below" else "alphabetic"
+            xml.SubElement(
+                coordinates_xml, "text",
+                x="0",
+                y=repr(y),
+                style=_css_style(toyplot.style.combine(
+                    {"alignment-baseline": alignment_baseline},
+                    axis.interactive.coordinates.label.style,
+                    )),
+                )
+
+    context.define("toyplot/axis/coordinates", ["toyplot/canvas/id"], """
+        function(canvas_id)
+        {
+            function sign(x)
+            {
+                return x < 0 ? -1 : x > 0 ? 1 : 0;
+            }
+
+            function mix(a, b, amount)
+            {
+                return ((1.0 - amount) * a) + (amount * b);
+            }
+
+            function log(x, base)
+            {
+                return Math.log(Math.abs(x)) / Math.log(base);
+            }
+
+            function in_range(a, x, b)
+            {
+                var left = Math.min(a, b);
+                var right = Math.max(a, b);
+                return left <= x && x <= right;
+            }
+
+            function inside(range, projection)
+            {
+                for(var i = 0; i != projection.length; ++i)
+                {
+                    var segment = projection[i];
+                    if(in_range(segment.range.min, range, segment.range.max))
+                        return true;
+                }
+                return false;
+            }
+
+            function to_domain(range, projection)
+            {
+                for(var i = 0; i != projection.length; ++i)
+                {
+                    var segment = projection[i];
+                    if(in_range(segment.range.bounds.min, range, segment.range.bounds.max))
+                    {
+                        if(segment.scale == "linear")
+                        {
+                            var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
+                            return mix(segment.domain.min, segment.domain.max, amount)
+                        }
+                        else if(segment.scale[0] == "log")
+                        {
+                            var amount = (range - segment.range.min) / (segment.range.max - segment.range.min);
+                            var base = segment.scale[1];
+                            return sign(segment.domain.min) * Math.pow(base, mix(log(segment.domain.min, base), log(segment.domain.max, base), amount));
+                        }
+                    }
+                }
+            }
+
+            var axes = {};
+
+            function display_coordinates(e)
+            {
+                var current = svg.createSVGPoint();
+                current.x = e.clientX;
+                current.y = e.clientY;
+
+                for(var axis_id in axes)
+                {
+                    var axis = document.querySelector("#" + axis_id);
+                    var coordinates = axis.querySelector(".toyplot-coordinates-Axis-coordinates");
+                    if(coordinates)
+                    {
+                        var projection = axes[axis_id];
+                        var local = current.matrixTransform(axis.getScreenCTM().inverse());
+                        if(inside(local.x, projection))
+                        {
+                            var domain = to_domain(local.x, projection);
+                            coordinates.style.visibility = "visible";
+                            coordinates.setAttribute("transform", "translate(" + local.x + ")");
+                            var text = coordinates.querySelector("text");
+                            text.textContent = domain.toFixed(2);
+                        }
+                        else
+                        {
+                            coordinates.style.visibility= "hidden";
+                        }
+                    }
+                }
+            }
+
+            var svg = document.querySelector("#" + canvas_id);
+            svg.addEventListener("click", display_coordinates);
+
+            var module = {};
+            module.show_axis = function(axis_id, projection)
+            {
+                axes[axis_id] = projection;
+            }
+
+            return module;
+        }""",
+        )
+
+    projection = []
+    for segment in axis.projection._segments:
+        projection.append({
+            "scale": segment.scale,
+            "domain":
+            {
+                "min": segment.domain.min,
+                "max": segment.domain.max,
+                "bounds":
+                {
+                    "min": segment.domain.bounds.min,
+                    "max": segment.domain.bounds.max,
+                },
+            },
+            "range":
+            {
+                "min": segment.range.min,
+                "max": segment.range.max,
+                "bounds":
+                {
+                    "min": segment.range.bounds.min,
+                    "max": segment.range.bounds.max,
+                },
+            },
+        })
+
+    context.require(["toyplot/axis/coordinates"], """function(coordinates, axis_id, projection)
+    {
+        coordinates.show_axis(axis_id, projection);
+    }""", [context.get_id(axis), projection])
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Numberline, RenderContext)

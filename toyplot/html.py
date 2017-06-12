@@ -800,15 +800,19 @@ def _render(canvas, context):
     }""")
 
     # Register a Javascript module to provide a popup context menu.
-    context.define("toyplot/menu/context", ["toyplot/root"], factory="""function(root)
+    context.define("toyplot/menu/context", ["toyplot/root", "toyplot/canvas"], factory="""function(root, canvas)
     {
         var wrapper = document.createElement("div");
-        wrapper.innerHTML = "<ul class='toyplot-context-menu' style='background:rgba(0%,0%,0%,0.75); border:0; color:white; list-style:none; margin:0; padding:5px; position:fixed; visibility:hidden;'></ul>"
+        wrapper.innerHTML = "<ul class='toyplot-context-menu' style='background:#eee; border:1px solid #b8b8b8; border-radius:5px; box-shadow: 0px 0px 5px rgba(0%,0%,0%,0.2); margin:0; padding:3px 0; position:fixed; visibility:hidden;'></ul>"
         var menu = wrapper.firstChild;
 
         root.appendChild(menu);
 
         var items = [];
+
+
+        var opening = null;
+        var immediate_close = null;
         function open_menu(e)
         {
             var show_menu = false;
@@ -828,36 +832,86 @@ def _render(canvas, context):
 
             if(show_menu)
             {
-                menu.style.left = (e.clientX - 5) + "px";
+                opening = true;
+                immediate_close = false;
+                menu.style.left = (e.clientX + 1) + "px";
                 menu.style.top = (e.clientY - 5) + "px";
                 menu.style.visibility = "visible";
                 e.stopPropagation();
                 e.preventDefault();
             }
         }
-        root.addEventListener("contextmenu", open_menu);
 
-        function close_menu(e)
+        function close_menu()
         {
             menu.style.visibility = "hidden";
         }
-        menu.addEventListener("mouseleave", close_menu);
+
+        function contextmenu(e)
+        {
+            open_menu(e);
+        }
+
+        function mousemove(e)
+        {
+            if(opening)
+            {
+                immediate_close = true;
+            }
+        }
+
+        function mouseup(e)
+        {
+            if(opening && immediate_close)
+            {
+                close_menu();
+            }
+            opening = false;
+        }
+
+        function keydown(e)
+        {
+            console.log(e);
+            if(e.key == "Escape" || e.key == "Esc" || e.keyCode == 27)
+            {
+                close_menu();
+            }
+        }
+
+        canvas.addEventListener("contextmenu", contextmenu);
+        canvas.addEventListener("mousemove", mousemove);
+        canvas.addEventListener("mouseup", mouseup);
+        canvas.addEventListener("keydown", keydown);
 
         var module = {};
         module.add_item = function(label, show_callback, choose_callback)
         {
             var wrapper = document.createElement("div");
-            wrapper.innerHTML = "<li class='toyplot-context-menu-item' style='padding:5px;list-style:none;margin:0'>" + label + "</li>"
+            wrapper.innerHTML = "<li class='toyplot-context-menu-item' style='background:#eee; color:#333; padding:2px 20px; list-style:none; margin:0; text-align:left;'>" + label + "</li>"
             var item = wrapper.firstChild;
 
-            items.push({item: item, show: show_callback, choose: choose_callback});
+            items.push({item: item, show: show_callback});
+
+            function mouseover()
+            {
+                this.style.background = "steelblue";
+                this.style.color = "white";
+            }
+
+            function mouseout()
+            {
+                this.style.background = "#eee";
+                this.style.color = "#333";
+            }
 
             function choose_item(e)
             {
                 close_menu();
                 choose_callback();
             }
-            item.addEventListener("click", choose_item);
+            item.addEventListener("mouseover", mouseover);
+            item.addEventListener("mouseout", mouseout);
+            item.addEventListener("mouseup", choose_item);
 
             menu.appendChild(item);
         };

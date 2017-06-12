@@ -1037,8 +1037,6 @@ class Cartesian(object):
         mark: :class:`toyplot.mark.Mark`
         """
 
-        if not isinstance(mark, toyplot.mark.Mark):
-            raise ValueError("Expected toyplot.mark.Mark, received %s" % type(mark))
         self._children.append(mark)
         return mark
 

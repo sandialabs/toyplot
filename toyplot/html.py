@@ -866,7 +866,6 @@ def _render(canvas, context):
 
         function keydown(e)
         {
-            console.log(e);
             if(e.key == "Escape" || e.key == "Esc" || e.keyCode == 27)
             {
                 close_menu();
@@ -876,7 +875,7 @@ def _render(canvas, context):
         canvas.addEventListener("contextmenu", contextmenu);
         canvas.addEventListener("mousemove", mousemove);
         canvas.addEventListener("mouseup", mouseup);
-        canvas.addEventListener("keydown", keydown);
+        document.addEventListener("keydown", keydown);
 
         var module = {};
         module.add_item = function(label, show_callback, choose_callback)

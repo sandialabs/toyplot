@@ -120,10 +120,12 @@ class RenderContext(object):
             raise ValueError("You must specify either factory or value.")
         if factory is not None and value is not None:
             raise ValueError("You must specify either factory or value.")
+        if value is not None and dependencies:
+            raise ValueError("Dependencies can only be specified when defining a factory, not a value.")
 
         self._javascript_modules[name] = (dependencies, factory, value)
 
-    def require(self, dependencies, code, arguments=None):
+    def require(self, dependencies=None, arguments=None, code=None):
         """Embed Javascript code and its dependencies into the output markup.
 
         The given code will be unconditionally embedded in the output markup,
@@ -132,19 +134,23 @@ class RenderContext(object):
 
         Parameters
         ----------
-        dependencies: sequence of strings, required
+        dependencies: sequence of strings, optional
             Names of modules that are required by this code.
+        arguments: sequence of Python objects, optional
+            Additional arguments to be passed to the Javascript code.
+            Arguments must be compatible with :func:`json.dumps`.
         code: string, required
-            Javascript code to be embedded, which must be a function that takes the
-            modules listed in `requirements`, in-order, as arguments, followed by the
-            values listed in `arguments`, in-order.
-        arguments: sequence of literal values, optional
-            Additional arguments to be passed to the Javascript function.
-            These can be strings, numbers, `None`, `True`, or `False`.
+            Javascript function to be embedded, which must accept the modules
+            listed in `requirements` in-order, followed by the values listed in
+            `arguments` in-order, as arguments.
         """
+        if dependencies is None:
+            dependencies = []
         if arguments is None:
             arguments = []
-        self._javascript_calls.append((dependencies, code, arguments))
+        if code is None:
+            raise ValueError("You must specify a Javascript function using the code argument.")
+        self._javascript_calls.append((dependencies, arguments, code))
 
     @property
     def animation(self):
@@ -832,7 +838,7 @@ def _render(canvas, context):
     context.define("toyplot/menu/context", ["toyplot/root", "toyplot/canvas"], factory="""function(root, canvas)
     {
         var wrapper = document.createElement("div");
-        wrapper.innerHTML = "<ul class='toyplot-context-menu' style='background:#eee; border:1px solid #b8b8b8; border-radius:5px; box-shadow: 0px 0px 5px rgba(0%,0%,0%,0.2); margin:0; padding:3px 0; position:fixed; visibility:hidden;'></ul>"
+        wrapper.innerHTML = "<ul class='toyplot-context-menu' style='background:#eee; border:1px solid #b8b8b8; border-radius:5px; box-shadow: 0px 0px 8px rgba(0%,0%,0%,0.25); margin:0; padding:3px 0; position:fixed; visibility:hidden;'></ul>"
         var menu = wrapper.firstChild;
 
         root.appendChild(menu);
@@ -967,7 +973,7 @@ def _render_javascript(context):
             if not visited.get(neighbor, False):
                 search(neighbor, visited, modules)
         modules.append((name, context._javascript_modules[name]))
-    for requirements, code, arguments in context._javascript_calls:
+    for requirements, arguments, code in context._javascript_calls:
         for requirement in requirements:
             if not visited.get(requirement, False):
                 search(requirement, visited, modules)
@@ -994,7 +1000,7 @@ var modules={};
             script += ";\n"
 
     # Make all calls.
-    for requirements, code, arguments in context._javascript_calls:
+    for requirements, arguments, code in context._javascript_calls:
         script += """("""
         script += code
         script += """)("""
@@ -1029,10 +1035,12 @@ def _render_table(owner, key, label, table, filename, context):
         filename = "toyplot"
 
     context.require(
-        ["toyplot/tables", "toyplot/menu/context", "toyplot/file"],
-        """function(tables, contextmenu, file, owner_id, key, label, names, columns, filename)
+        dependencies=["toyplot/tables", "toyplot/menu/context", "toyplot/file"],
+        arguments=[owner_id, key, label, names, columns, filename],
+        code="""function(tables, contextmenu, file, owner_id, key, label, names, columns, filename)
         {
             tables.store(owner_id, key, names, columns);
+
             var owner = document.querySelector("#" + owner_id);
             function show_item(e)
             {
@@ -1043,8 +1051,10 @@ def _render_table(owner, key, label, table, filename, context):
             {
                 file.save("text/csv", "utf-8", tables.get_csv(owner_id, key), filename + ".csv");
             }
+
             contextmenu.add_item("Save " + label + " as CSV", show_item, choose_item);
-        }""", arguments=[owner_id, key, label, names, columns, filename])
+        }""",
+    )
 
 
 @dispatch(toyplot.canvas.Canvas._AnimationFrames, RenderContext)
@@ -1542,10 +1552,14 @@ def _render(canvas, axis, context):
             },
         })
 
-    context.require(["toyplot/axis/coordinates"], """function(coordinates, axis_id, projection)
-    {
-        coordinates.show_axis(axis_id, projection);
-    }""", [context.get_id(axis), projection])
+    context.require(
+        dependencies=["toyplot/axis/coordinates"],
+        arguments=[context.get_id(axis), projection],
+        code="""function(coordinates, axis_id, projection)
+        {
+            coordinates.show_axis(axis_id, projection);
+        }""",
+    )
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Numberline, RenderContext)

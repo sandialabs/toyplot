@@ -874,7 +874,7 @@ def _render(canvas, context):
 
         canvas.addEventListener("contextmenu", contextmenu);
         canvas.addEventListener("mousemove", mousemove);
-        canvas.addEventListener("mouseup", mouseup);
+        document.addEventListener("mouseup", mouseup);
         document.addEventListener("keydown", keydown);
 
         var module = {};

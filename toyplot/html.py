@@ -1032,10 +1032,10 @@ def _render_table(owner, key, label, table, filename, context):
                 else:
                     names.append(name)
                     columns.append(column.tolist())
-        else: # Assume numpy matrix
-            for column in content.T:
-                names.append(column[0])
-                columns.append(column[1:].tolist())
+    else: # Assume numpy matrix
+        for column in table.T:
+            names.append(column[0])
+            columns.append(column[1:].tolist())
 
     if not (names and columns):
         return

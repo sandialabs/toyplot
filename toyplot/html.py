@@ -807,10 +807,10 @@ def _render(canvas, context):
     }""")
 
     # Register a Javascript module for saving data from the browser.
-    context.define("toyplot/file", factory="""function()
+    context.define("toyplot/io", factory="""function()
     {
         var module = {};
-        module.save = function(mime_type, charset, data, filename)
+        module.save_file = function(mime_type, charset, data, filename)
         {
             var uri = "data:" + mime_type + ";charset=" + charset + "," + data;
             uri = encodeURI(uri);
@@ -835,7 +835,7 @@ def _render(canvas, context):
     }""")
 
     # Register a Javascript module to provide a popup context menu.
-    context.define("toyplot/menu/context", ["toyplot/root", "toyplot/canvas"], factory="""function(root, canvas)
+    context.define("toyplot/menus/context", ["toyplot/root", "toyplot/canvas"], factory="""function(root, canvas)
     {
         var wrapper = document.createElement("div");
         wrapper.innerHTML = "<ul class='toyplot-context-menu' style='background:#eee; border:1px solid #b8b8b8; border-radius:5px; box-shadow: 0px 0px 8px rgba(0%,0%,0%,0.25); margin:0; padding:3px 0; position:fixed; visibility:hidden;'></ul>"
@@ -1023,21 +1023,31 @@ def _render_table(owner, key, label, table, filename, context):
 
     names = []
     columns = []
-    for name, column in table.items():
-        if "toyplot:exportable" in table.metadata(name) and table.metadata(name)["toyplot:exportable"]:
-            if column.dtype == toyplot.color.dtype:
-                raise ValueError("Color column table export isn't supported.") # pragma: no cover
-            else:
-                names.append(name)
-                columns.append(column.tolist())
+
+    if isinstance(table, toyplot.data.Table):
+        for name, column in table.items():
+            if "toyplot:exportable" in table.metadata(name) and table.metadata(name)["toyplot:exportable"]:
+                if column.dtype == toyplot.color.dtype:
+                    raise ValueError("Color column table export isn't supported.") # pragma: no cover
+                else:
+                    names.append(name)
+                    columns.append(column.tolist())
+        else: # Assume numpy matrix
+            for column in content.T:
+                names.append(column[0])
+                columns.append(column[1:].tolist())
+
+    if not (names and columns):
+        return
+
     owner_id = context.get_id(owner)
     if filename is None:
         filename = "toyplot"
 
     context.require(
-        dependencies=["toyplot/tables", "toyplot/menu/context", "toyplot/file"],
+        dependencies=["toyplot/tables", "toyplot/menus/context", "toyplot/io"],
         arguments=[owner_id, key, label, names, columns, filename],
-        code="""function(tables, contextmenu, file, owner_id, key, label, names, columns, filename)
+        code="""function(tables, context_menu, io, owner_id, key, label, names, columns, filename)
         {
             tables.store(owner_id, key, names, columns);
 
@@ -1049,10 +1059,10 @@ def _render_table(owner, key, label, table, filename, context):
 
             function choose_item()
             {
-                file.save("text/csv", "utf-8", tables.get_csv(owner_id, key), filename + ".csv");
+                io.save_file("text/csv", "utf-8", tables.get_csv(owner_id, key), filename + ".csv");
             }
 
-            contextmenu.add_item("Save " + label + " as CSV", show_item, choose_item);
+            context_menu.add_item("Save " + label + " as CSV", show_item, choose_item);
         }""",
     )
 
@@ -1423,8 +1433,8 @@ def _render(canvas, axis, context):
                     )),
                 )
 
-    context.define("toyplot/axis/coordinates", ["toyplot/canvas/id"], """
-        function(canvas_id)
+    context.define("toyplot.coordinates.Axis", ["toyplot/canvas"], """
+        function(canvas)
         {
             function sign(x)
             {
@@ -1485,7 +1495,7 @@ def _render(canvas, axis, context):
 
             function display_coordinates(e)
             {
-                var current = svg.createSVGPoint();
+                var current = canvas.createSVGPoint();
                 current.x = e.clientX;
                 current.y = e.clientY;
 
@@ -1513,11 +1523,10 @@ def _render(canvas, axis, context):
                 }
             }
 
-            var svg = document.querySelector("#" + canvas_id);
-            svg.addEventListener("click", display_coordinates);
+            canvas.addEventListener("click", display_coordinates);
 
             var module = {};
-            module.show_axis = function(axis_id, projection)
+            module.show_coordinates = function(axis_id, projection)
             {
                 axes[axis_id] = projection;
             }
@@ -1553,11 +1562,11 @@ def _render(canvas, axis, context):
         })
 
     context.require(
-        dependencies=["toyplot/axis/coordinates"],
+        dependencies=["toyplot.coordinates.Axis"],
         arguments=[context.get_id(axis), projection],
-        code="""function(coordinates, axis_id, projection)
+        code="""function(axis, axis_id, projection)
         {
-            coordinates.show_axis(axis_id, projection);
+            axis.show_coordinates(axis_id, projection);
         }""",
     )
 

@@ -257,8 +257,18 @@ def render(canvas, fobj=None, animation=False, style=None):
     if style is not None:
         root_xml.set("style", toyplot.style.to_css(style))
 
-    # Render the canvas.
+    # Setup a render context
     context = RenderContext(root=root_xml)
+
+    # Register a Javascript module to keep track of the root id
+    context.define("toyplot/root/id", value=root_xml.get("id"))
+    # Register a Javascript module to keep track of the root
+    context.define("toyplot/root", ["toyplot/root/id"], factory="""function(root_id)
+    {
+        return document.querySelector("#" + root_id);
+    }""")
+
+    # Render the canvas.
     _render(canvas, context.copy(parent=root_xml)) # pylint: disable=no-value-for-parameter
 
     # Return / write the results.
@@ -747,19 +757,117 @@ def _render(canvas, context):
         _render(canvas, child._finalize(), context.copy(parent=svg_xml))
 
     # Create a container for any Javascript code.
-    interactive_xml = xml.SubElement(
+    javascript_xml = xml.SubElement(
         context.parent,
         "div",
-        attrib={"class": "toyplot-interactive"},
+        attrib={"class": "toyplot-behavior"},
         )
 
-    # Register a module to keep track of the root id
+    # Register a Javascript module to keep track of the canvas id.
     context.define("toyplot/canvas/id", value=context.get_id(canvas))
+    # Register a Javascript module to keep track of the canvas.
+    context.define("toyplot/canvas", ["toyplot/canvas/id"], factory="""function(canvas_id)
+    {
+        return document.querySelector("#" + canvas_id);
+    }""")
+
+    # Register a Javascript module for saving data from the browser.a
+    context.define("toyplot/file", factory="""function()
+    {
+        var module = {};
+        module.save = function(mime_type, charset, data, filename)
+        {
+            var uri = "data:" + mime_type + ";charset=" + charset + "," + data;
+            uri = encodeURI(uri);
+
+            var link = document.createElement("a");
+            if(typeof link.download != "undefined")
+            {
+              link.href = uri;
+              link.style = "visibility:hidden";
+              link.download = filename;
+
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }
+            else
+            {
+              window.open(uri);
+            }
+        };
+        return module;
+    }""")
+
+    # Register a Javascript module to provide a popup context menu.
+    context.define("toyplot/menu/context", ["toyplot/root"], factory="""function(root)
+    {
+        var wrapper = document.createElement("div");
+        wrapper.innerHTML = "<ul class='toyplot-context-menu' style='background:rgba(0%,0%,0%,0.75); border:0; color:white; list-style:none; margin:0; padding:5px; position:fixed; visibility:hidden;'></ul>"
+        var menu = wrapper.firstChild;
+
+        root.appendChild(menu);
+
+        var items = [];
+        function open_menu(e)
+        {
+            var show_menu = false;
+            for(var index=0; index != items.length; ++index)
+            {
+                var item = items[index];
+                if(item.show(e))
+                {
+                    item.item.style.display = "block";
+                    show_menu = true;
+                }
+                else
+                {
+                    item.item.style.display = "none";
+                }
+            }
+
+            if(show_menu)
+            {
+                menu.style.left = (e.clientX - 5) + "px";
+                menu.style.top = (e.clientY - 5) + "px";
+                menu.style.visibility = "visible";
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        }
+        root.addEventListener("contextmenu", open_menu);
+
+        function close_menu(e)
+        {
+            menu.style.visibility = "hidden";
+        }
+        menu.addEventListener("mouseleave", close_menu);
+
+        var module = {};
+        module.add_item = function(label, show_callback, choose_callback)
+        {
+            var wrapper = document.createElement("div");
+            wrapper.innerHTML = "<li class='toyplot-context-menu-item' style='padding:5px;list-style:none;margin:0'>" + label + "</li>"
+            var item = wrapper.firstChild;
+
+            items.push({item: item, show: show_callback, choose: choose_callback});
+
+            function choose_item(e)
+            {
+                close_menu();
+                choose_callback();
+            }
+            item.addEventListener("click", choose_item);
+
+            menu.appendChild(item);
+        };
+        return module;
+    }""")
 
     # Embed Javascript code and dependencies in the container.
-    _render_javascript(context.copy(parent=interactive_xml))
-    _render_data_table_export(context.copy(parent=interactive_xml))
-    _render(canvas._animation, context.copy(parent=interactive_xml)) # pylint: disable=no-value-for-parameter
+    _render_javascript(context.copy(parent=javascript_xml))
+    _render_data_table_export(context.copy(parent=javascript_xml))
+    _render(canvas._animation, context.copy(parent=javascript_xml)) # pylint: disable=no-value-for-parameter
 
 
 def _render_javascript(context):

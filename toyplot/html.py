@@ -810,9 +810,7 @@ def _render(canvas, context):
 
         var items = [];
 
-
-        var opening = null;
-        var immediate_close = null;
+        var ignore_mouseup = null;
         function open_menu(e)
         {
             var show_menu = false;
@@ -832,8 +830,7 @@ def _render(canvas, context):
 
             if(show_menu)
             {
-                opening = true;
-                immediate_close = false;
+                ignore_mouseup = true;
                 menu.style.left = (e.clientX + 1) + "px";
                 menu.style.top = (e.clientY - 5) + "px";
                 menu.style.visibility = "visible";
@@ -854,19 +851,17 @@ def _render(canvas, context):
 
         function mousemove(e)
         {
-            if(opening)
-            {
-                immediate_close = true;
-            }
+            ignore_mouseup = false;
         }
 
         function mouseup(e)
         {
-            if(opening && immediate_close)
+            if(ignore_mouseup)
             {
-                close_menu();
+                ignore_mouseup = false;
+                return;
             }
-            opening = false;
+            close_menu();
         }
 
         function keydown(e)
@@ -908,10 +903,15 @@ def _render(canvas, context):
             {
                 close_menu();
                 choose_callback();
+
+                e.stopPropagation();
+                e.preventDefault();
             }
+
             item.addEventListener("mouseover", mouseover);
             item.addEventListener("mouseout", mouseout);
             item.addEventListener("mouseup", choose_item);
+            item.addEventListener("contextmenu", choose_item);
 
             menu.appendChild(item);
         };

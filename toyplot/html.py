@@ -10,6 +10,7 @@ import base64
 import collections
 import copy
 import functools
+import io
 import itertools
 import json
 import string
@@ -55,12 +56,11 @@ class _NumpyJSONEncoder(json.JSONEncoder):
 class RenderContext(object):
     """Stores context data during rendering.
 
-    This is only of use when create your own custom Toyplot marks.  It is not
-    intended for end-users.
+    This is only of use when creating custom Toyplot marks.  It is not intended
+    for end-users.
     """
     def __init__(self, root):
         self._animation = collections.defaultdict(lambda: collections.defaultdict(list))
-        self._data = list()
         self._id_cache = dict()
         self._parent = None
         self._rendered = set()
@@ -68,18 +68,6 @@ class RenderContext(object):
         self._javascript_modules = dict()
         self._javascript_calls = list()
 
-    def add_data(self, item, content, title, filename):
-        if isinstance(item, toyplot.mark.Mark) and item.annotation:
-            return
-        if isinstance(item, toyplot.coordinates.Table) and item.annotation:
-            return
-
-        self._data.append({
-            "id": self.get_id(item),
-            "title": title,
-            "content": content,
-            "filename": filename,
-            })
 
     def already_rendered(self, renderable):
         if renderable in self._rendered:
@@ -771,7 +759,48 @@ def _render(canvas, context):
         return document.querySelector("#" + canvas_id);
     }""")
 
-    # Register a Javascript module for saving data from the browser.a
+    # Register a Javascript module for storing table data.
+    context.define("toyplot/tables", factory="""function()
+    {
+        var tables = [];
+
+        var module = {};
+
+        module.store = function(owner, key, names, columns)
+        {
+            tables.push({owner: owner, key: key, names: names, columns: columns});
+        }
+
+        module.get_csv = function(owner, key)
+        {
+            var csv = "";
+            for(var i = 0; i != tables.length; ++i)
+            {
+                var table = tables[i];
+                if(table.owner != owner)
+                    continue;
+                if(table.key != key)
+                    continue;
+
+                csv += table.names.join(",") + "\\n";
+                for(var i = 0; i != table.columns[0].length; ++i)
+                {
+                  for(var j = 0; j != table.columns.length; ++j)
+                  {
+                    if(j)
+                      csv += ",";
+                    csv += table.columns[j][i];
+                  }
+                  csv += "\\n";
+                }
+                return csv;
+            }
+        }
+
+        return module;
+    }""")
+
+    # Register a Javascript module for saving data from the browser.
     context.define("toyplot/file", factory="""function()
     {
         var module = {};
@@ -919,7 +948,6 @@ def _render(canvas, context):
 
     # Embed Javascript code and dependencies in the container.
     _render_javascript(context.copy(parent=javascript_xml))
-    _render_data_table_export(context.copy(parent=javascript_xml))
     _render(canvas._animation, context.copy(parent=javascript_xml)) # pylint: disable=no-value-for-parameter
 
 
@@ -981,112 +1009,42 @@ var modules={};
     xml.SubElement(context.parent, "script").text = script
 
 
-def _render_data_table_export(context):
-    if not context._data:
+def _render_table(owner, key, label, table, filename, context):
+    if isinstance(owner, toyplot.mark.Mark) and owner.annotation:
+        return
+    if isinstance(owner, toyplot.coordinates.Table) and owner.annotation:
         return
 
-    context.parent.append(xml.XML(
-        """<ul class="toyplot-mark-popup" onmouseleave="this.style.visibility='hidden'" style="background:rgba(0%,0%,0%,0.75);border:0;border-radius:6px;color:white;cursor:default;list-style:none;margin:0;padding:5px;position:fixed;visibility:hidden">
-            <li class="toyplot-mark-popup-title" style="color:lightgray;cursor:default;padding:5px;list-style:none;margin:0"/>
-            <li class="toyplot-mark-popup-save-csv" style="border-radius:3px;padding:5px;list-style:none;margin:0" onmouseover="this.style.color='steelblue';this.style.background='white'" onmouseout="this.style.color='white';this.style.background='steelblue'">
-                Save as .csv
-            </li>
-        </ul>"""))
+    names = []
+    columns = []
+    for name, column in table.items():
+        if "toyplot:exportable" in table.metadata(name) and table.metadata(name)["toyplot:exportable"]:
+            if column.dtype == toyplot.color.dtype:
+                raise ValueError("Color column table export isn't supported.") # pragma: no cover
+            else:
+                names.append(name)
+                columns.append(column.tolist())
+    owner_id = context.get_id(owner)
+    if filename is None:
+        filename = "toyplot"
 
-    data_tables = list()
-    for data in context._data:
-        content = data["content"]
-
-        names = []
-        columns = []
-
-        if isinstance(content, toyplot.data.Table):
-            for name, column in content.items():
-                if "toyplot:exportable" in content.metadata(name) and content.metadata(name)["toyplot:exportable"]:
-                    if column.dtype == toyplot.color.dtype:
-                        raise ValueError("Color column table export isn't supported.") # pragma: no cover
-                    else:
-                        names.append(name)
-                        columns.append(column.tolist())
-        else: # Assume numpy matrix
-            for column in content.T:
-                names.append(column[0])
-                columns.append(column[1:].tolist())
-
-        if names and columns:
-            data_tables.append({
-                "id": data["id"],
-                "filename": data["filename"] if data["filename"] else "toyplot",
-                "title": data["title"],
-                "names": names,
-                "columns": columns,
-                })
-
-    xml.SubElement(context.parent, "script").text = string.Template("""
-        (function()
+    context.require(
+        ["toyplot/tables", "toyplot/menu/context", "toyplot/file"],
+        """function(tables, contextmenu, file, owner_id, key, label, names, columns, filename)
         {
-          var data_tables = $data_tables;
-
-          function save_csv(data_table)
-          {
-            var uri = "data:text/csv;charset=utf-8,";
-            uri += data_table.names.join(",") + "\\n";
-            for(var i = 0; i != data_table.columns[0].length; ++i)
+            tables.store(owner_id, key, names, columns);
+            var owner = document.querySelector("#" + owner_id);
+            function show_item(e)
             {
-              for(var j = 0; j != data_table.columns.length; ++j)
-              {
-                if(j)
-                  uri += ",";
-                uri += data_table.columns[j][i];
-              }
-              uri += "\\n";
-            }
-            uri = encodeURI(uri);
-
-            var link = document.createElement("a");
-            if(typeof link.download != "undefined")
-            {
-              link.href = uri;
-              link.style = "visibility:hidden";
-              link.download = data_table.filename + ".csv";
-
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            }
-            else
-            {
-              window.open(uri);
-            }
-          }
-
-          function open_popup(data_table)
-          {
-            return function(e)
-            {
-              var popup = document.querySelector("#$root_id .toyplot-mark-popup");
-              popup.querySelector(".toyplot-mark-popup-title").innerHTML = data_table.title;
-              popup.querySelector(".toyplot-mark-popup-save-csv").onclick = function() { popup.style.visibility = "hidden"; save_csv(data_table); }
-              popup.style.left = (e.clientX - 50) + "px";
-              popup.style.top = (e.clientY - 20) + "px";
-              popup.style.visibility = "visible";
-              e.stopPropagation();
-              e.preventDefault();
+                return owner.contains(e.target);
             }
 
-          }
-
-          for(var i = 0; i != data_tables.length; ++i)
-          {
-            var data_table = data_tables[i];
-            var event_target = document.querySelector("#" + data_table.id);
-            event_target.oncontextmenu = open_popup(data_table);
-          }
-        })();
-        """).substitute(
-            root_id=context.root.get("id"),
-            data_tables=json.dumps(data_tables),
-            )
+            function choose_item()
+            {
+                file.save("text/csv", "utf-8", tables.get_csv(owner_id, key), filename + ".csv");
+            }
+            contextmenu.add_item("Save " + label + " as CSV", show_item, choose_item);
+        }""", arguments=[owner_id, key, label, names, columns, filename])
 
 
 @dispatch(toyplot.canvas.Canvas._AnimationFrames, RenderContext)
@@ -1750,7 +1708,7 @@ def _render(numberline, mark, context):
     if offset:
         mark_xml.set("transform", "translate(0,%s)" % -offset)
 
-    context.add_data(mark, mark._table, title="Scatterplot Data", filename=mark._filename)
+    _render_table(owner=mark, key="data", label="scatterplot data", table=mark._table, filename=mark._filename, context=context)
 
     dimension1 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates])
     X = numberline.axis.projection(dimension1)
@@ -1835,7 +1793,7 @@ def _render(canvas, axes, context):
     axes_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         axes), attrib={"class": "toyplot-coordinates-Table"})
 
-    context.add_data(axes, axes._cell_data, title="Table Data", filename=axes._filename)
+    _render_table(owner=axes, key="data", label="table data", table=axes._cell_data, filename=axes._filename, context=context)
 
     # Render title
     _draw_text(
@@ -2107,7 +2065,8 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-BarBoundaries"})
-    context.add_data(mark, mark._table, title="Bar Data", filename=mark._filename)
+
+    _render_table(owner=mark, key="data", label="bar data", table=mark._table, filename=mark._filename, context=context)
 
     for boundary1, boundary2, fill, opacity, title in zip(
             boundaries.T[:-1],
@@ -2186,7 +2145,8 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-BarMagnitudes"})
-    context.add_data(mark, mark._table, title="Bar Data", filename=mark._filename)
+
+    _render_table(owner=mark, key="data", label="bar data", table=mark._table, filename=mark._filename, context=context)
 
     for boundary1, boundary2, fill, opacity, title in zip(
             boundaries.T[:-1],
@@ -2244,7 +2204,8 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-FillBoundaries"})
-    context.add_data(mark, mark._table, title="Fill Data", filename=mark._filename)
+
+    _render_table(owner=mark, key="data", label="fill data", table=mark._table, filename=mark._filename, context=context)
 
     for boundary1, boundary2, fill, opacity, title in zip(
             boundaries.T[:-1], boundaries.T[1:], mark._fill, mark._opacity, mark._title):
@@ -2296,7 +2257,8 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-FillMagnitudes"})
-    context.add_data(mark, mark._table, title="Fill Data", filename=mark._filename)
+
+    _render_table(owner=mark, key="data", label="fill data", table=mark._table, filename=mark._filename, context=context)
 
     for boundary1, boundary2, fill, opacity, title in zip(
             boundaries.T[:-1], boundaries.T[1:], mark._fill, mark._opacity, mark._title):
@@ -2379,8 +2341,8 @@ def _render(axes, mark, context): # pragma: no cover
             y = axes.project("y", mark._ecoordinates.T[i])
 
     mark_xml = xml.SubElement(context.parent, "g", id=context.get_id(mark), attrib={"class": "toyplot-mark-Graph"})
-    context.add_data(mark, mark._vtable, title="Graph Vertex Data", filename=mark._vfilename)
-    #context.add_data(mark, mark._etable, title="Graph Edge Data", filename=mark._efilename)
+    _render_table(owner=mark, key="vertex_data", label="graph vertex data", table=mark._vtable, filename=mark._vfilename, context=context)
+    _render_table(owner=mark, key="edge_data", label="graph edge data", table=mark._etable, filename=mark._efilename, context=context)
 
     coordinate_index = 0
     edge_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Edges"})
@@ -2491,7 +2453,8 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-Plot"})
-    context.add_data(mark, mark._table, title="Plot Data", filename=mark._filename)
+
+    _render_table(owner=mark, key="data", label="plot data", table=mark._table, filename=mark._filename, context=context)
 
     for series, stroke, stroke_width, stroke_opacity, stroke_title, marker, msize, mfill, mstroke, mopacity, mtitle in zip(
             series.T,
@@ -2586,7 +2549,8 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={
             "class": "toyplot-mark-Rect"})
-    context.add_data(mark, mark._table, title="Rect Data", filename=mark._filename)
+
+    _render_table(owner=mark, key="data", label="rect data", table=mark._table, filename=mark._filename, context=context)
 
     series_xml = xml.SubElement(
         mark_xml, "g", attrib={"class": "toyplot-Series"})
@@ -2633,7 +2597,8 @@ def _render(axes, mark, context):
         id=context.get_id(mark),
         attrib={"class": "toyplot-mark-Scatterplot"},
         )
-    context.add_data(mark, mark._table, title="Scatterplot Data", filename=mark._filename)
+
+    _render_table(owner=mark, key="data", label="scatterplot", table=mark._table, filename=mark._filename, context=context)
 
     for x, y, marker, msize, mfill, mstroke, mopacity, mtitle in zip(
             X.T,
@@ -2693,7 +2658,9 @@ def _render(parent, mark, context):
         id=context.get_id(mark),
         attrib={"class": "toyplot-mark-Text"},
         )
-    context.add_data(mark, mark._table, title="Text Data", filename=mark._filename)
+
+    _render_table(owner=mark, key="data", label="text data", table=mark._table, filename=mark._filename, context=context)
+
     series_xml = xml.SubElement(
         mark_xml, "g", attrib={"class": "toyplot-Series"})
     for dx, dy, dtext, dangle, dfill, dopacity, dtitle in zip(

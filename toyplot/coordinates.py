@@ -608,7 +608,7 @@ class Cartesian(object):
     """Standard two-dimensional Cartesian coordinate system.
 
     Do not create Cartesian instances directly.  Use factory methods such
-    as :meth:`toyplot.canvas.Canvas.axes` instead.
+    as :meth:`toyplot.canvas.Canvas.cartesian` instead.
     """
 
     class LabelHelper(object):
@@ -633,29 +633,35 @@ class Cartesian(object):
 
     def __init__(
             self,
-            xmin_range,
-            xmax_range,
-            ymin_range,
-            ymax_range,
             aspect,
-            xmin,
-            xmax,
-            ymin,
-            ymax,
-            show,
-            xshow,
-            yshow,
             label,
-            xlabel,
-            ylabel,
-            xticklocator,
-            yticklocator,
-            xscale,
-            yscale,
             padding,
+            palette,
             parent,
-            xaxis=None,
-            yaxis=None):
+            show,
+            xaxis,
+            xlabel,
+            xmax,
+            xmax_range,
+            xmin,
+            xmin_range,
+            xscale,
+            xshow,
+            xticklocator,
+            yaxis,
+            ylabel,
+            ymax,
+            ymax_range,
+            ymin,
+            ymin_range,
+            yscale,
+            yshow,
+            yticklocator,
+            ):
+
+        if palette is None:
+            palette = toyplot.color.Palette()
+
         self._finalized = None
 
         self._xmin_range = xmin_range
@@ -674,7 +680,7 @@ class Cartesian(object):
         self._expand_domain_range_bottom = None
         self._padding = toyplot.units.convert(padding, target="px", default="px")
 
-        self._palette = toyplot.color.Palette()
+        self._palette = palette
         self._bar_colors = itertools.cycle(self._palette)
         self._fill_colors = itertools.cycle(self._palette)
         self._graph_colors = itertools.cycle(self._palette)
@@ -2110,16 +2116,17 @@ class Cartesian(object):
     def share(
             self,
             axis="x",
-            xmin=None,
-            xmax=None,
-            ymin=None,
-            ymax=None,
+            palette=None,
             xlabel=None,
-            ylabel=None,
-            xticklocator=None,
-            yticklocator=None,
+            xmax=None,
+            xmin=None,
             xscale="linear",
+            xticklocator=None,
+            ylabel=None,
+            ymax=None,
+            ymin=None,
             yscale="linear",
+            yticklocator=None,
         ):
         """Create a Cartesian coordinate system with a shared axis.
 
@@ -2143,29 +2150,30 @@ class Cartesian(object):
         """
 
         shared = Cartesian(
-            xmin_range=self._xmin_range,
-            xmax_range=self._xmax_range,
-            ymin_range=self._ymin_range,
-            ymax_range=self._ymax_range,
             aspect=self._aspect,
-            xmin=xmin,
-            xmax=xmax,
-            ymin=ymin,
-            ymax=ymax,
-            show=True,
-            xshow=True,
-            yshow=True,
             label=None,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            xticklocator=xticklocator,
-            yticklocator=yticklocator,
-            xscale=xscale,
-            yscale=yscale,
             padding=self._padding,
+            palette=palette,
             parent=self._parent,
+            show=True,
             xaxis=self.x if axis == "x" else None,
+            xlabel=xlabel,
+            xmax=xmax,
+            xmax_range=self._xmax_range,
+            xmin=xmin,
+            xmin_range=self._xmin_range,
+            xscale=xscale,
+            xshow=True,
+            xticklocator=xticklocator,
             yaxis=self.y if axis == "y" else None,
+            ylabel=ylabel,
+            ymax=ymax,
+            ymax_range=self._ymax_range,
+            ymin=ymin,
+            ymin_range=self._ymin_range,
+            yscale=yscale,
+            yshow=True,
+            yticklocator=yticklocator,
             )
 
         shared.x.spine.position = "high" if axis == "y" else "low"
@@ -2317,6 +2325,7 @@ class Numberline(object):
             x2,
             y2,
             padding,
+            palette,
             spacing,
             min,
             max,
@@ -2326,6 +2335,9 @@ class Numberline(object):
             scale,
             parent,
         ):
+
+        if palette is None:
+            palette = toyplot.color.Palette()
 
         self._finalized = None
 
@@ -2340,7 +2352,7 @@ class Numberline(object):
             )
         self._children = []
         self._child_offset = {}
-        self._palette = toyplot.color.Palette()
+        self._palette = palette
         self._parent = parent
         self._scatterplot_colors = itertools.cycle(self._palette)
         self._child_style = {}
@@ -3039,44 +3051,48 @@ class Table(object):
 
         def cartesian(
                 self,
-                xmin=None,
-                xmax=None,
-                ymin=None,
-                ymax=None,
                 aspect=None,
-                show=True,
-                xshow=False,
-                yshow=False,
-                label=None,
-                xlabel=None,
-                ylabel=None,
-                xticklocator=None,
-                yticklocator=None,
-                xscale="linear",
-                yscale="linear",
-                padding=3,
                 cell_padding=3,
+                label=None,
+                padding=3,
+                palette=None,
+                show=True,
+                xlabel=None,
+                xmax=None,
+                xmin=None,
+                xscale="linear",
+                xshow=False,
+                xticklocator=None,
+                ylabel=None,
+                ymax=None,
+                ymin=None,
+                yscale="linear",
+                yshow=False,
+                yticklocator=None,
             ):
 
             axes = toyplot.coordinates.Table.EmbeddedCartesian(
-                table=self._table,
-                xmin=xmin,
-                xmax=xmax,
-                ymin=ymin,
-                ymax=ymax,
                 aspect=aspect,
-                show=show,
-                xshow=xshow,
-                yshow=yshow,
                 label=label,
-                xlabel=xlabel,
-                ylabel=ylabel,
-                xticklocator=xticklocator,
-                yticklocator=yticklocator,
-                xscale=xscale,
-                yscale=yscale,
                 padding=padding,
+                palette=palette,
                 parent=self._table._parent,
+                show=show,
+                xaxis=None,
+                xlabel=xlabel,
+                xmax=xmax,
+                xmin=xmin,
+                xscale=xscale,
+                xshow=xshow,
+                xticklocator=xticklocator,
+                yaxis=None,
+                ylabel=ylabel,
+                ymax=ymax,
+                ymin=ymin,
+                yscale=yscale,
+                yshow=yshow,
+                yticklocator=yticklocator,
+                table=self._table,
                 )
 
             self._table._merge_cells(self._selection)

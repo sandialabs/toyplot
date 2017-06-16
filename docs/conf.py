@@ -287,10 +287,6 @@ latex_documents = [
 # the title page.
 latex_logo = "../artwork/toyplot.png"
 
-# For "manual" documents, if this is true, then toplevel headings are parts,
-# not chapters.
-latex_use_parts = True
-
 # If true, show page references after internal links.
 #latex_show_pagerefs = False
 

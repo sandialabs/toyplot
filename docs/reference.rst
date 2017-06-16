@@ -2,10 +2,8 @@
     :width: 200px
     :align: right
 
-API Reference
-=============
-
-Python API:
+Python API
+==========
 
 .. toctree::
     :maxdepth: 2
@@ -44,9 +42,3 @@ Python API:
     toyplot.units.rst
     toyplot.webm.rst
 
-Javascript API:
-
-.. toctree::
-    :maxdepth: 2
-
-    javascript.rst

@@ -35,6 +35,7 @@ Documentation
    contributing.rst
    release-notes.rst
    reference.rst
+   javascript.rst
    support.rst
    credits.rst
 

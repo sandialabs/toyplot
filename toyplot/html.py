@@ -913,13 +913,13 @@ def _render(canvas, context):
         document.addEventListener("keydown", keydown);
 
         var module = {};
-        module.add_item = function(label, show_callback, choose_callback)
+        module.add_item = function(label, show, activate)
         {
             var wrapper = document.createElement("div");
             wrapper.innerHTML = "<li class='toyplot-context-menu-item' style='background:#eee; color:#333; padding:2px 20px; list-style:none; margin:0; text-align:left;'>" + label + "</li>"
             var item = wrapper.firstChild;
 
-            items.push({item: item, show: show_callback});
+            items.push({item: item, show: show});
 
             function mouseover()
             {
@@ -936,7 +936,7 @@ def _render(canvas, context):
             function choose_item(e)
             {
                 close_menu();
-                choose_callback();
+                activate();
 
                 e.stopPropagation();
                 e.preventDefault();

@@ -772,14 +772,13 @@ def _render(canvas, context):
 
         var module = {};
 
-        module.store = function(owner, key, names, columns)
+        module.set = function(owner, key, names, columns)
         {
             tables.push({owner: owner, key: key, names: names, columns: columns});
         }
 
-        module.get_csv = function(owner, key)
+        module.get = function(owner, key)
         {
-            var csv = "";
             for(var i = 0; i != tables.length; ++i)
             {
                 var table = tables[i];
@@ -787,7 +786,16 @@ def _render(canvas, context):
                     continue;
                 if(table.key != key)
                     continue;
+                return {names: table.names, columns: table.columns};
+            }
+        }
 
+        module.get_csv = function(owner, key)
+        {
+            var table = module.get(owner, key);
+            if(table != undefined)
+            {
+                var csv = "";
                 csv += table.names.join(",") + "\\n";
                 for(var i = 0; i != table.columns[0].length; ++i)
                 {
@@ -1049,7 +1057,7 @@ def _render_table(owner, key, label, table, filename, context):
         arguments=[owner_id, key, label, names, columns, filename],
         code="""function(tables, context_menu, io, owner_id, key, label, names, columns, filename)
         {
-            tables.store(owner_id, key, names, columns);
+            tables.set(owner_id, key, names, columns);
 
             var owner = document.querySelector("#" + owner_id);
             function show_item(e)

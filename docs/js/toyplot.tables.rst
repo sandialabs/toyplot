@@ -5,7 +5,7 @@ toyplot/tables module
 
 The `toyplot/tables` module can be used to store tabular data for later retrieval.
 
-.. js:function:: toyplot/tables.store(owner, key, names, columns)
+.. js:function:: toyplot/tables.set(owner, key, names, columns)
 
     Store tabular information, identified by owner and key, for later retrieval.  For example::
 
@@ -23,19 +23,20 @@ The `toyplot/tables` module can be used to store tabular data for later retrieva
     :param array columns: Array of values for eacn column in the table.
 
 
-.. js:function:: toyplot/tables.get_csv(owner, key)
+.. js:function:: toyplot/tables.get(owner, key)
 
-    Retrieve the CSV representation of a table stored previously using :js:func:`toyplot/tables.store`.  For example::
+    Retrieve a table stored previously using :js:func:`toyplot/tables.set`.  For example::
 
         context.require(
             dependencies=["toyplot/tables"],
-            arguments=[mark_id],
-            code="""function(tables, mark_id)
+            arguments=[graph_id],
+            code="""function(tables, graph_id)
             {
-                console.log(tables.get_csv(mark_id, "vertex_data"));
+                console.log(tables.get(graph_id, "vertex_data"));
             }""")
 
     :param string owner: Unique id for the object that "owns" the table.
     :param string key: Used to disambiguate tables when the owner has more than one.
 
-    :returns: String containing the CSV representation of the table.
+    :returns: object containing `names` and `columns` arrays, containing the
+    table column names and column values, respectively.

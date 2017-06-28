@@ -577,7 +577,17 @@ def _draw_marker(
     marker_xml = xml.SubElement(root, "g", attrib=attrib)
     if title is not None:
         xml.SubElement(marker_xml, "title").text = str(title)
-    shape_xml = xml.SubElement(marker_xml, "g", transform="rotate(%r, %r, %r)" % (-marker.angle, cx, cy))
+
+    transform = ""
+    if marker.angle:
+        transform += " rotate(%r, %r, %r)" % (-marker.angle, cx, cy)
+    if marker.dx or marker.dy:
+        transform += " translate(%r, %r)" % (marker.dx, marker.dy)
+
+    shape_xml = xml.SubElement(marker_xml, "g")
+    if transform:
+        shape_xml.set("transform", transform)
+
     if marker.shape == "|":
         _draw_bar(shape_xml, cx, cy, marker.size)
     elif marker.shape == "/":
@@ -2406,12 +2416,15 @@ def _render(axes, mark, context): # pragma: no cover
 
         if tmarker:
             angle = -numpy.rad2deg(numpy.arctan2(cy - last_cy, cx - last_cx))
+            marker=toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + tmarker
+            if marker._dx is None:
+                marker = marker + toyplot.marker.create(dx=-marker.size / 2)
 
             _draw_marker(
                 edge_xml,
                 cx=cx,
                 cy=cy,
-                marker=toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + tmarker,
+                marker=marker,
                 #extra_class="toyplot-Datum",
                 #title=vtitle,
                 )

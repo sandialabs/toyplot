@@ -483,13 +483,13 @@ def _draw_text(
                         )
 
             elif isinstance(box, toyplot.text.MarkerBox):
-                _draw_marker(
-                    group,
-                    cx=(box.left + box.right) * 0.5,
-                    cy=(box.top + box.bottom) * 0.5,
-                    default=toyplot.marker.create(size=box.height),
-                    marker=box.marker,
-                    )
+                if box.marker:
+                    _draw_marker(
+                        group,
+                        cx=(box.left + box.right) * 0.5,
+                        cy=(box.top + box.bottom) * 0.5,
+                        marker=toyplot.marker.create(size=box.height) + box.marker,
+                        )
                 if box.style.get("-toyplot-text-layout-box-visibility", None) == "visible":
                     xml.SubElement(
                         group,
@@ -526,16 +526,10 @@ def _draw_marker(
         root,
         cx,
         cy,
-        default,
         marker,
         extra_class=None,
         title=None,
         ):
-
-    if not marker:
-        return
-
-    marker = default + toyplot.marker.convert(marker)
 
     if marker.shape in _draw_marker.variations:
         variation = _draw_marker.variations[marker.shape]
@@ -1765,22 +1759,22 @@ def _render(numberline, mark, context):
                 mopacity[not_null],
                 mtitle[not_null],
             ):
-            dstyle = toyplot.style.combine(
-                {
-                    "fill": toyplot.color.to_css(dfill),
-                    "stroke": toyplot.color.to_css(dstroke),
-                    "opacity": dopacity,
-                },
-                mark._mstyle)
-            _draw_marker(
-                series_xml,
-                cx=dx,
-                cy=0,
-                default=toyplot.marker.create(size=dsize, mstyle=dstyle, lstyle=mark._mlstyle),
-                marker=dmarker,
-                extra_class="toyplot-Datum",
-                title=dtitle,
-                )
+            if dmarker:
+                dstyle = toyplot.style.combine(
+                    {
+                        "fill": toyplot.color.to_css(dfill),
+                        "stroke": toyplot.color.to_css(dstroke),
+                        "opacity": dopacity,
+                    },
+                    mark._mstyle)
+                _draw_marker(
+                    series_xml,
+                    cx=dx,
+                    cy=0,
+                    marker=toyplot.marker.create(size=dsize, mstyle=dstyle, lstyle=mark._mlstyle) + toyplot.marker.convert(dmarker),
+                    extra_class="toyplot-Datum",
+                    title=dtitle,
+                    )
 
 
 @dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Cartesian, RenderContext)
@@ -2434,22 +2428,22 @@ def _render(axes, mark, context): # pragma: no cover
             mark._vtable[mark._vopacity[0]],
             mark._vtable[mark._vtitle[0]],
         ):
-        vstyle = toyplot.style.combine(
-            {
-                "fill": toyplot.color.to_css(vcolor),
-                "stroke": toyplot.color.to_css(vcolor),
-                "opacity": vopacity,
-            },
-            mark._vstyle)
-        _draw_marker(
-            vertex_xml,
-            cx=vx,
-            cy=vy,
-            default=toyplot.marker.create(size=vsize, mstyle=vstyle, lstyle=mark._vlstyle),
-            marker=vmarker,
-            extra_class="toyplot-Datum",
-            title=vtitle,
-            )
+        if vmarker:
+            vstyle = toyplot.style.combine(
+                {
+                    "fill": toyplot.color.to_css(vcolor),
+                    "stroke": toyplot.color.to_css(vcolor),
+                    "opacity": vopacity,
+                },
+                mark._vstyle)
+            _draw_marker(
+                vertex_xml,
+                cx=vx,
+                cy=vy,
+                marker=toyplot.marker.create(size=vsize, mstyle=vstyle, lstyle=mark._vlstyle) + toyplot.marker.convert(vmarker),
+                extra_class="toyplot-Datum",
+                title=vtitle,
+                )
 
     # Render vertex labels
     if mark._vlshow:
@@ -2543,21 +2537,21 @@ def _render(axes, mark, context):
                 mopacity[not_null],
                 mtitle[not_null],
             ):
-            dstyle = toyplot.style.combine(
-                {
-                    "fill": toyplot.color.to_css(dfill),
-                    "stroke": toyplot.color.to_css(dstroke),
-                    "opacity": dopacity},
-                mark._mstyle)
-            _draw_marker(
-                series_xml,
-                cx=dx,
-                cy=dy,
-                default=toyplot.marker.create(size=dsize, mstyle=dstyle, lstyle=mark._mlstyle),
-                marker=dmarker,
-                extra_class="toyplot-Datum",
-                title=dtitle,
-                )
+            if dmarker:
+                dstyle = toyplot.style.combine(
+                    {
+                        "fill": toyplot.color.to_css(dfill),
+                        "stroke": toyplot.color.to_css(dstroke),
+                        "opacity": dopacity},
+                    mark._mstyle)
+                _draw_marker(
+                    series_xml,
+                    cx=dx,
+                    cy=dy,
+                    marker=toyplot.marker.create(size=dsize, mstyle=dstyle, lstyle=mark._mlstyle) + toyplot.marker.convert(dmarker),
+                    extra_class="toyplot-Datum",
+                    title=dtitle,
+                    )
 
 
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Rect, RenderContext)
@@ -2656,22 +2650,22 @@ def _render(axes, mark, context):
                 mopacity[not_null],
                 mtitle[not_null],
             ):
-            dstyle = toyplot.style.combine(
-                {
-                    "fill": toyplot.color.to_css(dfill),
-                    "stroke": toyplot.color.to_css(dstroke),
-                    "opacity": dopacity,
-                },
-                mark._mstyle)
-            _draw_marker(
-                series_xml,
-                cx=dx,
-                cy=dy,
-                default=toyplot.marker.create(size=dsize, mstyle=dstyle, lstyle=mark._mlstyle),
-                marker=dmarker,
-                extra_class="toyplot-Datum",
-                title=dtitle,
-                )
+            if dmarker:
+                dstyle = toyplot.style.combine(
+                    {
+                        "fill": toyplot.color.to_css(dfill),
+                        "stroke": toyplot.color.to_css(dstroke),
+                        "opacity": dopacity,
+                    },
+                    mark._mstyle)
+                _draw_marker(
+                    series_xml,
+                    cx=dx,
+                    cy=dy,
+                    marker=toyplot.marker.create(size=dsize, mstyle=dstyle, lstyle=mark._mlstyle) + toyplot.marker.convert(dmarker),
+                    extra_class="toyplot-Datum",
+                    title=dtitle,
+                    )
 
 
 @dispatch((toyplot.canvas.Canvas, toyplot.coordinates.Cartesian), toyplot.mark.Text, RenderContext)

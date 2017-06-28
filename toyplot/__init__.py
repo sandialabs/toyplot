@@ -187,6 +187,7 @@ def graph(
         margin=50,
         olayout=None,
         padding=20,
+        tmarker=">",
         varea=None,
         vcolor=None,
         vcoordinates=None,

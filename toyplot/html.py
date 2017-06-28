@@ -2377,13 +2377,15 @@ def _render(axes, mark, context): # pragma: no cover
 
     coordinate_index = 0
     edge_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Edges"})
-    for esource, etarget, eshape, ecolor, ewidth, eopacity in zip(
+
+    for esource, etarget, eshape, ecolor, ewidth, eopacity, tmarker in zip(
             mark._etable[mark._esource[0]],
             mark._etable[mark._etarget[0]],
             mark._etable[mark._eshape[0]],
             mark._etable[mark._ecolor[0]],
             mark._etable[mark._ewidth[0]],
             mark._etable[mark._eopacity[0]],
+            mark._etable[mark._tmarker[0]],
         ):
         estyle = toyplot.style.combine(
             {
@@ -2395,6 +2397,10 @@ def _render(axes, mark, context): # pragma: no cover
             mark._estyle)
 
         path = []
+        last_cx = None
+        last_cy = None
+        cx = None
+        cy = None
         for segment in eshape:
             if segment == "M":
                 count = 1
@@ -2406,8 +2412,12 @@ def _render(axes, mark, context): # pragma: no cover
                 count = 3
             path.append(segment)
             for i in range(count):
-                path.append(str(x[coordinate_index]))
-                path.append(str(y[coordinate_index]))
+                last_cx = cx
+                last_cy = cy
+                cx = x[coordinate_index]
+                cy = y[coordinate_index]
+                path.append(str(cx))
+                path.append(str(cy))
                 coordinate_index += 1
 
         xml.SubElement(
@@ -2416,6 +2426,19 @@ def _render(axes, mark, context): # pragma: no cover
             d=" ".join(path),
             style=_css_style(estyle),
             )
+
+        angle = -numpy.rad2deg(numpy.arctan2(cy - last_cy, cx - last_cx))
+
+        _draw_marker(
+            edge_xml,
+            cx=cx,
+            cy=cy,
+            default=toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}),
+            marker=tmarker,
+            #extra_class="toyplot-Datum",
+            #title=vtitle,
+            )
+
 
     # Project vertex coordinates
     for i in range(2):

@@ -1552,7 +1552,7 @@ class Cartesian(object):
             eopacity=1.0,
             estyle=None,
             ewidth=1.0,
-            tmarker=">",
+            tmarker=None,
             varea=None,
             vcolor=None,
             vcoordinates=None,

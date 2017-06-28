@@ -522,6 +522,46 @@ def _draw_text(
                 group = hyperlink.pop()
 
 
+def _draw_bar(parent_xml, cx, cy, size, angle=0):
+    markup = xml.SubElement(
+        parent_xml,
+        "line",
+        x1=repr(cx),
+        x2=repr(cx),
+        y1=repr(cy - size / 2),
+        y2=repr(cy + size / 2),
+        )
+    if angle:
+        markup.set("transform", "rotate(%r, %r, %r)" % (-angle, cx, cy))
+
+
+def _draw_square(parent_xml, cx, cy, size, angle=0):
+    markup = xml.SubElement(
+        parent_xml,
+        "rect",
+        x=repr(cx - size / 2),
+        y=repr(cy - size / 2),
+        width=repr(size),
+        height=repr(size),
+        )
+    if angle:
+        markup.set("transform", "rotate(%r, %r, %r)" % (-angle, cx, cy))
+
+
+def _draw_triangle(parent_xml, cx, cy, size, angle=0):
+    markup = xml.SubElement(
+        parent_xml,
+        "polygon",
+        points=" ".join(["%r,%r" % (xp, yp) for xp, yp in [
+           (cx - size / 2, cy + size / 2),
+           (cx, cy - size / 2),
+           (cx + size / 2, cy + size / 2),
+           ]]),
+        )
+    if angle:
+        markup.set("transform", "rotate(%r, %r, %r)" % (-angle, cx, cy))
+
+
 def _draw_marker(
         root,
         cx,
@@ -531,146 +571,73 @@ def _draw_marker(
         title=None,
         ):
 
-    if marker.shape in _draw_marker.variations:
-        variation = _draw_marker.variations[marker.shape]
-        marker = marker + toyplot.marker.create(shape=variation[0], angle=marker.angle + variation[1])
-
     attrib = _css_attrib(marker.mstyle)
     if extra_class is not None:
         attrib["class"] = extra_class
     marker_xml = xml.SubElement(root, "g", attrib=attrib)
     if title is not None:
         xml.SubElement(marker_xml, "title").text = str(title)
+    shape_xml = xml.SubElement(marker_xml, "g", transform="rotate(%r, %r, %r)" % (-marker.angle, cx, cy))
     if marker.shape == "|":
-        xml.SubElement(
-            marker_xml,
-            "line",
-            transform="rotate(%r, %r, %r)" % (-marker.angle, cx, cy),
-            x1=repr(cx),
-            x2=repr(cx),
-            y1=repr(cy - (marker.size / 2)),
-            y2=repr(cy + (marker.size / 2)))
+        _draw_bar(shape_xml, cx, cy, marker.size)
+    elif marker.shape == "/":
+        _draw_bar(shape_xml, cx, cy, marker.size, -45)
+    elif marker.shape == "-":
+        _draw_bar(shape_xml, cx, cy, marker.size, 90)
+    elif marker.shape == "\\":
+        _draw_bar(shape_xml, cx, cy, marker.size, 45)
     elif marker.shape == "+":
-        xml.SubElement(
-            marker_xml,
-            "line",
-            transform="rotate(%r, %r, %r)" % (-marker.angle, cx, cy),
-            x1=repr(cx),
-            x2=repr(cx),
-            y1=repr(cy - (marker.size / 2)),
-            y2=repr(cy + (marker.size / 2)))
-        xml.SubElement(
-            marker_xml,
-            "line",
-            transform="rotate(%r, %r, %r)" % (-marker.angle, cx, cy),
-            x1=repr(cx - (marker.size / 2)),
-            x2=repr(cx + (marker.size / 2)),
-            y1=repr(cy),
-            y2=repr(cy))
+        _draw_bar(shape_xml, cx, cy, marker.size)
+        _draw_bar(shape_xml, cx, cy, marker.size, 90)
+    elif marker.shape == "x":
+        _draw_bar(shape_xml, cx, cy, marker.size, -45)
+        _draw_bar(shape_xml, cx, cy, marker.size, 45)
     elif marker.shape == "*":
-        xml.SubElement(
-            marker_xml,
-            "line",
-            transform="rotate(%r, %r, %r)" % (-marker.angle, cx, cy),
-            x1=repr(cx),
-            x2=repr(cx),
-            y1=repr(cy - (marker.size / 2)),
-            y2=repr(cy + (marker.size / 2)))
-        xml.SubElement(
-            marker_xml,
-            "line",
-            transform="rotate(%r, %r, %r)" % (-marker.angle + 60, cx, cy),
-            x1=repr(cx),
-            x2=repr(cx),
-            y1=repr(cy - (marker.size / 2)),
-            y2=repr(cy + (marker.size / 2)))
-        xml.SubElement(
-            marker_xml,
-            "line",
-            transform="rotate(%r, %r, %r)" % (-marker.angle - 60, cx, cy),
-            x1=repr(cx),
-            x2=repr(cx),
-            y1=repr(cy - (marker.size / 2)),
-            y2=repr(cy + (marker.size / 2)))
+        _draw_bar(shape_xml, cx, cy, marker.size)
+        _draw_bar(shape_xml, cx, cy, marker.size, -60)
+        _draw_bar(shape_xml, cx, cy, marker.size, 60)
     elif marker.shape == "^":
-        xml.SubElement(marker_xml,
-            "polygon",
-            transform="rotate(%r, %r, %r)" % (-marker.angle, cx, cy),
-            points=" ".join(["%r,%r" % (xp, yp) for xp, yp in [
-               (cx - (marker.size / 2), cy + (marker.size / 2)),
-               (cx, cy - (marker.size / 2)),
-               (cx + (marker.size / 2), cy + (marker.size / 2)),
-   ]]))
+        _draw_triangle(shape_xml, cx, cy, marker.size)
+    elif marker.shape == ">":
+        _draw_triangle(shape_xml, cx, cy, marker.size, -90)
+    elif marker.shape == "v":
+        _draw_triangle(shape_xml, cx, cy, marker.size, 180)
+    elif marker.shape == "<":
+        _draw_triangle(shape_xml, cx, cy, marker.size, 90)
     elif marker.shape == "s":
-        xml.SubElement(
-            marker_xml,
-            "rect",
-            transform="rotate(%r, %r, %r)" % (-marker.angle, cx, cy),
-            x=repr(cx - (marker.size / 2)),
-            y=repr(cy - (marker.size / 2)),
-            width=repr(marker.size),
-            height=repr(marker.size))
+        _draw_square(shape_xml, cx, cy, marker.size)
+    elif marker.shape == "d":
+        _draw_square(shape_xml, cx, cy, marker.size, 45)
     elif marker.shape == "o":
-        xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
     elif marker.shape == "oo":
-        xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
-        xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 4))
+        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 4))
     elif marker.shape == "o|":
-        xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
-        xml.SubElement(
-            marker_xml,
-            "line",
-            transform="rotate(%r, %r, %r)" % (-marker.angle, cx, cy),
-            x1=repr(cx),
-            x2=repr(cx),
-            y1=repr(cy - (marker.size / 2)),
-            y2=repr(cy + (marker.size / 2)))
+        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_bar(shape_xml, cx, cy, marker.size)
+    elif marker.shape == "o/":
+        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_bar(shape_xml, cx, cy, marker.size, -45)
+    elif marker.shape == "o-":
+        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_bar(shape_xml, cx, cy, marker.size, 90)
+    elif marker.shape == "o\\":
+        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_bar(shape_xml, cx, cy, marker.size, 45)
     elif marker.shape == "o+":
-        xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
-        xml.SubElement(
-            marker_xml,
-            "line",
-            transform="rotate(%r, %r, %r)" % (-marker.angle, cx, cy),
-            x1=repr(cx),
-            x2=repr(cx),
-            y1=repr(cy - (marker.size / 2)),
-            y2=repr(cy + (marker.size / 2)))
-        xml.SubElement(
-            marker_xml,
-            "line",
-            transform="rotate(%r, %r, %r)" % (-marker.angle,
-            cx,
-            cy),
-            x1=repr(cx - (marker.size / 2)),
-            x2=repr(cx + (marker.size / 2)),
-            y1=repr(cy),
-            y2=repr(cy))
+        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_bar(shape_xml, cx, cy, marker.size)
+        _draw_bar(shape_xml, cx, cy, marker.size, 90)
+    elif marker.shape == "ox":
+        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_bar(shape_xml, cx, cy, marker.size, -45)
+        _draw_bar(shape_xml, cx, cy, marker.size, 45)
     elif marker.shape == "o*":
-        xml.SubElement(marker_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
-        xml.SubElement(
-            marker_xml,
-            "line",
-            transform="rotate(%r, %r, %r)" % (-marker.angle, cx, cy),
-            x1=repr(cx),
-            x2=repr(cx),
-            y1=repr(cy - (marker.size / 2)),
-            y2=repr(cy + (marker.size / 2)))
-        xml.SubElement(
-            marker_xml,
-            "line",
-            transform="rotate(%r, %r, %r)" % (-marker.angle + 60, cx, cy),
-            x1=repr(cx),
-            x2=repr(cx),
-            y1=repr(cy - (marker.size / 2)),
-            y2=repr(cy + (marker.size / 2)))
-        xml.SubElement(
-            marker_xml,
-            "line",
-            transform="rotate(%r, %r, %r)" % (-marker.angle - 60, cx, cy),
-            x1=repr(cx),
-            x2=repr(cx),
-            y1=repr(cy - (marker.size / 2)),
-            y2=repr(cy + (marker.size / 2)))
+        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_bar(shape_xml, cx, cy, marker.size)
+        _draw_bar(shape_xml, cx, cy, marker.size, -60)
+        _draw_bar(shape_xml, cx, cy, marker.size, 60)
 
     if marker.label: # Never compute a text layout unless we have to.
         _draw_text(
@@ -689,19 +656,6 @@ def _draw_marker(
                 marker.lstyle),
             )
     return marker_xml
-
-_draw_marker.variations = {
-    "-": ("|", 90),
-    "/": ("|", -45),
-    "\\": ("|", 45),
-    "x": ("+", 45),
-    ">": ("^", -90),
-    "v": ("^", 180),
-    "<": ("^", 90),
-    "d": ("s", 45),
-    "o-": ("o|", 90),
-    "ox": ("o+", 45),
-    }
 
 
 def _axis_transform(x1, y1, x2, y2, offset, return_length=False):
@@ -2361,10 +2315,39 @@ def _render(axes, mark, context): # pragma: no cover
     # Project edge coordinates
     for i in range(2):
         if mark._coordinate_axes[i] == "x":
-            x = axes.project("x", mark._ecoordinates.T[i])
+            edge_x = axes.project("x", mark._ecoordinates.T[i])
         elif mark._coordinate_axes[i] == "y":
-            y = axes.project("y", mark._ecoordinates.T[i])
+            edge_y = axes.project("y", mark._ecoordinates.T[i])
 
+    # Project vertex coordinates
+    for i in range(2):
+        if mark._coordinate_axes[i] == "x":
+            vertex_x = axes.project("x", mark._vtable[mark._vcoordinates[i]])
+        elif mark._coordinate_axes[i] == "y":
+            vertex_y = axes.project("y", mark._vtable[mark._vcoordinates[i]])
+
+    # Create final vertex markers
+    vertex_markers = []
+    for vmarker, vsize, vcolor, vopacity in zip(
+            mark._vtable[mark._vmarker[0]],
+            mark._vtable[mark._vsize[0]],
+            mark._vtable[mark._vcolor[0]],
+            mark._vtable[mark._vopacity[0]],
+        ):
+        if vmarker:
+            vstyle = toyplot.style.combine(
+                {
+                    "fill": toyplot.color.to_css(vcolor),
+                    "stroke": toyplot.color.to_css(vcolor),
+                    "opacity": vopacity,
+                },
+                mark._vstyle)
+            vertex_marker=toyplot.marker.create(size=vsize, mstyle=vstyle, lstyle=mark._vlstyle) + toyplot.marker.convert(vmarker)
+            vertex_markers.append(vertex_marker)
+        else:
+            vertex_markers.append(None)
+
+    # Render edges
     mark_xml = xml.SubElement(context.parent, "g", id=context.get_id(mark), attrib={"class": "toyplot-mark-Graph"})
     _render_table(owner=mark, key="vertex_data", label="graph vertex data", table=mark._vtable, filename=mark._vfilename, context=context)
     _render_table(owner=mark, key="edge_data", label="graph edge data", table=mark._etable, filename=mark._efilename, context=context)
@@ -2408,8 +2391,8 @@ def _render(axes, mark, context): # pragma: no cover
             for i in range(count):
                 last_cx = cx
                 last_cy = cy
-                cx = x[coordinate_index]
-                cy = y[coordinate_index]
+                cx = edge_x[coordinate_index]
+                cy = edge_y[coordinate_index]
                 path.append(str(cx))
                 path.append(str(cy))
                 coordinate_index += 1
@@ -2421,49 +2404,33 @@ def _render(axes, mark, context): # pragma: no cover
             style=_css_style(estyle),
             )
 
-        angle = -numpy.rad2deg(numpy.arctan2(cy - last_cy, cx - last_cx))
+        if tmarker:
+            angle = -numpy.rad2deg(numpy.arctan2(cy - last_cy, cx - last_cx))
 
-        _draw_marker(
-            edge_xml,
-            cx=cx,
-            cy=cy,
-            default=toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}),
-            marker=tmarker,
-            #extra_class="toyplot-Datum",
-            #title=vtitle,
-            )
+            _draw_marker(
+                edge_xml,
+                cx=cx,
+                cy=cy,
+                marker=toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + tmarker,
+                #extra_class="toyplot-Datum",
+                #title=vtitle,
+                )
 
 
-    # Project vertex coordinates
-    for i in range(2):
-        if mark._coordinate_axes[i] == "x":
-            x = axes.project("x", mark._vtable[mark._vcoordinates[i]])
-        elif mark._coordinate_axes[i] == "y":
-            y = axes.project("y", mark._vtable[mark._vcoordinates[i]])
-
+    # Render vertex markers
     vertex_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Vertices"})
-    for vx, vy, vmarker, vsize, vcolor, vopacity, vtitle in zip(
-            x,
-            y,
-            mark._vtable[mark._vmarker[0]],
-            mark._vtable[mark._vsize[0]],
-            mark._vtable[mark._vcolor[0]],
-            mark._vtable[mark._vopacity[0]],
+    for vx, vy, vmarker, vtitle in zip(
+            vertex_x,
+            vertex_y,
+            vertex_markers,
             mark._vtable[mark._vtitle[0]],
         ):
         if vmarker:
-            vstyle = toyplot.style.combine(
-                {
-                    "fill": toyplot.color.to_css(vcolor),
-                    "stroke": toyplot.color.to_css(vcolor),
-                    "opacity": vopacity,
-                },
-                mark._vstyle)
             _draw_marker(
                 vertex_xml,
                 cx=vx,
                 cy=vy,
-                marker=toyplot.marker.create(size=vsize, mstyle=vstyle, lstyle=mark._vlstyle) + toyplot.marker.convert(vmarker),
+                marker=vertex_marker,
                 extra_class="toyplot-Datum",
                 title=vtitle,
                 )
@@ -2471,7 +2438,7 @@ def _render(axes, mark, context): # pragma: no cover
     # Render vertex labels
     if mark._vlshow:
         vlabel_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Labels"})
-        for dx, dy, dtext in zip(x, y, mark._vtable[mark._vlabel[0]]):
+        for dx, dy, dtext in zip(vertex_x, vertex_y, mark._vtable[mark._vlabel[0]]):
             _draw_text(
                 root=vlabel_xml,
                 text=toyplot.compatibility.unicode_type(dtext),

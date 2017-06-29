@@ -9,6 +9,8 @@ from __future__ import absolute_import
 
 import copy
 
+import numpy
+
 import toyplot.compatibility
 import toyplot.style
 
@@ -103,6 +105,27 @@ class Marker(object):
             " dx='%s'" % self._dx if self._dx else "",
             " dy='%s'" % self._dy if self._dy else "",
             )
+
+    def intersect(self, x0, y0):
+        """Compute the intersection between this marker's border and a line segment.
+       
+        Parameters
+        ----------
+        x0, y0 (number, required)
+            Relative coordinates of a line segment originating at the center of this marker. 
+
+        Returns
+        -------
+        x0, y0 (number)
+            Relative coordinates of the intersection with this marker's border.
+        """
+        if self._size:
+            if self._shape == "o":
+                v = numpy.array([x0, y0])
+                v /= numpy.linalg.norm(v)
+                v *= self._size / 2
+                return v[0], v[1]
+        return 0, 0
 
 
 def create(shape=None, mstyle=None, size=None, angle=None, label=None, lstyle=None, dx=None, dy=None):

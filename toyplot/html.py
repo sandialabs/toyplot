@@ -2384,10 +2384,10 @@ def _render(axes, mark, context): # pragma: no cover
             mark._estyle)
 
         path = []
-        last_cx = None
-        last_cy = None
-        cx = None
-        cy = None
+        last_x = None
+        last_y = None
+        x = None
+        y = None
         for segment in eshape:
             if segment == "M":
                 count = 1
@@ -2399,12 +2399,12 @@ def _render(axes, mark, context): # pragma: no cover
                 count = 3
             path.append(segment)
             for i in range(count):
-                last_cx = cx
-                last_cy = cy
-                cx = edge_x[coordinate_index]
-                cy = edge_y[coordinate_index]
-                path.append(str(cx))
-                path.append(str(cy))
+                last_x = x
+                last_y = y
+                x = edge_x[coordinate_index]
+                y = edge_y[coordinate_index]
+                path.append(str(x))
+                path.append(str(y))
                 coordinate_index += 1
 
         xml.SubElement(
@@ -2414,16 +2414,29 @@ def _render(axes, mark, context): # pragma: no cover
             style=_css_style(estyle),
             )
 
+        # Render edge tail markers.
         if tmarker:
-            angle = -numpy.rad2deg(numpy.arctan2(cy - last_cy, cx - last_cx))
+            # We want to place the tail marker where it touches the boundary of the vertex marker.
+            vertex_marker = vertex_markers[etarget]
+            if vertex_marker:
+                bx, by = vertex_marker.intersect(last_x - x, last_y - y)
+            else:
+                bx, by = 0, 0
+
+            # Compute the marker angle using the last edge segment.
+            angle = -numpy.rad2deg(numpy.arctan2(y - last_y, x - last_x))
+
+            # Create the marker with defaults.
             marker=toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + tmarker
+
+            # By default, move the marker so that its tip matches the end of the edge line segment.
             if marker._dx is None:
                 marker = marker + toyplot.marker.create(dx=-marker.size / 2)
 
             _draw_marker(
                 edge_xml,
-                cx=cx,
-                cy=cy,
+                cx=x + bx,
+                cy=y + by,
                 marker=marker,
                 #extra_class="toyplot-Datum",
                 #title=vtitle,

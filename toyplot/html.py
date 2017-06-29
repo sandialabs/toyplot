@@ -2353,7 +2353,7 @@ def _render(axes, mark, context): # pragma: no cover
                     "opacity": vopacity,
                 },
                 mark._vstyle)
-            vertex_marker=toyplot.marker.create(size=vsize, mstyle=vstyle, lstyle=mark._vlstyle) + toyplot.marker.convert(vmarker)
+            vertex_marker = toyplot.marker.create(size=vsize, mstyle=vstyle, lstyle=mark._vlstyle) + toyplot.marker.convert(vmarker)
             vertex_markers.append(vertex_marker)
         else:
             vertex_markers.append(None)
@@ -2384,12 +2384,17 @@ def _render(axes, mark, context): # pragma: no cover
             edge_end,
         ):
 
+        # Skip loop edges.
+        if esource == etarget:
+            continue
+
         source_vertex_marker = vertex_markers[esource]
+        target_vertex_marker = vertex_markers[etarget]
+
         if source_vertex_marker:
             dp = source_vertex_marker.intersect(edge_coordinates[start + 1] - edge_coordinates[start])
             edge_coordinates[start] += dp
 
-        target_vertex_marker = vertex_markers[etarget]
         if target_vertex_marker:
             dp = target_vertex_marker.intersect(edge_coordinates[end - 2] - edge_coordinates[end - 1])
             edge_coordinates[end - 1] += dp
@@ -2462,7 +2467,7 @@ def _render(axes, mark, context): # pragma: no cover
                 ))
 
             # Create the marker with defaults.
-            marker=toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + toyplot.marker.convert(hmarker)
+            marker = toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + toyplot.marker.convert(hmarker)
 
             # By default, move the marker so that its tip matches the end of the edge line segment.
             if marker._dx is None:
@@ -2492,7 +2497,7 @@ def _render(axes, mark, context): # pragma: no cover
             angle = -numpy.rad2deg(numpy.arctan2(edge_coordinates[start+1][1] - edge_coordinates[start][1], edge_coordinates[start+1][0] - edge_coordinates[start][0]))
 
             # Create the marker with defaults.
-            marker=toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + toyplot.marker.convert(mmarker)
+            marker = toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + toyplot.marker.convert(mmarker)
 
             _draw_marker(
                 edge_xml,
@@ -2514,7 +2519,7 @@ def _render(axes, mark, context): # pragma: no cover
             angle = -numpy.rad2deg(numpy.arctan2(edge_coordinates[end-1][1] - edge_coordinates[end-2][1], edge_coordinates[end-1][0] - edge_coordinates[end-2][0]))
 
             # Create the marker with defaults.
-            marker=toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + toyplot.marker.convert(tmarker)
+            marker = toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + toyplot.marker.convert(tmarker)
 
             # By default, move the marker so that its tip matches the end of the edge line segment.
             if marker._dx is None:

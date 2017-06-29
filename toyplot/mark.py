@@ -433,8 +433,10 @@ class Graph(Mark): # pragma: no cover
             etable,
             etarget,
             ewidth,
-            tmarker,
             hmarker,
+            mmarker,
+            mposition,
+            tmarker,
             vcolor,
             vcoordinates,
             vfilename,
@@ -511,14 +513,18 @@ class Graph(Mark): # pragma: no cover
         self._ewidth = toyplot.require.table_keys(etable, ewidth, length=1)
         # 1 edge opacity column
         self._eopacity = toyplot.require.table_keys(etable, eopacity, length=1)
-        # 1 tail marker column
-        self._tmarker = toyplot.require.table_keys(etable, tmarker, length=1)
-        # 1 head marker column
-        self._hmarker = toyplot.require.table_keys(etable, hmarker, length=1)
         # Edge style
         self._estyle = toyplot.style.require(estyle, allowed=toyplot.style.allowed.line)
         # Export filename
         self._efilename = toyplot.require.filename(efilename)
+        # 1 head marker column
+        self._hmarker = toyplot.require.table_keys(etable, hmarker, length=1)
+        # 1 middle marker column
+        self._mmarker = toyplot.require.table_keys(etable, mmarker, length=1)
+        # 1 middle marker position column
+        self._mposition = toyplot.require.table_keys(etable, mposition, length=1)
+        # 1 tail marker column
+        self._tmarker = toyplot.require.table_keys(etable, tmarker, length=1)
 
     def domain(self, axis):
         index = numpy.flatnonzero(self._coordinate_axes == axis)[0]

@@ -2365,7 +2365,7 @@ def _render(axes, mark, context): # pragma: no cover
     edge_coordinate_index = 0
     edge_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Edges"})
 
-    for esource, etarget, eshape, ecolor, ewidth, eopacity, hmarker, tmarker in zip(
+    for esource, etarget, eshape, ecolor, ewidth, eopacity, hmarker, mmarker, mposition, tmarker in zip(
             mark._etable[mark._esource[0]],
             mark._etable[mark._etarget[0]],
             mark._etable[mark._eshape[0]],
@@ -2373,6 +2373,8 @@ def _render(axes, mark, context): # pragma: no cover
             mark._etable[mark._ewidth[0]],
             mark._etable[mark._eopacity[0]],
             mark._etable[mark._hmarker[0]],
+            mark._etable[mark._mmarker[0]],
+            mark._etable[mark._mposition[0]],
             mark._etable[mark._tmarker[0]],
         ):
         estyle = toyplot.style.combine(
@@ -2455,6 +2457,27 @@ def _render(axes, mark, context): # pragma: no cover
                 #extra_class="toyplot-Datum",
                 #title=vtitle,
                 )
+
+        # Render edge middle markers.
+        if mmarker:
+            # Place the marker within the first edge segment.
+            x, y = edge_coordinates[0] * (1 - mposition) + edge_coordinates[1] * mposition
+
+            # Compute the marker angle using the first edge segment.
+            angle = -numpy.rad2deg(numpy.arctan2(edge_coordinates[1][1] - edge_coordinates[0][1], edge_coordinates[1][0] - edge_coordinates[0][0]))
+
+            # Create the marker with defaults.
+            marker=toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + toyplot.marker.convert(mmarker)
+
+            _draw_marker(
+                edge_xml,
+                cx=x,
+                cy=y,
+                marker=marker,
+                #extra_class="toyplot-Datum",
+                #title=vtitle,
+                )
+
         # Render edge tail markers.
         if tmarker:
             # Compute the marker angle using the last edge segment.

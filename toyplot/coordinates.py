@@ -1553,6 +1553,8 @@ class Cartesian(object):
             estyle=None,
             ewidth=1.0,
             hmarker=None,
+            mmarker=None,
+            mposition=0.5,
             tmarker=None,
             varea=None,
             vcolor=None,
@@ -1627,8 +1629,10 @@ class Cartesian(object):
         eopacity = toyplot.broadcast.scalar(eopacity, layout.ecount)
         estyle = toyplot.style.require(estyle, allowed=toyplot.style.allowed.line)
 
-        tmarker = toyplot.broadcast.pyobject(tmarker, layout.ecount)
         hmarker = toyplot.broadcast.pyobject(hmarker, layout.ecount)
+        mmarker = toyplot.broadcast.pyobject(mmarker, layout.ecount)
+        mposition = toyplot.broadcast.scalar(mposition, layout.ecount)
+        tmarker = toyplot.broadcast.pyobject(tmarker, layout.ecount)
 
         if along == "x":
             coordinate_axes = ["x", "y"]
@@ -1656,8 +1660,10 @@ class Cartesian(object):
         etable["color"] = ecolor
         etable["width"] = ewidth
         etable["opacity"] = eopacity
-        etable["tmarker"] = tmarker
         etable["hmarker"] = hmarker
+        etable["mmarker"] = mmarker
+        etable["mposition"] = mposition
+        etable["tmarker"] = tmarker
 
         return self.add_mark(
             toyplot.mark.Graph(
@@ -1673,6 +1679,8 @@ class Cartesian(object):
                 etarget=["target"],
                 ewidth=["width"],
                 hmarker=["hmarker"],
+                mmarker=["mmarker"],
+                mposition=["mposition"],
                 tmarker=["tmarker"],
                 vcolor=["color"],
                 vcoordinates=coordinate_axes,

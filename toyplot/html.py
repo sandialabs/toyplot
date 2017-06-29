@@ -2547,7 +2547,7 @@ def _render(axes, mark, context): # pragma: no cover
                 vertex_xml,
                 cx=vx,
                 cy=vy,
-                marker=vertex_marker,
+                marker=vmarker,
                 extra_class="toyplot-Datum",
                 title=vtitle,
                 )

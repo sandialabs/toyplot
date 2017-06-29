@@ -434,6 +434,7 @@ class Graph(Mark): # pragma: no cover
             etarget,
             ewidth,
             tmarker,
+            hmarker,
             vcolor,
             vcoordinates,
             vfilename,
@@ -512,6 +513,8 @@ class Graph(Mark): # pragma: no cover
         self._eopacity = toyplot.require.table_keys(etable, eopacity, length=1)
         # 1 tail marker column
         self._tmarker = toyplot.require.table_keys(etable, tmarker, length=1)
+        # 1 head marker column
+        self._hmarker = toyplot.require.table_keys(etable, hmarker, length=1)
         # Edge style
         self._estyle = toyplot.style.require(estyle, allowed=toyplot.style.allowed.line)
         # Export filename

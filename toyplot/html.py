@@ -2322,21 +2322,22 @@ def _render(axes, mark, context):
 
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Graph, RenderContext)
 def _render(axes, mark, context): # pragma: no cover
-    # Project edge coordinates
+    # Project edge coordinates.
     for i in range(2):
         if mark._coordinate_axes[i] == "x":
             edge_x = axes.project("x", mark._ecoordinates.T[i])
         elif mark._coordinate_axes[i] == "y":
             edge_y = axes.project("y", mark._ecoordinates.T[i])
+    edge_coordinates = numpy.column_stack((edge_x, edge_y))
 
-    # Project vertex coordinates
+    # Project vertex coordinates.
     for i in range(2):
         if mark._coordinate_axes[i] == "x":
             vertex_x = axes.project("x", mark._vtable[mark._vcoordinates[i]])
         elif mark._coordinate_axes[i] == "y":
             vertex_y = axes.project("y", mark._vtable[mark._vcoordinates[i]])
 
-    # Create final vertex markers
+    # Create final vertex markers.
     vertex_markers = []
     for vmarker, vsize, vcolor, vopacity in zip(
             mark._vtable[mark._vmarker[0]],
@@ -2357,15 +2358,50 @@ def _render(axes, mark, context): # pragma: no cover
         else:
             vertex_markers.append(None)
 
-    # Render edges
+    # Identify ranges of edge coordinates for each edge.
+    index = 0
+    edge_start = []
+    edge_end = []
+    for eshape in mark._etable[mark._eshape[0]]:
+        edge_start.append(index)
+        for segment in eshape:
+            if segment == "M":
+                count = 1
+            elif segment == "L":
+                count = 1
+            elif segment == "Q":
+                count = 2
+            elif segment == "C":
+                count = 3
+            index += count
+        edge_end.append(index)
+
+    # Adjust edge coordinates so edges don't overlap vertex markers.
+    for esource, etarget, start, end in zip(
+            mark._etable[mark._esource[0]],
+            mark._etable[mark._etarget[0]],
+            edge_start,
+            edge_end,
+        ):
+
+        source_vertex_marker = vertex_markers[esource]
+        if source_vertex_marker:
+            dp = source_vertex_marker.intersect(edge_coordinates[start + 1] - edge_coordinates[start])
+            edge_coordinates[start] += dp
+
+        target_vertex_marker = vertex_markers[etarget]
+        if target_vertex_marker:
+            dp = target_vertex_marker.intersect(edge_coordinates[end - 2] - edge_coordinates[end - 1])
+            edge_coordinates[end - 1] += dp
+
+    # Render the graph.
     mark_xml = xml.SubElement(context.parent, "g", id=context.get_id(mark), attrib={"class": "toyplot-mark-Graph"})
     _render_table(owner=mark, key="vertex_data", label="graph vertex data", table=mark._vtable, filename=mark._vfilename, context=context)
     _render_table(owner=mark, key="edge_data", label="graph edge data", table=mark._etable, filename=mark._efilename, context=context)
 
-    edge_coordinate_index = 0
+    # Render edges.
     edge_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Edges"})
-
-    for esource, etarget, eshape, ecolor, ewidth, eopacity, hmarker, mmarker, mposition, tmarker in zip(
+    for esource, etarget, eshape, ecolor, ewidth, eopacity, hmarker, mmarker, mposition, tmarker, start, end in zip(
             mark._etable[mark._esource[0]],
             mark._etable[mark._etarget[0]],
             mark._etable[mark._eshape[0]],
@@ -2376,6 +2412,8 @@ def _render(axes, mark, context): # pragma: no cover
             mark._etable[mark._mmarker[0]],
             mark._etable[mark._mposition[0]],
             mark._etable[mark._tmarker[0]],
+            edge_start,
+            edge_end,
         ):
         estyle = toyplot.style.combine(
             {
@@ -2386,33 +2424,6 @@ def _render(axes, mark, context): # pragma: no cover
             },
             mark._estyle)
 
-        # Get coordinates for this edge
-        edge_coordinates = []
-        for segment in eshape:
-            if segment == "M":
-                count = 1
-            elif segment == "L":
-                count = 1
-            elif segment == "Q":
-                count = 2
-            elif segment == "C":
-                count = 3
-            for _ in range(count):
-                edge_coordinates.append(numpy.array([edge_x[edge_coordinate_index], edge_y[edge_coordinate_index]]))
-                edge_coordinate_index += 1
-
-        # Adjust edge coordinates so we don't overlap vertex markers
-        source_vertex_marker = vertex_markers[esource]
-        if source_vertex_marker:
-            dp = source_vertex_marker.intersect(edge_coordinates[1] - edge_coordinates[0])
-            edge_coordinates[0] += dp
-
-        target_vertex_marker = vertex_markers[etarget]
-        if target_vertex_marker:
-            dp = target_vertex_marker.intersect(edge_coordinates[-2] - edge_coordinates[-1])
-            edge_coordinates[-1] += dp
-
-        # Generate a path for this edge
         path = []
         index = 0
         for segment in eshape:
@@ -2426,8 +2437,8 @@ def _render(axes, mark, context): # pragma: no cover
                 count = 3
             path.append(segment)
             for _ in range(count):
-                path.append(str(edge_coordinates[index][0]))
-                path.append(str(edge_coordinates[index][1]))
+                path.append(str(edge_coordinates[start + index][0]))
+                path.append(str(edge_coordinates[start + index][1]))
                 index += 1
 
         xml.SubElement(
@@ -2437,10 +2448,18 @@ def _render(axes, mark, context): # pragma: no cover
             style=_css_style(estyle),
             )
 
-        # Render edge head markers.
+    # Render edge head markers.
+    for hmarker, start, end in zip(
+            mark._etable[mark._hmarker[0]],
+            edge_start,
+            edge_end,
+        ):
         if hmarker:
             # Compute the marker angle using the first edge segment.
-            angle = -numpy.rad2deg(numpy.arctan2(edge_coordinates[1][1] - edge_coordinates[0][1], edge_coordinates[1][0] - edge_coordinates[0][0]))
+            angle = -numpy.rad2deg(numpy.arctan2(
+                edge_coordinates[start+1][1] - edge_coordinates[start][1],
+                edge_coordinates[start+1][0] - edge_coordinates[start][0],
+                ))
 
             # Create the marker with defaults.
             marker=toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + toyplot.marker.convert(hmarker)
@@ -2451,20 +2470,26 @@ def _render(axes, mark, context): # pragma: no cover
 
             _draw_marker(
                 edge_xml,
-                cx=edge_coordinates[0][0],
-                cy=edge_coordinates[0][1],
+                cx=edge_coordinates[start][0],
+                cy=edge_coordinates[start][1],
                 marker=marker,
                 #extra_class="toyplot-Datum",
                 #title=vtitle,
                 )
 
-        # Render edge middle markers.
+    # Render edge middle markers.
+    for mmarker, mposition, start, end in zip(
+            mark._etable[mark._mmarker[0]],
+            mark._etable[mark._mposition[0]],
+            edge_start,
+            edge_end,
+        ):
         if mmarker:
             # Place the marker within the first edge segment.
-            x, y = edge_coordinates[0] * (1 - mposition) + edge_coordinates[1] * mposition
+            x, y = edge_coordinates[start] * (1 - mposition) + edge_coordinates[start+1] * mposition
 
             # Compute the marker angle using the first edge segment.
-            angle = -numpy.rad2deg(numpy.arctan2(edge_coordinates[1][1] - edge_coordinates[0][1], edge_coordinates[1][0] - edge_coordinates[0][0]))
+            angle = -numpy.rad2deg(numpy.arctan2(edge_coordinates[start+1][1] - edge_coordinates[start][1], edge_coordinates[start+1][0] - edge_coordinates[start][0]))
 
             # Create the marker with defaults.
             marker=toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + toyplot.marker.convert(mmarker)
@@ -2478,10 +2503,15 @@ def _render(axes, mark, context): # pragma: no cover
                 #title=vtitle,
                 )
 
-        # Render edge tail markers.
+    # Render edge tail markers.
+    for tmarker, start, end in zip(
+            mark._etable[mark._tmarker[0]],
+            edge_start,
+            edge_end,
+        ):
         if tmarker:
             # Compute the marker angle using the last edge segment.
-            angle = -numpy.rad2deg(numpy.arctan2(edge_coordinates[-1][1] - edge_coordinates[-2][1], edge_coordinates[-1][0] - edge_coordinates[-2][0]))
+            angle = -numpy.rad2deg(numpy.arctan2(edge_coordinates[end-1][1] - edge_coordinates[end-2][1], edge_coordinates[end-1][0] - edge_coordinates[end-2][0]))
 
             # Create the marker with defaults.
             marker=toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + toyplot.marker.convert(tmarker)
@@ -2492,13 +2522,12 @@ def _render(axes, mark, context): # pragma: no cover
 
             _draw_marker(
                 edge_xml,
-                cx=edge_coordinates[-1][0],
-                cy=edge_coordinates[-1][1],
+                cx=edge_coordinates[end-1][0],
+                cy=edge_coordinates[end-1][1],
                 marker=marker,
                 #extra_class="toyplot-Datum",
                 #title=vtitle,
                 )
-
 
     # Render vertex markers
     vertex_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Vertices"})

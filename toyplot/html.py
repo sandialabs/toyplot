@@ -2370,6 +2370,25 @@ def _render(axes, mark, context): # pragma: no cover
         else:
             vertex_markers.append(None)
 
+    # Create final edge styles.
+    edge_styles = []
+    for ecolor, ewidth, eopacity in zip(
+            mark._etable[mark._ecolor[0]],
+            mark._etable[mark._ewidth[0]],
+            mark._etable[mark._eopacity[0]],
+        ):
+        edge_styles.append(
+            toyplot.style.combine(
+                {
+                    "fill": "white",
+                    "stroke": toyplot.color.to_css(ecolor),
+                    "stroke-width": ewidth,
+                    "stroke-opacity": eopacity,
+                },
+                mark._estyle,
+            )
+        )
+
     # Identify ranges of edge coordinates for each edge.
     index = 0
     edge_start = []
@@ -2418,13 +2437,11 @@ def _render(axes, mark, context): # pragma: no cover
 
     # Render edges.
     edge_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Edges"})
-    for esource, etarget, eshape, ecolor, ewidth, eopacity, hmarker, mmarker, mposition, tmarker, start, end in zip(
+    for esource, etarget, eshape, estyle, hmarker, mmarker, mposition, tmarker, start, end in zip(
             mark._etable[mark._esource[0]],
             mark._etable[mark._etarget[0]],
             mark._etable[mark._eshape[0]],
-            mark._etable[mark._ecolor[0]],
-            mark._etable[mark._ewidth[0]],
-            mark._etable[mark._eopacity[0]],
+            edge_styles,
             mark._etable[mark._hmarker[0]],
             mark._etable[mark._mmarker[0]],
             mark._etable[mark._mposition[0]],
@@ -2432,14 +2449,6 @@ def _render(axes, mark, context): # pragma: no cover
             edge_start,
             edge_end,
         ):
-        estyle = toyplot.style.combine(
-            {
-                "fill": "none",
-                "stroke": toyplot.color.to_css(ecolor),
-                "stroke-width": ewidth,
-                "stroke-opacity": eopacity,
-            },
-            mark._estyle)
 
         path = []
         index = 0
@@ -2466,7 +2475,8 @@ def _render(axes, mark, context): # pragma: no cover
             )
 
     # Render edge head markers.
-    for hmarker, start, end in zip(
+    for estyle, hmarker, start, end in zip(
+            edge_styles,
             mark._etable[mark._hmarker[0]],
             edge_start,
             edge_end,
@@ -2479,7 +2489,7 @@ def _render(axes, mark, context): # pragma: no cover
                 ))
 
             # Create the marker with defaults.
-            marker = toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + toyplot.marker.convert(hmarker)
+            marker = toyplot.marker.create(size=10, angle=angle, mstyle=estyle, lstyle={}) + toyplot.marker.convert(hmarker)
 
             # By default, move the marker so that its tip matches the end of the edge line segment.
             if marker._dx is None:
@@ -2495,7 +2505,8 @@ def _render(axes, mark, context): # pragma: no cover
                 )
 
     # Render edge middle markers.
-    for mmarker, mposition, start, end in zip(
+    for estyle, mmarker, mposition, start, end in zip(
+            edge_styles,
             mark._etable[mark._mmarker[0]],
             mark._etable[mark._mposition[0]],
             edge_start,
@@ -2509,7 +2520,7 @@ def _render(axes, mark, context): # pragma: no cover
             angle = -numpy.rad2deg(numpy.arctan2(edge_coordinates[start+1][1] - edge_coordinates[start][1], edge_coordinates[start+1][0] - edge_coordinates[start][0]))
 
             # Create the marker with defaults.
-            marker = toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + toyplot.marker.convert(mmarker)
+            marker = toyplot.marker.create(size=10, angle=angle, mstyle=estyle, lstyle={}) + toyplot.marker.convert(mmarker)
 
             _draw_marker(
                 edge_xml,
@@ -2521,7 +2532,8 @@ def _render(axes, mark, context): # pragma: no cover
                 )
 
     # Render edge tail markers.
-    for tmarker, start, end in zip(
+    for estyle, tmarker, start, end in zip(
+            edge_styles,
             mark._etable[mark._tmarker[0]],
             edge_start,
             edge_end,
@@ -2531,7 +2543,7 @@ def _render(axes, mark, context): # pragma: no cover
             angle = -numpy.rad2deg(numpy.arctan2(edge_coordinates[end-1][1] - edge_coordinates[end-2][1], edge_coordinates[end-1][0] - edge_coordinates[end-2][0]))
 
             # Create the marker with defaults.
-            marker = toyplot.marker.create(size=10, angle=angle, mstyle={}, lstyle={}) + toyplot.marker.convert(tmarker)
+            marker = toyplot.marker.create(size=10, angle=angle, mstyle=estyle, lstyle={}) + toyplot.marker.convert(tmarker)
 
             # By default, move the marker so that its tip matches the end of the edge line segment.
             if marker._dx is None:

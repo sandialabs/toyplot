@@ -142,7 +142,6 @@ class Marker(object):
                     p = p / ap[1] * self._size * height / 2
                 return p
 
-
         return numpy.zeros((2,))
 
 

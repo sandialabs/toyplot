@@ -14,6 +14,7 @@ import numpy
 import toyplot.compatibility
 import toyplot.style
 
+
 class Marker(object):
     """Represents the complete specification of a marker's appearance."""
     def __init__(self, shape, mstyle, size, angle, label, lstyle, dx, dy):
@@ -124,6 +125,24 @@ class Marker(object):
                 p /= numpy.linalg.norm(p)
                 p *= self._size / 2
                 return p
+            if self._shape in ["s"]:
+                u = numpy.max(numpy.abs(p))
+                p /= u
+                p *= self._size / 2
+                return p
+            if self._shape and self._shape[0] == "r":
+                width, height = self._shape[1:].split("x")
+                width = float(width)
+                height = float(height)
+
+                ap = numpy.abs(p)
+                if ap[0] / ap[1] > width / height:
+                    p = p / ap[0] * self._size * width / 2
+                else:
+                    p = p / ap[1] * self._size * height / 2
+                return p
+
+
         return numpy.zeros((2,))
 
 

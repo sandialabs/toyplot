@@ -535,14 +535,14 @@ def _draw_bar(parent_xml, cx, cy, size, angle=0):
         markup.set("transform", "rotate(%r, %r, %r)" % (-angle, cx, cy))
 
 
-def _draw_square(parent_xml, cx, cy, size, angle=0):
+def _draw_rect(parent_xml, cx, cy, size, width=1, height=1, angle=0):
     markup = xml.SubElement(
         parent_xml,
         "rect",
-        x=repr(cx - size / 2),
-        y=repr(cy - size / 2),
-        width=repr(size),
-        height=repr(size),
+        x=repr(cx - size / 2 * width),
+        y=repr(cy - size / 2 * height),
+        width=repr(size * width),
+        height=repr(size * height),
         )
     if angle:
         markup.set("transform", "rotate(%r, %r, %r)" % (-angle, cx, cy))
@@ -561,6 +561,15 @@ def _draw_triangle(parent_xml, cx, cy, size, angle=0):
     if angle:
         markup.set("transform", "rotate(%r, %r, %r)" % (-angle, cx, cy))
 
+
+def _draw_circle(parent_xml, cx, cy, size):
+    xml.SubElement(
+        parent_xml,
+        "circle",
+        cx=repr(cx),
+        cy=repr(cy),
+        r=repr(size / 2),
+        )
 
 def _draw_marker(
         root,
@@ -591,60 +600,63 @@ def _draw_marker(
     if marker.shape == "|":
         _draw_bar(shape_xml, cx, cy, marker.size)
     elif marker.shape == "/":
-        _draw_bar(shape_xml, cx, cy, marker.size, -45)
+        _draw_bar(shape_xml, cx, cy, marker.size, angle=-45)
     elif marker.shape == "-":
-        _draw_bar(shape_xml, cx, cy, marker.size, 90)
+        _draw_bar(shape_xml, cx, cy, marker.size, angle=90)
     elif marker.shape == "\\":
-        _draw_bar(shape_xml, cx, cy, marker.size, 45)
+        _draw_bar(shape_xml, cx, cy, marker.size, angle=45)
     elif marker.shape == "+":
         _draw_bar(shape_xml, cx, cy, marker.size)
-        _draw_bar(shape_xml, cx, cy, marker.size, 90)
+        _draw_bar(shape_xml, cx, cy, marker.size, angle=90)
     elif marker.shape == "x":
-        _draw_bar(shape_xml, cx, cy, marker.size, -45)
-        _draw_bar(shape_xml, cx, cy, marker.size, 45)
+        _draw_bar(shape_xml, cx, cy, marker.size, angle=-45)
+        _draw_bar(shape_xml, cx, cy, marker.size, angle=45)
     elif marker.shape == "*":
         _draw_bar(shape_xml, cx, cy, marker.size)
-        _draw_bar(shape_xml, cx, cy, marker.size, -60)
-        _draw_bar(shape_xml, cx, cy, marker.size, 60)
+        _draw_bar(shape_xml, cx, cy, marker.size, angle=-60)
+        _draw_bar(shape_xml, cx, cy, marker.size, angle=60)
     elif marker.shape == "^":
         _draw_triangle(shape_xml, cx, cy, marker.size)
     elif marker.shape == ">":
-        _draw_triangle(shape_xml, cx, cy, marker.size, -90)
+        _draw_triangle(shape_xml, cx, cy, marker.size, angle=-90)
     elif marker.shape == "v":
-        _draw_triangle(shape_xml, cx, cy, marker.size, 180)
+        _draw_triangle(shape_xml, cx, cy, marker.size, angle=180)
     elif marker.shape == "<":
-        _draw_triangle(shape_xml, cx, cy, marker.size, 90)
+        _draw_triangle(shape_xml, cx, cy, marker.size, angle=90)
     elif marker.shape == "s":
-        _draw_square(shape_xml, cx, cy, marker.size)
+        _draw_rect(shape_xml, cx, cy, marker.size)
     elif marker.shape == "d":
-        _draw_square(shape_xml, cx, cy, marker.size, 45)
+        _draw_rect(shape_xml, cx, cy, marker.size, angle=45)
+    elif marker.shape and marker.shape[0]== "r":
+        width, height = marker.shape[1:].split("x")
+        _draw_rect(shape_xml, cx, cy, marker.size, width=float(width), height=float(height))
     elif marker.shape == "o":
-        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_circle(shape_xml, cx, cy, marker.size)
     elif marker.shape == "oo":
-        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
-        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 4))
+        _draw_circle(shape_xml, cx, cy, marker.size)
+        _draw_circle(shape_xml, cx, cy, marker.size / 2)
     elif marker.shape == "o|":
-        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_circle(shape_xml, cx, cy, marker.size)
         _draw_bar(shape_xml, cx, cy, marker.size)
     elif marker.shape == "o/":
-        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_circle(shape_xml, cx, cy, marker.size)
         _draw_bar(shape_xml, cx, cy, marker.size, -45)
     elif marker.shape == "o-":
-        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_circle(shape_xml, cx, cy, marker.size)
         _draw_bar(shape_xml, cx, cy, marker.size, 90)
     elif marker.shape == "o\\":
-        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_circle(shape_xml, cx, cy, marker.size)
         _draw_bar(shape_xml, cx, cy, marker.size, 45)
     elif marker.shape == "o+":
-        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_circle(shape_xml, cx, cy, marker.size)
         _draw_bar(shape_xml, cx, cy, marker.size)
         _draw_bar(shape_xml, cx, cy, marker.size, 90)
     elif marker.shape == "ox":
-        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_circle(shape_xml, cx, cy, marker.size)
         _draw_bar(shape_xml, cx, cy, marker.size, -45)
         _draw_bar(shape_xml, cx, cy, marker.size, 45)
     elif marker.shape == "o*":
-        xml.SubElement(shape_xml, "circle", cx=repr(cx), cy=repr(cy), r=repr(marker.size / 2))
+        _draw_circle(shape_xml, cx, cy, marker.size)
         _draw_bar(shape_xml, cx, cy, marker.size)
         _draw_bar(shape_xml, cx, cy, marker.size, -60)
         _draw_bar(shape_xml, cx, cy, marker.size, 60)

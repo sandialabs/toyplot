@@ -136,10 +136,13 @@ class Marker(object):
                 height = float(height)
 
                 ap = numpy.abs(p)
-                if ap[0] / ap[1] > width / height:
-                    p = p / ap[0] * self._size * width / 2
+                if ap[1]:
+                    if ap[0] / ap[1] > width / height:
+                        p = p / ap[0] * self._size * width / 2
+                    else:
+                        p = p / ap[1] * self._size * height / 2
                 else:
-                    p = p / ap[1] * self._size * height / 2
+                    p = p / ap[0] * self._size * width / 2
                 return p
 
         return numpy.zeros((2,))

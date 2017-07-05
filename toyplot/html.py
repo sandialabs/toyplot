@@ -593,73 +593,73 @@ def _draw_marker(
     if marker.dx or marker.dy:
         transform += " translate(%r, %r)" % (marker.dx, marker.dy)
 
-    shape_xml = xml.SubElement(marker_xml, "g")
+    #shape_xml = xml.SubElement(marker_xml, "g")
     if transform:
-        shape_xml.set("transform", transform)
+        marker_xml.set("transform", transform)
 
     if marker.shape == "|":
-        _draw_bar(shape_xml, cx, cy, marker.size)
+        _draw_bar(marker_xml, cx, cy, marker.size)
     elif marker.shape == "/":
-        _draw_bar(shape_xml, cx, cy, marker.size, angle=-45)
+        _draw_bar(marker_xml, cx, cy, marker.size, angle=-45)
     elif marker.shape == "-":
-        _draw_bar(shape_xml, cx, cy, marker.size, angle=90)
+        _draw_bar(marker_xml, cx, cy, marker.size, angle=90)
     elif marker.shape == "\\":
-        _draw_bar(shape_xml, cx, cy, marker.size, angle=45)
+        _draw_bar(marker_xml, cx, cy, marker.size, angle=45)
     elif marker.shape == "+":
-        _draw_bar(shape_xml, cx, cy, marker.size)
-        _draw_bar(shape_xml, cx, cy, marker.size, angle=90)
+        _draw_bar(marker_xml, cx, cy, marker.size)
+        _draw_bar(marker_xml, cx, cy, marker.size, angle=90)
     elif marker.shape == "x":
-        _draw_bar(shape_xml, cx, cy, marker.size, angle=-45)
-        _draw_bar(shape_xml, cx, cy, marker.size, angle=45)
+        _draw_bar(marker_xml, cx, cy, marker.size, angle=-45)
+        _draw_bar(marker_xml, cx, cy, marker.size, angle=45)
     elif marker.shape == "*":
-        _draw_bar(shape_xml, cx, cy, marker.size)
-        _draw_bar(shape_xml, cx, cy, marker.size, angle=-60)
-        _draw_bar(shape_xml, cx, cy, marker.size, angle=60)
+        _draw_bar(marker_xml, cx, cy, marker.size)
+        _draw_bar(marker_xml, cx, cy, marker.size, angle=-60)
+        _draw_bar(marker_xml, cx, cy, marker.size, angle=60)
     elif marker.shape == "^":
-        _draw_triangle(shape_xml, cx, cy, marker.size)
+        _draw_triangle(marker_xml, cx, cy, marker.size)
     elif marker.shape == ">":
-        _draw_triangle(shape_xml, cx, cy, marker.size, angle=-90)
+        _draw_triangle(marker_xml, cx, cy, marker.size, angle=-90)
     elif marker.shape == "v":
-        _draw_triangle(shape_xml, cx, cy, marker.size, angle=180)
+        _draw_triangle(marker_xml, cx, cy, marker.size, angle=180)
     elif marker.shape == "<":
-        _draw_triangle(shape_xml, cx, cy, marker.size, angle=90)
+        _draw_triangle(marker_xml, cx, cy, marker.size, angle=90)
     elif marker.shape == "s":
-        _draw_rect(shape_xml, cx, cy, marker.size)
+        _draw_rect(marker_xml, cx, cy, marker.size)
     elif marker.shape == "d":
-        _draw_rect(shape_xml, cx, cy, marker.size, angle=45)
+        _draw_rect(marker_xml, cx, cy, marker.size, angle=45)
     elif marker.shape and marker.shape[0]== "r":
         width, height = marker.shape[1:].split("x")
-        _draw_rect(shape_xml, cx, cy, marker.size, width=float(width), height=float(height))
+        _draw_rect(marker_xml, cx, cy, marker.size, width=float(width), height=float(height))
     elif marker.shape == "o":
-        _draw_circle(shape_xml, cx, cy, marker.size)
+        _draw_circle(marker_xml, cx, cy, marker.size)
     elif marker.shape == "oo":
-        _draw_circle(shape_xml, cx, cy, marker.size)
-        _draw_circle(shape_xml, cx, cy, marker.size / 2)
+        _draw_circle(marker_xml, cx, cy, marker.size)
+        _draw_circle(marker_xml, cx, cy, marker.size / 2)
     elif marker.shape == "o|":
-        _draw_circle(shape_xml, cx, cy, marker.size)
-        _draw_bar(shape_xml, cx, cy, marker.size)
+        _draw_circle(marker_xml, cx, cy, marker.size)
+        _draw_bar(marker_xml, cx, cy, marker.size)
     elif marker.shape == "o/":
-        _draw_circle(shape_xml, cx, cy, marker.size)
-        _draw_bar(shape_xml, cx, cy, marker.size, -45)
+        _draw_circle(marker_xml, cx, cy, marker.size)
+        _draw_bar(marker_xml, cx, cy, marker.size, -45)
     elif marker.shape == "o-":
-        _draw_circle(shape_xml, cx, cy, marker.size)
-        _draw_bar(shape_xml, cx, cy, marker.size, 90)
+        _draw_circle(marker_xml, cx, cy, marker.size)
+        _draw_bar(marker_xml, cx, cy, marker.size, 90)
     elif marker.shape == "o\\":
-        _draw_circle(shape_xml, cx, cy, marker.size)
-        _draw_bar(shape_xml, cx, cy, marker.size, 45)
+        _draw_circle(marker_xml, cx, cy, marker.size)
+        _draw_bar(marker_xml, cx, cy, marker.size, 45)
     elif marker.shape == "o+":
-        _draw_circle(shape_xml, cx, cy, marker.size)
-        _draw_bar(shape_xml, cx, cy, marker.size)
-        _draw_bar(shape_xml, cx, cy, marker.size, 90)
+        _draw_circle(marker_xml, cx, cy, marker.size)
+        _draw_bar(marker_xml, cx, cy, marker.size)
+        _draw_bar(marker_xml, cx, cy, marker.size, 90)
     elif marker.shape == "ox":
-        _draw_circle(shape_xml, cx, cy, marker.size)
-        _draw_bar(shape_xml, cx, cy, marker.size, -45)
-        _draw_bar(shape_xml, cx, cy, marker.size, 45)
+        _draw_circle(marker_xml, cx, cy, marker.size)
+        _draw_bar(marker_xml, cx, cy, marker.size, -45)
+        _draw_bar(marker_xml, cx, cy, marker.size, 45)
     elif marker.shape == "o*":
-        _draw_circle(shape_xml, cx, cy, marker.size)
-        _draw_bar(shape_xml, cx, cy, marker.size)
-        _draw_bar(shape_xml, cx, cy, marker.size, -60)
-        _draw_bar(shape_xml, cx, cy, marker.size, 60)
+        _draw_circle(marker_xml, cx, cy, marker.size)
+        _draw_bar(marker_xml, cx, cy, marker.size)
+        _draw_bar(marker_xml, cx, cy, marker.size, -60)
+        _draw_bar(marker_xml, cx, cy, marker.size, 60)
 
     if marker.label: # Never compute a text layout unless we have to.
         _draw_text(
@@ -2475,17 +2475,17 @@ def _render(axes, mark, context): # pragma: no cover
             )
 
     # Render edge head markers.
-    for estyle, hmarker, start, end in zip(
-            edge_styles,
+    for hmarker, estyle, estart, eend in zip(
             mark._etable[mark._hmarker[0]],
+            edge_styles,
             edge_start,
             edge_end,
         ):
         if hmarker:
             # Compute the marker angle using the first edge segment.
             angle = -numpy.rad2deg(numpy.arctan2(
-                edge_coordinates[start+1][1] - edge_coordinates[start][1],
-                edge_coordinates[start+1][0] - edge_coordinates[start][0],
+                edge_coordinates[estart+1][1] - edge_coordinates[estart][1],
+                edge_coordinates[estart+1][0] - edge_coordinates[estart][0],
                 ))
 
             # Create the marker with defaults.
@@ -2497,8 +2497,8 @@ def _render(axes, mark, context): # pragma: no cover
 
             _draw_marker(
                 edge_xml,
-                cx=edge_coordinates[start][0],
-                cy=edge_coordinates[start][1],
+                cx=edge_coordinates[estart][0],
+                cy=edge_coordinates[estart][1],
                 marker=marker,
                 #extra_class="toyplot-Datum",
                 #title=vtitle,

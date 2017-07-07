@@ -317,7 +317,7 @@ def render(svg, canvas):
                 fill, fill_gradient = get_fill(element, current_style)
                 stroke = get_stroke(current_style)
                 font_family = get_font_family(current_style)
-                font_size = float(current_style["font-size"].strip())
+                font_size = toyplot.units.convert(current_style["font-size"], target="px")
                 text = element.text
 
                 canvas.saveState()

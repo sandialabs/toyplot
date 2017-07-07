@@ -151,7 +151,7 @@ def layout(text, style, fonts):
         line_height = toyplot.units.convert(line_height, target="px", default="px", reference=font_size)
 
         node.get("style")["baseline-shift"] = baseline_shift
-        node.get("style")["font-size"] = font_size
+        node.get("style")["font-size"] = "%spx" % font_size
         node.get("style")["line-height"] = line_height
         node.get("style")["-toyplot-anchor-shift"] = toyplot_anchor_shift
 

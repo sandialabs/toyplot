@@ -627,7 +627,7 @@ def _draw_marker(
         _draw_rect(marker_xml, cx, cy, marker.size)
     elif marker.shape == "d":
         _draw_rect(marker_xml, cx, cy, marker.size, angle=45)
-    elif marker.shape and marker.shape[0]== "r":
+    elif marker.shape and marker.shape[0] == "r":
         width, height = marker.shape[1:].split("x")
         _draw_rect(marker_xml, cx, cy, marker.size, width=float(width), height=float(height))
     elif marker.shape == "o":

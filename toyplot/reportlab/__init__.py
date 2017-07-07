@@ -215,10 +215,10 @@ def render(svg, canvas):
                     set_stroke_color(canvas, stroke)
                     canvas.setLineCap(get_line_cap(current_style))
                     canvas.line(
-                        float(element.get("x1")),
-                        float(element.get("y1")),
-                        float(element.get("x2")),
-                        float(element.get("y2")),
+                        float(element.get("x1", 0)),
+                        float(element.get("y1", 0)),
+                        float(element.get("x2", 0)),
+                        float(element.get("y2", 0)),
                         )
             elif element.tag == "path":
                 stroke = get_stroke(current_style)

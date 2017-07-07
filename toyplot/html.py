@@ -648,7 +648,7 @@ def _draw_marker(
         _draw_bar(marker_xml, marker.size)
         _draw_bar(marker_xml, marker.size, 90)
     elif marker.shape == "ox":
-        _draw_circle(marker_xml, cx, cy, marker.size)
+        _draw_circle(marker_xml, marker.size)
         _draw_bar(marker_xml, marker.size, -45)
         _draw_bar(marker_xml, marker.size, 45)
     elif marker.shape == "o*":

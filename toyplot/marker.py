@@ -17,15 +17,13 @@ import toyplot.style
 
 class Marker(object):
     """Represents the complete specification of a marker's appearance."""
-    def __init__(self, shape, mstyle, size, angle, label, lstyle, dx, dy):
+    def __init__(self, shape, mstyle, size, angle, label, lstyle):
         self._shape = shape
         self._mstyle = mstyle
         self._size = size
         self._angle = angle
         self._label = label
         self._lstyle = lstyle
-        self._dx = dx
-        self._dy = dy
 
     @property
     def shape(self):
@@ -41,7 +39,7 @@ class Marker(object):
 
     @property
     def angle(self):
-        return self._angle if self._angle else 0
+        return self._angle
 
     @property
     def label(self):
@@ -50,14 +48,6 @@ class Marker(object):
     @property
     def lstyle(self):
         return self._lstyle
-
-    @property
-    def dx(self):
-        return self._dx if self._dx else 0
-
-    @property
-    def dy(self):
-        return self._dy if self._dy else 0
 
     def __add__(self, other):
         if isinstance(other, toyplot.compatibility.string_type):
@@ -74,19 +64,15 @@ class Marker(object):
             if other._label is not None:
                 result._label = other._label
             result._lstyle = toyplot.style.combine(result.lstyle, other._lstyle)
-            if other._dx is not None:
-                result._dx = other._dx
-            if other._dy is not None:
-                result._dy = other._dy
             return result
         else:
             raise ValueError("Can't add toyplot.marker.Marker and %r" % other) # pragma: no cover
 
     def __eq__(self, other):
-        return self._shape == other._shape and self._mstyle == other._mstyle and self._shape == other._shape and self._angle == other._angle and self._label == other._label and self._lstyle == other._lstyle and self._dx == other._dx and self._dy == other._dy
+        return self._shape == other._shape and self._mstyle == other._mstyle and self._shape == other._shape and self._angle == other._angle and self._label == other._label and self._lstyle == other._lstyle
 
     def __hash__(self):
-        return hash((self._shape, self._mstyle, self._size, self._angle, self._label, self._lstyle, self._dx, self._dy))
+        return hash((self._shape, self._mstyle, self._size, self._angle, self._label, self._lstyle))
 
     def __radd__(self, other):
         return other + self.to_html()
@@ -96,15 +82,13 @@ class Marker(object):
 
     def to_html(self):
         """Convert a marker specification to HTML markup that can be embedded in rich text."""
-        return """<marker%s%s%s%s%s%s%s%s/>""" % (
+        return """<marker%s%s%s%s%s%s/>""" % (
             " shape='%s'"% self._shape if self._shape else "",
             " mstyle='%s'" % toyplot.style.to_css(self._mstyle) if self._mstyle else "",
             " size='%s'"% self._size if self._size else "",
             " angle='%s'" % self._angle if self._angle else "",
             " label='%s'" % self._label if self._label else "",
             " lstyle='%s'" % toyplot.style.to_css(self._lstyle) if self._lstyle else "",
-            " dx='%s'" % self._dx if self._dx else "",
-            " dy='%s'" % self._dy if self._dy else "",
             )
 
     def intersect(self, p):
@@ -148,9 +132,9 @@ class Marker(object):
         return numpy.zeros((2,))
 
 
-def create(shape=None, mstyle=None, size=None, angle=None, label=None, lstyle=None, dx=None, dy=None):
+def create(shape=None, mstyle=None, size=None, angle=None, label=None, lstyle=None):
     """Factory function for creating instances of :class:`toyplot.marker.Marker`."""
-    return Marker(shape=shape, mstyle=mstyle, size=size, angle=angle, label=label, lstyle=lstyle, dx=dx, dy=dy)
+    return Marker(shape=shape, mstyle=mstyle, size=size, angle=angle, label=label, lstyle=lstyle)
 
 
 def convert(value):
@@ -160,7 +144,7 @@ def convert(value):
     if isinstance(value, Marker):
         return value
     if isinstance(value, toyplot.compatibility.string_type):
-        return Marker(shape=value, mstyle=None, size=None, angle=None, label=None, lstyle=None, dx=None, dy=None)
+        return Marker(shape=value, mstyle=None, size=None, angle=None, label=None, lstyle=None)
     if isinstance(value, dict):
         toyplot.log.warning("dict marker specifications are deprecated, use an instance of toyplot.marker.Marker instead.")
         return Marker(
@@ -170,8 +154,6 @@ def convert(value):
             angle=value.get("angle", None),
             label=value.get("label", None),
             lstyle=value.get("lstyle", None),
-            dx=value.get("dx", None),
-            dy=value.get("dy", None),
             )
     raise ValueError("Can't convert %r to toyplot.marker.Marker." % value) # pragma: no cover
 
@@ -186,14 +168,6 @@ def from_html(html):
     if angle is not None:
         angle = float(angle)
 
-    dx = html.get("dx", None)
-    if dx is not None:
-        dx = float(dx)
-
-    dy = html.get("dy", None)
-    if dy is not None:
-        dy = float(dy)
-
     return Marker(
         shape=html.get("shape", None),
         mstyle=toyplot.style.parse(html.get("mstyle", "")),
@@ -201,6 +175,4 @@ def from_html(html):
         angle=angle,
         label=html.get("label", None),
         lstyle=toyplot.style.parse(html.get("lstyle", "")),
-        dx=dx,
-        dy=dy,
         )

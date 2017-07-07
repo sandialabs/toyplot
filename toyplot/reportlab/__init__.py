@@ -262,8 +262,8 @@ def render(svg, canvas):
                 if stroke is not None:
                     set_stroke_color(canvas, stroke)
 
-                x = float(element.get("x"))
-                y = float(element.get("y"))
+                x = float(element.get("x", 0))
+                y = float(element.get("y", 0))
                 width = float(element.get("width"))
                 height = float(element.get("height"))
 
@@ -307,13 +307,13 @@ def render(svg, canvas):
                 if stroke is not None:
                     set_stroke_color(canvas, stroke)
 
-                cx = float(element.get("cx"))
-                cy = float(element.get("cy"))
+                cx = float(element.get("cx", 0))
+                cy = float(element.get("cy", 0))
                 r = float(element.get("r"))
                 canvas.circle(cx, cy, r, stroke=stroke is not None, fill=fill is not None)
             elif element.tag == "text":
-                x = float(element.get("x"))
-                y = float(element.get("y"))
+                x = float(element.get("x", 0))
+                y = float(element.get("y", 0))
                 fill, fill_gradient = get_fill(element, current_style)
                 stroke = get_stroke(current_style)
                 font_family = get_font_family(current_style)
@@ -343,8 +343,8 @@ def render(svg, canvas):
                 image = PIL.Image.open(image)
                 image = reportlab.lib.utils.ImageReader(image)
 
-                x = float(element.get("x"))
-                y = float(element.get("y"))
+                x = float(element.get("x", 0))
+                y = float(element.get("y", 0))
                 width = float(element.get("width"))
                 height = float(element.get("height"))
 

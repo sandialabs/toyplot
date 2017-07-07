@@ -387,16 +387,19 @@ def _draw_text(
     fonts = toyplot.font.ReportlabLibrary()
     layout = text if isinstance(text, toyplot.text.Layout) else toyplot.text.layout(text, style, fonts)
 
-    transform = "translate(%r,%r)" % (x, y)
+    transform = ""
+    if x or y:
+        transform += "translate(%r,%r)" % (x, y)
     if angle:
         transform += "rotate(%r)" % (-angle)
 
     group = xml.SubElement(
         root,
         "g",
-        transform=transform,
         attrib=attributes,
         )
+    if transform:
+        group.set("transform", transform)
 
     if title is not None:
         xml.SubElement(group, "title").text = str(title)
@@ -522,62 +525,59 @@ def _draw_text(
                 group = hyperlink.pop()
 
 
-def _draw_bar(parent_xml, cx, cy, size, angle=0):
+def _draw_bar(parent_xml, size, angle=0):
     markup = xml.SubElement(
         parent_xml,
         "line",
-        x1=repr(cx),
-        x2=repr(cx),
-        y1=repr(cy - size / 2),
-        y2=repr(cy + size / 2),
+        y1=repr(-size / 2),
+        y2=repr(size / 2),
         )
     if angle:
-        markup.set("transform", "rotate(%r, %r, %r)" % (-angle, cx, cy))
+        markup.set("transform", "rotate(%r)" % (-angle,))
 
 
-def _draw_rect(parent_xml, cx, cy, size, width=1, height=1, angle=0):
+def _draw_rect(parent_xml, size, width=1, height=1, angle=0):
     markup = xml.SubElement(
         parent_xml,
         "rect",
-        x=repr(cx - size / 2 * width),
-        y=repr(cy - size / 2 * height),
+        x=repr(-size / 2 * width),
+        y=repr(-size / 2 * height),
         width=repr(size * width),
         height=repr(size * height),
         )
     if angle:
-        markup.set("transform", "rotate(%r, %r, %r)" % (-angle, cx, cy))
+        markup.set("transform", "rotate(%r)" % (-angle,))
 
 
-def _draw_triangle(parent_xml, cx, cy, size, angle=0):
+def _draw_triangle(parent_xml, size, angle=0):
     markup = xml.SubElement(
         parent_xml,
         "polygon",
         points=" ".join(["%r,%r" % (xp, yp) for xp, yp in [
-           (cx - size / 2, cy + size / 2),
-           (cx, cy - size / 2),
-           (cx + size / 2, cy + size / 2),
+           (-size / 2, size / 2),
+           (0, -size / 2),
+           (size / 2, size / 2),
            ]]),
         )
     if angle:
-        markup.set("transform", "rotate(%r, %r, %r)" % (-angle, cx, cy))
+        markup.set("transform", "rotate(%r)" % (-angle,))
 
 
-def _draw_circle(parent_xml, cx, cy, size):
+def _draw_circle(parent_xml, size):
     xml.SubElement(
         parent_xml,
         "circle",
-        cx=repr(cx),
-        cy=repr(cy),
         r=repr(size / 2),
         )
 
 def _draw_marker(
         root,
-        cx,
-        cy,
         marker,
+        cx=None,
+        cy=None,
         extra_class=None,
         title=None,
+        transform=None,
         ):
 
     attrib = _css_attrib(marker.mstyle)
@@ -587,86 +587,80 @@ def _draw_marker(
     if title is not None:
         xml.SubElement(marker_xml, "title").text = str(title)
 
-    transform = ""
-    if marker.angle:
-        transform += " rotate(%r, %r, %r)" % (-marker.angle, cx, cy)
-    if marker.dx or marker.dy:
-        transform += " translate(%r, %r)" % (marker.dx, marker.dy)
-
-    #shape_xml = xml.SubElement(marker_xml, "g")
-    if transform:
-        marker_xml.set("transform", transform)
+    if transform is None:
+        transform = "translate(%r, %r)" % (cx, cy)
+        if marker.angle:
+            transform += " rotate(%r)" % (-marker.angle,)
+    marker_xml.set("transform", transform)
 
     if marker.shape == "|":
-        _draw_bar(marker_xml, cx, cy, marker.size)
+        _draw_bar(marker_xml, marker.size)
     elif marker.shape == "/":
-        _draw_bar(marker_xml, cx, cy, marker.size, angle=-45)
+        _draw_bar(marker_xml, marker.size, angle=-45)
     elif marker.shape == "-":
-        _draw_bar(marker_xml, cx, cy, marker.size, angle=90)
+        _draw_bar(marker_xml, marker.size, angle=90)
     elif marker.shape == "\\":
-        _draw_bar(marker_xml, cx, cy, marker.size, angle=45)
+        _draw_bar(marker_xml, marker.size, angle=45)
     elif marker.shape == "+":
-        _draw_bar(marker_xml, cx, cy, marker.size)
-        _draw_bar(marker_xml, cx, cy, marker.size, angle=90)
+        _draw_bar(marker_xml, marker.size)
+        _draw_bar(marker_xml, marker.size, angle=90)
     elif marker.shape == "x":
-        _draw_bar(marker_xml, cx, cy, marker.size, angle=-45)
-        _draw_bar(marker_xml, cx, cy, marker.size, angle=45)
+        _draw_bar(marker_xml, marker.size, angle=-45)
+        _draw_bar(marker_xml, marker.size, angle=45)
     elif marker.shape == "*":
-        _draw_bar(marker_xml, cx, cy, marker.size)
-        _draw_bar(marker_xml, cx, cy, marker.size, angle=-60)
-        _draw_bar(marker_xml, cx, cy, marker.size, angle=60)
+        _draw_bar(marker_xml, marker.size)
+        _draw_bar(marker_xml, marker.size, angle=-60)
+        _draw_bar(marker_xml, marker.size, angle=60)
     elif marker.shape == "^":
-        _draw_triangle(marker_xml, cx, cy, marker.size)
+        _draw_triangle(marker_xml, marker.size)
     elif marker.shape == ">":
-        _draw_triangle(marker_xml, cx, cy, marker.size, angle=-90)
+        _draw_triangle(marker_xml, marker.size, angle=-90)
     elif marker.shape == "v":
-        _draw_triangle(marker_xml, cx, cy, marker.size, angle=180)
+        _draw_triangle(marker_xml, marker.size, angle=180)
     elif marker.shape == "<":
-        _draw_triangle(marker_xml, cx, cy, marker.size, angle=90)
+        _draw_triangle(marker_xml, marker.size, angle=90)
     elif marker.shape == "s":
-        _draw_rect(marker_xml, cx, cy, marker.size)
+        _draw_rect(marker_xml, marker.size)
     elif marker.shape == "d":
-        _draw_rect(marker_xml, cx, cy, marker.size, angle=45)
+        _draw_rect(marker_xml, marker.size, angle=45)
     elif marker.shape and marker.shape[0] == "r":
         width, height = marker.shape[1:].split("x")
-        _draw_rect(marker_xml, cx, cy, marker.size, width=float(width), height=float(height))
+        _draw_rect(marker_xml, marker.size, width=float(width), height=float(height))
     elif marker.shape == "o":
-        _draw_circle(marker_xml, cx, cy, marker.size)
+        _draw_circle(marker_xml, marker.size)
     elif marker.shape == "oo":
-        _draw_circle(marker_xml, cx, cy, marker.size)
-        _draw_circle(marker_xml, cx, cy, marker.size / 2)
+        _draw_circle(marker_xml, marker.size)
+        _draw_circle(marker_xml, marker.size / 2)
     elif marker.shape == "o|":
-        _draw_circle(marker_xml, cx, cy, marker.size)
-        _draw_bar(marker_xml, cx, cy, marker.size)
+        _draw_circle(marker_xml, marker.size)
+        _draw_bar(marker_xml, marker.size)
     elif marker.shape == "o/":
-        _draw_circle(marker_xml, cx, cy, marker.size)
-        _draw_bar(marker_xml, cx, cy, marker.size, -45)
+        _draw_circle(marker_xml, marker.size)
+        _draw_bar(marker_xml, marker.size, -45)
     elif marker.shape == "o-":
-        _draw_circle(marker_xml, cx, cy, marker.size)
-        _draw_bar(marker_xml, cx, cy, marker.size, 90)
+        _draw_circle(marker_xml, marker.size)
+        _draw_bar(marker_xml, marker.size, 90)
     elif marker.shape == "o\\":
-        _draw_circle(marker_xml, cx, cy, marker.size)
-        _draw_bar(marker_xml, cx, cy, marker.size, 45)
+        _draw_circle(marker_xml, marker.size)
+        _draw_bar(marker_xml, marker.size, 45)
     elif marker.shape == "o+":
-        _draw_circle(marker_xml, cx, cy, marker.size)
-        _draw_bar(marker_xml, cx, cy, marker.size)
-        _draw_bar(marker_xml, cx, cy, marker.size, 90)
+        _draw_circle(marker_xml, marker.size)
+        _draw_bar(marker_xml, marker.size)
+        _draw_bar(marker_xml, marker.size, 90)
     elif marker.shape == "ox":
         _draw_circle(marker_xml, cx, cy, marker.size)
-        _draw_bar(marker_xml, cx, cy, marker.size, -45)
-        _draw_bar(marker_xml, cx, cy, marker.size, 45)
+        _draw_bar(marker_xml, marker.size, -45)
+        _draw_bar(marker_xml, marker.size, 45)
     elif marker.shape == "o*":
-        _draw_circle(marker_xml, cx, cy, marker.size)
-        _draw_bar(marker_xml, cx, cy, marker.size)
-        _draw_bar(marker_xml, cx, cy, marker.size, -60)
-        _draw_bar(marker_xml, cx, cy, marker.size, 60)
+        _draw_circle(marker_xml, marker.size)
+        _draw_bar(marker_xml, marker.size)
+        _draw_bar(marker_xml, marker.size, -60)
+        _draw_bar(marker_xml, marker.size, 60)
 
     if marker.label: # Never compute a text layout unless we have to.
         _draw_text(
             root=marker_xml,
             text=marker.label,
-            x=cx,
-            y=cy,
             style=toyplot.style.combine(
                 {
                     "-toyplot-vertical-align": "middle",
@@ -2475,87 +2469,107 @@ def _render(axes, mark, context): # pragma: no cover
             )
 
     # Render edge head markers.
-    for hmarker, estyle, estart, eend in zip(
+    marker_xml = xml.SubElement(edge_xml, "g", attrib={"class": "toyplot-HeadMarkers"})
+    for marker, estyle, estart, eend in zip(
             mark._etable[mark._hmarker[0]],
             edge_styles,
             edge_start,
             edge_end,
         ):
-        if hmarker:
+        if marker:
             # Compute the marker angle using the first edge segment.
-            angle = -numpy.rad2deg(numpy.arctan2(
+            edge_angle = -numpy.rad2deg(numpy.arctan2(
                 edge_coordinates[estart+1][1] - edge_coordinates[estart][1],
                 edge_coordinates[estart+1][0] - edge_coordinates[estart][0],
                 ))
 
-            # Create the marker with defaults.
-            marker = toyplot.marker.create(size=10, angle=angle, mstyle=estyle, lstyle={}) + toyplot.marker.convert(hmarker)
+            transform = "translate(%r, %r)" % (edge_coordinates[estart][0], edge_coordinates[estart][1])
+            if edge_angle:
+                transform += " rotate(%r)" % (-edge_angle,)
+            transform += " translate(%r, 0)" % (marker.size / 2,)
+            if marker.angle is not None:
+                if isinstance(marker.angle, toyplot.compatibility.string_type) and marker.angle[0:1] == "r":
+                    angle = float(marker.angle[1:])
+                else:
+                    angle = -edge_angle + float(marker.angle)
+                transform += " rotate(%r)" % (-angle,)
 
-            # By default, move the marker so that its tip matches the end of the edge line segment.
-            if marker._dx is None:
-                marker = marker + toyplot.marker.create(dx=marker.size / 2)
+            # Create the marker with defaults.
+            marker = toyplot.marker.create(size=10, mstyle=estyle) + toyplot.marker.convert(marker)
 
             _draw_marker(
-                edge_xml,
-                cx=edge_coordinates[estart][0],
-                cy=edge_coordinates[estart][1],
+                marker_xml,
                 marker=marker,
-                #extra_class="toyplot-Datum",
-                #title=vtitle,
+                transform=transform,
                 )
 
     # Render edge middle markers.
-    for estyle, mmarker, mposition, start, end in zip(
+    marker_xml = xml.SubElement(edge_xml, "g", attrib={"class": "toyplot-MiddleMarkers"})
+    for estyle, marker, mposition, start, end in zip(
             edge_styles,
             mark._etable[mark._mmarker[0]],
             mark._etable[mark._mposition[0]],
             edge_start,
             edge_end,
         ):
-        if mmarker:
+        if marker:
             # Place the marker within the first edge segment.
             x, y = edge_coordinates[start] * (1 - mposition) + edge_coordinates[start+1] * mposition
 
             # Compute the marker angle using the first edge segment.
-            angle = -numpy.rad2deg(numpy.arctan2(edge_coordinates[start+1][1] - edge_coordinates[start][1], edge_coordinates[start+1][0] - edge_coordinates[start][0]))
+            angle = -numpy.rad2deg(numpy.arctan2(
+                edge_coordinates[start+1][1] - edge_coordinates[start][1],
+                edge_coordinates[start+1][0] - edge_coordinates[start][0],
+                ))
+            if marker.angle is not None:
+                if isinstance(marker.angle, toyplot.compatibility.string_type) and marker.angle[0:1] == "r":
+                    angle += float(marker.angle[1:])
+                else:
+                    angle = float(marker.angle)
 
             # Create the marker with defaults.
-            marker = toyplot.marker.create(size=10, angle=angle, mstyle=estyle, lstyle={}) + toyplot.marker.convert(mmarker)
+            marker = toyplot.marker.create(size=10, mstyle=estyle) + toyplot.marker.convert(marker) + toyplot.marker.create(angle=angle)
 
             _draw_marker(
-                edge_xml,
+                marker_xml,
                 cx=x,
                 cy=y,
                 marker=marker,
-                #extra_class="toyplot-Datum",
-                #title=vtitle,
                 )
 
     # Render edge tail markers.
-    for estyle, tmarker, start, end in zip(
+    marker_xml = xml.SubElement(edge_xml, "g", attrib={"class": "toyplot-TailMarkers"})
+    for estyle, marker, start, end in zip(
             edge_styles,
             mark._etable[mark._tmarker[0]],
             edge_start,
             edge_end,
         ):
-        if tmarker:
+        if marker:
             # Compute the marker angle using the last edge segment.
-            angle = -numpy.rad2deg(numpy.arctan2(edge_coordinates[end-1][1] - edge_coordinates[end-2][1], edge_coordinates[end-1][0] - edge_coordinates[end-2][0]))
+            edge_angle = -numpy.rad2deg(numpy.arctan2(
+                edge_coordinates[end-1][1] - edge_coordinates[end-2][1],
+                edge_coordinates[end-1][0] - edge_coordinates[end-2][0],
+                ))
+
+            transform = "translate(%r, %r)" % (edge_coordinates[end-1][0], edge_coordinates[end-1][1])
+            if edge_angle:
+                transform += " rotate(%r)" % (-edge_angle,)
+            transform += " translate(%r, 0)" % (-marker.size / 2,)
+            if marker.angle is not None:
+                if isinstance(marker.angle, toyplot.compatibility.string_type) and marker.angle[0:1] == "r":
+                    angle = float(marker.angle[1:])
+                else:
+                    angle = -edge_angle + float(marker.angle)
+                transform += " rotate(%r)" % (-angle,)
 
             # Create the marker with defaults.
-            marker = toyplot.marker.create(size=10, angle=angle, mstyle=estyle, lstyle={}) + toyplot.marker.convert(tmarker)
-
-            # By default, move the marker so that its tip matches the end of the edge line segment.
-            if marker._dx is None:
-                marker = marker + toyplot.marker.create(dx=-marker.size / 2)
+            marker = toyplot.marker.create(size=10, angle=angle, mstyle=estyle, lstyle={}) + toyplot.marker.convert(marker)
 
             _draw_marker(
-                edge_xml,
-                cx=edge_coordinates[end-1][0],
-                cy=edge_coordinates[end-1][1],
+                marker_xml,
                 marker=marker,
-                #extra_class="toyplot-Datum",
-                #title=vtitle,
+                transform=transform,
                 )
 
     # Render vertex markers

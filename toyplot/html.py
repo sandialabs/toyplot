@@ -100,15 +100,15 @@ class RenderContext(object):
             Module name.  Any string is valid, but alphanumerics separated with
             slashes are recommended. Multiple calls to `define` with the same
             name argument will be silently ignored.
-        dependencies: sequence of strings, required
-            Names of modules that are dependencies by this module (if any).
+        dependencies: sequence of strings, optional
+            Names of modules that are dependencies of this module.
         factory: string, optional
-            Javascript factory for this module, which must be a function that
-            takes the modules listed in `dependencies`, in-order, as arguments,
-            and returns the initialized module.
+            Javascript code that will construct the module, which must be a
+            function that takes the modules listed in `dependencies`, in-order,
+            as arguments, and returns the initialized module.
         value: Python object, optional
-            Arbitrary value for this module, which must be a JSON-convertible
-            value (string, number, boolean, None, list, or dict).
+            Arbitrary value for this module, which must be compatible with
+            :func:`json.dumps`.
         """
         if name in self._javascript_modules:
             return
@@ -137,12 +137,12 @@ class RenderContext(object):
         dependencies: sequence of strings, optional
             Names of modules that are required by this code.
         arguments: sequence of Python objects, optional
-            Additional arguments to be passed to the Javascript code.
-            Arguments must be compatible with :func:`json.dumps`.
+            Additional arguments to be passed to the Javascript code, which
+            must be compatible with :func:`json.dumps`.
         code: string, required
-            Javascript function to be embedded, which must accept the modules
-            listed in `requirements` in-order, followed by the values listed in
-            `arguments` in-order, as arguments.
+            Javascript code to be embedded, which must be a function that
+            accepts the modules listed in `requirements` in-order, followed by
+            the values listed in `arguments` in-order, as arguments.
         """
         if dependencies is None:
             dependencies = []

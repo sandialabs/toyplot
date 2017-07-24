@@ -2564,7 +2564,7 @@ def _render(axes, mark, context): # pragma: no cover
                 transform += " rotate(%r)" % (-angle,)
 
             # Create the marker with defaults.
-            marker = toyplot.marker.create(size=10, angle=angle, mstyle=estyle, lstyle={}) + toyplot.marker.convert(marker)
+            marker = toyplot.marker.create(size=10, mstyle=estyle, lstyle={}) + toyplot.marker.convert(marker)
 
             _draw_marker(
                 marker_xml,

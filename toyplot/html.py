@@ -2374,7 +2374,7 @@ def _render(axes, mark, context): # pragma: no cover
         edge_styles.append(
             toyplot.style.combine(
                 {
-                    "fill": "white",
+                    "fill": "none",
                     "stroke": toyplot.color.to_css(ecolor),
                     "stroke-width": ewidth,
                     "stroke-opacity": eopacity,
@@ -2382,6 +2382,10 @@ def _render(axes, mark, context): # pragma: no cover
                 mark._estyle,
             )
         )
+
+    edge_marker_styles = []
+    for estyle in edge_styles:
+        edge_marker_styles.append(toyplot.style.combine(estyle, {"fill":"white"}))
 
     # Identify ranges of edge coordinates for each edge.
     index = 0
@@ -2470,9 +2474,9 @@ def _render(axes, mark, context): # pragma: no cover
 
     # Render edge head markers.
     marker_xml = xml.SubElement(edge_xml, "g", attrib={"class": "toyplot-HeadMarkers"})
-    for marker, estyle, estart, eend in zip(
+    for marker, mstyle, estart, eend in zip(
             mark._etable[mark._hmarker[0]],
-            edge_styles,
+            edge_marker_styles,
             edge_start,
             edge_end,
         ):
@@ -2495,7 +2499,7 @@ def _render(axes, mark, context): # pragma: no cover
                 transform += " rotate(%r)" % (-angle,)
 
             # Create the marker with defaults.
-            marker = toyplot.marker.create(size=10, mstyle=estyle) + toyplot.marker.convert(marker)
+            marker = toyplot.marker.create(size=10, mstyle=mstyle) + toyplot.marker.convert(marker)
 
             _draw_marker(
                 marker_xml,
@@ -2505,8 +2509,8 @@ def _render(axes, mark, context): # pragma: no cover
 
     # Render edge middle markers.
     marker_xml = xml.SubElement(edge_xml, "g", attrib={"class": "toyplot-MiddleMarkers"})
-    for estyle, marker, mposition, start, end in zip(
-            edge_styles,
+    for mstyle, marker, mposition, start, end in zip(
+            edge_marker_styles,
             mark._etable[mark._mmarker[0]],
             mark._etable[mark._mposition[0]],
             edge_start,
@@ -2528,7 +2532,7 @@ def _render(axes, mark, context): # pragma: no cover
                     angle = float(marker.angle)
 
             # Create the marker with defaults.
-            marker = toyplot.marker.create(size=10, mstyle=estyle) + toyplot.marker.convert(marker) + toyplot.marker.create(angle=angle)
+            marker = toyplot.marker.create(size=10, mstyle=mstyle) + toyplot.marker.convert(marker) + toyplot.marker.create(angle=angle)
 
             _draw_marker(
                 marker_xml,
@@ -2539,8 +2543,8 @@ def _render(axes, mark, context): # pragma: no cover
 
     # Render edge tail markers.
     marker_xml = xml.SubElement(edge_xml, "g", attrib={"class": "toyplot-TailMarkers"})
-    for estyle, marker, start, end in zip(
-            edge_styles,
+    for mstyle, marker, start, end in zip(
+            edge_marker_styles,
             mark._etable[mark._tmarker[0]],
             edge_start,
             edge_end,
@@ -2564,7 +2568,7 @@ def _render(axes, mark, context): # pragma: no cover
                 transform += " rotate(%r)" % (-angle,)
 
             # Create the marker with defaults.
-            marker = toyplot.marker.create(size=10, mstyle=estyle, lstyle={}) + toyplot.marker.convert(marker)
+            marker = toyplot.marker.create(size=10, mstyle=mstyle, lstyle={}) + toyplot.marker.convert(marker)
 
             _draw_marker(
                 marker_xml,

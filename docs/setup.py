@@ -9,7 +9,7 @@ import shutil
 import subprocess
 
 parser = argparse.ArgumentParser()
-parser.add_argument("command", nargs="?", default="html", choices=["clean", "html", "latex"], help="Command to run.")
+parser.add_argument("command", nargs="?", default="html", choices=["clean", "html"], help="Command to run.")
 arguments = parser.parse_args()
 
 root_dir = os.path.abspath(os.path.join(__file__, "..", ".."))
@@ -58,8 +58,6 @@ def convert_notebook(name):
 
     env = dict()
     env.update(os.environ)
-    if arguments.command == "latex":
-        env["TOYPLOT_AUTOFORMAT"] = "png"
 
     subprocess.check_call(["jupyter",
                            "nbconvert",
@@ -78,8 +76,7 @@ def convert_notebook(name):
         content = re.sub(":([^:]+):``([^`]+)``", ":\\1:`\\2`", content)
         content = re.sub("[.][.].*\\\\(_[^:]+):", ".. \\1:", content)
 
-        if arguments.command != "latex":
-            content = """
+        content = """
   .. image:: ../artwork/toyplot.png
     :width: 200px
     :align: right
@@ -123,8 +120,8 @@ if arguments.command == "clean":
             os.remove("%s.rst" % name)
 
 # Generate the HTML documentation.
-if arguments.command in ["html", "latex"]:
+if arguments.command == "html":
     for name in notebooks:
         convert_notebook(name)
-    subprocess.check_call(["make", arguments.command], cwd=docs_dir)
+    subprocess.check_call(["make", "html"], cwd=docs_dir)
 

@@ -2481,6 +2481,9 @@ def _render(axes, mark, context): # pragma: no cover
             edge_end,
         ):
         if marker:
+            # Create the marker with defaults.
+            marker = toyplot.marker.create(size=10, mstyle=mstyle) + toyplot.marker.convert(marker)
+
             # Compute the marker angle using the first edge segment.
             edge_angle = -numpy.rad2deg(numpy.arctan2(
                 edge_coordinates[estart+1][1] - edge_coordinates[estart][1],
@@ -2498,8 +2501,6 @@ def _render(axes, mark, context): # pragma: no cover
                     angle = -edge_angle + float(marker.angle)
                 transform += " rotate(%r)" % (-angle,)
 
-            # Create the marker with defaults.
-            marker = toyplot.marker.create(size=10, mstyle=mstyle) + toyplot.marker.convert(marker)
 
             _draw_marker(
                 marker_xml,
@@ -2517,6 +2518,9 @@ def _render(axes, mark, context): # pragma: no cover
             edge_end,
         ):
         if marker:
+            # Create the marker with defaults.
+            marker = toyplot.marker.create(size=10, mstyle=mstyle) + toyplot.marker.convert(marker)
+
             # Place the marker within the first edge segment.
             x, y = edge_coordinates[start] * (1 - mposition) + edge_coordinates[start+1] * mposition
 
@@ -2531,8 +2535,7 @@ def _render(axes, mark, context): # pragma: no cover
                 else:
                     angle = float(marker.angle)
 
-            # Create the marker with defaults.
-            marker = toyplot.marker.create(size=10, mstyle=mstyle) + toyplot.marker.convert(marker) + toyplot.marker.create(angle=angle)
+            marker = marker + toyplot.marker.create(angle=angle)
 
             _draw_marker(
                 marker_xml,
@@ -2550,6 +2553,9 @@ def _render(axes, mark, context): # pragma: no cover
             edge_end,
         ):
         if marker:
+            # Create the marker with defaults.
+            marker = toyplot.marker.create(size=10, mstyle=mstyle, lstyle={}) + toyplot.marker.convert(marker)
+
             # Compute the marker angle using the last edge segment.
             edge_angle = -numpy.rad2deg(numpy.arctan2(
                 edge_coordinates[end-1][1] - edge_coordinates[end-2][1],
@@ -2567,8 +2573,6 @@ def _render(axes, mark, context): # pragma: no cover
                     angle = -edge_angle + float(marker.angle)
                 transform += " rotate(%r)" % (-angle,)
 
-            # Create the marker with defaults.
-            marker = toyplot.marker.create(size=10, mstyle=mstyle, lstyle={}) + toyplot.marker.convert(marker)
 
             _draw_marker(
                 marker_xml,

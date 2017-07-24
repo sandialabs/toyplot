@@ -2384,8 +2384,11 @@ def _render(axes, mark, context): # pragma: no cover
         )
 
     edge_marker_styles = []
-    for estyle in edge_styles:
-        edge_marker_styles.append(toyplot.style.combine(estyle, {"fill":"white"}))
+    for ecolor, estyle in zip(
+            mark._etable[mark._ecolor[0]],
+            edge_styles,
+            ):
+        edge_marker_styles.append(toyplot.style.combine(estyle, {"fill": toyplot.color.to_css(ecolor)}))
 
     # Identify ranges of edge coordinates for each edge.
     index = 0

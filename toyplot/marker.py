@@ -8,6 +8,7 @@
 from __future__ import absolute_import
 
 import copy
+import xml.sax.saxutils
 
 import numpy
 
@@ -83,11 +84,11 @@ class Marker(object):
     def to_html(self):
         """Convert a marker specification to HTML markup that can be embedded in rich text."""
         return """<marker%s%s%s%s%s%s/>""" % (
-            " shape='%s'"% self._shape if self._shape else "",
+            " shape='%s'"% xml.sax.saxutils.escape(self._shape) if self._shape else "",
             " mstyle='%s'" % toyplot.style.to_css(self._mstyle) if self._mstyle else "",
             " size='%s'"% self._size if self._size else "",
             " angle='%s'" % self._angle if self._angle else "",
-            " label='%s'" % self._label if self._label else "",
+            " label='%s'" % xml.sax.saxutils.escape(self._label) if self._label else "",
             " lstyle='%s'" % toyplot.style.to_css(self._lstyle) if self._lstyle else "",
             )
 

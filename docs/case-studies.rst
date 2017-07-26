@@ -13,3 +13,4 @@ The following case studies provide more realistic, in-depth examples of how you 
   :maxdepth: 1
 
   communities-case-study.rst
+  neural-network-case-study.rst

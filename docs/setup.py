@@ -104,6 +104,7 @@ notebooks = [
         "log-scales",
         "markers",
         "matrix-visualization",
+        "neural-network-case-study",
         "null-data",
         "numberline-coordinates",
         "rendering",

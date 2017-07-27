@@ -10,24 +10,24 @@ Release Notes
 Toyplot 0.15.0 - July 27, 2017
 ------------------------------
 
-Markers can be embedded in any text, including tick marks, legends, labels, and table contents.
-Hyperlinks can be embedded in any text using the <a href="..."> tag.
-Legends are implemented using table coordinates, so legends can be customized using any table feature.
-Started a new documentation section for case-studies, with graph community and neural network examples.
-Started a new section in the documentation for projects using Toyplot.
-Callers can define their own custom marks, and modify rendering for existing marks, using the new rendering API.
-Defined a new API for embedding Javascript in HTML markup, for use with custom marks.
-Graph visualizations can export vertex and edge data as CSV tables.
-Added support for head, middle, and tail markers on graph edges.
-Added an `offset` property for Cartesian axis labels.
-Toyplot colors are allowed as style property values.
-Per-series and per-datum colors can be specified using Python sequences as well as numpy arrays.
-Error messages specify which CSS properties are allowed.
-Deprecated the `gutter` parameter in favor of `margin`, which can specify separate left / right / top / bottom margins, if desired.
-Added `toyplot.html.tostring()` to simplify generating HTML.
-Added a style option to `toyplot.html.render()` and `toyplot.html.tostring()`.
-Added a `palette` argument to override the default series palette when creating axes.
-Text markup didn't include units for font-size, causing incorrect results on Firefox.
+* Markers can be embedded in any text, including tick marks, legends, labels, and table contents.
+* Hyperlinks can be embedded in any text using the <a href="..."> tag.
+* Legends are implemented using table coordinates, so legends can be customized using any table feature.
+* Started a new documentation section for case-studies, with graph community and neural network examples.
+* Started a new section in the documentation for projects using Toyplot.
+* Callers can define their own custom marks, and modify rendering for existing marks, using the new rendering API.
+* Defined a new API for embedding Javascript in HTML markup, for use with custom marks.
+* Graph visualizations can export vertex and edge data as CSV tables.
+* Added support for head, middle, and tail markers on graph edges.
+* Added an `offset` property for Cartesian axis labels.
+* Toyplot colors are allowed as style property values.
+* Per-series and per-datum colors can be specified using Python sequences as well as numpy arrays.
+* Error messages specify which CSS properties are allowed.
+* Deprecated the `gutter` parameter in favor of `margin`, which can specify separate left / right / top / bottom margins, if desired.
+* Added `toyplot.html.tostring()` to simplify generating HTML.
+* Added a style option to `toyplot.html.render()` and `toyplot.html.tostring()`.
+* Added a `palette` argument to override the default series palette when creating axes.
+* Text markup didn't include units for font-size, causing incorrect results on Firefox.
 
 Toyplot 0.14.0 - April 17, 2017
 -------------------------------

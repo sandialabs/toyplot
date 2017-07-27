@@ -3,10 +3,10 @@ language: python
 python:
     - "2.7"
     - "3.6"
-addons:
-    apt:
-        packages:
-        - ghostscript
+#addons:
+#    apt:
+#        packages:
+#        - ghostscript
 install:
     - env | sort
     - wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh

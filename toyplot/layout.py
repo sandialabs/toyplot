@@ -23,7 +23,6 @@ def region(
         rect=None,
         corner=None,
         grid=None,
-        gutter=None,
         margin=None):
     """Specify a rectangular target region relative to a parent region.
 
@@ -46,10 +45,6 @@ def region(
     xmin, xmax, ymin, ymax: number
       The boundaries of the target region, specified in CSS pixel units.
     """
-
-    if gutter is not None:
-        toyplot.log.warning("The gutter parameter is deprecated, use margin instead.")
-        margin = gutter
 
     if margin is None:
         margin = 0

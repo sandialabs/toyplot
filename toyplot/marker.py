@@ -146,16 +146,6 @@ def convert(value):
         return value
     if isinstance(value, toyplot.compatibility.string_type):
         return Marker(shape=value, mstyle=None, size=None, angle=None, label=None, lstyle=None)
-    if isinstance(value, dict):
-        toyplot.log.warning("dict marker specifications are deprecated, use an instance of toyplot.marker.Marker instead.")
-        return Marker(
-            shape=value.get("shape", None),
-            mstyle=value.get("mstyle", None),
-            size=value.get("size", None),
-            angle=value.get("angle", None),
-            label=value.get("label", None),
-            lstyle=value.get("lstyle", None),
-            )
     raise ValueError("Can't convert %r to toyplot.marker.Marker." % value) # pragma: no cover
 
 

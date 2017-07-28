@@ -1753,20 +1753,6 @@ class Cartesian(object):
                 annotation=annotation,
                 ))
 
-    def legend(
-            self,
-            entries,
-            bounds=None,
-            rect=None,
-            corner=None,
-            grid=None,
-            gutter=None,
-            margin=50,
-            style=None,
-            label_style=None,
-        ): # pylint: disable=no-self-use
-        toyplot.log.warning("toyplot.coordinates.Cartesian.legend() is deprecated and ignored, use toyplot.canvas.legend() instead.")
-
     def plot(
             self,
             a,
@@ -2009,7 +1995,6 @@ class Cartesian(object):
             size=None,
             opacity=1.0,
             title=None,
-            style=None,
             mstyle=None,
             mlstyle=None,
             filename=None,
@@ -2075,8 +2060,6 @@ class Cartesian(object):
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
         mtitle = toyplot.broadcast.pyobject(title, series.shape)
-        if style is not None:
-            toyplot.log.warning("style parameter is deprecated and will be ignored.  Use mstyle and mlstyle to style markers and marker labels, respectively.")
         mstyle = toyplot.style.require(mstyle, allowed=toyplot.style.allowed.marker)
         mlstyle = toyplot.style.require(mlstyle, allowed=toyplot.style.allowed.text)
 
@@ -2486,7 +2469,6 @@ class Numberline(object):
             size=None,
             opacity=1.0,
             title=None,
-            style=None,
             mstyle=None,
             mlstyle=None,
             filename=None):
@@ -2532,8 +2514,6 @@ class Numberline(object):
         mstroke = toyplot.color.broadcast(colors=mfill, shape=coordinates.shape)
         mopacity = toyplot.broadcast.scalar(opacity, coordinates.shape)
         mtitle = toyplot.broadcast.pyobject(title, coordinates.shape)
-        if style is not None:
-            toyplot.log.warning("style parameter is deprecated and will be ignored.  Use mstyle and mlstyle to style markers and marker labels, respectively.") # pragma: no cover
         mstyle = toyplot.style.require(mstyle, allowed=toyplot.style.allowed.marker)
         mlstyle = toyplot.style.require(mlstyle, allowed=toyplot.style.allowed.text)
 
@@ -3023,48 +3003,6 @@ class Table(object):
             row_indices, column_indices = self._table._selection_coordinates(self._selection)
             self._table._column_widths[column_indices] = toyplot.units.convert(value, "px", "px")
         width = property(fset=_set_width)
-
-        def axes(
-                self,
-                xmin=None,
-                xmax=None,
-                ymin=None,
-                ymax=None,
-                aspect=None,
-                show=True,
-                xshow=False,
-                yshow=False,
-                label=None,
-                xlabel=None,
-                ylabel=None,
-                xticklocator=None,
-                yticklocator=None,
-                xscale="linear",
-                yscale="linear",
-                padding=3,
-                cell_padding=3,
-            ): # pragma: no cover
-            toyplot.log.warning("axes() is deprecated, use cartesian() instead.")
-            return self.cartesian(
-                xmin=xmin,
-                xmax=xmax,
-                ymin=ymin,
-                ymax=ymax,
-                aspect=aspect,
-                show=show,
-                xshow=xshow,
-                yshow=yshow,
-                label=label,
-                xlabel=xlabel,
-                ylabel=ylabel,
-                xticklocator=xticklocator,
-                yticklocator=yticklocator,
-                xscale=xscale,
-                yscale=yscale,
-                padding=padding,
-                cell_padding=cell_padding,
-                )
-
 
         def cartesian(
                 self,

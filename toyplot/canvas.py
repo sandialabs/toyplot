@@ -236,66 +236,12 @@ class Canvas(object):
         if enable:
             Canvas._autorender.append((self, autoformat))
 
-    def axes(
-            self,
-            aspect=None,
-            bounds=None,
-            corner=None,
-            grid=None,
-            gutter=None,
-            label=None,
-            margin=50,
-            padding=10,
-            rect=None,
-            show=True,
-            xlabel=None,
-            xmax=None,
-            xmin=None,
-            xscale="linear",
-            xshow=True,
-            xticklocator=None,
-            ylabel=None,
-            ymax=None,
-            ymin=None,
-            yscale="linear",
-            yshow=True,
-            yticklocator=None,
-        ):
-
-        toyplot.log.warning("toyplot.canvas.Canvas.axes() is deprecated, use toyplot.canvas.Canvas.cartesian() instead.") # pragma: no cover
-
-        return self.cartesian(
-            aspect=aspect,
-            bounds=bounds,
-            corner=corner,
-            grid=grid,
-            gutter=gutter,
-            label=label,
-            margin=margin,
-            padding=padding,
-            rect=rect,
-            show=show,
-            xlabel=xlabel,
-            xmax=xmax,
-            xmin=xmin,
-            xscale=xscale,
-            xshow=xshow,
-            xticklocator=xticklocator,
-            ylabel=ylabel,
-            ymax=ymax,
-            ymin=ymin,
-            yscale=yscale,
-            yshow=yshow,
-            yticklocator=yticklocator,
-            )
-
     def cartesian(
             self,
             aspect=None,
             bounds=None,
             corner=None,
             grid=None,
-            gutter=None,
             label=None,
             margin=50,
             padding=10,
@@ -381,7 +327,6 @@ class Canvas(object):
             rect=rect,
             corner=corner,
             grid=grid,
-            gutter=gutter,
             margin=margin,
             )
         self._children.append(
@@ -420,12 +365,9 @@ class Canvas(object):
             bounds=None,
             corner=None,
             grid=None,
-            gutter=None,
             label=None,
-            label_style=None,
             margin=50,
             rect=None,
-            style=None,
             ):
         """Add a legend to the canvas.
 
@@ -464,24 +406,18 @@ class Canvas(object):
         margin: size of the margin around grid cells, optional
           Specifies the amount of empty space to leave between grid cells When using the
           `grid` parameter to position the legend.
-        style: dict, optional
         id: string, optional
 
         Returns
         -------
         legend: :class:`toyplot.coordinates.Table`
         """
-        if style is not None:
-            toyplot.log.warning("The style parameter is deprecated and ignored, use the table API to alter legend appearance instead.") # pragma: no cover
-        if label_style is not None:
-            toyplot.log.warning("The label_style parameter is deprecated and ignored, use the table API to alter legend appearance instead.") # pragma: no cover
 
         xmin, xmax, ymin, ymax = toyplot.layout.region(
             0, self._width, 0, self._height,
             bounds=bounds,
             corner=corner,
             grid=grid,
-            gutter=gutter,
             margin=margin,
             rect=rect,
             )
@@ -535,7 +471,6 @@ class Canvas(object):
             corner=None,
             filename=None,
             grid=None,
-            gutter=None,
             label=None,
             llabel=None,
             llocator=None,
@@ -572,7 +507,7 @@ class Canvas(object):
                 )
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
-            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter, margin=margin)
+            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, margin=margin)
 
         table = toyplot.coordinates.Table(
             annotation=False,
@@ -695,7 +630,6 @@ class Canvas(object):
             bounds=None,
             corner=None,
             grid=None,
-            gutter=None,
             label=None,
             margin=50,
             max=None,
@@ -738,7 +672,6 @@ class Canvas(object):
             bounds=bounds,
             corner=corner,
             grid=grid,
-            gutter=gutter,
             label=label,
             margin=margin,
             max=max,
@@ -772,7 +705,6 @@ class Canvas(object):
             bounds=None,
             corner=None,
             grid=None,
-            gutter=None,
             label=None,
             margin=50,
             max=None,
@@ -815,7 +747,7 @@ class Canvas(object):
         axes: :class:`toyplot.coordinates.Cartesian`
         """
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
-            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, gutter=gutter, margin=margin)
+            0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, margin=margin)
 
         if x1 is None:
             x1 = xmin_range
@@ -881,7 +813,6 @@ class Canvas(object):
             corner=None,
             filename=None,
             grid=None,
-            gutter=None,
             label=None,
             lcolumns=None,
             margin=50,
@@ -922,7 +853,6 @@ class Canvas(object):
             rect=rect,
             corner=corner,
             grid=grid,
-            gutter=gutter,
             margin=margin,
             )
         table = toyplot.coordinates.Table(
@@ -974,7 +904,6 @@ class Canvas(object):
             bounds=None,
             corner=None,
             grid=None,
-            gutter=None,
             margin=50,
             rect=None,
         ):
@@ -1030,7 +959,6 @@ class Canvas(object):
             rect=rect,
             corner=corner,
             grid=grid,
-            gutter=gutter,
             margin=margin,
             )
 

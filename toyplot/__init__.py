@@ -461,7 +461,6 @@ def scatterplot(
         padding=10,
         show=True,
         size=None,
-        style=None,
         title=None,
         width=None,
         xlabel=None,
@@ -523,7 +522,6 @@ def scatterplot(
         mstyle=mstyle,
         opacity=opacity,
         size=size,
-        style=style,
         title=title,
         )
     return canvas, axes, mark

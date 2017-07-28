@@ -410,3 +410,14 @@ epub_exclude_files = ['search.html']
 
 # If false, no index is generated.
 #epub_use_index = True
+
+# set up the types of member to check that are documented
+def warn_undocumented_members(app, what, name, obj, options, lines):
+    if what not in [] and len(lines) == 0:
+        print("WARNING: %s is undocumented: %s" % (what, name))
+        lines.append(".. Warning:: %s '%s' undocumented" % (what, name))
+
+def setup(app):
+    app.connect('autodoc-process-docstring', warn_undocumented_members);
+
+

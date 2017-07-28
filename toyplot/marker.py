@@ -97,12 +97,12 @@ class Marker(object):
 
         Parameters
         ----------
-        p (numpy 2d vector, required)
+        p: :class:`numpy.ndarray` with shape (2), required
             Relative coordinates of a line segment originating at the center of this marker.
 
         Returns
         -------
-        dp (numpy 2d vector)
+        dp: :class:`numpy.ndarray` with shape (2)
             Relative coordinates of the intersection with this marker's border.
         """
         if self._size:

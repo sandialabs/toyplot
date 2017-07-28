@@ -83,10 +83,11 @@ nitpick_ignore = [
     ]
 
 intersphinx_mapping = {
-    "arrow": ("http://arrow.readthedocs.io/en/latest", None),
-    "numpy": ("http://docs.scipy.org/doc/numpy-1.10.1", None),
-    "python": ("http://docs.python.org/3.5", None),
-    "PIL": ("http://pillow.readthedocs.io/en/3.2.x", None),
+    "arrow": ("http://arrow.readthedocs.io/en/latest", "arrow.inv"),
+    "numpy": ("http://docs.scipy.org/doc/numpy-1.13.0", "numpy.inv"),
+    "pandas": ("http://pandas-docs.github.io/pandas-docs-travis", "pandas.inv"),
+    "python": ("http://docs.python.org/3.6", "python.inv"),
+    "PIL": ("http://pillow.readthedocs.io/en/3.2.x", "pillow.inv"),
     }
 
 # Add any paths that contain templates here, relative to this directory.

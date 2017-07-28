@@ -102,10 +102,10 @@ class Table(object):
         * :class:`toyplot.data.Table` - creates a copy of the given table.
         * :class:`collections.OrderedDict` - creates a column for each key-value pair in the input, in the same order.  Each value must be implicitly convertable to a numpy masked array, and every value must contain the same number of items.
         * object returned when loading a `.npz` file with :func:`numpy.load` - creates a column for each key-value pair in the given file, in the same order.  Each array in the input file must contain the same number of items.
-        * :class:`dict` / :class:`collections.Mapping` - creates a column for each key-value pair in the input, sorted by key in lexicographical order.  Each value must be implicitly convertable to a numpy masked array, and every value must contain the same number of items.
-        * :class:`list` / :class:`collections.Sequence` - creates a column for each key-value tuple in the input sequence, in the same order.  Each value must be implicitly convertable to a numpy masked array, and every value must contain the same number of items.
+        * :class:`dict` / :class:`collections.abc.Mapping` - creates a column for each key-value pair in the input, sorted by key in lexicographical order.  Each value must be implicitly convertable to a numpy masked array, and every value must contain the same number of items.
+        * :class:`list` / :class:`collections.abc.Sequence` - creates a column for each key-value tuple in the input sequence, in the same order.  Each value must be implicitly convertable to a numpy masked array, and every value must contain the same number of items.
         * :class:`numpy.ndarray` - creates a column for each column in a numpy matrix (2D array).  The order of the columns is maintained, and each column is assigned a unique name.
-        * :class:`pandas.core.frame.DataFrame` - creates a column for each column in a `Pandas <http://pandas.pydata.org>`_ data frame.  The order of the columns is maintained.
+        * :class:`pandas.DataFrame` - creates a column for each column in a `Pandas <http://pandas.pydata.org>`_ data frame.  The order of the columns is maintained.
 
     index: bool or string, optional
         Controls whether to convert a `Pandas <http://pandas.pydata.org>`_ data
@@ -315,11 +315,12 @@ class Table(object):
 
     @property
     def shape(self):
-        """Return the shape (number of rows and columns) of the table.
+        """The table shape (number of rows and columns).
 
         Returns
         -------
-        shape: (number of rows, number of columns) tuple.
+        shape: tuple
+            (number of rows, number of columns) tuple.
         """
         return (
             list(self._columns.values())[0].shape[0] if len(self._columns) else 0,
@@ -327,11 +328,12 @@ class Table(object):
         )
 
     def items(self):
-        """Return the table names and columns, in column order.
+        """Return column names and columns, in column order.
 
         Returns
         -------
-        items: sequence of (name, column) tuples.
+        items: list
+            Sequence of (name, column) tuples.
         """
         return self._columns.items()
 
@@ -379,7 +381,8 @@ class Table(object):
 
         Returns
         -------
-        matrix: :class:`numpy.ma.core.MaskedArray` with two dimensions.
+        matrix: :class:`numpy.ma.MaskedArray`
+            The returned array will have two dimensions.
         """
         return numpy.ma.column_stack(list(self._columns.values()))
 

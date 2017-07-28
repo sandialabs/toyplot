@@ -15,37 +15,37 @@ class Font(object):
     """Base class for objects that can return information about a specific typeface."""
     @property
     def ascent(self):
-        """Return the ascent for the given font.
+        """Font ascent (maximum height above the baseline).
 
         Returns
         -------
-        ascent: number
+        ascent: :class:`number<numbers.Number>`
             ascent of the font in CSS pixels.
         """
         raise NotImplementedError() # pragma: no cover
 
     @property
     def descent(self):
-        """Return the descent for the given font.
+        """Font descent (maximum height below the baseline).
 
         Returns
         -------
-        descent: number
+        descent: :class:`number<numbers.Number>`
             descent of the font in CSS pixels.
         """
         raise NotImplementedError() # pragma: no cover
 
     def width(self, string):
-        """Return the width of a string.
+        """Return the width of a string if rendered using the font.
 
         Parameters
         ----------
-        string: str
+        string: str, required
             The text to be measured.
 
         Returns
         -------
-        width: number
+        width: :class:`number<numbers.Number>`
             Width of the string in CSS pixels, if rendered using the given font and
             font size.
         """

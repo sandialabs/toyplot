@@ -28,21 +28,21 @@ def region(
 
     Parameters
     ----------
-    xmin: number, required
+    xmin: :class:`number<numbers.Number>`, required
       Minimum X boundary of the parent region, specified in CSS pixel units.
-    xmax: number, required
+    xmax: :class:`number<numbers.Number>`, required
       Maximum X boundary of the parent region, specified in CSS pixel units.
-    ymin: number, required
+    ymin: :class:`number<numbers.Number>`, required
       Minimum Y boundary of the parent region, specified in CSS pixel units.
-    ymax: number, required
+    ymax: :class:`number<numbers.Number>`, required
       Maximum Y boundary of the parent region, specified in CSS pixel units.
-    margin: number, string, (number, string) tuple, or tuple containing between one and four numbers, strings, or (number, string) tuples, optional
+    margin: :class:`number<numbers.Number>`, string, (:class:`number<numbers.Number>`, string) tuple, or tuple containing between one and four :class:`numbers<numbers.Number>`, strings, or (:class:`number<numbers.Number>`, string) tuples, optional
       Padding around the target region, specified in real-world units.  Defaults
       to CSS pixel units.  See :ref:`units` for details.  Follows the same behavior as the CSS margin property.
 
     Returns
     -------
-    xmin, xmax, ymin, ymax: number
+    xmin, xmax, ymin, ymax: :class:`number<numbers.Number>`
       The boundaries of the target region, specified in CSS pixel units.
     """
 

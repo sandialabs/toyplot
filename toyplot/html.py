@@ -221,7 +221,7 @@ def render(canvas, fobj=None, animation=False, style=None):
 
     Returns
     -------
-    html: xml.etree.ElementTree.Element or `None`
+    html: :class:`xml.etree.ElementTree.Element` or `None`
       HTML representation of `canvas`, as a DOM tree, or `None` if the caller
       specifies the `fobj` parameter.
 

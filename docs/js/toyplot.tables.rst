@@ -38,5 +38,5 @@ The `toyplot/tables` module can be used to store tabular data for later retrieva
     :param string owner: Unique id for the object that "owns" the table.
     :param string key: Used to disambiguate tables when the owner has more than one.
 
-    :returns: object containing `names` and `columns` arrays, containing the
-    table column names and column values, respectively.
+    :returns: object containing `names` and `columns` arrays, containing the table column names and column values, respectively.
+

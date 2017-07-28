@@ -50,7 +50,7 @@ def bars(
     """Convenience function for creating a bar plot in a single call.
 
     See :meth:`toyplot.coordinates.Cartesian.bars`,
-    :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
+    :meth:`toyplot.canvas.Canvas.cartesian`, and :class:`toyplot.canvas.Canvas` for
     parameter descriptions.
 
     Returns
@@ -126,7 +126,7 @@ def fill(
     """Convenience function for creating a fill plot in a single call.
 
     See :meth:`toyplot.coordinates.Cartesian.fill`,
-    :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
+    :meth:`toyplot.canvas.Canvas.cartesian`, and :class:`toyplot.canvas.Canvas` for
     parameter descriptions.
 
     Returns
@@ -207,7 +207,7 @@ def graph(
     """Convenience function for creating a graph plot in a single call.
 
     See :meth:`toyplot.coordinates.Cartesian.graph`,
-    :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
+    :meth:`toyplot.canvas.Canvas.cartesian`, and :class:`toyplot.canvas.Canvas` for
     parameter descriptions.
 
     Returns
@@ -388,7 +388,7 @@ def plot(
     """Convenience function for creating a line plot in a single call.
 
     See :meth:`toyplot.coordinates.Cartesian.plot`,
-    :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
+    :meth:`toyplot.canvas.Canvas.cartesian`, and :class:`toyplot.canvas.Canvas` for
     parameter descriptions.
 
     Returns
@@ -477,7 +477,7 @@ def scatterplot(
     """Convenience function for creating a scatter plot in a single call.
 
     See :meth:`toyplot.coordinates.Cartesian.scatterplot`,
-    :meth:`toyplot.canvas.Canvas.axes`, and :class:`toyplot.canvas.Canvas` for
+    :meth:`toyplot.canvas.Canvas.cartesian`, and :class:`toyplot.canvas.Canvas` for
     parameter descriptions.
 
     Returns

@@ -16,15 +16,16 @@ def require(css, allowed):
     Parameters
     ----------
     css: dict or None
-        The style object to be validated.  An exception will be raised if it is
-        not a valid style object.
+        The style dictionary to be validated.  An exception will be raised if it is
+        not a valid style dictionary or None.
     allowed: sequence of strings
         The set of allowed style properties.  An exception will be raised if `css`
         contains any keys that aren't in this sequence.
 
     Returns
     -------
-    style: the validated style object.
+    style: dict
+        The validated style dictionary.
     """
     if css is None:
         return css

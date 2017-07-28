@@ -7,7 +7,7 @@
 Release Notes
 =============
 
-Toyplot 0.15.0 - July 27, 2017
+Toyplot 0.15.1 - July 27, 2017
 ------------------------------
 
 * Markers can be embedded in any text, including tick marks, legends, labels, and table contents.

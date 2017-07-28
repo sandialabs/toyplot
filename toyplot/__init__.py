@@ -136,7 +136,7 @@ def fill(
     axes: :class:`toyplot.coordinates.Cartesian`
       A new set of 2D axes that fill the canvas.
     mark: :class:`toyplot.mark.FillBoundaries` or :class:`toyplot.mark.FillMagnitudes`
-      The new bar mark.
+      The new fill mark.
     """
     canvas = Canvas(
         height=height,
@@ -486,7 +486,7 @@ def scatterplot(
       A new canvas object.
     axes: :class:`toyplot.coordinates.Cartesian`
       A new set of 2D axes that fill the canvas.
-    mark: :class:`toyplot.mark.Plot`
+    mark: :class:`toyplot.mark.Scatterplot`
       The new scatter plot mark.
     """
     canvas = Canvas(

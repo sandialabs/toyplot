@@ -9,6 +9,6 @@ Welcome to Toyplot, the kid-sized plotting toolkit for Python with grownup-sized
 * Provide a clean, minimalist interface that scientists and engineers will love.
 
 You can see the full Toyplot documentation with tutorials at
-http://toyplot.readthedocs.io ... for questions, comments, or suggestions, get
+https://toyplot.readthedocs.io ... for questions, comments, or suggestions, get
 in touch with our team at https://gitter.im/sandialabs/toyplot.
 

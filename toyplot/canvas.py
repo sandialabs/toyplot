@@ -146,6 +146,10 @@ class Canvas(object):
         from . import html
         return toyplot.html.tostring(self, style={"text-align":"center"})
 
+    def _repr_png_(self):
+        from . import png
+        return toyplot.png.render(self)
+
     @property
     def height(self):
         """Height of the canvas in CSS pixels."""

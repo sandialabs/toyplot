@@ -120,7 +120,7 @@ class Canvas(object):
         def __init__(self):
             collections.defaultdict.__init__(self, lambda: collections.defaultdict(list))
 
-    def __init__(self, width=None, height=None, style=None, autorender=None, autoformat=None):
+    def __init__(self, width=None, height=None, style=None, hyperlink=None, autorender=None, autoformat=None):
         self._width = toyplot.units.convert(
             width, "px", default="px") if width is not None else 600
         self._height = toyplot.units.convert(
@@ -136,7 +136,10 @@ class Canvas(object):
             "stroke-opacity": 1.0,
             "stroke-width": 1.0,
         }
+        self._hyperlink = None
+
         self.style = style
+        self.hyperlink = hyperlink
 
         self._animation = toyplot.Canvas._AnimationFrames()
         self._children = []
@@ -166,6 +169,14 @@ class Canvas(object):
             self._style,
             toyplot.style.require(value, allowed=set(["background-color", "border"])),
             )
+
+    @property
+    def hyperlink(self):
+        return self._hyperlink
+
+    @hyperlink.setter
+    def hyperlink(self, value):
+        self._hyperlink = toyplot.require.optional_string(value)
 
     @property
     def width(self):

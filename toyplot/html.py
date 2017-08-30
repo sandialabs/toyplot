@@ -693,9 +693,15 @@ def _axis_transform(x1, y1, x2, y2, offset, return_length=False):
 
 @dispatch(toyplot.canvas.Canvas, RenderContext)
 def _render(canvas, context):
+    # Optionally apply a hyperlink to the entire canvas.
+    parent_xml = context.parent
+    if canvas._hyperlink:
+        hyperlink_xml = xml.SubElement(parent_xml, "a", attrib={"href": canvas._hyperlink})
+        parent_xml = hyperlink_xml
+
     # Create the root SVG element.
     svg_xml = xml.SubElement(
-        context.parent,
+        parent_xml,
         "svg",
         xmlns="http://www.w3.org/2000/svg",
         attrib={

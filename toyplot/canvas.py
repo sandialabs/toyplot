@@ -159,6 +159,14 @@ class Canvas(object):
         return self._height
 
     @property
+    def hyperlink(self):
+        return self._hyperlink
+
+    @hyperlink.setter
+    def hyperlink(self, value):
+        self._hyperlink = toyplot.require.hyperlink(value)
+
+    @property
     def style(self):
         """Canvas style."""
         return self._style
@@ -169,14 +177,6 @@ class Canvas(object):
             self._style,
             toyplot.style.require(value, allowed=set(["background-color", "border"])),
             )
-
-    @property
-    def hyperlink(self):
-        return self._hyperlink
-
-    @hyperlink.setter
-    def hyperlink(self, value):
-        self._hyperlink = toyplot.require.optional_string(value)
 
     @property
     def width(self):

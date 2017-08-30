@@ -1817,9 +1817,9 @@ def _render(canvas, axes, context):
 
         # Optionally render the cell background.
         cell_style = axes._cell_style[cell_selection][0]
-        cell_link = axes._cell_link[cell_selection][0]
+        cell_hyperlink = axes._cell_hyperlink[cell_selection][0]
         cell_title = axes._cell_title[cell_selection][0]
-        if cell_style is not None or cell_link is not None or cell_title is not None:
+        if cell_style is not None or cell_hyperlink is not None or cell_title is not None:
             # Compute the cell boundaries.
             cell_top = axes._cell_top[row_min]
             cell_bottom = axes._cell_bottom[row_max]
@@ -1827,11 +1827,11 @@ def _render(canvas, axes, context):
             cell_right = axes._cell_right[column_max]
 
             cell_parent_xml = axes_xml
-            if cell_link is not None:
+            if cell_hyperlink is not None:
                 cell_parent_xml = xml.SubElement(
                     cell_parent_xml,
                     "a",
-                    attrib={"xlink:href": cell_link},
+                    attrib={"xlink:href": cell_hyperlink},
                     )
 
             cell_xml = xml.SubElement(

@@ -2996,8 +2996,13 @@ class Table(object):
         title = property(fset=_set_title)
 
         def _set_link(self, value):
-            self._table._cell_link[self._selection] = str(value)
+            toyplot.log.warning("CellReference.link is deprecated, use CellReference.hyperlink instead.")
+            self._set_hyperlink(value)
         link = property(fset=_set_link)
+
+        def _set_hyperlink(self, value):
+            self._table._cell_hyperlink[self._selection] = str(value)
+        hyperlink = property(fset=_set_hyperlink)
 
         def _set_width(self, value):
             row_indices, column_indices = self._table._selection_coordinates(self._selection)
@@ -3291,7 +3296,7 @@ class Table(object):
         self._cell_show = numpy.ones(self._shape, dtype="bool")
         self._cell_style = numpy.empty(self._shape, dtype="object")
         self._cell_title = numpy.empty(self._shape, dtype="object")
-        self._cell_link = numpy.empty(self._shape, dtype="object")
+        self._cell_hyperlink = numpy.empty(self._shape, dtype="object")
 
         self._hlines = numpy.empty((self._shape[0] + 1, self._shape[1]), dtype="object")
         self._hlines_show = numpy.ones((self._shape[0] + 1, self._shape[1]), dtype="bool")
@@ -3360,7 +3365,7 @@ class Table(object):
         self._cell_show = numpy.delete(self._cell_show, indices, axis=axis)
         self._cell_style = numpy.delete(self._cell_style, indices, axis=axis)
         self._cell_title = numpy.delete(self._cell_title, indices, axis=axis)
-        self._cell_link = numpy.delete(self._cell_link, indices, axis=axis)
+        self._cell_hyperlink = numpy.delete(self._cell_hyperlink, indices, axis=axis)
 
         self._hlines = numpy.delete(self._hlines, indices, axis=axis)
         self._hlines_show = numpy.delete(self._hlines_show, indices, axis=axis)
@@ -3414,7 +3419,7 @@ class Table(object):
         self._cell_show = numpy.insert(self._cell_show, position, True, axis=axis)
         self._cell_style = numpy.insert(self._cell_style, position, self._cell_style[source], axis=axis)
         self._cell_title = numpy.insert(self._cell_title, position, None, axis=axis)
-        self._cell_link = numpy.insert(self._cell_link, position, None, axis=axis)
+        self._cell_hyperlink = numpy.insert(self._cell_hyperlink, position, None, axis=axis)
 
         self._hlines = numpy.insert(self._hlines, position, self._hlines[source], axis=axis)
         self._hlines_show = numpy.insert(self._hlines_show, position, True, axis=axis)

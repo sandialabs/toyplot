@@ -109,11 +109,11 @@ class Canvas(object):
         Note that hyperlinks set on other entities (such as axes, marks, or
         text) will override this.
     autorender: boolean, optional
-        Turn autorendering on / off for this canvas. By default the global
-        autorender flag is used.
+        Turn autorendering on / off for this canvas.  Defaults to the value in
+        :data:`toyplot.config.autorender`.
     autoformat: string, optional
-        Specify the format to use when autorendering. By default the global
-        autoformat is used.
+        Specify the format ("html" or "png") to be used for autorendering this
+        canvas.  Defaults to the value in :data:`toyplot.config.autoformat`.
 
     Examples
     --------
@@ -242,9 +242,12 @@ class Canvas(object):
         Parameters
         ----------
         enable: boolean, optional
-            Turn autorendering on / off.  Defaults to the value at toyplot.config.autorender.
+            Turn autorendering on / off for this canvas.  Defaults to the value
+            in :data:`toyplot.config.autorender`.
         format: string, optional
-            Specify the format ("html" or "png") to be used for autorendering.  Defaults to the value at toyplot.config.autoformat.
+            Specify the format ("html" or "png") to be used for autorendering
+            this canvas.  Defaults to the value in
+            :data:`toyplot.config.autoformat`.
         """
         if enable is None:
             enable = toyplot.config.autorender

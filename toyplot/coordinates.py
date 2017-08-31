@@ -634,6 +634,7 @@ class Cartesian(object):
     def __init__(
             self,
             aspect,
+            hyperlink,
             label,
             padding,
             palette,
@@ -671,6 +672,9 @@ class Cartesian(object):
 
         self._aspect = None
         self.aspect = aspect
+
+        self._hyperlink = None
+        self.hyperlink = hyperlink
 
         self._expand_domain_range_x = None
         self._expand_domain_range_y = None
@@ -737,6 +741,14 @@ class Cartesian(object):
         if value not in [None, "fit-range"]:
             raise ValueError("Unknown aspect value: %s" % value) # pragma: no cover
         self._aspect = value
+
+    @property
+    def hyperlink(self):
+        return self._hyperlink
+
+    @hyperlink.setter
+    def hyperlink(self, value):
+        self._hyperlink = toyplot.require.hyperlink(value)
 
     @property
     def show(self):
@@ -2116,6 +2128,7 @@ class Cartesian(object):
     def share(
             self,
             axis="x",
+            hyperlink=None,
             palette=None,
             xlabel=None,
             xmax=None,
@@ -2151,6 +2164,7 @@ class Cartesian(object):
 
         shared = Cartesian(
             aspect=self._aspect,
+            hyperlink=hyperlink,
             label=None,
             padding=self._padding,
             palette=palette,
@@ -2178,6 +2192,8 @@ class Cartesian(object):
 
         shared.x.spine.position = "high" if axis == "y" else "low"
         shared.y.spine.position = "high" if axis == "x" else "low"
+
+        self.hyperlink = None
 
         self._parent._children.append(shared)
         return self._parent._children[-1]
@@ -3012,6 +3028,7 @@ class Table(object):
         def cartesian(
                 self,
                 aspect=None,
+                hyperlink=None,
                 cell_padding=3,
                 label=None,
                 padding=3,
@@ -3033,6 +3050,7 @@ class Table(object):
 
             axes = toyplot.coordinates.Table.EmbeddedCartesian(
                 aspect=aspect,
+                hyperlink=hyperlink,
                 label=label,
                 padding=padding,
                 palette=palette,

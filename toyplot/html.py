@@ -1768,6 +1768,18 @@ def _render(canvas, axes, context):
         height=repr(axes._ymax_range - axes._ymin_range + axes.padding * 2),
         )
 
+    if axes._hyperlink:
+        hyperlink_xml = xml.SubElement(cartesian_xml, "a", attrib={"xlink:href": axes._hyperlink})
+        xml.SubElement(
+            hyperlink_xml,
+            "rect",
+            x=repr(axes._xmin_range),
+            y=repr(axes._ymin_range),
+            width=repr(axes._xmax_range - axes._xmin_range),
+            height=repr(axes._ymax_range - axes._ymin_range),
+            attrib={"fill": "none", "stroke": "none", "pointer-events": "fill"},
+            )
+
     children_xml = xml.SubElement(
         cartesian_xml,
         "g",

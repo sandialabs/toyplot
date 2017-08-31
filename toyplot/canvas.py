@@ -253,6 +253,7 @@ class Canvas(object):
             bounds=None,
             corner=None,
             grid=None,
+            hyperlink=None,
             label=None,
             margin=50,
             padding=10,
@@ -312,6 +313,8 @@ class Canvas(object):
         aspect: string, optional
           Set to "fit-range" to automatically expand the domain so that its
           aspect ratio matches the aspect ratio of the range.
+        hyperlink: string, optiona.
+          Makes the axes range into a clickable hyperlink.
         show: bool, optional
           Set to `False` to hide the axes (the axes contents will still be visible).
         xshow, yshow: bool, optional
@@ -343,6 +346,7 @@ class Canvas(object):
         self._children.append(
             toyplot.coordinates.Cartesian(
                 aspect=aspect,
+                hyperlink=hyperlink,
                 label=label,
                 padding=padding,
                 palette=palette,

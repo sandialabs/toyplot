@@ -308,7 +308,7 @@ class Canvas(object):
             left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
             a set of i, column-span, j, row-span coordinates so the legend can cover
             more than one cell.
-        hyperlink: string, optiona.
+        hyperlink: string, optional
             When specified, the axes range is hyperlinked to the given URI.  Note that this
             overrides the canvas hyperlink, if any, and is overridden by hyperlinks set on
             other entities such as marks or text.

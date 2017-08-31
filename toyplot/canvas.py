@@ -167,6 +167,7 @@ class Canvas(object):
 
     @property
     def hyperlink(self):
+        """URI that will be hyperlinked from the entire canvas."""
         return self._hyperlink
 
     @hyperlink.setter
@@ -175,7 +176,7 @@ class Canvas(object):
 
     @property
     def style(self):
-        """Canvas style."""
+        """Collection of CSS styles that will be applied to the canvas."""
         return self._style
 
     @style.setter

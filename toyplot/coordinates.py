@@ -744,6 +744,7 @@ class Cartesian(object):
 
     @property
     def hyperlink(self):
+        """Specify a URI that will be hyperlinked from the axes range."""
         return self._hyperlink
 
     @hyperlink.setter

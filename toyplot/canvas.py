@@ -95,18 +95,25 @@ class Canvas(object):
     Parameters
     ----------
     width: number, string, or (number, string) tuple, optional
-      Width of the canvas.  Assumes CSS pixels if units aren't provided.
-      Defaults to 600px (6.25") if unspecified.  See :ref:`units` for details on
-      how Toyplot handles real world units.
+        Width of the canvas.  Assumes CSS pixels if units aren't provided.
+        Defaults to 600px (6.25") if unspecified.  See :ref:`units` for details on
+        how Toyplot handles real world units.
     height: number, string, or (number, string) tuple, optional
-      Height of the canvas.  Assumes CSS pixels if units aren't provided.
-      Defaults to the canvas width if unspecified.  See :ref:`units` for details
-      on how Toyplot handles real world units.
+        Height of the canvas.  Assumes CSS pixels if units aren't provided.
+        Defaults to the canvas width if unspecified.  See :ref:`units` for details
+        on how Toyplot handles real world units.
     style: dict, optional
-      Collection of CSS styles to apply to the canvas.
+        Collection of CSS styles to apply to the canvas.
+    hyperlink: string, optional
+        When specified, the entire canvas is hyperlinked to the given URI.
+        Note that hyperlinks set on other entities (such as axes, marks, or
+        text) will override this.
     autorender: boolean, optional
-      Turn autorendering on / off for this canvas.  Default:
-      use the global autorender flag.
+        Turn autorendering on / off for this canvas. By default the global
+        autorender flag is used.
+    autoformat: string, optional
+        Specify the format to use when autorendering. By default the global
+        autoformat is used.
 
     Examples
     --------
@@ -277,59 +284,61 @@ class Canvas(object):
 
         Parameters
         ----------
-        bounds: (xmin, xmax, ymin, ymax) tuple, optional
-          Use the bounds property to position / size the axes by specifying the
-          position of each of its boundaries.  Assumes CSS pixels if units
-          aren't provided, and supports all units described in :ref:`units`,
-          including percentage of the canvas width / height.
-        rect: (x, y, width, height) tuple, optional
-          Use the rect property to position / size the axes by specifying its
-          upper-left-hand corner, width, and height.  Assumes CSS pixels if
-          units aren't provided, and supports all units described in
-          :ref:`units`, including percentage of the canvas width / height.
-        corner: (corner, inset, width, height) tuple, optional
-          Use the corner property to position / size the axes by specifying its
-          width and height, plus an inset from a corner of the canvas.  Allowed
-          corner values are "top-left", "top", "top-right", "right",
-          "bottom-right", "bottom", "bottom-left", and "left".  The width and
-          height may be specified using absolute units as described in
-          :ref:`units`, or as a percentage of the canvas width / height.  The
-          inset only supports absolute drawing units.  All units default to CSS
-          pixels if unspecified.
-        grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
-          Use the grid property to position / size the axes using a collection of
-          grid cells filling the canvas.  Specify the number of rows and columns in
-          the grid, then specify either a zero-based cell index (which runs in
-          left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
-          a set of i, column-span, j, row-span coordinates so the legend can cover
-          more than one cell.
-        margin: size of the margin around grid cells, optional
-          Specifies the amount of empty space to leave between grid cells When using the
-          `grid` parameter for positioning.  Assumes CSS pixels by default, and supports
-          all of the absolute units described in :ref:`units`.
-        xmin, xmax, ymin, ymax: float, optional
-          Used to explicitly override the axis domain (normally, the domain is
-          implicitly defined by any marks added to the axes).
         aspect: string, optional
-          Set to "fit-range" to automatically expand the domain so that its
-          aspect ratio matches the aspect ratio of the range.
+            Set to "fit-range" to automatically expand the domain so that its
+            aspect ratio matches the aspect ratio of the range.
+        bounds: (xmin, xmax, ymin, ymax) tuple, optional
+            Use the bounds property to position / size the axes by specifying the
+            position of each of its boundaries.  Assumes CSS pixels if units
+            aren't provided, and supports all units described in :ref:`units`,
+            including percentage of the canvas width / height.
+        corner: (corner, inset, width, height) tuple, optional
+            Use the corner property to position / size the axes by specifying its
+            width and height, plus an inset from a corner of the canvas.  Allowed
+            corner values are "top-left", "top", "top-right", "right",
+            "bottom-right", "bottom", "bottom-left", and "left".  The width and
+            height may be specified using absolute units as described in
+            :ref:`units`, or as a percentage of the canvas width / height.  The
+            inset only supports absolute drawing units.  All units default to CSS
+            pixels if unspecified.
+        grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
+            Use the grid property to position / size the axes using a collection of
+            grid cells filling the canvas.  Specify the number of rows and columns in
+            the grid, then specify either a zero-based cell index (which runs in
+            left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
+            a set of i, column-span, j, row-span coordinates so the legend can cover
+            more than one cell.
         hyperlink: string, optiona.
-          Makes the axes range into a clickable hyperlink.
-        show: bool, optional
-          Set to `False` to hide the axes (the axes contents will still be visible).
-        xshow, yshow: bool, optional
-          Set to `False` to hide individual axes.
+            When specified, the axes range is hyperlinked to the given URI.  Note that this
+            overrides the canvas hyperlink, if any, and is overridden by hyperlinks set on
+            other entities such as marks or text.
         label: string, optional
-          Human-readable axes label.
-        xlabel, ylabel: string, optional
-          Human-readable axis labels.
-        xticklocator, yticklocator: :class:`toyplot.locator.TickLocator`, optional
-          Controls the placement and formatting of axis ticks and tick labels.
-        xscale, yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
-          Specifies the mapping from data to canvas coordinates along an axis.
+            Human-readable axes label.
+        margin: size of the margin around grid cells, optional
+            Specifies the amount of empty space to leave between grid cells When using the
+            `grid` parameter for positioning.  Assumes CSS pixels by default, and supports
+            all of the absolute units described in :ref:`units`.
         padding: number, string, or (number, string) tuple,  optional
-          Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
-          See :ref:`units` for details on how Toyplot handles real-world units.
+            Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
+            See :ref:`units` for details on how Toyplot handles real-world units.
+        rect: (x, y, width, height) tuple, optional
+            Use the rect property to position / size the axes by specifying its
+            upper-left-hand corner, width, and height.  Assumes CSS pixels if
+            units aren't provided, and supports all units described in
+            :ref:`units`, including percentage of the canvas width / height.
+        show: bool, optional
+            Set to `False` to hide the axes (the axes contents will still be visible).
+        xmin, xmax, ymin, ymax: float, optional
+            Used to explicitly override the axis domain (normally, the domain is
+            implicitly defined by any marks added to the axes).
+        xshow, yshow: bool, optional
+            Set to `False` to hide individual axes.
+        xlabel, ylabel: string, optional
+            Human-readable axis labels.
+        xticklocator, yticklocator: :class:`toyplot.locator.TickLocator`, optional
+            Controls the placement and formatting of axis ticks and tick labels.
+        xscale, yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
+            Specifies the mapping from data to canvas coordinates along an axis.
 
         Returns
         -------

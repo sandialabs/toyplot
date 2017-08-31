@@ -286,13 +286,13 @@ class Table(object):
         root_xml = xml.Element(
             "table",
             style="border-collapse:collapse; border:none; color: %s" %
-            toyplot.color.near_black)
+            toyplot.color.black)
         root_xml.set("class", "toyplot-data-Table")
         header_xml = xml.SubElement(
             root_xml,
             "tr",
             style="border:none;border-bottom:1px solid %s" %
-            toyplot.color.near_black)
+            toyplot.color.black)
         for name in self._columns.keys():
             xml.SubElement(
                 header_xml,

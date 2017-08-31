@@ -196,5 +196,5 @@ def step_impl(context):
 
 @given(u'rich text {markup}')
 def step_impl(context, markup):
-    context.axes.text(0, 0, markup, color=toyplot.color.near_black, style={"font-size": "32px"})
+    context.axes.text(0, 0, markup, color=toyplot.color.black, style={"font-size": "32px"})
 

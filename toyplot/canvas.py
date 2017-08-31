@@ -127,12 +127,12 @@ class Canvas(object):
             height, "px", default="px") if height is not None else self._width
         self._style = {
             "background-color": "transparent",
-            "fill": toyplot.color.near_black,
+            "fill": toyplot.color.black,
             "fill-opacity": 1.0,
             "font-family": "Helvetica",
             "font-size": "12px",
             "opacity": 1.0,
-            "stroke": toyplot.color.near_black,
+            "stroke": toyplot.color.black,
             "stroke-opacity": 1.0,
             "stroke-width": 1.0,
         }
@@ -1026,7 +1026,7 @@ class Canvas(object):
         table["toyplot:fill"] = toyplot.color.broadcast(
             colors=fill,
             shape=(table.shape[0],),
-            default=toyplot.color.near_black,
+            default=toyplot.color.black,
             )
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
         table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])

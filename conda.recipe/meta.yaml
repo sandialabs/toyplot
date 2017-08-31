@@ -12,11 +12,9 @@ build:
 requirements:
   build:
     - setuptools
-    - colormath
     - multipledispatch
     - numpy >=1.7
   run:
-    - colormath
     - multipledispatch
     - numpy >=1.7
 

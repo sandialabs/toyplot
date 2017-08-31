@@ -664,7 +664,7 @@ def _draw_marker(
             style=toyplot.style.combine(
                 {
                     "-toyplot-vertical-align": "middle",
-                    "fill": toyplot.color.near_black,
+                    "fill": toyplot.color.black,
                     "font-size": "%rpx" % (marker.size * 0.75),
                     "stroke": "none",
                     "text-anchor": "middle",
@@ -1069,46 +1069,46 @@ def _render(frames, context):
             <input class="toyplot-current-frame" title="Frame" type="range" min="0" max="{frames}" step="1" value="0"/>
             <button class="toyplot-rewind" title="Rewind" style="width:40px;height:24px">
                 <svg width="20" height="20">
-                    <polygon points="10,5 0,10 10,15" stroke="none" fill="{near_black}"/>
-                    <polygon points="20,5 10,10 20,15" stroke="none" fill="{near_black}"/>
+                    <polygon points="10,5 0,10 10,15" stroke="none" fill="{black}"/>
+                    <polygon points="20,5 10,10 20,15" stroke="none" fill="{black}"/>
                 </svg>
             </button>
             <button class="toyplot-reverse-play" title="Reverse Play" style="width:40px;height:24px">
                 <svg width="20" height="20">
-                    <polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/>
+                    <polygon points="15,5 5,10 15,15" stroke="none" fill="{black}"/>
                 </svg>
             </button>
             <button class="toyplot-frame-rewind" title="Frame Rewind" style="width:40px;height:24px">
                 <svg width="20" height="20">
-                    <polygon points="15,5 5,10 15,15" stroke="none" fill="{near_black}"/>
-                    <rect x="17" y="5" width="2" height="10" stroke="none" fill="{near_black}"/>
+                    <polygon points="15,5 5,10 15,15" stroke="none" fill="{black}"/>
+                    <rect x="17" y="5" width="2" height="10" stroke="none" fill="{black}"/>
                 </svg>
             </button>
             <button class="toyplot-stop" title="Stop" style="width:40px;height:24px">
                 <svg width="20" height="20">
-                    <rect x="5" y="5" width="10" height="10" stroke="none" fill="{near_black}"/>
+                    <rect x="5" y="5" width="10" height="10" stroke="none" fill="{black}"/>
                 </svg>
             </button>
             <button class="toyplot-frame-advance" title="Frame Advance" style="width:40px;height:24px">
                 <svg width="20" height="20">
-                    <polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/>
-                    <rect x="1" y="5" width="2" height="10" stroke="none" fill="{near_black}"/>
+                    <polygon points="5,5 15,10 5,15" stroke="none" fill="{black}"/>
+                    <rect x="1" y="5" width="2" height="10" stroke="none" fill="{black}"/>
                 </svg>
             </button>
             <button class="toyplot-forward-play" title="Play" style="width:40px;height:24px">
                 <svg width="20" height="20">
-                    <polygon points="5,5 15,10 5,15" stroke="none" fill="{near_black}"/>
+                    <polygon points="5,5 15,10 5,15" stroke="none" fill="{black}"/>
                 </svg>
             </button>
             <button class="toyplot-fast-forward" title="Fast Forward" style="width:40px;height:24px">
                 <svg width="20" height="20">
-                    <polygon points="0,5 10,10 0,15" stroke="none" fill="{near_black}"/>
-                    <polygon points="10,5 20,10 10,15" stroke="none" fill="{near_black}"/>
+                    <polygon points="0,5 10,10 0,15" stroke="none" fill="{black}"/>
+                    <polygon points="10,5 20,10 10,15" stroke="none" fill="{black}"/>
                 </svg>
             </button>
         </div>""".format(
             frames=len(times) - 2,
-            near_black=toyplot.color.near_black,
+            black=toyplot.color.black,
             )))
 
     xml.SubElement(context.parent, "script").text = string.Template("""

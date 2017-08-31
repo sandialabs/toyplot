@@ -10,16 +10,16 @@ import logging
 import re
 import xml.etree.ElementTree as xml
 
-logging.getLogger("colormath").setLevel(logging.INFO) # colormath produces obnoxious amounts of debug logging
-import colormath.color_objects # pylint: disable=wrong-import-position
-import colormath.color_conversions # pylint: disable=wrong-import-position
 import numpy # pylint: disable=wrong-import-position
 
 import toyplot.compatibility # pylint: disable=wrong-import-position
 
 
-near_black = "#292724"
+black = "#292724"
+"""Default color used throughout Toyplot figures."""
 
+near_black = "#292724"
+"""Deprecated, use :data:`toyplot.color.black` instead."""
 
 dtype = {"names": ["r", "g", "b", "a"], "formats": ["float64", "float64", "float64", "float64"]}
 """Data type for storing RGBA color information in :class:`numpy.ndarray` instances.
@@ -56,9 +56,22 @@ except:
     pass
 
 
-#def array(values):
-#    """Construct an array of Toyplot color values."""
-#    return numpy.array(values, dtype=dtype)
+def lab(l, a, b):
+    """Construct a Toyplot color from CIE Lab values."""
+    y = (l + 16.0) / 116.0
+    x = a / 500.0 + y
+    z = y - b / 200.0
+
+    x3 = x * x * x
+    z3 = z * z * z
+    return xyz(
+        lab.white[0] * (x3 if x3 > lab.epsilon else (x - 16.0 / 116.0) / 7.787),
+        lab.white[1] * (numpy.power(((l + 16.0) / 116.0), 3) if l > (lab.kappa * lab.epsilon) else l / lab.kappa),
+        lab.white[2] * (z3 if z3 > lab.epsilon else (z - 16.0 / 116.0) / 7.787),
+        )
+lab.epsilon = 216.0 / 24389.0
+lab.kappa = 24389.0 / 27.0
+lab.white = numpy.array([95.047, 100.0, 108.883])
 
 
 def rgb(r, g, b):
@@ -81,44 +94,60 @@ def rgba(r, g, b, a):
     return numpy.array((r, g, b, a), dtype=dtype)
 
 
-def lab(L, a, b):
-    """Construct a Toyplot color from Lab values.
+def xyz(x, y, z):
+    """Construct a Toyplot color from CIE XYZ values, using observer = 2 deg and illuminant = D65."""
+    x = x / 100.0
+    y = y / 100.0
+    z = z / 100.0
 
-    Returns
-    -------
-    color: :class:`numpy.ndarray` scalar containing RGBA values with dtype = :data:`toyplot.color.dtype`.
-    """
-    RGB = colormath.color_conversions.convert_color(colormath.color_objects.LabColor(L, a, b), colormath.color_objects.sRGBColor)
-    return rgb(*RGB.get_value_tuple()) # pylint: disable=no-value-for-parameter
+    r = x * 3.2406 + y * -1.5372 + z * -0.4986
+    g = x * -0.9689 + y * 1.8758 + z * 0.0415
+    b = x * 0.0557 + y * -0.2040 + z * 1.0570
+
+    r = 1.055 * numpy.power(r, 1 / 2.4) - 0.055 if r > 0.0031308 else 12.92 * r
+    g = 1.055 * numpy.power(g, 1 / 2.4) - 0.055 if g > 0.0031308 else 12.92 * g
+    b = 1.055 * numpy.power(b, 1 / 2.4) - 0.055 if b > 0.0031308 else 12.92 * b
+
+    return rgb(*numpy.clip((r, g, b), 0, 1))
 
 
 def to_lab(color):
-    """Convert a Toyplot color to Lab values."""
-    Lab = colormath.color_conversions.convert_color(
-        colormath.color_objects.sRGBColor(color["r"], color["g"], color["b"]), colormath.color_objects.LabColor)
-    return Lab.get_value_tuple()
+    """Convert a Toyplot color to a CIE Lab color."""
+
+    color = to_xyz(color)
+
+    def pivot(n):
+        return numpy.power(n, 1.0 / 3.0) if n > pivot.epsilon else (pivot.kappa * n + 16) / 116
+    pivot.epsilon = 216.0 / 24389.0
+    pivot.kappa = 24389.0 / 27.0
+
+    x = pivot(color[0] / to_lab.white[0])
+    y = pivot(color[1] / to_lab.white[1])
+    z = pivot(color[2] / to_lab.white[2])
+
+    return numpy.array([max(0, 116 * y - 16), 500 * (x - y), 200 * (y - z)])
+to_lab.white = numpy.array([95.047, 100.0, 108.883])
 
 
-def _lab_to_msh(L, a, b):
-    M = numpy.sqrt(L * L + a * a + b * b)
-    s = numpy.arccos(L / M) if (M > 0.001) else 0.0
-    h = numpy.arctan2(b, a) if (s > 0.001) else 0.0
-    return M, s, h
+def to_xyz(color):
+    """Convert a Toyplot color to a CIE XYZ color using observer = 2 deg and illuminant = D65."""
+    def pivot(n):
+        return (numpy.power((n + 0.055) / 1.055, 2.4) if n > 0.04045 else n / 12.92) * 100.0
 
+    r = pivot(color["r"])
+    g = pivot(color["g"])
+    b = pivot(color["b"])
 
-def _msh_to_lab(M, s, h):
-    L = M * numpy.cos(s)
-    a = M * numpy.sin(s) * numpy.cos(h)
-    b = M * numpy.sin(s) * numpy.sin(h)
-    return L, a, b
+    return numpy.array([
+        r * 0.4124 + g * 0.3576 + b * 0.1805,
+        r * 0.2126 + g * 0.7152 + b * 0.0722,
+        r * 0.0193 + g * 0.1192 + b * 0.9505,
+        ])
 
 
 def _require_color(color):
     if isinstance(color, toyplot.compatibility.string_type):
         return css(color)
-# I'm having a tough time creating a test that will exercise this, which is a good sign we don't need it.
-#    elif isinstance(color, numpy.ndarray) and color.ndim == 0 and issubclass(color.dtype.type, numpy.character):
-#        return css(str(color))
     elif isinstance(color, (numpy.void, numpy.ndarray)) and color.dtype == dtype:
         return color
     elif isinstance(color, (tuple, list, numpy.ndarray)) and len(color) == 3:
@@ -439,6 +468,12 @@ class DivergingMap(Map):
     def __init__(self, low=None, high=None, domain_min=None, domain_max=None):
         toyplot.color.Map.__init__(self, domain_min=domain_min, domain_max=domain_max)
 
+        def _lab_to_msh(L, a, b):
+            M = numpy.sqrt(L * L + a * a + b * b)
+            s = numpy.arccos(L / M) if (M > 0.001) else 0.0
+            h = numpy.arctan2(b, a) if (s > 0.001) else 0.0
+            return M, s, h
+
         def middle(original):
             m, s, h = 88, 0, original[2]
             if m > original[0]:
@@ -470,6 +505,12 @@ class DivergingMap(Map):
         -------
         colors: :class:`numpy.ndarray` containing RGBA values with dtype = :data:`toyplot.color.dtype` and the same shape as `values`.
         """
+
+        def _msh_to_lab(M, s, h):
+            L = M * numpy.cos(s)
+            a = M * numpy.sin(s) * numpy.cos(h)
+            b = M * numpy.sin(s) * numpy.sin(h)
+            return L, a, b
 
         values = numpy.array(values)
         domain_min = domain_min if domain_min is not None else self.domain.min if self.domain.min is not None else values.min()

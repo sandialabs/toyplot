@@ -188,30 +188,30 @@ def step_impl(context):
 @then(u'individual values can be mapped to colors by the diverging color map')
 def step_impl(context):
     toyplot.testing.assert_color_equal(
-        context.color_map.color(-1), [0.33479085, 0.28308437, 0.75649522, 1.])
+        context.color_map.color(-1), [0.23003265,  0.29899933,  0.75400176,  1.])
     toyplot.testing.assert_color_equal(
-        context.color_map.color(0), [0.33479085, 0.28308437, 0.75649522, 1.])
+        context.color_map.color(0), [0.23003265,  0.29899933,  0.75400176,  1.])
     toyplot.testing.assert_color_equal(
-        context.color_map.color(0.5), [0.86541961, 0.86538428, 0.86533315, 1.])
+        context.color_map.color(0.5), [0.86539042,  0.86541865,  0.86532601,  1.])
     toyplot.testing.assert_color_equal(
-        context.color_map.color(1), [0.69462562, 0.00296461, 0.15458183, 1.])
+        context.color_map.color(1), [0.7059977,  0.01612647,  0.15000112,  1.])
     toyplot.testing.assert_color_equal(
-        context.color_map.color(2), [0.69462562, 0.00296461, 0.15458183, 1.])
+        context.color_map.color(2), [0.7059977,  0.01612647,  0.15000112,  1.])
 
 
 @then(
     u'individual values can be mapped to css colors by the diverging color map')
 def step_impl(context):
     nose.tools.assert_equal(
-        context.color_map.css(-1), "rgba(33.5%,28.3%,75.6%,1.000)")
+        context.color_map.css(-1), "rgba(23.0%,29.9%,75.4%,1.000)")
     nose.tools.assert_equal(
-        context.color_map.css(0), "rgba(33.5%,28.3%,75.6%,1.000)")
+        context.color_map.css(0), "rgba(23.0%,29.9%,75.4%,1.000)")
     nose.tools.assert_equal(
         context.color_map.css(0.5), "rgba(86.5%,86.5%,86.5%,1.000)")
     nose.tools.assert_equal(
-        context.color_map.css(1), "rgba(69.5%,0.3%,15.5%,1.000)")
+        context.color_map.css(1), "rgba(70.6%,1.6%,15.0%,1.000)")
     nose.tools.assert_equal(
-        context.color_map.css(2), "rgba(69.5%,0.3%,15.5%,1.000)")
+        context.color_map.css(2), "rgba(70.6%,1.6%,15.0%,1.000)")
 
 
 @given(u'a linear color map')

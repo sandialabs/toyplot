@@ -11,7 +11,7 @@ import xml.etree.ElementTree as xml
 
 @given(u'a canvas with a border')
 def step_impl(context):
-    context.canvas = toyplot.Canvas(style={"border":"1px solid %s" % toyplot.color.near_black})
+    context.canvas = toyplot.Canvas(style={"border":"1px solid %s" % toyplot.color.black})
 
 @then(u'axes can be added to the canvas using the default layout.')
 def step_impl(context):

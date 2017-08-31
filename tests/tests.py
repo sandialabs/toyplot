@@ -687,8 +687,8 @@ def test_axes_scatterplot_singular():
 
 
 def test_axes_scatterplot_markers():
-    marker_style = {"stroke": toyplot.color.near_black, "fill": "cornsilk"}
-    label_style = {"stroke": "none", "fill": toyplot.color.near_black}
+    marker_style = {"stroke": toyplot.color.black, "fill": "cornsilk"}
+    label_style = {"stroke": "none", "fill": toyplot.color.black}
     markers = [
         None,
         "",

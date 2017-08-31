@@ -1746,7 +1746,7 @@ class Cartesian(object):
         color = toyplot.color.broadcast(
             colors=color,
             shape=(table.shape[0], 1),
-            default=toyplot.color.near_black,
+            default=toyplot.color.black,
             )
         table["color"] = color[:, 0]
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
@@ -2305,7 +2305,7 @@ class Cartesian(object):
         color = toyplot.color.broadcast(
             colors=color,
             shape=(table.shape[0], 1),
-            default=toyplot.color.near_black,
+            default=toyplot.color.black,
             )
         table["color"] = color[:, 0]
         table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
@@ -3333,7 +3333,7 @@ class Table(object):
             label, style={"font-size": "14px", "baseline-shift": "100%"})
 
         self._separation = 2
-        self._gstyle = {"stroke": toyplot.color.near_black, "stroke-width": 0.5}
+        self._gstyle = {"stroke": toyplot.color.black, "stroke-width": 0.5}
 
         lstyle = {
             }

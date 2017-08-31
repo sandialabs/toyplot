@@ -17,7 +17,6 @@ To use Toyplot you will need, at a minimum, Python 2 or 3 (duh):
 plus the following (if you install Toyplot
 using pip, these are automatically installed for you):
 
-* colormath - https://github.com/gtaylor/python-colormath
 * multipledispatch - https://github.com/mrocklin/multipledispatch
 * numpy >= 1.8.0 - http://numpy.org
 

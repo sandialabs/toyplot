@@ -2,7 +2,7 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-"""Generate PNG images using Ghostscript.
+"""Functions to render PNG images using Ghostscript.
 """
 
 from __future__ import absolute_import

@@ -2,7 +2,7 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-"""Generate PDF documents."""
+"""Functions to render PDF documents."""
 
 from __future__ import absolute_import
 from __future__ import division

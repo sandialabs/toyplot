@@ -5,7 +5,9 @@
 from behave import *
 
 import numpy
-import toyplot.testing
+import toyplot
+
+import testing
 
 
 @given(u'a default canvas')
@@ -26,5 +28,5 @@ def step_impl(context):
 @then(u'the visualization should match the {reference} reference image')
 def step_impl(context, reference):
     show_diff = context.config.userdata.getbool("show_diff", default=True)
-    toyplot.testing.assert_canvas_equal(context.canvas, reference, show_diff=show_diff)
+    testing.assert_canvas_equal(context.canvas, reference, show_diff=show_diff)
 

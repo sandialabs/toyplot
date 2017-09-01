@@ -7,7 +7,8 @@ from behave import *
 import nose
 import numpy
 import toyplot.data
-import toyplot.testing
+
+import testing
 
 
 @then(u'the cartesian axes can be rendered with defaults')
@@ -340,7 +341,7 @@ def step_impl(context):
 @then(
     u'the result should be a fill plot between the boundary and the origin with implicit x')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-one-boundary")
 
 
@@ -352,7 +353,7 @@ def step_impl(context):
 
 @then(u'the result should be a fill plot between the boundary and the origin')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-one-boundary-position")
 
 
@@ -364,7 +365,7 @@ def step_impl(context):
 
 @then(u'the result should be a fill plot between the two boundaries')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-two-boundaries-position")
 
 
@@ -376,7 +377,7 @@ def step_impl(context):
 @then(
     u'the result should be multiple fill series between the boundaries with implicit x')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-boundaries")
 
 
@@ -388,7 +389,7 @@ def step_impl(context):
 
 @then(u'the result should be multiple fill series between the boundaries')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-boundaries-position")
 
 
@@ -401,7 +402,7 @@ def step_impl(context):
 @then(
     u'the result should be multiple fill series between the boundaries along y')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-boundaries-position-along-y")
 
 
@@ -414,7 +415,7 @@ def step_impl(context):
 @then(
     u'the result should be multiple fill series between the boundaries with titles')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-boundaries-titles")
 
 
@@ -436,7 +437,7 @@ def step_impl(context):
 @then(
     u'the result should be one fill series stacked above the origin with implicit x')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-one-magnitude")
 
 
@@ -448,7 +449,7 @@ def step_impl(context):
 
 @then(u'the result should be one fill series stacked above the origin')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-one-magnitude-position")
 
 
@@ -461,7 +462,7 @@ def step_impl(context):
 @then(
     u'the result should be multiple fill series stacked above the origin with implicit x')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-magnitudes")
 
 
@@ -473,7 +474,7 @@ def step_impl(context):
 
 @then(u'the result should be multiple fill series stacked above the origin')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-magnitudes-position")
 
 
@@ -486,7 +487,7 @@ def step_impl(context):
 @then(
     u'the result should be multiple fill series stacked above the origin along y')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-magnitudes-position-along-y")
 
 
@@ -500,7 +501,7 @@ def step_impl(context):
 @then(
     u'the result should be multiple fill series stacked above the origin with titles')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-magnitudes-position-titles")
 
 
@@ -513,7 +514,7 @@ def step_impl(context):
 @then(
     u'the result should be multiple fill series stacked with symmetric baseline')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-magnitudes-symmetric-baseline")
 
 
@@ -526,7 +527,7 @@ def step_impl(context):
 @then(
     u'the result should be multiple fill series stacked with wiggle baseline')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-fill-n-magnitudes-wiggle-baseline")
 
 
@@ -540,7 +541,7 @@ def step_impl(context):
 
 @then(u'the line marks should be treated as annotations.')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-lines-annotation")
 
 
@@ -555,6 +556,6 @@ def step_impl(context):
 
 @then(u'the line marks should be treated as data.')
 def step_impl(context):
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         context.canvas, "axes-lines-data")
 

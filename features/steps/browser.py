@@ -9,7 +9,6 @@ import nose.tools
 import numpy
 import sys
 import toyplot.browser
-import toyplot.testing
 import webbrowser
 
 

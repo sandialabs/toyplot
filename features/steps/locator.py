@@ -7,7 +7,8 @@ from behave import *
 import numpy
 import sys
 import toyplot.locator
-import toyplot.testing
+
+import testing
 
 try:
     import arrow
@@ -33,7 +34,7 @@ def step_impl(context):
     canvas = toyplot.Canvas()
     axes = canvas.cartesian()
     axes.plot(context.x, context.y)
-    toyplot.testing.assert_canvas_equal(canvas, "tick-locator-default")
+    testing.assert_canvas_equal(canvas, "tick-locator-default")
 
 
 @then(u'the data can be rendered with ticks evenly spread across the domain')
@@ -43,7 +44,7 @@ def step_impl(context):
         xticklocator=toyplot.locator.Uniform(count=10, format="{:.3g}"))
     axes.y.ticks.locator = toyplot.locator.Uniform(count=3, format="{:.1f}")
     axes.plot(context.x, context.y)
-    toyplot.testing.assert_canvas_equal(canvas, "tick-locator-basic")
+    testing.assert_canvas_equal(canvas, "tick-locator-basic")
 
 
 @then(u'the data can be rendered with explicit locations')
@@ -58,7 +59,7 @@ def step_impl(context):
                 4,
                 6]))
     axes.plot(context.x, context.y)
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         canvas, "tick-locator-explicit-locations")
 
 
@@ -69,7 +70,7 @@ def step_impl(context):
         locations=[0, numpy.pi, 2 * numpy.pi], labels=["0", "pi", "2pi"]))
     axes.y.ticks.locator = toyplot.locator.Explicit([-1, 1], ["-1", "1"])
     axes.plot(context.x, context.y)
-    toyplot.testing.assert_canvas_equal(
+    testing.assert_canvas_equal(
         canvas, "tick-locator-explicit-locations-labels")
 
 
@@ -80,7 +81,7 @@ def step_impl(context):
         xticklocator=toyplot.locator.Explicit(labels=["red", "green", "blue"]))
     axes.y.ticks.locator = toyplot.locator.Explicit([-1, 1], ["-1", "1"])
     axes.plot(context.x, context.y)
-    toyplot.testing.assert_canvas_equal(canvas, "tick-locator-explicit-labels")
+    testing.assert_canvas_equal(canvas, "tick-locator-explicit-labels")
 
 
 @then(u'the data can be rendered with ticks identified by heckbert')
@@ -89,7 +90,7 @@ def step_impl(context):
     axes = canvas.cartesian(xticklocator=toyplot.locator.Heckbert(count=10))
     axes.y.ticks.locator = toyplot.locator.Heckbert(count=3)
     axes.plot(context.x, context.y)
-    toyplot.testing.assert_canvas_equal(canvas, "tick-locator-heckbert")
+    testing.assert_canvas_equal(canvas, "tick-locator-heckbert")
 
 
 @then(u'the data can be rendered with ticks identified by optimization')
@@ -98,7 +99,7 @@ def step_impl(context):
     axes = canvas.cartesian(xticklocator=toyplot.locator.Extended(count=12))
     axes.y.ticks.locator = toyplot.locator.Extended(count=5)
     axes.plot(context.x, context.y)
-    toyplot.testing.assert_canvas_equal(canvas, "tick-locator-extended")
+    testing.assert_canvas_equal(canvas, "tick-locator-extended")
 
 @then(u'the data can be rendered without ticks')
 def step_impl(context):
@@ -106,7 +107,7 @@ def step_impl(context):
     axes = canvas.cartesian(xticklocator=toyplot.locator.Null())
     axes.y.ticks.locator = toyplot.locator.Null()
     axes.plot(context.x, context.y)
-    toyplot.testing.assert_canvas_equal(canvas, "tick-locator-null")
+    testing.assert_canvas_equal(canvas, "tick-locator-null")
 
 @given(u'seven thousand years of timestamp data')
 def step_impl(context):
@@ -241,6 +242,6 @@ def step_impl(context):
 
 @then(u'the generated figure will match {reference}')
 def step_impl(context, reference):
-    toyplot.testing.assert_canvas_equal(context.canvas, reference)
+    testing.assert_canvas_equal(context.canvas, reference)
 
 

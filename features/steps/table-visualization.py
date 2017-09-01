@@ -7,7 +7,6 @@ from behave import *
 import nose
 import numpy
 import toyplot.data
-import toyplot.testing
 
 
 @given(u'a sample toyplot.data.Table')

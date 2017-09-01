@@ -9,11 +9,12 @@ import io
 import nose.tools
 import numpy
 import os
-import toyplot.testing
 import xml.etree.ElementTree as xml
 
-if not os.path.exists(toyplot.testing.backend_dir):
-    os.makedirs(toyplot.testing.backend_dir)
+import testing
+
+if not os.path.exists(testing.backend_dir):
+    os.makedirs(testing.backend_dir)
 
 @given(u'that the {} backend is available')
 def step_impl(context, name):
@@ -26,7 +27,7 @@ def step_impl(context, name):
 
 @then(u'the canvas can be rendered to an html file')
 def step_impl(context):
-    target = os.path.join(toyplot.testing.backend_dir, "%s.html" % context.name)
+    target = os.path.join(testing.backend_dir, "%s.html" % context.name)
     context.backend.render(context.canvas, target)
     #html = xml.parse(target)
     #nose.tools.assert_equal(html.getroot().tag, "{http://www.w3.org/2000/svg}svg")
@@ -49,7 +50,7 @@ def step_impl(context):
 
 @then(u'the canvas can be rendered to a pdf file')
 def step_impl(context):
-    target = os.path.join(toyplot.testing.backend_dir, "%s.pdf" % context.name)
+    target = os.path.join(testing.backend_dir, "%s.pdf" % context.name)
     context.backend.render(context.canvas, target)
 
 
@@ -66,9 +67,9 @@ def step_impl(context):
 
 @then(u'the canvas can be rendered to a png file')
 def step_impl(context):
-    target = os.path.join(toyplot.testing.backend_dir, "%s.png" % context.name)
+    target = os.path.join(testing.backend_dir, "%s.png" % context.name)
     context.backend.render(context.canvas, target)
-    image = toyplot.testing.read_png(target)
+    image = testing.read_png(target)
     nose.tools.assert_equal(image.shape, (600, 600, 4))
     nose.tools.assert_equal(image.dtype, "uint8")
 
@@ -79,7 +80,7 @@ def step_impl(context):
     context.backend.render(context.canvas, buffer)
     buffer.seek(0)
 
-    image = toyplot.testing.read_png(buffer)
+    image = testing.read_png(buffer)
     nose.tools.assert_equal(image.shape, (600, 600, 4))
     nose.tools.assert_equal(image.dtype, "uint8")
 
@@ -87,7 +88,7 @@ def step_impl(context):
 @then(u'the canvas can be rendered to a returned png document')
 def step_impl(context):
     png = context.backend.render(context.canvas)
-    image = toyplot.testing.read_png(io.BytesIO(png))
+    image = testing.read_png(io.BytesIO(png))
     nose.tools.assert_equal(image.shape, (600, 600, 4))
     nose.tools.assert_equal(image.dtype, "uint8")
 
@@ -95,28 +96,28 @@ def step_impl(context):
 @then(u'the canvas can be rendered to a 200 pixel wide png document')
 def step_impl(context):
     png = context.backend.render(context.canvas, width="200px")
-    image = toyplot.testing.read_png(io.BytesIO(png))
+    image = testing.read_png(io.BytesIO(png))
     nose.tools.assert_equal(image.shape, (200, 200, 4))
     nose.tools.assert_equal(image.dtype, "uint8")
 
 @then(u'the canvas can be rendered to a 150 pixel high png document')
 def step_impl(context):
     png = context.backend.render(context.canvas, height="150px")
-    image = toyplot.testing.read_png(io.BytesIO(png))
+    image = testing.read_png(io.BytesIO(png))
     nose.tools.assert_equal(image.shape, (150, 150, 4))
     nose.tools.assert_equal(image.dtype, "uint8")
 
 @then(u'the canvas can be rendered to a half scale png document')
 def step_impl(context):
     png = context.backend.render(context.canvas, scale=0.5)
-    image = toyplot.testing.read_png(io.BytesIO(png))
+    image = testing.read_png(io.BytesIO(png))
     nose.tools.assert_equal(image.shape, (300, 300, 4))
     nose.tools.assert_equal(image.dtype, "uint8")
 
 
 @then(u'the canvas can be rendered to an svg file')
 def step_impl(context):
-    target = os.path.join(toyplot.testing.backend_dir, "%s.svg" % context.name)
+    target = os.path.join(testing.backend_dir, "%s.svg" % context.name)
     context.backend.render(context.canvas, target)
     svg = xml.parse(target)
     nose.tools.assert_equal(svg.getroot().tag, "{http://www.w3.org/2000/svg}svg")

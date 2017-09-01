@@ -12,8 +12,11 @@ import numpy
 import os
 import sys
 import tempfile
+
 import toyplot.data
-import toyplot.testing
+
+import testing
+
 
 try:
     import pandas
@@ -416,6 +419,6 @@ def step_impl(context):
 def step_impl(context):
     html = context.data._repr_html_()
     nose.tools.assert_is_instance(html, toyplot.compatibility.unicode_type)
-    toyplot.testing.assert_html_equal(html, "data-table")
+    testing.assert_html_equal(html, "data-table")
 
 

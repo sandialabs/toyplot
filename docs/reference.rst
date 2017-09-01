@@ -35,7 +35,6 @@ Python API
     toyplot.require.rst
     toyplot.style.rst
     toyplot.svg.rst
-    toyplot.testing.rst
     toyplot.text.rst
     toyplot.transform.rst
     toyplot.units.rst

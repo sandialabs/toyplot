@@ -3,11 +3,14 @@
 # rights in this software.
 
 from behave import *
+
 import io
+
 import nose.tools
 import numpy.testing
-import toyplot.testing
-import xml.etree.ElementTree as xml
+import toyplot
+
+import testing
 
 @given(u'a canvas with a border')
 def step_impl(context):
@@ -67,7 +70,7 @@ def step_impl(context):
 @then(u'the canvas can be rendered in Jupyter as a PNG image')
 def step_impl(context):
     png = context.canvas._repr_png_()
-    image = toyplot.testing.read_png(io.BytesIO(png))
+    image = testing.read_png(io.BytesIO(png))
     nose.tools.assert_equal(image.shape, (600, 600, 4))
     nose.tools.assert_equal(image.dtype, "uint8")
 

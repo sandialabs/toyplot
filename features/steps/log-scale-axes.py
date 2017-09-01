@@ -7,7 +7,6 @@ from behave import *
 import nose
 import numpy
 import toyplot.data
-import toyplot.testing
 
 
 @given(u'values from -1000 to -1')

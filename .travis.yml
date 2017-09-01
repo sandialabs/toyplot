@@ -27,8 +27,8 @@ install:
     - export PATH=$TRAVIS_BUILD_DIR/ffmpeg:$PATH
     - ffmpeg -version
 script:
-    - coverage run --source toyplot --omit toyplot/testing.py,toyplot/qt/*.py -m nose --exclude-dir toyplot
-    - coverage run --append --source toyplot --omit toyplot/testing.py,toyplot/qt/*.py -m behave --tags=~webm
+    - coverage run --source toyplot -m nose --exclude-dir toyplot
+    - coverage run --append --source toyplot -m behave
     - coverage report
     - python backend-report.py
 after_script:

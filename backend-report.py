@@ -28,6 +28,5 @@ for module in [
     "toyplot.reportlab.pdf",
     "toyplot.reportlab.png",
     "toyplot.svg",
-    "toyplot.webm",
     ]:
     print_report(module)

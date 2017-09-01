@@ -38,5 +38,4 @@ Python API
     toyplot.text.rst
     toyplot.transform.rst
     toyplot.units.rst
-    toyplot.webm.rst
 

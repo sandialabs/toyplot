@@ -28,10 +28,10 @@ you'll need Ghostscript::
 
     $ sudo port install ghostscript
 
-MP4 / WebM Export
------------------
+MP4 Export
+----------
 
-If you plan to render animated Toyplot figures as  MP4 / WebM files, you'll
+If you plan to render animated Toyplot figures as MP4 files, you'll
 need all the above for exporting PNG images, plus ffmpeg::
 
     $ sudo port install ffmpeg

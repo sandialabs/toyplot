@@ -26,11 +26,6 @@ try:
 except:
     pass
 
-try:
-    import toyplot.webm
-except:
-    pass
-
 
 @given(u'an animated canvas')
 def step_impl(context):
@@ -51,7 +46,7 @@ def step_impl(context):
 
 @then(u'the canvas can be rendered as {type} video')
 def step_impl(context, type):
-    nose.tools.assert_in(type, ["mp4", "webm"])
+    nose.tools.assert_in(type, ["mp4"])
 
     def progress(frame):
         pass

@@ -57,10 +57,10 @@ you'll need the PDF Export dependencies, plus Ghostscript:
 
 * Ghostscript - Postscript / PDF interpreter - http://www.ghostscript.com
 
-MP4 / WebM Export
------------------
+MP4 Export
+----------
 
-If you plan to render animated Toyplot figures as MP4 or WebM videos, you'll need
+If you plan to render animated Toyplot figures as MP4 videos, you'll need
 the PNG Export dependencies for exporting PNG files, plus ffmpeg:
 
 * ffmpeg - cross-platform video conversion - https://www.ffmpeg.org

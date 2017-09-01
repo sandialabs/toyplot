@@ -40,6 +40,7 @@ def convert_notebook(name):
 
     if not os.path.exists(test_dir):
         os.mkdir(test_dir)
+    shutil.copyfile(os.path.join(docs_dir, "docs.py"), os.path.join(test_dir, "docs.py"))
 
     subprocess.check_call(["jupyter",
                            "nbconvert",

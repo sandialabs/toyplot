@@ -5,11 +5,11 @@
 import numpy
 import toyplot.color
 
-def plot_luma(a, b=None): #pragma: no cover
-    if b is not None:
-        colormaps = [(a, b)]
+def plot_luma(*args): #pragma: no cover
+    if len(args) == 2:
+        colormaps = [(args[0], args[1])]
     else:
-        colormaps = a
+        colormaps = args[0]
 
     grid_n = 4.0
     grid_m = numpy.ceil(len(colormaps) / grid_n)

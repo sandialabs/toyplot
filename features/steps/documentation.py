@@ -10,8 +10,6 @@ import pkgutil
 import subprocess
 import sys
 
-import toyplot.docs
-
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 docs_dir = os.path.join(root_dir, "docs")
 package_dir = os.path.join(root_dir, "toyplot")
@@ -58,13 +56,4 @@ def step_impl(context):
         if reference not in modules:
             raise AssertionError("No matching module found for %s." % reference)
 
-
-@given(u'a collection of linear color maps')
-def step_impl(context):
-    context.color_maps = toyplot.color.linear.maps()
-
-
-@then(u'the color maps can be rendered as luma plots')
-def step_impl(context):
-    context.canvas = toyplot.docs.plot_luma(context.color_maps)
 

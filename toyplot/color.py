@@ -2,6 +2,8 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Functionality for managing colors, palettes, and color maps."""
+
 from __future__ import division
 
 import collections

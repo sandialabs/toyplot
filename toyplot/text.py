@@ -107,6 +107,23 @@ class _LineBreak(object):
 
 
 def layout(text, style, fonts):
+    """Convert text with markup into a layout that is ready to be rendered.
+
+    Parameters
+    ----------
+    text: string, required
+        Text with markup to be converted.
+    style: dict, required
+        Collection of CSS properties to be used as defaults for the text layout.
+    fonts: :class:`toyplot.font.Library`, required
+        Font library that will supply font information for the text layout.
+
+    Returns
+    -------
+    layout: :class:`toyplot.text.Layout`
+        The text layout contains a hierarchy of styled, positiioned nodes that
+        are ready to be rendered.
+    """
     def cascade_styles(style, node):
         """Cascades style information so that each node in an XML DOM has an explicit representation of each property/value pair."""
         if node.tag in ["b", "strong"]:
@@ -387,6 +404,18 @@ def layout(text, style, fonts):
 
 
 def dump(box, stream=None, level=0, indent="  ", recursive=True): # pragma: no cover
+    """Writes formatted text layout information to a stream.
+
+    Parameters
+    ----------
+    box: :class:`toyplot.text.Layout`, :class:`toyplot.text.LineBox`, :class:`toyplot.text.TextBox`, :class:`toyplot.text.MarkerBox`, :class:`toyplot.text.PushHyperlink`, or :class:`toyplot.text.PopHyperlink`, required
+        The layout object to be formatted.
+    stream: file like object, optional
+        The stream where formatted data will be written.  Defaults to
+        :data:`sys.stdout`
+    recursive: boolean, optional
+        If `True`, recursively print the entire layout tree underneath `box`.
+    """
     if stream is None:
         stream = sys.stdout
     stream.write(indent * level)

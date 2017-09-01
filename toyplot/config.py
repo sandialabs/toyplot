@@ -16,4 +16,3 @@ autorender = True
 
 autoformat = os.environ.get("TOYPLOT_AUTOFORMAT", "html")
 """Default value for the :class:`toyplot.canvas.Canvas` autoformat feature."""
-

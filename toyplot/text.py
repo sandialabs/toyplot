@@ -326,7 +326,7 @@ def layout(text, style, fonts):
 
                 # Line left/right/bottom/top are relative offsets from the layout anchor in canvas coordinates.
                 line.left = offset_x
-                line.right = offset_x + line.width
+                line.right = offset_x + line.width + line.style["-toyplot-anchor-shift"]
                 line.top += offset_y
                 line.baseline = offset_y
                 line.bottom += offset_y

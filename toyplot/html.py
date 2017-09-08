@@ -406,6 +406,9 @@ def _draw_text(
     if title is not None:
         xml.SubElement(group, "title").text = str(title)
 
+    layout_opacity = 0.5
+    layout_stroke_width = 1
+
     if layout.style.get("-toyplot-text-layout-visibility", None) == "visible":
         xml.SubElement(
             group,
@@ -416,17 +419,19 @@ def _draw_text(
             height=str(layout.height),
             stroke="red",
             fill="none",
-            opacity="0.5",
+            opacity=str(layout_opacity),
+            attrib={"stroke-width": str(layout_stroke_width)},
             )
         xml.SubElement(
             group,
             "circle",
             x="0",
             y="0",
-            r="3",
-            stroke="none",
-            fill="red",
-            opacity="0.5",
+            r="1.5",
+            stroke="red",
+            fill="none",
+            opacity=str(layout_opacity),
+            attrib={"stroke-width": str(layout_stroke_width)},
             )
 
     hyperlink = []
@@ -441,7 +446,8 @@ def _draw_text(
                 height=str(line.height),
                 stroke="green",
                 fill="none",
-                opacity="0.5",
+                opacity=str(layout_opacity),
+                attrib={"stroke-width": str(layout_stroke_width)},
                 )
             xml.SubElement(
                 group,
@@ -452,7 +458,8 @@ def _draw_text(
                 y2=str(line.baseline),
                 stroke="green",
                 fill="none",
-                opacity="0.5",
+                opacity=str(layout_opacity),
+                attrib={"stroke-width": str(layout_stroke_width)},
                 )
         for box in line.children:
             if isinstance(box, toyplot.text.TextBox):
@@ -473,7 +480,8 @@ def _draw_text(
                         height=str(box.height),
                         stroke="blue",
                         fill="none",
-                        opacity="0.5",
+                        opacity=str(layout_opacity),
+                        attrib={"stroke-width": str(layout_stroke_width)},
                         )
                     xml.SubElement(
                         group,
@@ -484,7 +492,8 @@ def _draw_text(
                         y2=str(box.baseline),
                         stroke="blue",
                         fill="none",
-                        opacity="0.5",
+                        opacity=str(layout_opacity),
+                        attrib={"stroke-width": str(layout_stroke_width)},
                         )
 
             elif isinstance(box, toyplot.text.MarkerBox):
@@ -505,7 +514,8 @@ def _draw_text(
                         height=str(box.height),
                         stroke="blue",
                         fill="none",
-                        opacity="0.5",
+                        opacity=str(layout_opacity),
+                        attrib={"stroke-width": str(layout_stroke_width)},
                         )
                     xml.SubElement(
                         group,
@@ -516,7 +526,8 @@ def _draw_text(
                         y2=str(box.baseline),
                         stroke="blue",
                         fill="none",
-                        opacity="0.5",
+                        opacity=str(layout_opacity),
+                        attrib={"stroke-width": str(layout_stroke_width)},
                         )
 
             elif isinstance(box, toyplot.text.PushHyperlink):

@@ -321,6 +321,7 @@ def layout(text, style, fonts):
                     anchor_offset = -line.width
                 else:
                     raise ValueError("Unknown text-anchor value: %s" % text_anchor)
+                anchor_offset += layout.style["-toyplot-anchor-shift"]
 
                 offset_x = anchor_offset
 
@@ -333,7 +334,7 @@ def layout(text, style, fonts):
 
                 for child in line.children:
                     # Child left/right/bottom/top are relative offsets from the layout anchor in canvas coordinates.
-                    child.left = offset_x + child.style["-toyplot-anchor-shift"]
+                    child.left = offset_x
                     child.right = child.left + child.width
                     child.top += offset_y
                     child.baseline += offset_y
@@ -361,7 +362,7 @@ def layout(text, style, fonts):
 
 
     def cleanup_styles(layout):
-        """Remove style properties that we don't want rendered (because their effect is already baked into box positions."""
+        """Remove style properties that we don't want rendered (because their effect is already baked into the box positions."""
         for line in layout.children:
             for child in line.children:
                 child.style.pop("-toyplot-anchor-shift", None)

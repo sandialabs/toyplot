@@ -149,5 +149,6 @@ def _color_fixup(styles):
     return styles
 
 def to_css(*styles):
+    """Convert one-or-more dicts containing CSS properties into a single CSS string."""
     style = _color_fixup(combine(*styles))
     return ";".join(["%s:%s" % (key, value) for key, value in sorted(style.items())])

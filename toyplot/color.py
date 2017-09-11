@@ -329,7 +329,9 @@ def spread(color, count=5, lightness=0.9, reverse=False):
 
 
 class Map(object):
+    """Interface for objects that map from scalar values to colors."""
     class DomainHelper(object):
+        """Interface to get / set the domain for a :class:`toyplot.color.Map`."""
         def __init__(self, domain_min, domain_max):
             self._min = domain_min
             self._max = domain_max
@@ -713,6 +715,7 @@ class LinearMap(Map):
 
 
 class BrewerFactory(object):
+    """Creates Toyplot color palettes and maps based on the Color Brewer 2.0 palettes."""
     def names(self, category=None):
         """Return a list of available palette names."""
         names = [name for name in sorted(self._data.keys())]
@@ -2798,6 +2801,7 @@ Use this to create Toyplot color palettes and maps based on the Color Brewer 2.0
 """
 
 class LinearFactory(object):
+    """Creates high-quality linear color maps by name."""
     def names(self):
         """Return a list of available map names."""
         return [name for name in self._data.keys()]
@@ -3102,6 +3106,7 @@ Use this to create Toyplot linear color maps by name.
 
 
 class DivergingFactory(object):
+    """Creates high-quality diverging color maps by name."""
     def names(self):
         """Return a list of available map names."""
         return [name for name in sorted(self._data.keys())]

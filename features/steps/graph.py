@@ -5,19 +5,20 @@
 from behave import *
 
 import numpy
-import toyplot.generate
 import toyplot.layout
+
+import testing
 
 @given(u'a prufer tree')
 def step_impl(context):
     numpy.random.seed(1234)
-    context.graph = toyplot.generate.prufer_tree(numpy.random.choice(4, 12))
+    context.graph = testing.prufer_tree(numpy.random.choice(4, 12))
     context.disconnected_vertices = None
     context.vcoordinates = None
 
 @given(u'a ba graph')
 def step_impl(context):
-    context.graph = toyplot.generate.barabasi_albert_graph(n=20)
+    context.graph = testing.barabasi_albert_graph(n=20)
     context.disconnected_vertices = None
     context.vcoordinates = None
 
@@ -90,7 +91,7 @@ def step_impl(context):
 @given(u'a graph and a subgraph')
 def step_impl(context):
     numpy.random.seed(1234)
-    context.graph = toyplot.generate.prufer_tree(numpy.random.choice(4, 12))
+    context.graph = testing.prufer_tree(numpy.random.choice(4, 12))
     context.subgraph = context.graph[:-4]
 
 @then(u'the subgraph can be rendered with the graph layout')

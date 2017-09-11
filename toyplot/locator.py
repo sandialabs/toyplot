@@ -2,6 +2,8 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Strategy objects that compute the position and format of axis ticks and labels."""
+
 from __future__ import division
 
 import datetime
@@ -39,13 +41,29 @@ class TickLocator(object):
 
 
 class Null(TickLocator):
-    """Do-nothing locator that generates no ticks."""
+    """Do-nothing tick locator that generates no ticks.
+
+    Use :class:`toyplot.locator.Null` when you want to display an axis, but
+    omit any ticks.
+    """
     def ticks(self, domain_min, domain_max):
+        """Returns an empty set containing no ticks.
+
+        Parameters
+        ----------
+        domain_min, domain_max: number
+
+        Returns
+        -------
+        locations : empty sequence
+        labels : empty sequence
+        titles : empty sequence
+        """
         return [], [], []
 
 
 class Uniform(TickLocator):
-    """Generate N evenly spaced ticks that include the minimum and maximum values of a domain.
+    """Generate :math:`N` evenly spaced ticks that include the minimum and maximum values of a domain.
 
     Parameters
     ----------
@@ -60,7 +78,7 @@ class Uniform(TickLocator):
         self._format = format
 
     def ticks(self, domain_min, domain_max):
-        """Return a set of ticks for the given domain.
+        """Return a set of :math:`N` evenly spaced ticks for the given domain.
 
         Parameters
         ----------

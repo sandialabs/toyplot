@@ -9,7 +9,7 @@ from __future__ import division
 
 import numbers
 import numpy
-import toyplot.compatibility
+import six
 
 def instance(value, types):
     """Verify the type of a value."""
@@ -89,7 +89,7 @@ def scalar_matrix(value, rows=None, columns=None):
 
 
 def optional_string(value):
-    if not isinstance(value, (toyplot.compatibility.string_type, type(None))):
+    if not isinstance(value, (six.string_types, type(None))):
         raise ValueError("Expected a string value or None, received %s." % value) # pragma: no cover
     return value
 

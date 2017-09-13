@@ -21,11 +21,11 @@ import xml.etree.ElementTree as xml
 
 from multipledispatch import dispatch
 import numpy
+import six
 
 import toyplot.coordinates
 import toyplot.canvas
 import toyplot.color
-import toyplot.compatibility
 import toyplot.mark
 import toyplot.marker
 
@@ -268,7 +268,7 @@ def render(canvas, fobj=None, animation=False, style=None):
     _render(canvas, context.copy(parent=root_xml)) # pylint: disable=no-value-for-parameter
 
     # Return / write the results.
-    if isinstance(fobj, toyplot.compatibility.string_type):
+    if isinstance(fobj, six.string_types):
         with open(fobj, "wb") as stream:
             stream.write(xml.tostring(root_xml, method="html"))
     elif fobj is not None:
@@ -305,7 +305,7 @@ def tostring(canvas, style=None):
     a larger document.  It is the caller's responsibility to supply the <html>,
     <body> etc. if the result is intended as a standalone HTML document.
     """
-    return toyplot.compatibility.unicode_type(xml.tostring(render(canvas=canvas, style=style), encoding="utf-8", method="html"), encoding="utf-8")
+    return six.text_type(xml.tostring(render(canvas=canvas, style=style), encoding="utf-8", method="html"), encoding="utf-8")
 
 
 def _color_fixup(styles):
@@ -2529,7 +2529,7 @@ def _render(axes, mark, context): # pragma: no cover
                 transform += " rotate(%r)" % (-edge_angle,)
             transform += " translate(%r, 0)" % (marker.size / 2,)
             if marker.angle is not None:
-                if isinstance(marker.angle, toyplot.compatibility.string_type) and marker.angle[0:1] == "r":
+                if isinstance(marker.angle, six.string_types) and marker.angle[0:1] == "r":
                     angle = float(marker.angle[1:])
                 else:
                     angle = -edge_angle + float(marker.angle)
@@ -2564,7 +2564,7 @@ def _render(axes, mark, context): # pragma: no cover
                 edge_coordinates[start+1][0] - edge_coordinates[start][0],
                 ))
             if marker.angle is not None:
-                if isinstance(marker.angle, toyplot.compatibility.string_type) and marker.angle[0:1] == "r":
+                if isinstance(marker.angle, six.string_types) and marker.angle[0:1] == "r":
                     angle += float(marker.angle[1:])
                 else:
                     angle = float(marker.angle)
@@ -2601,7 +2601,7 @@ def _render(axes, mark, context): # pragma: no cover
                 transform += " rotate(%r)" % (-edge_angle,)
             transform += " translate(%r, 0)" % (-marker.size / 2,)
             if marker.angle is not None:
-                if isinstance(marker.angle, toyplot.compatibility.string_type) and marker.angle[0:1] == "r":
+                if isinstance(marker.angle, six.string_types) and marker.angle[0:1] == "r":
                     angle = float(marker.angle[1:])
                 else:
                     angle = -edge_angle + float(marker.angle)
@@ -2638,7 +2638,7 @@ def _render(axes, mark, context): # pragma: no cover
         for dx, dy, dtext in zip(vertex_x, vertex_y, mark._vtable[mark._vlabel[0]]):
             _draw_text(
                 root=vlabel_xml,
-                text=toyplot.compatibility.unicode_type(dtext),
+                text=six.text_type(dtext),
                 x=dx,
                 y=dy,
                 style=mark._vlstyle,
@@ -2887,7 +2887,7 @@ def _render(parent, mark, context):
 
         _draw_text(
             root=series_xml,
-            text=toyplot.compatibility.unicode_type(dtext),
+            text=six.text_type(dtext),
             x=dx,
             y=dy,
             angle=dangle,

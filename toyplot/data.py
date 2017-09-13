@@ -17,9 +17,9 @@ try:
     import pandas
 except: # pragma: no cover
     pass
+import six
 
 import toyplot.color
-import toyplot.compatibility
 
 
 def minimax(items):
@@ -203,11 +203,11 @@ class Table(object):
         # Cases that return a column (array):
 
         # table["a"]
-        if isinstance(index, toyplot.compatibility.string_type):
+        if isinstance(index, six.string_types):
             column = index
             column_slice = slice(None, None, None)
         # table["a", 10], table["a", 10:20], table["a", [10, 12, 18]], etc.
-        elif isinstance(index, tuple) and isinstance(index[0], toyplot.compatibility.string_type):
+        elif isinstance(index, tuple) and isinstance(index[0], six.string_types):
             column = index[0]
             column_slice = index[1]
 
@@ -236,7 +236,7 @@ class Table(object):
                 row_slice = index[0]
 
             # table[, "a"]
-            if isinstance(index[1], toyplot.compatibility.string_type):
+            if isinstance(index[1], six.string_types):
                 columns = [index[1]]
             # table[, ["a", "b", "c"]], etc.
             else:
@@ -255,19 +255,19 @@ class Table(object):
 
 
     def __setitem__(self, index, value):
-        if isinstance(index, toyplot.compatibility.string_type):
+        if isinstance(index, six.string_types):
             value = numpy.ma.array(value)
             if value.ndim != 1:
                 raise ValueError("Can't assign %s-dimensional array to the '%s' column." % (value.ndim, index))
             for column in self._columns.values():
                 if column.shape != value.shape:
                     raise ValueError("Expected %s values, received %s." % (column.shape[0], value.shape[0]))
-            column = toyplot.compatibility.unicode_type(index)
+            column = six.text_type(index)
             self._columns[column] = value
             return
 
         if isinstance(index, tuple):
-            if isinstance(index[0], toyplot.compatibility.string_type) and isinstance(index[1], (int, slice)):
+            if isinstance(index[0], six.string_types) and isinstance(index[1], (int, slice)):
                 column, column_slice = index
                 self._columns[column][column_slice] = value
                 return
@@ -299,7 +299,7 @@ class Table(object):
             xml.SubElement(
                 header_xml,
                 "th",
-                style="text-align:left;border:none;padding-right:1em;").text = toyplot.compatibility.unicode_type(name)
+                style="text-align:left;border:none;padding-right:1em;").text = six.text_type(name)
 
         iterators = [iter(column) for column in self._columns.values()]
         for _ in numpy.arange(len(self)):
@@ -311,9 +311,9 @@ class Table(object):
                 xml.SubElement(
                     row_xml,
                     "td",
-                    style="border:none;padding-right:1em;").text = toyplot.compatibility.unicode_type(value)
+                    style="border:none;padding-right:1em;").text = six.text_type(value)
 
-        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
+        return six.text_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
     @property
     def shape(self):
@@ -411,7 +411,7 @@ def read_csv(fobj, convert=False):
     Python standard library, or functionality provided by `numpy` or `Pandas`.
     """
     import csv
-    if isinstance(fobj, toyplot.compatibility.string_type):
+    if isinstance(fobj, six.string_types):
         fobj = open(fobj, "r")
     rows = [row for row in csv.reader(fobj)]
     columns = zip(*rows)

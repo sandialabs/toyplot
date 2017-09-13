@@ -5,7 +5,7 @@
 from __future__ import division
 
 import numpy
-import toyplot.compatibility
+import six
 
 
 class Formatter(object):
@@ -57,7 +57,7 @@ class FloatFormatter(Formatter):
         self._nanshow = nanshow
 
     def format(self, value):
-        if isinstance(value, toyplot.compatibility.string_type):
+        if isinstance(value, six.string_types):
             return value, "", ""
 
         if numpy.isnan(value) and not self._nanshow:

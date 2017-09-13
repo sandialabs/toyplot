@@ -13,7 +13,6 @@ import numpy
 import toyplot.coordinates
 import toyplot.broadcast
 import toyplot.color
-import toyplot.compatibility
 import toyplot.config
 import toyplot.layout
 import toyplot.style

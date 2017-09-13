@@ -9,7 +9,8 @@ from __future__ import division
 
 import xml.etree.ElementTree as xml
 
-import toyplot.compatibility
+import six
+
 import toyplot.html
 import toyplot.require
 
@@ -50,7 +51,7 @@ def render(canvas, fobj=None, animation=False):
     html, html_animation = toyplot.html.render(canvas, animation=True)
     svg = html.find("svg")
 
-    if isinstance(fobj, toyplot.compatibility.string_type):
+    if isinstance(fobj, six.string_types):
         with open(fobj, "wb") as stream:
             stream.write(xml.tostring(svg, method="xml"))
     elif fobj is not None:

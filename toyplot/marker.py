@@ -11,8 +11,8 @@ import copy
 import xml.sax.saxutils
 
 import numpy
+import six
 
-import toyplot.compatibility
 import toyplot.style
 
 
@@ -51,7 +51,7 @@ class Marker(object):
         return self._lstyle
 
     def __add__(self, other):
-        if isinstance(other, toyplot.compatibility.string_type):
+        if isinstance(other, six.string_types):
             return self.to_html() + other
         elif isinstance(other, toyplot.marker.Marker):
             result = copy.deepcopy(self)
@@ -144,7 +144,7 @@ def convert(value):
         return value
     if isinstance(value, Marker):
         return value
-    if isinstance(value, toyplot.compatibility.string_type):
+    if isinstance(value, six.string_types):
         return Marker(shape=value, mstyle=None, size=None, angle=None, label=None, lstyle=None)
     raise ValueError("Can't convert %r to toyplot.marker.Marker." % value) # pragma: no cover
 

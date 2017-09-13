@@ -8,14 +8,14 @@ from __future__ import division
 
 import datetime
 
-import numpy
 try:
     import arrow
 except: # pragma: no cover
     pass
+import numpy
+import six
 
 import toyplot.broadcast
-import toyplot.compatibility
 
 class TickLocator(object):
 
@@ -700,7 +700,7 @@ class Timestamp(TickLocator):
     def __init__(self, count=None, interval=None, timezone="utc", format=None):
         # pylint: disable=redefined-variable-type
         if interval is not None:
-            if isinstance(interval, toyplot.compatibility.string_type):
+            if isinstance(interval, six.string_types):
                 interval = (1, interval)
             interval = (int(interval[0]), interval[1].lower())
 

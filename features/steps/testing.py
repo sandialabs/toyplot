@@ -16,6 +16,7 @@ import xml.etree.ElementTree as xml
 
 import numpy.testing
 import png
+import six
 
 import toyplot.html
 import toyplot.require
@@ -51,7 +52,7 @@ def _assert_string_equal(content, test_file, reference_file, encoding="utf-8"):
     if os.path.exists(test_file):
         os.remove(test_file)
     if os.path.exists(reference_file):
-        reference = toyplot.compatibility.unicode_type(
+        reference = six.text_type(
             open(reference_file, "rb").read(), encoding=encoding)
         if content != reference:
             if not os.path.exists(failed_dir):
@@ -76,7 +77,7 @@ def _json_comparison_string(o):
     """
     if o is None:
         return "null"
-    if isinstance(o, toyplot.compatibility.string_type):
+    if isinstance(o, six.string_types):
         return "\"" + o + "\""
     if isinstance(o, numbers.Integral):
         return str(o)
@@ -235,7 +236,7 @@ def assert_canvas_equal(canvas, name, show_diff=True):
         raise AssertionError(message)
 
 def read_png(fobj):
-    if isinstance(fobj, toyplot.compatibility.string_type):
+    if isinstance(fobj, six.string_types):
         reader = png.Reader(filename=fobj)
     else:
         reader = png.Reader(fobj)

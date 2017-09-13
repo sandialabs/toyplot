@@ -11,7 +11,6 @@ import time
 
 import numpy
 
-import toyplot.compatibility
 import toyplot.units
 
 def region(

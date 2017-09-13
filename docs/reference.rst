@@ -14,7 +14,6 @@ Python API
     toyplot.canvas.rst
     toyplot.color.rst
     toyplot.coordinates.rst
-    toyplot.compatibility.rst
     toyplot.config.rst
     toyplot.data.rst
     toyplot.font.rst

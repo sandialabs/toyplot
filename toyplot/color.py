@@ -13,8 +13,7 @@ import re
 import xml.etree.ElementTree as xml
 
 import numpy # pylint: disable=wrong-import-position
-
-import toyplot.compatibility # pylint: disable=wrong-import-position
+import six # pylint: disable=wrong-import-position
 
 
 black = "#292724"
@@ -37,8 +36,8 @@ def _html_color_swatches(colors, css_class, margin=0):
         xml.SubElement(
             root_xml,
             "div",
-            style="float:left;width:20px;height:20px;margin-right:%spx;background-color:%s" % (margin, toyplot.color.to_css(color)))
-    return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
+            style="float:left;width:20px;height:20px;margin-right:%spx;background-color:%s" % (margin, to_css(color)))
+    return six.text_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
 
 def _jupyter_color_swatches(colors):
@@ -148,7 +147,7 @@ def to_xyz(color):
 
 
 def _require_color(color):
-    if isinstance(color, toyplot.compatibility.string_type):
+    if isinstance(color, six.string_types):
         return css(color)
     elif isinstance(color, (numpy.void, numpy.ndarray)) and color.dtype == dtype:
         return color
@@ -192,12 +191,12 @@ def broadcast(colors, shape, default=None):
 
     # Next, extract the user's choice of custom palette / colormap.
     colormap = None
-    if isinstance(colors, toyplot.color.Map):
+    if isinstance(colors, Map):
         colormap = colors
         colors = numpy.arange(shape[0]) # By default, generate [0, M) per-datum values
         if per_datum and shape[1] > 1:
             colors = numpy.arange(shape[1]) # More than one series, so generate [0, N) per-series values
-    elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], toyplot.color.Map):
+    elif isinstance(colors, tuple) and len(colors) == 2 and isinstance(colors[1], Map):
         colors, colormap = colors
 
     # Next, convert the supplied colors into a toyplot color array.
@@ -209,7 +208,7 @@ def broadcast(colors, shape, default=None):
             pass
         elif issubclass(colors.dtype.type, numpy.number): # Array of numeric values, so map values to colors
             if colormap is None:
-                colormap = toyplot.color.brewer.map("BlueRed", domain_min=colors.min(), domain_max=colors.max())
+                colormap = brewer.map("BlueRed", domain_min=colors.min(), domain_max=colors.max())
             colors = colormap.colors(colors)
         elif issubclass(colors.dtype.type, numpy.character): # Convert CSS strings to colors.
             colors = numpy.array([_require_color(color) for color in colors.flat], dtype=dtype).reshape(colors.shape)
@@ -353,7 +352,7 @@ class Map(object):
             self._max = value
 
     def __init__(self, domain_min, domain_max):
-        self._domain = toyplot.color.Map.DomainHelper(domain_min, domain_max)
+        self._domain = Map.DomainHelper(domain_min, domain_max)
 
     def _finalize(self):
         return self
@@ -381,7 +380,7 @@ class CategoricalMap(Map):
         if palette is None:
             palette = Palette()
         self._palette = palette
-        toyplot.color.Map.__init__(self, domain_min=0, domain_max=len(palette))
+        super(CategoricalMap, self).__init__(domain_min=0, domain_max=len(palette))
 
     def colors(self, values, domain_min=None, domain_max=None):
         """Convert a sequence of categorical (nonnegative integer) values to colors.
@@ -470,7 +469,7 @@ class DivergingMap(Map):
     """
 
     def __init__(self, low=None, high=None, domain_min=None, domain_max=None):
-        toyplot.color.Map.__init__(self, domain_min=domain_min, domain_max=domain_max)
+        super(DivergingMap, self).__init__(domain_min=domain_min, domain_max=domain_max)
 
         def _lab_to_msh(L, a, b):
             M = numpy.sqrt(L * L + a * a + b * b)
@@ -595,7 +594,7 @@ class DivergingMap(Map):
             "div",
             style="float:left;width:200px;height:20px;background:linear-gradient(to right,%s)" % (gradient_stops),
             )
-        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
+        return six.text_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
 
 class LinearMap(Map):
@@ -627,7 +626,7 @@ class LinearMap(Map):
     """
 
     def __init__(self, palette=None, stops=None, domain_min=None, domain_max=None):
-        toyplot.color.Map.__init__(self, domain_min=domain_min, domain_max=domain_max)
+        super(LinearMap, self).__init__(domain_min=domain_min, domain_max=domain_max)
 
         if palette is None:
             palette = brewer.palette("BlueRed")
@@ -711,7 +710,7 @@ class LinearMap(Map):
             "div",
             style="float:left;width:200px;height:20px;background:linear-gradient(to right,%s)" % (gradient_stops),
             )
-        return toyplot.compatibility.unicode_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
+        return six.text_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 
 
 class BrewerFactory(object):

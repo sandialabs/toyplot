@@ -9,7 +9,7 @@ from __future__ import division
 
 import numbers
 import re
-import toyplot.compatibility
+import six
 
 def convert(value, target, default=None, reference=None):
     """Convert quantities using real-world units.
@@ -47,7 +47,7 @@ def convert(value, target, default=None, reference=None):
         if default is None:
             raise ValueError("Value doesn't contain units, and no default units specified.")
         value = (value, default)
-    elif isinstance(value, toyplot.compatibility.string_type):
+    elif isinstance(value, six.string_types):
         if value == "0":
             return 0
         value, units = re.match(r"([^a-zA-Z%]+)([a-zA-Z%]+)\Z", value).groups()
@@ -59,7 +59,7 @@ def convert(value, target, default=None, reference=None):
         raise ValueError("Value must be a number, string or (number, string) tuple.")
     if not isinstance(value[0], numbers.Number):
         raise ValueError("Value must be a number, string or (number, string) tuple.")
-    if not isinstance(value[1], toyplot.compatibility.string_type):
+    if not isinstance(value[1], six.string_types):
         raise ValueError("Value must be a number, string or (number, string) tuple.")
 
     value, units = value

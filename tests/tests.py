@@ -17,9 +17,9 @@ import sys
 import tempfile
 import xml.etree.ElementTree as xml
 
+import six
 import toyplot
 import toyplot.color
-import toyplot.compatibility
 import toyplot.html
 import toyplot.locator
 import toyplot.svg
@@ -55,7 +55,7 @@ def json_comparison_string(o):
     """
     if o is None:
         return "null"
-    if isinstance(o, toyplot.compatibility.string_type):
+    if isinstance(o, six.string_types):
         return "\"" + o + "\""
     if isinstance(o, numbers.Integral):
         return str(o)

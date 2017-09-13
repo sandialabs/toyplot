@@ -360,7 +360,13 @@ class Map(object):
 
     @property
     def domain(self):
-        """Accessor for the map's :class:`domain <toyplot.color.Map.DomainHelper>`"""
+        """Accessor for the map's domain.
+
+        Returns
+        -------
+        domain: :class:`toyplot.color.Map.DomainHelper`
+            Provides access to the minimum and maximum domain values for the map.
+        """
         return self._domain
 
 

@@ -22,7 +22,6 @@ import toyplot.locator
 import toyplot.mark
 import toyplot.projection
 import toyplot.require
-import toyplot.text
 
 ##########################################################################
 # Helpers

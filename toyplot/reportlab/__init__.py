@@ -12,8 +12,8 @@ import io
 import re
 
 import numpy
-import reportlab.pdfgen.canvas
-import reportlab.pdfbase
+import reportlab.lib.colors
+import reportlab.lib.utils
 
 import toyplot.color
 import toyplot.units

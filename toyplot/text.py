@@ -12,7 +12,6 @@ import xml.etree.ElementTree as xml
 
 import numpy
 
-import toyplot.broadcast
 import toyplot.font
 import toyplot.require
 import toyplot.style

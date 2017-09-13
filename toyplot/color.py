@@ -8,7 +8,6 @@ from __future__ import division
 
 import collections
 import colorsys
-import logging
 import re
 import xml.etree.ElementTree as xml
 

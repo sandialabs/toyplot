@@ -12,7 +12,6 @@ import base64
 import collections
 import copy
 import functools
-import io
 import itertools
 import json
 import string
@@ -26,8 +25,10 @@ import six
 import toyplot.coordinates
 import toyplot.canvas
 import toyplot.color
+import toyplot.font
 import toyplot.mark
 import toyplot.marker
+import toyplot.text
 
 
 _namespace = dict()

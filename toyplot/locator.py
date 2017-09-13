@@ -12,15 +12,16 @@ try:
     import arrow
 except: # pragma: no cover
     pass
+import custom_inherit
 import numpy
 import six
 
 import toyplot.broadcast
 
+
+@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
 class TickLocator(object):
-
     """Base class for tick locators - objects that compute the position and format of axis tick labels."""
-
     def ticks(self, domain_min, domain_max):
         """Return a set of ticks for the given domain.
 
@@ -47,18 +48,6 @@ class Null(TickLocator):
     omit any ticks.
     """
     def ticks(self, domain_min, domain_max):
-        """Returns an empty set containing no ticks.
-
-        Parameters
-        ----------
-        domain_min, domain_max: number
-
-        Returns
-        -------
-        locations : empty sequence
-        labels : empty sequence
-        titles : empty sequence
-        """
         return [], [], []
 
 
@@ -72,27 +61,11 @@ class Uniform(TickLocator):
     format : string, optional
       Format string used to generate labels from tick locations.
     """
-
     def __init__(self, count=5, format="{:g}"):
         self._count = count
         self._format = format
 
     def ticks(self, domain_min, domain_max):
-        """Return a set of :math:`N` evenly spaced ticks for the given domain.
-
-        Parameters
-        ----------
-        domain_min, domain_max: number
-
-        Returns
-        -------
-        locations : sequence of numbers
-          The axis locations where ticks should be positioned.
-        labels : sequence of strings
-          Labels for each tick location.
-        titles : sequence of strings
-          Titles for each tick location.  Typically, backends render titles as tooltips.
-        """
         locations = numpy.linspace(
             domain_min, domain_max, self._count, endpoint=True)
         labels = [self._format.format(location) for location in locations]
@@ -101,7 +74,6 @@ class Uniform(TickLocator):
 
 
 class Explicit(TickLocator):
-
     """Explicitly specify a collection of tick locations and labels for an axis.
 
     You must specify the set of locations, the set of labels, or both.  If you
@@ -121,7 +93,6 @@ class Explicit(TickLocator):
     format : string, optional
       Format string used to generate labels from tick locations.
     """
-
     def __init__(
             self,
             locations=None,
@@ -149,21 +120,6 @@ class Explicit(TickLocator):
         self._titles = titles
 
     def ticks(self, domain_min, domain_max):
-        """Return a set of ticks for the given domain.
-
-        Parameters
-        ----------
-        domain_min, domain_max: number
-
-        Returns
-        -------
-        locations : sequence of numbers
-          The axis locations where ticks / labels should be positioned.
-        labels : sequence of strings
-          Labels for each tick location.
-        titles : sequence of strings
-          Titles for each tick location.  Typically, backends render titles as tooltips.
-        """
         return self._locations, self._labels, self._titles
 
 # An alpha version of the Talbot, Lin, Hanrahan tick mark generator for matplotlib.
@@ -190,7 +146,6 @@ class Explicit(TickLocator):
 
 
 class Extended(TickLocator):
-
     """Generate ticks using "An Extension of Wilkinson's Algorithm for Positioning Tick Labels on Axes" by Talbot, Lin, and Hanrahan.
 
     Parameters
@@ -205,9 +160,7 @@ class Extended(TickLocator):
     format : string, optional
       Format string used to generate labels from tick locations.
     """
-
     def __init__(self, count=5, steps=None, weights=None, only_inside=False, format="{0:.{digits}f}"):
-
         self._count = count
         self._steps = steps if steps is not None else [1, 5, 2, 2.5, 4, 3]
         self._weights = weights if weights is not None else [0.25, 0.2, 0.5, 0.05]
@@ -215,21 +168,6 @@ class Extended(TickLocator):
         self._format = format
 
     def ticks(self, domain_min, domain_max):
-        """Return a set of ticks for the given domain.
-
-        Parameters
-        ----------
-        domain_min, domain_max: number
-
-        Returns
-        -------
-        locations : sequence of numbers
-          The axis locations where ticks should be positioned.
-        labels : sequence of strings
-          Labels for each tick location.
-        titles : sequence of strings
-          Titles for each tick location.  Typically, backends render titles as tooltips.
-        """
         def coverage(dmin, dmax, lmin, lmax):
             range_ = dmax - dmin
             return 1 - 0.5 * (numpy.power(dmax - lmax,
@@ -348,7 +286,6 @@ class Extended(TickLocator):
 
 
 class Heckbert(TickLocator):
-
     """Generate ticks using the "Nice numbers for graph labels" algorithm by Paul Heckbert.
 
     Note that this locator can produce ticks outside the minimum / maximum axis
@@ -360,28 +297,11 @@ class Heckbert(TickLocator):
     format : string, optional
       Format string used to generate labels from tick locations.
     """
-
     def __init__(self, count=5, format="{0:.{digits}f}"):
-
         self._count = count
         self._format = format
 
     def ticks(self, domain_min, domain_max):
-        """Return a set of ticks for the given domain.
-
-        Parameters
-        ----------
-        domain_min, domain_max: number
-
-        Returns
-        -------
-        locations : sequence of numbers
-          The axis locations where ticks should be positioned.
-        labels : sequence of strings
-          Labels for each tick location.
-        titles : sequence of strings
-          Titles for each tick location.  Typically, backends render titles as tooltips.
-        """
         def nicenum(x, rounding):
             exponent = numpy.floor(numpy.log10(x))
             fraction = x / numpy.power(10, exponent)
@@ -417,7 +337,6 @@ class Heckbert(TickLocator):
 
 
 class Integer(TickLocator):
-
     """Generate evenly-spaced integer ticks
 
     Parameters
@@ -425,26 +344,10 @@ class Integer(TickLocator):
     step: integer, optional
       Number of integer values to skip between labels.
     """
-
     def __init__(self, step=1):
         self._step = step
 
     def ticks(self, domain_min, domain_max):
-        """Return a set of ticks for the given domain.
-
-        Parameters
-        ----------
-        domain_min, domain_max: number
-
-        Returns
-        -------
-        locations : sequence of integers
-          The axis locations where ticks should be positioned.
-        labels : sequence of strings
-          Labels for each tick location.
-        titles : sequence of strings
-          Titles for each tick location.  Typically, backends render titles as tooltips.
-        """
         locations = numpy.arange(
             domain_min, domain_max + 1, self._step, dtype="int64")
         labels = [repr(location) for location in locations]
@@ -453,7 +356,6 @@ class Integer(TickLocator):
 
 
 class Log(TickLocator):
-
     """Generate ticks that are evenly spaced on a logarithmic scale
 
     Parameters
@@ -488,28 +390,11 @@ class Log(TickLocator):
     >>> locator = toyplot.locator.Log(format="{base}^{exponent}")
 
     """
-
     def __init__(self, base=10, format="{base}<sup> {exponent}</sup>"):
-
         self._base = base
         self._format = format
 
     def ticks(self, domain_min, domain_max):
-        """Return a set of ticks for the given domain.
-
-        Parameters
-        ----------
-        domain_min, domain_max: number
-
-        Returns
-        -------
-        locations : sequence of numbers
-          The axis locations where ticks should be positioned.
-        labels : sequence of strings
-          Labels for each tick location.
-        titles : sequence of strings
-          Titles for each tick location.  Typically, backends render titles as tooltips.
-        """
         if domain_min < 0 and domain_max < 0:
             negative_exponents = numpy.arange(
                 numpy.ceil(numpy.log10(numpy.abs(domain_min)) / numpy.log10(self._base)),
@@ -696,7 +581,6 @@ class Timestamp(TickLocator):
 
     >>> toyplot.locator.Timestamp(format="{0:dddd}, {0:MMMM} {0:D}, {0:YYYY}")
     """
-
     def __init__(self, count=None, interval=None, timezone="utc", format=None):
         # pylint: disable=redefined-variable-type
         if interval is not None:
@@ -734,23 +618,7 @@ class Timestamp(TickLocator):
         self._timezone = timezone
         self._format = format
 
-
     def ticks(self, domain_min, domain_max):
-        """Return a set of ticks for the given domain.
-
-        Parameters
-        ----------
-        domain_min, domain_max: number
-
-        Returns
-        -------
-        locations : sequence of numbers
-          The axis locations where ticks should be positioned.
-        labels : sequence of strings
-          Labels for each tick location.
-        titles : sequence of strings
-          Titles for each tick location.  Typically, backends render titles as tooltips.
-        """
         # If the caller didn't specify an interval, find one that yields the number of locations closest to the requested count
         if self._interval is None:
             if self._count is None:

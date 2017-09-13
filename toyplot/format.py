@@ -4,12 +4,14 @@
 
 from __future__ import division
 
+import custom_inherit
 import numpy
 import six
 
 
+@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
 class Formatter(object):
-    """Base class for formatters - objects that compute text representations from data."""
+    """Abstract interface for formatters - objects that compute text representations from data."""
 
     def format(self, value):
         """Return a text representation of the given value.

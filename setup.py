@@ -23,6 +23,7 @@ setup(
     description="A modern plotting toolkit supporting electronic publishing and reproducibility.",
     install_requires=[
         "arrow",
+        "custom_inherit",
         "multipledispatch",
         "numpy>=1.8.0",
         "pypng",

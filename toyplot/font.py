@@ -7,12 +7,16 @@
 
 from __future__ import absolute_import
 
+import custom_inherit
 import reportlab.pdfbase.pdfmetrics
+import six
 
 import toyplot.units
 
+
+@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
 class Font(object):
-    """Base class for objects that can return information about a specific typeface."""
+    """Abstract interface for objects that return information about a specific combination of typeface and size."""
     @property
     def ascent(self):
         """Font ascent (maximum height above the baseline).
@@ -52,8 +56,9 @@ class Font(object):
         raise NotImplementedError() # pragma: no cover
 
 
+@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
 class Library(object):
-    """Base class for objects that can manage information about a collection of fonts."""
+    """Abstract interface for objects that manage a collection of fonts."""
     def font(self, style):
         """Lookup a font using CSS style information and return a corresponding Font object.
 
@@ -99,19 +104,6 @@ class ReportlabFont(Font):
         return self._descent
 
     def width(self, string):
-        """Return the width of a string if rendered using this font.
-
-        Parameters
-        ----------
-        string: str, required
-            The text to be measured.
-
-        Returns
-        -------
-        width: :class:`number<numbers.Number>`
-            Width of the string in CSS pixels, if rendered using the given font and
-            font size.
-        """
         width = reportlab.pdfbase.pdfmetrics.stringWidth(string, self._family, self._size)
         width = toyplot.units.convert(width, target="px", default="pt")
         return width
@@ -123,12 +115,7 @@ class ReportlabLibrary(Library):
         self._cache = dict()
 
     def font(self, style):
-        """Lookup a font using CSS style information and return a corresponding Font object.
-
-        Parameters
-        ----------
-        style: dict containing CSS style information
-
+        """
         Returns
         -------
         font: instance of :class:`toyplot.font.ReportlabFont`

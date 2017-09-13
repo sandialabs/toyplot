@@ -11,8 +11,9 @@ import colorsys
 import re
 import xml.etree.ElementTree as xml
 
-import numpy # pylint: disable=wrong-import-position
-import six # pylint: disable=wrong-import-position
+import custom_inherit
+import numpy
+import six
 
 
 black = "#292724"
@@ -227,7 +228,6 @@ def broadcast(colors, shape, default=None):
 
 
 class Palette(object):
-
     """Storage for an ordered collection of colors.
 
     Parameters
@@ -248,7 +248,6 @@ class Palette(object):
     Palettes are displayed as a collection of color swatches when viewed in a
     Jupyter notebook.
     """
-
     def __init__(self, colors=None, reverse=False):
         if colors is None:
             colors = numpy.array(brewer._data["Set2"][8]) / 255.0
@@ -326,8 +325,9 @@ def spread(color, count=5, lightness=0.9, reverse=False):
     return Palette(numpy.array(results), reverse=reverse)
 
 
+@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
 class Map(object):
-    """Interface for objects that map from scalar values to colors."""
+    """Abstract interface for objects that map scalar values to colors."""
     class DomainHelper(object):
         """Interface to get / set the domain for a :class:`toyplot.color.Map`."""
         def __init__(self, domain_min, domain_max):
@@ -336,6 +336,7 @@ class Map(object):
 
         @property
         def min(self):
+            """Minimum domain value."""
             return self._min
 
         @min.setter
@@ -344,6 +345,7 @@ class Map(object):
 
         @property
         def max(self):
+            """Maximum domain value."""
             return self._max
 
         @max.setter
@@ -358,10 +360,11 @@ class Map(object):
 
     @property
     def domain(self):
+        """Accessor for the map's :class:`domain <toyplot.color.Map.DomainHelper>`"""
         return self._domain
 
-class CategoricalMap(Map):
 
+class CategoricalMap(Map):
     """Maps 1D categorical values (nonnegative integers) to colors.
 
     Parameters
@@ -374,7 +377,6 @@ class CategoricalMap(Map):
     Categorical maps are displayed as a collection of color swatches when viewed
     in a Jupyter notebook.
     """
-
     def __init__(self, palette=None):
         if palette is None:
             palette = Palette()
@@ -438,7 +440,6 @@ class CategoricalMap(Map):
 
 
 class DivergingMap(Map):
-
     """Maps 1D values to colors using a perceptually-uniform diverging color map.
 
     Based on "Diverging Color Maps for Scientific Visualization", Kenneth
@@ -466,7 +467,6 @@ class DivergingMap(Map):
     -----
     Diverging maps generate a color preview when viewed in a Jupyter notebook.
     """
-
     def __init__(self, low=None, high=None, domain_min=None, domain_max=None):
         super(DivergingMap, self).__init__(domain_min=domain_min, domain_max=domain_max)
 
@@ -597,7 +597,6 @@ class DivergingMap(Map):
 
 
 class LinearMap(Map):
-
     """Maps 1D values to colors.
 
     Values within the domain specified at construction time are mapped to the

@@ -2,11 +2,15 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Provides data objects (marks) that are displayed on a :class:`canvas <toyplot.canvas.Canvas>`."""
+
 from __future__ import absolute_import, division
 
 import itertools
 
+import custom_inherit
 import numpy
+import six
 
 import toyplot.color
 import toyplot.marker
@@ -15,11 +19,20 @@ import toyplot.require
 ##########################################################################
 # Basic Toyplot marks
 
+@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
 class Mark(object):
+    """Abstract interface for Toyplot marks.
 
-    """Base class for all Toyplot marks.
+    Marks are data objects that are added to a coordinate system for display on
+    a :class:`canvas <toyplot.canvas.Canvas>`.  Marks carry no explicit visual
+    representation of their own - it is up to the coordinate system and
+    :ref:`backend` to determine how to render the data.
+
+    For example, a :class:`scatterplot <toyplot.mark.Scatterplot>` mark is
+    rendered using points by a :class:`cartesian
+    <toyplot.coordinates.Cartesian>` coordinate system, but could be rendered
+    using lines by a hypothetical parallel coordinate system.
     """
-
     def __init__(self, annotation=False):
         self._annotation = False
         self.annotation = annotation
@@ -68,7 +81,7 @@ class Mark(object):
 
     @property
     def markers(self): # pylint: disable=no-self-use
-        """Return an ordered set of in-use markers for this mark.
+        """Return an ordered set of markers used by this mark, if any.
 
         Returns
         -------
@@ -76,14 +89,13 @@ class Mark(object):
         """
         return []
 
-class AxisLines(Mark):
 
+class AxisLines(Mark):
     """Render multiple lines parallel to an axis.
 
     Do not create AxisLines instances directly.  Use factory methods such as
     :meth:`toyplot.coordinates.Cartesian.hlines` and :meth:`toyplot.coordinates.Cartesian.vlines` instead.
     """
-
     def __init__(
             self,
             coordinate_axes,
@@ -119,13 +131,11 @@ class AxisLines(Mark):
 
 
 class BarBoundaries(Mark):
-
     """Render multiple stacked bars defined by bar boundaries.
 
     Do not create BarBoundaries instances directly.  Use factory methods such as
     :func:`toyplot.bars` or :meth:`toyplot.coordinates.Cartesian.bars` instead.
     """
-
     def __init__(
             self,
             coordinate_axes,
@@ -190,13 +200,11 @@ class BarBoundaries(Mark):
 
 
 class BarMagnitudes(Mark):
-
     """Render multiple stacked bars defined by bar magnitudes.
 
     Do not create BarMagnitudes instances directly.  Use factory methods such as
     :func:`toyplot.bars` or :meth:`toyplot.coordinates.Cartesian.bars` instead.
     """
-
     def __init__(
             self,
             coordinate_axes,
@@ -266,13 +274,11 @@ class BarMagnitudes(Mark):
 
 
 class FillBoundaries(Mark):
-
     """Render multiple stacked fill regions defined by boundaries.
 
     Do not create FillBoundaries instances directly.  Use factory methods such
     as :func:`toyplot.fill` or :meth:`toyplot.coordinates.Cartesian.fill` instead.
     """
-
     def __init__(
             self,
             coordinate_axes,
@@ -336,13 +342,11 @@ class FillBoundaries(Mark):
 
 
 class FillMagnitudes(Mark):
-
     """Render multiple stacked fill regions defined by magnitudes.
 
     Do not create FillMagnitudes instances directly.  Use factory methods such
     as :func:`toyplot.fill` or :meth:`toyplot.coordinates.Cartesian.fill` instead.
     """
-
     def __init__(
             self,
             coordinate_axes,
@@ -413,13 +417,11 @@ class FillMagnitudes(Mark):
 
 
 class Graph(Mark): # pragma: no cover
-
     """Plot a graph (collection of vertices and edges).
 
     Do not create Graph instances directly.  Use factory methods such as
     :meth:`toyplot.coordinates.Cartesian.graph` instead.
     """
-
     def __init__(
             self,
             coordinate_axes,
@@ -639,7 +641,6 @@ class Image(Mark):
 
 
 class Plot(Mark):
-
     """Plot multiple bivariate data series using lines and/or markers.
 
     Do not create Plot instances directly.  Use factory methods such as
@@ -647,7 +648,6 @@ class Plot(Mark):
     :meth:`toyplot.coordinates.Cartesian.plot` and
     :meth:`toyplot.coordinates.Cartesian.scatterplot` instead.
     """
-
     def __init__(
             self,
             coordinate_axes,
@@ -735,13 +735,11 @@ class Plot(Mark):
 
 
 class Rect(Mark):
-
     """Plot axis-aligned rectangles.
 
     Do not create Rect instances directly.  Use factory methods such as
     :meth:`toyplot.coordinates.Cartesian.rects` instead.
     """
-
     def __init__(
             self,
             coordinate_axes,
@@ -790,14 +788,12 @@ class Rect(Mark):
 
 
 class Scatterplot(Mark):
-
     """Plot multivariate data series using markers.
 
     Do not create Scatterplot instances directly.  Use factory methods such as
     :func:`toyplot.scatterplot` and :meth:`toyplot.coordinates.Cartesian.scatterplot`
     instead.
     """
-
     def __init__(
             self,
             coordinate_axes,
@@ -878,13 +874,11 @@ class Scatterplot(Mark):
 
 
 class Text(Mark):
-
     """Render text.
 
     Do not create Text instances directly.  Use factory methods such as
     :meth:`toyplot.canvas.Canvas.text` or :meth:`toyplot.coordinates.Cartesian.text` instead.
     """
-
     def __init__(
             self,
             coordinate_axes,

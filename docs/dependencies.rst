@@ -19,6 +19,7 @@ using pip, these are automatically installed for you):
 
 * multipledispatch - https://github.com/mrocklin/multipledispatch
 * numpy >= 1.8.0 - http://numpy.org
+* six - http://pythonhosted.org/six
 
 Timestamp Labels
 ----------------
@@ -35,7 +36,7 @@ Bitmap Images
 To add bitmap images to your figures, you'll need the following (if you install Toyplot
 using pip, it's automatically installed for you):
 
-* pypng - Python PNG IO library - https://pythonhosted.org/pypng/index.html
+* pypng - Python PNG IO library - http://pythonhosted.org/pypng
 
 PDF Export
 ----------
@@ -71,7 +72,7 @@ Source Installation
 If you're installing Toyplot from source, you'll need setuptools to run the
 Toyplot setup.py script:
 
-* setuptools - http://pythonhosted.org//setuptools
+* setuptools - https://packaging.python.org/tutorials/installing-packages
 
 Regression Testing
 ------------------

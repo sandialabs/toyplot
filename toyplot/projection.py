@@ -2,12 +2,16 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Classes and functions for projecting coordinates between spaces."""
+
 from __future__ import division
 
+import custom_inherit
 import numpy
+import six
 
 
-def mix(a, b, amount):
+def _mix(a, b, amount):
     return ((1.0 - amount) * a) + (amount * b)
 
 
@@ -24,19 +28,91 @@ def _in_range(a, x, b):
     return result
 
 
+@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
 class Projection(object):
-    """Base class for objects that can map from domain to range and range to domain."""
+    """Abstract interface for objects that can map between one-dimensional domain and range spaces.
+
+    .. automethod:: __call__
+    """
     def __call__(self, domain_values):
+        """Map domain values to range values.
+
+        Parameters
+        ----------
+        domain_values: :class:`numpy.ndarray` or compatible.
+            The domain values to convert.
+
+        Returns
+        -------
+        range_values: :class:`numpy.ndarray`
+            The domain values projected into range values.
+
+        Examples
+        --------
+
+        >>> projection = toyplot.projection.linear(0, 1, -1, 1)
+        >>> projection(0.75)
+        0.5
+        """
         raise NotImplementedError() # pragma: no cover
 
     def inverse(self, range_values):
+        """Map range values to domain values.
+
+        Parameters
+        ----------
+        range_values: :class:`numpy.ndarray` or compatible.
+            The range values to convert.
+
+        Returns
+        -------
+        domain_values: :class:`numpy.ndarray`
+            The range values projected into domain values.
+
+        Examples
+        --------
+
+        >>> projection = toyplot.projection.linear(0, 1, -1, 1)
+        >>> projection.inverse(-0.5)
+        0.25
+        """
         raise NotImplementedError() # pragma: no cover
 
 
 class Piecewise(Projection):
-    """Compute a projection from an arbitrary collection of linear and log segments."""
+    """Projects between domain and range data using a piecewise collection of linear and log segments.
+
+    Parameters
+    ----------
+    segments: sequence of :class:`toyplot.projection.Piecewise.Segment` objects, required
+        Callers must supply one-to-many segments, each of which defines a
+        mapping between bounded, non-overlapping regions of the domain
+        and range spaces.
+
+    .. automethod:: __call__
+    """
     class Segment(object):
-        class Container(object):
+        """Defines a mapping between bounded regions of domain-space and range-space.
+
+        Parameters
+        ----------
+        scale: "linear" or ("log", base) tuple, required
+
+        domain_bounds_min, domain_bounds_max: number, required
+            These values define the bounds of this segment in domain space, and
+            may include positive or negative infinity.
+
+        domain_min, domain_max: number, required
+            These values are mapped to `range_min` and `range_max`, respectively.
+
+        range_min, range_max: number, required
+            These values are mapped to `domain_min` and `domain_max`, respectively.
+
+        range_bounds_min, range_bounds_max: number, required
+            These values define the bounds of this segment in range space, and
+            may include positive or negative infinity.
+        """
+        class _Container(object):
             pass
 
         def __init__(
@@ -52,14 +128,14 @@ class Piecewise(Projection):
                 range_bounds_max,
             ):
             self.scale = scale
-            self.domain = Piecewise.Segment.Container()
-            self.domain.bounds = Piecewise.Segment.Container()
+            self.domain = Piecewise.Segment._Container()
+            self.domain.bounds = Piecewise.Segment._Container()
             self.domain.bounds.min = domain_bounds_min
             self.domain.min = domain_min
             self.domain.max = domain_max
             self.domain.bounds.max = domain_bounds_max
-            self.range = Piecewise.Segment.Container()
-            self.range.bounds = Piecewise.Segment.Container()
+            self.range = Piecewise.Segment._Container()
+            self.range.bounds = Piecewise.Segment._Container()
             self.range.bounds.min = range_bounds_min
             self.range.min = range_min
             self.range.max = range_max
@@ -69,7 +145,6 @@ class Piecewise(Projection):
         self._segments = segments
 
     def __call__(self, domain_values):
-        """Transform values from the domain to the range."""
         domain_values = numpy.ma.array(domain_values, dtype="float64")
         range_values = numpy.empty_like(domain_values)
         for segment in self._segments:
@@ -79,7 +154,7 @@ class Piecewise(Projection):
                 segment.domain.bounds.max)
             if segment.scale == "linear":
                 amount = (domain_values[indices] - segment.domain.min) / (segment.domain.max - segment.domain.min)
-                range_values[indices] = mix(
+                range_values[indices] = _mix(
                     segment.range.min, segment.range.max, amount)
             else:
                 scale, base = segment.scale
@@ -89,7 +164,7 @@ class Piecewise(Projection):
                                                 base)) / (_log(segment.domain.max,
                                                                base) - _log(segment.domain.min,
                                                                             base))
-                    range_values[indices] = mix(
+                    range_values[indices] = _mix(
                         segment.range.min, segment.range.max, amount)
                 else:
                     raise Exception("Unknown scale: %s" % (scale,)) # pragma: no cover
@@ -99,7 +174,6 @@ class Piecewise(Projection):
         return range_values
 
     def inverse(self, range_values):
-        """Transform values from the range to the domain."""
         range_values = numpy.ma.array(range_values, dtype="float64")
         domain_values = numpy.empty_like(range_values)
         for segment in self._segments:
@@ -109,14 +183,14 @@ class Piecewise(Projection):
                 segment.range.bounds.max)
             if segment.scale == "linear":
                 amount = (range_values[indices] - segment.range.min) / (segment.range.max - segment.range.min)
-                domain_values[indices] = mix(
+                domain_values[indices] = _mix(
                     segment.domain.min, segment.domain.max, amount)
             else:
                 scale, base = segment.scale
                 if scale == "log":
                     amount = (range_values[indices] - segment.range.min) / (segment.range.max - segment.range.min)
                     domain_values[indices] = numpy.sign(
-                        segment.domain.min) * numpy.power(base, mix(
+                        segment.domain.min) * numpy.power(base, _mix(
                             _log(segment.domain.min, base),
                             _log(segment.domain.max, base),
                             amount))
@@ -246,8 +320,8 @@ def log(
 
     # Mixed negative / positive domain
     if domain_min < linear_domain_min and linear_domain_max < domain_max:
-        linear_range_min = mix(range_min, range_max, 0.4)
-        linear_range_max = mix(range_min, range_max, 0.6)
+        linear_range_min = _mix(range_min, range_max, 0.4)
+        linear_range_max = _mix(range_min, range_max, 0.6)
         return Piecewise([
             Piecewise.Segment(
                 ("log", base),
@@ -285,7 +359,7 @@ def log(
             ])
 
     if domain_min < linear_domain_min:
-        linear_range_min = mix(range_min, range_max, 0.8)
+        linear_range_min = _mix(range_min, range_max, 0.8)
         return Piecewise([
             Piecewise.Segment(
                 ("log", base),
@@ -312,7 +386,7 @@ def log(
             ])
 
     if linear_domain_max < domain_max:
-        linear_range_max = mix(range_min, range_max, 0.2)
+        linear_range_max = _mix(range_min, range_max, 0.2)
         return Piecewise([
             Piecewise.Segment(
                 "linear",

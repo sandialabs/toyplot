@@ -501,8 +501,6 @@ class Axis(object):
 
     @scale.setter
     def scale(self, value):
-        # pylint: disable=redefined-variable-type
-
         if value == "linear":
             self._scale = "linear"
             return
@@ -923,10 +921,10 @@ class Cartesian(object):
                 ytick_locations, ytick_labels, ytick_titles = self.y._locator().ticks(ydomain_min, ydomain_max)
 
             # Allow tick locations to grow (never shrink) the domain.
-            if len(xtick_locations):
+            if xtick_locations:
                 xdomain_min = numpy.amin((xdomain_min, xtick_locations[0]))
                 xdomain_max = numpy.amax((xdomain_max, xtick_locations[-1]))
-            if len(ytick_locations):
+            if ytick_locations:
                 ydomain_min = numpy.amin((ydomain_min, ytick_locations[0]))
                 ydomain_max = numpy.amax((ydomain_max, ytick_locations[-1]))
 
@@ -955,7 +953,7 @@ class Cartesian(object):
                 x_tick_location = "below"
                 x_label_location = "below"
             elif self.x.spine.position == "high":
-                x_offset = -self.padding
+                x_offset = -self.padding # pylint: disable=invalid-unary-operand-type
                 x_spine_y = self._ymin_range
                 x_ticks_near = 5
                 x_ticks_far = 0
@@ -970,7 +968,7 @@ class Cartesian(object):
                 x_label_location = "below"
 
             if self.y.spine._position == "low":
-                y_offset = -self.padding
+                y_offset = -self.padding # pylint: disable=invalid-unary-operand-type
                 y_spine_x = self._xmin_range
                 y_ticks_near = 0
                 y_ticks_far = 5
@@ -2623,7 +2621,7 @@ class Numberline(object):
                 tick_locations, tick_labels, tick_titles = self.axis._locator().ticks(domain_min, domain_max)
 
             # Allow tick locations to grow (never shrink) the domain.
-            if len(tick_locations):
+            if tick_locations:
                 domain_min = numpy.amin((domain_min, tick_locations[0]))
                 domain_max = numpy.amax((domain_max, tick_locations[-1]))
 
@@ -3351,7 +3349,7 @@ class Table(object):
 
     def _region_bounds(self, region):
         rows, columns = numpy.nonzero(self._cell_region == region)
-        if len(rows) and len(columns):
+        if rows and columns:
             return (rows.min(), rows.max() + 1, columns.min(), columns.max() + 1)
         return (0, 0, 0, 0)
 

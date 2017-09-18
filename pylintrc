@@ -41,7 +41,7 @@ confidence=
 # either give multiple identifier separated by comma (,) or put this option
 # multiple time. See also the "--disable" option for examples.
 #enable=
-enable=relative-beyond-top-level, import-error, import-self, reimported, relative-import, deprecated-module, wildcard-import, misplaced-future, cyclic-import, wrong-import-order, wrong-import-position, ungrouped-imports, multiple-imports
+#enable=relative-beyond-top-level, import-error, import-self, reimported, relative-import, deprecated-module, wildcard-import, misplaced-future, cyclic-import, wrong-import-order, wrong-import-position, ungrouped-imports, multiple-imports, unpacking-non-sequence, invalid-all-object, no-name-in-module, unbalanced-untuple-unpacking, undefined-variable, undefined-all-variable, used-before-assignment, cell-var-from-loop, global-variable-undefined, redefined-builtin, redefine-in-handler, redefined-outer-name, unused-import, unused-argument, unused-wildcard-import, unused-variable, global-variable-not-assigned, undefined-loop-variable, global-statement, global-at-module-level, bad-open-mode, redundant-unittest-assert, boolean-datetime, deprecated-method, bad-thread-instantiation, duplicate-code
 
 # Disable the message, report, category or checker with the given id(s). You
 # can either give multiple identifiers separated by comma (,) or put this
@@ -52,8 +52,7 @@ enable=relative-beyond-top-level, import-error, import-self, reimported, relativ
 # --enable=similarities". If you want to run only the classes checker, but have
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
-#disable=attribute-defined-outside-init, bad-continuation, bare-except, cyclic-import, duplicate-code, import-error, invalid-name, line-too-long, locally-disabled, misplaced-comparison-constant, pointless-statement, protected-access, singleton-comparison, too-few-public-methods, too-many-branches, too-many-instance-attributes, too-many-locals, too-many-nested-blocks, too-many-return-statements, too-many-statements, fixme, missing-docstring,
-disable=all
+disable=attribute-defined-outside-init, bad-continuation, bare-except, cyclic-import, duplicate-code, import-error, invalid-name, line-too-long, locally-disabled, misplaced-comparison-constant, pointless-statement, protected-access, singleton-comparison, too-few-public-methods, too-many-branches, too-many-instance-attributes, too-many-locals, too-many-nested-blocks, too-many-return-statements, too-many-statements, fixme, missing-docstring, redefined-builtin, unused-argument, unused-variable, no-else-return, redefined-outer-name
 
 
 [REPORTS]

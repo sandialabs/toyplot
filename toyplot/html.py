@@ -50,10 +50,10 @@ dispatch = functools.partial(dispatch, namespace=_namespace)
 
 class _NumpyJSONEncoder(json.JSONEncoder):
     # pylint: disable=method-hidden
-    def default(self, obj): # pragma: no cover
-        if isinstance(obj, numpy.generic):
-            return numpy.asscalar(obj)
-        return json.JSONEncoder.default(self, obj)
+    def default(self, o): # pragma: no cover
+        if isinstance(o, numpy.generic):
+            return numpy.asscalar(o)
+        return json.JSONEncoder.default(self, o)
 
 
 class RenderContext(object):
@@ -340,7 +340,7 @@ def _css_style(*styles):
 def _css_attrib(*styles):
     style = _color_fixup(toyplot.style.combine(*styles))
     attrib = {}
-    if len(style):
+    if style:
         attrib["style"] = ";".join(
             ["%s:%s" % (key, value) for key, value in sorted(style.items())])
     return attrib
@@ -394,7 +394,7 @@ def _draw_text(
     if x or y:
         transform += "translate(%r,%r)" % (x, y)
     if angle:
-        transform += "rotate(%r)" % (-angle)
+        transform += "rotate(%r)" % (-angle) # pylint: disable=invalid-unary-operand-type
 
     group = xml.SubElement(
         root,
@@ -1932,7 +1932,7 @@ def _render(canvas, axes, context):
                     style=toyplot.style.combine(cell_lstyle, {"text-anchor": "end"}),
                     text=prefix + separator + suffix,
                     )
-            elif cell_align is "separator":
+            elif cell_align == "separator":
                 x = (cell_left + cell_right) / 2
                 _draw_text(
                     root=axes_xml,

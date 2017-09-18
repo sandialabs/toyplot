@@ -136,7 +136,7 @@ def render(svg, canvas):
         canvas.saveState()
 
         current_style = {}
-        if len(styles):
+        if styles:
             current_style.update(styles[-1])
         for declaration in element.get("style", "").split(";"):
             if declaration == "":
@@ -227,7 +227,7 @@ def render(svg, canvas):
                     canvas.setLineCap(get_line_cap(current_style))
                     path = canvas.beginPath()
                     commands = element.get("d").split()
-                    while len(commands):
+                    while commands:
                         command = commands.pop(0)
                         if command == "L":
                             path.lineTo(
@@ -332,8 +332,6 @@ def render(svg, canvas):
                 canvas.restoreState()
 
             elif element.tag == "image":
-                # pylint: disable=redefined-variable-type
-
                 import PIL.Image
                 image = element.get("xlink:href")
                 if not image.startswith("data:image/png;base64,"):

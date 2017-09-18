@@ -582,7 +582,6 @@ class Timestamp(TickLocator):
     >>> toyplot.locator.Timestamp(format="{0:dddd}, {0:MMMM} {0:D}, {0:YYYY}")
     """
     def __init__(self, count=None, interval=None, timezone="utc", format=None):
-        # pylint: disable=redefined-variable-type
         if interval is not None:
             if isinstance(interval, six.string_types):
                 interval = (1, interval)

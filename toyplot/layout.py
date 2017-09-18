@@ -275,7 +275,7 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
     edges = edges.reshape((ecount, 2), order="C")
 
     # If the caller supplied extra vertex ids, merge them in.
-    if len(stack) and stack[-1] is not None:
+    if stack and stack[-1] is not None:
         extra_vids = toyplot.require.vector(stack.pop())
         disconnected_vids = numpy.setdiff1d(extra_vids, vids)
         vids = numpy.append(vids, disconnected_vids)
@@ -300,8 +300,6 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
     # Apply the layout algorithm to whatever's left.
     start = time.time()
     if layout is None:
-        # pylint: disable=redefined-variable-type
-
         # If there are unspecified coordinates, use a force-directed layout.
         if numpy.ma.is_masked(ivcoordinates):
             layout = toyplot.layout.FruchtermanReingold()

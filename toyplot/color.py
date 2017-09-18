@@ -180,7 +180,7 @@ def broadcast(colors, shape, default=None):
         shape = (shape,)
     if not isinstance(shape, tuple):
         raise ValueError("Shape parameter must be a tuple with length 1 or 2.") # pragma: no cover
-    if not 0 < len(shape) < 3:
+    if not 0 < len(shape) < 3: #pylint: disable=len-as-condition
         raise ValueError("Shape parameter must be a tuple with length 1 or 2.") # pragma: no cover
 
     per_datum = len(shape) == 2
@@ -636,7 +636,7 @@ class LinearMap(Map):
             palette = brewer.palette("BlueRed")
         if stops is None:
             stops = numpy.linspace(0, 1, len(palette), endpoint=True)
-        stops = numpy.array(stops) # pylint: disable=redefined-variable-type
+        stops = numpy.array(stops)
 
         if stops.shape != palette._colors.shape:
             raise ValueError("Number of stops must match palette length.") # pragma: no cover

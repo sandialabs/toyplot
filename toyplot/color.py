@@ -180,7 +180,7 @@ def broadcast(colors, shape, default=None):
         shape = (shape,)
     if not isinstance(shape, tuple):
         raise ValueError("Shape parameter must be a tuple with length 1 or 2.") # pragma: no cover
-    if not 0 < len(shape) < 3: #pylint: disable=len-as-condition
+    if not 0 < len(shape) < 3:
         raise ValueError("Shape parameter must be a tuple with length 1 or 2.") # pragma: no cover
 
     per_datum = len(shape) == 2

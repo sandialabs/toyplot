@@ -276,7 +276,7 @@ class Table(object):
         return self._columns.__delitem__(key)
 
     def __len__(self):
-        return list(self._columns.values())[0].shape[0] if self._columns else 0
+        return list(self._columns.values())[0].shape[0] if len(self._columns) else 0
 
     def __iter__(self):
         for row in numpy.arange(self.__len__()):
@@ -323,7 +323,7 @@ class Table(object):
             (number of rows, number of columns) tuple.
         """
         return (
-            list(self._columns.values())[0].shape[0] if self._columns else 0,
+            list(self._columns.values())[0].shape[0] if len(self._columns) else 0,
             len(self._columns),
         )
 

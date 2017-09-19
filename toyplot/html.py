@@ -2,7 +2,7 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-"""Functions to render HTML markup."""
+"""Functions to render the canonical HTML representation of a Toyplot figure."""
 
 # pylint: disable=function-redefined
 
@@ -59,8 +59,8 @@ class _NumpyJSONEncoder(json.JSONEncoder):
 class RenderContext(object):
     """Stores context data during rendering.
 
-    This is only of use when creating custom Toyplot marks.  It is not intended
-    for end-users.
+    This is only of use for Toyplot developers and library developers who are
+    implementing rendering code.  It is not intended for end-users.
     """
     def __init__(self, root):
         self._animation = collections.defaultdict(lambda: collections.defaultdict(list))
@@ -71,20 +71,73 @@ class RenderContext(object):
         self._javascript_modules = dict()
         self._javascript_calls = list()
 
+    def already_rendered(self, o):
+        """Track whether an object has already been rendered.
 
-    def already_rendered(self, renderable):
-        if renderable in self._rendered:
+        Used to prevent objects that can be shared, such as
+        :class:`toyplot.coordinates.Axis`, from generating duplicate markup in
+        the output HTML.
+
+        Parameters
+        ----------
+        o: any Python object, required
+
+        Returns
+        -------
+        rendered: boolean
+            If the given object hasn't already been rendered, records it as
+            rendered and returns `False`.  Subsequent calls with the given
+            object will always return `True`.
+
+        Examples
+        --------
+
+        The following checks to see if `mark` has already been rendered::
+
+                if not context.already_rendered(mark):
+                    # Render the mark
+        """
+        if o in self._rendered:
             return True
-        self._rendered.add(renderable)
+        self._rendered.add(o)
         return False
 
-    def get_id(self, obj):
-        python_id = id(obj)
+    def get_id(self, o):
+        """Return a globally unique identifier for an object.
+
+        The generated identifier is cached, so multiple lookups on the same
+        object will return consistent results.
+
+        Parameters
+        ----------
+        o: any Python object, required.
+
+        Returns
+        -------
+        id: str
+            Globally unique identifier that can be used in HTML markup as an identifier
+            that can be targeted from Javascript code.
+        """
+        python_id = id(o)
         if python_id not in self._id_cache:
             self._id_cache[python_id] = "t" + uuid.uuid4().hex
         return self._id_cache[python_id]
 
     def copy(self, parent):
+        """Copy the current :class:`toyplot.html.RenderContext`.
+
+        Creates a copy of the current render context that can be used to render
+        children of the currently-rendered object.
+
+        Parameters
+        ----------
+        parent: any Python object, required.
+
+        Returns
+        -------
+        context: :class:`toyplot.html.RenderContext`
+            The `parent` attribute will be set to the supplied parent object.
+        """
         result = copy.copy(self)
         result._parent = parent
         return result

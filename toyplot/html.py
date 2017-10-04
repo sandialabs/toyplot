@@ -84,7 +84,7 @@ class RenderContext(object):
 
         Returns
         -------
-        rendered: boolean
+        rendered: bool
             If the given object hasn't already been rendered, records it as
             rendered and returns `False`.  Subsequent calls with the given
             object will always return `True`.

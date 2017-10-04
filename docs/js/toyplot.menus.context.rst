@@ -28,10 +28,10 @@ context menu entries when the user right-clicks over a figure.
     Note that the Toyplot context menu will not be shown if there are no visible items.  When this happens
     the system context menu will be shown instead.
 
-    :param string label: Human readable label for the menu item to be added.
-    :param function show: Callback function that will be called before the context menu is opened.
+    :param label: Human readable string label for the menu item to be added.
+    :param show: Javascript callback function that will be called before the context menu is opened.
         The function must take one argument - the DOM event that is causing the
         context menu to be shown (such as a `contextmenu` or `mousedown`
         event).  The callback should return `true` if the menu item should be
         visible, or `false` otherwise.
-    :param function activate: Callback function that will be called if the user selects this item.
+    :param activate: Javascript callback function that will be called if the user selects this item.

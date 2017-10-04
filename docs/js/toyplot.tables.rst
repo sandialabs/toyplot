@@ -17,10 +17,10 @@ The `toyplot/tables` module can be used to store tabular data for later retrieva
                 tables.store(mark_id, "vertex_data", column_names, columns);
             }""")
 
-    :param string owner: Unique id for the object that "owns" the table.
-    :param string key: Used to disambiguate tables when the owner has more than one.
-    :param array names: Names for each column in the table.
-    :param array columns: Array of values for eacn column in the table.
+    :param owner: Unique string id for the object that "owns" the table.
+    :param key: String key used to disambiguate tables when the owner has more than one.
+    :param names: Array of string names for each column in the table.
+    :param columns: Array of value arrays for eacn column in the table.
 
 
 .. js:function:: toyplot/tables.get(owner, key)
@@ -35,8 +35,8 @@ The `toyplot/tables` module can be used to store tabular data for later retrieva
                 console.log(tables.get(graph_id, "vertex_data"));
             }""")
 
-    :param string owner: Unique id for the object that "owns" the table.
-    :param string key: Used to disambiguate tables when the owner has more than one.
+    :param owner: Unique string id for the object that "owns" the table.
+    :param key: String key used to disambiguate tables when the owner has more than one.
 
     :returns: object containing `names` and `columns` arrays, containing the table column names and column values, respectively.
 

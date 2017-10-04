@@ -26,7 +26,7 @@ class Mark(object):
     Marks are data objects that are added to a coordinate system for display on
     a :class:`canvas <toyplot.canvas.Canvas>`.  Marks carry no explicit visual
     representation of their own - it is up to the coordinate system and
-    :ref:`backend` to determine how to render the data.
+    :ref:`rendering backend<backends>` to determine how to render the data.
 
     For example, a :class:`scatterplot <toyplot.mark.Scatterplot>` mark is
     rendered using points by a :class:`cartesian

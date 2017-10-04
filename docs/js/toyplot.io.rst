@@ -21,9 +21,9 @@ The `toyplot/io` module contains functionality for exporting data from the viewe
     they may-or-may not prompt the user to choose an alternate filename, or
     offer to open the file in some other application instead.
 
-    :param string mime_type: MIME type of the data to be saved (e.g. "text/csv").
-    :param string charset: Character encoding of the data to be saved (e.g. "utf-8").
-    :param string data: Data content to be saved.
-    :param string filename: Suggested filename to use for saving the data to disk.
+    :param mime_type: String MIME type of the data to be saved (e.g. "text/csv").
+    :param charset: String character encoding of the data to be saved (e.g. "utf-8").
+    :param data: String data to be saved.
+    :param filename: Suggested filename string to use for saving the data to disk.
 
 

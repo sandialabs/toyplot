@@ -26,6 +26,7 @@ def value_in(value, choices):
 
 
 def table_keys(table, keys, length=None, min_length=None, modulus=None):
+    """Raise an exception if any of the given keys fails to match the column keys in the given table."""
     keys = string_vector(keys, length=length, min_length=min_length, modulus=modulus)
     allowed = list(table.keys())
     for key in keys:

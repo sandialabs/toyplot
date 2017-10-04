@@ -238,6 +238,7 @@ class Axis(object):
 
 
     class InteractiveCoordinatesLabelHelper(object):
+        """Controls the appearance and behavior of interactive coordinate labels."""
         def __init__(self):
             self._show = True
             self._style = {
@@ -253,6 +254,7 @@ class Axis(object):
 
 
     class InteractiveCoordinatesTickHelper(object):
+        """Controls the appearance and behavior of interactive coordinate ticks."""
         def __init__(self):
             self._show = True
             self._style = {
@@ -305,6 +307,7 @@ class Axis(object):
 
 
     class LabelHelper(object):
+        """Controls the appearance and behavior of an axis label."""
         def __init__(self, text, style):
             self._location = None
             self._offset = None
@@ -327,6 +330,7 @@ class Axis(object):
 
 
     class SpineHelper(object):
+        """Controls the appearance and behavior of an axis spine."""
         def __init__(self):
             self._position = "low"
             self._show = True
@@ -345,6 +349,7 @@ class Axis(object):
 
 
     class PerTickHelper(object):
+        """Controls the appearanace and behavior of individual axis ticks."""
         class TickProxy(object):
             def __init__(self, tick, allowed):
                 self._tick = tick
@@ -385,6 +390,7 @@ class Axis(object):
 
 
     class TicksHelper(object):
+        """Controls the appearance and behavior of axis ticks."""
         def __init__(self, locator, angle):
             self._far = None
             self._labels = Axis.TickLabelsHelper(angle)
@@ -424,6 +430,7 @@ class Axis(object):
 
 
     class TickLabelsHelper(object):
+        """Controls the appearance and behavior of axis tick labels."""
         def __init__(self, angle):
             self._angle = angle
             self._label = Axis.PerTickHelper(toyplot.style.allowed.text)
@@ -610,6 +617,7 @@ class Cartesian(object):
     """
 
     class LabelHelper(object):
+        """Controls the appearance and behavior of a Cartesian coordinate system label."""
         def __init__(self, text, style):
             self._style = {}
             self._text = None
@@ -1027,6 +1035,23 @@ class Cartesian(object):
         return self._finalized
 
     def project(self, axis, values):
+        """Project a set of domain values to coordinate system range values.
+
+        Note that this API is intended for advanced users creating their own
+        custom marks, end-users should never need to use it.
+
+        Parameters
+        ----------
+        axis: "x" or "y", required
+            The axis to be projected
+        values: array-like, required
+            The values to be projected
+
+        Returns
+        -------
+        projected: :class:`numpy.ndarray`
+            The projected values.
+        """
         if axis == "x":
             return self._x_projection(values)
         elif axis == "y":

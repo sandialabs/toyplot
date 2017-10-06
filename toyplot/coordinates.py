@@ -2683,6 +2683,7 @@ class Table(object):
     as :meth:`toyplot.canvas.Canvas.table` instead.
     """
     class Label(object):
+        """Controls the appearance and behavior of the table label."""
         def __init__(self, text, style):
 
             self._style = {}
@@ -2700,6 +2701,7 @@ class Table(object):
 
 
     class CellMark(object):
+        """Abstract interface for objects that embed other Toyplot visualizations in table cells."""
         def __init__(self, table, axes, series):
             self._table = table
             self._axes = axes

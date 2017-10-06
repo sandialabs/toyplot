@@ -127,10 +127,10 @@ class Canvas(object):
             collections.defaultdict.__init__(self, lambda: collections.defaultdict(list))
 
     def __init__(self, width=None, height=None, style=None, hyperlink=None, autorender=None, autoformat=None):
-        self._width = toyplot.units.convert(
-            width, "px", default="px") if width is not None else 600
-        self._height = toyplot.units.convert(
-            height, "px", default="px") if height is not None else self._width
+        # Must be set before _height
+        self._width = toyplot.units.convert(width, "px", default="px") if width is not None else 600
+        self._height = toyplot.units.convert(height, "px", default="px") if height is not None else self._width
+        self._hyperlink = None
         self._style = {
             "background-color": "transparent",
             "fill": toyplot.color.black,
@@ -142,10 +142,9 @@ class Canvas(object):
             "stroke-opacity": 1.0,
             "stroke-width": 1.0,
         }
-        self._hyperlink = None
 
-        self.style = style
         self.hyperlink = hyperlink
+        self.style = style
 
         self._animation = toyplot.Canvas._AnimationFrames()
         self._children = []
@@ -163,6 +162,10 @@ class Canvas(object):
     def height(self):
         """Height of the canvas in CSS pixels."""
         return self._height
+
+    @height.setter
+    def height(self, value):
+        self._height = toyplot.units.convert(value, "px", default="px")
 
     @property
     def hyperlink(self):
@@ -189,6 +192,10 @@ class Canvas(object):
     def width(self):
         """Width of the canvas in CSS pixels."""
         return self._width
+
+    @width.setter
+    def width(self, value):
+        self._width = toyplot.units.convert(value, "px", default="px")
 
     def animate(self, frames, callback=None):
         """Generate a collection of animation frames, calling a callback to store an explicit representation of what changes at each frame.
@@ -285,6 +292,10 @@ class Canvas(object):
         ):
         """Add a set of Cartesian axes to the canvas.
 
+        See Also
+        --------
+        :ref:`cartesian-coordinates`
+
         Parameters
         ----------
         aspect: string, optional
@@ -312,18 +323,22 @@ class Canvas(object):
             a set of i, column-span, j, row-span coordinates so the legend can cover
             more than one cell.
         hyperlink: string, optional
-            When specified, the axes range is hyperlinked to the given URI.  Note that this
-            overrides the canvas hyperlink, if any, and is overridden by hyperlinks set on
-            other entities such as marks or text.
+            When specified, the range (content area of the axes) is hyperlinked
+            to the given URI.  Note that this overrides the canvas hyperlink,
+            if any, and is overridden by hyperlinks set on other entities such
+            as marks or text.
         label: string, optional
             Human-readable axes label.
-        margin: size of the margin around grid cells, optional
-            Specifies the amount of empty space to leave between grid cells When using the
-            `grid` parameter for positioning.  Assumes CSS pixels by default, and supports
-            all of the absolute units described in :ref:`units`.
+        margin: number, (top, side) tuple, (top, side, bottom) tuple, or (top, right, bottom, left) tuple, optional
+            Specifies the amount of empty space to leave between the axes
+            contents and the containing grid cell When using the `grid`
+            parameter for positioning.  Assumes CSS pixels by default, and
+            supports all of the absolute units described in :ref:`units`.
         padding: number, string, or (number, string) tuple,  optional
             Distance between the axes and plotted data.  Assumes CSS pixels if units aren't provided.
             See :ref:`units` for details on how Toyplot handles real-world units.
+        palette: :class:`toyplot.color.Palette`, optional
+            Specifies a palette to be used when automatically assigning per-series colors.
         rect: (x, y, width, height) tuple, optional
             Use the rect property to position / size the axes by specifying its
             upper-left-hand corner, width, and height.  Assumes CSS pixels if
@@ -333,7 +348,7 @@ class Canvas(object):
             Set to `False` to hide the axes (the axes contents will still be visible).
         xmin, xmax, ymin, ymax: float, optional
             Used to explicitly override the axis domain (normally, the domain is
-            implicitly defined by any marks added to the axes).
+            implicitly defined by the marks added to the axes).
         xshow, yshow: bool, optional
             Set to `False` to hide individual axes.
         xlabel, ylabel: string, optional
@@ -341,7 +356,8 @@ class Canvas(object):
         xticklocator, yticklocator: :class:`toyplot.locator.TickLocator`, optional
             Controls the placement and formatting of axis ticks and tick labels.
         xscale, yscale: "linear", "log", "log10", "log2", or a ("log", <base>) tuple, optional
-            Specifies the mapping from data to canvas coordinates along an axis.
+            Specifies the mapping from data to canvas coordinates along an
+            axis.  See :ref:`log-scales` for examples.
 
         Returns
         -------
@@ -398,6 +414,10 @@ class Canvas(object):
             ):
         """Add a legend to the canvas.
 
+        See Also
+        --------
+        :ref:`labels-and-legends`
+
         Parameters
         ----------
         entries: sequence of entries to add to the legend Each entry to be
@@ -406,34 +426,35 @@ class Canvas(object):
             specified using the syntax described in :ref:`markers`, and marks can
             be any instance of :class:`toyplot.mark.Mark`.
         bounds: (xmin, xmax, ymin, ymax) tuple, optional
-          Use the bounds property to position / size the legend by specifying the
-          position of each of its boundaries.  The boundaries may be specified in
-          absolute drawing units, or as a percentage of the canvas width / height
-          using strings that end with "%".
-        rect: (x, y, width, height) tuple, optional
-          Use the rect property to position / size the legend by specifying its
-          upper-left-hand corner, width, and height.  Each parameter may be specified
-          in absolute drawing units, or as a percentage of the canvas width / height
-          using strings that end with "%".
+            Use the bounds property to position / size the legend by specifying the
+            position of each of its boundaries.  The boundaries may be specified in
+            absolute drawing units, or as a percentage of the canvas width / height
+            using strings that end with "%".
         corner: (corner, inset, width, height) tuple, optional
-          Use the corner property to position / size the legend by specifying its
-          width and height, plus an inset from a corner of the canvas.  Allowed
-          corner values are "top-left", "top", "top-right", "right",
-          "bottom-right", "bottom", "bottom-left", and "left".  The width and
-          height may be specified in absolute drawing units, or as a percentage of
-          the canvas width / height using strings that end with "%".  The inset is
-          specified in absolute drawing units.
+            Use the corner property to position / size the legend by specifying its
+            width and height, plus an inset from a corner of the canvas.  Allowed
+            corner values are "top-left", "top", "top-right", "right",
+            "bottom-right", "bottom", "bottom-left", and "left".  The width and
+            height may be specified in absolute drawing units, or as a percentage of
+            the canvas width / height using strings that end with "%".  The inset is
+            specified in absolute drawing units.
         grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
-          Use the grid property to position / size the legend using a collection of
-          grid cells filling the canvas.  Specify the number of rows and columns in
-          the grid, then specify either a zero-based cell index (which runs in
-          left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
-          a set of i, column-span, j, row-span coordinates so the legend can cover
-          more than one cell.
-        margin: size of the margin around grid cells, optional
-          Specifies the amount of empty space to leave between grid cells When using the
-          `grid` parameter to position the legend.
-        id: string, optional
+            Use the grid property to position / size the legend using a collection of
+            grid cells filling the canvas.  Specify the number of rows and columns in
+            the grid, then specify either a zero-based cell index (which runs in
+            left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
+            a set of i, column-span, j, row-span coordinates so the legend can cover
+            more than one cell.
+        label: str, optional
+            Optional human-readable label for the legend.
+        margin: number, (top, side) tuple, (top, side, bottom) tuple, or (top, right, bottom, left) tuple, optional
+            Specifies the amount of empty space to leave between legend and the
+            containing grid cell when using the `grid` parameter for positioning.
+        rect: (x, y, width, height) tuple, optional
+            Use the rect property to position / size the legend by specifying its
+            upper-left-hand corner, width, and height.  Each parameter may be specified
+            in absolute drawing units, or as a percentage of the canvas width / height
+            using strings that end with "%".
 
         Returns
         -------
@@ -514,8 +535,80 @@ class Canvas(object):
         ):
         """Add a matrix visualization to the canvas.
 
+        See Also
+        --------
+        :ref:`matrix-visualization`
+
         Parameters
         ----------
+        data: array-like matrix, or (matrix, :class:`toyplot.color.Map`) tuple, required
+            The given data will be used to populate the visualization, using either the
+            given colormap or a default.
+        blabel: str, optional
+            Human readable label along the bottom of the matrix.
+        blocator: :class:`toyplot.locator.TickLocator`, optional
+            Supplies column labels along the bottom of the matrix.
+        bounds: (xmin, xmax, ymin, ymax) tuple, optional
+            Use the bounds property to position / size the legend by specifying the
+            position of each of its boundaries.  The boundaries may be specified in
+            absolute drawing units, or as a percentage of the canvas width / height
+            using strings that end with "%".
+        bshow: bool, optional
+            Set to `False` to hide column labels along the bottom of the matrix.
+        colorshow: bool, optional
+            Set to `True` to add a color scale to the visualization.
+        corner: (corner, inset, width, height) tuple, optional
+            Use the corner property to position / size the legend by specifying its
+            width and height, plus an inset from a corner of the canvas.  Allowed
+            corner values are "top-left", "top", "top-right", "right",
+            "bottom-right", "bottom", "bottom-left", and "left".  The width and
+            height may be specified in absolute drawing units, or as a percentage of
+            the canvas width / height using strings that end with "%".  The inset is
+            specified in absolute drawing units.
+        filename: str, optional
+            Supplies a default filename for users who choose to download the
+            matrix contents.  Note that users and web browsers are free to
+            ignore or override this.
+        grid: (rows, columns, index) tuple, or (rows, columns, i, j) tuple, or (rows, columns, i, rowspan, j, columnspan) tuple, optional
+            Use the grid property to position / size the legend using a collection of
+            grid cells filling the canvas.  Specify the number of rows and columns in
+            the grid, then specify either a zero-based cell index (which runs in
+            left-ot-right, top-to-bottom order), a pair of i, j cell coordinates, or
+            a set of i, column-span, j, row-span coordinates so the legend can cover
+            more than one cell.
+        label: str, optional
+            Optional human-readable label for the matrix.
+        llabel: str, optional
+            Human readable label along the left side of the matrix.
+        llocator: :class:`toyplot.locator.TickLocator`, optional
+            Supplies row labels along the left side of the matrix.
+        lshow: bool, optional
+            Set to `False` to hide row labels along the left side of the matrix.
+        margin: number, (top, side) tuple, (top, side, bottom) tuple, or (top, right, bottom, left) tuple, optional
+            Specifies the amount of empty space to leave between the matrix and
+            the containing grid cell when using the `grid` parameter for
+            positioning.
+        rect: (x, y, width, height) tuple, optional
+            Use the rect property to position / size the legend by specifying its
+            upper-left-hand corner, width, and height.  Each parameter may be specified
+            in absolute drawing units, or as a percentage of the canvas width / height
+            using strings that end with "%".
+        rlabel: str, optional
+            Human readable label along the right side of the matrix.
+        rlocator: :class:`toyplot.locator.TickLocator`, optional
+            Supplies row labels along the right side of the matrix.
+        rshow: bool, optional
+            Set to `False` to hide row labels along the right side of the matrix.
+        step: integer, optional
+            Specifies the number of rows or columns to skip between indices.
+            This is useful when the matrix cells become too small relative to
+            the index text.
+        tlabel: str, optional
+            Human readable label along the top of the matrix.
+        tlocator: :class:`toyplot.locator.TickLocator`, optional
+            Supplies column labels along the top of the matrix.
+        tshow: bool, optional
+            Set to `False` to hide column labels along the top of the matrix.
 
         Returns
         -------

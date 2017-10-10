@@ -15,6 +15,8 @@ import custom_inherit
 import numpy
 import six
 
+import toyplot.projection
+
 
 black = "#292724"
 """Default color used throughout Toyplot figures."""
@@ -608,7 +610,7 @@ class LinearMap(Map):
     Values within the domain specified at construction time are mapped to the
     colors in the underlying palette.  Values outside the domain are clamped to
     the minimum / maximum domain values.  If unspecified, the domain will be
-    computed on-the-fly every time :meth:`toyplot.color.LinearMap.colors` is
+    computed on-the-fly each time :meth:`toyplot.color.LinearMap.colors` is
     called.
 
     Parameters
@@ -616,15 +618,16 @@ class LinearMap(Map):
     palette: :class:`toyplot.color.Palette`
         Specify the set of colors used by the map.
     stops: sequence of scalars, one per palette color, optional
-        Specify a "stop" for each palette color.  By default each color is
-        evenly spaced.
+        Specify a "stop" in the range [0, 1] for each palette color.  By
+        default the stops are evenly spaced.
     center: scalar, optional
-        If specified, the mapping domain will be expanded as-needed so that
-        this value falls in the center.  This is useful when there is a
-        significant value that should fall in the middle of the color range,
-        such as zero or a mean.
+        If specified, map [domain_min, center] to the first half of the color
+        palette, and [center, domain_max] to the second half of the palette.
+        This is useful for diverging palettes when there is a domain-specific
+        critical value that should fall in the middle of the color range, such
+        as zero or a mean or median.
     domain_min: scalar, optional
-    domain_max: scalar,  optional
+    domain_max: scalar, optional
 
     Notes
     -----
@@ -665,18 +668,20 @@ class LinearMap(Map):
         domain_max = domain_max if domain_max is not None else self.domain.max if self.domain.max is not None else values.max()
 
         if self._center is not None:
-            spread = max(abs(domain_max - self._center), abs(domain_min - self._center))
-            domain_min = self._center - spread
-            domain_max = self._center + spread
+            segments = [
+                toyplot.projection.Piecewise.Segment("linear", -numpy.inf, domain_min, self._center, self._center, -numpy.inf, 0, 0.5, 0.5),
+                toyplot.projection.Piecewise.Segment("linear", self._center, self._center, domain_max, numpy.inf, 0.5, 0.5, 1.0, numpy.inf),
+            ]
+            projection = toyplot.projection.Piecewise(segments)
+        else:
+            projection = toyplot.projection.linear(domain_min, domain_max, 0.0, 1.0)
 
-        domain = (self._stops * (domain_max - domain_min)) + domain_min
-
-        flat = numpy.ravel(values)
+        flat = projection(numpy.ravel(values))
         result = numpy.empty(flat.shape, dtype=dtype)
-        result["r"] = numpy.interp(flat, domain, self._palette._colors["r"])
-        result["g"] = numpy.interp(flat, domain, self._palette._colors["g"])
-        result["b"] = numpy.interp(flat, domain, self._palette._colors["b"])
-        result["a"] = numpy.interp(flat, domain, self._palette._colors["a"])
+        result["r"] = numpy.interp(flat, self._stops, self._palette._colors["r"])
+        result["g"] = numpy.interp(flat, self._stops, self._palette._colors["g"])
+        result["b"] = numpy.interp(flat, self._stops, self._palette._colors["b"])
+        result["a"] = numpy.interp(flat, self._stops, self._palette._colors["a"])
         return result.reshape(values.shape)
 
     def color(self, value, domain_min=None, domain_max=None):

@@ -618,9 +618,12 @@ class LinearMap(Map):
     stops: sequence of scalars, one per palette color, optional
         Specify a "stop" for each palette color.  By default each color is
         evenly spaced.
-
+    center: scalar, optional
+        If specified, the mapping domain will be expanded as-needed so that
+        this value falls in the center.  This is useful when there is a
+        significant value that should fall in the middle of the color range,
+        such as zero or a mean.
     domain_min: scalar, optional
-
     domain_max: scalar,  optional
 
     Notes
@@ -629,7 +632,7 @@ class LinearMap(Map):
     a Jupyter notebook.
     """
 
-    def __init__(self, palette=None, stops=None, domain_min=None, domain_max=None):
+    def __init__(self, palette=None, stops=None, center=None, domain_min=None, domain_max=None):
         super(LinearMap, self).__init__(domain_min=domain_min, domain_max=domain_max)
 
         if palette is None:
@@ -643,6 +646,7 @@ class LinearMap(Map):
 
         self._palette = palette
         self._stops = stops
+        self._center = center
 
 
     def colors(self, values, domain_min=None, domain_max=None):
@@ -659,6 +663,12 @@ class LinearMap(Map):
         values = numpy.array(values)
         domain_min = domain_min if domain_min is not None else self.domain.min if self.domain.min is not None else values.min()
         domain_max = domain_max if domain_max is not None else self.domain.max if self.domain.max is not None else values.max()
+
+        if self._center is not None:
+            spread = max(abs(domain_max - self._center), abs(domain_min - self._center))
+            domain_min = self._center - spread
+            domain_max = self._center + spread
+
         domain = (self._stops * (domain_max - domain_min)) + domain_min
 
         flat = numpy.ravel(values)
@@ -778,7 +788,7 @@ class BrewerFactory(object):
         """
         return [(name, self.palette(name)) for name in self.names(category)]
 
-    def map(self, name, count=None, reverse=False, domain_min=None, domain_max=None):
+    def map(self, name, count=None, reverse=False, center=None, domain_min=None, domain_max=None):
         """Return a color map that uses the given Color Brewer 2.0 palette.
 
         Returns
@@ -792,6 +802,7 @@ class BrewerFactory(object):
 
         return LinearMap(
             palette=self.palette(name=name, count=count, reverse=reverse),
+            center=center,
             domain_min=domain_min,
             domain_max=domain_max,
             )

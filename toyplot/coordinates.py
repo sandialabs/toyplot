@@ -2135,18 +2135,18 @@ class Cartesian(object):
 
         return self.add_mark(
             toyplot.mark.Scatterplot(
-                table=table,
                 coordinate_axes=coordinate_axes,
                 coordinates=coordinate_keys,
-                marker=marker_keys,
-                msize=msize_keys,
-                mfill=mfill_keys,
-                mstroke=mstroke_keys,
-                mopacity=mopacity_keys,
-                mtitle=mtitle_keys,
-                mstyle=mstyle,
-                mlstyle=mlstyle,
                 filename=filename,
+                marker=marker_keys,
+                mfill=mfill_keys,
+                mlstyle=mlstyle,
+                mopacity=mopacity_keys,
+                msize=msize_keys,
+                mstroke=mstroke_keys,
+                mstyle=mstyle,
+                mtitle=mtitle_keys,
+                table=table,
                 ))
 
     def share(
@@ -2590,18 +2590,18 @@ class Numberline(object):
             offset = len(self._children) * self._spacing
 
         mark = toyplot.mark.Scatterplot(
-            table=table,
             coordinate_axes=coordinate_axes,
             coordinates=coordinate_keys,
-            marker=marker_keys,
-            msize=msize_keys,
-            mfill=mfill_keys,
-            mstroke=mstroke_keys,
-            mopacity=mopacity_keys,
-            mtitle=mtitle_keys,
-            mstyle=mstyle,
-            mlstyle=mlstyle,
             filename=filename,
+            marker=marker_keys,
+            mfill=mfill_keys,
+            mlstyle=mlstyle,
+            mopacity=mopacity_keys,
+            msize=msize_keys,
+            mstroke=mstroke_keys,
+            mstyle=mstyle,
+            mtitle=mtitle_keys,
+            table=table,
             )
 
         self.add_mark(mark)

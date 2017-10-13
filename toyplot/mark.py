@@ -797,17 +797,17 @@ class Scatterplot(Mark):
     def __init__(
             self,
             coordinate_axes,
-            table,
             coordinates,
-            marker,
-            msize,
-            mfill,
-            mstroke,
-            mopacity,
-            mtitle,
-            mstyle,
-            mlstyle,
             filename,
+            marker,
+            mfill,
+            mlstyle,
+            mopacity,
+            msize,
+            mstroke,
+            mstyle,
+            mtitle,
+            table,
         ):
         Mark.__init__(self)
 

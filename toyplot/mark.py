@@ -801,6 +801,7 @@ class Scatterplot(Mark):
             filename,
             marker,
             mfill,
+            mhyperlink,
             mlstyle,
             mopacity,
             msize,
@@ -811,34 +812,37 @@ class Scatterplot(Mark):
         ):
         Mark.__init__(self)
 
-        # D axis identifiers
+        self._table = toyplot.require.instance(table, toyplot.data.Table)
+
+        # We require at last one coordinate dimension (number of dimensions = D)
         self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, min_length=1)
         D = len(self._coordinate_axes)
 
-        self._table = toyplot.require.instance(table, toyplot.data.Table)
-
-        # D * N coordinate columns
+        # We require D coordinate columns for each series (number of series = N)
         self._coordinates = toyplot.require.table_keys(table, coordinates, modulus=D)
         N = len(self._coordinates) / D
 
-        # N marker columns
-        self._marker = toyplot.require.table_keys(table, marker, length=N)
-        # N marker size columns
-        self._msize = toyplot.require.table_keys(table, msize, length=N)
-        # N marker fill color columns
-        self._mfill = toyplot.require.table_keys(table, mfill, length=N)
-        # N marker stroke color columns
-        self._mstroke = toyplot.require.table_keys(table, mstroke, length=N)
-        # N marker opacity columns
-        self._mopacity = toyplot.require.table_keys(table, mopacity, length=N)
-        # N marker title columns
-        self._mtitle = toyplot.require.table_keys(table, mtitle, length=N)
-        # Marker style
-        self._mstyle = toyplot.style.require(mstyle, allowed=toyplot.style.allowed.marker)
-        # Marker label style
-        self._mlstyle = toyplot.style.require(mlstyle, allowed=toyplot.style.allowed.text)
-        # Export filename
+        # We require 1 export filename
         self._filename = toyplot.require.filename(filename)
+        # We require 1 marker style
+        self._mstyle = toyplot.style.require(mstyle, allowed=toyplot.style.allowed.marker)
+        # We require 1 marker label style
+        self._mlstyle = toyplot.style.require(mlstyle, allowed=toyplot.style.allowed.text)
+
+        # We require N marker columns
+        self._marker = toyplot.require.table_keys(table, marker, length=N)
+        # We require N marker fill color columns
+        self._mfill = toyplot.require.table_keys(table, mfill, length=N)
+        # We require N marker hyperlink columns
+        self._mhyperlink = toyplot.require.table_keys(table, mhyperlink, length=N)
+        # We require N marker opacity columns
+        self._mopacity = toyplot.require.table_keys(table, mopacity, length=N)
+        # We require N marker size columns
+        self._msize = toyplot.require.table_keys(table, msize, length=N)
+        # We require N marker stroke color columns
+        self._mstroke = toyplot.require.table_keys(table, mstroke, length=N)
+        # We require N marker title columns
+        self._mtitle = toyplot.require.table_keys(table, mtitle, length=N)
 
     def domain(self, axis):
         columns = [coordinate_column for coordinate_axis, coordinate_column in zip(itertools.cycle(self._coordinate_axes), self._coordinates) if coordinate_axis == axis]

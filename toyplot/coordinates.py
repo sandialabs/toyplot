@@ -2025,15 +2025,16 @@ class Cartesian(object):
             a,
             b=None,
             along="x",
-            color=None,
-            marker="o",
             area=None,
-            size=None,
-            opacity=1.0,
-            title=None,
-            mstyle=None,
-            mlstyle=None,
+            color=None,
             filename=None,
+            hyperlink=None,
+            marker="o",
+            mlstyle=None,
+            mstyle=None,
+            opacity=1.0,
+            size=None,
+            title=None,
         ):
         """Add a bivariate plot to the axes.
 
@@ -2096,6 +2097,7 @@ class Cartesian(object):
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
         mopacity = toyplot.broadcast.scalar(opacity, series.shape)
         mtitle = toyplot.broadcast.pyobject(title, series.shape)
+        mhyperlink = toyplot.broadcast.pyobject(hyperlink, series.shape)
         mstyle = toyplot.style.require(mstyle, allowed=toyplot.style.allowed.marker)
         mlstyle = toyplot.style.require(mlstyle, allowed=toyplot.style.allowed.text)
 
@@ -2114,8 +2116,9 @@ class Cartesian(object):
         mstroke_keys = []
         mopacity_keys = []
         mtitle_keys = []
-        for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column, mtitle_column) in enumerate(
-                zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T, mtitle.T)):
+        mhyperlink_keys = []
+        for index, (series_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column, mtitle_column, mhyperlink_column) in enumerate(
+                zip(series.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T, mtitle.T, mhyperlink.T)):
             coordinate_keys.append(coordinate_axes[0])
             coordinate_keys.append(coordinate_axes[1] + str(index))
             marker_keys.append("marker" + str(index))
@@ -2124,6 +2127,7 @@ class Cartesian(object):
             mstroke_keys.append("stroke" + str(index))
             mopacity_keys.append("opacity" + str(index))
             mtitle_keys.append("title" + str(index))
+            mhyperlink_keys.append("hyperlink" + str(index))
             table[coordinate_keys[-1]] = series_column
             _mark_exportable(table, coordinate_keys[-1])
             table[marker_keys[-1]] = marker_column
@@ -2132,6 +2136,7 @@ class Cartesian(object):
             table[mstroke_keys[-1]] = mstroke_column
             table[mopacity_keys[-1]] = mopacity_column
             table[mtitle_keys[-1]] = mtitle_column
+            table[mhyperlink_keys[-1]] = mhyperlink_column
 
         return self.add_mark(
             toyplot.mark.Scatterplot(
@@ -2140,6 +2145,7 @@ class Cartesian(object):
                 filename=filename,
                 marker=marker_keys,
                 mfill=mfill_keys,
+                mhyperlink=mhyperlink_keys,
                 mlstyle=mlstyle,
                 mopacity=mopacity_keys,
                 msize=msize_keys,
@@ -2502,16 +2508,18 @@ class Numberline(object):
     def scatterplot(
             self,
             coordinates,
-            offset=None,
-            color=None,
-            marker="o",
             area=None,
-            size=None,
-            opacity=1.0,
-            title=None,
-            mstyle=None,
+            color=None,
+            filename=None,
+            hyperlink=None,
+            marker="o",
             mlstyle=None,
-            filename=None):
+            mstyle=None,
+            offset=None,
+            opacity=1.0,
+            size=None,
+            title=None,
+            ):
         """Add a univariate plot to the axes.
 
         Parameters
@@ -2554,6 +2562,7 @@ class Numberline(object):
         mstroke = toyplot.color.broadcast(colors=mfill, shape=coordinates.shape)
         mopacity = toyplot.broadcast.scalar(opacity, coordinates.shape)
         mtitle = toyplot.broadcast.pyobject(title, coordinates.shape)
+        mhyperlink = toyplot.broadcast.pyobject(hyperlink, coordinates.shape)
         mstyle = toyplot.style.require(mstyle, allowed=toyplot.style.allowed.marker)
         mlstyle = toyplot.style.require(mlstyle, allowed=toyplot.style.allowed.text)
 
@@ -2568,8 +2577,9 @@ class Numberline(object):
         mstroke_keys = []
         mopacity_keys = []
         mtitle_keys = []
-        for index, (coordinate_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column, mtitle_column) in enumerate(
-                zip(coordinates.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T, mtitle.T)):
+        mhyperlink_keys = []
+        for index, (coordinate_column, marker_column, msize_column, mfill_column, mstroke_column, mopacity_column, mtitle_column, mhyperlink_column) in enumerate(
+                zip(coordinates.T, marker.T, msize.T, mfill.T, mstroke.T, mopacity.T, mtitle.T, mhyperlink.T)):
             coordinate_keys.append(coordinate_axes[0] + str(index))
             marker_keys.append("marker" + str(index))
             msize_keys.append("size" + str(index))
@@ -2577,6 +2587,7 @@ class Numberline(object):
             mstroke_keys.append("stroke" + str(index))
             mopacity_keys.append("opacity" + str(index))
             mtitle_keys.append("title" + str(index))
+            mhyperlink_keys.append("hyperlink" + str(index))
             table[coordinate_keys[-1]] = coordinate_column
             _mark_exportable(table, coordinate_keys[-1])
             table[marker_keys[-1]] = marker_column
@@ -2585,6 +2596,7 @@ class Numberline(object):
             table[mstroke_keys[-1]] = mstroke_column
             table[mopacity_keys[-1]] = mopacity_column
             table[mtitle_keys[-1]] = mtitle_column
+            table[mhyperlink_keys[-1]] = mhyperlink_column
 
         if offset is None:
             offset = len(self._children) * self._spacing
@@ -2595,6 +2607,7 @@ class Numberline(object):
             filename=filename,
             marker=marker_keys,
             mfill=mfill_keys,
+            mhyperlink=mhyperlink_keys,
             mlstyle=mlstyle,
             mopacity=mopacity_keys,
             msize=msize_keys,

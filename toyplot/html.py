@@ -1780,7 +1780,7 @@ def _render(numberline, mark, context):
 
     dimension1 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates])
     X = numberline.axis.projection(dimension1)
-    for x, marker, msize, mfill, mstroke, mopacity, mtitle in zip(
+    for x, marker, msize, mfill, mstroke, mopacity, mtitle, mhyperlink in zip(
             X.T,
             [mark._table[key] for key in mark._marker],
             [mark._table[key] for key in mark._msize],
@@ -1788,12 +1788,12 @@ def _render(numberline, mark, context):
             [mark._table[key] for key in mark._mstroke],
             [mark._table[key] for key in mark._mopacity],
             [mark._table[key] for key in mark._mtitle],
+            [mark._table[key] for key in mark._mhyperlink],
         ):
         not_null = numpy.invert(numpy.ma.getmaskarray(x))
 
-        series_xml = xml.SubElement(
-            mark_xml, "g", attrib={"class": "toyplot-Series"})
-        for dx, dmarker, dsize, dfill, dstroke, dopacity, dtitle in zip(
+        series_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Series"})
+        for dx, dmarker, dsize, dfill, dstroke, dopacity, dtitle, dhyperlink in zip(
                 x[not_null],
                 marker[not_null],
                 msize[not_null],
@@ -1801,8 +1801,14 @@ def _render(numberline, mark, context):
                 mstroke[not_null],
                 mopacity[not_null],
                 mtitle[not_null],
+                mhyperlink[not_null],
             ):
             if dmarker:
+                if dhyperlink:
+                    datum_xml = xml.SubElement(series_xml, "a", attrib={"xlink:href": dhyperlink})
+                else:
+                    datum_xml = series_xml
+
                 dstyle = toyplot.style.combine(
                     {
                         "fill": toyplot.color.to_css(dfill),
@@ -1811,7 +1817,7 @@ def _render(numberline, mark, context):
                     },
                     mark._mstyle)
                 _draw_marker(
-                    series_xml,
+                    datum_xml,
                     cx=dx,
                     cy=0,
                     marker=toyplot.marker.create(size=dsize, mstyle=dstyle, lstyle=mark._mlstyle) + toyplot.marker.convert(dmarker),
@@ -2866,7 +2872,7 @@ def _render(axes, mark, context):
 
     _render_table(owner=mark, key="data", label="scatterplot", table=mark._table, filename=mark._filename, context=context)
 
-    for x, y, marker, msize, mfill, mstroke, mopacity, mtitle in zip(
+    for x, y, marker, msize, mfill, mstroke, mopacity, mtitle, mhyperlink in zip(
             X.T,
             Y.T,
             [mark._table[key] for key in mark._marker],
@@ -2875,13 +2881,14 @@ def _render(axes, mark, context):
             [mark._table[key] for key in mark._mstroke],
             [mark._table[key] for key in mark._mopacity],
             [mark._table[key] for key in mark._mtitle],
+            [mark._table[key] for key in mark._mhyperlink],
         ):
         not_null = numpy.invert(numpy.logical_or(
             numpy.ma.getmaskarray(x), numpy.ma.getmaskarray(y)))
 
         series_xml = xml.SubElement(
             mark_xml, "g", attrib={"class": "toyplot-Series"})
-        for dx, dy, dmarker, dsize, dfill, dstroke, dopacity, dtitle in zip(
+        for dx, dy, dmarker, dsize, dfill, dstroke, dopacity, dtitle, dhyperlink in zip(
                 x[not_null],
                 y[not_null],
                 marker[not_null],
@@ -2890,8 +2897,14 @@ def _render(axes, mark, context):
                 mstroke[not_null],
                 mopacity[not_null],
                 mtitle[not_null],
+                mhyperlink[not_null],
             ):
             if dmarker:
+                if dhyperlink:
+                    datum_xml = xml.SubElement(series_xml, "a", attrib={"xlink:href": dhyperlink})
+                else:
+                    datum_xml = series_xml
+
                 dstyle = toyplot.style.combine(
                     {
                         "fill": toyplot.color.to_css(dfill),
@@ -2900,7 +2913,7 @@ def _render(axes, mark, context):
                     },
                     mark._mstyle)
                 _draw_marker(
-                    series_xml,
+                    datum_xml,
                     cx=dx,
                     cy=dy,
                     marker=toyplot.marker.create(size=dsize, mstyle=dstyle, lstyle=mark._mlstyle) + toyplot.marker.convert(dmarker),

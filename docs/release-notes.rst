@@ -7,6 +7,25 @@
 Release Notes
 =============
 
+Toyplot 0.16.0 - October 26th, 2017
+-----------------------------------
+
+* The -toyplot-anchor-shift property didn't affect text layout extents correctly - thanks to Deren Eaton.
+* Corrected a broken link in the documentation - thanks to Github user @kannes.
+* Removed the dependency on colormath, which is currently broken by an API change in networkx.
+* Replaced toyplot.compatibility with six, since the latter is already a transitive dependency.
+* Replaced toyplot.color.near_black with toyplot.color.black
+* A hyperlink can be set for an entire canvas.
+* A hyperlink can be set for a set of Cartesian axes.
+* Per-datum hyperlinks can be set for scatterplots.
+* Moved documentation- and test-specific code out of the main library.
+* Set a reasonable stroke width when drawing text layout boxes for troubleshooting.
+* Clarified in the documentation how tick locators can affect the visible domain.
+* Corrected copy-n-paste errors in many docstrings.
+* Fixed many broken documentation crosslinks.
+* Supplied many missing docstrings.
+* Removed the WebM rendering backend, which has been broken and unused for a long time.
+
 Toyplot 0.15.1 - July 27, 2017
 ------------------------------
 

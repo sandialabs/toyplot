@@ -430,6 +430,7 @@ def read_csv(fobj, convert=False):
 
     return result
 
+
 def communities():
     """Return sample community detection data.
 
@@ -447,3 +448,15 @@ def communities():
     assigned = numpy.array([row.split() for row in open(os.path.join(_data_dir, "community-assigned.csv"), "rb")], dtype="int")
 
     return edges, truth, assigned
+
+
+def commute():
+    """Return sample OBD-II commuting data.
+
+    Returns
+    -------
+    table: :class:`toyplot.data.Table`
+        Table containing a stream of OBD-II data collected from an automobile during a morning commute.
+    """
+    return read_csv(os.path.join(_data_dir, "commute.csv"))
+

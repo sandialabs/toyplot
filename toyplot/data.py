@@ -481,3 +481,15 @@ def deliveries():
         Table containing a stream of OBD-II data collected from an automobile during a morning commute.
     """
     return read_csv(os.path.join(_data_dir, "deliveries.csv"))
+
+
+def temperatures():
+    """Return sample temperature data.
+
+    Returns
+    -------
+    table: :class:`toyplot.data.Table`
+        Table containing temperature data collected by NOAA.
+    """
+    return read_csv(temperatures.path)
+temperatures.path = os.path.join(_data_dir, "temperatures.csv")

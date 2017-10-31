@@ -329,7 +329,7 @@ def step_impl(context):
 
 @when(u'toyplot.data.Table is initialized with a csv file')
 def step_impl(context):
-    context.data = toyplot.data.read_csv("docs/temperatures.csv")
+    context.data = toyplot.data.read_csv(toyplot.data.temperatures.path)
 
 
 @then(u'the toyplot.data.Table contains the csv file columns')
@@ -342,7 +342,7 @@ def step_impl(context):
 
 @when(u'toyplot.data.Table is initialized with a csv file and conversion')
 def step_impl(context):
-    context.data = toyplot.data.read_csv("docs/temperatures.csv", convert=True)
+    context.data = toyplot.data.read_csv(toyplot.data.temperatures.path, convert=True)
 
 
 @then(u'the toyplot.data.Table contains the csv file columns with numeric type')
@@ -356,7 +356,7 @@ def step_impl(context):
 @when(u'toyplot.data.Table is initialized with a pandas dataframe')
 def step_impl(context):
     if pandas_available(context):
-        context.data = toyplot.data.Table(pandas.read_csv("docs/temperatures.csv"))
+        context.data = toyplot.data.Table(pandas.read_csv(toyplot.data.temperatures.path))
 
 
 @then(u'the toyplot.data.Table contains the data frame columns')
@@ -368,7 +368,7 @@ def step_impl(context):
 @when(u'toyplot.data.Table is initialized with a pandas dataframe with index')
 def step_impl(context):
     if pandas_available(context):
-        context.data = toyplot.data.Table(pandas.read_csv("docs/temperatures.csv"), index=True)
+        context.data = toyplot.data.Table(pandas.read_csv(toyplot.data.temperatures.path), index=True)
 
 
 @then(u'the toyplot.data.Table contains the data frame columns plus an index column')
@@ -408,7 +408,7 @@ def step_impl(context):
 @when(u'toyplot.data.Table is initialized with a pandas dataframe with duplicate column names')
 def step_impl(context):
     if pandas_available(context):
-        context.data = toyplot.data.Table(pandas.read_csv("docs/temperatures.csv")[["STATION", "DATE", "STATION", "DATE", "DATE"]])
+        context.data = toyplot.data.Table(pandas.read_csv(toyplot.data.temperatures.path)[["STATION", "DATE", "STATION", "DATE", "DATE"]])
 
 
 @then(u'the toyplot.data.Table contains the data frame columns with uniqified column names')

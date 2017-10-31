@@ -431,6 +431,17 @@ def read_csv(fobj, convert=False):
     return result
 
 
+def cars():
+    """Return sample automobile model data.
+
+    Returns
+    -------
+    table: :class:`toyplot.data.Table`
+        Table containing descriptions of multiple makes and models of automobile.
+    """
+    return read_csv(os.path.join(_data_dir, "cars.csv"), convert=True)
+
+
 def communities():
     """Return sample community detection data.
 

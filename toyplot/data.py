@@ -9,6 +9,7 @@ from __future__ import division
 import collections
 import itertools
 import numbers
+import os
 import sys
 import xml.etree.ElementTree as xml
 
@@ -21,6 +22,7 @@ import six
 
 import toyplot.color
 
+_data_dir = os.path.abspath(os.path.dirname(__file__))
 
 def minimax(items):
     """Compute the minimum and maximum of an arbitrary collection of scalar- or array-like items.
@@ -427,3 +429,21 @@ def read_csv(fobj, convert=False):
                     pass
 
     return result
+
+def communities():
+    """Return sample community detection data.
+
+    Returns
+    -------
+    edges: :class:`numpy.ndarray`
+        An :math:`E \\times 2` matrix containing source and target vertex ids for :math:`E` edges.
+    truth: :class:`numpy.ndarray`
+        A :math:`V \\times 2` matrix containing a vertex id and ground-truth community id for :math:`V` vertices.
+    assigned: :class:`numpy.ndarray`
+        A :math:`V \\times 2` matrix containing a vertex id and alternate community id for :math:`V` vertices.
+    """
+    edges = numpy.array([row.split() for row in open(os.path.join(_data_dir, "community-edges.csv"), "rb")], dtype="int")
+    truth = numpy.array([row.split() for row in open(os.path.join(_data_dir, "community-truth.csv"), "rb")], dtype="int")
+    assigned = numpy.array([row.split() for row in open(os.path.join(_data_dir, "community-assigned.csv"), "rb")], dtype="int")
+
+    return edges, truth, assigned

@@ -6,7 +6,6 @@ from setuptools import setup, find_packages
 import re
 
 setup(
-    name="toyplot",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
@@ -38,6 +37,9 @@ setup(
   See the Toyplot documentation at http://toyplot.readthedocs.io, and the Toyplot sources at http://github.com/sandialabs/toyplot""",
     maintainer="Timothy M. Shead",
     maintainer_email="tshead@sandia.gov",
+    name="toyplot",
+    packages=find_packages(),
+    package_data = {"": ["*.csv"]},
     url="http://toyplot.readthedocs.org",
     version=re.search(
         r"^__version__ = ['\"]([^'\"]*)['\"]",
@@ -45,5 +47,4 @@ setup(
             "toyplot/__init__.py",
             "r").read(),
         re.M).group(1),
-    packages=find_packages(),
 )

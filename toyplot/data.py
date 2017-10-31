@@ -470,5 +470,3 @@ def deliveries():
         Table containing a stream of OBD-II data collected from an automobile during a morning commute.
     """
     return read_csv(os.path.join(_data_dir, "deliveries.csv"))
-
-

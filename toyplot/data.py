@@ -460,3 +460,15 @@ def commute():
     """
     return read_csv(os.path.join(_data_dir, "commute.csv"))
 
+
+def deliveries():
+    """Return sample delivery data.
+
+    Returns
+    -------
+    table: :class:`toyplot.data.Table`
+        Table containing a stream of OBD-II data collected from an automobile during a morning commute.
+    """
+    return read_csv(os.path.join(_data_dir, "deliveries.csv"))
+
+

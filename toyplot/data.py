@@ -439,7 +439,8 @@ def cars():
     table: :class:`toyplot.data.Table`
         Table containing descriptions of multiple makes and models of automobile.
     """
-    return read_csv(os.path.join(_data_dir, "cars.csv"), convert=True)
+    return read_csv(cars.path, convert=True)
+cars.path = os.path.join(_data_dir, "cars.csv")
 
 
 def communities():
@@ -469,7 +470,8 @@ def commute():
     table: :class:`toyplot.data.Table`
         Table containing a stream of OBD-II data collected from an automobile during a morning commute.
     """
-    return read_csv(os.path.join(_data_dir, "commute.csv"))
+    return read_csv(commute.path)
+commute.path = os.path.join(_data_dir, "commute.csv")
 
 
 def deliveries():
@@ -480,7 +482,8 @@ def deliveries():
     table: :class:`toyplot.data.Table`
         Table containing a stream of OBD-II data collected from an automobile during a morning commute.
     """
-    return read_csv(os.path.join(_data_dir, "deliveries.csv"))
+    return read_csv(deliveries.path)
+deliveries.path = os.path.join(_data_dir, "deliveries.csv")
 
 
 def temperatures():

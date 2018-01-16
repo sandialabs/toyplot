@@ -7,16 +7,26 @@
 from __future__ import absolute_import
 from __future__ import division
 
-
+import logging
 import os
 import subprocess
+
 import toyplot.png
 
+log = logging.getLogger(__name__)
 
-for path in os.environ["PATH"].split(os.pathsep):
-    if os.path.exists(os.path.join(path, "ffmpeg")):
-        break
-else:
+# Verify that ffmpeg is installed, and check the version
+_ffmpeg_command = None
+_ffmpeg_version = None
+for command in ["ffmpeg"]:
+    try:
+        _ffmpeg_version = subprocess.check_output([command, "-version"]).decode(encoding="utf-8").strip()
+        _ffmpeg_command = command
+        log.info("Using %s.", _ffmpeg_version)
+    except:
+        pass
+
+if _ffmpeg_command is None:
     raise Exception("An ffmpeg executable is required.")  # pragma: no cover
 
 
@@ -62,24 +72,35 @@ def render(
     """
 
     command = [
-        "ffmpeg",
+        _ffmpeg_command,
         "-f", "image2pipe",
         "-c", "png",
         "-i", "-",
         "-pix_fmt", "yuv420p",
+        "-vcodec", "h264",
+        "-preset", "slow",
+        "-tune", "animation",
+        "-crf", "17",
         "-y",
         filename,
     ]
-    ffmpeg = subprocess.Popen(
-        command,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
-    for frame, png in enumerate(
-            toyplot.png.render_frames(
-                canvas=canvas, width=width, height=height, scale=scale)):
-        if progress is not None:
-            progress(frame)
-        ffmpeg.stdin.write(png)
-    ffmpeg.stdin.close()
-    ffmpeg.wait()
+
+    try:
+        log.info("Running command: %s", " ".join(command))
+        ffmpeg = subprocess.Popen(
+            command,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        for frame, png in enumerate(
+                toyplot.png.render_frames(
+                    canvas=canvas, width=width, height=height, scale=scale)):
+            if progress is not None:
+                progress(frame)
+            ffmpeg.stdin.write(png)
+        ffmpeg.stdin.close()
+        ffmpeg.wait()
+    except Exception as e:
+        log.error(ffmpeg.stdout.read())
+        log.error(ffmpeg.stderr.read())
+        raise e

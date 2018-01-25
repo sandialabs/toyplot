@@ -234,21 +234,30 @@ def apply_changes(html, changes):
         elif change_type == "set-datum-style":
             for mark_id, series, datum, style in instructions:
                 mark_xml = html.find(".//*[@id='%s']" % mark_id)
-                series_xml = mark_xml.findall(
-                    "*[@class='toyplot-Series']")[series]
-                datum_xml = series_xml.findall(
-                    "*[@class='toyplot-Datum']")[datum]
+                series_xml = mark_xml.findall("*[@class='toyplot-Series']")[series]
+                datum_xml = series_xml.findall("*[@class='toyplot-Datum']")[datum]
                 style = toyplot.style.combine(dict([declaration.split(
                     ":") for declaration in datum_xml.get("style").split(";") if declaration != ""]), style)
                 datum_xml.set("style", _css_style(style))
         elif change_type == "set-datum-text":
-            for mark_id, series, datum, text in instructions:
+            for mark_id, series, datum, text, style in instructions:
                 mark_xml = html.find(".//*[@id='%s']" % mark_id)
-                series_xml = mark_xml.findall(
-                    "*[@class='toyplot-Series']")[series]
-                datum_xml = series_xml.findall(
-                    "*[@class='toyplot-Datum']")[datum]
-                datum_xml.text = text
+                series_xml = mark_xml.findall("*[@class='toyplot-Series']")[series]
+                datum_xml = series_xml.findall("*[@class='toyplot-Datum']")[datum]
+
+                # Render the new text, parented to a temporary element.
+                root_xml = xml.Element("temp")
+                _draw_text(root_xml, text, style=style)
+
+                # Remove old markup from the datum.
+                while len(datum_xml):
+                    del datum_xml[0]
+
+                # Move new markup to the datum.
+                for child in root_xml[0]:
+                    datum_xml.append(child)
+
+                #xml.dump(datum_xml)
 
 
 def render(canvas, fobj=None, animation=False, style=None):

@@ -1254,8 +1254,8 @@ def _render_animation(canvas, context):
                     for(var i = 0; i != type_changes.length; ++i)
                     {
                       var mark_style = type_changes[i];
-                      var mark = get_item(mark_style[0]);
-                      for(var key in mark_style[1])
+                      var mark = get_item(mark_style.mark);
+                      for(var key in mark_style.style)
                         mark.style.setProperty(key, mark_style[1][key]);
                     }
                   }
@@ -1264,9 +1264,9 @@ def _render_animation(canvas, context):
                     for(var i = 0; i != type_changes.length; ++i)
                     {
                       var datum_style = type_changes[i];
-                      var datum = get_item(datum_style[0]).querySelectorAll(".toyplot-Series")[datum_style[1]].querySelectorAll(".toyplot-Datum")[datum_style[2]];
-                      for(var key in datum_style[3])
-                        datum.style.setProperty(key, datum_style[3][key]);
+                      var datum = get_item(datum_style.mark).querySelectorAll(".toyplot-Series")[datum_style.series].querySelectorAll(".toyplot-Datum")[datum_style.datum];
+                      for(var key in datum_style.style)
+                        datum.style.setProperty(key, datum_style.style[key]);
                     }
                   }
                 }

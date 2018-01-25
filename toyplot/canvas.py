@@ -27,16 +27,12 @@ class AnimationFrame(object):
     AnimationFrame is automatically created by :meth:`toyplot.canvas.Canvas.animate`
     or :meth:`toyplot.canvas.Canvas.time` and passed to your callback.
     """
-    def __init__(self, count, index, begin, end, changes):
+    def __init__(self, changes, count, index, begin, end):
+        self._changes = changes
         self._count = count
         self._index = index
         self._begin = begin
         self._end = end
-        self._changes = changes
-
-        # Pre-initialize storage for this frame
-        self._changes[self._begin]
-        self._changes[self._end]
 
     @property
     def count(self):
@@ -90,7 +86,7 @@ class AnimationFrame(object):
             raise ValueError(
                 "Mark style can only be set on toyplot.mark.Mark instances.")
 
-        self._changes[self._begin]["set-mark-style"].append((mark, style))
+        self._changes.add(self._begin, self._end, "set-mark-style", dict(mark=mark, style=style))
 
     def set_datum_style(self, mark, series, datum, style):
         """Change the style of one datum in a :class:`toyplot.mark.Mark` at the current frame.
@@ -114,8 +110,10 @@ class AnimationFrame(object):
             )):
             raise ValueError("Cannot set datum style for %s." % type(mark))
 
-        self._changes[self._begin][
-            "set-datum-style"].append((mark, series, datum, style))
+        self._changes.add(self._begin, self._end, "set-datum-style", dict(mark=mark, series=series, datum=datum, style=style))
+
+    def set_text(self, mark, text, style=None):
+        self.set_datum_text(mark, 0, 0, text, style)
 
     def set_datum_text(self, mark, series, datum, text, style=None):
         """Change the text in a :class:`toyplot.mark.Text` at the current frame.
@@ -152,8 +150,7 @@ class AnimationFrame(object):
         if not isinstance(style, (dict, type(None))):
             raise ValueError("style must be a dict or None.")
 
-        self._changes[self._begin]["set-datum-text"].append((mark, series, datum, text, style))
-
+        self._changes.add(self._begin, self._end, "set-datum-text", dict(mark=mark, series=series, datum=datum, text=text, style=style))
 
 
 ##########################################################################
@@ -193,9 +190,18 @@ class Canvas(object):
     >>> canvas = toyplot.Canvas("8in", "6in", style={"background-color":"yellow"})
     """
 
-    class _AnimationFrames(collections.defaultdict):
+    class _AnimationChanges(object):
         def __init__(self):
-            collections.defaultdict.__init__(self, lambda: collections.defaultdict(list))
+            self._begin = []
+            self._end = []
+            self._change = []
+            self._state = []
+
+        def add(self, begin, end, change, state):
+            self._begin.append(begin)
+            self._end.append(end)
+            self._change.append(change)
+            self._state.append(state)
 
     def __init__(self, width=None, height=None, style=None, hyperlink=None, autorender=None, autoformat=None):
         # Must be set before _height
@@ -217,7 +223,7 @@ class Canvas(object):
         self.hyperlink = hyperlink
         self.style = style
 
-        self._animation = toyplot.Canvas._AnimationFrames()
+        self._changes = toyplot.Canvas._AnimationChanges()
         self._children = []
         self.autorender(autorender, autoformat)
 
@@ -295,13 +301,20 @@ class Canvas(object):
             times = numpy.linspace(0, frame_count / frame_rate, frame_count + 1, endpoint=True)
 
         for index, (begin, end) in enumerate(zip(times[:-1], times[1:])):
-            frame = AnimationFrame(index=index, begin=begin, end=end, count=frame_count, changes=self._animation)
+            frame = AnimationFrame(changes=self._changes, index=index, begin=begin, end=end, count=frame_count)
             if callback:
                 callback(frame)
 
-        # Record the end-time of the last frame, so backends can calculate
-        # frame durations.
-        self._animation[frames[-1]]
+
+    def animation(self):
+        begin = 0.0
+        end = numpy.max(self._changes._end)
+        changes = collections.defaultdict(lambda: collections.defaultdict(list))
+        for begin, change, state in zip(self._changes._begin, self._changes._change, self._changes._state):
+            changes[begin][change].append(state)
+
+        return begin, end, changes
+
 
     def autorender(self, enable=None, autoformat=None):
         """Enable / disable canvas autorendering.
@@ -1243,7 +1256,7 @@ class Canvas(object):
             index = 0
         if count is None:
             count = 1
-        return AnimationFrame(count, index, begin, end, self._animation)
+        return AnimationFrame(changes=self._changes, count=count, index=index, begin=begin, end=end)
 
     def _point_scale(self, width=None, height=None, scale=None):
         """Return a scale factor to convert this canvas to a target width or height in points."""

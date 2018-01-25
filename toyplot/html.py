@@ -63,13 +63,13 @@ class RenderContext(object):
     implementing rendering code.  It is not intended for end-users.
     """
     def __init__(self, root):
-        self._animation = collections.defaultdict(lambda: collections.defaultdict(list))
-        self._id_cache = dict()
+        self._animation = {}
+        self._id_cache = {}
         self._parent = None
         self._rendered = set()
         self._root = root
-        self._javascript_modules = dict()
-        self._javascript_calls = list()
+        self._javascript_modules = {}
+        self._javascript_calls = []
 
     def already_rendered(self, o):
         """Track whether an object has already been rendered.
@@ -1008,7 +1008,7 @@ def _render(canvas, context):
 
     # Embed Javascript code and dependencies in the container.
     _render_javascript(context.copy(parent=javascript_xml))
-    _render(canvas._animation, context.copy(parent=javascript_xml)) # pylint: disable=no-value-for-parameter
+    _render_animation(canvas, context.copy(parent=javascript_xml)) # pylint: disable=no-value-for-parameter
 
 
 def _render_javascript(context):
@@ -1121,22 +1121,31 @@ def _render_table(owner, key, label, table, filename, context):
     )
 
 
-@dispatch(toyplot.canvas.Canvas._AnimationFrames, RenderContext)
-def _render(frames, context):
-    # Collect animation data.
-    for time, time_changes in list(frames.items())[:-1]:
-        # Ensure we have an entry for every time, even if there aren't any
-        # changes.
-        context.animation[time]
-        for frame_type, type_changes in time_changes.items():
-            for change in type_changes:
-                context.animation[time][frame_type].append(
-                    [context.get_id(change[0])] + list(change[1:]))
+@dispatch(toyplot.canvas.Canvas, RenderContext)
+def _render_animation(canvas, context):
+    # Collect animation changes, alter them so they can be used with the DOM,
+    # and store them in the render context for later use by callers.
+    begin, end, changes = canvas.animation()
 
-    if len(context.animation) < 2:
+    for time, change in changes.items():
+        context.animation[time] = {}
+        for key, states in change.items():
+            context.animation[time][key] = []
+            for state in states:
+                context.animation[time][key].append({})
+                for k, v in state.items():
+                    if isinstance(v, toyplot.mark.Mark):
+                        v = context.get_id(v)
+                    context.animation[time][key][-1][k] = v
+
+    # If we don't have any animation, we're done.
+    if len(context.animation) < 1:
         return
 
-    times = numpy.array(sorted(context.animation.keys()))
+    # We do have animation, so reconfigure our animation changes for use with
+    # JavaScript.
+
+    times = numpy.concatenate((sorted(context.animation.keys()), [end]))
     durations = times[1:] - times[:-1]
     changes = [change for time, change in sorted(context.animation.items())]
 
@@ -1183,7 +1192,7 @@ def _render(frames, context):
                 </svg>
             </button>
         </div>""".format(
-            frames=len(times) - 2,
+            frames=len(context.animation),
             black=toyplot.color.black,
             )))
 

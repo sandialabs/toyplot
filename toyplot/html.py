@@ -48,11 +48,13 @@ _namespace = dict()
 dispatch = functools.partial(dispatch, namespace=_namespace)
 
 
-class _NumpyJSONEncoder(json.JSONEncoder):
+class _CustomJSONEncoder(json.JSONEncoder):
     # pylint: disable=method-hidden
     def default(self, o): # pragma: no cover
         if isinstance(o, numpy.generic):
             return numpy.asscalar(o)
+        if isinstance(o, xml.Element):
+            return six.text_type(xml.tostring(o, encoding="utf-8", method="html"), encoding="utf-8")
         return json.JSONEncoder.default(self, o)
 
 
@@ -224,40 +226,33 @@ class RenderContext(object):
 
 
 def apply_changes(html, changes):
-    for change_type, instructions in changes.items():
-        if change_type == "set-mark-style":
-            for mark_id, style in instructions:
-                mark = html.find(".//*[@id='%s']" % mark_id)
-                style = toyplot.style.combine(dict([declaration.split(
-                    ":") for declaration in mark.get("style").split(";") if declaration != ""]), style)
+    for change, states in changes.items():
+        if change == "set-mark-style":
+            for state in states:
+                mark = html.find(".//*[@id='%s']" % state["mark"])
+                style = toyplot.style.combine(dict([declaration.split(":") for declaration in mark.get("style").split(";") if declaration != ""]), state["style"])
                 mark.set("style", _css_style(style))
-        elif change_type == "set-datum-style":
-            for mark_id, series, datum, style in instructions:
-                mark_xml = html.find(".//*[@id='%s']" % mark_id)
-                series_xml = mark_xml.findall("*[@class='toyplot-Series']")[series]
-                datum_xml = series_xml.findall("*[@class='toyplot-Datum']")[datum]
+        elif change == "set-datum-style":
+            for state in states:
+                mark_xml = html.find(".//*[@id='%s']" % state["mark"])
+                series_xml = mark_xml.findall("*[@class='toyplot-Series']")[state["series"]]
+                datum_xml = series_xml.findall("*[@class='toyplot-Datum']")[state["datum"]]
                 style = toyplot.style.combine(dict([declaration.split(
-                    ":") for declaration in datum_xml.get("style").split(";") if declaration != ""]), style)
+                    ":") for declaration in datum_xml.get("style").split(";") if declaration != ""]), state["style"])
                 datum_xml.set("style", _css_style(style))
-        elif change_type == "set-datum-text":
-            for mark_id, series, datum, text, style in instructions:
-                mark_xml = html.find(".//*[@id='%s']" % mark_id)
-                series_xml = mark_xml.findall("*[@class='toyplot-Series']")[series]
-                datum_xml = series_xml.findall("*[@class='toyplot-Datum']")[datum]
-
-                # Render the new text, parented to a temporary element.
-                root_xml = xml.Element("temp")
-                _draw_text(root_xml, text, style=style)
+        elif change == "set-datum-text":
+            for state in states:
+                mark_xml = html.find(".//*[@id='%s']" % state["mark"])
+                series_xml = mark_xml.findall("*[@class='toyplot-Series']")[state["series"]]
+                datum_xml = series_xml.findall("*[@class='toyplot-Datum']")[state["datum"]]
 
                 # Remove old markup from the datum.
                 while len(datum_xml):
                     del datum_xml[0]
 
-                # Move new markup to the datum.
-                for child in root_xml[0]:
+                # Copy new markup to the datum.
+                for child in state["layout"]:
                     datum_xml.append(child)
-
-                #xml.dump(datum_xml)
 
 
 def render(canvas, fobj=None, animation=False, style=None):
@@ -1050,7 +1045,7 @@ var modules={};
             script += ",".join(argument_list)
             script += ");\n"
         if value is not None:
-            script += json.dumps(value, cls=_NumpyJSONEncoder, sort_keys=True)
+            script += json.dumps(value, cls=_CustomJSONEncoder, sort_keys=True)
             script += ";\n"
 
     # Make all calls.
@@ -1059,7 +1054,7 @@ var modules={};
         script += code
         script += """)("""
         argument_list = ["""modules["%s"]""" % requirement for requirement in requirements]
-        argument_list += [json.dumps(argument, cls=_NumpyJSONEncoder, sort_keys=True) for argument in arguments]
+        argument_list += [json.dumps(argument, cls=_CustomJSONEncoder, sort_keys=True) for argument in arguments]
         script += ",".join(argument_list)
         script += """);\n"""
 
@@ -1130,13 +1125,16 @@ def _render_animation(canvas, context):
     for time, change in changes.items():
         context.animation[time] = {}
         for key, states in change.items():
-            context.animation[time][key] = []
-            for state in states:
-                context.animation[time][key].append({})
-                for k, v in state.items():
-                    if isinstance(v, toyplot.mark.Mark):
-                        v = context.get_id(v)
-                    context.animation[time][key][-1][k] = v
+            context.animation[time][key] = [dict(state) for state in states]
+
+            for state in context.animation[time][key]:
+                if "mark" in state:
+                    state["mark"] = context.get_id(state["mark"])
+
+            if key == "set-datum-text":
+                layout_xml = xml.Element("temp")
+                _draw_text(layout_xml, text=state.pop("text"), style=state.pop("style"))
+                state["layout"] = layout_xml.find("g")
 
     # If we don't have any animation, we're done.
     if len(context.animation) < 1:
@@ -1199,145 +1197,165 @@ def _render_animation(canvas, context):
     xml.SubElement(context.parent, "script").text = string.Template("""
         (function()
         {
-          var root_id = "$root_id";
-          var frame_durations = $frame_durations;
-          var state_changes = $state_changes;
+            var root_id = "$root_id";
+            var frame_durations = $frame_durations;
+            var state_changes = $state_changes;
 
-          var current_frame = null;
-          var timeout = null;
+            var current_frame = null;
+            var timeout = null;
 
-          function set_timeout(value)
-          {
-            if(timeout !== null)
-              window.clearTimeout(timeout);
-            timeout = value;
-          }
-
-          function set_current_frame(frame)
-          {
-            current_frame = frame;
-            document.querySelector("#" + root_id + " .toyplot-current-frame").value = frame;
-          }
-
-          function play_reverse()
-          {
-            set_current_frame((current_frame - 1 + frame_durations.length) % frame_durations.length);
-            render_changes(0, current_frame+1)
-            set_timeout(window.setTimeout(play_reverse, frame_durations[(current_frame - 1 + frame_durations.length) % frame_durations.length] * 1000));
-          }
-
-          function play_forward()
-          {
-            set_current_frame((current_frame + 1) % frame_durations.length);
-            render_changes(current_frame, current_frame+1);
-            set_timeout(window.setTimeout(play_forward, frame_durations[current_frame] * 1000));
-          }
-
-          var item_cache = {};
-          function get_item(id)
-          {
-            if(!(id in item_cache))
-              item_cache[id] = document.getElementById(id);
-            return item_cache[id];
-          }
-
-          function render_changes(begin, end)
-          {
-            for(var frame = begin; frame != end; ++frame)
+            function set_timeout(value)
             {
-                var changes = state_changes[frame];
-                for(var type in changes)
+                if(timeout !== null)
+                    window.clearTimeout(timeout);
+                timeout = value;
+            }
+
+            function set_current_frame(frame)
+            {
+                current_frame = frame;
+                document.querySelector("#" + root_id + " .toyplot-current-frame").value = frame;
+            }
+
+            function play_reverse()
+            {
+                set_current_frame((current_frame - 1 + frame_durations.length) % frame_durations.length);
+                render_changes(0, current_frame+1)
+                set_timeout(window.setTimeout(play_reverse, frame_durations[(current_frame - 1 + frame_durations.length) % frame_durations.length] * 1000));
+            }
+
+            function play_forward()
+            {
+                set_current_frame((current_frame + 1) % frame_durations.length);
+                render_changes(current_frame, current_frame+1);
+                set_timeout(window.setTimeout(play_forward, frame_durations[current_frame] * 1000));
+            }
+
+            var item_cache = {};
+            function get_item(id)
+            {
+                if(!(id in item_cache))
+                    item_cache[id] = document.getElementById(id);
+                return item_cache[id];
+            }
+
+            function render_changes(begin, end)
+            {
+                for(var frame = begin; frame != end; ++frame)
                 {
-                  var type_changes = changes[type]
-                  if(type == "set-mark-style")
-                  {
-                    for(var i = 0; i != type_changes.length; ++i)
+                    var changes = state_changes[frame];
+                    for(var type in changes)
                     {
-                      var mark_style = type_changes[i];
-                      var mark = get_item(mark_style.mark);
-                      for(var key in mark_style.style)
-                        mark.style.setProperty(key, mark_style[1][key]);
+                        var states = changes[type]
+                        if(type == "set-mark-style")
+                        {
+                            for(var i = 0; i != states.length; ++i)
+                            {
+                                var state = states[i];
+                                var mark = get_item(state.mark);
+                                for(var key in state.style)
+                                {
+                                    mark.style.setProperty(key, state[1][key]);
+                                }
+                            }
+                        }
+                        else if(type == "set-datum-style")
+                        {
+                            for(var i = 0; i != states.length; ++i)
+                            {
+                                var state = states[i];
+                                var datum = get_item(state.mark).querySelectorAll(".toyplot-Series")[state.series].querySelectorAll(".toyplot-Datum")[state.datum];
+                                for(var key in state.style)
+                                {
+                                    datum.style.setProperty(key, state.style[key]);
+                                }
+                            }
+                        }
+                        else if(type == "set-datum-text")
+                        {
+                            for(var i = 0; i != states.length; ++i)
+                            {
+                                var state = states[i];
+                                var datum = get_item(state.mark).querySelectorAll(".toyplot-Series")[state.series].querySelectorAll(".toyplot-Datum")[state.datum];
+                                var layout = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                                layout.innerHTML = state.layout;
+                                layout = layout.firstChild;
+
+                                while(datum.firstElementChild)
+                                    datum.removeChild(datum.firstElementChild);
+                                while(layout.firstElementChild)
+                                    datum.appendChild(layout.removeChild(layout.firstElementChild));
+                            }
+                        }
                     }
-                  }
-                  else if(type == "set-datum-style")
-                  {
-                    for(var i = 0; i != type_changes.length; ++i)
-                    {
-                      var datum_style = type_changes[i];
-                      var datum = get_item(datum_style.mark).querySelectorAll(".toyplot-Series")[datum_style.series].querySelectorAll(".toyplot-Datum")[datum_style.datum];
-                      for(var key in datum_style.style)
-                        datum.style.setProperty(key, datum_style.style[key]);
-                    }
-                  }
                 }
             }
-          }
 
-          function on_set_frame()
-          {
+            function on_set_frame()
+            {
             set_timeout(null);
             set_current_frame(document.querySelector("#" + root_id + " .toyplot-current-frame").valueAsNumber);
             render_changes(0, current_frame+1);
-          }
+            }
 
-          function on_frame_rewind()
-          {
+            function on_frame_rewind()
+            {
             set_timeout(null);
             set_current_frame((current_frame - 1 + frame_durations.length) % frame_durations.length);
             render_changes(0, current_frame+1);
-          }
+            }
 
-          function on_rewind()
-          {
+            function on_rewind()
+            {
             set_current_frame(0);
             render_changes(0, current_frame+1);
-          }
+            }
 
-          function on_play_reverse()
-          {
+            function on_play_reverse()
+            {
             set_timeout(window.setTimeout(play_reverse, frame_durations[(current_frame - 1 + frame_durations.length) % frame_durations.length] * 1000));
-          }
+            }
 
-          function on_stop()
-          {
+            function on_stop()
+            {
             set_timeout(null);
-          }
+            }
 
-          function on_play_forward()
-          {
+            function on_play_forward()
+            {
             set_timeout(window.setTimeout(play_forward, frame_durations[current_frame] * 1000));
-          }
+            }
 
-          function on_fast_forward()
-          {
+            function on_fast_forward()
+            {
             set_timeout(null);
             set_current_frame(frame_durations.length - 1);
             render_changes(0, current_frame + 1)
-          }
+            }
 
-          function on_frame_advance()
-          {
+            function on_frame_advance()
+            {
             set_timeout(null);
             set_current_frame((current_frame + 1) % frame_durations.length);
             render_changes(current_frame, current_frame+1);
-          }
+            }
 
-          set_current_frame(0);
-          render_changes(0, current_frame+1);
+            set_current_frame(0);
+            render_changes(0, current_frame+1);
 
-          document.querySelector("#" + root_id + " .toyplot-current-frame").oninput = on_set_frame;
-          document.querySelector("#" + root_id + " .toyplot-rewind").onclick = on_rewind;
-          document.querySelector("#" + root_id + " .toyplot-reverse-play").onclick = on_play_reverse;
-          document.querySelector("#" + root_id + " .toyplot-frame-rewind").onclick = on_frame_rewind;
-          document.querySelector("#" + root_id + " .toyplot-stop").onclick = on_stop;
-          document.querySelector("#" + root_id + " .toyplot-frame-advance").onclick = on_frame_advance;
-          document.querySelector("#" + root_id + " .toyplot-forward-play").onclick = on_play_forward;
-          document.querySelector("#" + root_id + " .toyplot-fast-forward").onclick = on_fast_forward;
+            document.querySelector("#" + root_id + " .toyplot-current-frame").oninput = on_set_frame;
+            document.querySelector("#" + root_id + " .toyplot-rewind").onclick = on_rewind;
+            document.querySelector("#" + root_id + " .toyplot-reverse-play").onclick = on_play_reverse;
+            document.querySelector("#" + root_id + " .toyplot-frame-rewind").onclick = on_frame_rewind;
+            document.querySelector("#" + root_id + " .toyplot-stop").onclick = on_stop;
+            document.querySelector("#" + root_id + " .toyplot-frame-advance").onclick = on_frame_advance;
+            document.querySelector("#" + root_id + " .toyplot-forward-play").onclick = on_play_forward;
+            document.querySelector("#" + root_id + " .toyplot-fast-forward").onclick = on_fast_forward;
         })();
         """).substitute(
             root_id=context.root.get("id"),
             frame_durations=json.dumps(durations.tolist()),
-            state_changes=json.dumps(changes, cls=_NumpyJSONEncoder),
+            state_changes=json.dumps(changes, cls=_CustomJSONEncoder),
             )
 
 

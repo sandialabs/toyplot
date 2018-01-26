@@ -140,8 +140,8 @@ def render_frames(canvas, width=None, height=None, scale=None):
     svg, svg_animation = toyplot.svg.render(canvas, animation=True)
     scale = canvas._point_scale(width=width, height=height, scale=scale)
 
-    for time, changes in sorted(svg_animation.items()):
-        toyplot.svg.apply_changes(svg, changes)
+    for time in sorted(svg_animation.keys()):
+        toyplot.svg.apply_changes(svg, svg_animation[time])
 
         pdf = io.BytesIO()
         surface = reportlab.pdfgen.canvas.Canvas(pdf, pagesize=(scale * canvas.width, scale * canvas.height))

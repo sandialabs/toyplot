@@ -27,8 +27,8 @@ def convert_notebook(name):
 
     nbconvert_version = subprocess.check_output(["jupyter", "nbconvert", "--version"]).strip()
     allowed = ["4.0.0", "4.1.0", "4.2.0"]
-    if nbconvert_version not in allowed:
-        raise Exception("Unsupported nbconvert version: %s, use one of %s" % (nbconvert_version, ", ".join(allowed)))
+#    if nbconvert_version not in allowed:
+#        raise Exception("Unsupported nbconvert version: %s, use one of %s" % (nbconvert_version, ", ".join(allowed)))
 
     # Some installations of ipython don't properly configure the hooks for Pygments lexers, which leads to missing
     # source code cells when the documentation is built on readthedocs.org.

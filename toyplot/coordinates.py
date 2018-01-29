@@ -3052,7 +3052,7 @@ class Table(object):
         title = property(fset=_set_title)
 
         def _set_link(self, value):
-            warnings.warn("CellReference.link is deprecated, use CellReference.hyperlink instead.", toyplot.DeprecationWarning)
+            warnings.warn("CellReference.link is deprecated, use CellReference.hyperlink instead.", toyplot.DeprecationWarning, stacklevel=2)
             self._set_hyperlink(value)
         link = property(fset=_set_link)
 

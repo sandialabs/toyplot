@@ -9,6 +9,8 @@ from __future__ import division
 
 import collections
 import numbers
+import warnings
+
 import numpy
 import six
 import toyplot.coordinates
@@ -27,12 +29,16 @@ class AnimationFrame(object):
     AnimationFrame is automatically created by :meth:`toyplot.canvas.Canvas.animate`
     or :meth:`toyplot.canvas.Canvas.time` and passed to your callback.
     """
-    def __init__(self, changes, count, index, begin, end):
+    def __init__(self, changes, count, number, begin, end):
         self._changes = changes
         self._count = count
-        self._index = index
+        self._number = number
         self._begin = begin
         self._end = end
+
+    def index(self):
+        warnings.warn("toyplot.canvas.AnimationFrame.index() is deprecated, use the `number` property instead.", toyplot.DeprecationWarning, stacklevel=2)
+        return self._number
 
     @property
     def count(self):
@@ -41,10 +47,10 @@ class AnimationFrame(object):
         return self._count
 
     @property
-    def index(self):
-        """Current animation frame index.
+    def number(self):
+        """Current animation frame number.
         """
-        return self._index
+        return self._number
 
     @property
     def begin(self):
@@ -52,14 +58,8 @@ class AnimationFrame(object):
         """
         return self._begin
 
-    @property
     def time(self):
-        """Time of the current frame in seconds.
-
-        Note
-        ----
-        This is an alias for :attr:`toyplot.canvas.AnimationFrame.begin`
-        """
+        warnings.warn("toyplot.canvas.AnimationFrame.time() is deprecated, use the `begin` property instead.", toyplot.DeprecationWarning, stacklevel=2)
         return self._begin
 
     @property
@@ -69,10 +69,14 @@ class AnimationFrame(object):
         return self._end
 
     @property
-    def duration(self):
+    def length(self):
         """Duration of the current frame in seconds.
         """
         return self._end - self._begin
+
+    def duration(self):
+        warnings.warn("toyplot.canvas.AnimationFrame.duration() is deprecated, use the `length` property instead.", toyplot.DeprecationWarning, stacklevel=2)
+        return self.length
 
     def set_mark_style(self, mark, style):
         """Change the style of a mark.
@@ -274,8 +278,36 @@ class Canvas(object):
     def width(self, value):
         self._width = toyplot.units.convert(value, "px", default="px")
 
-    def animate(self, frames, callback=None):
-        """Generate a collection of animation frames, calling a callback to store an explicit representation of what changes at each frame.
+
+    def frame(self, begin, end=None, number=None, count=None):
+        """Return a single animation frame that can be used to animate the canvas contents.
+
+        Parameters
+        ----------
+        begin: float
+          Specify the frame start time (in seconds).
+        end: float, optional
+          Specify the frame end time (in seconds).
+        number: integer, optional
+          Specify a number for this frame.
+        count: integer, optional
+          Specify the total number of frames of which this frame is one.
+
+        Returns
+        -------
+        frame: :class:`toyplot.canvas.AnimationFrame` instance.
+        """
+        if end is None:
+            end = begin + (1.0 / 30.0)
+        if number is None:
+            number = 0
+        if count is None:
+            count = 1
+        return AnimationFrame(changes=self._changes, count=count, number=number, begin=begin, end=end)
+
+
+    def frames(self, frames):
+        """Return a sequence of animation frames that can be used to animate the canvas contents.
 
         Parameters
         ----------
@@ -286,12 +318,12 @@ class Canvas(object):
           containing the number of frames and the frame rate in frames-per-second.
           Finally, you may simply specify the number of frames, in which case the
           rate will default to 30 frames-per-second.
-        callback: function
-          The callback function will be called once per frame, and will receive an
-          instance of :class:`toyplot.canvas.AnimationFrame` as its sole argument.  The
-          callback function can access the frame number, time, and duration from the
-          state object, and should use the other methods provided by the state object
-          to make changes to the canvas.
+
+        Yields
+        ------
+        frames: :class:`toyplot.canvas.AnimationFrame`
+            Use the methods and properties of each frame object to modify the
+            state of the canvas over time.
         """
         if isinstance(frames, numbers.Integral):
             frames = (frames, 30.0)
@@ -301,14 +333,38 @@ class Canvas(object):
             times = numpy.linspace(0, frame_count / frame_rate, frame_count + 1, endpoint=True)
 
         for index, (begin, end) in enumerate(zip(times[:-1], times[1:])):
-            frame = AnimationFrame(changes=self._changes, index=index, begin=begin, end=end, count=frame_count)
+            yield AnimationFrame(changes=self._changes, count=frame_count, number=index, begin=begin, end=end)
+
+
+    def animate(self, frames, callback=None):
+        warnings.warn("toyplot.canvas.animate() is deprecated, use frames() instead.", toyplot.DeprecationWarning, stacklevel=2)
+
+        for frame in self.frames(frames):
             if callback:
                 callback(frame)
 
 
+    def time(self, begin, end, number=None, count=None):
+        warnings.warn("toyplot.canvas.Canvas.time() is deprecated, use frame() instead.", toyplot.DeprecationWarning, stacklevel=2)
+        return self.frame(begin=begin, end=end, number=number, count=count)
+
+
     def animation(self):
+        """Return a summary of the canvas animation state.
+
+        Returns
+        -------
+        begin: float
+            Start-time of the animation in seconds.
+        end: float
+            End-time of the animation in seconds.
+        changes: object
+            Opaque collection of data structures that describe changes to the
+            canvas state during animation (if any).
+        """
+
         begin = 0.0
-        end = numpy.max(self._changes._end)
+        end = numpy.max(self._changes._end) if self._changes._end else 0.0
         changes = collections.defaultdict(lambda: collections.defaultdict(list))
         for begin, change, state in zip(self._changes._begin, self._changes._change, self._changes._state):
             changes[begin][change].append(state)
@@ -1233,30 +1289,6 @@ class Canvas(object):
                 filename=None,
                 ))
         return self._children[-1]
-
-    def time(self, begin, end, index=None, count=None):
-        """Return a :class:`toyplot.canvas.AnimationFrame` with the given start and end time, ready to store animated canvas modifications.
-
-        Parameters
-        ----------
-        begin: scalar
-          Specify the frame start time (in seconds).
-        end: scalar
-          Specify the frame end time (in seconds).
-        index: integer, optional
-          Specify an index for this frame.  Note that the index is simply a
-          convenience for code that depends on accessing the index from the
-          result AnimationFrame.
-
-        Returns
-        -------
-        frame: :class:`toyplot.canvas.AnimationFrame` instance.
-        """
-        if index is None:
-            index = 0
-        if count is None:
-            count = 1
-        return AnimationFrame(changes=self._changes, count=count, index=index, begin=begin, end=end)
 
     def _point_scale(self, width=None, height=None, scale=None):
         """Return a scale factor to convert this canvas to a target width or height in points."""

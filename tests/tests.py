@@ -762,30 +762,25 @@ def test_axes_rect():
 
 
 def test_animation_frame_sanity_checks():
-    frame = toyplot.canvas.AnimationFrame(
-        index=1,
-        begin=2.3,
-        end=2.4,
-        changes=collections.defaultdict(
-            lambda: collections.defaultdict(list)))
-    nose.tools.assert_equal(frame.index(), 1)
-    nose.tools.assert_equal(frame.time(), 2.3)
-    numpy.testing.assert_almost_equal(frame.duration(), 0.1)
+    frame = toyplot.canvas.AnimationFrame(number=1, begin=2.3, end=2.4, count=1, changes=collections.defaultdict(lambda: collections.defaultdict(list)))
+    nose.tools.assert_equal(frame.number, 1)
+    nose.tools.assert_equal(frame.begin, 2.3)
+    numpy.testing.assert_almost_equal(frame.length, 0.1)
     with nose.tools.assert_raises(ValueError):
         frame.set_mark_style(None, {})
     with nose.tools.assert_raises(ValueError):
         frame.set_datum_style(None, 0, 0, {})
 
 
-def test_canvas_time():
+def test_canvas_frame():
     canvas = toyplot.Canvas()
-    frame = canvas.time(0.3, 0.4)
-    nose.tools.assert_equal(frame.time(), 0.3)
-    numpy.testing.assert_almost_equal(frame.duration(), 0.1)
-    nose.tools.assert_equal(frame.index(), 0)
+    frame = canvas.frame(0.3, 0.4)
+    nose.tools.assert_equal(frame.begin, 0.3)
+    numpy.testing.assert_almost_equal(frame.length, 0.1)
+    nose.tools.assert_equal(frame.number, 0)
 
-    frame = canvas.time(0.3, 0.4, 5)
-    nose.tools.assert_equal(frame.time(), 0.3)
-    numpy.testing.assert_almost_equal(frame.duration(), 0.1)
-    nose.tools.assert_equal(frame.index(), 5)
+    frame = canvas.frame(0.3, 0.4, 5)
+    nose.tools.assert_equal(frame.begin, 0.3)
+    numpy.testing.assert_almost_equal(frame.length, 0.1)
+    nose.tools.assert_equal(frame.number, 5)
 

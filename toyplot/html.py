@@ -1131,10 +1131,10 @@ def _render_animation(canvas, context):
                 if "mark" in state:
                     state["mark"] = context.get_id(state["mark"])
 
-            if key == "set-datum-text":
-                layout_xml = xml.Element("temp")
-                _draw_text(layout_xml, text=state.pop("text"), style=state.pop("style"))
-                state["layout"] = layout_xml.find("g")
+                if key == "set-datum-text":
+                    layout_xml = xml.Element("temp")
+                    _draw_text(layout_xml, text=state.pop("text"), style=state.pop("style"))
+                    state["layout"] = layout_xml.find("g")
 
     # If we don't have any animation, we're done.
     if len(context.animation) < 1:

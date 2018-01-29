@@ -9,6 +9,7 @@ from __future__ import division
 
 import collections
 import itertools
+import warnings
 
 import numpy
 import six
@@ -3051,7 +3052,7 @@ class Table(object):
         title = property(fset=_set_title)
 
         def _set_link(self, value):
-            toyplot.log.warning("CellReference.link is deprecated, use CellReference.hyperlink instead.")
+            warnings.warn("CellReference.link is deprecated, use CellReference.hyperlink instead.", toyplot.DeprecationWarning)
             self._set_hyperlink(value)
         link = property(fset=_set_link)
 

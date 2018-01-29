@@ -19,6 +19,10 @@ log.setLevel(logging.WARNING)
 log.addHandler(logging.NullHandler())
 
 
+class DeprecationWarning(Warning):
+    pass
+
+
 def bars(
         a,
         b=None,

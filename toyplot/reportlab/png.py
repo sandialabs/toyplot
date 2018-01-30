@@ -32,11 +32,11 @@ for command in ["gs", "gswin64c", "gswin32c"]:
 if _gs_command is None:
     raise Exception("A ghostscript executable is required.")  # pragma: no cover
 
-if distutils.version.StrictVersion(_gs_version) >= "9.10":
+if distutils.version.StrictVersion(_gs_version) >= "9.14":
     _gs_resolution = ["-r%s" % (96 * 4), "-dDownScaleFactor=4"]
 else:
     _gs_resolution = ["-r%s" % (96)]
-    toyplot.log.warning("For better output PNG quality, install ghostscript >= 9.10.")
+    toyplot.log.warning("For better output PNG quality, install ghostscript >= 9.14.")
 
 
 def render(canvas, fobj=None, width=None, height=None, scale=None):

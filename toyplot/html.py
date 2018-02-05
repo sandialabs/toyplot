@@ -2005,6 +2005,7 @@ def _render(canvas, axes, context):
                     root=axes_xml,
                     x=x,
                     y=y,
+                    angle=cell_angle,
                     style=toyplot.style.combine(cell_lstyle, {"text-anchor": "start"}),
                     text=prefix + separator + suffix,
                     )
@@ -2024,6 +2025,7 @@ def _render(canvas, axes, context):
                     root=axes_xml,
                     x=x,
                     y=y,
+                    angle=cell_angle,
                     style=toyplot.style.combine(cell_lstyle, {"text-anchor": "end"}),
                     text=prefix + separator + suffix,
                     )

@@ -19,6 +19,7 @@ Python API
     toyplot.font.rst
     toyplot.format.rst
     toyplot.html.rst
+    toyplot.image.rst
     toyplot.layout.rst
     toyplot.locator.rst
     toyplot.mark.rst

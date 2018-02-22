@@ -26,6 +26,7 @@ import toyplot.coordinates
 import toyplot.canvas
 import toyplot.color
 import toyplot.font
+import toyplot.image
 import toyplot.mark
 import toyplot.marker
 import toyplot.text
@@ -3004,8 +3005,6 @@ def _render(parent, mark, context):
 
 @dispatch((toyplot.canvas.Canvas), toyplot.mark.Image, RenderContext)
 def _render(parent, mark, context):
-    encoded = base64.standard_b64encode(mark.to_png()).decode("ascii")
-
     mark_xml = xml.SubElement(
         context.parent,
         "g",
@@ -3020,5 +3019,5 @@ def _render(parent, mark, context):
         y=repr(mark._ymin_range),
         width=repr(mark._xmax_range - mark._xmin_range),
         height=repr(mark._ymax_range - mark._ymin_range),
-        attrib={"xlink:href": "data:image/png;base64," + encoded},
+        attrib={"xlink:href": toyplot.image.to_png_data_uri(mark._data)},
         )

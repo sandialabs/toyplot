@@ -2,7 +2,7 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-"""Image management and manipulation.
+"""Bitmap management and manipulation.
 """
 
 from __future__ import absolute_import
@@ -21,12 +21,12 @@ log = logging.getLogger(__name__)
 
 
 def to_png(data, stream):
-    """Convert an in-memory image to PNG format.
+    """Convert an in-memory bitmap to PNG format.
 
     Parameters
     ----------
     data: :class:`numpy.ndarray`, required
-        Source array containing image data to be converted.  Valid array shapes
+        Source array containing bitmap data to be converted.  Valid array shapes
         are :math:`M \times N \times 1` (greyscale data), :math:`M \times N \times 2`
         (greyscale plus alpha channel), :math:`M \times N \times 3`
         (RGB data), or :math:`M \times N \times 4` (RGB + alpha).  Floating
@@ -56,12 +56,12 @@ def to_png(data, stream):
 
 
 def to_png_data_uri(data):
-    """Convert an in-memory image to PNG format, encoded as a data: URI.
+    """Convert an in-memory bitmap to PNG format, encoded as a data: URI.
 
     Parameters
     ----------
     data: :class:`numpy.ndarray`, required
-        Source array containing image data to be converted.  Valid array shapes
+        Source array containing bitmap data to be converted.  Valid array shapes
         are :math:`M \times N \times 1` (greyscale data), :math:`M \times N \times 2`
         (greyscale plus alpha channel), :math:`M \times N \times 3`
         (RGB data), or :math:`M \times N \times 4` (RGB + alpha).  Floating
@@ -70,7 +70,7 @@ def to_png_data_uri(data):
     Returns
     -------
     uri: str
-        A data: URI containing the base64 encoded image.
+        A data: URI containing the base64 encoded bitmap.
     """
     stream = io.BytesIO()
     to_png(data, stream)

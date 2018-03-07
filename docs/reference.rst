@@ -9,17 +9,17 @@ Python API
     :maxdepth: 2
 
     toyplot.rst
+    toyplot.bitmap.rst
     toyplot.broadcast.rst
     toyplot.browser.rst
     toyplot.canvas.rst
     toyplot.color.rst
-    toyplot.coordinates.rst
     toyplot.config.rst
+    toyplot.coordinates.rst
     toyplot.data.rst
     toyplot.font.rst
     toyplot.format.rst
     toyplot.html.rst
-    toyplot.image.rst
     toyplot.layout.rst
     toyplot.locator.rst
     toyplot.mark.rst

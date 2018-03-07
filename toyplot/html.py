@@ -22,11 +22,11 @@ from multipledispatch import dispatch
 import numpy
 import six
 
+import toyplot.bitmap
 import toyplot.coordinates
 import toyplot.canvas
 import toyplot.color
 import toyplot.font
-import toyplot.image
 import toyplot.mark
 import toyplot.marker
 import toyplot.text
@@ -3019,5 +3019,5 @@ def _render(parent, mark, context):
         y=repr(mark._ymin_range),
         width=repr(mark._xmax_range - mark._xmin_range),
         height=repr(mark._ymax_range - mark._ymin_range),
-        attrib={"xlink:href": toyplot.image.to_png_data_uri(mark._data)},
+        attrib={"xlink:href": toyplot.bitmap.to_png_data_uri(mark._data)},
         )

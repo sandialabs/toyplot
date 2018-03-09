@@ -20,7 +20,7 @@ import toyplot.color
 log = logging.getLogger(__name__)
 
 
-def to_png(data, stream):
+def to_png(data, stream, bitdepth=None):
     """Convert an in-memory bitmap to PNG format.
 
     Parameters
@@ -33,18 +33,25 @@ def to_png(data, stream):
         point values are scaled and converted to unsigned 8 bit integers.
     stream: file-like object, required
         Target file to receive PNG data.
+    bitdepth: integer, optional
+        Override the default output bit depth.  Allowed color / bitdepth combinations
+        are: greyscale (1/2/4/8/16), greyscale + alpha (8/16), RGB (8/16), and RGB + alpha (8/16).
     """
-    log.debug("Image data: %s %s", data.shape, data.dtype)
-
     if data.dtype == toyplot.color.dtype:
         data = numpy.dstack((data["r"], data["g"], data["b"], data["a"]))
+
     if issubclass(data.dtype.type, numpy.bool_):
-        bitdepth = 1
-    elif issubclass(data.dtype.type, numpy.floating):
-        data = (data * 255.0).astype("uint8")
-        bitdepth = 8
+        if bitdepth is None:
+            bitdepth = 1
     else:
-        bitdepth = 8
+        if bitdepth is None:
+            bitdepth = 8
+
+    if issubclass(data.dtype.type, numpy.floating):
+        if bitdepth == 8:
+            data = (data * 255.0).astype("uint8")
+        elif bitdepth == 16:
+            data = (data * 65535.0).astype("uint16")
 
     width = data.shape[1]
     height = data.shape[0]

@@ -16,3 +16,9 @@ autorender = True
 
 autoformat = os.environ.get("TOYPLOT_AUTOFORMAT", "html")
 """Default value for the :class:`toyplot.canvas.Canvas` autoformat feature."""
+
+width = None
+"""Default value for the :class:`toyplot.canvas.Canvas` width."""
+
+height = None
+"""Default value for the :class:`toyplot.canvas.Canvas` height."""

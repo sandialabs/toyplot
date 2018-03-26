@@ -208,7 +208,10 @@ class Canvas(object):
             self._state.append(state)
 
     def __init__(self, width=None, height=None, style=None, hyperlink=None, autorender=None, autoformat=None):
-        # Must be set before _height
+        if width is None:
+            width = toyplot.config.width
+        if height is None:
+            height = toyplot.config.height
         self._width = toyplot.units.convert(width, "px", default="px") if width is not None else 600
         self._height = toyplot.units.convert(height, "px", default="px") if height is not None else self._width
         self._hyperlink = None

@@ -124,6 +124,7 @@ def _xml_comparison_string(element):
                 stream.write(u" %s='%s'" % (key, format_value(value)))
 
         text = element.text if element.text is not None else ""
+        text = format_value(text)
         if element.tag in [
                 "{http://www.sandia.gov/toyplot}data-table",
                 "{http://www.sandia.gov/toyplot}coordinates"]:
@@ -228,8 +229,8 @@ def assert_canvas_equal(canvas, name, show_diff=True):
             message = "Test output %s doesn't match %s:\n\n*** Test -> Reference ***\n%s\n*** Reference -> Test ***\n%s\n" % (
                 test_file,
                 reference_file,
-                reference.communicate()[0],
-                test.communicate()[0],
+                reference.communicate()[0].decode("utf-8"),
+                test.communicate()[0].decode("utf-8"),
                 )
         else:
             message = "Test output %s doesn't match %s.\n" % (test_file, reference_file)

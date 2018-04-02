@@ -760,7 +760,7 @@ class Canvas(object):
             colormap = toyplot.require.instance(data[1], toyplot.color.Map)
         else:
             matrix = toyplot.require.scalar_matrix(data)
-            colormap = toyplot.color.brewer.map("BlueRed")
+            colormap = toyplot.color.brewer.map("BlueRed", domain_min=matrix.min(), domain_max=matrix.max())
 
         colors = colormap.colors(matrix)
 

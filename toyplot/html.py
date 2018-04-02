@@ -355,7 +355,7 @@ def tostring(canvas, style=None):
 
     Returns
     -------
-    html: string
+    html: str
       HTML representation of `canvas` as a string.
 
     Notes

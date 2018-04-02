@@ -682,7 +682,7 @@ class Canvas(object):
 
         Parameters
         ----------
-        data: array-like matrix, or (matrix, :class:`toyplot.color.Map`) tuple, required
+        data: matrix, or (matrix, :class:`toyplot.color.Map`) tuple, required
             The given data will be used to populate the visualization, using either the
             given colormap or a default.
         blabel: str, optional
@@ -760,12 +760,9 @@ class Canvas(object):
             colormap = toyplot.require.instance(data[1], toyplot.color.Map)
         else:
             matrix = toyplot.require.scalar_matrix(data)
-            palette = toyplot.color.brewer.palette("BlueRed")
-            colormap = toyplot.color.LinearMap(
-                palette=palette,
-                domain_min=matrix.min(),
-                domain_max=matrix.max(),
-                )
+            colormap = toyplot.color.brewer.map("BlueRed")
+
+        colors = colormap.colors(matrix)
 
         xmin_range, xmax_range, ymin_range, ymax_range = toyplot.layout.region(
             0, self._width, 0, self._height, bounds=bounds, rect=rect, corner=corner, grid=grid, margin=margin)
@@ -855,11 +852,11 @@ class Canvas(object):
         table.body.cells.data = matrix
         table.body.cells.format = toyplot.format.NullFormatter()
 
-        for i, row in enumerate(matrix):
-            for j, value in enumerate(row):
+        for i in numpy.arange(matrix.shape[0]):
+            for j in numpy.arange(matrix.shape[1]):
                 cell = table.body.cell[i, j]
-                cell.style = {"stroke": "none", "fill": colormap.css(value)}
-                cell.title = value
+                cell.style = {"stroke": "none", "fill": toyplot.color.to_css(colors[i, j])}
+                cell.title = matrix[i, j]
 
         self._children.append(table)
 

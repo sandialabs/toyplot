@@ -25,9 +25,9 @@ import toyplot.units
 class AnimationFrame(object):
     """Used to specify modifications to a `toyplot.canvas.Canvas` during animation.
 
-    Do not create AnimationFrame instances yourself, an instance of
-    AnimationFrame is automatically created by :meth:`toyplot.canvas.Canvas.animate`
-    or :meth:`toyplot.canvas.Canvas.time` and passed to your callback.
+    Do not create AnimationFrame instances yourself, use
+    :meth:`toyplot.canvas.Canvas.frame` and
+    :meth:`toyplot.canvas.Canvas.frames` instead.
     """
     def __init__(self, changes, count, number, begin, end):
         self._changes = changes
@@ -37,6 +37,7 @@ class AnimationFrame(object):
         self._end = end
 
     def index(self):
+        """Deprecated, use the `toyplot.canvas.AnimationFrame.number` property instead."""
         warnings.warn("toyplot.canvas.AnimationFrame.index() is deprecated, use the `number` property instead.", toyplot.DeprecationWarning, stacklevel=2)
         return self._number
 
@@ -59,6 +60,7 @@ class AnimationFrame(object):
         return self._begin
 
     def time(self):
+        """Deprecated, use the `toyplot.canvas.AnimationFrame.begin` property instead."""
         warnings.warn("toyplot.canvas.AnimationFrame.time() is deprecated, use the `begin` property instead.", toyplot.DeprecationWarning, stacklevel=2)
         return self._begin
 
@@ -75,6 +77,7 @@ class AnimationFrame(object):
         return self._end - self._begin
 
     def duration(self):
+        """Deprecated, use the `toyplot.canvas.AnimationFrame.length` property instead."""
         warnings.warn("toyplot.canvas.AnimationFrame.duration() is deprecated, use the `length` property instead.", toyplot.DeprecationWarning, stacklevel=2)
         return self.length
 
@@ -340,7 +343,8 @@ class Canvas(object):
 
 
     def animate(self, frames, callback=None):
-        warnings.warn("toyplot.canvas.animate() is deprecated, use frames() instead.", toyplot.DeprecationWarning, stacklevel=2)
+        """Deprecated, use :func:`toyplot.canvas.Canvas.frames` instead."""
+        warnings.warn("toyplot.canvas.Canvas.animate() is deprecated, use frames() instead.", toyplot.DeprecationWarning, stacklevel=2)
 
         for frame in self.frames(frames):
             if callback:
@@ -348,6 +352,7 @@ class Canvas(object):
 
 
     def time(self, begin, end, number=None, count=None):
+        """Deprecated, use :func:`toyplot.canvas.Canvas.frame` instead."""
         warnings.warn("toyplot.canvas.Canvas.time() is deprecated, use frame() instead.", toyplot.DeprecationWarning, stacklevel=2)
         return self.frame(begin=begin, end=end, number=number, count=count)
 

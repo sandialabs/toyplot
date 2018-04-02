@@ -7,6 +7,25 @@
 Release Notes
 =============
 
+Toyplot 0.17.0 - April 1st, 2018
+--------------------------------
+
+* Moved sample datasets into the `toyplot.data` module.
+* toyplot.mp4.render() generates H.264 output.
+* Restored `toyplot.canvas.AnimationFrame.set_datum_text()`, which was with the debut of rich text..
+* Use the Python warnings module for deprecation warnings.
+* Disabled pylint testing on Travis-CI, it was too much of a moving target.
+* Simplified the animation API.
+* Switched to Python 3 as the primary build and test environment.
+* Removed obsolete dependencies from the Travis build.
+* Disabled PNG downscaling for ghostscript versions < 9.14.
+* Table cell data can be rotated.
+* Moved image manipulation into a new `toyplot.bitmap` module.
+* Added a bitdepth option to `toyplot.bitmap.to_png()`.
+* Allow default canvas width and height to be set in `toyplot.config`.
+* Fixed a false-positive comparing XML documents.
+* Explicit colormap domains aren't required for toyplot.canvas.matrix().
+
 Toyplot 0.16.0 - October 26th, 2017
 -----------------------------------
 

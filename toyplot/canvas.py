@@ -9,7 +9,6 @@ from __future__ import division
 
 import collections
 import numbers
-import warnings
 
 import numpy
 import six
@@ -36,10 +35,6 @@ class AnimationFrame(object):
         self._begin = begin
         self._end = end
 
-    def index(self):
-        warnings.warn("toyplot.canvas.AnimationFrame.index() is deprecated, use the `number` property instead.", toyplot.DeprecationWarning, stacklevel=2)
-        return self._number
-
     @property
     def count(self):
         """Total number of frames in the current animation.
@@ -58,10 +53,6 @@ class AnimationFrame(object):
         """
         return self._begin
 
-    def time(self):
-        warnings.warn("toyplot.canvas.AnimationFrame.time() is deprecated, use the `begin` property instead.", toyplot.DeprecationWarning, stacklevel=2)
-        return self._begin
-
     @property
     def end(self):
         """End of the current frame in seconds.
@@ -73,10 +64,6 @@ class AnimationFrame(object):
         """Duration of the current frame in seconds.
         """
         return self._end - self._begin
-
-    def duration(self):
-        warnings.warn("toyplot.canvas.AnimationFrame.duration() is deprecated, use the `length` property instead.", toyplot.DeprecationWarning, stacklevel=2)
-        return self.length
 
     def set_mark_style(self, mark, style):
         """Change the style of a mark.
@@ -337,19 +324,6 @@ class Canvas(object):
 
         for index, (begin, end) in enumerate(zip(times[:-1], times[1:])):
             yield AnimationFrame(changes=self._changes, count=frame_count, number=index, begin=begin, end=end)
-
-
-    def animate(self, frames, callback=None):
-        warnings.warn("toyplot.canvas.animate() is deprecated, use frames() instead.", toyplot.DeprecationWarning, stacklevel=2)
-
-        for frame in self.frames(frames):
-            if callback:
-                callback(frame)
-
-
-    def time(self, begin, end, number=None, count=None):
-        warnings.warn("toyplot.canvas.Canvas.time() is deprecated, use frame() instead.", toyplot.DeprecationWarning, stacklevel=2)
-        return self.frame(begin=begin, end=end, number=number, count=count)
 
 
     def animation(self):

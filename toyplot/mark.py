@@ -7,7 +7,6 @@
 from __future__ import absolute_import, division
 
 import itertools
-import warnings
 
 import custom_inherit
 import numpy
@@ -607,25 +606,6 @@ class Image(Mark):
             raise ValueError("Unsupported image dtype: %s" % data.dtype)
 
         self._data = data
-
-    def to_png(self):
-        import io
-        import toyplot
-        import toyplot.bitmap
-
-        warnings.warn("toyplot.mark.Image.to_png() is deprecated, use toyplot.bitmap.to_png() instead.", toyplot.DeprecationWarning, stacklevel=2)
-
-        stream = io.BytesIO()
-        toyplot.bitmap.to_png(self._data, stream)
-        return stream.getvalue()
-
-    def to_data_url(self):
-        import toyplot
-        import toyplot.bitmap
-
-        warnings.warn("toyplot.mark.Image.to_data_url() is deprecated, use toyplot.bitmap.to_png_data_uri() instead.", toyplot.DeprecationWarning, stacklevel=2)
-
-        return toyplot.bitmap.to_png_data_uri(self._data)
 
 
 class Plot(Mark):

@@ -22,11 +22,11 @@ import toyplot.units
 
 
 class AnimationFrame(object):
-    """Used to specify modifications to a `toyplot.canvas.Canvas` during animation.
+    """Used to specify modifications to a `toyplot.canvas.Canvas` for animation.
 
-    Do not create AnimationFrame instances yourself, an instance of
-    AnimationFrame is automatically created by :meth:`toyplot.canvas.Canvas.animate`
-    or :meth:`toyplot.canvas.Canvas.time` and passed to your callback.
+    Do not create AnimationFrame instances yourself, use
+    :meth:`toyplot.canvas.Canvas.frame` and
+    :meth:`toyplot.canvas.Canvas.frames` instead.
     """
     def __init__(self, changes, count, number, begin, end):
         self._changes = changes
@@ -43,7 +43,7 @@ class AnimationFrame(object):
 
     @property
     def number(self):
-        """Current animation frame number.
+        """Current animation frame number (zero-based).
         """
         return self._number
 

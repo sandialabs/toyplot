@@ -34,14 +34,13 @@ def step_impl(context):
     axes = context.canvas.cartesian()
     scatterplot = axes.scatterplot(numpy.arange(10))
 
-    def callback(frame):
-        if frame.index() == 0:
+    for frame in context.canvas.frames(11):
+        if frame.number == 0:
             for i in numpy.arange(10):
                 frame.set_datum_style(scatterplot, 0, i, {"opacity": 0})
         else:
             frame.set_datum_style(
-                scatterplot, 0, frame.index() - 1, {"opacity": 1})
-    context.canvas.animate(11, callback)
+                scatterplot, 0, frame.number - 1, {"opacity": 1})
 
 
 @then(u'the canvas can be rendered as {type} video')

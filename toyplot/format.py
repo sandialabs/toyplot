@@ -75,6 +75,13 @@ class FloatFormatter(Formatter):
 
 class UnitFormatter(Formatter):
     """Formats values with corresponding units
+    
+    Parameters
+    ----------
+    format: format string, optional
+        Uses standard Python Format String Syntax.
+    nanshow: bool, optional
+        Set to `False` to hide NaN values.
     """
 
     def __init__(self, format="{:.6}", nanshow=True):
@@ -82,7 +89,24 @@ class UnitFormatter(Formatter):
         self._nanshow = nanshow
 
     def format(self, value, units):
+        """Return a text representation of the given value.
 
+        Parameters
+        ----------
+        value: value to be formatted
+        units: units to be formatted
+
+        Returns
+        -------
+        prefix : string
+          Formatted data to be displayed before the separator.
+        separator : string
+          Separator between formatted data, or empty string.
+        suffix : string
+          Formatted data to be displayed after the separator, or empty string.
+        unit : string
+          Formatted units to be displayed after the suffix, or empty string.
+        """
         if units not in UnitFormatter._units:
             raise Exception("Incorrect type of units provided")
 
@@ -147,6 +171,23 @@ class CurrencyFormatter(Formatter):
             raise Exception("Incorrect currency provided")
     
     def format(self, value): 
+        """Return a text representation of the given currency value.
+
+        Parameters
+        ----------
+        value: value to be formatted
+
+        Returns
+        -------
+        code : string
+          Formatted currency code to be displayed before the prefix, or empty string.
+        prefix : string
+          Formatted data to be displayed before the separator.
+        separator : string
+          Separator between formatted data, or empty string.
+        suffix : string
+          Formatted data to be displayed after the separator, or empty string.
+        """
         formatted = self._format.format(value).split(".")
     
         return CurrencyFormatter._codes[self._curr], formatted[0], self._dp, formatted[1]

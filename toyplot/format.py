@@ -71,3 +71,92 @@ class FloatFormatter(Formatter):
         if len(formatted) == 1:
             return formatted[0], "", ""
         return formatted[0], ".", formatted[1]
+
+
+class UnitFormatter(Formatter):
+    """Formats values with corresponding units
+    """
+
+    def __init__(self, format="{:.6}", nanshow=True):
+        self._format = format
+        self._nanshow = nanshow
+
+    def format(self, value, units):
+
+        if units not in UnitFormatter._units:
+            raise Exception("Incorrect type of units provided")
+
+        if isinstance(value, six.string_types):
+            return value, "", ""
+
+        if numpy.isnan(value) and not self._nanshow:
+            return "", "", ""
+
+        formatted = self._format.format(value).split(".")
+        if len(formatted) == 1:
+            return formatted[0], "", ""
+        return formatted[0], ".", formatted[1], UnitFormatter._units[units]
+
+
+UnitFormatter._units = {
+    "centimeter": "cm",
+    "centimeters": "cm",
+    "cm": "cm",
+    "decimeter": "dm",
+    "decimeters": "dm",
+    "dm": "dm",
+    "in": "in",
+    "inch": "in",
+    "inches": "in",
+    "m": "m",
+    "meter": "m",
+    "meters": "m",
+    "millimeter": "mm",
+    "millimeters": "mm",
+    "mm": "mm",
+    "pc": "pc",
+    "pica": "pc",
+    "picas": "pc",
+    "pixel": "px",
+    "pixels": "px",
+    "point": "pt",
+    "points": "pt",
+    "pt": "pt",
+    "px": "px",
+}
+
+
+
+class CurrencyFormatter(Formatter):
+    """Formats currency value with corresponding codes
+        places:  required number of places after the decimal point
+        curr:    optional currency symbol before the sign (may be blank)
+        sep:     optional grouping separator (comma, period, space, or blank)
+        dp:      decimal point indicator (comma or period)
+                 only specify as blank when places is zero
+   """
+    def __init__(self, format="{:,.2f}", nanshow=True, curr='$',
+        sep=',', dp='.',):
+        self._format = format
+        self._nanshow = nanshow
+        self._curr = curr
+        self._sep = sep
+        self._dp = dp
+
+        if self._curr not in CurrencyFormatter._codes:
+            raise Exception("Incorrect currency provided")
+    
+    def format(self, value): 
+        formatted = self._format.format(value).split(".")
+    
+        return CurrencyFormatter._codes[self._curr], formatted[0], self._dp, formatted[1]
+
+
+CurrencyFormatter._codes = {
+        "aud": "$", 
+        "cad": "$",
+        "eur": "€",
+        "gbp": "£",
+        "hkd": "HK$",
+        "usd": "$",
+}

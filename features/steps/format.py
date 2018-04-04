@@ -65,22 +65,20 @@ def step_impl(context):
     u'formatting inch units with the toyplot.format.UnitFormatter should produce valid output')
 def step_impl(context):
     val = context.formatter.format(12.2, "inches")
-    prefix, separator, suffix, units = val
+    prefix, separator, suffix = val
     nose.tools.assert_equal(prefix, "12")
     nose.tools.assert_equal(separator, ".")
-    nose.tools.assert_equal(suffix, "2")
-    nose.tools.assert_equal(units, "in")
+    nose.tools.assert_equal(suffix, "2 in")
 
 
 @then(
     u'formatting point units with the toyplot.format.UnitFormatter should produce valid output')
 def step_impl(context):
     val = context.formatter.format(5.1, "points")
-    prefix, separator, suffix, units = val
+    prefix, separator, suffix = val
     nose.tools.assert_equal(prefix, "5")
     nose.tools.assert_equal(separator, ".")
-    nose.tools.assert_equal(suffix, "1")
-    nose.tools.assert_equal(units, "pt")
+    nose.tools.assert_equal(suffix, "1 pt")
 
 
 @given(u'an instance of toyplot.format.CurrencyFormatter')
@@ -91,9 +89,8 @@ def step_impl(context):
 @then(
     u'formatting Canadian currency with the toyplot.format.CurrencyFormatter should produce valid output')
 def step_impl(context):
-    codes, prefix, dp, suffix = context.formatter.format(100.00)
-    nose.tools.assert_equal(codes, "$")
-    nose.tools.assert_equal(prefix, "100")
+    prefix, dp, suffix = context.formatter.format(100.00)
+    nose.tools.assert_equal(prefix, "$100")
     nose.tools.assert_equal(dp, ".")
     nose.tools.assert_equal(suffix, "00")
 
@@ -103,9 +100,8 @@ def step_impl(context):
 def step_impl(context):
     context.formatter = toyplot.format.CurrencyFormatter(curr="eur")
     val = context.formatter.format(9000.56)
-    codes, prefix, dp, suffix = val
-    nose.tools.assert_equal(codes, "€")
-    nose.tools.assert_equal(prefix, "9,000")
+    prefix, dp, suffix = val
+    nose.tools.assert_equal(prefix, u"\u20AC" +"9,000")
     nose.tools.assert_equal(dp, ".")
     nose.tools.assert_equal(suffix, "56")
 
@@ -114,8 +110,7 @@ def step_impl(context):
 def step_impl(context):
     context.formatter = toyplot.format.CurrencyFormatter(curr="gbp")
     val = context.formatter.format(23423410.5)
-    codes, prefix, dp, suffix = val
-    nose.tools.assert_equal(codes, "£")
-    nose.tools.assert_equal(prefix, "23,423,410")
+    prefix, dp, suffix = val
+    nose.tools.assert_equal(prefix, u"\u00a3" +"23,423,410")
     nose.tools.assert_equal(dp, ".")
     nose.tools.assert_equal(suffix, "50")

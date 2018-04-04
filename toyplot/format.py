@@ -119,7 +119,7 @@ class UnitFormatter(Formatter):
         formatted = self._format.format(value).split(".")
         if len(formatted) == 1:
             return formatted[0], "", ""
-        return formatted[0], ".", formatted[1], UnitFormatter._units[units]
+        return formatted[0], ".", formatted[1] +" " +UnitFormatter._units[units]
 
 
 UnitFormatter._units = {
@@ -190,7 +190,7 @@ class CurrencyFormatter(Formatter):
         """
         formatted = self._format.format(value).split(".")
     
-        return CurrencyFormatter._codes[self._curr], formatted[0], self._dp, formatted[1]
+        return CurrencyFormatter._codes[self._curr] + formatted[0], self._dp, formatted[1]
 
 
 CurrencyFormatter._codes = {

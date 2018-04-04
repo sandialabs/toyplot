@@ -104,7 +104,7 @@ class UnitFormatter(Formatter):
           Separator between formatted data, or empty string.
         suffix : string
           Formatted data to be displayed after the separator, or empty string.
-        unit : string
+        units : string
           Formatted units to be displayed after the suffix, or empty string.
         """
         if units not in UnitFormatter._units:
@@ -179,11 +179,11 @@ class CurrencyFormatter(Formatter):
 
         Returns
         -------
-        code : string
+        codes : string
           Formatted currency code to be displayed before the prefix, or empty string.
         prefix : string
           Formatted data to be displayed before the separator.
-        separator : string
+        dp : string
           Separator between formatted data, or empty string.
         suffix : string
           Formatted data to be displayed after the separator, or empty string.

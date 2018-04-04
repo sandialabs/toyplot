@@ -196,8 +196,8 @@ class CurrencyFormatter(Formatter):
 CurrencyFormatter._codes = {
         "aud": "$", 
         "cad": "$",
-        "eur": "€",
-        "gbp": "£",
+        "eur": u"\u20AC",
+        "gbp": u"\u00a3",
         "hkd": "HK$",
         "usd": "$",
 }

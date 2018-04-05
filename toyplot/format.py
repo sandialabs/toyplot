@@ -84,7 +84,7 @@ class UnitFormatter(Formatter):
         Set to `False` to hide NaN values.
     """
 
-    def __init__(self, format="{:.6}", nanshow=True, units='pt'):
+    def __init__(self, format="{:.6g}", nanshow=True, units='pt'):
         self._format = format
         self._nanshow = nanshow
         self._units = units
@@ -161,7 +161,7 @@ class CurrencyFormatter(Formatter):
         dp:      decimal point indicator (comma or period)
                  only specify as blank when places is zero
    """
-    def __init__(self, format="{:,.2f}", nanshow=True, curr='$',
+    def __init__(self, format="{:,.2f}", nanshow=True, curr='cad',
         sep=',', dp='.',):
         self._format = format
         self._nanshow = nanshow
@@ -197,9 +197,6 @@ class CurrencyFormatter(Formatter):
             return "", "", ""
 
         formatted = self._format.format(value).split(".")
-        if len(formatted) == 1:
-            return CurrencyFormatter._codes[self._curr] +formatted[0], "", ""
-    
         return CurrencyFormatter._codes[self._curr] + formatted[0], self._dp, formatted[1]
 
 

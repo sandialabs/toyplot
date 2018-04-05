@@ -84,11 +84,15 @@ class UnitFormatter(Formatter):
         Set to `False` to hide NaN values.
     """
 
-    def __init__(self, format="{:.6}", nanshow=True):
+    def __init__(self, format="{:.6}", nanshow=True, units='pt'):
         self._format = format
         self._nanshow = nanshow
+        self._units = units
 
-    def format(self, value, units):
+        if units not in UnitFormatter._units:
+            raise Exception("Incorrect type of units provided")
+
+    def format(self, value):
         """Return a text representation of the given value.
 
         Parameters
@@ -107,8 +111,6 @@ class UnitFormatter(Formatter):
         units : string
           Formatted units to be displayed after the suffix, or empty string.
         """
-        if units not in UnitFormatter._units:
-            raise Exception("Incorrect type of units provided")
 
         if isinstance(value, six.string_types):
             return value, "", ""
@@ -118,8 +120,8 @@ class UnitFormatter(Formatter):
 
         formatted = self._format.format(value).split(".")
         if len(formatted) == 1:
-            return formatted[0], "", ""
-        return formatted[0], ".", formatted[1] +" " +UnitFormatter._units[units]
+            return formatted[0] +" " +UnitFormatter._units[self._units], "", ""
+        return formatted[0], ".", formatted[1] +" " +UnitFormatter._units[self._units]
 
 
 UnitFormatter._units = {
@@ -188,7 +190,15 @@ class CurrencyFormatter(Formatter):
         suffix : string
           Formatted data to be displayed after the separator, or empty string.
         """
+        if isinstance(value, six.string_types):
+            return value, "", ""
+
+        if numpy.isnan(value) and not self._nanshow:
+            return "", "", ""
+
         formatted = self._format.format(value).split(".")
+        if len(formatted) == 1:
+            return +CurrencyFormatter._codes[self._curr] +formatted[0], "", ""
     
         return CurrencyFormatter._codes[self._curr] + formatted[0], self._dp, formatted[1]
 

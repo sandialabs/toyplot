@@ -101,6 +101,11 @@ def step_impl(context):
     nose.tools.assert_equal(separator, "")
     nose.tools.assert_equal(suffix, "")
 
+    prefix, dp, suffix = context.formatter.format(numpy.nan)
+    nose.tools.assert_equal(prefix, "")
+    nose.tools.assert_equal(dp, "")
+    nose.tools.assert_equal(suffix, "")
+
 
 @given(u'an instance of toyplot.format.CurrencyFormatter')
 def step_impl(context):
@@ -145,6 +150,11 @@ def step_impl(context):
     u'formatting currency with the toyplot.format.CurrencyFormatter should handle errors correctly')
 def step_impl(context):
     prefix, dp, suffix = context.formatter.format("test")
+    nose.tools.assert_equal(prefix, "")
+    nose.tools.assert_equal(dp, "")
+    nose.tools.assert_equal(suffix, "")
+
+    prefix, dp, suffix = context.formatter.format(numpy.nan)
     nose.tools.assert_equal(prefix, "")
     nose.tools.assert_equal(dp, "")
     nose.tools.assert_equal(suffix, "")

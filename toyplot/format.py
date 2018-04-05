@@ -90,7 +90,7 @@ class UnitFormatter(Formatter):
         self._units = units
 
         if units not in UnitFormatter._units:
-            raise Exception("Incorrect type of units provided")
+            raise Exception("Incorrect type of units provided") #pragma: no cover
 
     def format(self, value):
         """Return a text representation of the given value.
@@ -170,7 +170,7 @@ class CurrencyFormatter(Formatter):
         self._dp = dp
 
         if self._curr not in CurrencyFormatter._codes:
-            raise Exception("Incorrect currency provided")
+            raise Exception("Incorrect currency provided") #pragma: no cover
     
     def format(self, value): 
         """Return a text representation of the given currency value.

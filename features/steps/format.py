@@ -9,13 +9,13 @@ import numpy.testing
 import toyplot.format
 
 
-@given(u'an instance of toyplot.format.DefaultFormatter')
+@given(u'an instance of toyplot.format.BasicFormatter')
 def step_impl(context):
-    context.formatter = toyplot.format.DefaultFormatter()
+    context.formatter = toyplot.format.BasicFormatter()
 
 
 @then(
-    u'formatting strings with the toyplot.format.DefaultFormatter should produce valid output')
+    u'formatting strings with the toyplot.format.BasicFormatter should produce valid output')
 def step_impl(context):
     prefix, separator, suffix = context.formatter.format("1")
     nose.tools.assert_equal(prefix, "1")
@@ -24,7 +24,7 @@ def step_impl(context):
 
 
 @then(
-    u'formatting integers with the toyplot.format.DefaultFormatter should produce valid output')
+    u'formatting integers with the toyplot.format.BasicFormatter should produce valid output')
 def step_impl(context):
     prefix, separator, suffix = context.formatter.format(1)
     nose.tools.assert_equal(prefix, "1")
@@ -54,7 +54,7 @@ def step_impl(context):
     nose.tools.assert_equal(prefix, "1")
     nose.tools.assert_equal(separator, "")
     nose.tools.assert_equal(suffix, "")
- 
+
 
 @given(u'an instance of toyplot.format.UnitFormatter')
 def step_impl(context):

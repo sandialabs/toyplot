@@ -6,9 +6,14 @@
 
 from __future__ import division
 
+import numbers
+import warnings
+
 import custom_inherit
 import numpy
 import six
+
+import toyplot
 
 
 @six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
@@ -40,13 +45,29 @@ class NullFormatter(Formatter):
         return "", "", ""
 
 
-class DefaultFormatter(Formatter):
-    """Formats data using its default string representation."""
+class BasicFormatter(Formatter):
+    """Convert data to its default string representation."""
+    def __init__(self, nanshow=True):
+        self._nanshow = nanshow
+
     def format(self, value):
+        try:
+            if not self._nanshow and numpy.isnan(value):
+                return "", "", ""
+        except:
+            pass
+
         return "%s" % value, "", ""
 
 
-class FloatFormatter(Formatter):
+class DefaultFormatter(BasicFormatter):
+    """Deprecated, use :class:`toyplot.format.BasicFormatter` instead."""
+    def __init__(self):
+        super(DefaultFormatter, self).__init__(nanshow=True)
+        warnings.warn("toyplot.format.DefaultFormatter is deprecated, use toyplot.format.BasicFormatter instead.", toyplot.DeprecationWarning, stacklevel=2)
+
+
+class FloatFormatter(BasicFormatter):
     """Formats floating-point values with aligned decimal points.
 
     Parameters
@@ -57,25 +78,22 @@ class FloatFormatter(Formatter):
         Set to `False` to hide NaN values.
     """
     def __init__(self, format="{:.6g}", nanshow=True):
+        super(FloatFormatter, self).__init__(nanshow=nanshow)
         self._format = format
-        self._nanshow = nanshow
 
     def format(self, value):
-        if isinstance(value, six.string_types):
-            return value, "", ""
+        if isinstance(value, numbers.Number) and not numpy.isnan(value):
+            formatted = self._format.format(value).split(".")
+            if len(formatted) == 1:
+                return formatted[0], "", ""
+            return formatted[0], ".", formatted[1]
 
-        if numpy.isnan(value) and not self._nanshow:
-            return "", "", ""
-
-        formatted = self._format.format(value).split(".")
-        if len(formatted) == 1:
-            return formatted[0], "", ""
-        return formatted[0], ".", formatted[1]
+        return super(FloatFormatter, self).format(value)
 
 
-class UnitFormatter(Formatter):
+class UnitFormatter(BasicFormatter):
     """Formats values with corresponding units
-    
+
     Parameters
     ----------
     format: format string, optional
@@ -85,8 +103,8 @@ class UnitFormatter(Formatter):
     """
 
     def __init__(self, format="{:.6g}", nanshow=True, units='pt'):
+        super(UnitFormatter, self).__init__(nanshow=nanshow)
         self._format = format
-        self._nanshow = nanshow
         self._units = units
 
         if units not in UnitFormatter._units:
@@ -112,17 +130,13 @@ class UnitFormatter(Formatter):
           Formatted units to be displayed after the suffix, or empty string.
         """
 
-        if isinstance(value, six.string_types):
-            return value, "", ""
+        if isinstance(value, numbers.Number) and not numpy.isnan(value):
+            formatted = self._format.format(value).split(".")
+            if len(formatted) == 1:
+                return formatted[0] +" " +UnitFormatter._units[self._units], "", ""
+            return formatted[0], ".", formatted[1] +" " +UnitFormatter._units[self._units]
 
-        if numpy.isnan(value) and not self._nanshow:
-            return "", "", ""
-
-        formatted = self._format.format(value).split(".")
-        if len(formatted) == 1:
-            return formatted[0] +" " +UnitFormatter._units[self._units], "", ""
-        return formatted[0], ".", formatted[1] +" " +UnitFormatter._units[self._units]
-
+        return super(UnitFormatter, self).format(value)
 
 UnitFormatter._units = {
     "centimeter": "cm",
@@ -153,7 +167,7 @@ UnitFormatter._units = {
 
 
 
-class CurrencyFormatter(Formatter):
+class CurrencyFormatter(BasicFormatter):
     """Formats currency value with corresponding codes
         places:  required number of places after the decimal point
         curr:    optional currency symbol before the sign (may be blank)
@@ -161,18 +175,17 @@ class CurrencyFormatter(Formatter):
         dp:      decimal point indicator (comma or period)
                  only specify as blank when places is zero
    """
-    def __init__(self, format="{:,.2f}", nanshow=True, curr='cad',
-        sep=',', dp='.',):
+    def __init__(self, format="{:,.2f}", nanshow=True, curr='cad', sep=',', dp='.',):
+        super(CurrencyFormatter, self).__init__(nanshow=nanshow)
         self._format = format
-        self._nanshow = nanshow
         self._curr = curr
         self._sep = sep
         self._dp = dp
 
         if self._curr not in CurrencyFormatter._codes:
             raise Exception("Incorrect currency provided") #pragma: no cover
-    
-    def format(self, value): 
+
+    def format(self, value):
         """Return a text representation of the given currency value.
 
         Parameters
@@ -190,18 +203,15 @@ class CurrencyFormatter(Formatter):
         suffix : string
           Formatted data to be displayed after the separator, or empty string.
         """
-        if isinstance(value, six.string_types):
-            return value, "", ""
 
-        if numpy.isnan(value) and not self._nanshow:
-            return "", "", ""
+        if isinstance(value, numbers.Number) and not numpy.isnan(value):
+            formatted = self._format.format(value).split(".")
+            return CurrencyFormatter._codes[self._curr] + formatted[0], self._dp, formatted[1]
 
-        formatted = self._format.format(value).split(".")
-        return CurrencyFormatter._codes[self._curr] + formatted[0], self._dp, formatted[1]
-
+        return super(CurrencyFormatter, self).format(value)
 
 CurrencyFormatter._codes = {
-        "aud": "$", 
+        "aud": "$",
         "cad": "$",
         "eur": u"\u20AC",
         "gbp": u"\u00a3",

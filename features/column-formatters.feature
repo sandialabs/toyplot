@@ -1,7 +1,7 @@
 Feature: Column formatters
-  Scenario Outline: Default formatter
-    Given an instance of toyplot.format.DefaultFormatter
-    Then formatting <input> with the toyplot.format.DefaultFormatter should produce valid output
+  Scenario Outline: Basic formatter
+    Given an instance of toyplot.format.BasicFormatter
+    Then formatting <input> with the toyplot.format.BasicFormatter should produce valid output
 
     Examples:
       | input                             |

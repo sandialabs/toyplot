@@ -180,6 +180,19 @@ def render(svg, canvas):
                         stroke=0,
                         fill=1,
                         )
+
+                if current_style["border-style"] != "none":
+                    set_stroke_color(canvas, toyplot.color.css(current_style["border-color"]))
+                    canvas.setLineWidth(float(current_style["border-width"]))
+                    canvas.rect(
+                        0,
+                        0,
+                        float(element.get("width")[:-2]),
+                        float(element.get("height")[:-2]),
+                        stroke=1,
+                        fill=0,
+                        )
+
                 for child in element:
                     render_element(root, child, canvas, styles)
 

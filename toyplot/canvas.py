@@ -204,6 +204,9 @@ class Canvas(object):
         self._hyperlink = None
         self._style = {
             "background-color": "transparent",
+            "border-color": toyplot.color.black,
+            "border-style": "none",
+            "border-width": 1.0,
             "fill": toyplot.color.black,
             "fill-opacity": 1.0,
             "font-family": "Helvetica",
@@ -256,7 +259,7 @@ class Canvas(object):
     def style(self, value):
         self._style = toyplot.style.combine(
             self._style,
-            toyplot.style.require(value, allowed=set(["background-color", "border"])),
+            toyplot.style.require(value, allowed=set(["background-color", "border-color", "border-style", "border-width"])),
             )
 
     @property

@@ -164,9 +164,9 @@ def assert_canvas_matches(canvas, name):
         if not os.path.exists("tests/diffs"):
             os.mkdir("tests/diffs")
         with open("tests/diffs/%s.svg" % name, "wb") as file:
-            file.write(svg_string)
+            file.write(svg_string.encode("utf-8"))
         with open("tests/diffs/%s.reference.svg" % name, "wb") as file:
-            file.write(reference_string)
+            file.write(reference_string.encode("utf-8"))
         if not os.path.exists("tests/failed"):
             os.mkdir("tests/failed")
         with open("tests/failed/%s.svg" % name, "wb") as file:

@@ -305,13 +305,19 @@ class Table(object):
         for _ in numpy.arange(len(self)):
             for index, iterator in enumerate(iterators):
                 value = next(iterator)
+
+                if isinstance(value, numbers.Number):
+                    value = "{:.12g}".format(value)
+                else:
+                    value = six.text_type(value)
+
                 if index == 0:
                     row_xml = xml.SubElement(
                         root_xml, "tr", style="border:none")
                 xml.SubElement(
                     row_xml,
                     "td",
-                    style="border:none;padding-right:1em;").text = six.text_type(value)
+                    style="border:none;padding-right:1em;").text = value
 
         return six.text_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
 

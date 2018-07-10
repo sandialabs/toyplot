@@ -6,6 +6,8 @@
 
 from __future__ import division
 
+import numbers
+
 import numpy
 
 import toyplot.color
@@ -150,5 +152,9 @@ def _color_fixup(styles):
 
 def to_css(*styles):
     """Convert one-or-more dicts containing CSS properties into a single CSS string."""
-    style = _color_fixup(combine(*styles))
-    return ";".join(["%s:%s" % (key, value) for key, value in sorted(style.items())])
+    declarations = []
+    for key, value in sorted( _color_fixup(combine(*styles)).items()):
+        if isinstance(value, numbers.Number):
+            value = "{:.6g}".format(value)
+        declarations.append("%s:%s" % (key, value))
+    return ";".join(declarations)

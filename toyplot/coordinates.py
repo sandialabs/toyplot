@@ -3330,7 +3330,7 @@ class Table(object):
         self._cell_angle = numpy.zeros(self._shape, dtype="float")
         self._cell_axes = numpy.empty(self._shape, dtype="object")
         self._cell_data = numpy.empty(self._shape, dtype="object")
-        self._cell_format = numpy.tile(toyplot.format.DefaultFormatter(), self._shape)
+        self._cell_format = numpy.tile(toyplot.format.BasicFormatter(), self._shape)
         self._cell_group = numpy.arange(self._shape[0] * self._shape[1]).reshape(self._shape)
         self._cell_lstyle = numpy.empty(self._shape, dtype="object")
 
@@ -3463,7 +3463,7 @@ class Table(object):
         self._cell_angle = numpy.insert(self._cell_angle, position, 0, axis=axis)
         self._cell_axes = numpy.insert(self._cell_axes, position, None, axis=axis)
         self._cell_data = numpy.insert(self._cell_data, position, None, axis=axis)
-        self._cell_format = numpy.insert(self._cell_format, position, toyplot.format.DefaultFormatter(), axis=axis)
+        self._cell_format = numpy.insert(self._cell_format, position, toyplot.format.BasicFormatter(), axis=axis)
         self._cell_group = numpy.insert(self._cell_group, position, -1, axis=axis)
         self._cell_group[self._cell_group == -1] = numpy.unique(self._cell_group).max() + 1 + numpy.arange(numpy.count_nonzero(self._cell_group == -1)) # pylint: disable=no-member
         self._cell_lstyle = numpy.insert(self._cell_lstyle, position, None, axis=axis)

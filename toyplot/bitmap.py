@@ -27,9 +27,9 @@ def to_png(data, stream, bitdepth=None):
     ----------
     data: :class:`numpy.ndarray`, required
         Source array containing bitmap data to be converted.  Valid array shapes
-        are :math:`M \times N \times 1` (greyscale data), :math:`M \times N \times 2`
-        (greyscale plus alpha channel), :math:`M \times N \times 3`
-        (RGB data), or :math:`M \times N \times 4` (RGB + alpha).  Floating
+        are :math:`M \\times N \\times 1` (greyscale data), :math:`M \\times N \\times 2`
+        (greyscale plus alpha channel), :math:`M \\times N \\times 3`
+        (RGB data), or :math:`M \\times N \\times 4` (RGB + alpha).  Floating
         point values are scaled and converted to unsigned 8 bit integers.
     stream: file-like object, required
         Target file to receive PNG data.
@@ -69,9 +69,9 @@ def to_png_data_uri(data):
     ----------
     data: :class:`numpy.ndarray`, required
         Source array containing bitmap data to be converted.  Valid array shapes
-        are :math:`M \times N \times 1` (greyscale data), :math:`M \times N \times 2`
-        (greyscale plus alpha channel), :math:`M \times N \times 3`
-        (RGB data), or :math:`M \times N \times 4` (RGB + alpha).  Floating
+        are :math:`M \\times N \\times 1` (greyscale data), :math:`M \\times N \\times 2`
+        (greyscale plus alpha channel), :math:`M \\times N \\times 3`
+        (RGB data), or :math:`M \\times N \\times 4` (RGB + alpha).  Floating
         point values are scaled and converted to unsigned 8 bit integers.
 
     Returns

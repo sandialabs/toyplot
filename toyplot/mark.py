@@ -273,6 +273,60 @@ class BarMagnitudes(Mark):
         return result
 
 
+class Ellipse(Mark):
+    """Plot ellipses.
+
+    Do not create Ellipse instances directly.  Use factory methods such as
+    :meth:`toyplot.coordinates.Cartesian.ellipse` instead.
+    """
+    def __init__(
+            self,
+            coordinate_axes,
+            table,
+            x,
+            y,
+            rx,
+            ry,
+            angle,
+            fill,
+            opacity,
+            title,
+            style,
+            filename,
+        ):
+        Mark.__init__(self)
+
+        self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=2)
+
+        self._table = toyplot.require.instance(table, toyplot.data.Table)
+
+        self._x = toyplot.require.table_keys(table, x, length=1)
+        self._y = toyplot.require.table_keys(table, y, length=1)
+        # 1 x-radius column
+        self._rx = toyplot.require.table_keys(table, rx, length=1)
+        # 1 y-radius column
+        self._ry = toyplot.require.table_keys(table, ry, length=1)
+        # 1 angle column
+        self._angle = toyplot.require.table_keys(table, angle, length=1)
+        # 1 fill color column
+        self._fill = toyplot.require.table_keys(table, fill, length=1)
+        # 1 opacity column
+        self._opacity = toyplot.require.table_keys(table, opacity, length=1)
+        # 1 title column
+        self._title = toyplot.require.table_keys(table, title, length=1)
+        # Rectangle style
+        self._style = toyplot.style.require(style, allowed=toyplot.style.allowed.fill)
+        # Export filename
+        self._filename = toyplot.require.filename(filename)
+
+    def domain(self, axis):
+        if axis == self._coordinate_axes[0]:
+            return toyplot.data.minimax([self._table[self._x[0]]])
+        if axis == self._coordinate_axes[1]:
+            return toyplot.data.minimax([self._table[self._y[0]]])
+
+
+
 class FillBoundaries(Mark):
     """Render multiple stacked fill regions defined by boundaries.
 

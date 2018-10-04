@@ -692,6 +692,7 @@ class Cartesian(object):
 
         self._palette = palette
         self._bar_colors = itertools.cycle(self._palette)
+        self._ellipse_colors = itertools.cycle(self._palette)
         self._fill_colors = itertools.cycle(self._palette)
         self._graph_colors = itertools.cycle(self._palette)
         self._plot_colors = itertools.cycle(self._palette)
@@ -1391,6 +1392,57 @@ class Cartesian(object):
             scale="linear",
             )
         return axis
+
+    def ellipse(
+            self,
+            x,
+            y,
+            rx,
+            ry,
+            angle,
+            color=None,
+            opacity=1.0,
+            title=None,
+            style=None,
+            filename=None,
+        ):
+        table = toyplot.data.Table()
+        table["x"] = toyplot.require.scalar_vector(x)
+        table["y"] = toyplot.require.scalar_vector(y, length=table.shape[0])
+        table["rx"] = toyplot.require.scalar_vector(rx, length=table.shape[0])
+        table["ry"] = toyplot.require.scalar_vector(ry, length=table.shape[0])
+        table["angle"] = toyplot.require.scalar_vector(angle, length=table.shape[0])
+        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
+        table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])
+        style = toyplot.style.combine(
+            {"stroke": "none"},
+            toyplot.style.require(style, allowed=toyplot.style.allowed.fill),
+            )
+
+        default_color = [next(self._rect_colors)]
+        table["toyplot:fill"] = toyplot.color.broadcast(
+            colors=color,
+            shape=(table.shape[0], 1),
+            default=default_color,
+            )[:, 0]
+
+        coordinate_axes = ["x", "y"]
+
+        return self.add_mark(
+            toyplot.mark.Ellipse(
+                coordinate_axes,
+                table=table,
+                x=["x"],
+                y=["y"],
+                rx=["rx"],
+                ry=["ry"],
+                angle=["angle"],
+                fill=["toyplot:fill"],
+                opacity=["opacity"],
+                title=["title"],
+                style=style,
+                filename=filename,
+                ))
 
     def fill(
             self,

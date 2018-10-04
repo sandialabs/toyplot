@@ -2456,6 +2456,54 @@ def _render(axes, mark, context):
             xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
+@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Ellipse, RenderContext)
+def _render(axes, mark, context):
+    assert(mark._coordinate_axes.tolist() == ["x", "y"])
+    if mark._coordinate_axes.tolist() == ["x", "y"]:
+        x = axes.project("x", mark._table[mark._x[0]])
+        y = axes.project("y", mark._table[mark._y[0]])
+        rx = numpy.abs(axes.project("x", mark._table[mark._rx[0]] + mark._table[mark._x[0]]) - x)
+        ry = numpy.abs(axes.project("y", mark._table[mark._ry[0]] + mark._table[mark._y[0]]) - y)
+
+    mark_xml = xml.SubElement(
+        context.parent,
+        "g",
+        style=_css_style(
+            mark._style),
+        id=context.get_id(mark),
+        attrib={
+            "class": "toyplot-mark-Ellipse"})
+
+    _render_table(owner=mark, key="data", label="ellipse data", table=mark._table, filename=mark._filename, context=context)
+
+    series_xml = xml.SubElement(
+        mark_xml, "g", attrib={"class": "toyplot-Series"})
+    for dx, dy, drx, dry, dangle, dfill, dopacity, dtitle in zip(
+            x,
+            y,
+            rx,
+            ry,
+            mark._table[mark._angle[0]],
+            mark._table[mark._fill[0]],
+            mark._table[mark._opacity[0]],
+            mark._table[mark._title[0]],
+        ):
+        dstyle = toyplot.style.combine(
+            {"fill": toyplot.color.to_css(dfill), "opacity": dopacity}, mark._style)
+        datum_xml = xml.SubElement(
+            series_xml,
+            "ellipse",
+            attrib={"class": "toyplot-Datum"},
+            cx=repr(dx),
+            cy=repr(dy),
+            rx=repr(drx),
+            ry=repr(dry),
+            style=_css_style(dstyle),
+            )
+        if dtitle is not None:
+            xml.SubElement(datum_xml, "title").text = str(dtitle)
+
+
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Graph, RenderContext)
 def _render(axes, mark, context): # pragma: no cover
     # Project edge coordinates.

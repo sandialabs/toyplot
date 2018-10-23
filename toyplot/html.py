@@ -2499,6 +2499,7 @@ def _render(axes, mark, context):
             rx=repr(drx),
             ry=repr(dry),
             style=_css_style(dstyle),
+            transform="rotate(%r %r %r)" % (-dangle, dx, dy),
             )
         if dtitle is not None:
             xml.SubElement(datum_xml, "title").text = str(dtitle)

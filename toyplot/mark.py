@@ -314,16 +314,18 @@ class Ellipse(Mark):
         self._opacity = toyplot.require.table_keys(table, opacity, length=1)
         # 1 title column
         self._title = toyplot.require.table_keys(table, title, length=1)
-        # Rectangle style
+        # Ellipse style
         self._style = toyplot.style.require(style, allowed=toyplot.style.allowed.fill)
         # Export filename
         self._filename = toyplot.require.filename(filename)
 
     def domain(self, axis):
+        radius = numpy.maximum(self._table[self._rx[0]], self._table[self._ry[0]])
+
         if axis == self._coordinate_axes[0]:
-            return toyplot.data.minimax([self._table[self._x[0]]])
+            return toyplot.data.minimax([self._table[self._x[0]] - radius, self._table[self._x[0]] + radius])
         if axis == self._coordinate_axes[1]:
-            return toyplot.data.minimax([self._table[self._y[0]]])
+            return toyplot.data.minimax([self._table[self._y[0]] - radius, self._table[self._y[0]] + radius])
 
 
 

@@ -146,6 +146,7 @@ class BarBoundaries(Mark):
             fill,
             opacity,
             title,
+            hyperlink,
             style,
             filename,
         ):
@@ -168,6 +169,8 @@ class BarBoundaries(Mark):
         self._opacity = toyplot.require.table_keys(table, opacity, length=len(boundaries) - 1)
         # N-1 title columns
         self._title = toyplot.require.table_keys(table, title, length=len(boundaries) - 1)
+        # N-1 hyperlink columns
+        self._hyperlink = toyplot.require.table_keys(table, hyperlink, length=len(boundaries) - 1)
         # Bar style
         self._style = toyplot.style.require(style, allowed=toyplot.style.allowed.fill)
         # Export filename
@@ -216,6 +219,7 @@ class BarMagnitudes(Mark):
             fill,
             opacity,
             title,
+            hyperlink,
             style,
             filename,
         ):
@@ -239,6 +243,8 @@ class BarMagnitudes(Mark):
         self._opacity = toyplot.require.table_keys(table, opacity, length=len(magnitudes))
         # N title columns
         self._title = toyplot.require.table_keys(table, title, length=len(magnitudes))
+        # N hyperlink columns
+        self._hyperlink = toyplot.require.table_keys(table, hyperlink, length=len(magnitudes))
         # Bar style
         self._style = toyplot.style.require(style, allowed=toyplot.style.allowed.fill)
         # Export filename

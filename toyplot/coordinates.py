@@ -1091,10 +1091,12 @@ class Cartesian(object):
             along="x",
             baseline="stacked",
             color=None,
+            filename=None,
+            hyperlink=None,
             opacity=1.0,
-            title=None,
             style=None,
-            filename=None):
+            title=None,
+            ):
         """Add stacked bars to the axes.
 
         This command generates one-or-more series of stacked bars.  For
@@ -1141,6 +1143,8 @@ class Cartesian(object):
           Specify a single opacity for all bars, one opacity per series, or one opacity per bar.
         title: array-like set of strings, optional
           Specify a single title, one title per series, or one title per bar.
+        hyperlink: array-like set of strings, optional
+          Specify a single hyperlink, one hyperlink per series, or one hyperlink per bar.
         style: dict, optional
           Collection of CSS styles to be applied globally.
 
@@ -1195,6 +1199,8 @@ class Cartesian(object):
                 opacity, (series.shape[0], series.shape[1] - 1))
             title = toyplot.broadcast.pyobject(
                 title, (series.shape[0], series.shape[1] - 1))
+            hyperlink = toyplot.broadcast.pyobject(
+                hyperlink, (series.shape[0], series.shape[1] - 1))
             style = toyplot.style.combine(
                 {"stroke": "white", "stroke-width": 1.0},
                 toyplot.style.require(style, allowed=toyplot.style.allowed.fill),
@@ -1214,21 +1220,24 @@ class Cartesian(object):
             fill_keys = []
             opacity_keys = []
             title_keys = []
+            hyperlink_keys = []
 
             boundary_keys.append("boundary0")
             table[boundary_keys[-1]] = series.T[0]
 
-            for index, (boundary_column, fill_column, opacity_column, title_column) in enumerate(
-                    zip(series.T[1:], color.T, opacity.T, title.T)):
+            for index, (boundary_column, fill_column, opacity_column, title_column, hyperlink_column) in enumerate(
+                    zip(series.T[1:], color.T, opacity.T, title.T, hyperlink.T)):
                 boundary_keys.append("boundary" + str(index + 1))
                 fill_keys.append("fill" + str(index))
                 opacity_keys.append("opacity" + str(index))
                 title_keys.append("title" + str(index))
+                hyperlink_keys.append("hyperlink" + str(index))
                 table[boundary_keys[-1]] = boundary_column
                 _mark_exportable(table, boundary_keys[-1])
                 table[fill_keys[-1]] = fill_column
                 table[opacity_keys[-1]] = opacity_column
                 table[title_keys[-1]] = title_column
+                table[hyperlink_keys[-1]] = hyperlink_column
 
             return self.add_mark(
                 toyplot.mark.BarBoundaries(
@@ -1240,6 +1249,7 @@ class Cartesian(object):
                     fill=fill_keys,
                     opacity=opacity_keys,
                     title=title_keys,
+                    hyperlink=hyperlink_keys,
                     style=style,
                     filename=filename,
                     ))
@@ -1287,6 +1297,7 @@ class Cartesian(object):
                 )
             opacity = toyplot.broadcast.scalar(opacity, series.shape)
             title = toyplot.broadcast.pyobject(title, series.shape)
+            hyperlink = toyplot.broadcast.pyobject(hyperlink, series.shape)
             style = toyplot.style.combine(
                 {"stroke": "white", "stroke-width": 1.0},
                 toyplot.style.require(style, allowed=toyplot.style.allowed.fill),
@@ -1322,17 +1333,20 @@ class Cartesian(object):
             fill_keys = []
             opacity_keys = []
             title_keys = []
-            for index, (magnitude_column, fill_column, opacity_column, title_column) in enumerate(
-                    zip(series.T, color.T, opacity.T, title.T)):
+            hyperlink_keys = []
+            for index, (magnitude_column, fill_column, opacity_column, title_column, hyperlink_column) in enumerate(
+                    zip(series.T, color.T, opacity.T, title.T, hyperlink.T)):
                 magnitude_keys.append("magnitude" + str(index))
                 fill_keys.append("fill" + str(index))
                 opacity_keys.append("opacity" + str(index))
                 title_keys.append("title" + str(index))
+                hyperlink_keys.append("hyperlink" + str(index))
                 table[magnitude_keys[-1]] = magnitude_column
                 _mark_exportable(table, magnitude_keys[-1])
                 table[fill_keys[-1]] = fill_column
                 table[opacity_keys[-1]] = opacity_column
                 table[title_keys[-1]] = title_column
+                table[hyperlink_keys[-1]] = hyperlink_column
 
             return self.add_mark(
                 toyplot.mark.BarMagnitudes(
@@ -1345,6 +1359,7 @@ class Cartesian(object):
                     fill=fill_keys,
                     opacity=opacity_keys,
                     title=title_keys,
+                    hyperlink=hyperlink_keys,
                     style=style,
                     filename=filename,
                     ))

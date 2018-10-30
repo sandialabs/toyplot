@@ -2193,12 +2193,13 @@ def _render(axes, mark, context):
 
     _render_table(owner=mark, key="data", label="bar data", table=mark._table, filename=mark._filename, context=context)
 
-    for boundary1, boundary2, fill, opacity, title in zip(
+    for boundary1, boundary2, fill, opacity, title, hyperlink in zip(
             boundaries.T[:-1],
             boundaries.T[1:],
             [mark._table[key] for key in mark._fill],
             [mark._table[key] for key in mark._opacity],
             [mark._table[key] for key in mark._title],
+            [mark._table[key] for key in mark._hyperlink],
         ):
         not_null = numpy.invert(
             numpy.logical_or(
@@ -2207,7 +2208,7 @@ def _render(axes, mark, context):
 
         series_xml = xml.SubElement(
             mark_xml, "g", attrib={"class": "toyplot-Series"})
-        for dleft, dright, dboundary1, dboundary2, dfill, dopacity, dtitle in zip(
+        for dleft, dright, dboundary1, dboundary2, dfill, dopacity, dtitle, dhyperlink in zip(
                 left[not_null],
                 right[not_null],
                 boundary1[not_null],
@@ -2215,13 +2216,20 @@ def _render(axes, mark, context):
                 fill[not_null],
                 opacity[not_null],
                 title[not_null],
+                hyperlink[not_null],
             ):
             dstyle = toyplot.style.combine({
                 "fill": toyplot.color.to_css(dfill),
                 "opacity": dopacity,
                 }, mark._style)
+
+            if dhyperlink:
+                parent_xml = xml.SubElement(series_xml, "a", attrib={"xlink:href": dhyperlink})
+            else:
+                parent_xml = series_xml
+
             datum_xml = xml.SubElement(
-                series_xml,
+                parent_xml,
                 "rect",
                 attrib={
                     "class": "toyplot-Datum",
@@ -2273,16 +2281,17 @@ def _render(axes, mark, context):
 
     _render_table(owner=mark, key="data", label="bar data", table=mark._table, filename=mark._filename, context=context)
 
-    for boundary1, boundary2, fill, opacity, title in zip(
+    for boundary1, boundary2, fill, opacity, title, hyperlink in zip(
             boundaries.T[:-1],
             boundaries.T[1:],
             [mark._table[key] for key in mark._fill],
             [mark._table[key] for key in mark._opacity],
             [mark._table[key] for key in mark._title],
+            [mark._table[key] for key in mark._hyperlink],
         ):
         series_xml = xml.SubElement(
             mark_xml, "g", attrib={"class": "toyplot-Series"})
-        for dleft, dright, dboundary1, dboundary2, dfill, dopacity, dtitle in zip(
+        for dleft, dright, dboundary1, dboundary2, dfill, dopacity, dtitle, dhyperlink in zip(
                 left[not_null],
                 right[not_null],
                 boundary1[not_null],
@@ -2290,11 +2299,18 @@ def _render(axes, mark, context):
                 fill[not_null],
                 opacity[not_null],
                 title[not_null],
+                hyperlink[not_null],
             ):
             dstyle = toyplot.style.combine(
                 {"fill": toyplot.color.to_css(dfill), "opacity": dopacity}, mark._style)
+
+            if dhyperlink:
+                parent_xml = xml.SubElement(series_xml, "a", attrib={"xlink:href": dhyperlink})
+            else:
+                parent_xml = series_xml
+
             datum_xml = xml.SubElement(
-                series_xml,
+                parent_xml,
                 "rect",
                 attrib={
                     "class": "toyplot-Datum",

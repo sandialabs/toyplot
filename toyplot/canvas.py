@@ -97,7 +97,7 @@ class AnimationFrame(object):
                 toyplot.mark.BarBoundaries,
                 toyplot.mark.BarMagnitudes,
                 toyplot.mark.Plot,
-                toyplot.mark.Scatterplot,
+                toyplot.mark.Point,
             )):
             raise ValueError("Cannot set datum style for %s." % type(mark))
 

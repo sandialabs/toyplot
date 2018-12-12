@@ -2158,7 +2158,7 @@ class Cartesian(object):
         elif area is not None and size is None:
             msize = numpy.sqrt(toyplot.broadcast.scalar(area, series.shape))
         else:
-            toyplot.log.warning("Scatterplot size parameter overrides area.")
+            toyplot.log.warning("Size parameter overrides area.")
             msize = toyplot.broadcast.scalar(size, series.shape)
 
         mstroke = toyplot.color.broadcast(colors=mfill, shape=series.shape)
@@ -2206,7 +2206,7 @@ class Cartesian(object):
             table[mhyperlink_keys[-1]] = mhyperlink_column
 
         return self.add_mark(
-            toyplot.mark.Scatterplot(
+            toyplot.mark.Point(
                 coordinate_axes=coordinate_axes,
                 coordinates=coordinate_keys,
                 filename=filename,
@@ -2623,7 +2623,7 @@ class Numberline(object):
         elif area is not None and size is None:
             msize = numpy.sqrt(toyplot.broadcast.scalar(area, coordinates.shape))
         else:
-            toyplot.log.warning("Scatterplot size parameter overrides area.")
+            toyplot.log.warning("Size parameter overrides area.")
             msize = toyplot.broadcast.scalar(size, coordinates.shape)
 
         mstroke = toyplot.color.broadcast(colors=mfill, shape=coordinates.shape)
@@ -2668,7 +2668,7 @@ class Numberline(object):
         if offset is None:
             offset = len(self._children) * self._spacing
 
-        mark = toyplot.mark.Scatterplot(
+        mark = toyplot.mark.Point(
             coordinate_axes=coordinate_axes,
             coordinates=coordinate_keys,
             filename=filename,

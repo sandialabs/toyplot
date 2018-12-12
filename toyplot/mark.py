@@ -28,7 +28,7 @@ class Mark(object):
     representation of their own - it is up to the coordinate system and
     :ref:`rendering backend<backends>` to determine how to render the data.
 
-    For example, a :class:`scatterplot <toyplot.mark.Scatterplot>` mark is
+    For example, a :class:`scatterplot <toyplot.mark.Point>` mark is
     rendered using points by a :class:`cartesian
     <toyplot.coordinates.Cartesian>` coordinate system, but could be rendered
     using lines by a hypothetical parallel coordinate system.
@@ -817,10 +817,10 @@ class Rect(Mark):
             return toyplot.data.minimax([self._table[self._top[0]], self._table[self._bottom[0]]])
 
 
-class Scatterplot(Mark):
+class Point(Mark):
     """Plot multivariate data series using markers.
 
-    Do not create Scatterplot instances directly.  Use factory methods such as
+    Do not create Point instances directly.  Use factory methods such as
     :func:`toyplot.scatterplot` and :meth:`toyplot.coordinates.Cartesian.scatterplot`
     instead.
     """

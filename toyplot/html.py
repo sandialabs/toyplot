@@ -1800,7 +1800,7 @@ def _render(numberline, colormap, context):
         )
 
 
-@dispatch(toyplot.coordinates.Numberline, toyplot.mark.Scatterplot, RenderContext)
+@dispatch(toyplot.coordinates.Numberline, toyplot.mark.Point, RenderContext)
 def _render(numberline, mark, context):
     offset = numberline._child_offset[mark]
 
@@ -1808,12 +1808,12 @@ def _render(numberline, mark, context):
         context.parent,
         "g",
         id=context.get_id(mark),
-        attrib={"class": "toyplot-mark-Scatterplot"},
+        attrib={"class": "toyplot-mark-Point"},
         )
     if offset:
         mark_xml.set("transform", "translate(0,%s)" % -offset)
 
-    _render_table(owner=mark, key="data", label="scatterplot data", table=mark._table, filename=mark._filename, context=context)
+    _render_table(owner=mark, key="data", label="point data", table=mark._table, filename=mark._filename, context=context)
 
     dimension1 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates])
     X = numberline.axis.projection(dimension1)
@@ -2955,7 +2955,7 @@ def _render(axes, mark, context):
             xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
-@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Scatterplot, RenderContext)
+@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Point, RenderContext)
 def _render(axes, mark, context):
     dimension1 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates[0::2]])
     dimension2 = numpy.ma.column_stack([mark._table[key] for key in mark._coordinates[1::2]])
@@ -2971,10 +2971,10 @@ def _render(axes, mark, context):
         context.parent,
         "g",
         id=context.get_id(mark),
-        attrib={"class": "toyplot-mark-Scatterplot"},
+        attrib={"class": "toyplot-mark-Point"},
         )
 
-    _render_table(owner=mark, key="data", label="scatterplot", table=mark._table, filename=mark._filename, context=context)
+    _render_table(owner=mark, key="data", label="point", table=mark._table, filename=mark._filename, context=context)
 
     for x, y, marker, msize, mfill, mstroke, mopacity, mtitle, mhyperlink in zip(
             X.T,

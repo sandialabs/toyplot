@@ -493,8 +493,8 @@ def scatterplot(
       A new canvas object.
     axes: :class:`toyplot.coordinates.Cartesian`
       A new set of 2D axes that fill the canvas.
-    mark: :class:`toyplot.mark.Scatterplot`
-      The new scatter plot mark.
+    mark: :class:`toyplot.mark.Point`
+      The new scatterplot mark.
     """
     canvas = Canvas(
         height=height,

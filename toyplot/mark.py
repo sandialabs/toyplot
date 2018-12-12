@@ -7,6 +7,7 @@
 from __future__ import absolute_import, division
 
 import itertools
+import logging
 
 import custom_inherit
 import numpy
@@ -15,6 +16,10 @@ import six
 import toyplot.color
 import toyplot.marker
 import toyplot.require
+
+
+log = logging.getLogger(__name__)
+
 
 ##########################################################################
 # Basic Toyplot marks
@@ -764,61 +769,8 @@ class Plot(Mark):
         return result
 
 
-class Rect(Mark):
-    """Plot axis-aligned rectangles.
-
-    Do not create Rect instances directly.  Use factory methods such as
-    :meth:`toyplot.coordinates.Cartesian.rects` instead.
-    """
-    def __init__(
-            self,
-            coordinate_axes,
-            table,
-            left,
-            right,
-            top,
-            bottom,
-            fill,
-            opacity,
-            title,
-            style,
-            filename,
-        ):
-        Mark.__init__(self)
-
-        # 2 axis identifiers
-        self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, length=2)
-
-        self._table = toyplot.require.instance(table, toyplot.data.Table)
-
-        # 1 coordinate column
-        self._left = toyplot.require.table_keys(table, left, length=1)
-        # 1 coordinate column
-        self._right = toyplot.require.table_keys(table, right, length=1)
-        # 1 coordinate column
-        self._top = toyplot.require.table_keys(table, top, length=1)
-        # 1 coordinate column
-        self._bottom = toyplot.require.table_keys(table, bottom, length=1)
-        # 1 fill color column
-        self._fill = toyplot.require.table_keys(table, fill, length=1)
-        # 1 opacity column
-        self._opacity = toyplot.require.table_keys(table, opacity, length=1)
-        # 1 title column
-        self._title = toyplot.require.table_keys(table, title, length=1)
-        # Rectangle style
-        self._style = toyplot.style.require(style, allowed=toyplot.style.allowed.fill)
-        # Export filename
-        self._filename = toyplot.require.filename(filename)
-
-    def domain(self, axis):
-        if axis == self._coordinate_axes[0]:
-            return toyplot.data.minimax([self._table[self._left[0]], self._table[self._right[0]]])
-        if axis == self._coordinate_axes[1]:
-            return toyplot.data.minimax([self._table[self._top[0]], self._table[self._bottom[0]]])
-
-
 class Point(Mark):
-    """Plot multivariate data series using markers.
+    """Represent one or more data series as points in an arbitrary-dimension space.
 
     Do not create Point instances directly.  Use factory methods such as
     :func:`toyplot.scatterplot` and :meth:`toyplot.coordinates.Cartesian.scatterplot`
@@ -905,6 +857,53 @@ class Point(Mark):
                 break
 
         return result
+
+
+class Range(Mark):
+    """Represents axis-aligned ranges (min/max pairs) in arbitrary-dimensional space.
+
+    Do not create Range instances directly.  Use factory methods such as
+    :meth:`toyplot.coordinates.Cartesian.rects` instead.
+    """
+    def __init__(
+            self,
+            coordinate_axes,
+            coordinates,
+            filename,
+            fill,
+            opacity,
+            style,
+            table,
+            title,
+        ):
+        Mark.__init__(self)
+
+        self._table = toyplot.require.instance(table, toyplot.data.Table)
+
+        # We require at least one coordinate dimension (number of dimensions = D)
+        self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, min_length=1)
+        D = len(self._coordinate_axes)
+
+        # We require 2 * D coordinate columns for each series (number of series = N)
+        self._coordinates = toyplot.require.table_keys(table, coordinates, modulus=2 * D)
+        N = len(self._coordinates) / (2 * D)
+
+        # We require 1 export filename
+        self._filename = toyplot.require.filename(filename)
+        # We require 1 fill style
+        self._style = toyplot.style.require(style, allowed=toyplot.style.allowed.fill)
+
+        # We require N fill color columns
+        self._fill = toyplot.require.table_keys(table, fill, length=N)
+        # We require N opacity columns
+        self._opacity = toyplot.require.table_keys(table, opacity, length=N)
+        # We require N title columns
+        self._title = toyplot.require.table_keys(table, title, length=N)
+
+    def domain(self, axis):
+        log.debug("%s %s", axis, self._coordinate_axes)
+        index = numpy.flatnonzero(self._coordinate_axes == axis)[0]
+        return toyplot.data.minimax((self._table[self._coordinates[index * 2 + 0]], self._table[self._coordinates[index * 2 + 1]]))
 
 
 class Text(Mark):

@@ -1863,6 +1863,44 @@ def _render(numberline, mark, context):
                     )
 
 
+@dispatch(toyplot.coordinates.Numberline, toyplot.mark.Range, RenderContext)
+def _render(numberline, mark, context):
+    offset = numberline._child_offset[mark]
+    width = numberline._child_width[mark]
+
+    mark_xml = xml.SubElement(context.parent, "g", id=context.get_id(mark), attrib={"class": "toyplot-mark-Range"})
+    if offset:
+        mark_xml.set("transform", "translate(0,%s)" % -offset)
+
+    _render_table(owner=mark, key="data", label="range data", table=mark._table, filename=mark._filename, context=context)
+
+    x1 = numberline.axis.projection(mark._table[mark._coordinates[0]])
+    x2 = numberline.axis.projection(mark._table[mark._coordinates[1]])
+
+    series_xml = xml.SubElement(mark_xml, "g", attrib={"class": "toyplot-Series"})
+
+    for dx1, dx2, dfill, dopacity, dtitle in zip(
+        x1,
+        x2,
+        mark._table[mark._fill[0]],
+        mark._table[mark._opacity[0]],
+        mark._table[mark._title[0]],
+        ):
+        dstyle = toyplot.style.combine({"fill": toyplot.color.to_css(dfill), "opacity": dopacity}, mark._style)
+        datum_xml = xml.SubElement(
+            series_xml,
+            "rect",
+            attrib={"class": "toyplot-Datum"},
+            x=repr(min(dx1, dx2)),
+            y=repr(-width * 0.5),
+            width=repr(numpy.abs(dx1 - dx2)),
+            height=repr(width),
+            style=_css_style(dstyle),
+            )
+        if dtitle is not None:
+            xml.SubElement(datum_xml, "title").text = str(dtitle)
+
+
 @dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Cartesian, RenderContext)
 def _render(canvas, axes, context):
     cartesian_xml = xml.SubElement(context.parent, "g", id=context.get_id(
@@ -2905,26 +2943,19 @@ def _render(axes, mark, context):
                     )
 
 
-@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Rect, RenderContext)
+@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Range, RenderContext)
 def _render(axes, mark, context):
-    if mark._coordinate_axes.tolist() == ["x", "y"]:
-        x1 = axes.project("x", mark._table[mark._left[0]])
-        x2 = axes.project("x", mark._table[mark._right[0]])
-        y1 = axes.project("y", mark._table[mark._top[0]])
-        y2 = axes.project("y", mark._table[mark._bottom[0]])
-    elif mark._coordinate_axes.tolist() == ["y", "x"]:
-        x1 = axes.project("x", mark._table[mark._top[0]])
-        x2 = axes.project("x", mark._table[mark._bottom[0]])
-        y1 = axes.project("y", mark._table[mark._left[0]])
-        y2 = axes.project("y", mark._table[mark._right[0]])
-    mark_xml = xml.SubElement(
-        context.parent,
-        "g",
-        style=_css_style(
-            mark._style),
-        id=context.get_id(mark),
-        attrib={
-            "class": "toyplot-mark-Rect"})
+    if mark._coordinate_axes[0] == "x":
+        x1 = axes.project("x", mark._table[mark._coordinates[0]])
+        x2 = axes.project("x", mark._table[mark._coordinates[1]])
+        y1 = axes.project("y", mark._table[mark._coordinates[2]])
+        y2 = axes.project("y", mark._table[mark._coordinates[3]])
+    elif mark._coordinate_axes[0] == "y":
+        x1 = axes.project("x", mark._table[mark._coordinates[2]])
+        x2 = axes.project("x", mark._table[mark._coordinates[3]])
+        y1 = axes.project("y", mark._table[mark._coordinates[0]])
+        y2 = axes.project("y", mark._table[mark._coordinates[1]])
+    mark_xml = xml.SubElement(context.parent, "g", style=_css_style(mark._style), id=context.get_id(mark), attrib={"class": "toyplot-mark-Range"})
 
     _render_table(owner=mark, key="data", label="rect data", table=mark._table, filename=mark._filename, context=context)
 
@@ -2939,8 +2970,7 @@ def _render(axes, mark, context):
             mark._table[mark._opacity[0]],
             mark._table[mark._title[0]],
         ):
-        dstyle = toyplot.style.combine(
-            {"fill": toyplot.color.to_css(dfill), "opacity": dopacity}, mark._style)
+        dstyle = toyplot.style.combine({"fill": toyplot.color.to_css(dfill), "opacity": dopacity}, mark._style)
         datum_xml = xml.SubElement(
             series_xml,
             "rect",

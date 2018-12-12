@@ -9,6 +9,7 @@ from __future__ import division
 
 import collections
 import itertools
+import warnings
 
 import numpy
 import six
@@ -2041,10 +2042,38 @@ class Cartesian(object):
             d,
             along="x",
             color=None,
-            opacity=1.0,
-            title=None,
-            style=None,
             filename=None,
+            opacity=1.0,
+            style=None,
+            title=None,
+        ):
+        warnings.warn("toyplot.coordinates.Cartesian.rects() is deprecated, use toyplot.coordinates.Cartesian.rectangle() instead.", toyplot.DeprecationWarning, stacklevel=2)
+        return self.rectangle(
+            a,
+            b,
+            c,
+            d,
+            along=along,
+            color=color,
+            opacity=opacity,
+            title=title,
+            style=style,
+            filename=filename,
+            )
+
+
+    def rectangle(
+            self,
+            a,
+            b,
+            c,
+            d,
+            along="x",
+            color=None,
+            filename=None,
+            opacity=1.0,
+            style=None,
+            title=None,
         ):
         table = toyplot.data.Table()
         table["left"] = toyplot.require.scalar_vector(a)
@@ -2073,19 +2102,17 @@ class Cartesian(object):
             coordinate_axes = ["y", "x"]
 
         return self.add_mark(
-            toyplot.mark.Rect(
-                coordinate_axes,
-                table=table,
-                left=["left"],
-                right=["right"],
-                top=["top"],
-                bottom=["bottom"],
+            toyplot.mark.Range(
+                coordinate_axes=coordinate_axes,
+                coordinates=["left", "right", "top", "bottom"],
+                filename=filename,
                 fill=["toyplot:fill"],
                 opacity=["opacity"],
-                title=["title"],
                 style=style,
-                filename=filename,
+                table=table,
+                title=["title"],
                 ))
+
 
     def scatterplot(
             self,
@@ -2468,6 +2495,7 @@ class Numberline(object):
         self._palette = palette
         self._parent = parent
         self._scatterplot_colors = itertools.cycle(self._palette)
+        self._range_colors = itertools.cycle(self._palette)
         self._child_style = {}
         self._child_width = {}
         self._x1 = x1
@@ -2570,6 +2598,59 @@ class Numberline(object):
         self._child_offset[colormap] = offset
         self._child_width[colormap] = width
         self._child_style[colormap] = style
+
+
+    def range(
+            self,
+            start,
+            end,
+            color=None,
+            filename=None,
+            offset=None,
+            opacity=1.0,
+            style=None,
+            title=None,
+            width=10,
+        ):
+        if offset is None:
+            offset = len(self._children) * self._spacing
+
+        table = toyplot.data.Table()
+        table["start"] = toyplot.require.scalar_vector(start)
+        table["end"] = toyplot.require.scalar_vector(
+            end, length=table.shape[0])
+        table["opacity"] = toyplot.broadcast.scalar(opacity, table.shape[0])
+        table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])
+        style = toyplot.style.combine(
+            {"stroke": "none"},
+            toyplot.style.require(style, allowed=toyplot.style.allowed.fill),
+            )
+
+        default_color = [next(self._range_colors)]
+        table["toyplot:fill"] = toyplot.color.broadcast(
+            colors=color,
+            shape=(table.shape[0], 1),
+            default=default_color,
+            )[:, 0]
+
+        mark = self.add_mark(
+            toyplot.mark.Range(
+                coordinate_axes=["axis"],
+                coordinates=["start", "end"],
+                filename=filename,
+                fill=["toyplot:fill"],
+                opacity=["opacity"],
+                style=style,
+                table=table,
+                title=["title"],
+                ))
+
+        self._child_offset[mark] = offset
+        self._child_width[mark] = width
+
+        self._update_domain(numpy.column_stack((table["start"], table["end"])), display=True, data=True)
+
+        return mark
 
 
     def scatterplot(

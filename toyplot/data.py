@@ -14,10 +14,6 @@ import sys
 import xml.etree.ElementTree as xml
 
 import numpy
-try:
-    import pandas
-except: # pragma: no cover
-    pass
 import six
 
 import toyplot.color
@@ -155,15 +151,18 @@ class Table(object):
                 keys = [str(i) for i in numpy.arange(data.shape[1])]
                 values = [data[:, i] for i in numpy.arange(data.shape[1])]
             # Input data based on Pandas data structures.
-            elif "pandas" in sys.modules and isinstance(data, pandas.DataFrame):
-                keys = [str(data.ix[:, i].name) for i in range(data.shape[1])]
-                values = [data.ix[:, i] for i in range(data.shape[1])]
+            elif "pandas" in sys.modules:
+                import pandas
+                if isinstance(data, pandas.DataFrame):
+                    keys = [str(data.ix[:, i].name) for i in range(data.shape[1])]
+                    values = [data.ix[:, i] for i in range(data.shape[1])]
 
-                if index:
-                    key_format = "index{}" if index == True else index
-                    keys = [key_format.format(i, index=i) for i in range(data.index.nlevels)] + keys
-                    values = [data.index.get_level_values(i) for i in range(data.index.nlevels)] + values
-            else:
+                    if index:
+                        key_format = "index{}" if index == True else index
+                        keys = [key_format.format(i, index=i) for i in range(data.index.nlevels)] + keys
+                        values = [data.index.get_level_values(i) for i in range(data.index.nlevels)] + values
+
+            if keys is None or values is None:
                 raise ValueError("Can't create a toyplot.data.Table from an instance of %s" % type(data))
 
             # Get the set of unique keys, so we can see if there are any duplicates.

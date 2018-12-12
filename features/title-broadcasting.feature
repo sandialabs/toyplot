@@ -6,7 +6,7 @@ Feature: Title Broadcasting
         And a set of per-series title values
         And a set of per-datum title values
         Then <mark> can be rendered with <title>
-        And the generated figure will match <reference>
+        And the figure should match the <reference> reference image
 
         Examples:
             | mark                         | title                            | reference |
@@ -35,5 +35,5 @@ Feature: Title Broadcasting
         Given a default canvas
         And a set of cartesian axes
         Then bars can be rendered with a single series and per-datum titles
-        And the generated figure will match title-broadcast-bars-single-series-per-datum-titles
+        And the figure should match the title-broadcast-bars-single-series-per-datum-titles reference image
 

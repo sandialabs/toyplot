@@ -4,7 +4,7 @@ Feature: Table axes
         And a sample toyplot.data.Table
         And an instance of toyplot.coordinates.Table
         Then the table can be rendered <phrase>
-        And the visualization should match the <reference> reference image
+        And the figure should match the <reference> reference image
 
         Examples:
             | phrase                                 | reference |
@@ -38,24 +38,24 @@ Feature: Table axes
         Given a default canvas
         And a sample toyplot.data.Table
         Then an instance of toyplot.coordinates.Table can be rendered without a header
-        And the visualization should match the table-without-header reference image
+        And the figure should match the table-without-header reference image
 
     Scenario: Render table using convenience API
         Given a default canvas
         And a sample toyplot.data.Table
         Then the table can be rendered using the convenience API
-        And the visualization should match the table-convenience-api reference image
+        And the figure should match the table-convenience-api reference image
 
     Scenario: Render table containing null values
         Given a default canvas
         And a sample toyplot.data.Table containing null values
         And an instance of toyplot.coordinates.Table
-        Then the visualization should match the table-nulls reference image
+        Then the figure should match the table-nulls reference image
 
     Scenario Outline: Render table without data
         Given a default canvas
         And an instance of toyplot.coordinates.Table with <dimensions>
-        Then the visualization should match the <reference> reference image
+        Then the figure should match the <reference> reference image
 
         Examples:
             | dimensions | reference |
@@ -67,7 +67,7 @@ Feature: Table axes
         And every grid line is enabled
         And every region is colored
         And <region> <selection> is merged
-        Then the visualization should match the <reference> reference image
+        Then the figure should match the <reference> reference image
 
         Examples:
             | region   | selection | reference                 |
@@ -83,7 +83,7 @@ Feature: Table axes
         And every grid line is enabled
         And <selection> is deleted
         And every region is colored
-        Then the visualization should match the <reference> reference image
+        Then the figure should match the <reference> reference image
 
         Examples:
             | selection | reference |
@@ -100,7 +100,7 @@ Feature: Table axes
         And every grid line is enabled
         And every region is colored
         And a <region> <celltype> is inserted <position> <selection>
-        Then the visualization should match the <reference> reference image
+        Then the figure should match the <reference> reference image
 
         Examples:
             | region | celltype | position  | selection | reference                        |

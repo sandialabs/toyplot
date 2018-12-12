@@ -1,4 +1,4 @@
-Feature: Lines
+Feature: Line visualization
   Scenario: Annotation Lines
     When adding default line marks to axes
     Then the line marks should be treated as annotations.

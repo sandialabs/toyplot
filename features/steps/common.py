@@ -25,7 +25,7 @@ def step_impl(context):
     context.axes.plot(numpy.sin(numpy.linspace(0, 10)))
 
 
-@then(u'the visualization should match the {reference} reference image')
+@then(u'the figure should match the {reference} reference image')
 def step_impl(context, reference):
     show_diff = context.config.userdata.getbool("show_diff", default=True)
     testing.assert_canvas_equal(context.canvas, reference, show_diff=show_diff)

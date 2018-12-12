@@ -1,4 +1,4 @@
-Feature: Unit conversion
+Feature: Units
   Scenario Outline: General unit conversion
     When converting <input> to <target> the response should be <response>
 

@@ -1,4 +1,4 @@
-Feature: Backends
+Feature: Backend
   Scenario Outline: Render a canvas with a backend
     Given that the <backend> backend is available
     And a default canvas

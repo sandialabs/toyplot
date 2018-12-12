@@ -8,7 +8,7 @@ Feature: Color Broadcasting
         And a set of per-datum values
         And a set of per-datum colors
         Then <mark> can be rendered with <color>
-        And the generated figure will match <reference>
+        And the figure should match the <reference> reference image
 
         Examples:
             | mark             | color                                       | reference |
@@ -80,7 +80,7 @@ Feature: Color Broadcasting
         And a set of cartesian axes
         And a set of diverging series
         Then <mark> can be rendered with <type>
-        And the generated figure will match <reference>
+        And the figure should match the <reference> reference image
 
         Examples:
             | mark             | type                                        | reference |

@@ -6,7 +6,7 @@ Feature: Opacity Broadcasting
         And a set of per-series opacity values
         And a set of per-datum opacity values
         Then <mark> can be rendered with <opacity>
-        And the generated figure will match <reference>
+        And the figure should match the <reference> reference image
 
         Examples:
             | mark           | opacity               | reference                                           |
@@ -33,5 +33,5 @@ Feature: Opacity Broadcasting
         Given a default canvas
         And a set of cartesian axes
         Then bars can be rendered with a single series and per-datum opacities
-        And the generated figure will match opacity-broadcast-bars-single-series-per-datum-opacities
+        And the figure should match the opacity-broadcast-bars-single-series-per-datum-opacities reference image
 

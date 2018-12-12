@@ -3,7 +3,7 @@ Feature: Graph visualization
         Given a <graph>
         And a <layout> graph layout
         When the graph and layout are combined
-        Then the visualization should match the <reference> reference image
+        Then the figure should match the <reference> reference image
 
         Examples:
             | graph                   | layout                          | reference                        |
@@ -23,7 +23,7 @@ Feature: Graph visualization
         Given <graph>
         And a <layout> graph layout
         When the source and target arrays and layout are combined
-        Then the visualization should match the <reference> reference image
+        Then the figure should match the <reference> reference image
 
         Examples:
             | graph                                        | layout                            | reference                        |
@@ -36,15 +36,15 @@ Feature: Graph visualization
         And disconnected vertices
         And a fruchterman-reingold graph layout
         When the graph and layout are combined
-        Then the visualization should match the graph-ba-graph-disconnected-vertices-fruchterman-reingold-layout reference image
+        Then the figure should match the graph-ba-graph-disconnected-vertices-fruchterman-reingold-layout reference image
 
     Scenario: Render subgraph with shared layout
         Given a graph and a subgraph
         Then the subgraph can be rendered with the graph layout
-        And the visualization should match the graph-shared-layout-subgraph reference image
+        And the figure should match the graph-shared-layout-subgraph reference image
 
     Scenario: Render graph with shared layout
         Given a graph and a subgraph
         Then the graph can be rendered with the subgraph layout
-        And the visualization should match the graph-shared-layout-graph reference image
+        And the figure should match the graph-shared-layout-graph reference image
 

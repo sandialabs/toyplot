@@ -6,7 +6,7 @@ Feature: Legends
     And the data is rendered as <mark>
     And the marks are added to a legend
     And the legend is added to the <target>
-    Then the visualization should match the <reference> reference image
+    Then the figure should match the <reference> reference image
 
     Examples:
       | data                                    | mark       | target    | reference                       |

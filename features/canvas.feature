@@ -2,7 +2,7 @@ Feature: Canvas
     Scenario Outline: Canvas layouts
         Given a canvas with a border
         Then axes can be added to the canvas using <layout>.
-        And the visualization should match the <reference> reference image
+        And the figure should match the <reference> reference image
 
         Examples:
             | layout                | reference |
@@ -27,4 +27,4 @@ Feature: Canvas
     Scenario: Canvas numberline layout
         Given a canvas with a border
         Then numberlines can be added to the canvas using relative coordinates
-        And the visualization should match the canvas-layout-numberline-relative reference image
+        And the figure should match the canvas-layout-numberline-relative reference image

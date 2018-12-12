@@ -4,7 +4,7 @@ Feature: Log scale axes
         And a default canvas
         And <axes>
         When plotting x, x with markers
-        Then the generated figure will match <reference>
+        Then the figure should match the <reference> reference image
 
         Examples:
             | data                             | axes                   | reference                                        |
@@ -28,7 +28,7 @@ Feature: Log scale axes
         And a default canvas
         And <axes>
         When plotting the values with bars
-        Then the generated figure will match <reference>
+        Then the figure should match the <reference> reference image
 
         Examples:
             | data                             | axes                                 | reference                                               |

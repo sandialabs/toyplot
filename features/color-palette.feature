@@ -1,5 +1,5 @@
-Feature: Color palettes
-    Scenario: Colors
+Feature: Color palette
+    Scenario: Color
         Given a color value
         Then the color value can be rendered as ipython html
 
@@ -12,7 +12,7 @@ Feature: Color palettes
         Given a reversed default color palette
         Then the reversed palette can be rendered as ipython html
 
-    Scenario: Color Brewer palettes
+    Scenario: Color Brewer palette
         Given a collection of Color Brewer palettes
         Then each palette can be rendered as ipython html
 
@@ -37,15 +37,15 @@ Feature: Color palettes
         When the user creates a reversed Color Brewer palette
         Then the Color Brewer palette should have its colors reversed
 
-    Scenario: Lighten color palettes
+    Scenario: Lighten color palette
         Given a starting color
         Then the color can be used to generate a palette of lighter shades
 
-    Scenario: Concatenate color palettes
+    Scenario: Concatenate color palette
         Given two color palettes
         Then the color palettes can be concatenated into a single palette
 
-    Scenario: Incrementally grow color palettes
+    Scenario: Incrementally grow color palette
         Given a color palette
         Then another palette can be appended
 

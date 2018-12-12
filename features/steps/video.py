@@ -5,10 +5,11 @@
 from behave import *
 import nose.tools
 
+import collections
 import io
 import json
 import logging
-import numpy
+import numpy.testing
 import os
 import subprocess
 import sys
@@ -72,10 +73,39 @@ def step_impl(context, type):
     nose.tools.assert_equal(video_stream["height"], 600)
     nose.tools.assert_equal(video_stream["nb_read_frames"], "11")
 
+
 @then(u'the canvas can be rendered as png frames')
 def step_impl(context):
     for frame in toyplot.png.render_frames(context.canvas):
         image = testing.read_png(io.BytesIO(frame))
         nose.tools.assert_equal(image.shape, (600, 600, 4))
         nose.tools.assert_equal(image.dtype, "uint8")
+
+
+@when(u'an animation frame is created, its fields are populated correctly.')
+def step_impl(context):
+    frame = toyplot.canvas.AnimationFrame(number=1, begin=2.3, end=2.4, count=1, changes=collections.defaultdict(lambda: collections.defaultdict(list)))
+    nose.tools.assert_equal(frame.number, 1)
+    nose.tools.assert_equal(frame.begin, 2.3)
+    numpy.testing.assert_almost_equal(frame.length, 0.1)
+    with nose.tools.assert_raises(ValueError):
+        frame.set_mark_style(None, {})
+    with nose.tools.assert_raises(ValueError):
+        frame.set_datum_style(None, 0, 0, {})
+
+
+@when(u'a canvas is used to create an animation frame, its fields are populated correctly.')
+def step_impl(context):
+    canvas = toyplot.Canvas()
+    frame = canvas.frame(0.3, 0.4)
+    nose.tools.assert_equal(frame.begin, 0.3)
+    numpy.testing.assert_almost_equal(frame.length, 0.1)
+    nose.tools.assert_equal(frame.number, 0)
+
+    frame = canvas.frame(0.3, 0.4, 5)
+    nose.tools.assert_equal(frame.begin, 0.3)
+    numpy.testing.assert_almost_equal(frame.length, 0.1)
+    nose.tools.assert_equal(frame.number, 5)
+
+
 

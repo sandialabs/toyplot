@@ -18,7 +18,7 @@ Feature: Tick locators
         Given <period> of timestamp data
         And a default interval
         And a visualization using the timestamp locator
-        Then the generated figure will match <reference>
+        Then the figure should match the <reference> reference image
 
         Examples:
             | period              | reference                        |
@@ -42,7 +42,7 @@ Feature: Tick locators
         Given <period> of timestamp data
         And a <count> <units> interval
         And a visualization using the timestamp locator
-        Then the generated figure will match <reference>
+        Then the figure should match the <reference> reference image
 
         Examples:
             | period              | count    | units        | reference                                     |
@@ -62,7 +62,7 @@ Feature: Tick locators
         Given <period> of timestamp data
         And an interval of <interval>
         And a visualization using the timestamp locator
-        Then the generated figure will match <reference>
+        Then the figure should match the <reference> reference image
 
         Examples:
             | period              | interval     | reference                                  |

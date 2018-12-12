@@ -4,7 +4,7 @@ Feature: Image visualization
         And a default canvas
         And a canvas background color
         When the image is added to the canvas
-        Then the visualization should match the <reference> reference image
+        Then the figure should match the <reference> reference image
 
         Examples:
             | image                                   | reference                              |

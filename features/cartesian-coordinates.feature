@@ -1,10 +1,10 @@
-Feature: Cartesian axes
-    Scenario Outline: Cartesian axes API
+Feature: Cartesian coordinates
+    Scenario Outline: Cartesian coordinates
         Given a default canvas
         And a set of cartesian axes
         And a sample plot
         Then the cartesian axes can be rendered <phrase>
-        And the generated figure will match <reference>
+        And the figure should match the <reference> reference image
 
     Examples:
         | phrase                                                | reference        |
@@ -58,10 +58,23 @@ Feature: Cartesian axes
         | with y axis label                                     | axes-cartesian-y-label |
         | with explicit y axis domain                           | axes-cartesian-y-domain |
 
+
     Scenario: Shared axis
         Given a default canvas
         And a set of cartesian axes
         And a sample plot
         And a shared axis
-        Then the generated figure will match axes-cartesian-shared-x-axis
+        Then the figure should match the axes-cartesian-shared-x-axis reference image
+
+    Scenario Outline: Miscellaneous
+        Given a default canvas
+        And a set of cartesian axes
+        And <scenario>
+        Then the figure should match the <reference> reference image
+
+        Examples:
+            | scenario              | reference |
+            | axes-palette | axes-palette |
+            | axes-palettes | axes-palettes |
+            | axes-tick-titles | axes-tick-titles |
 

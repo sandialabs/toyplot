@@ -1,4 +1,4 @@
-Feature: Data tables
+Feature: Data table
   Scenario: Data table manipulation
     Given a new toyplot.data.table
     Then the table should be empty

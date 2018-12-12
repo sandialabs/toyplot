@@ -240,8 +240,3 @@ def step_impl(context):
     numberline.axis.ticks.show = True
     numberline.scatterplot(timestamps, marker="|", size=15)
 
-@then(u'the generated figure will match {reference}')
-def step_impl(context, reference):
-    testing.assert_canvas_equal(context.canvas, reference)
-
-

@@ -3,7 +3,7 @@ Feature: Matrix visualization
         Given a default canvas
         And a matrix
         And a matrix visualization <scenario>
-        Then the visualization should match the <reference> reference image
+        Then the figure should match the <reference> reference image
 
         Examples:
             | scenario | reference |
@@ -18,5 +18,5 @@ Feature: Matrix visualization
         And a set of cartesian axes
         And a matrix
         And a matrix visualization without left labels
-        Then the visualization should match the matrix-data-range reference image
+        Then the figure should match the matrix-data-range reference image
 

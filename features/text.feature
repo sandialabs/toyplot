@@ -3,7 +3,7 @@ Feature: Text
         Given a default canvas
         And a set of cartesian axes
         And text with <phrase>
-        Then the generated figure will match <reference>
+        Then the figure should match the <reference> reference image
 
         Examples: Horizontal Alignment
           | phrase                       | reference                          |
@@ -44,7 +44,7 @@ Feature: Text
         Given a default canvas
         And a set of cartesian axes
         And rich text <markup>
-        Then the generated figure will match <reference>
+        Then the figure should match the <reference> reference image
 
         Examples:
           | markup                                | reference                          |

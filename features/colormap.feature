@@ -1,13 +1,13 @@
-Feature: Color maps
+Feature: Colormap
 
-  Scenario: Linear color maps
+  Scenario: Linear color map
     Given a linear color map
     Then the linear color map can be rendered as ipython html
     And the linear color map can map scalar values to toyplot colors
     And the linear color map can map scalar values to css colors
     And the color map domain can be changed
 
-  Scenario: Diverging color maps
+  Scenario: Diverging color map
     Given a collection of diverging color maps
     Then each diverging color map can be rendered as ipython html
 
@@ -27,7 +27,7 @@ Feature: Color maps
     When the user creates a default diverging color map with domain
     Then individual values can be mapped to css colors by the diverging color map
 
-  Scenario: Categorical color maps
+  Scenario: Categorical color map
     Given a categorical color map, the map can be rendered as ipython html
 
   Scenario: Categorial color map colors

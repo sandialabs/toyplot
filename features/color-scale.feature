@@ -3,7 +3,7 @@ Feature: Color scale
     Given a default canvas
     And a <colormap>
     Then a <scale> can be added to the canvas
-    And the visualization should match the <reference> reference image
+    And the figure should match the <reference> reference image
 
     Examples:
       | colormap            | scale                | reference |
@@ -15,7 +15,7 @@ Feature: Color scale
     And a set of cartesian axes
     And a <colormap>
     Then a <scale> can be added to the axes
-    And the visualization should match the <reference> reference image
+    And the figure should match the <reference> reference image
 
     Examples:
       | colormap                 | scale          | reference |
@@ -25,7 +25,7 @@ Feature: Color scale
   Scenario Outline: Matrix visualization color scales
     Given a default canvas
     Then a <scale> can be added to a matrix visualization
-    And the visualization should match the <reference> reference image
+    And the figure should match the <reference> reference image
 
     Examples:
       | scale                               | reference |

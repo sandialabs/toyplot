@@ -21,13 +21,13 @@ If your data is two-dimensional, you should use
 Typically, you create numberlines explicitly using
 :meth:`toyplot.canvas.Canvas.numberline`:
 
-.. code:: ipython3
+.. code:: python
 
     import numpy
     numpy.random.seed(1234)
     events = numpy.random.uniform(size=(25, 4))
 
-.. code:: ipython3
+.. code:: python
 
     import toyplot
     canvas = toyplot.Canvas(width=600, height=100)
@@ -370,7 +370,7 @@ one-dimensional scatterplots, so you only supply one set of coordinates.
 When you add multiple marks to a numberline, they “stack up” on top of
 each other:
 
-.. code:: ipython3
+.. code:: python
 
     canvas = toyplot.Canvas(width=600, height=100)
     numberline = canvas.numberline()
@@ -727,7 +727,7 @@ each other:
 You can specify the default spacing between marks (and the axis spine)
 when you create the numberline:
 
-.. code:: ipython3
+.. code:: python
 
     canvas = toyplot.Canvas(width=600, height=100)
     numberline = canvas.numberline(spacing=10)
@@ -1085,7 +1085,7 @@ And you can individually control the offset of the individual marks, as
 well as the padding (distance between the axis spine and the first
 mark):
 
-.. code:: ipython3
+.. code:: python
 
     canvas = toyplot.Canvas(width=600, height=200)
     numberline = canvas.numberline(spacing=10, padding=20)
@@ -1478,12 +1478,12 @@ mark):
 Of course, you have control over all the normal parameters of a
 scatterplot, such as color and marker type:
 
-.. code:: ipython3
+.. code:: python
 
     timestamps = numpy.random.uniform(size=40)
     event_types = numpy.random.choice(2, size=timestamps.shape)
 
-.. code:: ipython3
+.. code:: python
 
     colormap = toyplot.color.CategoricalMap()
     
@@ -1829,7 +1829,7 @@ scatterplot, such as color and marker type:
 
 Along with scatterplots, numberlines can be used to show data *ranges*:
 
-.. code:: ipython3
+.. code:: python
 
     canvas = toyplot.Canvas(width=600, height=100)
     numberline = canvas.numberline()
@@ -1956,7 +1956,7 @@ Along with scatterplots, numberlines can be used to show data *ranges*:
 
 You can place multiple ranges on the numberline:
 
-.. code:: ipython3
+.. code:: python
 
     start = [2, 5]
     end = [3, 6.2]
@@ -2087,7 +2087,7 @@ You can place multiple ranges on the numberline:
 Of course, you can control color and style for each range, and stack
 multiple ranges on one numberline:
 
-.. code:: ipython3
+.. code:: python
 
     canvas = toyplot.Canvas(width=600, height=100)
     numberline = canvas.numberline(min=-1, max=11)
@@ -2216,7 +2216,7 @@ multiple ranges on one numberline:
 In addition to scatterplots and ranges, numberlines can be used to
 display any :class:`toyplot.color.Map`:
 
-.. code:: ipython3
+.. code:: python
 
     colormap = toyplot.color.diverging.map("BlueRed", domain_min=0, domain_max=1)
     canvas = toyplot.Canvas(width=600, height=100)
@@ -2351,7 +2351,7 @@ to coordinates on the axis). You can see above that we specified
 rule, since it has an implicit :math:`[0, N)` domain where :math:`N` is
 the number of colors in the map:
 
-.. code:: ipython3
+.. code:: python
 
     colormap = toyplot.color.brewer.map("Set1")
     canvas = toyplot.Canvas(width=600, height=100)
@@ -2480,7 +2480,7 @@ the number of colors in the map:
 Note that, unlike a scatterplot, a color map has a width that can be
 varied:
 
-.. code:: ipython3
+.. code:: python
 
     canvas = toyplot.Canvas(width=600, height=100)
     numberline = canvas.numberline()
@@ -2608,7 +2608,7 @@ varied:
 Also note that some colors may tend to blend-in with the canvas
 background:
 
-.. code:: ipython3
+.. code:: python
 
     colormap = toyplot.color.brewer.map("Greys", domain_min=0, domain_max=1)
     canvas = toyplot.Canvas(width=600, height=100)
@@ -2737,7 +2737,7 @@ background:
 To make the color map stand out from the background, you can use the
 ``style`` parameter to add a border:
 
-.. code:: ipython3
+.. code:: python
 
     canvas = toyplot.Canvas(width=600, height=100)
     numberline = canvas.numberline()
@@ -2869,7 +2869,7 @@ add color scales to visualizations, but by creating a numberline object
 of your own, you can create more complex scales. For example, you could
 define a multi-range scale, or add marks to highlight critical values:
 
-.. code:: ipython3
+.. code:: python
 
     colormap1 = toyplot.color.diverging.map("BlueRed", domain_min=-1, domain_max=1)
     colormap2 = toyplot.color.diverging.map("PurpleGreen", domain_min=-0.5, domain_max=1.5)
@@ -3276,7 +3276,7 @@ coordinates. When you use :ref:`canvas-layout` functions, you create
 numberlines that are horizontal and centered within the bounds of the
 area you define:
 
-.. code:: ipython3
+.. code:: python
 
     canvas = toyplot.Canvas(width=600, height=200, style={"background-color":"#f8f8f8"})
     
@@ -3645,7 +3645,7 @@ However, you can also specify the endpoints of a numberline explicitly,
 which allows you to create numberlines in any orientation including
 diagonal:
 
-.. code:: ipython3
+.. code:: python
 
     canvas = toyplot.Canvas(width=600)
     

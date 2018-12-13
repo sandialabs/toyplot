@@ -25,11 +25,6 @@ def convert_notebook(name):
             target) >= os.path.getmtime(source):
         return
 
-    nbconvert_version = subprocess.check_output(["jupyter", "nbconvert", "--version"]).strip().decode("utf-8")
-    allowed = ["4.0.0", "4.1.0", "4.2.0"]
-    if nbconvert_version not in allowed:
-        raise Exception("Unsupported nbconvert version: %s, use one of %s" % (nbconvert_version, ", ".join(allowed)))
-
     # Some installations of ipython don't properly configure the hooks for Pygments lexers, which leads to missing
     # source code cells when the documentation is built on readthedocs.org.
     import pygments.plugin
@@ -45,7 +40,6 @@ def convert_notebook(name):
 
     subprocess.check_call(["jupyter",
                            "nbconvert",
-                           "--execute",
                            "--to",
                            "python",
                            source,
@@ -71,13 +65,18 @@ def convert_notebook(name):
                            name,
                            ], env=env)
 
-    # Unmangle Sphinx cross-references in the tutorial that get mangled by
-    # markdown.
     with open(target, "r") as file:
         content = file.read()
+
+        # Fixup programming language, so code cells aren't hidden by readthedocs.
+        content = content.replace(".. code:: ipython3", ".. code:: python")
+
+        # Unmangle Sphinx cross-references in the tutorial that get mangled by
+        # markdown.
         content = re.sub(":([^:]+):``([^`]+)``", ":\\1:`\\2`", content)
         content = re.sub("[.][.].*\\\\(_[^:]+):", ".. \\1:", content)
 
+        # Add the logo at the top of the page.
         content = """
   .. image:: ../artwork/toyplot.png
     :width: 200px

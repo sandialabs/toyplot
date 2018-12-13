@@ -92,7 +92,7 @@ class ReportlabFont(Font):
         self._ascent = toyplot.units.convert(ascent, target="px", default="pt")
         self._descent = toyplot.units.convert(descent, target="px", default="pt")
 
-    def __repr__(self):
+    def __repr__(self): # pragma: no cover
         return "<toyplot.font.ReportlabFont family=%r size=%r ascent=%r descent=%r>" % (self._family, self._size, self.ascent, self.descent)
 
     @property

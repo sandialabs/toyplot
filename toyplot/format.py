@@ -62,7 +62,7 @@ class BasicFormatter(Formatter):
 
 class DefaultFormatter(BasicFormatter):
     """Deprecated, use :class:`toyplot.format.BasicFormatter` instead."""
-    def __init__(self):
+    def __init__(self): # pragma: no cover
         super(DefaultFormatter, self).__init__(nanshow=True)
         warnings.warn("toyplot.format.DefaultFormatter is deprecated, use toyplot.format.BasicFormatter instead.", toyplot.DeprecationWarning, stacklevel=2)
 

@@ -34,7 +34,7 @@ if _gs_command is None:
 
 if distutils.version.StrictVersion(_gs_version) >= "9.14":
     _gs_resolution = ["-r%s" % (96 * 4), "-dDownScaleFactor=4"]
-else:
+else: # pragma: no cover
     _gs_resolution = ["-r%s" % (96)]
     toyplot.log.warning("For better output PNG quality, install ghostscript >= 9.14.")
 

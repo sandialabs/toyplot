@@ -23,7 +23,7 @@ for command in ["ffmpeg"]:
         _ffmpeg_version = subprocess.check_output([command, "-version"]).decode(encoding="utf-8").strip()
         _ffmpeg_command = command
         log.info("Using %s.", _ffmpeg_version)
-    except:
+    except: # pragma: no cover
         pass
 
 if _ffmpeg_command is None:
@@ -100,7 +100,7 @@ def render(
             ffmpeg.stdin.write(png)
         ffmpeg.stdin.close()
         ffmpeg.wait()
-    except Exception as e:
+    except Exception as e: # pragma: no cover
         log.error(ffmpeg.stdout.read())
         log.error(ffmpeg.stderr.read())
         raise e

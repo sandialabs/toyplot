@@ -24,8 +24,9 @@ install:
     - tar xf ffmpeg-release-64bit-static.tar.xz --strip-components 1 -C ffmpeg
     - export PATH=$TRAVIS_BUILD_DIR/ffmpeg:$PATH
     - ffmpeg -version
+    - python setup.py develop
 script:
-    - coverage run --source toyplot -m behave
+    - coverage run --source toyplot -m behave --no-logcapture
     - coverage report
     - python backend-report.py
 after_script:

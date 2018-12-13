@@ -5,14 +5,20 @@
 from behave import *
 import nose.tools
 
+import glob
+import logging
 import os
 import pkgutil
+import shutil
 import subprocess
 import sys
+
+log = logging.getLogger(__name__)
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 docs_dir = os.path.join(root_dir, "docs")
 package_dir = os.path.join(root_dir, "toyplot")
+notebook_dir = os.path.join(os.path.dirname(__file__), "notebooks")
 
 
 @given(u'all public Toyplot modules')
@@ -56,4 +62,36 @@ def step_impl(context):
         if reference not in modules:
             raise AssertionError("No matching module found for %s." % reference)
 
+
+@given(u'the Toyplot documentation notebooks')
+def step_impl(context):
+    context.notebooks = sorted(glob.glob(os.path.join(docs_dir, "*.ipynb")))
+
+
+@then(u'every notebook can be converted to a script')
+def step_impl(context):
+    if os.path.exists(notebook_dir):
+        shutil.rmtree(notebook_dir)
+    os.mkdir(notebook_dir)
+
+    for notebook_path in context.notebooks:
+        python_path = os.path.join(notebook_dir, os.path.splitext(notebook_path)[0] + ".py")
+        subprocess.check_call(["jupyter", "nbconvert", "--to", "python", notebook_path, "--output", python_path])
+
+
+@then(u'every notebook script can be run without error')
+def step_impl(context):
+    failures = {}
+    for notebook_path in context.notebooks:
+        python_path = os.path.join(notebook_dir, os.path.splitext(notebook_path)[0] + ".py")
+        try:
+            subprocess.check_call(["python", python_path], cwd=docs_dir)
+        except Exception as e:
+            failures[notebook_path] = e
+
+    if failures:
+        message = ""
+        for notebook_path, exception in failures.items():
+            message += notebook_path + " exception:\n\n" + exception + "\n\n"
+        raise AssertionError(message)
 

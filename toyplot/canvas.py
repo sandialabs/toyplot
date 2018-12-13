@@ -833,7 +833,7 @@ class Canvas(object):
             for j in numpy.arange(matrix.shape[1]):
                 cell = table.body.cell[i, j]
                 cell.style = {"stroke": "none", "fill": toyplot.color.to_css(colors[i, j])}
-                cell.title = matrix[i, j]
+                cell.title = "%.6f" % matrix[i, j]
 
         self._children.append(table)
 

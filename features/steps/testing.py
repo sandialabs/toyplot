@@ -70,75 +70,6 @@ def _assert_string_equal(content, test_file, reference_file, encoding="utf-8"):
             (reference_file))
 
 
-def _json_comparison_string(o):
-    """Convert a Python object to a JSON string representation that can be used for comparison.
-
-    Limits the precision of floating-point numbers.
-    """
-    if o is None:
-        return "null"
-    if isinstance(o, six.string_types):
-        return "\"" + o + "\""
-    if isinstance(o, numbers.Integral):
-        return str(o)
-    if isinstance(o, numbers.Real):
-        return "%.9g" % o
-    if isinstance(o, collections.Sequence):
-        return "[" + ",".join([_json_comparison_string(i) for i in o]) + "]"
-    if isinstance(o, collections.Mapping):
-        return "{" + ",".join(["\"" + key + "\":" + _json_comparison_string(value)
-                               for key, value in o.items()]) + "}"
-    raise Exception("Unexpected value: %s" % o)
-
-
-def _xml_comparison_string(element):
-    """Convert an XML element to a pretty string representation that can be used for comparison.
-
-    Filters-out elements and attributes (like id) that shouldn't be compared,
-    and limits the precision of floating-point numbers.
-    """
-    def format_value(value):
-        try:
-            return "%.9g" % float(value)
-        except:
-            return value
-
-    def write_element(element, stream, indent):
-        stream.write(u"%s<%s" % (indent, element.tag))
-        for key, value in element.items():
-            if key in ["id", "clip-path"]:
-                continue
-            if key == "style":
-                value = re.sub("fill:url[(]#.*[)]", "fill:url(#)", value)
-
-            if key == "d" and element.tag == "{http://www.w3.org/2000/svg}path":
-                stream.write(
-                    u" %s='%s'" % (key, " ".join([format_value(d) for d in value.split(" ")])))
-            elif key == "transform":
-                stream.write(u" %s='%s'" % (
-                    key, "".join([format_value(d) for d in re.split(r"(,|\(|\))", value)])))
-            elif key == "points" and element.tag == "{http://www.w3.org/2000/svg}polygon":
-                stream.write(u" %s='%s'" % (key, " ".join(
-                    [",".join([format_value(i) for i in p.split(",")]) for p in value.split(" ")])))
-            else:
-                stream.write(u" %s='%s'" % (key, format_value(value)))
-
-        text = element.text if element.text is not None else ""
-        text = format_value(text)
-        if element.tag in [
-                "{http://www.sandia.gov/toyplot}data-table",
-                "{http://www.sandia.gov/toyplot}coordinates"]:
-            text = str(_json_comparison_string(json.loads(element.text)))
-        stream.write(u">%s\n" % text)
-        for child in list(element):
-            write_element(child, stream, indent + "  ")
-        stream.write(u"%s</%s>\n" % (indent, element.tag))
-
-    stream = io.StringIO()
-    write_element(element, stream, indent="")
-    return stream.getvalue()
-
-
 def assert_color_equal(a, b):
     """Raise an exception if a toyplot color doesn't match a reference.
 
@@ -184,7 +115,7 @@ def assert_html_equal(html, name):
 
 
 def attribute_mismatch(tag, key, avalue, bvalue):
-    raise AssertionError("Tag %r attribute %r value %r does not match %r." % (tag, key, avalue, bvalue))
+    raise AssertionError("Tag %r attribute %r value\n\t%r\ndoes not match\n\t%r." % (tag, key, avalue, bvalue))
 
 
 def optional_float(value):
@@ -215,6 +146,24 @@ def assert_path_equal(tag, key, avalue, bvalue):
     assert_mixed_list_equal(alist, blist, tag, key, avalue, bvalue)
 
 
+def assert_points_equal(tag, key, avalue, bvalue):
+    alist = [float(value) for pair in avalue.split() for value in pair.split(",")]
+    blist = [float(value) for pair in bvalue.split() for value in pair.split(",")]
+    assert_mixed_list_equal(alist, blist, tag, key, avalue, bvalue)
+
+
+def assert_style_equal(tag, key, avalue, bvalue):
+    alist = [optional_float(value) for pair in avalue.split(":") for value in pair.split(";") if not value.startswith("url(")]
+    blist = [optional_float(value) for pair in bvalue.split(":") for value in pair.split(";") if not value.startswith("url(")]
+    assert_mixed_list_equal(alist, blist, tag, key, avalue, bvalue)
+
+
+def assert_transform_equal(tag, key, avalue, bvalue):
+    alist = [optional_float(value.strip()) for value in re.split("[(,)]", avalue)]
+    blist = [optional_float(value.strip()) for value in re.split("[(,)]", bvalue)]
+    assert_mixed_list_equal(alist, blist, tag, key, avalue, bvalue)
+
+
 def assert_dom_equal(a, b, exceptions):
     if a.tag != b.tag:
         raise AssertionError("Tag %r does not match %r." % (a.tag, b.tag))
@@ -235,13 +184,11 @@ def assert_dom_equal(a, b, exceptions):
         elif exception.get("type", None) == "path":
             assert_path_equal(a.tag, akey, avalue, bvalue)
         elif exception.get("type", None) == "points":
-            alist = [float(value) for pair in avalue.split() for value in pair.split(",")]
-            blist = [float(value) for pair in bvalue.split() for value in pair.split(",")]
-            assert_mixed_list_equal(alist, blist, a.tag, akey, avalue, bvalue)
+            assert_points_equal(a.tag, akey, avalue, bvalue)
+        elif exception.get("type", None) == "style":
+            assert_style_equal(a.tag, akey, avalue, bvalue)
         elif exception.get("type", None) == "transform":
-            alist = [optional_float(value.strip()) for value in re.split("[(,)]", avalue)]
-            blist = [optional_float(value.strip()) for value in re.split("[(,)]", bvalue)]
-            assert_mixed_list_equal(alist, blist, a.tag, akey, avalue, bvalue)
+            assert_transform_equal(a.tag, akey, avalue, bvalue)
         else:
             if avalue != bvalue:
                 attribute_mismatch(a.tag, akey, avalue, bvalue)
@@ -298,6 +245,7 @@ def assert_canvas_equal(canvas, name, show_diff=True):
                     "clip-path": {"ignore": True},
                     "id": {"ignore": True},
                     "transform": {"type": "transform"},
+                    "style": {"type": "style"},
                     },
                 "{http://www.w3.org/2000/svg}linearGradient": {
                     "id": {"ignore": True},
@@ -307,6 +255,7 @@ def assert_canvas_equal(canvas, name, show_diff=True):
                     "x2": {"type": "float"},
                     "y1": {"type": "float"},
                     "y2": {"type": "float"},
+                    "style": {"type": "style"},
                     },
                 "{http://www.w3.org/2000/svg}linearGradient": {
                     "id": {"ignore": True},
@@ -326,6 +275,7 @@ def assert_canvas_equal(canvas, name, show_diff=True):
                     "y": {"type": "float"},
                     "width": {"type": "float"},
                     "height": {"type": "float"},
+                    "style": {"type": "style"},
                     },
                 "{http://www.w3.org/2000/svg}stop": {
                     "offset": {"type": "float"},

@@ -183,27 +183,27 @@ def step_impl(context):
 
 @then(u'rects can be rendered with default colors')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1])
+    context.axes.rectangle(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1])
 
 @then(u'rects can be rendered with one explicit color')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color="red")
+    context.axes.rectangle(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color="red")
 
 @then(u'rects can be rendered with per-datum explicit colors')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=context.datum_colors[:-1,0])
+    context.axes.rectangle(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=context.datum_colors[:-1,0])
 
 @then(u'rects can be rendered with colormap colors')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=toyplot.color.LinearMap(toyplot.color.brewer.palette("Set1")))
+    context.axes.rectangle(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=toyplot.color.LinearMap(toyplot.color.brewer.palette("Set1")))
 
 @then(u'rects can be rendered with per-datum value colors')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=context.datum_values[:-1,0])
+    context.axes.rectangle(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=context.datum_values[:-1,0])
 
 @then(u'rects can be rendered with per-datum value + colormap colors')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=(context.datum_values[:-1,0], toyplot.color.LinearMap()))
+    context.axes.rectangle(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], color=(context.datum_values[:-1,0], toyplot.color.LinearMap()))
 
 
 

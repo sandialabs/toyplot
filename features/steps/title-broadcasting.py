@@ -69,11 +69,11 @@ def step_impl(context):
 
 @then(u'rects can be rendered with one explicit title')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], title="rect")
+    context.axes.rectangle(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], title="rect")
 
 @then(u'rects can be rendered with per-datum titles')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], title=context.datum_titles[:-1,0])
+    context.axes.rectangle(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], title=context.datum_titles[:-1,0])
 
 @then(u'scatterplots can be rendered with one explicit title')
 def step_impl(context):

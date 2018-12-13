@@ -62,11 +62,11 @@ def step_impl(context):
 
 @then(u'rects can be rendered with one explicit opacity')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], opacity=0.2)
+    context.axes.rectangle(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], opacity=0.2)
 
 @then(u'rects can be rendered with per-datum opacities')
 def step_impl(context):
-    context.axes.rects(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], opacity=context.datum_opacities[:-1,0])
+    context.axes.rectangle(context.series[:-1,0], context.series[1:,0], context.series[:-1,1], context.series[1:,1], opacity=context.datum_opacities[:-1,0])
 
 @then(u'scatterplots can be rendered with one explicit opacity')
 def step_impl(context):

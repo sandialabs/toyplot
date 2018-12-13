@@ -183,27 +183,46 @@ def assert_html_equal(html, name):
     _assert_string_equal(html, test_file, reference_file)
 
 
+def assert_dom_equal(lhs, rhs, ignore):
+    if lhs.tag != rhs.tag:
+        raise AssertionError("Tag %r does not match %r." % (lhs.tag, rhs.tag))
+
+    for (lhkey, lhvalue), (rhkey, rhvalue) in zip(lhs.items(), rhs.items()):
+        if lhkey != rhkey:
+            raise AssertionError("Tag %r attribute key %r does not match %r." % (lhs.tag, lhkey, rhkey))
+        if (lhs.tag, lhkey) not in ignore:
+            if lhvalue != rhvalue:
+                raise AssertionError("Tag %r attribute %r value %r does not match %r." % (lhs.tag, lhkey, lhvalue, rhvalue))
+
+    if lhs.text != rhs.text:
+        raise AssertionError("Tag text %r does not match %r." % (lhs.text, rhs.text))
+
+    if lhs.tail != rhs.tail:
+        raise AssertionError("Tag tail %r does not match %r." % (lhs.tail, rhs.tail))
+
+    for lhc, rhc in zip(lhs, rhs):
+        assert_dom_equal(lhc, rhc, ignore)
+
+
 def assert_canvas_equal(canvas, name, show_diff=True):
     test_file = os.path.join(failed_dir, "%s.svg" % name)
     reference_file = os.path.join(reference_dir, "%s.svg" % name)
 
-    # Render multiple representations of the canvas for coverage ...
-    html = io.BytesIO()
-    toyplot.html.render(canvas, html)
-
-    svg = io.BytesIO()
-    toyplot.svg.render(canvas, svg)
-
-    for module in ["toyplot.pdf", "toyplot.png", "toyplot.reportlab.pdf", "toyplot.reportlab.png"]:
+    # Render multiple representations of the canvas for coverage.
+    for module in ["toyplot.html", "toyplot.pdf", "toyplot.png", "toyplot.reportlab.pdf", "toyplot.reportlab.png"]:
         if module in sys.modules:
             stream = io.BytesIO()
             sys.modules[module].render(canvas, stream)
+
+    # Render the canvas to svg for comparison against the reference.
+    svg = io.BytesIO()
+    toyplot.svg.render(canvas, svg)
 
     # Get rid of any past failures ...
     if os.path.exists(test_file):
         os.remove(test_file)
 
-    # If there's no stored SVG reference for this canvas, create one ...
+    # If there's no stored SVG reference for this canvas, create one.
     if not os.path.exists(reference_file):
         with open(reference_file, "wb") as stream:
             stream.write(svg.getvalue())
@@ -211,30 +230,30 @@ def assert_canvas_equal(canvas, name, show_diff=True):
             "Created new reference file %s ... you should verify its contents before re-running the test." %
             reference_file)
 
-    # Compare the SVG representation of the canvas to the SVG reference ...
+    # Compare the SVG representation of the canvas to the SVG reference.
     svg_dom = xml.fromstring(svg.getvalue())
     reference_dom = xml.parse(reference_file).getroot()
 
-    svg_string = _xml_comparison_string(svg_dom)
-    reference_string = _xml_comparison_string(reference_dom)
+    try:
+        assert_dom_equal(
+            svg_dom,
+            reference_dom,
+            ignore=[
+                ("{http://www.w3.org/2000/svg}clipPath", "id"),
+                ("{http://www.w3.org/2000/svg}g", "clip-path"),
+                ("{http://www.w3.org/2000/svg}g", "id"),
+                ("{http://www.w3.org/2000/svg}linearGradient", "id"),
+                ("{http://www.w3.org/2000/svg}svg", "id"),
+                ]
+            )
 
-    if svg_string != reference_string:
+    except AssertionError as e:
         if not os.path.exists(failed_dir):
             os.mkdir(failed_dir)
         with open(test_file, "wb") as stream:
             stream.write(svg.getvalue())
-        if show_diff:
-            reference = subprocess.Popen(["xmldiff", test_file, reference_file], stdout=subprocess.PIPE)
-            test = subprocess.Popen(["xmldiff", reference_file, test_file], stdout=subprocess.PIPE)
-            message = "Test output %s doesn't match %s:\n\n*** Test -> Reference ***\n%s\n*** Reference -> Test ***\n%s\n" % (
-                test_file,
-                reference_file,
-                reference.communicate()[0].decode("utf-8"),
-                test.communicate()[0].decode("utf-8"),
-                )
-        else:
-            message = "Test output %s doesn't match %s.\n" % (test_file, reference_file)
-        raise AssertionError(message)
+        raise AssertionError("%s\nTest output\n\t%s\ndoesn't match\n\t%s.\n" % (e, test_file, reference_file))
+
 
 def read_png(fobj):
     if isinstance(fobj, six.string_types):
@@ -250,6 +269,7 @@ def read_png(fobj):
     elif meta["bitdepth"] == 8:
         image = numpy.resize(numpy.vstack(map(numpy.uint8, pixels)), (height, width, planes))
     return image
+
 
 def prufer_tree(sequence):
     """Use a Prufer sequence to generate a tree.
@@ -280,6 +300,7 @@ def prufer_tree(sequence):
     targets.append(v)
 
     return numpy.column_stack((sources, targets))
+
 
 def barabasi_albert_graph(n=30, m=2, seed=1234):
     """Generate a graph using the preferential attachment model of Barabasi and Albert.

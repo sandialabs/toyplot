@@ -183,25 +183,77 @@ def assert_html_equal(html, name):
     _assert_string_equal(html, test_file, reference_file)
 
 
-def assert_dom_equal(lhs, rhs, ignore):
-    if lhs.tag != rhs.tag:
-        raise AssertionError("Tag %r does not match %r." % (lhs.tag, rhs.tag))
+def attribute_mismatch(tag, key, avalue, bvalue):
+    raise AssertionError("Tag %r attribute %r value %r does not match %r." % (tag, key, avalue, bvalue))
 
-    for (lhkey, lhvalue), (rhkey, rhvalue) in zip(lhs.items(), rhs.items()):
-        if lhkey != rhkey:
-            raise AssertionError("Tag %r attribute key %r does not match %r." % (lhs.tag, lhkey, rhkey))
-        if (lhs.tag, lhkey) not in ignore:
-            if lhvalue != rhvalue:
-                raise AssertionError("Tag %r attribute %r value %r does not match %r." % (lhs.tag, lhkey, lhvalue, rhvalue))
 
-    if lhs.text != rhs.text:
-        raise AssertionError("Tag text %r does not match %r." % (lhs.text, rhs.text))
+def optional_float(value):
+    try:
+        return float(value)
+    except:
+        return value
 
-    if lhs.tail != rhs.tail:
-        raise AssertionError("Tag tail %r does not match %r." % (lhs.tail, rhs.tail))
 
-    for lhc, rhc in zip(lhs, rhs):
-        assert_dom_equal(lhc, rhc, ignore)
+def assert_mixed_list_equal(alist, blist, tag, key, avalue, bvalue):
+    print(alist)
+    print(blist)
+    if len(alist) != len(blist):
+        attribute_mismatch(tag, key, avalue, bvalue)
+
+    for a, b in zip(alist, blist):
+        if isinstance(a, float):
+            if not numpy.allclose(a, b):
+                attribute_mismatch(tag, key, avalue, bvalue)
+        else:
+            if a != b:
+                attribute_mismatch(tag, key, avalue, bvalue)
+
+
+def assert_path_equal(tag, key, avalue, bvalue):
+    alist = [optional_float(value) for value in avalue.split()]
+    blist = [optional_float(value) for value in bvalue.split()]
+    assert_mixed_list_equal(alist, blist, tag, key, avalue, bvalue)
+
+
+def assert_dom_equal(a, b, exceptions):
+    if a.tag != b.tag:
+        raise AssertionError("Tag %r does not match %r." % (a.tag, b.tag))
+
+    for (akey, avalue), (bkey, bvalue) in zip(a.items(), b.items()):
+        if akey != bkey:
+            raise AssertionError("Tag %r attribute %r does not match %r." % (a.tag, akey, bkey))
+
+        # Optionally skip some tag/attribute pairs
+        exception = exceptions.get(a.tag, {})
+        exception = exception.get(akey, {})
+        if exception.get("ignore", False):
+            continue
+
+        if exception.get("type", None) == "float":
+            if not numpy.allclose(float(avalue), float(bvalue)):
+                attribute_mismatch(a.tag, akey, avalue, bvalue)
+        elif exception.get("type", None) == "path":
+            assert_path_equal(a.tag, akey, avalue, bvalue)
+        elif exception.get("type", None) == "points":
+            alist = [float(value) for pair in avalue.split() for value in pair.split(",")]
+            blist = [float(value) for pair in bvalue.split() for value in pair.split(",")]
+            assert_mixed_list_equal(alist, blist, a.tag, akey, avalue, bvalue)
+        elif exception.get("type", None) == "transform":
+            alist = [optional_float(value.strip()) for value in re.split("[(,)]", avalue)]
+            blist = [optional_float(value.strip()) for value in re.split("[(,)]", bvalue)]
+            assert_mixed_list_equal(alist, blist, a.tag, akey, avalue, bvalue)
+        else:
+            if avalue != bvalue:
+                attribute_mismatch(a.tag, akey, avalue, bvalue)
+
+    if a.text != b.text:
+        raise AssertionError("Tag %r text %r does not match %r." % (a.tag, a.text, b.text))
+
+    if a.tail != b.tail:
+        raise AssertionError("Tag %r tail %r does not match %r." % (a.tag, a.tail, b.tail))
+
+    for achild, bchild in zip(a, b):
+        assert_dom_equal(achild, bchild, exceptions)
 
 
 def assert_canvas_equal(canvas, name, show_diff=True):
@@ -238,13 +290,54 @@ def assert_canvas_equal(canvas, name, show_diff=True):
         assert_dom_equal(
             svg_dom,
             reference_dom,
-            ignore=[
-                ("{http://www.w3.org/2000/svg}clipPath", "id"),
-                ("{http://www.w3.org/2000/svg}g", "clip-path"),
-                ("{http://www.w3.org/2000/svg}g", "id"),
-                ("{http://www.w3.org/2000/svg}linearGradient", "id"),
-                ("{http://www.w3.org/2000/svg}svg", "id"),
-                ]
+            exceptions={
+                "{http://www.w3.org/2000/svg}clipPath": {
+                    "id": {"ignore": True},
+                    },
+                "{http://www.w3.org/2000/svg}g": {
+                    "clip-path": {"ignore": True},
+                    "id": {"ignore": True},
+                    "transform": {"type": "transform"},
+                    },
+                "{http://www.w3.org/2000/svg}linearGradient": {
+                    "id": {"ignore": True},
+                    },
+                "{http://www.w3.org/2000/svg}line": {
+                    "x1": {"type": "float"},
+                    "x2": {"type": "float"},
+                    "y1": {"type": "float"},
+                    "y2": {"type": "float"},
+                    },
+                "{http://www.w3.org/2000/svg}linearGradient": {
+                    "id": {"ignore": True},
+                    "x1": {"type": "float"},
+                    "x2": {"type": "float"},
+                    "y1": {"type": "float"},
+                    "y2": {"type": "float"},
+                    },
+                "{http://www.w3.org/2000/svg}path": {
+                    "d": {"type": "path"},
+                    },
+                "{http://www.w3.org/2000/svg}polygon": {
+                    "points": {"type": "points"},
+                    },
+                "{http://www.w3.org/2000/svg}rect": {
+                    "x": {"type": "float"},
+                    "y": {"type": "float"},
+                    "width": {"type": "float"},
+                    "height": {"type": "float"},
+                    },
+                "{http://www.w3.org/2000/svg}stop": {
+                    "offset": {"type": "float"},
+                    },
+                "{http://www.w3.org/2000/svg}svg": {
+                    "id": {"ignore": True},
+                    },
+                "{http://www.w3.org/2000/svg}text": {
+                    "x": {"type": "float"},
+                    "y": {"type": "float"},
+                    },
+                }
             )
 
     except AssertionError as e:

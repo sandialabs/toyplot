@@ -88,7 +88,7 @@ def step_impl(context):
     failures = {}
     for notebook, script in zip(context.notebooks, context.scripts):
         try:
-            command = ["python", script]
+            command = ["coverage", "run", "--source", "toyplot", "--append", script]
             log.info(" ".join(command))
             subprocess.check_call(command, cwd=docs_dir)
             # Remove the script (we only do this if execution succeeded)

@@ -14,11 +14,11 @@ import subprocess
 import sys
 
 log = logging.getLogger(__name__)
+log.name = "features.steps.documentation"
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 docs_dir = os.path.join(root_dir, "docs")
 package_dir = os.path.join(root_dir, "toyplot")
-notebook_dir = os.path.join(os.path.dirname(__file__), "notebooks")
 
 
 @given(u'all public Toyplot modules')
@@ -65,29 +65,36 @@ def step_impl(context):
 
 @given(u'the Toyplot documentation notebooks')
 def step_impl(context):
+    # Make a list of available notebooks.
     context.notebooks = sorted(glob.glob(os.path.join(docs_dir, "*.ipynb")))
 
 
 @then(u'every notebook can be converted to a script')
 def step_impl(context):
-    if os.path.exists(notebook_dir):
-        shutil.rmtree(notebook_dir)
-    os.mkdir(notebook_dir)
+    # Convert notebook paths to script paths.
+    context.scripts = [os.path.splitext(notebook)[0] + ".py" for notebook in context.notebooks]
+    context.scripts = context.scripts
 
-    for notebook_path in context.notebooks:
-        python_path = os.path.join(notebook_dir, os.path.splitext(notebook_path)[0] + ".py")
-        subprocess.check_call(["jupyter", "nbconvert", "--to", "python", notebook_path, "--output", python_path])
+    # Convert each notebook to a script.
+    for notebook, script in zip(context.notebooks, context.scripts):
+        command = ["jupyter", "nbconvert", "--to", "python", notebook, "--output", script]
+        log.info(" ".join(command))
+        subprocess.check_call(command)
 
 
 @then(u'every notebook script can be run without error')
 def step_impl(context):
+    # Run each notebook script, keeping track of failures.
     failures = {}
-    for notebook_path in context.notebooks:
-        python_path = os.path.join(notebook_dir, os.path.splitext(notebook_path)[0] + ".py")
+    for notebook, script in zip(context.notebooks, context.scripts):
         try:
-            subprocess.check_call(["python", python_path], cwd=docs_dir)
+            command = ["python", script]
+            log.info(" ".join(command))
+            subprocess.check_call(command, cwd=docs_dir)
+            # Remove the script (we only do this if execution succeeded)
+            os.remove(script)
         except Exception as e:
-            failures[notebook_path] = e
+            failures[notebook] = e
 
     if failures:
         message = ""

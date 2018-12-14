@@ -186,6 +186,7 @@ def step_impl(context):
             0, 0, "Text!", style={"text-anchor": "foo"})
         toyplot.html.render(context.canvas)
 
+
 @when(u'text is aligned with an unknown alignment-baseline value, an exception is raised.')
 def step_impl(context):
     with nose.tools.assert_raises(ValueError):

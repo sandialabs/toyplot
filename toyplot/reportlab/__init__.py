@@ -196,6 +196,11 @@ def render(svg, canvas):
                 for child in element:
                     render_element(root, child, canvas, styles)
 
+            elif element.tag == "a":
+                # At the moment, it doesn't look like reportlab supports external hyperlinks.
+                for child in element:
+                    render_element(root, child, canvas, styles)
+
             elif element.tag == "g":
                 if element.get("clip-path", None) is not None:
                     clip_id = element.get("clip-path")[5:-1]

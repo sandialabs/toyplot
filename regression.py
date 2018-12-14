@@ -10,6 +10,5 @@ parser.add_argument("--show-diff", action="store_true", help="Display difference
 arguments = parser.parse_args()
 
 subprocess.call(["coverage", "run", "--source", "toyplot", "-m", "behave", "--no-logcapture", "-D", "show_diff=True" if arguments.show_diff else "show_diff=False"])
-subprocess.call(["coverage", "combine", "--append", "docs/.coverage"])
 subprocess.call(["coverage", "report"])
 subprocess.call(["coverage", "html", "--directory", ".cover"])

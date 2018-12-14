@@ -27,7 +27,6 @@ install:
     - python setup.py develop
 script:
     - coverage run --source toyplot -m behave --no-logcapture
-    - coverage combine --append docs/.coverage
     - coverage report
     - python backend-report.py
 after_script:

@@ -13,6 +13,12 @@ import shutil
 import subprocess
 import sys
 
+import IPython
+import IPython.core.interactiveshell
+import nbformat
+
+import toyplot
+
 log = logging.getLogger(__name__)
 log.name = "features.steps.documentation"
 
@@ -65,40 +71,51 @@ def step_impl(context):
 
 @given(u'the Toyplot documentation notebooks')
 def step_impl(context):
-    # Make a list of available notebooks.
     context.notebooks = sorted(glob.glob(os.path.join(docs_dir, "*.ipynb")))
 
 
-@then(u'every notebook can be converted to a script')
+@then(u'every notebook runs without error')
 def step_impl(context):
-    # Convert notebook paths to script paths.
-    context.scripts = [os.path.splitext(notebook)[0] + ".py" for notebook in context.notebooks]
-    context.scripts = context.scripts
-
-    # Convert each notebook to a script.
-    for notebook, script in zip(context.notebooks, context.scripts):
-        command = ["jupyter", "nbconvert", "--to", "python", notebook, "--output", script]
-        log.info(" ".join(command))
-        subprocess.check_call(command)
+    sys.path.append(docs_dir)
+    cwd = os.getcwd()
+    os.chdir(docs_dir)
+    for notebook in context.notebooks:
+        context.execute_steps("Then notebook %s runs without error" % notebook)
+    os.chdir(cwd)
+    sys.path.remove(docs_dir)
 
 
-@then(u'every notebook script can be run without error')
-def step_impl(context):
-    # Run each notebook script, keeping track of failures.
-    failures = {}
-    for notebook, script in zip(context.notebooks, context.scripts):
-        try:
-            command = ["coverage", "run", "--source", "toyplot", "--append", script]
-            log.info(" ".join(command))
-            subprocess.check_call(command, cwd=docs_dir)
-            # Remove the script (we only do this if execution succeeded)
-            os.remove(script)
-        except Exception as e:
-            failures[notebook] = e
+@then(u'notebook {notebook} runs without error')
+def step_impl(context, notebook):
+    log.info(notebook)
 
-    if failures:
-        message = ""
-        for notebook_path, exception in failures.items():
-            message += notebook_path + " exception:\n\n" + exception + "\n\n"
-        raise AssertionError(message)
+    with open(notebook) as stream:
+        notebook = nbformat.read(stream, as_version=4)
+
+    shell = IPython.core.interactiveshell.InteractiveShell.instance()
+    nblocals = dict()
+
+    for cell in notebook.cells:
+        if cell.cell_type == "code":
+            code = shell.input_transformer_manager.transform_cell(cell.source)
+            exec(code, nblocals)
+            toyplot.Canvas._ipython_post_execute()
+
+#    # Run each notebook script, keeping track of failures.
+#    failures = {}
+#    for notebook, script in zip(context.notebooks, context.scripts):
+#        try:
+#            command = ["coverage", "run", "--source", "toyplot", "--append", script]
+#            log.info(" ".join(command))
+#            subprocess.check_call(command, cwd=docs_dir)
+#            # Remove the script (we only do this if execution succeeded)
+#            os.remove(script)
+#        except Exception as e:
+#            failures[notebook] = e
+#
+#    if failures:
+#        message = ""
+#        for notebook_path, exception in failures.items():
+#            message += notebook_path + " exception:\n\n" + exception + "\n\n"
+#        raise AssertionError(message)
 

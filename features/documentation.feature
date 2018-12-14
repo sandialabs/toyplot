@@ -8,5 +8,4 @@ Feature: Documentation
 
     Scenario: Notebook documentation
         Given the Toyplot documentation notebooks
-        Then every notebook can be converted to a script
-        And every notebook script can be run without error
+        Then every notebook runs without error

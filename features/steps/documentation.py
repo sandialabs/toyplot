@@ -80,7 +80,7 @@ def step_impl(context):
     cwd = os.getcwd()
     os.chdir(docs_dir)
     for notebook in context.notebooks:
-        context.execute_steps("Then notebook %s runs without error" % notebook)
+        context.execute_steps(u"Then notebook %s runs without error" % notebook)
     os.chdir(cwd)
     sys.path.remove(docs_dir)
 

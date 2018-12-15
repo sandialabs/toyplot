@@ -176,11 +176,11 @@ class RenderContext(object):
             dependencies = []
 
         if factory is None and value is None:
-            raise ValueError("You must specify either factory or value.")
+            raise ValueError("You must specify either factory or value.") #pragma: no cover
         if factory is not None and value is not None:
-            raise ValueError("You must specify either factory or value.")
+            raise ValueError("You must specify either factory or value.") #pragma: no cover
         if value is not None and dependencies:
-            raise ValueError("Dependencies can only be specified when defining a factory, not a value.")
+            raise ValueError("Dependencies can only be specified when defining a factory, not a value.") #pragma: no cover
 
         self._javascript_modules[name] = (dependencies, factory, value)
 
@@ -208,7 +208,7 @@ class RenderContext(object):
         if arguments is None:
             arguments = []
         if code is None:
-            raise ValueError("You must specify a Javascript function using the code argument.")
+            raise ValueError("You must specify a Javascript function using the code argument.") #pragma: no cover
         self._javascript_calls.append((dependencies, arguments, code))
 
     @property
@@ -468,7 +468,7 @@ def _draw_text(
     layout_opacity = 0.5
     layout_stroke_width = 1
 
-    if layout.style.get("-toyplot-text-layout-visibility", None) == "visible":
+    if layout.style.get("-toyplot-text-layout-visibility", None) == "visible": # pragma: no cover
         xml.SubElement(
             group,
             "rect",
@@ -495,7 +495,7 @@ def _draw_text(
 
     hyperlink = []
     for line in layout.children:
-        if line.style.get("-toyplot-text-layout-line-visibility", None) == "visible":
+        if line.style.get("-toyplot-text-layout-line-visibility", None) == "visible": # pragma: no cover
             xml.SubElement(
                 group,
                 "rect",
@@ -529,7 +529,7 @@ def _draw_text(
                     y=str(box.baseline),
                     style=toyplot.style.to_css(box.style),
                     ).text = box.text
-                if box.style.get("-toyplot-text-layout-box-visibility", None) == "visible":
+                if box.style.get("-toyplot-text-layout-box-visibility", None) == "visible": # pragma: no cover
                     xml.SubElement(
                         group,
                         "rect",
@@ -563,7 +563,7 @@ def _draw_text(
                         cy=(box.top + box.bottom) * 0.5,
                         marker=toyplot.marker.create(size=box.height) + box.marker,
                         )
-                if box.style.get("-toyplot-text-layout-box-visibility", None) == "visible":
+                if box.style.get("-toyplot-text-layout-box-visibility", None) == "visible": # pragma: no cover
                     xml.SubElement(
                         group,
                         "rect",

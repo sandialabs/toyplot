@@ -40,6 +40,26 @@ Feature: Text
         And a set of cartesian axes
         When text is aligned with an unknown alignment-baseline value, an exception is raised.
 
+    Scenario Outline: Custom font family
+        Given a default canvas
+        And a set of cartesian axes
+        And text using font-family <family>
+        Then the figure should match the <reference> reference image
+
+        Examples: Fonts
+          | family            | reference                          |
+          | courier           | text-font-family-courier           |
+          | helvetica         | text-font-family-helvetica         |
+          | times             | text-font-family-times             |
+          | monospace         | text-font-family-monospace         |
+          | serif             | text-font-family-serif             |
+          | sans-serif        | text-font-family-sans-serif        |
+
+    Scenario: Unknown font family
+        Given a default canvas
+        And a set of cartesian axes
+        When text is drawn with an unknown font family, an exception is raised.
+
     Scenario Outline: Rich Text
         Given a default canvas
         And a set of cartesian axes

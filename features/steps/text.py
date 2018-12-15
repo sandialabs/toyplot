@@ -60,6 +60,7 @@ def step_impl(context):
             "-toyplot-anchor-shift": "-10px"})
     context.axes.scatterplot(0, 0, color="black")
 
+
 @given(u'text with angled anchor shift')
 def step_impl(context):
     context.axes.text(
@@ -71,6 +72,7 @@ def step_impl(context):
             "font-size": "32px",
             "-toyplot-anchor-shift": "10px"})
     context.axes.scatterplot(0, 0, color="black")
+
 
 @given(u'text with vertical alignment top')
 def step_impl(context):
@@ -172,6 +174,7 @@ def step_impl(context):
         0, 0, "Text!", style={"font-size": "24px", "baseline-shift": "-100%"})
     context.axes.scatterplot(0, 0, color="black")
 
+
 @given(u'text with angled baseline shift')
 def step_impl(context):
     context.axes.text(
@@ -197,5 +200,18 @@ def step_impl(context):
 
 @given(u'rich text {markup}')
 def step_impl(context, markup):
-    context.axes.text(0, 0, markup, color=toyplot.color.black, style={"font-size": "32px"})
+    context.axes.text(0, 0, markup, color=toyplot.color.black, style={"font-family": family, "font-size": "32px"})
+
+
+@given(u'text using font-family {family}')
+def step_impl(context, family):
+    context.axes.text(0, 0, "Font-family: %s" % family, style={"font-family": family, "font-size": "32px"})
+
+
+@when(u'text is drawn with an unknown font family, an exception is raised.')
+def step_impl(context):
+    with nose.tools.assert_raises(ValueError):
+        context.axes.text(0, 0, "Font-family: nonexistent", style={"font-family": "nonexistent", "font-size": "32px"})
+        context.canvas._repr_html_()
+
 

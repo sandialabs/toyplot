@@ -1415,13 +1415,16 @@ class Cartesian(object):
             y,
             rx,
             ry,
-            angle,
+            angle=None,
             color=None,
             opacity=1.0,
             title=None,
             style=None,
             filename=None,
         ):
+        if angle is None:
+            angle = numpy.zeros_like(x)
+
         table = toyplot.data.Table()
         table["x"] = toyplot.require.scalar_vector(x)
         table["y"] = toyplot.require.scalar_vector(y, length=table.shape[0])

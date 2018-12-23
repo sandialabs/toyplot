@@ -331,13 +331,22 @@ class Ellipse(Mark):
         self._filename = toyplot.require.filename(filename)
 
     def domain(self, axis):
-        radius = numpy.maximum(self._table[self._rx[0]], self._table[self._ry[0]])
+        x = self._table[self._x[0]]
+        y = self._table[self._y[0]]
+        rx = self._table[self._rx[0]]
+        ry = self._table[self._ry[0]]
+        theta = numpy.radians(self._table[self._angle[0]])
+
+        u = numpy.column_stack((numpy.cos(theta), numpy.sin(theta))) * rx
+        v = numpy.column_stack((numpy.cos(theta + numpy.pi / 2), numpy.sin(theta + numpy.pi / 2))) * ry
+
+        dx = numpy.sqrt(u[:,0] * u[:,0] + v[:,0] * v[:,0])
+        dy = numpy.sqrt(u[:,1] * u[:,1] + v[:,1] * v[:,1])
 
         if axis == self._coordinate_axes[0]:
-            return toyplot.data.minimax([self._table[self._x[0]] - radius, self._table[self._x[0]] + radius])
+            return toyplot.data.minimax((x - dx, x + dx))
         if axis == self._coordinate_axes[1]:
-            return toyplot.data.minimax([self._table[self._y[0]] - radius, self._table[self._y[0]] + radius])
-
+            return toyplot.data.minimax((y - dy, y + dy))
 
 
 class FillBoundaries(Mark):
@@ -901,7 +910,6 @@ class Range(Mark):
         self._title = toyplot.require.table_keys(table, title, length=N)
 
     def domain(self, axis):
-        log.debug("%s %s", axis, self._coordinate_axes)
         index = numpy.flatnonzero(self._coordinate_axes == axis)[0]
         return toyplot.data.minimax((self._table[self._coordinates[index * 2 + 0]], self._table[self._coordinates[index * 2 + 1]]))
 

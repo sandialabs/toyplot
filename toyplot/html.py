@@ -14,6 +14,7 @@ import copy
 import functools
 import itertools
 import json
+import logging
 import string
 import uuid
 import xml.etree.ElementTree as xml
@@ -30,6 +31,8 @@ import toyplot.font
 import toyplot.mark
 import toyplot.marker
 import toyplot.text
+
+log = logging.getLogger(__name__)
 
 
 _namespace = dict()
@@ -2513,11 +2516,6 @@ def _render(axes, mark, context):
 @dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Ellipse, RenderContext)
 def _render(axes, mark, context):
     assert(mark._coordinate_axes.tolist() == ["x", "y"])
-    if mark._coordinate_axes.tolist() == ["x", "y"]:
-        x = axes.project("x", mark._table[mark._x[0]])
-        y = axes.project("y", mark._table[mark._y[0]])
-        rx = numpy.abs(axes.project("x", mark._table[mark._rx[0]] + mark._table[mark._x[0]]) - x)
-        ry = numpy.abs(axes.project("y", mark._table[mark._ry[0]] + mark._table[mark._y[0]]) - y)
 
     mark_xml = xml.SubElement(
         context.parent,
@@ -2533,10 +2531,10 @@ def _render(axes, mark, context):
     series_xml = xml.SubElement(
         mark_xml, "g", attrib={"class": "toyplot-Series"})
     for dx, dy, drx, dry, dangle, dfill, dopacity, dtitle in zip(
-            x,
-            y,
-            rx,
-            ry,
+            mark._table[mark._x[0]],
+            mark._table[mark._y[0]],
+            mark._table[mark._rx[0]],
+            mark._table[mark._ry[0]],
             mark._table[mark._angle[0]],
             mark._table[mark._fill[0]],
             mark._table[mark._opacity[0]],
@@ -2544,17 +2542,27 @@ def _render(axes, mark, context):
         ):
         dstyle = toyplot.style.combine(
             {"fill": toyplot.color.to_css(dfill), "opacity": dopacity}, mark._style)
+
+        theta = numpy.radians(dangle)
+        u = numpy.array((numpy.cos(theta), numpy.sin(theta))) * drx
+        v = numpy.array((numpy.cos(theta + numpy.pi / 2), numpy.sin(theta + numpy.pi / 2))) * dry
+
+        mix = numpy.linspace(0, numpy.pi * 2, 100)
+        p = numpy.cos(mix)[:,None] * u + numpy.sin(mix)[:,None] * v
+
+        x = axes.project("x", dx + p[:,0])
+        y = axes.project("y", dy + p[:,1])
+
+        points = ["%r,%r" % point for point in zip(x, y)]
+
         datum_xml = xml.SubElement(
             series_xml,
-            "ellipse",
+            "polygon",
             attrib={"class": "toyplot-Datum"},
-            cx=repr(dx),
-            cy=repr(dy),
-            rx=repr(drx),
-            ry=repr(dry),
+            points=" ".join(points),
             style=_css_style(dstyle),
-            transform="rotate(%r %r %r)" % (-dangle, dx, dy),
             )
+
         if dtitle is not None:
             xml.SubElement(datum_xml, "title").text = str(dtitle)
 

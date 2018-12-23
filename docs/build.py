@@ -3,6 +3,7 @@
 # rights in this software.
 
 import argparse
+import glob
 import os
 import re
 import shutil
@@ -90,30 +91,9 @@ def convert_notebook(name):
 if os.path.exists(build_dir):
     shutil.rmtree(build_dir)
 
-notebooks = [
-        "canvas-layout",
-        "cartesian-coordinates",
-        "colors",
-        "color-mapping",
-        "communities-case-study",
-        "convenience-api",
-        "data-tables",
-        "graph-visualization",
-        "image-visualization",
-        "interaction",
-        "labels-and-legends",
-        "log-scales",
-        "markers",
-        "matrix-visualization",
-        "neural-network-case-study",
-        "null-data",
-        "numberline-coordinates",
-        "rendering",
-        "table-coordinates",
-        "text",
-        "tick-locators",
-        "tutorial",
-        "units"]
+notebooks = sorted(glob.glob("*.ipynb"))
+notebooks = [os.path.basename(notebook) for notebook in notebooks]
+notebooks = [os.path.splitext(notebook)[0] for notebook in notebooks]
 
 # Clean the build.
 if arguments.command == "clean":

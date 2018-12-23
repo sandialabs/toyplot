@@ -337,8 +337,8 @@ class Ellipse(Mark):
         ry = self._table[self._ry[0]]
         theta = numpy.radians(self._table[self._angle[0]])
 
-        u = numpy.column_stack((numpy.cos(theta), numpy.sin(theta))) * rx
-        v = numpy.column_stack((numpy.cos(theta + numpy.pi / 2), numpy.sin(theta + numpy.pi / 2))) * ry
+        u = numpy.column_stack((rx * numpy.cos(theta), rx * numpy.sin(theta)))
+        v = numpy.column_stack((ry * numpy.cos(theta + numpy.pi / 2), ry * numpy.sin(theta + numpy.pi / 2)))
 
         dx = numpy.sqrt(u[:,0] * u[:,0] + v[:,0] * v[:,0])
         dy = numpy.sqrt(u[:,1] * u[:,1] + v[:,1] * v[:,1])

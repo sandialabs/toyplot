@@ -18,6 +18,7 @@ Contents:
   color-mapping.rst
   convenience-api.rst
   data-tables.rst
+  ellipse-visualization.rst
   embedding.rst
   graph-visualization.rst
   image-visualization.rst

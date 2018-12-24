@@ -2081,34 +2081,6 @@ class Cartesian(object):
                 filename=filename,
                 ))
 
-    def rects(
-            self,
-            a,
-            b,
-            c,
-            d,
-            along="x",
-            color=None,
-            filename=None,
-            opacity=1.0,
-            style=None,
-            title=None,
-        ):
-        """Deprecated, use :meth:`toyplot.coordinates.Cartesian.rectangle` instead."""
-        warnings.warn("toyplot.coordinates.Cartesian.rects() is deprecated, use toyplot.coordinates.Cartesian.rectangle() instead.", toyplot.DeprecationWarning, stacklevel=2)
-        return self.rectangle(
-            a,
-            b,
-            c,
-            d,
-            along=along,
-            color=color,
-            opacity=opacity,
-            title=title,
-            style=style,
-            filename=filename,
-            )
-
 
     def rectangle(
             self,

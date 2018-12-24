@@ -21,9 +21,6 @@ import toyplot.projection
 black = "#292724"
 """Default color used throughout Toyplot figures."""
 
-near_black = "#292724"
-"""Deprecated, use :data:`toyplot.color.black` instead."""
-
 dtype = {"names": ["r", "g", "b", "a"], "formats": ["float64", "float64", "float64", "float64"]}
 """Data type for storing RGBA color information in :class:`numpy.ndarray` instances.
 """

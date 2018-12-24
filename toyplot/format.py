@@ -60,13 +60,6 @@ class BasicFormatter(Formatter):
         return "%s" % value, "", ""
 
 
-class DefaultFormatter(BasicFormatter):
-    """Deprecated, use :class:`toyplot.format.BasicFormatter` instead."""
-    def __init__(self): # pragma: no cover
-        super(DefaultFormatter, self).__init__(nanshow=True)
-        warnings.warn("toyplot.format.DefaultFormatter is deprecated, use toyplot.format.BasicFormatter instead.", toyplot.DeprecationWarning, stacklevel=2)
-
-
 class FloatFormatter(BasicFormatter):
     """Formats floating-point values with aligned decimal points.
 

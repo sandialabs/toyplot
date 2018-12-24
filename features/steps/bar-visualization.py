@@ -11,7 +11,7 @@ import numpy.testing
 import toyplot
 
 
-@given(u'axes-bars-boundaries-masked-nan')
+@given(u'bars-boundaries-masked-nan')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(size=(50, 50))
@@ -24,13 +24,13 @@ def step_impl(context):
     context.axes.bars(b, baseline=None)
 
 
-@given(u'axes-bars-histogram')
+@given(u'bars-histogram')
 def step_impl(context):
     numpy.random.seed(1234)
     context.axes.bars(numpy.histogram(numpy.random.normal(size=10000), 100))
 
 
-@given(u'axes-bars-magnitudes-masked-nan')
+@given(u'bars-magnitudes-masked-nan')
 def step_impl(context):
     x = numpy.linspace(0, 2 * numpy.pi, 51)
     y = numpy.ma.column_stack((
@@ -44,7 +44,7 @@ def step_impl(context):
     context.axes.bars(x, y)
 
 
-@given(u'axes-bars-n-boundaries-along-y')
+@given(u'bars-n-boundaries-along-y')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -54,7 +54,7 @@ def step_impl(context):
     context.axes.bars(series, along="y", baseline=None)
 
 
-@given(u'axes-bars-n-boundaries-centers')
+@given(u'bars-n-boundaries-centers')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -65,7 +65,7 @@ def step_impl(context):
     context.axes.bars(x, series, baseline=None)
 
 
-@given(u'axes-bars-n-boundaries-edges')
+@given(u'bars-n-boundaries-edges')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -78,7 +78,7 @@ def step_impl(context):
     context.axes.bars(x1, x2, series, baseline=None)
 
 
-@given(u'axes-bars-n-boundaries-titles')
+@given(u'bars-n-boundaries-titles')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -100,7 +100,7 @@ def step_impl(context):
         baseline=None)
 
 
-@given(u'axes-bars-n-boundaries')
+@given(u'bars-n-boundaries')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -110,7 +110,7 @@ def step_impl(context):
     context.axes.bars(series, baseline=None)
 
 
-@given(u'axes-bars-n-magnitudes-along-y')
+@given(u'bars-n-magnitudes-along-y')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -120,7 +120,7 @@ def step_impl(context):
     context.axes.bars(series, along="y")
 
 
-@given(u'axes-bars-n-magnitudes-centers')
+@given(u'bars-n-magnitudes-centers')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -131,7 +131,7 @@ def step_impl(context):
     context.axes.bars(x, series)
 
 
-@given(u'axes-bars-n-magnitudes-edges')
+@given(u'bars-n-magnitudes-edges')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -144,7 +144,7 @@ def step_impl(context):
     context.axes.bars(x1, x2, series)
 
 
-@given(u'axes-bars-n-magnitudes-symmetric')
+@given(u'bars-n-magnitudes-symmetric')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -154,7 +154,7 @@ def step_impl(context):
     context.axes.bars(series, baseline="symmetric")
 
 
-@given(u'axes-bars-n-magnitudes-titles')
+@given(u'bars-n-magnitudes-titles')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -164,7 +164,7 @@ def step_impl(context):
     context.axes.bars(series, baseline="stacked", title=["mean", "standard deviation"])
 
 
-@given(u'axes-bars-n-magnitudes-wiggle')
+@given(u'bars-n-magnitudes-wiggle')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -174,7 +174,7 @@ def step_impl(context):
     context.axes.bars(series, baseline="wiggle")
 
 
-@given(u'axes-bars-n-magnitudes')
+@given(u'bars-n-magnitudes')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -184,7 +184,7 @@ def step_impl(context):
     context.axes.bars(series)
 
 
-@given(u'axes-bars-one-boundary-centers')
+@given(u'bars-one-boundary-centers')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -194,7 +194,7 @@ def step_impl(context):
     context.axes.bars(x, y1, baseline=None)
 
 
-@given(u'axes-bars-one-boundary-edges')
+@given(u'bars-one-boundary-edges')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -206,7 +206,7 @@ def step_impl(context):
     context.axes.bars(x1, x2, y1, baseline=None)
 
 
-@given(u'axes-bars-one-boundary')
+@given(u'bars-one-boundary')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -215,7 +215,7 @@ def step_impl(context):
     context.axes.bars(y1, baseline=None)
 
 
-@given(u'axes-bars-one-magnitude-centers')
+@given(u'bars-one-magnitude-centers')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -225,7 +225,7 @@ def step_impl(context):
     context.axes.bars(x, y)
 
 
-@given(u'axes-bars-one-magnitude-edges')
+@given(u'bars-one-magnitude-edges')
 def step_impl(context):
     numpy.random.seed(1234)
     observations = numpy.random.normal(loc=1, size=(25, 100))
@@ -235,15 +235,6 @@ def step_impl(context):
     y = numpy.mean(observations, axis=1)
 
     context.axes.bars(x1, x2, y)
-
-
-@given(u'axes-bars-one-magnitude')
-def step_impl(context):
-    numpy.random.seed(1234)
-    observations = numpy.random.normal(loc=1, size=(25, 100))
-    y = numpy.mean(observations, axis=1)
-
-    context.axes.bars(y)
 
 
 @given(u'bars-one-magnitude')

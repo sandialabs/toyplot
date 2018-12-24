@@ -7,27 +7,26 @@ Feature: Bar visualization
 
         Examples:
             | scenario              | reference |
-            | axes-bars-boundaries-masked-nan | axes-bars-boundaries-masked-nan |
-            | axes-bars-histogram | axes-bars-histogram |
-            | axes-bars-magnitudes-masked-nan | axes-bars-magnitudes-masked-nan |
-            | axes-bars-n-boundaries-along-y | axes-bars-n-boundaries-along-y |
-            | axes-bars-n-boundaries-centers | axes-bars-n-boundaries-centers |
-            | axes-bars-n-boundaries-edges | axes-bars-n-boundaries-edges |
-            | axes-bars-n-boundaries-titles | axes-bars-n-boundaries-titles |
-            | axes-bars-n-boundaries | axes-bars-n-boundaries |
-            | axes-bars-n-magnitudes-along-y | axes-bars-n-magnitudes-along-y |
-            | axes-bars-n-magnitudes-centers | axes-bars-n-magnitudes-centers |
-            | axes-bars-n-magnitudes-edges | axes-bars-n-magnitudes-edges |
-            | axes-bars-n-magnitudes-symmetric | axes-bars-n-magnitudes-symmetric |
-            | axes-bars-n-magnitudes-titles | axes-bars-n-magnitudes-titles |
-            | axes-bars-n-magnitudes-wiggle | axes-bars-n-magnitudes-wiggle |
-            | axes-bars-n-magnitudes | axes-bars-n-magnitudes |
-            | axes-bars-one-boundary-centers | axes-bars-one-boundary-centers |
-            | axes-bars-one-boundary-edges | axes-bars-one-boundary-edges |
-            | axes-bars-one-boundary | axes-bars-one-boundary |
-            | axes-bars-one-magnitude-centers | axes-bars-one-magnitude-centers |
-            | axes-bars-one-magnitude-edges | axes-bars-one-magnitude-edges |
-            | axes-bars-one-magnitude | axes-bars-one-magnitude |
+            | bars-boundaries-masked-nan | bars-boundaries-masked-nan |
+            | bars-histogram | bars-histogram |
+            | bars-magnitudes-masked-nan | bars-magnitudes-masked-nan |
+            | bars-n-boundaries-along-y | bars-n-boundaries-along-y |
+            | bars-n-boundaries-centers | bars-n-boundaries-centers |
+            | bars-n-boundaries-edges | bars-n-boundaries-edges |
+            | bars-n-boundaries-titles | bars-n-boundaries-titles |
+            | bars-n-boundaries | bars-n-boundaries |
+            | bars-n-magnitudes-along-y | bars-n-magnitudes-along-y |
+            | bars-n-magnitudes-centers | bars-n-magnitudes-centers |
+            | bars-n-magnitudes-edges | bars-n-magnitudes-edges |
+            | bars-n-magnitudes-symmetric | bars-n-magnitudes-symmetric |
+            | bars-n-magnitudes-titles | bars-n-magnitudes-titles |
+            | bars-n-magnitudes-wiggle | bars-n-magnitudes-wiggle |
+            | bars-n-magnitudes | bars-n-magnitudes |
+            | bars-one-boundary-centers | bars-one-boundary-centers |
+            | bars-one-boundary-edges | bars-one-boundary-edges |
+            | bars-one-boundary | bars-one-boundary |
+            | bars-one-magnitude-centers | bars-one-magnitude-centers |
+            | bars-one-magnitude-edges | bars-one-magnitude-edges |
             | bars-one-magnitude | bars-one-magnitude |
 
 

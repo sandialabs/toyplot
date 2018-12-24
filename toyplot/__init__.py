@@ -12,7 +12,7 @@ import logging
 
 from toyplot.canvas import Canvas
 
-__version__ = "0.18.0-dev"
+__version__ = "0.18.0"
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)

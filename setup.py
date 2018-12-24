@@ -7,7 +7,7 @@ import re
 
 setup(
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Environment :: Other Environment",
         "Environment :: Web Environment",

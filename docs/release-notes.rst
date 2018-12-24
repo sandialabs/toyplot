@@ -7,12 +7,30 @@
 Release Notes
 =============
 
+Toyplot 0.18.0 - December 24th, 2018
+------------------------------------
+
+* This will be the final release of Toyplot with Python 2 support!
+* Added unit and currency formatting classes, courtesy of @ben-cunningham and @dahuget.
+* Reduced code duplication in the `toyplot.format` module.
+* Canvas borders are supported in PDF output.
+* Improved output previewing `toyplot.data.Table` in Jupyter notebooks.
+* Added ellipse visualizations.
+* Added hyperlink support for bar visualizations.
+* Redesigned `toyplot.mark.Rect` as `toyplot.mark.Range`, and added range visualization on numberlines.
+* Converted all remaining regression tests from nose to behave.
+* `toyplot.canvas.Canvas.matrix` formats cell titles properly.
+* Redesigned regression tests to use the DOM for comparisons.
+* Documentation notebooks are included in regression testing.
+* Documentation notebooks are included in coverage testing.
+* `toyplot.reportlab` backend ignores hyperlinks instead of failing.
+
 Toyplot 0.17.0 - April 1st, 2018
 --------------------------------
 
 * Moved sample datasets into the `toyplot.data` module.
 * toyplot.mp4.render() generates H.264 output.
-* Restored `toyplot.canvas.AnimationFrame.set_datum_text()`, which was with the debut of rich text..
+* Restored `toyplot.canvas.AnimationFrame.set_datum_text()`, which was broken by the debut of rich text.
 * Use the Python warnings module for deprecation warnings.
 * Disabled pylint testing on Travis-CI, it was too much of a moving target.
 * Simplified the animation API.

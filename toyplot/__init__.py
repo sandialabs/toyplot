@@ -20,6 +20,7 @@ log.addHandler(logging.NullHandler())
 
 
 class DeprecationWarning(Warning):
+    """Used with :func:`warnings.warn` to mark deprecated API."""
     pass
 
 

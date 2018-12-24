@@ -675,11 +675,11 @@ class Image(Mark):
         data = numpy.atleast_3d(data)
 
         if data.ndim != 3:
-            raise ValueError("Image must be a 1D, 2D or 3D array.")
+            raise ValueError("Image must be a 1D, 2D or 3D array.") # pragma: no cover
         if data.shape[2] < 1 or data.shape[2] > 4:
-            raise ValueError("Image must contain 1, 2, 3, or 4 channels.")
+            raise ValueError("Image must contain 1, 2, 3, or 4 channels.") # pragma: no cover
         if issubclass(data.dtype.type, (numpy.object_, numpy.complexfloating, numpy.flexible)) and data.dtype != toyplot.color.dtype:
-            raise ValueError("Unsupported image dtype: %s" % data.dtype)
+            raise ValueError("Unsupported image dtype: %s" % data.dtype) # pragma: no cover
 
         self._data = data
 

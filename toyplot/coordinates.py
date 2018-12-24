@@ -1422,6 +1422,50 @@ class Cartesian(object):
             style=None,
             filename=None,
         ):
+        """Add ellipses to the axes.
+
+        This command creates a single series of one-or-more ellipses.  To create
+        one ellipse, pass scalar values for the center and x and y radiuses:
+
+        >>> axes.ellipse(xcenter, ycenter, xradius, yradius)
+
+        You may also specify an optional angle, measured in degrees, that will
+        be used to rotate the ellipse counter-clockwise around its center:
+
+        >>> axes.ellipse(xcenter, ycenter, xradius, yradius, angle)
+
+        To create :math:`M` ellipses, pass size-:math:`M` vectors for each
+        of the parameters:
+
+        >>> axes.ellipse(xcenters, ycenters, xradiuses, yradiuses)
+        >>> axes.ellipse(xcenters, ycenters, xradiuses, yradiuses, angles)
+
+        Parameters
+        ----------
+        x, y: array-like series of center coordinates.
+        rx, ry: array-like series of x and y radiuses.
+        angle: array-like series of rotation angles, optional.
+        color: array-like series of colors, optional.
+            Specify a single color for all ellipses, or one color per ellipse.
+            Color values can be explicit Toyplot colors, scalar values to be
+            mapped to colors with a default colormap, or a (scalar, colormap)
+            tuple containing scalar values to be mapped to colors with the given
+            colormap.
+        opacity: array-like set of opacities, optional.
+            Specify a single opacity for all ellipses, or one opacity per ellipse.
+        title: array like set of strings, optional.
+            Specify a single title for all ellipses, or one title per ellipse.
+        style: dict, optional
+            Collection of CSS styles to be applied to every ellipse.
+        filename: string, optional
+            Specify a default filename to be used if the end-viewer decides to export
+            the plot data.
+
+        Returns
+        -------
+        mark: :class:`toyplot.mark.Ellipse` containing the mark data.
+        """
+
         if angle is None:
             angle = numpy.zeros_like(x)
 
@@ -2050,6 +2094,7 @@ class Cartesian(object):
             style=None,
             title=None,
         ):
+        """Deprecated, use :meth:`toyplot.coordinates.Cartesian.rectangle` instead."""
         warnings.warn("toyplot.coordinates.Cartesian.rects() is deprecated, use toyplot.coordinates.Cartesian.rectangle() instead.", toyplot.DeprecationWarning, stacklevel=2)
         return self.rectangle(
             a,

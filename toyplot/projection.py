@@ -8,7 +8,6 @@ from __future__ import division
 
 import custom_inherit
 import numpy
-import six
 
 
 def _mix(a, b, amount):
@@ -28,8 +27,7 @@ def _in_range(a, x, b):
     return result
 
 
-@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
-class Projection(object):
+class Projection(object, metaclass=custom_inherit.DocInheritMeta(style="numpy_napoleon")):
     """Abstract interface for objects that can map between one-dimensional domain and range spaces.
 
     .. automethod:: __call__

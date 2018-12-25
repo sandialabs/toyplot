@@ -11,13 +11,11 @@ import warnings
 
 import custom_inherit
 import numpy
-import six
 
 import toyplot
 
 
-@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
-class Formatter(object):
+class Formatter(object, metaclass=custom_inherit.DocInheritMeta(style="numpy_napoleon")):
     """Abstract interface for formatters - objects that compute text representations from data."""
 
     def format(self, value):

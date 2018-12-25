@@ -8,7 +8,6 @@ import io
 
 import nose.tools
 import numpy.testing
-import six
 import toyplot
 
 import testing
@@ -66,7 +65,7 @@ def step_impl(context):
 @then(u'the canvas can be rendered in Jupyter as HTML')
 def step_impl(context):
     html = context.canvas._repr_html_()
-    nose.tools.assert_is_instance(html, six.string_types)
+    nose.tools.assert_is_instance(html, str)
 
 @then(u'the canvas can be rendered in Jupyter as a PNG image')
 def step_impl(context):

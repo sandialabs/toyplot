@@ -9,7 +9,6 @@ from __future__ import division
 
 import numbers
 import numpy
-import six
 
 def instance(value, types):
     """Raise an exception if a value isn't one of the given type(s)."""
@@ -99,7 +98,7 @@ def scalar_matrix(value, rows=None, columns=None):
 
 def optional_string(value):
     """Raise an exception if a value isn't a string, or None."""
-    if not isinstance(value, (six.string_types, type(None))):
+    if not isinstance(value, (str, type(None))):
         raise ValueError("Expected a string value or None, received %s." % value) # pragma: no cover
     return value
 

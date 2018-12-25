@@ -13,7 +13,6 @@ import xml.etree.ElementTree as xml
 
 import custom_inherit
 import numpy
-import six
 
 import toyplot.projection
 
@@ -36,7 +35,7 @@ def _html_color_swatches(colors, css_class, margin=0):
             root_xml,
             "div",
             style="float:left;width:20px;height:20px;margin-right:%spx;background-color:%s" % (margin, to_css(color)))
-    return six.text_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
+    return xml.tostring(root_xml, encoding="unicode", method="html")
 
 
 def _jupyter_color_swatches(colors):
@@ -146,7 +145,7 @@ def to_xyz(color):
 
 
 def _require_color(color):
-    if isinstance(color, six.string_types):
+    if isinstance(color, str):
         return css(color)
     elif isinstance(color, (numpy.void, numpy.ndarray)) and color.dtype == dtype:
         return color
@@ -324,8 +323,7 @@ def spread(color, count=5, lightness=0.9, reverse=False):
     return Palette(numpy.array(results), reverse=reverse)
 
 
-@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
-class Map(object):
+class Map(object, metaclass=custom_inherit.DocInheritMeta(style="numpy_napoleon")):
     """Abstract interface for objects that map scalar values to colors."""
     class DomainHelper(object):
         """Interface to get / set the domain for a :class:`toyplot.color.Map`."""
@@ -598,7 +596,7 @@ class DivergingMap(Map):
             "div",
             style="float:left;width:200px;height:20px;background:linear-gradient(to right,%s)" % (gradient_stops),
             )
-        return six.text_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
+        return xml.tostring(root_xml, encoding="unicode", method="html")
 
 
 class LinearMap(Map):
@@ -726,7 +724,7 @@ class LinearMap(Map):
             "div",
             style="float:left;width:200px;height:20px;background:linear-gradient(to right,%s)" % (gradient_stops),
             )
-        return six.text_type(xml.tostring(root_xml, encoding="utf-8", method="html"), encoding="utf-8")
+        return xml.tostring(root_xml, encoding="unicode", method="html")
 
 
 class BrewerFactory(object):

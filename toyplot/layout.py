@@ -11,7 +11,6 @@ import time
 
 import custom_inherit
 import numpy
-import six
 
 import toyplot.units
 
@@ -398,8 +397,7 @@ def _require_tree(children):
 
     return root, max(depth)
 
-@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
-class EdgeLayout(object):
+class EdgeLayout(object, metaclass=custom_inherit.DocInheritMeta(style="numpy_napoleon")):
     """Abstract interface for algorithms that compute graph edge coordinates."""
     def edges(self, vcoordinates, edges):
         """Return edge coordinates for a graph.
@@ -478,8 +476,7 @@ class CurvedEdges(EdgeLayout):
         return eshapes, ecoordinates
 
 
-@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
-class GraphLayout(object):
+class GraphLayout(object, metaclass=custom_inherit.DocInheritMeta(style="numpy_napoleon")):
     """Abstract interface for algorithms that compute coordinates for graph vertices and edges."""
     def graph(self, vcoordinates, edges):
         """Compute vertex and edge coordinates for a graph.

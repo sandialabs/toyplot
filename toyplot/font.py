@@ -9,13 +9,11 @@ from __future__ import absolute_import
 
 import custom_inherit
 import reportlab.pdfbase.pdfmetrics
-import six
 
 import toyplot.units
 
 
-@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
-class Font(object):
+class Font(object, metaclass=custom_inherit.DocInheritMeta(style="numpy_napoleon")):
     """Abstract interface for objects that return information about a specific combination of typeface and size."""
     @property
     def ascent(self):
@@ -56,8 +54,7 @@ class Font(object):
         raise NotImplementedError() # pragma: no cover
 
 
-@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
-class Library(object):
+class Library(object, metaclass=custom_inherit.DocInheritMeta(style="numpy_napoleon")):
     """Abstract interface for objects that manage a collection of fonts."""
     def font(self, style):
         """Lookup a font using CSS style information and return a corresponding Font object.

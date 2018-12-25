@@ -27,7 +27,6 @@ setup(
         "numpy>=1.8.0",
         "pypng",
         "reportlab",
-        "six",
     ],
     long_description="""Toyplot is the kid-sized plotting toolkit for Python with grownup-sized goals:
   * Develop beautiful interactive, animated plots that embrace the unique capabilities of electronic publishing and support repoducibility.

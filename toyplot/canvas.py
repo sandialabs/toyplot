@@ -11,7 +11,6 @@ import collections
 import numbers
 
 import numpy
-import six
 import toyplot.coordinates
 import toyplot.broadcast
 import toyplot.color
@@ -136,7 +135,7 @@ class AnimationFrame(object):
             raise ValueError("series must be an integer index.")
         if not isinstance(datum, int):
             raise ValueError("datum must be an integer index.")
-        if not isinstance(text, six.string_types):
+        if not isinstance(text, str):
             raise ValueError("text must be a string.")
         if not isinstance(style, (dict, type(None))):
             raise ValueError("style must be a dict or None.")

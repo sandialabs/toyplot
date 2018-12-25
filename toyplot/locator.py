@@ -14,13 +14,11 @@ except: # pragma: no cover
     pass
 import custom_inherit
 import numpy
-import six
 
 import toyplot.broadcast
 
 
-@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
-class TickLocator(object):
+class TickLocator(object, metaclass=custom_inherit.DocInheritMeta(style="numpy_napoleon")):
     """Base class for tick locators - objects that compute the position and format of axis tick labels."""
     def ticks(self, domain_min, domain_max):
         """Return a set of ticks for the given domain.
@@ -583,7 +581,7 @@ class Timestamp(TickLocator):
     """
     def __init__(self, count=None, interval=None, timezone="utc", format=None):
         if interval is not None:
-            if isinstance(interval, six.string_types):
+            if isinstance(interval, str):
                 interval = (1, interval)
             interval = (int(interval[0]), interval[1].lower())
 

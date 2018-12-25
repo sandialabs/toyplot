@@ -12,7 +12,6 @@ import itertools
 import warnings
 
 import numpy
-import six
 
 import toyplot.broadcast
 import toyplot.color
@@ -1304,7 +1303,7 @@ class Cartesian(object):
                 toyplot.style.require(style, allowed=toyplot.style.allowed.fill),
                 )
 
-            if isinstance(baseline, six.string_types):
+            if isinstance(baseline, str):
                 baseline = toyplot.require.value_in(baseline, ["stacked", "symmetric", "wiggle"])
                 if baseline == "stacked":
                     baseline = numpy.zeros(series.shape[0])
@@ -1645,7 +1644,7 @@ class Cartesian(object):
                 toyplot.style.require(style, allowed=toyplot.style.allowed.fill),
                 )
 
-            if isinstance(baseline, six.string_types):
+            if isinstance(baseline, str):
                 baseline = toyplot.require.value_in(baseline, ["stacked", "symmetric", "wiggle"])
                 if baseline == "stacked":
                     baseline = numpy.ma.zeros(series.shape[0])

@@ -13,7 +13,6 @@ import io
 import subprocess
 
 import reportlab.pdfgen.canvas
-import six
 
 import toyplot.reportlab
 import toyplot.require
@@ -100,7 +99,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
     if fobj is None:
         return stdout
-    elif isinstance(fobj, six.string_types):
+    elif isinstance(fobj, str):
         with open(fobj, "wb") as stream:
             stream.write(stdout)
     else:

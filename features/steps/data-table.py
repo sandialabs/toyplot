@@ -13,7 +13,6 @@ import os
 import sys
 import tempfile
 
-import six
 import toyplot.data
 
 import testing
@@ -419,7 +418,7 @@ def step_impl(context):
 @then(u'the table can be rendered as format ipython html string')
 def step_impl(context):
     html = context.data._repr_html_()
-    nose.tools.assert_is_instance(html, six.text_type)
+    nose.tools.assert_is_instance(html, str)
     testing.assert_html_equal(html, "data-table")
 
 

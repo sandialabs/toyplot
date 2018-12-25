@@ -11,7 +11,6 @@ import logging
 
 import custom_inherit
 import numpy
-import six
 
 import toyplot.color
 import toyplot.marker
@@ -24,8 +23,7 @@ log = logging.getLogger(__name__)
 ##########################################################################
 # Basic Toyplot marks
 
-@six.add_metaclass(custom_inherit.DocInheritMeta(style="numpy_napoleon"))
-class Mark(object):
+class Mark(object, metaclass=custom_inherit.DocInheritMeta(style="numpy_napoleon")):
     """Abstract interface for Toyplot marks.
 
     Marks are data objects that are added to a coordinate system for display on

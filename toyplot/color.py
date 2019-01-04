@@ -662,6 +662,10 @@ class LinearMap(Map):
         domain_min = domain_min if domain_min is not None else self.domain.min if self.domain.min is not None else values.min()
         domain_max = domain_max if domain_max is not None else self.domain.max if self.domain.max is not None else values.max()
 
+        # If the domain is empty, default to the first color in the palette
+        if domain_min == domain_max:
+            return numpy.full_like(values, self._palette[0], dtype=dtype)
+
         if self._center is not None:
             segments = [
                 toyplot.projection.Piecewise.Segment("linear", -numpy.inf, domain_min, self._center, self._center, -numpy.inf, 0, 0.5, 0.5),

@@ -38,3 +38,16 @@ Feature: Colormap
 
   Scenario: Categorical color map css
     Given a categorical color map, individual css colors can be returned by index
+
+    Scenario Outline: Empty domain
+        Given a linear color map without a domain
+        And colormap values <values>
+        When mapping colors without a domain
+        Then the color swatches should match the <reference> reference html
+
+        Examples:
+            | values              | reference                   |
+            | [0, 0, 0]           | colormap-empty-domain-zeros |
+            | [1, 1, 1]           | colormap-empty-domain-ones  |
+
+

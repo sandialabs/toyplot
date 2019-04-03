@@ -89,8 +89,9 @@ class MarkerBox(object):
 
 class PushHyperlink(object):
     """Marks the beginning of a hyperlink."""
-    def __init__(self, href, style):
+    def __init__(self, href, target, style):
         self.href = href
+        self.target = target
         self.style = style
 
 
@@ -189,7 +190,7 @@ def layout(text, style, fonts):
             return root
 
         if node.tag == "a":
-            root.children.append(PushHyperlink(node.get("href"), node.get("style")))
+            root.children.append(PushHyperlink(node.get("href"), node.get("target", None), node.get("style")))
             if node.text:
                 root.children.append(TextBox(node.text, node.get("style")))
             for child in node:

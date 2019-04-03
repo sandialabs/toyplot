@@ -595,6 +595,8 @@ def _draw_text(
                 hyperlink.append(group)
                 group = xml.SubElement(group, "a")
                 group.set("xlink:href", box.href)
+                if box.target is not None:
+                    group.set("target", box.target)
             elif isinstance(box, toyplot.text.PopHyperlink):
                 group = hyperlink.pop()
 

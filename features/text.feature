@@ -79,5 +79,6 @@ Feature: Text
           | foo <strong>bar<br/>baz</strong> blah | text-rich-text-nested-break        |
           | foo &lt; bar &gt; baz                 | text-rich-text-brackets            |
           | foo &amp; baz                         | text-rich-text-ampersand           |
-          | Visit <a href="http://toyplot.readthedocs.io" style="fill:blue">Toyplot</a> for more info! | text-rich-text-hyperlink           |
+          | Visit <a href="http://toyplot.readthedocs.io" style="fill:blue">Toyplot</a> for more info! | text-rich-text-hyperlink |
+          | Visit <a href="http://toyplot.readthedocs.io" target="_blank" style="fill:blue">Toyplot</a> for more info! | text-rich-text-hyperlink-target |
 

@@ -20,7 +20,7 @@ install:
     - pip install arrow behave coverage coveralls custom_inherit nose-exclude pypng xmldiff
     - wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-i686-static.tar.xz
     - mkdir ffmpeg
-    - tar xf ffmpeg-release-64bit-static.tar.xz --strip-components 1 -C ffmpeg
+    - tar xf ffmpeg-release-i686-static.tar.xz --strip-components 1 -C ffmpeg
     - export PATH=$TRAVIS_BUILD_DIR/ffmpeg:$PATH
     - ffmpeg -version
     - python setup.py develop

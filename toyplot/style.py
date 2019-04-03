@@ -93,6 +93,7 @@ class allowed(object):
         "stroke-opacity",
         "stroke-width",
         "text-anchor",
+        "text-decoration-line",
         "text-shadow",
         "-toyplot-anchor-shift",
         "-toyplot-text-layout-box-visibility",

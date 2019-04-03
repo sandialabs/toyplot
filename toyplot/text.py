@@ -132,6 +132,8 @@ def layout(text, style, fonts):
             style = toyplot.style.combine(style, {"font-family": "monospace"})
         elif node.tag in ["em", "i"]:
             style = toyplot.style.combine(style, {"font-style": "italic"})
+        elif node.tag in ["a"]:
+            style = toyplot.style.combine(style, {"fill": "steelblue", "text-decoration-line": "none"})
 
         if "style" in node.attrib:
             node_style = toyplot.style.require(toyplot.style.parse(node.attrib["style"]), toyplot.style.allowed.text)

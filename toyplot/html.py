@@ -593,7 +593,11 @@ def _draw_text(
 
             elif isinstance(box, toyplot.text.PushHyperlink):
                 hyperlink.append(group)
-                group = xml.SubElement(group, "a")
+                group = xml.SubElement(
+                    group,
+                    "a",
+                    style=toyplot.style.to_css(box.style),
+                    )
                 group.set("xlink:href", box.href)
                 if box.target is not None:
                     group.set("target", box.target)

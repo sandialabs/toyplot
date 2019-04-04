@@ -453,87 +453,95 @@ class Log(TickLocator):
         return locations, labels, titles
 
 
-def _year_generator(interval):
-    def implementation(domain_min, domain_max):
-        for year in numpy.arange(domain_min.year - (domain_min.year % interval), domain_max.year + 1, interval):
-            value = arrow.Arrow(year, 1, 1)
+def _year_generator(years):
+    def implementation(domain_min, domain_max, timezone):
+        start = domain_min.to(timezone)
+        end = domain_max.to(timezone)
+        for year in numpy.arange(start.year - (start.year % years), end.year + 1, years):
+            value = arrow.Arrow(year=year, month=1, day=1, tzinfo=timezone)
             if value >= domain_min and value <= domain_max:
                 yield value.timestamp
     return implementation
 
 
-def _month_generator(interval):
-    def implementation(domain_min, domain_max):
-        for year in numpy.arange(domain_min.year, domain_max.year + 1):
-            for month in numpy.arange(0, 12, interval):
-                value = arrow.Arrow(year, month + 1, 1)
+def _month_generator(months):
+    def implementation(domain_min, domain_max, timezone):
+        start = domain_min.to(timezone)
+        end = domain_max.to(timezone)
+        for year in numpy.arange(start.year, end.year + 1):
+            for month in numpy.arange(0, 12, months):
+                value = arrow.Arrow(year=year, month=month + 1, day=1, tzinfo=timezone)
                 if value >= domain_min and value <= domain_max:
                     yield value.timestamp
     return implementation
 
 
-def _day_generator(interval):
-    def implementation(domain_min, domain_max):
-        value = arrow.Arrow(domain_min.year, domain_min.month, domain_min.day)
+def _day_generator(days):
+    def implementation(domain_min, domain_max, timezone):
+        start = domain_min.to(timezone)
+        value = arrow.Arrow(year=start.year, month=start.month, day=start.day, tzinfo=timezone)
         while value <= domain_max:
             if value >= domain_min:
                 yield value.timestamp
-            value += datetime.timedelta(days=interval)
+            value += datetime.timedelta(days=days)
     return implementation
 
 
-def _hour_generator(interval):
-    def implementation(domain_min, domain_max):
-        value = arrow.Arrow(domain_min.year, domain_min.month, domain_min.day)
+def _hour_generator(hours):
+    def implementation(domain_min, domain_max, timezone):
+        start = domain_min.to(timezone)
+        value = arrow.Arrow(year=start.year, month=start.month, day=start.day, tzinfo=timezone)
         while value <= domain_max:
             if value >= domain_min:
                 yield value.timestamp
-            value += datetime.timedelta(hours=interval)
+            value += datetime.timedelta(hours=hours)
     return implementation
 
 
-def _minute_generator(interval):
-    def implementation(domain_min, domain_max):
-        value = arrow.Arrow(domain_min.year, domain_min.month, domain_min.day)
+def _minute_generator(minutes):
+    def implementation(domain_min, domain_max, timezone):
+        start = domain_min.to(timezone)
+        value = arrow.Arrow(year=start.year, month=start.month, day=start.day, tzinfo=timezone)
         while value <= domain_max:
             if value >= domain_min:
                 yield value.timestamp
-            value += datetime.timedelta(minutes=interval)
+            value += datetime.timedelta(minutes=minutes)
     return implementation
 
 
-def _second_generator(interval):
-    def implementation(domain_min, domain_max):
-        value = arrow.Arrow(domain_min.year, domain_min.month, domain_min.day)
+def _second_generator(seconds):
+    def implementation(domain_min, domain_max, timezone):
+        start = domain_min.to(timezone)
+        value = arrow.Arrow(year=start.year, month=start.month, day=start.day, tzinfo=timezone)
         while value <= domain_max:
             if value >= domain_min:
                 yield value.timestamp
-            value += datetime.timedelta(seconds=interval)
+            value += datetime.timedelta(seconds=seconds)
     return implementation
 
 
 _intervals = [
-    dict(interval=datetime.timedelta(days=365 * 1000), generator=_year_generator(1000), format="{0:YYYY}"),
-    dict(interval=datetime.timedelta(days=365 * 100), generator=_year_generator(100), format="{0:YYYY}"),
-    dict(interval=datetime.timedelta(days=365 * 10), generator=_year_generator(10), format="{0:YYYY}"),
-    dict(interval=datetime.timedelta(days=365 * 5), generator=_year_generator(5), format="{0:YYYY}"),
-    dict(interval=datetime.timedelta(days=365), generator=_year_generator(1), format="{0:YYYY}"),
-    dict(interval=datetime.timedelta(days=90), generator=_month_generator(3), format="{0:MMMM} {0:YYYY}"),
-    dict(interval=datetime.timedelta(days=30), generator=_month_generator(1), format="{0:MMMM} {0:YYYY}"),
-    dict(interval=datetime.timedelta(days=7), generator=_day_generator(7), format="{0:ddd}, {0:MMM} {0:D}, {0:YYYY}"),
-    dict(interval=datetime.timedelta(days=1), generator=_day_generator(1), format="{0:ddd}, {0:MMM} {0:D}"),
-    dict(interval=datetime.timedelta(hours=12), generator=_hour_generator(12), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
-    dict(interval=datetime.timedelta(hours=6), generator=_hour_generator(6), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
-    dict(interval=datetime.timedelta(hours=4), generator=_hour_generator(4), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
-    dict(interval=datetime.timedelta(hours=1), generator=_hour_generator(1), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
-    dict(interval=datetime.timedelta(minutes=15), generator=_minute_generator(15), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
-    dict(interval=datetime.timedelta(minutes=10), generator=_minute_generator(10), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
-    dict(interval=datetime.timedelta(minutes=5), generator=_minute_generator(5), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
-    dict(interval=datetime.timedelta(minutes=1), generator=_minute_generator(1), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
-    dict(interval=datetime.timedelta(seconds=15), generator=_second_generator(15), format="{0:HH}:{0:mm}:{0:ss}"),
-    dict(interval=datetime.timedelta(seconds=10), generator=_second_generator(10), format="{0:HH}:{0:mm}:{0:ss}"),
-    dict(interval=datetime.timedelta(seconds=5), generator=_second_generator(5), format="{0:HH}:{0:mm}:{0:ss}"),
-    dict(interval=datetime.timedelta(seconds=1), generator=_second_generator(1), format="{0:HH}:{0:mm}:{0:ss}"),
+    dict(duration=datetime.timedelta(days=365 * 1000), generator=_year_generator(1000), format="{0:YYYY}"),
+    dict(duration=datetime.timedelta(days=365 * 100), generator=_year_generator(100), format="{0:YYYY}"),
+    dict(duration=datetime.timedelta(days=365 * 10), generator=_year_generator(10), format="{0:YYYY}"),
+    dict(duration=datetime.timedelta(days=365 * 5), generator=_year_generator(5), format="{0:YYYY}"),
+    dict(duration=datetime.timedelta(days=365), generator=_year_generator(1), format="{0:YYYY}"),
+    dict(duration=datetime.timedelta(days=90), generator=_month_generator(3), format="{0:MMMM} {0:YYYY}"),
+    dict(duration=datetime.timedelta(days=30), generator=_month_generator(1), format="{0:MMMM} {0:YYYY}"),
+    dict(duration=datetime.timedelta(days=7), generator=_day_generator(7), format="{0:ddd}, {0:MMM} {0:D}, {0:YYYY}"),
+    dict(duration=datetime.timedelta(days=1), generator=_day_generator(1), format="{0:ddd}, {0:MMM} {0:D}"),
+    dict(duration=datetime.timedelta(hours=12), generator=_hour_generator(12), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
+    dict(duration=datetime.timedelta(hours=6), generator=_hour_generator(6), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
+    dict(duration=datetime.timedelta(hours=4), generator=_hour_generator(4), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
+    dict(duration=datetime.timedelta(hours=1), generator=_hour_generator(1), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
+    dict(duration=datetime.timedelta(minutes=15), generator=_minute_generator(15), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
+    dict(duration=datetime.timedelta(minutes=10), generator=_minute_generator(10), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
+    dict(duration=datetime.timedelta(minutes=5), generator=_minute_generator(5), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
+    dict(duration=datetime.timedelta(minutes=1), generator=_minute_generator(1), format="{0:M}/{0:D} {0:HH}:{0:mm}"),
+    dict(duration=datetime.timedelta(seconds=15), generator=_second_generator(15), format="{0:HH}:{0:mm}:{0:ss}"),
+    dict(duration=datetime.timedelta(seconds=10), generator=_second_generator(10), format="{0:HH}:{0:mm}:{0:ss}"),
+    dict(duration=datetime.timedelta(seconds=5), generator=_second_generator(5), format="{0:HH}:{0:mm}:{0:ss}"),
+    dict(duration=datetime.timedelta(seconds=1), generator=_second_generator(1), format="{0:HH}:{0:mm}:{0:ss}"),
     ]
 
 
@@ -588,27 +596,27 @@ class Timestamp(TickLocator):
             amount, units = interval
 
             if units in ["millenium", "millenia"]:
-                interval = dict(interval=datetime.timedelta(days=365 * 1000 * amount), generator=_year_generator(1000 * amount), format="{0:YYYY}")
+                interval = dict(duration=datetime.timedelta(days=365 * 1000 * amount), generator=_year_generator(1000 * amount), format="{0:YYYY}")
             elif units in ["century", "centuries"]:
-                interval = dict(interval=datetime.timedelta(days=365 * 100 * amount), generator=_year_generator(100 * amount), format="{0:YYYY}")
+                interval = dict(duration=datetime.timedelta(days=365 * 100 * amount), generator=_year_generator(100 * amount), format="{0:YYYY}")
             elif units in ["decade", "decades"]:
-                interval = dict(interval=datetime.timedelta(days=365 * 10 * amount), generator=_year_generator(10 * amount), format="{0:YYYY}")
+                interval = dict(duration=datetime.timedelta(days=365 * 10 * amount), generator=_year_generator(10 * amount), format="{0:YYYY}")
             elif units in ["year", "years"]:
-                interval = dict(interval=datetime.timedelta(days=365 * amount), generator=_year_generator(amount), format="{0:YYYY}")
+                interval = dict(duration=datetime.timedelta(days=365 * amount), generator=_year_generator(amount), format="{0:YYYY}")
             elif units in ["quarter", "quarters"]:
-                interval = dict(interval=datetime.timedelta(days=90 * amount), generator=_month_generator(3 * amount), format="{0:MMMM} {0:YYYY}")
+                interval = dict(duration=datetime.timedelta(days=90 * amount), generator=_month_generator(3 * amount), format="{0:MMMM} {0:YYYY}")
             elif units in ["month", "months"]:
-                interval = dict(interval=datetime.timedelta(days=30 * amount), generator=_month_generator(amount), format="{0:MMMM} {0:YYYY}")
+                interval = dict(duration=datetime.timedelta(days=30 * amount), generator=_month_generator(amount), format="{0:MMMM} {0:YYYY}")
             elif units in ["week", "weeks"]:
-                interval = dict(interval=datetime.timedelta(days=7 * amount), generator=_day_generator(7 * amount), format="{0:ddd}, {0:MMM} {0:D}, {0.year}")
+                interval = dict(duration=datetime.timedelta(days=7 * amount), generator=_day_generator(7 * amount), format="{0:ddd}, {0:MMM} {0:D}, {0.year}")
             elif units in ["day", "days"]:
-                interval = dict(interval=datetime.timedelta(days=amount), generator=_day_generator(amount), format="{0:ddd}, {0:MMM} {0:D}")
+                interval = dict(duration=datetime.timedelta(days=amount), generator=_day_generator(amount), format="{0:ddd}, {0:MMM} {0:D}")
             elif units in ["hour", "hours"]:
-                interval = dict(interval=datetime.timedelta(hours=amount), generator=_hour_generator(amount), format="{0:M}/{0:D} {0:HH}:{0:mm}")
+                interval = dict(duration=datetime.timedelta(hours=amount), generator=_hour_generator(amount), format="{0:M}/{0:D} {0:HH}:{0:mm}")
             elif units in ["minute", "minutes"]:
-                interval = dict(interval=datetime.timedelta(minutes=amount), generator=_minute_generator(amount), format="{0:M}/{0:D} {0:HH}:{0:mm}")
+                interval = dict(duration=datetime.timedelta(minutes=amount), generator=_minute_generator(amount), format="{0:M}/{0:D} {0:HH}:{0:mm}")
             elif units in ["second", "seconds"]:
-                interval = dict(interval=datetime.timedelta(seconds=amount), generator=_second_generator(amount), format="{0:HH}:{0:mm}:{0:ss}")
+                interval = dict(duration=datetime.timedelta(seconds=amount), generator=_second_generator(amount), format="{0:HH}:{0:mm}:{0:ss}")
 
         self._count = count
         self._interval = interval
@@ -616,28 +624,28 @@ class Timestamp(TickLocator):
         self._format = format
 
     def ticks(self, domain_min, domain_max):
+        interval = self._interval
+
         # If the caller didn't specify an interval, find one that yields the number of locations closest to the requested count
-        if self._interval is None:
+        if interval is None:
             if self._count is None:
                 self._count = 7
 
             closest_difference = None
 
             for match in _intervals:
-                count = (domain_max - domain_min) / match["interval"].total_seconds()
+                count = (domain_max - domain_min) / match["duration"].total_seconds()
                 difference = numpy.abs(self._count - count)
 
                 if (closest_difference is None) or (difference < closest_difference):
-                    self._interval = match
+                    interval = match
                     closest_difference = difference
 
         # Generate ticks
-        locations = [location for location in self._interval["generator"](
-            arrow.get(domain_min),
-            arrow.get(domain_max),
-            )]
+        generator = interval["generator"]
+        label_format = interval["format"] if self._format is None else self._format
 
-        label_format = self._interval["format"] if self._format is None else self._format
+        locations = [location for location in generator(arrow.get(domain_min), arrow.get(domain_max), self._timezone)]
         labels = [label_format.format(arrow.get(location).to(self._timezone)) for location in locations]
         titles = numpy.repeat(None, len(labels))
         return locations, labels, titles

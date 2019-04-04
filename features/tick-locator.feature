@@ -68,3 +68,6 @@ Feature: Tick locators
             | period              | interval     | reference                                  |
             | one week            | days         | tick-locator-timestamp-days-interval       |
 
+    Scenario: Daily timestamp tick locators with timezone
+        Given a visualization using daily tick locators with a timezone
+        Then the figure should match the tick-locator-timestamp-daily-timezone reference image

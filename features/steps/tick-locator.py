@@ -240,3 +240,14 @@ def step_impl(context):
     numberline.axis.ticks.show = True
     numberline.scatterplot(timestamps, marker="|", size=15)
 
+@given(u'a visualization using daily tick locators with a timezone')
+def step_impl(context):
+    start = arrow.Arrow(2018, 7, 2, tzinfo="us/eastern")
+    end = arrow.Arrow(2018, 7, 7, tzinfo="us/eastern")
+    timestamps = [datetime[0].timestamp for datetime in arrow.Arrow.span_range("day", start, end)]
+
+    context.canvas = toyplot.Canvas(width=800, height=200)
+    numberline = context.canvas.numberline()
+    numberline.axis.ticks.locator = toyplot.locator.Timestamp(timezone="us/eastern")
+    numberline.axis.ticks.show = True
+    numberline.scatterplot(timestamps, marker="|", size=15)

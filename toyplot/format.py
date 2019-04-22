@@ -4,7 +4,6 @@
 
 """Strategy objects for formatting text."""
 
-from __future__ import division
 
 import numbers
 import warnings

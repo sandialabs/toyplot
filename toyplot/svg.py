@@ -5,7 +5,6 @@
 """Generates SVG images.
 """
 
-from __future__ import division
 
 import xml.etree.ElementTree as xml
 

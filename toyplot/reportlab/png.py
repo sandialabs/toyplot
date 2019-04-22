@@ -5,8 +5,6 @@
 """Functions to render PNG images using Ghostscript.
 """
 
-from __future__ import absolute_import
-from __future__ import division
 
 import distutils.version
 import io

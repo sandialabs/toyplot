@@ -5,7 +5,6 @@
 """Font management and font metrics.
 """
 
-from __future__ import absolute_import
 
 import custom_inherit
 import reportlab.pdfbase.pdfmetrics

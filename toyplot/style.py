@@ -4,7 +4,6 @@
 
 """Functionality for working with CSS style information."""
 
-from __future__ import division
 
 import numbers
 

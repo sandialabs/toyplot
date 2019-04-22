@@ -6,8 +6,6 @@
 many plots using a single compact statement.
 """
 
-from __future__ import division
-
 import logging
 
 from toyplot.canvas import Canvas

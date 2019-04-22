@@ -5,7 +5,6 @@
 """Implements the :class:`toyplot.canvas.Canvas` class, which defines the space that is available for creating plots.
 """
 
-from __future__ import division
 
 import collections
 import numbers

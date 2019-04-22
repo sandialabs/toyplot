@@ -5,7 +5,6 @@
 """Classes and functions for working with coordinate systems.
 """
 
-from __future__ import division
 
 import collections
 import itertools

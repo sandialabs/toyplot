@@ -4,8 +4,6 @@
 
 """Functions to render PNG images."""
 
-from __future__ import absolute_import
-from __future__ import division
 
 
 import toyplot.require

@@ -6,7 +6,6 @@
 
 # pylint: disable=function-redefined
 
-from __future__ import division, absolute_import
 
 import base64
 import collections

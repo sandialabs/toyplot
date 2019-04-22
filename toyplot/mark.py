@@ -4,7 +4,6 @@
 
 """Provides data objects (marks) that are displayed on a :class:`canvas <toyplot.canvas.Canvas>`."""
 
-from __future__ import absolute_import, division
 
 import itertools
 import logging

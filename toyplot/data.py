@@ -4,7 +4,6 @@
 
 """Classes and functions for working with raw data."""
 
-from __future__ import division
 
 import collections
 import itertools

@@ -4,7 +4,6 @@
 
 """Functions for manipulating transformation matrices."""
 
-from __future__ import division
 
 import numpy
 

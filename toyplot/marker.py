@@ -5,7 +5,6 @@
 """Functionality for managing markers (shapes used to highlight datums in plots and text).
 """
 
-from __future__ import absolute_import
 
 import copy
 import xml.sax.saxutils

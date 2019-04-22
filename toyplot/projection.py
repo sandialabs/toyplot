@@ -4,7 +4,6 @@
 
 """Classes and functions for projecting coordinates between spaces."""
 
-from __future__ import division
 
 import custom_inherit
 import numpy

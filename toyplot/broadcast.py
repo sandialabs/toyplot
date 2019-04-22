@@ -9,7 +9,6 @@ The functions in this module are used by Toyplot to handle the conversion from
 array representations.
 """
 
-from __future__ import division
 
 import numpy
 

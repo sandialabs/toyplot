@@ -4,7 +4,6 @@
 
 """Functionality for displaying a Toyplot canvas in a web browser."""
 
-from __future__ import division, absolute_import
 
 import collections
 

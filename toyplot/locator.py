@@ -4,7 +4,6 @@
 
 """Strategy objects that compute the position and format of axis ticks and labels."""
 
-from __future__ import division
 
 import datetime
 

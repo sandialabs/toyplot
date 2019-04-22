@@ -5,7 +5,6 @@
 """Bitmap management and manipulation.
 """
 
-from __future__ import absolute_import
 
 import base64
 import io

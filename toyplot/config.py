@@ -8,7 +8,6 @@ You can write to the attributes in :mod:`toyplot.config` if you wish to change
 the default behaviors for multiple figures.
 """
 
-from __future__ import division
 import os
 
 autorender = True

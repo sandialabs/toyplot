@@ -4,7 +4,6 @@
 
 """Functionality for managing colors, palettes, and color maps."""
 
-from __future__ import division
 
 import collections
 import colorsys

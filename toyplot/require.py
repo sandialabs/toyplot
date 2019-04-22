@@ -5,7 +5,6 @@
 """Functions used by the Toyplot implementation to validate inputs.  These are not intended for end-users.
 """
 
-from __future__ import division
 
 import numbers
 import numpy

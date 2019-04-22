@@ -5,7 +5,6 @@
 """Functionality for performing unit conversions.
 """
 
-from __future__ import division
 
 import numbers
 import re

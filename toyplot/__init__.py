@@ -7,6 +7,10 @@ many plots using a single compact statement.
 """
 
 import logging
+import sys
+
+if sys.version_info.major < 3:
+    raise RuntimeError("As of version 0.19, Toyplot requires Python 3.  For Python 2 support, use Toyplot version 0.18")
 
 from toyplot.canvas import Canvas
 

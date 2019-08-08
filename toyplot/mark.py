@@ -91,6 +91,9 @@ class Mark(object, metaclass=custom_inherit.DocInheritMeta(style="numpy_napoleon
         """
         return []
 
+    def __format__(self, format_spec):
+        return "".join([format(marker) for marker in self.markers])
+
 
 class AxisLines(Mark):
     """Render multiple lines parallel to an axis.

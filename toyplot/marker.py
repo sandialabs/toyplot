@@ -79,6 +79,9 @@ class Marker(object):
     def __repr__(self):
         return self.to_html()
 
+    def __format__(self, format_spec):
+        return self.to_html()
+
     def to_html(self):
         """Convert a marker specification to HTML markup that can be embedded in rich text."""
         return """<marker%s%s%s%s%s%s/>""" % (

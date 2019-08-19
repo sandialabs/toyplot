@@ -15,7 +15,7 @@ install:
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
     - conda info -a
-    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION graphviz mock multipledispatch notebook nbconvert numpy=1.12.1 pandas pip scikit-image
+    - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION graphviz mock multipledispatch notebook nbconvert numpy pandas pip scikit-image
     - source activate test-environment
     - pip install arrow behave coverage coveralls custom_inherit nose-exclude pillow pypng reportlab xmldiff
     - wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-i686-static.tar.xz

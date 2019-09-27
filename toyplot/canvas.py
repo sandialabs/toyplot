@@ -15,6 +15,7 @@ import toyplot.broadcast
 import toyplot.color
 import toyplot.config
 import toyplot.layout
+import toyplot.scenegraph
 import toyplot.style
 import toyplot.units
 
@@ -219,7 +220,7 @@ class Canvas(object):
         self.style = style
 
         self._changes = toyplot.Canvas._AnimationChanges()
-        self._children = []
+        self._scenegraph = toyplot.scenegraph.SceneGraph()
         self.autorender(autorender, autoformat)
 
     def _repr_html_(self):
@@ -487,36 +488,38 @@ class Canvas(object):
             grid=grid,
             margin=margin,
             )
-        self._children.append(
-            toyplot.coordinates.Cartesian(
-                aspect=aspect,
-                hyperlink=hyperlink,
-                label=label,
-                padding=padding,
-                palette=palette,
-                parent=self,
-                show=show,
-                xaxis=None,
-                xlabel=xlabel,
-                xmax=xmax,
-                xmax_range=xmax_range,
-                xmin=xmin,
-                xmin_range=xmin_range,
-                xscale=xscale,
-                xshow=xshow,
-                xticklocator=xticklocator,
-                ylabel=ylabel,
-                yaxis=None,
-                ymax=ymax,
-                ymax_range=ymax_range,
-                ymin=ymin,
-                ymin_range=ymin_range,
-                yscale=yscale,
-                yshow=yshow,
-                yticklocator=yticklocator,
-                ))
 
-        return self._children[-1]
+        axes = toyplot.coordinates.Cartesian(
+            aspect=aspect,
+            hyperlink=hyperlink,
+            label=label,
+            padding=padding,
+            palette=palette,
+            scenegraph=self._scenegraph,
+            show=show,
+            xaxis=None,
+            xlabel=xlabel,
+            xmax=xmax,
+            xmax_range=xmax_range,
+            xmin=xmin,
+            xmin_range=xmin_range,
+            xscale=xscale,
+            xshow=xshow,
+            xticklocator=xticklocator,
+            ylabel=ylabel,
+            yaxis=None,
+            ymax=ymax,
+            ymax_range=ymax_range,
+            ymin=ymin,
+            ymin_range=ymin_range,
+            yscale=yscale,
+            yshow=yshow,
+            yticklocator=yticklocator,
+            )
+
+        self._scenegraph.add_edge(self, "render", axes)
+
+        return axes
 
     def legend(
             self,
@@ -593,7 +596,7 @@ class Canvas(object):
             filename=None,
             label=label,
             lcolumns=0,
-            parent=self,
+            scenegraph=self._scenegraph,
             rcolumns=0,
             rows=len(entries),
             trows=0,
@@ -620,7 +623,7 @@ class Canvas(object):
             table.cells.cell[index, 0].data = text
             table.cells.cell[index, 1].data = label
 
-        self._children.append(table)
+        self._scenegraph.add_edge(self, "render", table)
 
         return table
 
@@ -749,7 +752,7 @@ class Canvas(object):
             filename=filename,
             label=label,
             lcolumns=2,
-            parent=self,
+            scenegraph=self._scenegraph,
             rcolumns=2,
             rows=matrix.shape[0],
             trows=2,
@@ -833,7 +836,7 @@ class Canvas(object):
                 cell.style = {"stroke": "none", "fill": toyplot.color.to_css(colors[i, j])}
                 cell.title = "%.6f" % matrix[i, j]
 
-        self._children.append(table)
+        self._scenegraph.add_edge(self, "render", table)
 
         if colorshow:
             self.color_scale(
@@ -1021,7 +1024,7 @@ class Canvas(object):
             min=min,
             padding=padding,
             palette=palette,
-            parent=self,
+            scenegraph=self._scenegraph,
             scale=scale,
             show=show,
             spacing=spacing,
@@ -1031,7 +1034,9 @@ class Canvas(object):
             y1=y1,
             y2=y2,
             )
-        self._children.append(axes)
+
+        self._scenegraph.add_edge(self, "render", axes)
+
         return axes
 
     def table(
@@ -1094,7 +1099,7 @@ class Canvas(object):
             filename=filename,
             label=label,
             lcolumns=lcolumns,
-            parent=self,
+            scenegraph=self._scenegraph,
             rcolumns=rcolumns,
             rows=rows,
             trows=trows,
@@ -1127,7 +1132,8 @@ class Canvas(object):
                 # Enable a single horizontal line between top and body.
                 table.cells.grid.hlines[trows] = "single"
 
-        self._children.append(table)
+        self._scenegraph.add_edge(self, "render", table)
+
         return table
 
     def image(
@@ -1194,15 +1200,17 @@ class Canvas(object):
             margin=margin,
             )
 
-        self._children.append(
-            toyplot.mark.Image(
-                xmin_range,
-                xmax_range,
-                ymin_range,
-                ymax_range,
-                data=data,
-                ))
-        return self._children[-1]
+        mark = toyplot.mark.Image(
+            xmin_range,
+            xmax_range,
+            ymin_range,
+            ymax_range,
+            data=data,
+            )
+
+        self._scenegraph.add_edge(self, "render", mark)
+
+        return mark
 
     def text(
             self,
@@ -1249,21 +1257,23 @@ class Canvas(object):
         table["title"] = toyplot.broadcast.pyobject(title, table.shape[0])
         style = toyplot.style.require(style, allowed=toyplot.style.allowed.text)
 
-        self._children.append(
-            toyplot.mark.Text(
-                coordinate_axes=["x", "y"],
-                table=table,
-                coordinates=["x", "y"],
-                text=["text"],
-                angle=["angle"],
-                fill=["toyplot:fill"],
-                opacity=["opacity"],
-                title=["title"],
-                style=style,
-                annotation=True,
-                filename=None,
-                ))
-        return self._children[-1]
+        mark = toyplot.mark.Text(
+            coordinate_axes=["x", "y"],
+            table=table,
+            coordinates=["x", "y"],
+            text=["text"],
+            angle=["angle"],
+            fill=["toyplot:fill"],
+            opacity=["opacity"],
+            title=["title"],
+            style=style,
+            annotation=True,
+            filename=None,
+            )
+
+        self._scenegraph.add_edge(self, "render", mark)
+
+        return mark
 
     def _point_scale(self, width=None, height=None, scale=None):
         """Return a scale factor to convert this canvas to a target width or height in points."""

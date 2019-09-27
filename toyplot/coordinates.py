@@ -643,7 +643,7 @@ class Cartesian(object):
             label,
             padding,
             palette,
-            parent,
+            scenegraph,
             show,
             xaxis,
             xlabel,
@@ -727,8 +727,7 @@ class Cartesian(object):
         self.x = xaxis
         self.y = yaxis
 
-        self._parent = parent
-        self._children = []
+        self._scenegraph = scenegraph
 
     @property
     def aspect(self):
@@ -805,7 +804,7 @@ class Cartesian(object):
     def _finalize(self):
         if self._finalized is None:
             # Begin with the implicit domain defined by our children.
-            for child in self._children:
+            for child in self._scenegraph.targets(self, "render"):
                 child = child._finalize()
                 if child is not None:
                     self.x._update_domain(child.domain("x"), display=True, data=not child.annotation)
@@ -1079,7 +1078,7 @@ class Cartesian(object):
         mark: :class:`toyplot.mark.Mark`
         """
 
-        self._children.append(mark)
+        self._scenegraph.add_edge(self, "render", mark)
         return mark
 
     def bars(
@@ -1392,7 +1391,7 @@ class Cartesian(object):
         axes: :class:`toyplot.coordinates.Numberline`
         """
 
-        axis = self._parent.color_scale(
+        axis = self._scenegraph.source("render", self).color_scale(
             colormap=colormap,
             x1=self._xmax_range + width + self._padding,
             x2=self._xmax_range + width + self._padding,
@@ -2310,7 +2309,7 @@ class Cartesian(object):
             label=None,
             padding=self._padding,
             palette=palette,
-            parent=self._parent,
+            scenegraph=self._scenegraph,
             show=True,
             xaxis=self.x if axis == "x" else None,
             xlabel=xlabel,
@@ -2337,8 +2336,10 @@ class Cartesian(object):
 
         self.hyperlink = None
 
-        self._parent._children.append(shared)
-        return self._parent._children[-1]
+        for parent in self._scenegraph.sources("render", self):
+            self._scenegraph.add_edge(parent, "render", shared)
+
+        return shared
 
     def text(
             self,
@@ -2491,7 +2492,7 @@ class Numberline(object):
             label,
             ticklocator,
             scale,
-            parent,
+            scenegraph,
         ):
 
         if palette is None:
@@ -2508,10 +2509,9 @@ class Numberline(object):
             tick_angle=0,
             scale=scale,
             )
-        self._children = []
         self._child_offset = {}
         self._palette = palette
-        self._parent = parent
+        self._scenegraph = scenegraph
         self._scatterplot_colors = itertools.cycle(self._palette)
         self._range_colors = itertools.cycle(self._palette)
         self._child_style = {}
@@ -2598,8 +2598,14 @@ class Numberline(object):
 
         if not isinstance(mark, toyplot.mark.Mark):
             raise ValueError("Expected toyplot.mark.Mark, received %s" % type(mark))
-        self._children.append(mark)
+        self._scenegraph.add_edge(self, "render", mark)
         return mark
+
+
+    def _default_offset(self, offset):
+        if offset is None:
+            offset = len(self._scenegraph.targets(self, "render")) * self._spacing
+        return offset
 
 
     def colormap(self, colormap, offset=None, width=10, style=None):
@@ -2608,14 +2614,14 @@ class Numberline(object):
         if colormap.domain.min is None or colormap.domain.max is None:
             raise ValueError("Cannot create color scale without explicit colormap domain.") # pragma: no cover
 
-        if offset is None:
-            offset = len(self._children) * self._spacing
+        offset = self._default_offset(offset)
 
         self._update_domain(numpy.array([colormap.domain.min, colormap.domain.max]), display=True, data=True)
-        self._children.append(colormap)
         self._child_offset[colormap] = offset
         self._child_width[colormap] = width
         self._child_style[colormap] = style
+
+        self._scenegraph.add_edge(self, "render", colormap)
 
 
     def range(
@@ -2630,8 +2636,8 @@ class Numberline(object):
             title=None,
             width=10,
         ):
-        if offset is None:
-            offset = len(self._children) * self._spacing
+
+        offset = self._default_offset(offset)
 
         table = toyplot.data.Table()
         table["start"] = toyplot.require.scalar_vector(start)
@@ -2764,8 +2770,7 @@ class Numberline(object):
             table[mtitle_keys[-1]] = mtitle_column
             table[mhyperlink_keys[-1]] = mhyperlink_column
 
-        if offset is None:
-            offset = len(self._children) * self._spacing
+        offset = self._default_offset(offset)
 
         mark = toyplot.mark.Point(
             coordinate_axes=coordinate_axes,
@@ -2967,7 +2972,7 @@ class Table(object):
                 elif isinstance(color, tuple) and len(color) == 2 and color[0] == "datum":
                     color = (series, color[1])
 
-                self._axes.bars(
+                self._finalized = self._axes.bars(
                     begin,
                     end,
                     series,
@@ -2979,7 +2984,8 @@ class Table(object):
                     style=self._style,
                     title=self._title,
                     )
-                self._finalized = self._axes._children.pop()
+
+                self._axes._scenegraph.remove_edge(self._axes, "render", self._finalized)
 
             return self._finalized
 
@@ -3073,7 +3079,7 @@ class Table(object):
                 elif isinstance(mfill, tuple) and len(mfill) == 2 and mfill[0] == "datum":
                     mfill = (series, mfill[1])
 
-                self._axes.plot(
+                self._finalized = self._axes.plot(
                     series,
                     along=along,
                     area=self._area,
@@ -3091,7 +3097,8 @@ class Table(object):
                     style=self._style,
                     title=self._title,
                     )
-                self._finalized = self._axes._children.pop()
+
+                self._axes._scenegraph.remove_edge(self._axes, "render", self._finalized)
 
             return self._finalized
 
@@ -3254,7 +3261,7 @@ class Table(object):
                 label=label,
                 padding=padding,
                 palette=palette,
-                parent=self._table._parent,
+                scenegraph=self._table._scenegraph,
                 show=show,
                 xaxis=None,
                 xlabel=xlabel,
@@ -3475,7 +3482,7 @@ class Table(object):
             lcolumns,
             rcolumns,
             label,
-            parent,
+            scenegraph,
             annotation,
             filename,
         ):
@@ -3485,7 +3492,7 @@ class Table(object):
         self._xmax_range = xmax_range
         self._ymin_range = ymin_range
         self._ymax_range = ymax_range
-        self._parent = parent
+        self._scenegraph = scenegraph
         self._annotation = False
         self.annotation = annotation
         self._filename = toyplot.require.filename(filename)

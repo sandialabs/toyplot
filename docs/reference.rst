@@ -32,6 +32,7 @@ Python API
     toyplot.reportlab.png.rst
     toyplot.reportlab.rst
     toyplot.require.rst
+    toyplot.scenegraph.rst
     toyplot.style.rst
     toyplot.svg.rst
     toyplot.text.rst

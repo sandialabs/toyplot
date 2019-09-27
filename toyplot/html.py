@@ -66,14 +66,15 @@ class RenderContext(object):
     This is only of use for Toyplot developers and library developers who are
     implementing rendering code.  It is not intended for end-users.
     """
-    def __init__(self, root):
+    def __init__(self, scenegraph, root):
         self._animation = {}
         self._id_cache = {}
+        self._javascript_modules = {}
+        self._javascript_calls = []
         self._parent = None
         self._rendered = set()
         self._root = root
-        self._javascript_modules = {}
-        self._javascript_calls = []
+        self._scenegraph = scenegraph
 
     def already_rendered(self, o):
         """Track whether an object has already been rendered.
@@ -226,6 +227,10 @@ class RenderContext(object):
         """Top-level DOM node."""
         return self._root
 
+    @property
+    def scenegraph(self):
+        return self._scenegraph
+
 
 def apply_changes(html, changes):
     for change, states in changes.items():
@@ -314,7 +319,7 @@ def render(canvas, fobj=None, animation=False, style=None):
         root_xml.set("style", toyplot.style.to_css(style))
 
     # Setup a render context
-    context = RenderContext(root=root_xml)
+    context = RenderContext(scenegraph=canvas._scenegraph, root=root_xml)
 
     # Register a Javascript module to keep track of the root id
     context.define("toyplot/root/id", value=root_xml.get("id"))
@@ -796,8 +801,8 @@ def _render(canvas, context):
         id=context.get_id(canvas))
 
     # Render everything on the canvas.
-    for child in canvas._children:
-        _render(canvas, child._finalize(), context.copy(parent=svg_xml))
+    for node in context.scenegraph.targets(canvas, "render"):
+        _render(node._finalize(), context.copy(parent=svg_xml))
 
     # Create a container for any Javascript code.
     javascript_xml = xml.SubElement(
@@ -1367,8 +1372,8 @@ def _render_animation(canvas, context):
             )
 
 
-@dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Axis, RenderContext)
-def _render(canvas, axis, context):
+@dispatch(toyplot.coordinates.Axis, RenderContext)
+def _render(axis, context):
     if context.already_rendered(axis):
         return
 
@@ -1660,8 +1665,8 @@ def _render(canvas, axis, context):
     )
 
 
-@dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Numberline, RenderContext)
-def _render(canvas, numberline, context):
+@dispatch(toyplot.coordinates.Numberline, RenderContext)
+def _render(numberline, context):
     numberline_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         numberline), attrib={"class": "toyplot-coordinates-Numberline"})
 
@@ -1693,10 +1698,10 @@ def _render(canvas, numberline, context):
         transform=transform,
         )
 
-    for child in numberline._children:
+    for child in numberline._scenegraph.targets(numberline, "render"):
         _render(numberline, child._finalize(), context.copy(parent=children_xml))
 
-    _render(canvas, numberline.axis, context.copy(parent=numberline_xml))
+    _render(numberline.axis, context.copy(parent=numberline_xml))
 
 
 @dispatch(toyplot.coordinates.Numberline, toyplot.color.CategoricalMap, RenderContext)
@@ -1908,8 +1913,8 @@ def _render(numberline, mark, context):
             xml.SubElement(datum_xml, "title").text = str(dtitle)
 
 
-@dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Cartesian, RenderContext)
-def _render(canvas, axes, context):
+@dispatch(toyplot.coordinates.Cartesian, RenderContext)
+def _render(axes, context):
     cartesian_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         axes), attrib={"class": "toyplot-coordinates-Cartesian"})
 
@@ -1941,12 +1946,12 @@ def _render(canvas, axes, context):
         attrib={"clip-path" : "url(#%s)" % clip_xml.get("id")},
         )
 
-    for child in axes._children:
+    for child in context.scenegraph.targets(axes, "render"):
         _render(axes, child._finalize(), context.copy(parent=children_xml))
 
     if axes._show:
-        _render(canvas, axes.x, context.copy(parent=cartesian_xml))
-        _render(canvas, axes.y, context.copy(parent=cartesian_xml))
+        _render(axes.x, context.copy(parent=cartesian_xml))
+        _render(axes.y, context.copy(parent=cartesian_xml))
         _draw_text(
             root=cartesian_xml,
             text=axes.label._text,
@@ -1956,8 +1961,8 @@ def _render(canvas, axes, context):
             )
 
 
-@dispatch(toyplot.canvas.Canvas, toyplot.coordinates.Table, RenderContext)
-def _render(canvas, axes, context):
+@dispatch(toyplot.coordinates.Table, RenderContext)
+def _render(axes, context):
     axes_xml = xml.SubElement(context.parent, "g", id=context.get_id(
         axes), attrib={"class": "toyplot-coordinates-Table"})
 
@@ -2101,7 +2106,7 @@ def _render(canvas, axes, context):
 
     # Render children.
     for child in axes._axes:
-        _render(axes._parent, child._finalize(), context.copy(parent=axes_xml))
+        _render(child._finalize(), context.copy(parent=axes_xml))
 
     # Render grid lines.
     row_boundaries = axes._row_boundaries
@@ -3068,14 +3073,14 @@ def _render(axes, mark, context):
                     )
 
 
-@dispatch((toyplot.canvas.Canvas, toyplot.coordinates.Cartesian), toyplot.mark.Text, RenderContext)
-def _render(parent, mark, context):
+@dispatch(toyplot.mark.Text, RenderContext)
+def _render(mark, context):
     x = mark._table[mark._coordinates[numpy.where(mark._coordinate_axes == "x")[0][0]]]
     y = mark._table[mark._coordinates[numpy.where(mark._coordinate_axes == "y")[0][0]]]
 
-    if isinstance(parent, toyplot.coordinates.Cartesian):
-        x = parent.project("x", x)
-        y = parent.project("y", y)
+#    if isinstance(parent, toyplot.coordinates.Cartesian):
+#        x = parent.project("x", x)
+#        y = parent.project("y", y)
 
     mark_xml = xml.SubElement(
         context.parent,
@@ -3110,8 +3115,50 @@ def _render(parent, mark, context):
             )
 
 
-@dispatch((toyplot.canvas.Canvas), toyplot.mark.Image, RenderContext)
-def _render(parent, mark, context):
+
+@dispatch(toyplot.coordinates.Cartesian, toyplot.mark.Text, RenderContext)
+def _render(axes, mark, context):
+    x = mark._table[mark._coordinates[numpy.where(mark._coordinate_axes == "x")[0][0]]]
+    y = mark._table[mark._coordinates[numpy.where(mark._coordinate_axes == "y")[0][0]]]
+
+    x = axes.project("x", x)
+    y = axes.project("y", y)
+
+    mark_xml = xml.SubElement(
+        context.parent,
+        "g",
+        id=context.get_id(mark),
+        attrib={"class": "toyplot-mark-Text"},
+        )
+
+    _render_table(owner=mark, key="data", label="text data", table=mark._table, filename=mark._filename, context=context)
+
+    series_xml = xml.SubElement(
+        mark_xml, "g", attrib={"class": "toyplot-Series"})
+    for dx, dy, dtext, dangle, dfill, dopacity, dtitle in zip(
+            x,
+            y,
+            mark._table[mark._text[0]],
+            mark._table[mark._angle[0]],
+            mark._table[mark._fill[0]],
+            mark._table[mark._opacity[0]],
+            mark._table[mark._title[0]],
+        ):
+
+        _draw_text(
+            root=series_xml,
+            text=str(dtext),
+            x=dx,
+            y=dy,
+            angle=dangle,
+            attributes={"class": "toyplot-Datum"},
+            style=toyplot.style.combine({"fill": toyplot.color.to_css(dfill), "opacity": dopacity}, mark._style),
+            title=dtitle,
+            )
+
+
+@dispatch(toyplot.mark.Image, RenderContext)
+def _render(mark, context):
     mark_xml = xml.SubElement(
         context.parent,
         "g",

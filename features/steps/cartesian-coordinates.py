@@ -321,6 +321,13 @@ def step_impl(context):
     context.shared_axes = context.axes.share("x")
 
 
+@given(u'a sample plot with two nonoverlapping series and shared x axis')
+def step_impl(context):
+    context.axes.scatterplot(numpy.arange(50, 100), numpy.arange(50, 100), color="crimson")
+    context.shared_axes = context.axes.share("x")
+    context.shared_axes.scatterplot(numpy.arange(10, 60), numpy.arange(50, 100), color="royalblue")
+
+
 @when(u'adding default line marks to axes')
 def step_impl(context):
     context.canvas = toyplot.Canvas()

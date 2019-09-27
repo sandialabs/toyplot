@@ -59,11 +59,17 @@ Feature: Cartesian coordinates
         | with explicit y axis domain                           | axes-cartesian-y-domain |
 
 
-    Scenario: Shared axis
+    Scenario: Empty shared axis
         Given a default canvas
         And a set of cartesian axes
         And a sample plot
         And a shared axis
+        Then the figure should match the axes-cartesian-empty-shared-x-axis reference image
+
+    Scenario: Shared axis
+        Given a default canvas
+        And a set of cartesian axes
+        And a sample plot with two nonoverlapping series and shared x axis
         Then the figure should match the axes-cartesian-shared-x-axis reference image
 
     Scenario Outline: Miscellaneous

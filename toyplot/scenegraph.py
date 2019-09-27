@@ -50,8 +50,9 @@ class SceneGraph(object):
         for relationship, graph in self._relationships.items():
             result += "\n  Relationship: {}".format(relationship)
             for source, targets in graph._targets.items():
+                result += "\n    {!r} ->".format(source)
                 for target in targets:
-                    result += "\n    {!r} -> {!r}".format(source, target)
+                    result += "\n      {!r}".format(target)
         return result
 
     def add_edge(self, source, relationship, target):

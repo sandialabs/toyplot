@@ -804,25 +804,25 @@ class Cartesian(object):
     def _finalize(self):
         if self._finalized is None:
             # Begin with the implicit domain defined by our children.
-            for child in self._scenegraph.targets(self, "render"):
+            for child in self._scenegraph.targets(self.x, "map"):
                 child = child._finalize()
                 if child is not None:
                     self.x._update_domain(child.domain("x"), display=True, data=not child.annotation)
+
+                    (x, y), (left, right, top, bottom) = child.extents(["x", "y"])
+                    self._expand_domain_range_x = x if self._expand_domain_range_x is None else numpy.concatenate((self._expand_domain_range_x, x))
+                    self._expand_domain_range_left = left if self._expand_domain_range_left is None else numpy.concatenate((self._expand_domain_range_left, left))
+                    self._expand_domain_range_right = right if self._expand_domain_range_right is None else numpy.concatenate((self._expand_domain_range_right, right))
+
+            for child in self._scenegraph.targets(self.y, "map"):
+                child = child._finalize()
+                if child is not None:
                     self.y._update_domain(child.domain("y"), display=True, data=not child.annotation)
 
                     (x, y), (left, right, top, bottom) = child.extents(["x", "y"])
-                    self._expand_domain_range_x = x if self._expand_domain_range_x is None else numpy.concatenate(
-                        (self._expand_domain_range_x, x))
-                    self._expand_domain_range_y = y if self._expand_domain_range_y is None else numpy.concatenate(
-                        (self._expand_domain_range_y, y))
-                    self._expand_domain_range_left = left if self._expand_domain_range_left is None else numpy.concatenate(
-                        (self._expand_domain_range_left, left))
-                    self._expand_domain_range_right = right if self._expand_domain_range_right is None else numpy.concatenate(
-                        (self._expand_domain_range_right, right))
-                    self._expand_domain_range_top = top if self._expand_domain_range_top is None else numpy.concatenate(
-                        (self._expand_domain_range_top, top))
-                    self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate(
-                        (self._expand_domain_range_bottom, bottom))
+                    self._expand_domain_range_y = y if self._expand_domain_range_y is None else numpy.concatenate((self._expand_domain_range_y, y))
+                    self._expand_domain_range_top = top if self._expand_domain_range_top is None else numpy.concatenate((self._expand_domain_range_top, top))
+                    self._expand_domain_range_bottom = bottom if self._expand_domain_range_bottom is None else numpy.concatenate((self._expand_domain_range_bottom, bottom))
 
             # Begin with the implicit domain defined by our data.
             xdomain_min = self.x._display_min
@@ -858,6 +858,17 @@ class Cartesian(object):
                     range_min=self._xmin_range,
                     range_max=self._xmax_range,
                     )
+
+                range_x = x_projection(self._expand_domain_range_x)
+                range_left = range_x + self._expand_domain_range_left
+                range_right = range_x + self._expand_domain_range_right
+
+                domain_left = x_projection.inverse(range_left)
+                domain_right = x_projection.inverse(range_right)
+
+                xdomain_min, xdomain_max = toyplot.data.minimax([xdomain_min, xdomain_max, domain_left, domain_right])
+
+            if self._expand_domain_range_y is not None:
                 y_projection = _create_projection(
                     self.y.scale,
                     domain_min=ydomain_min,
@@ -866,19 +877,13 @@ class Cartesian(object):
                     range_max=self._ymin_range,
                     )
 
-                range_x = x_projection(self._expand_domain_range_x)
                 range_y = y_projection(self._expand_domain_range_y)
-                range_left = range_x + self._expand_domain_range_left
-                range_right = range_x + self._expand_domain_range_right
                 range_top = range_y + self._expand_domain_range_top
                 range_bottom = range_y + self._expand_domain_range_bottom
 
-                domain_left = x_projection.inverse(range_left)
-                domain_right = x_projection.inverse(range_right)
                 domain_top = y_projection.inverse(range_top)
                 domain_bottom = y_projection.inverse(range_bottom)
 
-                xdomain_min, xdomain_max = toyplot.data.minimax([xdomain_min, xdomain_max, domain_left, domain_right])
                 ydomain_min, ydomain_max = toyplot.data.minimax([ydomain_min, ydomain_max, domain_top, domain_bottom])
 
             # Optionally expand the domain to match the aspect ratio of the range.
@@ -1079,6 +1084,9 @@ class Cartesian(object):
         """
 
         self._scenegraph.add_edge(self, "render", mark)
+        self._scenegraph.add_edge(self.x, "map", mark)
+        self._scenegraph.add_edge(self.y, "map", mark)
+
         return mark
 
     def bars(

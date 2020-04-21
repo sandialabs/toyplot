@@ -152,8 +152,8 @@ class Table(object):
             elif "pandas" in sys.modules:
                 import pandas
                 if isinstance(data, pandas.DataFrame):
-                    keys = [str(data.ix[:, i].name) for i in range(data.shape[1])]
-                    values = [data.ix[:, i] for i in range(data.shape[1])]
+                    keys = [str(data.iloc[:, i].name) for i in range(data.shape[1])]
+                    values = [data.iloc[:, i] for i in range(data.shape[1])]
 
                     if index:
                         key_format = "index{}" if index == True else index

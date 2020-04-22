@@ -14,7 +14,7 @@ if sys.version_info.major < 3:
 
 from toyplot.canvas import Canvas
 
-__version__ = "0.19.0"
+__version__ = "0.20.0-dev"
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.WARNING)

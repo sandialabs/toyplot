@@ -13,6 +13,5 @@ Features
 * Interaction types: hyperlinking, interactive mouse coordinates, export figure data to CSV.
 * Interactive output formats: Embeddable, self-contained HTML.
 * Static output formats: SVG, PDF, PNG, MP4.
-* Portability: single code base for Python 2.7 / Python 3.6.
 * Testing: greater-than-95% regression test coverage.
 

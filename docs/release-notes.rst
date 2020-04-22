@@ -7,6 +7,23 @@
 Release Notes
 =============
 
+Toyplot 0.19.0 - April 21st, 2020
+---------------------------------
+
+* First Toyplot release that only supports Python 3.
+* Colormaps return the first color instead of the last when the domain is empty.
+* The `target` attribute is supported in rich text hyperlinks, useful for opening hyperlinks in separate tabs from Juypter notebooks.
+* Provide an explicit default style for rich text hyperlinks, for consistent default outputs regardless of render context.
+* Add rich text support for styling underlines.
+* `toyplot.locator.Timestamp` didn't produce correctly positioned labels in some cases with non-UTC timezones.
+* Warn callers who try to use with Python 2.
+* Markers and marks are formattable objects, for easier embedding in rich text.
+* Switched to an explicit scenegraph to manage relationships among internal objects.
+* Fixed a bug that affect the domain and range of shared axes.
+* Expanded the user guide section on rendering.
+* Include the LICENSE file in source distributions, for downstream maintainers.
+* Fixed code that used obsolete Pandas ix API.
+
 Toyplot 0.18.0 - December 24th, 2018
 ------------------------------------
 

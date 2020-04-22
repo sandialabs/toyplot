@@ -15,7 +15,6 @@ setup(
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: BSD License",
         "Natural Language :: English",
-        "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 3",
         "Topic :: Scientific/Engineering :: Visualization",
     ],
@@ -29,7 +28,7 @@ setup(
         "reportlab",
     ],
     long_description="""Toyplot is the kid-sized plotting toolkit for Python with grownup-sized goals:
-  * Develop beautiful interactive, animated plots that embrace the unique capabilities of electronic publishing and support repoducibility.
+  * Develop beautiful plots that embrace the unique capabilities of electronic publishing and support repoducibility.
   * Create the best possible data graphics "out-of-the-box", maximizing data ink and minimizing chartjunk.
   * Provide a clean, minimalist interface that scientists and engineers will love.
 

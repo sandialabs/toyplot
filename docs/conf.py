@@ -71,9 +71,24 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "sphinxcontrib.napoleon",
+    "nbsphinx",
 ]
 
 napoleon_use_param = False
+
+nbsphinx_prolog = """
+ .. raw:: html
+
+    <style>
+        .nbinput .prompt, .nboutput .prompt { display: none; }
+    </style>
+
+ .. image:: ../artwork/toyplot.png
+    :width: 200px
+    :align: right
+"""
+
+highlight_language = 'none'
 
 # Complain about all cross reference targets that can't be found.
 nitpicky = True

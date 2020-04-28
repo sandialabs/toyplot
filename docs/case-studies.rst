@@ -14,3 +14,4 @@ The following case studies provide more realistic, in-depth examples of how you 
 
   communities-case-study.rst
   neural-network-case-study.rst
+  violin-plots-case-study.rst

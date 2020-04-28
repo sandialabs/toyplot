@@ -88,7 +88,7 @@ nbsphinx_prolog = """
     :align: right
 """
 
-highlight_language = 'none'
+highlight_language = 'ipython3'
 
 # Complain about all cross reference targets that can't be found.
 nitpicky = True

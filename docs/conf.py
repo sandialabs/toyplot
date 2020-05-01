@@ -21,11 +21,6 @@ sys.path.insert(0, os.path.abspath('..'))
 
 import toyplot
 
-# Mock calls to subprocess so we can import toyplot.mp4 and toyplot.reportlab.png
-import subprocess
-import unittest.mock
-subprocess.check_call = unittest.mock.MagicMock(return_value="3.2")
-
 # -- Project information -----------------------------------------------------
 
 project = 'Toyplot'

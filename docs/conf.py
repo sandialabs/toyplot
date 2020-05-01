@@ -1,3 +1,7 @@
+# Copyright 2014, Sandia Corporation. Under the terms of Contract
+# DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
+# rights in this software.
+
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -12,9 +16,15 @@
 
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('..'))
 
 import toyplot
+
+# Mock calls to subprocess so we can import toyplot.mp4 and toyplot.reportlab.png
+import subprocess
+import unittest.mock
+subprocess.check_call = unittest.mock.MagicMock(return_value="3.2")
 
 # -- Project information -----------------------------------------------------
 

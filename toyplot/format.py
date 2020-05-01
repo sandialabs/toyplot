@@ -159,12 +159,14 @@ UnitFormatter._units = {
 
 class CurrencyFormatter(BasicFormatter):
     """Formats currency value with corresponding codes
-        places:  required number of places after the decimal point
-        curr:    optional currency symbol before the sign (may be blank)
-        sep:     optional grouping separator (comma, period, space, or blank)
-        dp:      decimal point indicator (comma or period)
-                 only specify as blank when places is zero
-   """
+
+    Parameters
+    ----------
+    places:  required number of places after the decimal point
+    curr:    optional currency symbol before the sign (may be blank)
+    sep:     optional grouping separator (comma, period, space, or blank)
+    dp:      decimal point indicator (comma or period) only specify as blank when places is zero
+    """
     def __init__(self, format="{:,.2f}", nanshow=True, curr='cad', sep=',', dp='.',):
         super(CurrencyFormatter, self).__init__(nanshow=nanshow)
         self._format = format

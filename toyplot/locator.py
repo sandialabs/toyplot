@@ -459,7 +459,7 @@ def _year_generator(years):
         for year in numpy.arange(start.year - (start.year % years), end.year + 1, years):
             value = arrow.Arrow(year=year, month=1, day=1, tzinfo=timezone)
             if value >= domain_min and value <= domain_max:
-                yield value.timestamp
+                yield value.timestamp()
     return implementation
 
 
@@ -471,7 +471,7 @@ def _month_generator(months):
             for month in numpy.arange(0, 12, months):
                 value = arrow.Arrow(year=year, month=month + 1, day=1, tzinfo=timezone)
                 if value >= domain_min and value <= domain_max:
-                    yield value.timestamp
+                    yield value.timestamp()
     return implementation
 
 
@@ -481,7 +481,7 @@ def _day_generator(days):
         value = arrow.Arrow(year=start.year, month=start.month, day=start.day, tzinfo=timezone)
         while value <= domain_max:
             if value >= domain_min:
-                yield value.timestamp
+                yield value.timestamp()
             value += datetime.timedelta(days=days)
     return implementation
 
@@ -492,7 +492,7 @@ def _hour_generator(hours):
         value = arrow.Arrow(year=start.year, month=start.month, day=start.day, tzinfo=timezone)
         while value <= domain_max:
             if value >= domain_min:
-                yield value.timestamp
+                yield value.timestamp()
             value += datetime.timedelta(hours=hours)
     return implementation
 
@@ -503,7 +503,7 @@ def _minute_generator(minutes):
         value = arrow.Arrow(year=start.year, month=start.month, day=start.day, tzinfo=timezone)
         while value <= domain_max:
             if value >= domain_min:
-                yield value.timestamp
+                yield value.timestamp()
             value += datetime.timedelta(minutes=minutes)
     return implementation
 
@@ -514,7 +514,7 @@ def _second_generator(seconds):
         value = arrow.Arrow(year=start.year, month=start.month, day=start.day, tzinfo=timezone)
         while value <= domain_max:
             if value >= domain_min:
-                yield value.timestamp
+                yield value.timestamp()
             value += datetime.timedelta(seconds=seconds)
     return implementation
 

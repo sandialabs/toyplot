@@ -166,7 +166,7 @@ def assert_dom_equal(a, b, exceptions):
     if a.tag != b.tag:
         raise AssertionError("Tag %r does not match %r." % (a.tag, b.tag))
 
-    for (akey, avalue), (bkey, bvalue) in zip(a.items(), b.items()):
+    for (akey, avalue), (bkey, bvalue) in zip(sorted(a.items()), sorted(b.items())):
         if akey != bkey:
             raise AssertionError("Tag %r attribute %r does not match %r." % (a.tag, akey, bkey))
 

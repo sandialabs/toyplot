@@ -2,8 +2,6 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
-# Configuration file for the Sphinx documentation builder.
-#
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
@@ -16,30 +14,30 @@
 
 import os
 import sys
+sys.path.insert(0, os.path.abspath(".."))
 
-sys.path.insert(0, os.path.abspath('..'))
-
-import toyplot
 
 # -- Project information -----------------------------------------------------
 
-project = 'Toyplot'
-
+project = "Toyplot"
 copyright = u"""2014, Sandia Corporation. Under the terms of Contract
 DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 rights in this software"""
-
 author = 'Timothy M. Shead'
 
 # The full version, including alpha/beta/rc tags
+import toyplot
 release = toyplot.__version__
 
 
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+# extensions coming with Sphinx (named "sphinx.ext.*") or your custom
 # ones.
+
+import sphinx_rtd_theme
+
 extensions = [
     "nbsphinx",
     "sphinx.ext.autodoc",
@@ -47,21 +45,22 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
+    "sphinx_rtd_theme",
 ]
 
-napoleon_use_param = False
-
-nbsphinx_prolog = """
- .. raw:: html
-
-    <style>
-        .nbinput .prompt, .nboutput .prompt { display: none; }
-    </style>
-
- .. image:: ../artwork/toyplot.png
-    :width: 200px
-    :align: right
-"""
+#napoleon_use_param = False
+#
+#nbsphinx_prolog = """
+# .. raw:: html
+#
+#    <style>
+#        .nbinput .prompt, .nboutput .prompt { display: none; }
+#    </style>
+#
+# .. image:: ../artwork/toyplot.png
+#    :width: 200px
+#    :align: right
+#"""
 
 intersphinx_mapping = {
     "arrow": ("http://arrow.readthedocs.io/en/latest", "arrow.inv"),
@@ -74,11 +73,18 @@ intersphinx_mapping = {
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
+# The master toctree document.
+master_doc = "index"
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+
+# -- nbsphinx options --------------------------------------------------------
+
+nbsphinx_execute = "never" if "READTHEDOCS" in os.environ else "always"
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -91,3 +97,12 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+def warn_undocumented_members(app, what, name, obj, options, lines):
+    if what not in [] and len(lines) == 0:
+        print("WARNING: %s is undocumented: %s" % (what, name))
+        lines.append(".. Warning:: %s '%s' undocumented" % (what, name))
+
+def setup(app):
+    app.connect("autodoc-process-docstring", warn_undocumented_members);
+

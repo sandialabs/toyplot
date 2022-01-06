@@ -1,2 +1,2 @@
-nbsphinx
+nbsphinx>=0.8.6
 sphinx_rtd_theme

@@ -24,10 +24,6 @@ for command in ["ffmpeg"]:
     except: # pragma: no cover
         pass
 
-if _ffmpeg_command is None:
-    raise Exception("An ffmpeg executable is required.")  # pragma: no cover
-
-
 def render(
         canvas,
         filename,
@@ -68,6 +64,10 @@ def render(
     ...   print "Writing frame %s" % frame
     ... toyplot.mp4.render(canvas, "test.mp4", progress=callback)
     """
+
+    if _ffmpeg_command is None:
+        raise RuntimeError("An ffmpeg executable is required.")  # pragma: no cover
+
 
     command = [
         _ffmpeg_command,

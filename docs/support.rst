@@ -9,22 +9,17 @@ The Toyplot documentation:
 
 * http://toyplot.readthedocs.io
 
-Visit our GitHub repository for access to source code, issue tracker, and the wiki:
+Visit our GitHub repository for access to source code, test results, issue tracker, and the wiki:
 
 * http://github.com/sandialabs/toyplot
 
-We also have a continuous integration server that runs the Toyplot regression test
-suite anytime changes are committed to GitHub:
-
-* https://travis-ci.org/sandialabs/toyplot
-
-And here are our test coverage stats, also updated automatically when modifications are committed:
+Our coverage statistics are updated automatically when modifications are committed:
 
 * https://coveralls.io/r/sandialabs/toyplot
 
 For Toyplot questions, comments, or suggestions, get in touch with the team at:
 
-* https://gitter.im/sandialabs/toyplot
+* https://github.com/sandialabs/toyplot/discussions
 
 Otherwise, you can contact Tim directly:
 

@@ -1,0 +1,37 @@
+name: Regression tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      run: |
+        sudo apt-get install ffmpeg ghostscript
+        python -m pip install --upgrade pip
+        pip install arrow behave coverage coveralls custom_inherit Pillow pypng reportlab xmldiff
+        python setup.py develop
+    - name: Run tests
+      run: |
+        coverage run --source toyplot -m behave
+        coverage combine
+        coverage report
+    - name: Upload coverage to Coveralls
+      run: coveralls --service=github
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

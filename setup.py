@@ -6,8 +6,10 @@ from setuptools import setup, find_packages
 import re
 
 setup(
+    author="Timothy M. Shead",
+    author_email="tshead@sandia.gov",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Environment :: Other Environment",
         "Environment :: Web Environment",
@@ -38,7 +40,15 @@ setup(
     name="toyplot",
     packages=find_packages(),
     package_data = {"": ["*.csv"]},
-    url="http://toyplot.readthedocs.org",
+    project_urls={
+        "Chat": "https://github.com/sandialabs/toyplot/discussions",
+        "Coverage": "https://coveralls.io/r/sandialabs/toyplot",
+        "Documentation": "https://toyplot.readthedocs.io",
+        "Issue Tracker": "https://github.com/sandialabs/toyplot/issues",
+        "Regression Tests": "https://github.com/sandialabs/toyplot/actions",
+        "Source": "https://github.com/sandialabs/toyplot",
+    },
+    url="http://toyplot.readthedocs.io",
     version=re.search(
         r"^__version__ = ['\"]([^'\"]*)['\"]",
         open(

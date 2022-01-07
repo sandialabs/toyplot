@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.8", "3.9"]
 
     steps:
     - uses: actions/checkout@v2
@@ -24,7 +24,7 @@ jobs:
       run: |
         sudo apt-get install ffmpeg ghostscript
         python -m pip install --upgrade pip
-        pip install arrow behave coverage coveralls custom_inherit Pillow pypng reportlab xmldiff
+        pip install arrow behave coverage coveralls custom_inherit nose Pillow pypng reportlab xmldiff
         python setup.py develop
     - name: Run tests
       run: |

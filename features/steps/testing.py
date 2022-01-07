@@ -107,9 +107,37 @@ def assert_html_equal(html, name):
       Unique identifier of the reference file to use as a comparison.
       The reference file will be located at toyplot/features/reference/<name>.html
     """
+#    test_file = os.path.join(failed_dir, "%s.html" % name)
+#    reference_file = os.path.join(reference_dir, "%s.html" % name)
+#    _assert_string_equal(html, test_file, reference_file)
+
     test_file = os.path.join(failed_dir, "%s.html" % name)
     reference_file = os.path.join(reference_dir, "%s.html" % name)
-    _assert_string_equal(html, test_file, reference_file)
+
+    # Get rid of any past failures ...
+    if os.path.exists(test_file):
+        os.remove(test_file)
+
+    # If there's no stored HTML reference yet, create one.
+    if not os.path.exists(reference_file):
+        with open(reference_file, "wb") as stream:
+            stream.write(html)
+        raise AssertionError(
+            "Created new reference file %s ... you should verify its contents before re-running the test." %
+            reference_file)
+
+    # Compare the SVG representation of the canvas to the SVG reference.
+    html_dom = xml.fromstring(html)
+    reference_dom = xml.parse(reference_file).getroot()
+
+    try:
+        assert_dom_equal(html_dom, reference_dom, exceptions={})
+    except AssertionError as e:
+        if not os.path.exists(failed_dir):
+            os.mkdir(failed_dir)
+        with open(test_file, "wb") as stream:
+            stream.write(svg.getvalue())
+        raise AssertionError("%s\nTest output\n\t%s\ndoesn't match\n\t%s.\n" % (e, test_file, reference_file))
 
 
 def attribute_mismatch(tag, key, avalue, bvalue):

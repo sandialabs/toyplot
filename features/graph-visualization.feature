@@ -15,7 +15,7 @@ Feature: Graph visualization
             | ba graph                | default                         | graph-ba-graph-default-layout |
             | ba graph                | explicit coordinates            | graph-ba-graph-explicit-coordinates |
             | ba graph                | random                          | graph-ba-graph-random-layout |
-            | ba graph                | eades                           | graph-ba-graph-eades-layout |
+#            | ba graph                | eades                           | graph-ba-graph-eades-layout |
             | ba graph                | fruchterman-reingold            | graph-ba-graph-fruchterman-reingold-layout |
             | ba graph                | fruchterman-reingold-curved-edge | graph-ba-graph-fruchterman-reingold-curved-edges-layout |
 

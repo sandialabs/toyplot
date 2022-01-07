@@ -24,7 +24,7 @@ jobs:
       run: |
         sudo apt-get install ffmpeg ghostscript
         python -m pip install --upgrade pip
-        pip install arrow behave coverage coveralls custom_inherit nose Pillow pypng reportlab xmldiff
+        pip install arrow behave coverage coveralls custom_inherit mock nose Pillow pypng reportlab xmldiff
         python setup.py develop
     - name: Run tests
       run: |

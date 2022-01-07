@@ -7,6 +7,18 @@
 Release Notes
 =============
 
+Toyplot 1.0.0 - January 6th, 2021
+---------------------------------
+
+* First stable release of the Toyplot API!
+* Switched to nbsphinx for notebook-based documentation.
+* Added a violin plot case study.
+* DOM testing was broken by changes to Python dict key ordering behavior.
+* Require Arrow >= 1.0, and fix calls to obsolete Arrow API.
+* toyplot.mp4 module can be imported even if ffmpeg isn't available.
+* Switched to Github Actions for continuous integration.
+* Switched to Github Discussions for support.
+
 Toyplot 0.19.0 - April 21st, 2020
 ---------------------------------
 

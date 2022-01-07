@@ -49,18 +49,6 @@ extensions = [
 ]
 
 #napoleon_use_param = False
-#
-#nbsphinx_prolog = """
-# .. raw:: html
-#
-#    <style>
-#        .nbinput .prompt, .nboutput .prompt { display: none; }
-#    </style>
-#
-# .. image:: ../artwork/toyplot.png
-#    :width: 200px
-#    :align: right
-#"""
 
 intersphinx_mapping = {
     "arrow": ("http://arrow.readthedocs.io/en/latest", "arrow.inv"),
@@ -86,6 +74,18 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 nbsphinx_execute = "never" if "READTHEDOCS" in os.environ else "always"
 
+nbsphinx_prolog = """
+ .. raw:: html
+
+    <style>
+        .nbinput .prompt, .nboutput .prompt { display: none; }
+    </style>
+
+ .. image:: ../artwork/toyplot.png
+    :width: 200px
+    :align: right
+"""
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -96,7 +96,7 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 def warn_undocumented_members(app, what, name, obj, options, lines):
     if what not in [] and len(lines) == 0:

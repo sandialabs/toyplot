@@ -24,11 +24,13 @@ Python API
     toyplot.locator.rst
     toyplot.mark.rst
     toyplot.marker.rst
+    toyplot.mp4.rst
     toyplot.pdf.rst
     toyplot.png.rst
     toyplot.projection.rst
-    toyplot.reportlab.pdf.rst
     toyplot.reportlab.rst
+    toyplot.reportlab.pdf.rst
+    toyplot.reportlab.png.rst
     toyplot.require.rst
     toyplot.scenegraph.rst
     toyplot.style.rst

@@ -29,7 +29,6 @@ jobs:
     - name: Run tests
       run: |
         coverage run --source toyplot -m behave
-        coverage combine
         coverage report
     - name: Upload coverage to Coveralls
       run: coveralls --service=github

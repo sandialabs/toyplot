@@ -24,7 +24,7 @@ jobs:
       run: |
         sudo apt-get install ffmpeg ghostscript
         python -m pip install --upgrade pip
-        pip install arrow behave coverage coveralls custom_inherit ipython mock nbformat nose Pillow pypng reportlab xmldiff
+        pip install arrow behave coverage coveralls custom_inherit ipython mock nbformat nose pandas Pillow pypng reportlab xmldiff
         python setup.py develop
     - name: Run tests
       run: |
@@ -35,3 +35,10 @@ jobs:
       run: coveralls --service=github
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Archive failed tests
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: failed
+        path: features/failed
+

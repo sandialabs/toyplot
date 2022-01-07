@@ -87,35 +87,30 @@ def step_impl(context):
 
 @then(u'notebook {notebook} runs without error')
 def step_impl(context, notebook):
-    log.info(notebook)
+    notebook_dir = os.path.dirname(notebook)
+    working_dir = os.getcwd()
 
-    with open(notebook) as stream:
-        notebook = nbformat.read(stream, as_version=4)
+    sys.path.append(notebook_dir)
+    os.chdir(notebook_dir)
 
-    shell = IPython.core.interactiveshell.InteractiveShell.instance()
-    nblocals = dict()
+    exception = None
+    try:
+        with open(notebook) as stream:
+            notebook = nbformat.read(stream, as_version=4)
 
-    for cell in notebook.cells:
-        if cell.cell_type == "code":
-            code = shell.input_transformer_manager.transform_cell(cell.source)
-            exec(code, nblocals)
-            toyplot.Canvas._ipython_post_execute()
+        shell = IPython.core.interactiveshell.InteractiveShell.instance()
+        nblocals = dict()
 
-#    # Run each notebook script, keeping track of failures.
-#    failures = {}
-#    for notebook, script in zip(context.notebooks, context.scripts):
-#        try:
-#            command = ["coverage", "run", "--source", "toyplot", "--append", script]
-#            log.info(" ".join(command))
-#            subprocess.check_call(command, cwd=docs_dir)
-#            # Remove the script (we only do this if execution succeeded)
-#            os.remove(script)
-#        except Exception as e:
-#            failures[notebook] = e
-#
-#    if failures:
-#        message = ""
-#        for notebook_path, exception in failures.items():
-#            message += notebook_path + " exception:\n\n" + exception + "\n\n"
-#        raise AssertionError(message)
+        for cell in notebook.cells:
+            if cell.cell_type == "code":
+                code = shell.input_transformer_manager.transform_cell(cell.source)
+                exec(code, nblocals)
+    except Exception as e:
+        exception = e
+
+    os.chdir(working_dir)
+    sys.path.remove(notebook_dir)
+
+    if exception is not None:
+        raise exception
 

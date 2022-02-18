@@ -134,7 +134,7 @@ class Table(object):
                 keys = [key for key in data.keys()]
                 values = [data[key] for key in keys]
             # Input data for which an explicit column ordering is not known.
-            elif isinstance(data, (dict, collections.Mapping)):
+            elif isinstance(data, (dict, collections.abc.Mapping)):
                 keys = [key for key in sorted(data.keys())]
                 values = [data[key] for key in keys]
             # Input data based on sequences.

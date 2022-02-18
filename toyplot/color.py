@@ -197,7 +197,7 @@ def broadcast(colors, shape, default=None):
         colors, colormap = colors
 
     # Next, convert the supplied colors into a toyplot color array.
-    if isinstance(colors, collections.Sequence):
+    if isinstance(colors, collections.abc.Sequence):
         colors = numpy.array(colors)
 
     if isinstance(colors, numpy.ndarray):

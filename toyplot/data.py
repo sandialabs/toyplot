@@ -138,7 +138,7 @@ class Table(object):
                 keys = [key for key in sorted(data.keys())]
                 values = [data[key] for key in keys]
             # Input data based on sequences.
-            elif isinstance(data, (list, collections.Sequence)):
+            elif isinstance(data, (list, collections.abc.Sequence)):
                 keys = [key for key, value in data]
                 values = [value for key, value in data]
             # Input data based on numpy arrays.

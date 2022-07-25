@@ -124,11 +124,11 @@ def render(svg, canvas):
 
     def set_fill_color(canvas, color):
         canvas.setFillColorRGB(color["r"], color["g"], color["b"])
-        canvas.setFillAlpha(numpy.asscalar(color["a"]))
+        canvas.setFillAlpha(color["a"].item())
 
     def set_stroke_color(canvas, color):
         canvas.setStrokeColorRGB(color["r"], color["g"], color["b"])
-        canvas.setStrokeAlpha(numpy.asscalar(color["a"]))
+        canvas.setStrokeAlpha(color["a"].item())
 
     def render_element(root, element, canvas, styles):
         canvas.saveState()

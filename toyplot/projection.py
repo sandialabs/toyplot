@@ -167,7 +167,7 @@ class Piecewise(Projection):
                     raise Exception("Unknown scale: %s" % (scale,)) # pragma: no cover
 
         if range_values.shape == ():
-            range_values = numpy.asscalar(range_values)
+            range_values = range_values.item()
         return range_values
 
     def inverse(self, range_values):
@@ -195,7 +195,7 @@ class Piecewise(Projection):
                     raise Exception("Unknown scale: %s" % (scale,)) # pragma: no cover
 
         if domain_values.shape == ():
-            domain_values = numpy.asscalar(domain_values)
+            domain_values = domain_values.item()
         return domain_values
 
 

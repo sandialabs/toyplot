@@ -7,6 +7,11 @@
 Release Notes
 =============
 
+Toyplot 1.0.2 - August 24th, 2022
+---------------------------------
+
+* Replace deprecated Numpy calls for compatibility with Numpy 1.22 - thanks to @harmsm!
+
 Toyplot 1.0.1 - Febrary 18th, 2022
 ----------------------------------
 

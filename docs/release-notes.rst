@@ -7,7 +7,19 @@
 Release Notes
 =============
 
-Toyplot 1.0.0 - January 6th, 2021
+Toyplot 1.0.2 - August 24th, 2022
+---------------------------------
+
+* Replace deprecated Numpy calls for compatibility with Numpy 1.22 - thanks to @harmsm!
+
+Toyplot 1.0.1 - Febrary 18th, 2022
+----------------------------------
+
+* Officially compatible with Python 3.10.
+* Corrected usage of deprecated collections API - thanks to @StuntsPT!
+* Began exploring Graphcat - https://graphcat.readthedocs.io - as the basis for future Toyplot versions.
+
+Toyplot 1.0.0 - January 6th, 2022
 ---------------------------------
 
 * First stable release of the Toyplot API!

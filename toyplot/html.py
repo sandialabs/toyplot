@@ -54,7 +54,7 @@ class _CustomJSONEncoder(json.JSONEncoder):
     # pylint: disable=method-hidden
     def default(self, o): # pragma: no cover
         if isinstance(o, numpy.generic):
-            return numpy.asscalar(o)
+            return o.item()
         if isinstance(o, xml.Element):
             return xml.tostring(o, encoding="unicode", method="html")
         return json.JSONEncoder.default(self, o)

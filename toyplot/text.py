@@ -41,10 +41,10 @@ def extents(text, angle, style):
 
     for index, theta in enumerate(angle):
         transformation = toyplot.transform.rotation(theta)
-        corner1[index] = numpy.diag(corner1[index] * transformation)
-        corner2[index] = numpy.diag(corner2[index] * transformation)
-        corner3[index] = numpy.diag(corner3[index] * transformation)
-        corner4[index] = numpy.diag(corner4[index] * transformation)
+        corner1[index] = numpy.matmul(corner1[index], transformation)
+        corner2[index] = numpy.matmul(corner2[index], transformation)
+        corner3[index] = numpy.matmul(corner3[index], transformation)
+        corner4[index] = numpy.matmul(corner4[index], transformation)
 
     left = numpy.minimum(corner1.T[0], numpy.minimum(
         corner2.T[0], numpy.minimum(corner3.T[0], corner4.T[0])))

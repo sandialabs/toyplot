@@ -7,6 +7,12 @@
 Release Notes
 =============
 
+Toyplot 1.0.3 - October 12th, 2022
+----------------------------------
+
+* Use matrix multiplication to transform text - thanks to @eaton-lab!
+* Some experiments with computational-graph based layout.
+
 Toyplot 1.0.2 - August 24th, 2022
 ---------------------------------
 

@@ -83,15 +83,15 @@ def layout_children(item, item_top, item_right, item_bottom, item_left):
                 item_left + margin_left + padding_left + left,
                 ))
 
-#            child_top = item_top + margin_top + padding_top + top
-#            child_right = item_right - margin_right - padding_right - right
-#            child_bottom = item_bottom - margin_bottom - padding_bottom - bottom
-#            child_left = item_left + margin_left + padding_left + left
-#
-#            child.set("boxcat:top", child_top)
-#            child.set("boxcat:right", child_right)
-#            child.set("boxcat:bottom", child_bottom)
-#            child.set("boxcat:left", child_left)
+            child_top = item_top + margin_top + padding_top + top
+            child_right = item_right - margin_right - padding_right - right
+            child_bottom = item_bottom - margin_bottom - padding_bottom - bottom
+            child_left = item_left + margin_left + padding_left + left
+
+            child.set("boxcat:top", child_top)
+            child.set("boxcat:right", child_right)
+            child.set("boxcat:bottom", child_bottom)
+            child.set("boxcat:left", child_left)
 
             layout_children(child, child_top, child_right, child_bottom, child_left)
     else:

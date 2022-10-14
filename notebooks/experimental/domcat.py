@@ -2,11 +2,14 @@
 # DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains certain
 # rights in this software.
 
+"""Proof-of-concept DOM manipulation using Graphcat."""
+
 import copy
 import io
 import xml.etree.ElementTree as xml
 
 def append_element(graph, name, inputs):
+    """Graphcat task function that appends one element as a child of another."""
     parent = copy.copy(inputs.getone("parent"))
     child = inputs.getone("child")
     parent.append(child)
@@ -14,12 +17,14 @@ def append_element(graph, name, inputs):
 
 
 def create_element(tag, attrib={}, **extra):
+    """Graphcat task function that creates an element."""
     def implementation(graph, name, inputs):
         return xml.Element(tag, attrib=attrib, **extra)
     return implementation
 
 
 def dump(element, level=0):
+    """Recursively pretty-print an element and its children."""
     indent = "  " * level
     attributes = "".join(f" {key}=\"{str(value)}\"" for key, value in element.items())
     if len(element) or element.text:
@@ -34,6 +39,7 @@ def dump(element, level=0):
 
 
 def set_attribute(key, value):
+    """Graphcat task function that sets an element attribute."""
     def implementation(graph, name, inputs):
         original = inputs.getone(None)
         modified = xml.Element(original.tag, attrib=original.attrib)
@@ -43,7 +49,9 @@ def set_attribute(key, value):
         return modified
     return implementation
 
+
 def tostring(element):
+    """Convert an element to a compact string representation."""
     attributes = "".join(f" {key}=\"{str(value)}\"" for key, value in element.items())
     if len(element) or element.text:
         result = f"<{element.tag}{attributes}>"

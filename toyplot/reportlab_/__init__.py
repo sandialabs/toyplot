@@ -9,7 +9,6 @@ import base64
 import io
 import re
 
-import numpy
 import reportlab.lib.colors
 import reportlab.lib.utils
 

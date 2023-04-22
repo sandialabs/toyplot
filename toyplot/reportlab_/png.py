@@ -5,14 +5,14 @@
 """Functions to render PNG images using Ghostscript.
 """
 
-
-import distutils.version
+import packaging.version
+# import distutils.version
 import io
 import subprocess
 
 import reportlab.pdfgen.canvas
 
-import toyplot.reportlab
+import toyplot.reportlab_
 import toyplot.require
 import toyplot.svg
 
@@ -29,7 +29,8 @@ for command in ["gs", "gswin64c", "gswin32c"]:
 if _gs_command is None:
     raise Exception("A ghostscript executable is required.")  # pragma: no cover
 
-if distutils.version.StrictVersion(_gs_version) >= "9.14":
+# if distutils.version.StrictVersion(_gs_version) >= "9.14":
+if packaging.version.Version(_gs_version).base_version >= "9.14":
     _gs_resolution = ["-r%s" % (96 * 4), "-dDownScaleFactor=4"]
 else: # pragma: no cover
     _gs_resolution = ["-r%s" % (96)]
@@ -71,7 +72,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     surface.translate(0, scale * canvas.height)
     surface.scale(1, -1)
     surface.scale(scale, scale)
-    toyplot.reportlab.render(svg, surface)
+    toyplot.reportlab_.render(svg, surface)
     surface.showPage()
     surface.save()
 
@@ -130,7 +131,7 @@ def render_frames(canvas, width=None, height=None, scale=None):
 
     Examples
     --------
-    >>> for frame, png in enumerate(toyplot.reportlab.png.render_frames(canvas)):
+    >>> for frame, png in enumerate(toyplot.reportlab_.png.render_frames(canvas)):
     ...   open("frame-%s.png" % frame, "wb").write(png)
     """
     canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
@@ -145,7 +146,7 @@ def render_frames(canvas, width=None, height=None, scale=None):
         surface.translate(0, scale * canvas.height)
         surface.scale(1, -1)
         surface.scale(scale, scale)
-        toyplot.reportlab.render(svg, surface)
+        toyplot.reportlab_.render(svg, surface)
         surface.showPage()
         surface.save()
 

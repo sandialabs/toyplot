@@ -8,7 +8,7 @@
 
 import io
 import reportlab.pdfgen.canvas
-import toyplot.reportlab
+import toyplot.reportlab_
 import toyplot.require
 import toyplot.svg
 
@@ -47,8 +47,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
     Examples
     --------
-
-    >>> toyplot.reportlab.pdf.render(canvas, "figure-1.pdf", width=(4, "inches"))
+    >>> toyplot.reportlab_.pdf.render(canvas, "figure-1.pdf", width=(4, "inches"))
     """
     canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
     svg = toyplot.svg.render(canvas)
@@ -63,7 +62,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     surface.translate(0, scale * canvas.height)
     surface.scale(1, -1)
     surface.scale(scale, scale)
-    toyplot.reportlab.render(svg, surface)
+    toyplot.reportlab_.render(svg, surface)
     surface.showPage()
     surface.save()
     if fobj is None:

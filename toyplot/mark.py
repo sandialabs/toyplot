@@ -855,7 +855,9 @@ class Point(Mark):
         yext = numpy.zeros(coords[0].size)
 
         # extents requires marker shape (rect or not), size, and stroke-width
-        stroke_width = self._mstyle.get("stroke-width", 0)
+        stroke_width = 0
+        if hasattr(self, "_mstyle"):
+            stroke_width = self._mstyle.get("stroke-width", 0)
         iterdata = zip(
             range(coords[0].size),
             self._table[self._marker[0]],

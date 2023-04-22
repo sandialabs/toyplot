@@ -24,9 +24,9 @@ for module in [
     "toyplot.mp4",
     "toyplot.pdf",
     "toyplot.png",
-    "toyplot.reportlab",
-    "toyplot.reportlab.pdf",
-    "toyplot.reportlab.png",
+    "toyplot.reportlab_",
+    "toyplot.reportlab_.pdf",
+    "toyplot.reportlab_.png",
     "toyplot.svg",
     ]:
     print_report(module)

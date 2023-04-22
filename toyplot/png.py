@@ -7,7 +7,7 @@
 
 
 import toyplot.require
-import toyplot.reportlab.png as implementation
+import toyplot.reportlab_.png as implementation
 
 
 def render(canvas, fobj=None, width=None, height=None, scale=None):
@@ -39,7 +39,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
 
     Notes
     -----
-    The output PNG is rendered using :func:`toyplot.reportlab.png.render()`.
+    The output PNG is rendered using :func:`toyplot.reportlab_.png.render()`.
     This is subject to change.
     """
     canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
@@ -73,7 +73,7 @@ def render_frames(canvas, width=None, height=None, scale=None):
     Notes
     -----
     The output PNG images are rendered using
-    :func:`toyplot.reportlab.png.render_frames()`.  This is subject to change.
+    :func:`toyplot.reportlab_.png.render_frames()`.  This is subject to change.
 
     Examples
     --------

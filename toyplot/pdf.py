@@ -7,7 +7,7 @@
 
 
 import toyplot.require
-import toyplot.reportlab.pdf as implementation
+import toyplot.reportlab_.pdf as implementation
 
 
 def render(canvas, fobj=None, width=None, height=None, scale=None):
@@ -50,7 +50,7 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     Notes
     -----
     The output PDF is currently rendered using
-    :func:`toyplot.reportlab.pdf.render()`.
+    :func:`toyplot.reportlab_.pdf.render()`.
     """
     canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
     return implementation.render(canvas, fobj, width, height, scale)

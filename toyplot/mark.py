@@ -805,7 +805,7 @@ class Point(Mark):
 
         self._table = toyplot.require.instance(table, toyplot.data.Table)
 
-        # We require at last one coordinate dimension (number of dimensions = D)
+        # We require at least one coordinate dimension (number of dimensions = D)
         self._coordinate_axes = toyplot.require.string_vector(coordinate_axes, min_length=1)
         D = len(self._coordinate_axes)
 
@@ -838,6 +838,43 @@ class Point(Mark):
     def domain(self, axis):
         columns = [coordinate_column for coordinate_axis, coordinate_column in zip(itertools.cycle(self._coordinate_axes), self._coordinates) if coordinate_axis == axis]
         return toyplot.data.minimax([self._table[column] for column in columns])
+
+    def extents(self, axis: str):
+        """Return extents in 2 dimensions.
+
+        TODO: could support higher dimensions
+        """
+        # iterate over entered axes (e.g., ['x', 'y']) if exists for Mark
+        assert all(i in self._coordinate_axes for i in axis)
+
+        # get coordinates
+        coords = tuple(self._table[i] for i in self._coordinates)
+
+        # get empty extents arrays to be filled below.
+        xext = numpy.zeros(coords[0].size)
+        yext = numpy.zeros(coords[0].size)
+
+        # extents requires marker shape (rect or not), size, and stroke-width
+        stroke_width = self._mstyle.get("stroke-width", 0)
+        iterdata = zip(
+            range(coords[0].size),
+            self._table[self._marker[0]],
+            self._table[self._msize[0]],
+        )
+
+        # fill extents (left, right, top, bottom) for each marker
+        for idx, shape, size in iterdata:
+
+            # if 'r2x1' then width is 2X height
+            if shape[0] == "r":
+                width, height = (int(i) for i in shape[1:].split("x"))
+            else:
+                width, height = 1, 1
+
+            # extent is half of size diameter, stroke is already half
+            xext[idx] = (width * size) / 2 + stroke_width
+            yext[idx] = (height * size) / 2 + stroke_width
+        return coords, (-xext, xext, -yext, yext)
 
     @property
     def markers(self):

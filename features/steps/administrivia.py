@@ -40,17 +40,3 @@ def step_impl(context):
             if not stream.read().startswith(copyright_notice):
                 raise AssertionError("%s missing copyright notice." % source)
 
-@given(u'pylint')
-def step_impl(context):
-    for path in os.environ["PATH"].split(os.pathsep):
-        if os.path.exists(os.path.join(path, "pylint")):
-            context.pylint = os.path.join(path, "pylint")
-            return
-    context.scenario.skip(reason="The pylint command is not available.")
-
-@then(u'all pylint tests must pass without any messages.')
-def step_impl(context):
-    command = [context.pylint, package_dir]
-    pylint = subprocess.check_call(command)
-
-

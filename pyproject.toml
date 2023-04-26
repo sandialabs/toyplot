@@ -1,0 +1,64 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.module]
+name = "toyplot"
+
+[project]
+classifiers = [
+	"Development Status :: 5 - Production/Stable",
+	"Environment :: Console",
+	"Environment :: Other Environment",
+	"Environment :: Web Environment",
+	"Framework :: IPython",
+	"Intended Audience :: Science/Research",
+	"License :: OSI Approved :: BSD License",
+	"Natural Language :: English",
+	"Programming Language :: Python :: 3",
+	"Topic :: Scientific/Engineering :: Visualization",
+]
+dependencies = [
+        "arrow>=1.0",
+        "custom_inherit",
+        "multipledispatch",
+        "numpy>=1.8.0",
+        "pypng",
+        "reportlab",
+]
+description = "A modern plotting toolkit supporting electronic publishing and reproducibility."
+dynamic = ["version"]
+maintainers = [{name="Timothy M. Shead", email="tshead@sandia.gov"}]
+name = "toyplot"
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+all = [
+    "behave",
+    "coverage",
+    "ipython",
+    "nbsphinx",
+    "sphinx >= 3.5",
+    "sphinx-argparse",
+    "sphinx-gallery < 0.11",
+    "sphinx_rtd_theme",
+]
+doc = [
+    "ipython",
+    "nbsphinx",
+    "sphinx >= 3.5",
+    "sphinx-argparse",
+    "sphinx-gallery < 0.11",
+    "sphinx_rtd_theme",
+]
+
+[project.scripts]
+
+[project.urls]
+"Chat" = "https://github.com/sandialabs/toyplot/discussions"
+"Coverage" = "https://coveralls.io/r/sandialabs/toyplot"
+"Documentation" = "https://toyplot.readthedocs.io"
+"Issue Tracker" = "https://github.com/sandialabs/toyplot/issues"
+"Regression Tests" = "https://github.com/sandialabs/toyplot/actions"
+"Source" = "https://github.com/sandialabs/toyplot"
+

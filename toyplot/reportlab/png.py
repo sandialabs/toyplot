@@ -6,10 +6,10 @@
 """
 
 
-import distutils.version
 import io
 import subprocess
 
+from packaging.version import Version
 import reportlab.pdfgen.canvas
 
 import toyplot.reportlab
@@ -29,7 +29,7 @@ for command in ["gs", "gswin64c", "gswin32c"]:
 if _gs_command is None:
     raise Exception("A ghostscript executable is required.")  # pragma: no cover
 
-if distutils.version.StrictVersion(_gs_version) >= "9.14":
+if Version(_gs_version) >= Version("9.14"):
     _gs_resolution = ["-r%s" % (96 * 4), "-dDownScaleFactor=4"]
 else: # pragma: no cover
     _gs_resolution = ["-r%s" % (96)]

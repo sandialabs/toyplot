@@ -39,16 +39,14 @@ all = [
     "ipython",
     "nbsphinx",
     "sphinx >= 3.5",
-    "sphinx-argparse",
-    "sphinx-gallery < 0.11",
     "sphinx_rtd_theme",
 ]
 doc = [
-    "ipython",
+    "ipykernel",
     "nbsphinx",
+    "pandas",
+    "scikit-image",
     "sphinx >= 3.5",
-    "sphinx-argparse",
-    "sphinx-gallery < 0.11",
     "sphinx_rtd_theme",
 ]
 

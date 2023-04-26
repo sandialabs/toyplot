@@ -7,57 +7,60 @@
 Installation
 ============
 
-Using a Package Manager
------------------------------
+Toyplot
+-------
 
-A package manager (conda, apt, yum, MacPorts, etc) should generally be your
-first stop for installing Toyplot - it will make it easy to install Toyplot and
-its dependencies, keep them up-to-date, and even (gasp!) uninstall them
-cleanly.  If your package manager doesn't support Toyplot yet, drop them a line
-and let them know you'd like them to add it!
-
-If you're new to Python or unsure where to start, we strongly recommend taking
-a look at :ref:`Anaconda <anaconda-installation>`, which the Toyplot developers
-use during their day-to-day work.
-
-.. toctree::
-  :maxdepth: 2
-
-  anaconda-installation.rst
-  freebsd-installation.rst
-  macports-installation.rst
-
-Using Pip / Easy Install
-------------------------
-
-If your package manager doesn't support Toyplot, or doesn't have the latest
-version, your next option should be Python setup tools like `pip`.  You can
-always install the latest stable version of toyplot and its required
-dependencies using::
+To install the latest stable version of Toyplot and its dependencies, use `pip`::
 
     $ pip install toyplot
 
-... following that, you'll be able to use all of Toyplot's features, and export
-figures to all of Toyplot's preferred file formats, including HTML, SVG, and PDF.
+... once it completes, you'll be able to use all of Toyplot's core features.
 
-For export to other formats like PNG or MP4, you'll have to install additional resources
-listed in the :ref:`dependencies` section of the manual.
 
-.. _From Source:
-
-From Source
+Ghostscript
 -----------
 
-Finally, if you want to work with the latest, bleeding-edge Toyplot goodness,
-you can install it using the source code::
+To generate static PNG versions of your Toyplot figures, you'll need
+Ghostscript, which can't be installed via pip.  If you use `Conda <https://docs.conda.io/en/latest/>`_
+(which we strongly recommend), you can install it as follows::
 
-    $ git clone https://github.com/sandialabs/toyplot
-    $ cd toyplot
-    $ sudo python setup.py install
+    $ conda install ghostscript
 
-The setup script installs Toyplot's required dependencies and copies Toyplot into
-your Python site-packages directory, ready to go.
+ffmpeg
+------
 
-Once again, export to other formats like PNG or MP4, wil require additional resources
-listed in :ref:`dependencies`.
+If you plan to render animated Toyplot figures as MP4 files, you'll need
+ffmpeg, which also can't be installed via pip.  If you use `Conda <https://docs.conda.io/en/latest/>`_
+(again, strongly recommended), you can install it as follows::
 
+    $ conda install ffmpeg
+
+.. _documentation:
+
+Documentation
+-------------
+
+We assume that you'll normally access this documentation online, but if you
+want a local copy on your own computer, do the following:
+
+First, you'll need the `pandoc <https://pandoc.org>`_ universal document
+converter, which can't be installed with pip ... if you use `Conda <https://docs.conda.io/en/latest/>`_
+(we cannot recommend it strongly enough), you can install it with the following::
+
+    $ conda install pandoc
+
+Once you have pandoc, install Toyplot along with all of the dependencies needed to build the docs::
+
+    $ pip install toyplot[doc]
+
+Next, do the following to download a tarball to the current directory
+containing all of the Toyplot source code, which includes the documentation::
+
+    $ pip download toyplot --no-binary=:all: --no-deps
+
+Now, you can extract the tarball contents and build the documentation (adjust the
+following for the version you downloaded)::
+
+    $ tar xzvf toyplot-0.6.1.tar.gz
+    $ cd toyplot-0.6.1/docs
+    $ make html

@@ -4,8 +4,8 @@
   :width: 200px
   :align: right
 
-Toyplot Case Studies
-====================
+Case Studies
+============
 
 The following case studies provide more realistic, in-depth examples of how you might use Toyplot as part of a larger workflow:
 

@@ -25,19 +25,16 @@ Documentation
    :maxdepth: 2
 
    ethos.rst
-   features.rst
-   compatibility.rst
-   portability.rst
    installation.rst
-   dependencies.rst
    tutorial.rst
    user-guide.rst
    case-studies.rst
    projects.rst
-   contributing.rst
-   release-notes.rst
+   development.rst
    reference.rst
    javascript.rst
+   compatibility.rst
+   release-notes.rst
    support.rst
    credits.rst
 

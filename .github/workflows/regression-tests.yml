@@ -2,9 +2,9 @@ name: Regression tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [ packaging ]
   pull_request:
-    branches: [ main ]
+    branches: [ packaging ]
 
 jobs:
   build:
@@ -24,8 +24,8 @@ jobs:
       run: |
         sudo apt-get install ffmpeg ghostscript
         python -m pip install --upgrade pip
-        pip install behave coverage coveralls ipython mock nbformat nose pandas Pillow scikit-image xmldiff
-        pip install .
+        pip install coveralls
+        pip install .[all]
     - name: Run tests
       run: |
         coverage run --source toyplot -m behave --tags=~wip --logging-level INFO --no-logcapture

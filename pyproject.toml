@@ -34,20 +34,23 @@ requires-python = ">=3.8"
 
 [project.optional-dependencies]
 all = [
-    "behave",
-    "coverage",
-    "ipython",
-    "nbsphinx",
-    "sphinx >= 3.5",
-    "sphinx_rtd_theme",
+	"behave",
+	"coverage",
+	"ipykernel",
+	"nbsphinx",
+	"nose",
+	"pandas",
+	"scikit-image",
+	"sphinx >= 3.5",
+	"sphinx_rtd_theme",
 ]
 doc = [
-    "ipykernel",
-    "nbsphinx",
-    "pandas",
-    "scikit-image",
-    "sphinx >= 3.5",
-    "sphinx_rtd_theme",
+	"ipykernel",
+	"nbsphinx",
+	"pandas",
+	"scikit-image",
+	"sphinx >= 3.5",
+	"sphinx_rtd_theme",
 ]
 
 [project.scripts]

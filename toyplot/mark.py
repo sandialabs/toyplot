@@ -839,16 +839,15 @@ class Point(Mark):
         columns = [coordinate_column for coordinate_axis, coordinate_column in zip(itertools.cycle(self._coordinate_axes), self._coordinates) if coordinate_axis == axis]
         return toyplot.data.minimax([self._table[column] for column in columns])
 
-    def extents(self, axis: str):
-        """Return extents in 2 dimensions.
-
-        TODO: could support higher dimensions
+    def extents(self, axes):
+        """Return extents in 1 or 2 dimensions.
         """
         # iterate over entered axes (e.g., ['x', 'y']) if exists for Mark
-        assert all(i in self._coordinate_axes for i in axis)
+        assert all(i in self._coordinate_axes for i in axes)
 
-        # get coordinates
-        coords = tuple(self._table[i] for i in self._coordinates)
+        # get coordinates of 'x' 'y' from potentially ['x', 'y0', 'x', 'y1', ... etc]
+        axis_map = {key: index for index, key in enumerate(self._coordinate_axes)}
+        coords = tuple([self._table[self._coordinates[axis_map[axis]]] for axis in axes])
 
         # get empty extents arrays to be filled below.
         xext = numpy.zeros(coords[0].size)

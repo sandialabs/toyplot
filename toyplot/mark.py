@@ -874,6 +874,8 @@ class Point(Mark):
             # extent is half of size diameter, stroke is already half
             xext[idx] = (width * size) / 2 + stroke_width
             yext[idx] = (height * size) / 2 + stroke_width
+
+        # return is usually parsed: (x, y), (left, right, bottom, top) = ...
         return coords, (-xext, xext, -yext, yext)
 
     @property

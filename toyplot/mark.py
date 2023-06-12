@@ -840,8 +840,7 @@ class Point(Mark):
         return toyplot.data.minimax([self._table[column] for column in columns])
 
     def extents(self, axes):
-        """Return extents in 1 or 2 dimensions.
-        """
+        """Return extents in 1 or 2 dimensions."""
         # iterate over entered axes (e.g., ['x', 'y']) if exists for Mark
         assert all(i in self._coordinate_axes for i in axes)
 

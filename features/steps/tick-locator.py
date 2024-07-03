@@ -7,6 +7,7 @@ from behave import *
 import numpy
 import sys
 import toyplot.locator
+from toyplot.require import as_float
 
 import testing
 
@@ -223,7 +224,7 @@ def step_impl(context):
 
 @given(u'a {count} {units} interval')
 def step_impl(context, count, units):
-    context.timestamp_interval = (float(count), units)
+    context.timestamp_interval = (as_float(count), units)
 
 @given(u'an interval of days')
 def step_impl(context):

@@ -14,7 +14,7 @@ import custom_inherit
 import numpy
 
 import toyplot.projection
-
+from toyplot.require import as_float
 
 black = "#292724"
 """Default color used throughout Toyplot figures."""
@@ -3217,30 +3217,30 @@ def css(value):
 
     match = css.rgb_percent(value)
     if match:
-        r, g, b = [float(group) / 100.0 for group in match.groups()]
+        r, g, b = [as_float(group) / 100.0 for group in match.groups()]
         return rgba(r, g, b, 1)
 
     match = css.rgba(value)
     if match:
         r, g, b, a = [
-            int(group) / 255.0 for group in match.groups()[:3]] + [float(match.groups()[3])]
+            int(group) / 255.0 for group in match.groups()[:3]] + [as_float(match.groups()[3])]
         return rgba(r, g, b, a)
 
     match = css.rgba_percent(value)
     if match:
         r, g, b, a = [
-            float(group) / 100.0 for group in match.groups()[:3]] + [float(match.groups()[3])]
+            as_float(group) / 100.0 for group in match.groups()[:3]] + [as_float(match.groups()[3])]
         return rgba(r, g, b, a)
 
     match = css.hsl(value)
     if match:
-        h, s, l = [float(group) for group in match.groups()]
+        h, s, l = [as_float(group) for group in match.groups()]
         r, g, b = colorsys.hls_to_rgb((h / 360.0) % 1, l / 100.0, s / 100.0)
         return rgba(r, g, b, 1)
 
     match = css.hsla(value)
     if match:
-        h, s, l, a = [float(group) for group in match.groups()]
+        h, s, l, a = [as_float(group) for group in match.groups()]
         r, g, b = colorsys.hls_to_rgb((h / 360.0) % 1, l / 100.0, s / 100.0)
         return rgba(r, g, b, a)
 

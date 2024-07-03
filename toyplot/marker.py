@@ -12,6 +12,7 @@ import xml.sax.saxutils
 import numpy
 
 import toyplot.style
+from toyplot.require import as_float
 
 
 class Marker(object):
@@ -118,8 +119,8 @@ class Marker(object):
                 return p
             if self._shape and self._shape[0] == "r":
                 width, height = self._shape[1:].split("x")
-                width = float(width)
-                height = float(height)
+                width = as_float(width)
+                height = as_float(height)
 
                 ap = numpy.abs(p)
                 if ap[1]:
@@ -154,11 +155,11 @@ def from_html(html):
     """Convert a parsed xml.etree.ElementTree representation of a marker to a :class:`toyplot.marker.Marker` object."""
     size = html.get("size", None)
     if size is not None:
-        size = float(size)
+        size = as_float(size)
 
     angle = html.get("angle", None)
     if angle is not None:
-        angle = float(angle)
+        angle = as_float(angle)
 
     return Marker(
         shape=html.get("shape", None),

@@ -20,6 +20,8 @@ import toyplot.html
 import toyplot.require
 import toyplot.svg
 
+from toyplot.require import as_float
+
 try:
     import toyplot.pdf
 except:
@@ -146,7 +148,7 @@ def attribute_mismatch(tag, key, avalue, bvalue):
 
 def optional_float(value):
     try:
-        return float(value)
+        return as_float(value)
     except:
         return value
 
@@ -173,8 +175,8 @@ def assert_path_equal(tag, key, avalue, bvalue):
 
 
 def assert_points_equal(tag, key, avalue, bvalue):
-    alist = [float(value) for pair in avalue.split() for value in pair.split(",")]
-    blist = [float(value) for pair in bvalue.split() for value in pair.split(",")]
+    alist = [as_float(value) for pair in avalue.split() for value in pair.split(",")]
+    blist = [as_float(value) for pair in bvalue.split() for value in pair.split(",")]
     assert_mixed_list_equal(alist, blist, tag, key, avalue, bvalue)
 
 
@@ -205,7 +207,7 @@ def assert_dom_equal(a, b, exceptions):
             continue
 
         if exception.get("type", None) == "float":
-            if not numpy.allclose(float(avalue), float(bvalue)):
+            if not numpy.allclose(as_float(avalue), as_float(bvalue)):
                 attribute_mismatch(a.tag, akey, avalue, bvalue)
         elif exception.get("type", None) == "path":
             assert_path_equal(a.tag, akey, avalue, bvalue)

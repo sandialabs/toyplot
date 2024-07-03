@@ -347,7 +347,7 @@ class Integer(TickLocator):
     def ticks(self, domain_min, domain_max):
         locations = numpy.arange(
             domain_min, domain_max + 1, self._step, dtype="int64")
-        labels = [repr(location) for location in locations]
+        labels = [str(location) for location in locations]
         titles = numpy.repeat(None, len(locations))
         return locations, labels, titles
 

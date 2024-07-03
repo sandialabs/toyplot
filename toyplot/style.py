@@ -10,6 +10,7 @@ import numbers
 import numpy
 
 import toyplot.color
+from toyplot.require import as_float
 
 def require(css, allowed):
     """Validate that an object is usable as CSS style information.
@@ -136,14 +137,14 @@ def _color_fixup(styles):
     if "fill" in styles:
         color = toyplot.color.css(styles["fill"])
         if color is not None:
-            opacity = float(styles.get("fill-opacity", 1.0))
+            opacity = as_float(styles.get("fill-opacity", 1.0))
             styles["fill"] = "rgb(%.3g%%,%.3g%%,%.3g%%)" % (
                 color["r"] * 100, color["g"] * 100, color["b"] * 100)
             styles["fill-opacity"] = str(color["a"] * opacity)
     if "stroke" in styles:
         color = toyplot.color.css(styles["stroke"])
         if color is not None:
-            opacity = float(styles.get("stroke-opacity", 1.0))
+            opacity = as_float(styles.get("stroke-opacity", 1.0))
             styles["stroke"] = "rgb(%.3g%%,%.3g%%,%.3g%%)" % (
                 color["r"] * 100, color["g"] * 100, color["b"] * 100)
             styles["stroke-opacity"] = str(color["a"] * opacity)

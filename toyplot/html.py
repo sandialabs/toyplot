@@ -29,6 +29,7 @@ import toyplot.font
 import toyplot.mark
 import toyplot.marker
 import toyplot.text
+from toyplot.require import as_float
 
 log = logging.getLogger(__name__)
 
@@ -381,14 +382,14 @@ def _color_fixup(styles):
     if "fill" in styles:
         color = toyplot.color.css(styles["fill"])
         if color is not None:
-            opacity = float(styles.get("fill-opacity", 1.0))
+            opacity = as_float(styles.get("fill-opacity", 1.0))
             styles["fill"] = "rgb(%.3g%%,%.3g%%,%.3g%%)" % (
                 color["r"] * 100, color["g"] * 100, color["b"] * 100)
             styles["fill-opacity"] = str(color["a"] * opacity)
     if "stroke" in styles:
         color = toyplot.color.css(styles["stroke"])
         if color is not None:
-            opacity = float(styles.get("stroke-opacity", 1.0))
+            opacity = as_float(styles.get("stroke-opacity", 1.0))
             styles["stroke"] = "rgb(%.3g%%,%.3g%%,%.3g%%)" % (
                 color["r"] * 100, color["g"] * 100, color["b"] * 100)
             styles["stroke-opacity"] = str(color["a"] * opacity)
@@ -613,8 +614,8 @@ def _draw_bar(parent_xml, size, angle=0):
     markup = xml.SubElement(
         parent_xml,
         "line",
-        y1=repr(-size / 2),
-        y2=repr(size / 2),
+        y1=str(-size / 2),
+        y2=str(size / 2),
         )
     if angle:
         markup.set("transform", "rotate(%r)" % (-angle,))
@@ -624,10 +625,10 @@ def _draw_rect(parent_xml, size, width=1, height=1, angle=0):
     markup = xml.SubElement(
         parent_xml,
         "rect",
-        x=repr(-size / 2 * width),
-        y=repr(-size / 2 * height),
-        width=repr(size * width),
-        height=repr(size * height),
+        x=str(-size / 2 * width),
+        y=str(-size / 2 * height),
+        width=str(size * width),
+        height=str(size * height),
         )
     if angle:
         markup.set("transform", "rotate(%r)" % (-angle,))
@@ -651,7 +652,7 @@ def _draw_circle(parent_xml, size):
     xml.SubElement(
         parent_xml,
         "circle",
-        r=repr(size / 2),
+        r=str(size / 2),
         )
 
 def _draw_marker(
@@ -709,7 +710,7 @@ def _draw_marker(
         _draw_rect(marker_xml, marker.size, angle=45)
     elif marker.shape and marker.shape[0] == "r":
         width, height = marker.shape[1:].split("x")
-        _draw_rect(marker_xml, marker.size, width=float(width), height=float(height))
+        _draw_rect(marker_xml, marker.size, width=as_float(width), height=as_float(height))
     elif marker.shape == "o":
         _draw_circle(marker_xml, marker.size)
     elif marker.shape == "oo":
@@ -1401,10 +1402,10 @@ def _render(axis, context):
         xml.SubElement(
             axis_xml,
             "line",
-            x1=repr(x1),
-            y1=repr(0),
-            x2=repr(x2),
-            y2=repr(0),
+            x1=str(x1),
+            y1=str(0),
+            x2=str(x2),
+            y2=str(0),
             style=_css_style(
                 axis.spine._style))
 
@@ -1421,10 +1422,10 @@ def _render(axis, context):
                 xml.SubElement(
                     ticks_group,
                     "line",
-                    x1=repr(x),
-                    y1=repr(y1),
-                    x2=repr(x),
-                    y2=repr(y2),
+                    x1=str(x),
+                    y1=str(y1),
+                    x2=str(x),
+                    y2=str(y2),
                     style=_css_style(
                         axis.ticks._style,
                         tick_style))
@@ -1509,8 +1510,8 @@ def _render(axis, context):
                 coordinates_xml, "line",
                 x1="0",
                 x2="0",
-                y1=repr(y1),
-                y2=repr(y2),
+                y1=str(y1),
+                y2=str(y2),
                 style=_css_style(axis.interactive.coordinates.tick.style),
                 )
 
@@ -1520,7 +1521,7 @@ def _render(axis, context):
             xml.SubElement(
                 coordinates_xml, "text",
                 x="0",
-                y=repr(y),
+                y=str(y),
                 style=_css_style(toyplot.style.combine(
                     {"alignment-baseline": alignment_baseline},
                     axis.interactive.coordinates.label.style,
@@ -1685,10 +1686,10 @@ def _render(numberline, context):
     xml.SubElement(
         clip_xml,
         "rect",
-        x=repr(0),
-        y=repr(-height),
-        width=repr(length),
-        height=repr(height + numberline.axis._offset),
+        x=str(0),
+        y=str(-height),
+        width=str(length),
+        height=str(height + numberline.axis._offset),
         )
 
     children_xml = xml.SubElement(
@@ -1727,10 +1728,10 @@ def _render(numberline, colormap, context):
         xml.SubElement(
             mark_xml,
             "rect",
-            x=repr(x1),
-            y=repr(-width * 0.5),
-            width=repr(x2 - x1),
-            height=repr(width),
+            x=str(x1),
+            y=str(-width * 0.5),
+            width=str(x2 - x1),
+            height=str(width),
             style=_css_style({"stroke": "none", "fill": toyplot.color.to_css(color)}),
             )
 
@@ -1742,10 +1743,10 @@ def _render(numberline, colormap, context):
     xml.SubElement(
         mark_xml,
         "rect",
-        x=repr(colormap_range_min),
-        y=repr(-width * 0.5),
-        width=repr(colormap_range_max - colormap_range_min),
-        height=repr(width),
+        x=str(colormap_range_min),
+        y=str(-width * 0.5),
+        width=str(colormap_range_max - colormap_range_min),
+        height=str(width),
         style=_css_style(style),
         )
 
@@ -1774,10 +1775,10 @@ def _render(numberline, colormap, context):
         defs_xml,
         "linearGradient",
         id="t" + uuid.uuid4().hex,
-        x1=repr(colormap_range_min),
-        x2=repr(colormap_range_max),
-        y1=repr(0),
-        y2=repr(0),
+        x1=str(colormap_range_min),
+        x2=str(colormap_range_max),
+        y1=str(0),
+        y2=str(0),
         gradientUnits="userSpaceOnUse",
         )
 
@@ -1804,10 +1805,10 @@ def _render(numberline, colormap, context):
     xml.SubElement(
         mark_xml,
         "rect",
-        x=repr(colormap_range_min),
-        y=repr(-width * 0.5),
-        width=repr(colormap_range_max - colormap_range_min),
-        height=repr(width),
+        x=str(colormap_range_min),
+        y=str(-width * 0.5),
+        width=str(colormap_range_max - colormap_range_min),
+        height=str(width),
         style=_css_style(style),
         )
 
@@ -1903,10 +1904,10 @@ def _render(numberline, mark, context):
             series_xml,
             "rect",
             attrib={"class": "toyplot-Datum"},
-            x=repr(min(dx1, dx2)),
-            y=repr(-width * 0.5),
-            width=repr(numpy.abs(dx1 - dx2)),
-            height=repr(width),
+            x=str(min(dx1, dx2)),
+            y=str(-width * 0.5),
+            width=str(numpy.abs(dx1 - dx2)),
+            height=str(width),
             style=_css_style(dstyle),
             )
         if dtitle is not None:
@@ -1922,10 +1923,10 @@ def _render(axes, context):
     xml.SubElement(
         clip_xml,
         "rect",
-        x=repr(axes._xmin_range - axes.padding),
-        y=repr(axes._ymin_range - axes.padding),
-        width=repr(axes._xmax_range - axes._xmin_range + axes.padding * 2),
-        height=repr(axes._ymax_range - axes._ymin_range + axes.padding * 2),
+        x=str(axes._xmin_range - axes.padding),
+        y=str(axes._ymin_range - axes.padding),
+        width=str(axes._xmax_range - axes._xmin_range + axes.padding * 2),
+        height=str(axes._ymax_range - axes._ymin_range + axes.padding * 2),
         )
 
     if axes._hyperlink:
@@ -1933,10 +1934,10 @@ def _render(axes, context):
         xml.SubElement(
             hyperlink_xml,
             "rect",
-            x=repr(axes._xmin_range),
-            y=repr(axes._ymin_range),
-            width=repr(axes._xmax_range - axes._xmin_range),
-            height=repr(axes._ymax_range - axes._ymin_range),
+            x=str(axes._xmin_range),
+            y=str(axes._ymin_range),
+            width=str(axes._xmax_range - axes._xmin_range),
+            height=str(axes._ymax_range - axes._ymin_range),
             attrib={"fill": "none", "stroke": "none", "pointer-events": "fill"},
             )
 
@@ -2015,10 +2016,10 @@ def _render(axes, context):
             cell_xml = xml.SubElement(
                 cell_parent_xml,
                 "rect",
-                x=repr(cell_left),
-                y=repr(cell_top),
-                width=repr(cell_right - cell_left),
-                height=repr(cell_bottom - cell_top),
+                x=str(cell_left),
+                y=str(cell_top),
+                width=str(cell_right - cell_left),
+                height=str(cell_bottom - cell_top),
                 style=_css_style({"fill":"transparent", "stroke":"none"}, cell_style),
                 )
 
@@ -2133,36 +2134,36 @@ def _render(axes, context):
                 xml.SubElement(
                     axes_xml,
                     "line",
-                    x1=repr(column_boundaries[start]),
-                    y1=repr(y),
-                    x2=repr(column_boundaries[end]),
-                    y2=repr(y),
+                    x1=str(column_boundaries[start]),
+                    y1=str(y),
+                    x2=str(column_boundaries[end]),
+                    y2=str(y),
                     style=_css_style(axes._gstyle),
                     )
             elif line_type == "double":
                 xml.SubElement(
                     axes_xml,
                     "line",
-                    x1=repr(
+                    x1=str(
                         column_boundaries[start]),
-                    y1=repr(
+                    y1=str(
                         y - separation),
-                    x2=repr(
+                    x2=str(
                         column_boundaries[end]),
-                    y2=repr(
+                    y2=str(
                         y - separation),
                     style=_css_style(
                         axes._gstyle))
                 xml.SubElement(
                     axes_xml,
                     "line",
-                    x1=repr(
+                    x1=str(
                         column_boundaries[start]),
-                    y1=repr(
+                    y1=str(
                         y + separation),
-                    x2=repr(
+                    x2=str(
                         column_boundaries[end]),
-                    y2=repr(
+                    y2=str(
                         y + separation),
                     style=_css_style(
                         axes._gstyle))
@@ -2176,29 +2177,29 @@ def _render(axes, context):
                 xml.SubElement(
                     axes_xml,
                     "line",
-                    x1=repr(x),
-                    y1=repr(row_boundaries[start]),
-                    x2=repr(x),
-                    y2=repr(row_boundaries[end]),
+                    x1=str(x),
+                    y1=str(row_boundaries[start]),
+                    x2=str(x),
+                    y2=str(row_boundaries[end]),
                     style=_css_style(axes._gstyle),
                     )
             elif line_type == "double":
                 xml.SubElement(
                     axes_xml,
                     "line",
-                    x1=repr(x - separation),
-                    y1=repr(row_boundaries[start]),
-                    x2=repr(x - separation),
-                    y2=repr(row_boundaries[end]),
+                    x1=str(x - separation),
+                    y1=str(row_boundaries[start]),
+                    x2=str(x - separation),
+                    y2=str(row_boundaries[end]),
                     style=_css_style(axes._gstyle),
                     )
                 xml.SubElement(
                     axes_xml,
                     "line",
-                    x1=repr(x + separation),
-                    y1=repr(row_boundaries[start]),
-                    x2=repr(x + separation),
-                    y2=repr(row_boundaries[end]),
+                    x1=str(x + separation),
+                    y1=str(row_boundaries[start]),
+                    x2=str(x + separation),
+                    y2=str(row_boundaries[end]),
                     style=_css_style(axes._gstyle),
                     )
 
@@ -2283,10 +2284,10 @@ def _render(axes, mark, context):
                 "rect",
                 attrib={
                     "class": "toyplot-Datum",
-                    axis1: repr(min(dleft, dright)),
-                    axis2: repr(min(dboundary1, dboundary2)),
-                    distance1: repr(numpy.abs(dleft - dright)),
-                    distance2: repr(numpy.abs(dboundary1 - dboundary2)),
+                    axis1: str(min(dleft, dright)),
+                    axis2: str(min(dboundary1, dboundary2)),
+                    distance1: str(numpy.abs(dleft - dright)),
+                    distance2: str(numpy.abs(dboundary1 - dboundary2)),
                     },
                 style=_css_style(dstyle),
                 )
@@ -2364,10 +2365,10 @@ def _render(axes, mark, context):
                 "rect",
                 attrib={
                     "class": "toyplot-Datum",
-                    axis1: repr(min(dleft, dright)),
-                    axis2: repr(min(dboundary1, dboundary2)),
-                    distance1: repr(numpy.abs(dleft - dright)),
-                    distance2: repr(numpy.abs(dboundary1 - dboundary2)),
+                    axis1: str(min(dleft, dright)),
+                    axis2: str(min(dboundary1, dboundary2)),
+                    distance1: str(numpy.abs(dleft - dright)),
+                    distance2: str(numpy.abs(dboundary1 - dboundary2)),
                     },
                 style=_css_style(dstyle),
                 )
@@ -2511,10 +2512,10 @@ def _render(axes, mark, context):
             "line",
             attrib={
                 "class": "toyplot-Datum",
-                p1: repr(dposition),
-                p2: repr(dposition),
-                b1: repr(boundary1),
-                b2: repr(boundary2),
+                p1: str(dposition),
+                p2: str(dposition),
+                b1: str(boundary1),
+                b2: str(boundary2),
             },
             style=_css_style(dstyle),
         )
@@ -2749,9 +2750,9 @@ def _render(axes, mark, context): # pragma: no cover
             transform += " translate(%r, 0)" % (marker.size / 2,)
             if marker.angle is not None:
                 if isinstance(marker.angle, str) and marker.angle[0:1] == "r":
-                    angle = float(marker.angle[1:])
+                    angle = as_float(marker.angle[1:])
                 else:
-                    angle = -edge_angle + float(marker.angle)
+                    angle = -edge_angle + as_float(marker.angle)
                 transform += " rotate(%r)" % (-angle,)
 
 
@@ -2784,9 +2785,9 @@ def _render(axes, mark, context): # pragma: no cover
                 ))
             if marker.angle is not None:
                 if isinstance(marker.angle, str) and marker.angle[0:1] == "r":
-                    angle += float(marker.angle[1:])
+                    angle += as_float(marker.angle[1:])
                 else:
-                    angle = float(marker.angle)
+                    angle = as_float(marker.angle)
 
             marker = marker + toyplot.marker.create(angle=angle)
 
@@ -2821,9 +2822,9 @@ def _render(axes, mark, context): # pragma: no cover
             transform += " translate(%r, 0)" % (-marker.size / 2,)
             if marker.angle is not None:
                 if isinstance(marker.angle, str) and marker.angle[0:1] == "r":
-                    angle = float(marker.angle[1:])
+                    angle = as_float(marker.angle[1:])
                 else:
-                    angle = -edge_angle + float(marker.angle)
+                    angle = -edge_angle + as_float(marker.angle)
                 transform += " rotate(%r)" % (-angle,)
 
 
@@ -2992,10 +2993,10 @@ def _render(axes, mark, context):
             series_xml,
             "rect",
             attrib={"class": "toyplot-Datum"},
-            x=repr(min(dx1, dx2)),
-            y=repr(min(dy1, dy2)),
-            width=repr(numpy.abs(dx1 - dx2)),
-            height=repr(numpy.abs(dy1 - dy2)),
+            x=str(min(dx1, dx2)),
+            y=str(min(dy1, dy2)),
+            width=str(numpy.abs(dx1 - dx2)),
+            height=str(numpy.abs(dy1 - dy2)),
             style=_css_style(dstyle),
             )
         if dtitle is not None:
@@ -3169,9 +3170,9 @@ def _render(mark, context):
     xml.SubElement(
         mark_xml,
         "image",
-        x=repr(mark._xmin_range),
-        y=repr(mark._ymin_range),
-        width=repr(mark._xmax_range - mark._xmin_range),
-        height=repr(mark._ymax_range - mark._ymin_range),
+        x=str(mark._xmin_range),
+        y=str(mark._ymin_range),
+        width=str(mark._xmax_range - mark._xmin_range),
+        height=str(mark._ymax_range - mark._ymin_range),
         attrib={"xlink:href": toyplot.bitmap.to_png_data_uri(mark._data)},
         )

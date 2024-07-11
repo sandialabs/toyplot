@@ -4,7 +4,7 @@
 
 from behave import *
 
-import nose.tools
+import test
 import toyplot.html
 
 
@@ -184,7 +184,7 @@ def step_impl(context):
 
 @when(u'text is aligned with an unknown text-anchor value, an exception is raised.')
 def step_impl(context):
-    with nose.tools.assert_raises(ValueError):
+    with test.assert_raises(ValueError):
         context.axes.text(
             0, 0, "Text!", style={"text-anchor": "foo"})
         toyplot.html.render(context.canvas)
@@ -192,7 +192,7 @@ def step_impl(context):
 
 @when(u'text is aligned with an unknown alignment-baseline value, an exception is raised.')
 def step_impl(context):
-    with nose.tools.assert_raises(ValueError):
+    with test.assert_raises(ValueError):
         context.axes.text(
             0, 0, "Text!", style={"alignment-baseline": "foo"})
         toyplot.html.render(context.canvas)
@@ -210,7 +210,7 @@ def step_impl(context, family):
 
 @when(u'text is drawn with an unknown font family, an exception is raised.')
 def step_impl(context):
-    with nose.tools.assert_raises(ValueError):
+    with test.assert_raises(ValueError):
         context.axes.text(0, 0, "Font-family: nonexistent", style={"font-family": "nonexistent", "font-size": "32px"})
         context.canvas._repr_html_()
 

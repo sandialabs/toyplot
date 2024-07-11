@@ -3,7 +3,7 @@
 # rights in this software.
 
 from behave import *
-import nose.tools
+import test
 
 import glob
 import logging

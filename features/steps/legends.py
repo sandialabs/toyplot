@@ -3,7 +3,7 @@
 # rights in this software.
 
 from behave import *
-import nose.tools
+import test
 import numpy
 
 def sample_data():

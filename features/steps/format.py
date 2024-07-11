@@ -4,7 +4,7 @@
 
 from behave import *
 
-import nose.tools
+import test
 import numpy.testing
 import toyplot.format
 
@@ -39,7 +39,7 @@ def step_impl(context, value, output):
 	value = eval(value)
 	output = eval(output)
 	prefix, separator, suffix = context.formatter.format(value)
-	nose.tools.assert_equal(prefix, output[0])
-	nose.tools.assert_equal(separator, output[1])
-	nose.tools.assert_equal(suffix, output[2])
+	test.assert_equal(prefix, output[0])
+	test.assert_equal(separator, output[1])
+	test.assert_equal(suffix, output[2])
 

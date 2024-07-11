@@ -4,7 +4,6 @@
 
 from behave import *
 
-import nose
 import numpy
 import toyplot.data
 

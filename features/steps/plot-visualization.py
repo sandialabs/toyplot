@@ -6,7 +6,7 @@ from behave import *
 
 import collections
 
-import nose.tools
+import test
 import numpy.testing
 import toyplot
 

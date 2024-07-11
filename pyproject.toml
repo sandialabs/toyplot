@@ -39,7 +39,6 @@ all = [
 	"coverage",
 	"ipykernel",
 	"nbsphinx",
-	"nose",
 	"pandas",
 	"scikit-image",
 	"sphinx >= 3.5",

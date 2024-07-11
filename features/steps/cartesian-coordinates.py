@@ -7,6 +7,7 @@ from behave import *
 import numpy
 import toyplot.data
 
+import test
 import testing
 
 

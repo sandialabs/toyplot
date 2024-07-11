@@ -34,6 +34,9 @@ def assert_logs(logger=None, level=None):
 def assert_no_logs(logger=None, level=None):
     return unittest.TestCase().assertNoLogs(logger, level)
 
+def assert_raises(exception):
+    return unittest.TestCase().assertRaises(exception)
+
 def assert_sequence_equal(first, second, msg=None, seq_type=None):
     return unittest.TestCase().assertSequenceEqual(first, second, msg, seq_type)
 

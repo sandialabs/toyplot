@@ -24,7 +24,6 @@ Python API
     toyplot.locator.rst
     toyplot.mark.rst
     toyplot.marker.rst
-    toyplot.mp4.rst
     toyplot.pdf.rst
     toyplot.png.rst
     toyplot.projection.rst

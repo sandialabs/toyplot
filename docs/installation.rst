@@ -26,15 +26,6 @@ Ghostscript, which can't be installed via pip.  If you use `Conda <https://docs.
 
     $ conda install ghostscript
 
-ffmpeg
-------
-
-If you plan to render animated Toyplot figures as MP4 files, you'll need
-ffmpeg, which also can't be installed via pip.  If you use `Conda <https://docs.conda.io/en/latest/>`_
-(again, strongly recommended), you can install it as follows::
-
-    $ conda install ffmpeg
-
 .. _documentation:
 
 Documentation

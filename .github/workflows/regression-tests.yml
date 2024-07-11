@@ -2,7 +2,7 @@ name: Regression tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, remove-animation ]
   pull_request:
     branches: [ main ]
 

@@ -19,13 +19,13 @@ classifiers = [
 	"Topic :: Scientific/Engineering :: Visualization",
 ]
 dependencies = [
-        "arrow>=1.0",
-        "custom_inherit",
-        "multipledispatch",
-        "numpy>=1.8.0",
-	"packaging",
-        "pypng",
-        "reportlab",
+    "arrow>=1.0",
+    "custom_inherit",
+    "multipledispatch",
+    "numpy>=1.8.0,<2.0.0",
+    "packaging",
+    "pypng",
+    "reportlab",
 ]
 description = "A modern plotting toolkit supporting electronic publishing and reproducibility."
 dynamic = ["version"]

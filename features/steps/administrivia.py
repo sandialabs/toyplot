@@ -3,7 +3,6 @@
 # rights in this software.
 
 from behave import *
-import nose.tools
 
 import os
 import pkgutil

@@ -20,129 +20,6 @@ import toyplot.style
 import toyplot.units
 
 
-class AnimationFrame(object):
-    """Used to specify modifications to a `toyplot.canvas.Canvas` for animation.
-
-    Do not create AnimationFrame instances yourself, use
-    :meth:`toyplot.canvas.Canvas.frame` and
-    :meth:`toyplot.canvas.Canvas.frames` instead.
-    """
-    def __init__(self, changes, count, number, begin, end):
-        self._changes = changes
-        self._count = count
-        self._number = number
-        self._begin = begin
-        self._end = end
-
-    @property
-    def count(self):
-        """Total number of frames in the current animation.
-        """
-        return self._count
-
-    @property
-    def number(self):
-        """Current animation frame number (zero-based).
-        """
-        return self._number
-
-    @property
-    def begin(self):
-        """Beginning of the current frame in seconds.
-        """
-        return self._begin
-
-    @property
-    def end(self):
-        """End of the current frame in seconds.
-        """
-        return self._end
-
-    @property
-    def length(self):
-        """Duration of the current frame in seconds.
-        """
-        return self._end - self._begin
-
-    def set_mark_style(self, mark, style):
-        """Change the style of a mark.
-
-        Parameters
-        ----------
-        mark: :class:`toyplot.mark.Mark` instance
-        style: dict containing CSS style information
-        """
-        if not isinstance(mark, toyplot.mark.Mark):
-            raise ValueError(
-                "Mark style can only be set on toyplot.mark.Mark instances.")
-
-        self._changes.add(self._begin, self._end, "set-mark-style", dict(mark=mark, style=style))
-
-    def set_datum_style(self, mark, series, datum, style):
-        """Change the style of one datum in a :class:`toyplot.mark.Mark` at the current frame.
-
-        Parameters
-        ----------
-        mark: :class:`toyplot.mark.Mark`, required
-            Mark containing the datum to modify.
-        series: int, required
-            Zero-based index of the series containing the datum to modify.
-        datum: int, required
-            Zero-based index of the datum to modify.
-        style: dict, required
-            Python dict containing CSS style information to be assigned to the datum.
-        """
-        if not isinstance(mark, (
-                toyplot.mark.BarBoundaries,
-                toyplot.mark.BarMagnitudes,
-                toyplot.mark.Plot,
-                toyplot.mark.Point,
-            )):
-            raise ValueError("Cannot set datum style for %s." % type(mark))
-
-        self._changes.add(self._begin, self._end, "set-datum-style", dict(mark=mark, series=series, datum=datum, style=style))
-
-    def set_text(self, mark, text, style=None):
-        self.set_datum_text(mark, 0, 0, text, style)
-
-    def set_datum_text(self, mark, series, datum, text, style=None):
-        """Change the text in a :class:`toyplot.mark.Text` at the current frame.
-
-        Note
-        ----
-        Currently, animated text completely overwrites the original - thus, it
-        cannot inherit style (including color) information, which you will have
-        to re-specify explicitly.
-
-        Parameters
-        ----------
-        mark: :class:`toyplot.mark.Text`, required
-            Mark containing the text to modify.
-        series: int, required
-            Zero-based index of the series containing the datum to modify.
-        datum: int, required
-            Zero-based index of the datum to modify.
-        text: str, required
-            String containing the new text to be assigned to the datum.
-        style: dict, optional
-            Python dict containing CSS style information to be assigned to the datum.
-        angle: float, optional
-            Angle for the new text.
-        """
-        if not isinstance(mark, toyplot.mark.Text):
-            raise ValueError("mark must be an instance of toyplot.mark.Text.")
-        if not isinstance(series, int):
-            raise ValueError("series must be an integer index.")
-        if not isinstance(datum, int):
-            raise ValueError("datum must be an integer index.")
-        if not isinstance(text, str):
-            raise ValueError("text must be a string.")
-        if not isinstance(style, (dict, type(None))):
-            raise ValueError("style must be a dict or None.")
-
-        self._changes.add(self._begin, self._end, "set-datum-text", dict(mark=mark, series=series, datum=datum, text=text, style=style))
-
-
 ##########################################################################
 # Canvas
 
@@ -180,19 +57,6 @@ class Canvas(object):
     >>> canvas = toyplot.Canvas("8in", "6in", style={"background-color":"yellow"})
     """
 
-    class _AnimationChanges(object):
-        def __init__(self):
-            self._begin = []
-            self._end = []
-            self._change = []
-            self._state = []
-
-        def add(self, begin, end, change, state):
-            self._begin.append(begin)
-            self._end.append(end)
-            self._change.append(change)
-            self._state.append(state)
-
     def __init__(self, width=None, height=None, style=None, hyperlink=None, autorender=None, autoformat=None):
         if width is None:
             width = toyplot.config.width
@@ -219,7 +83,6 @@ class Canvas(object):
         self.hyperlink = hyperlink
         self.style = style
 
-        self._changes = toyplot.Canvas._AnimationChanges()
         self._scenegraph = toyplot.scenegraph.SceneGraph()
         self.autorender(autorender, autoformat)
 
@@ -269,86 +132,6 @@ class Canvas(object):
     @width.setter
     def width(self, value):
         self._width = toyplot.units.convert(value, "px", default="px")
-
-
-    def frame(self, begin, end=None, number=None, count=None):
-        """Return a single animation frame that can be used to animate the canvas contents.
-
-        Parameters
-        ----------
-        begin: float
-          Specify the frame start time (in seconds).
-        end: float, optional
-          Specify the frame end time (in seconds).
-        number: integer, optional
-          Specify a number for this frame.
-        count: integer, optional
-          Specify the total number of frames of which this frame is one.
-
-        Returns
-        -------
-        frame: :class:`toyplot.canvas.AnimationFrame` instance.
-        """
-        if end is None:
-            end = begin + (1.0 / 30.0)
-        if number is None:
-            number = 0
-        if count is None:
-            count = 1
-        return AnimationFrame(changes=self._changes, count=count, number=number, begin=begin, end=end)
-
-
-    def frames(self, frames):
-        """Return a sequence of animation frames that can be used to animate the canvas contents.
-
-        Parameters
-        ----------
-        frames: integer, tuple, or sequence
-          Pass a sequence of values that specify the time (in seconds) of the
-          beginning / end of each frame.  Note that the number of frames will be the
-          length of the sequence minus one.  Alternatively, you can pass a 2-tuple
-          containing the number of frames and the frame rate in frames-per-second.
-          Finally, you may simply specify the number of frames, in which case the
-          rate will default to 30 frames-per-second.
-
-        Yields
-        ------
-        frames: :class:`toyplot.canvas.AnimationFrame`
-            Use the methods and properties of each frame object to modify the
-            state of the canvas over time.
-        """
-        if isinstance(frames, numbers.Integral):
-            frames = (frames, 30.0)
-
-        if isinstance(frames, tuple):
-            frame_count, frame_rate = frames
-            times = numpy.linspace(0, frame_count / frame_rate, frame_count + 1, endpoint=True)
-
-        for index, (begin, end) in enumerate(zip(times[:-1], times[1:])):
-            yield AnimationFrame(changes=self._changes, count=frame_count, number=index, begin=begin, end=end)
-
-
-    def animation(self):
-        """Return a summary of the canvas animation state.
-
-        Returns
-        -------
-        begin: float
-            Start-time of the animation in seconds.
-        end: float
-            End-time of the animation in seconds.
-        changes: object
-            Opaque collection of data structures that describe changes to the
-            canvas state during animation (if any).
-        """
-
-        begin = 0.0
-        end = numpy.max(self._changes._end) if self._changes._end else 0.0
-        changes = collections.defaultdict(lambda: collections.defaultdict(list))
-        for begin, change, state in zip(self._changes._begin, self._changes._change, self._changes._state):
-            changes[begin][change].append(state)
-
-        return begin, end, changes
 
 
     def autorender(self, enable=None, autoformat=None):

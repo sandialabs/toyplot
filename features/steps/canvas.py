@@ -6,7 +6,7 @@ from behave import *
 
 import io
 
-import nose.tools
+import test
 import numpy.testing
 import toyplot
 
@@ -65,14 +65,14 @@ def step_impl(context):
 @then(u'the canvas can be rendered in Jupyter as HTML')
 def step_impl(context):
     html = context.canvas._repr_html_()
-    nose.tools.assert_is_instance(html, str)
+    test.assert_is_instance(html, str)
 
 @then(u'the canvas can be rendered in Jupyter as a PNG image')
 def step_impl(context):
     png = context.canvas._repr_png_()
     image = testing.read_png(io.BytesIO(png))
-    nose.tools.assert_equal(image.shape, (600, 600, 4))
-    nose.tools.assert_equal(image.dtype, "uint8")
+    test.assert_equal(image.shape, (600, 600, 4))
+    test.assert_equal(image.dtype, "uint8")
 
 @then(u'numberlines can be added to the canvas using relative coordinates')
 def step_impl(context):

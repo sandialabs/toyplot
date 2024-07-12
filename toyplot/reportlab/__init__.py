@@ -15,6 +15,7 @@ import reportlab.lib.utils
 
 import toyplot.color
 import toyplot.units
+from toyplot.require import as_float
 
 
 def render(svg, canvas):
@@ -47,8 +48,8 @@ def render(svg, canvas):
         if color is None:
             return None, None
 
-        fill_opacity = float(style.get("fill-opacity", 1.0))
-        opacity = float(style.get("opacity", 1.0))
+        fill_opacity = as_float(style.get("fill-opacity", 1.0))
+        opacity = as_float(style.get("opacity", 1.0))
         fill = toyplot.color.rgba(
             color["r"],
             color["g"],
@@ -65,8 +66,8 @@ def render(svg, canvas):
         if color is None:
             return None
 
-        stroke_opacity = float(style.get("stroke-opacity", 1.0))
-        opacity = float(style.get("opacity", 1.0))
+        stroke_opacity = as_float(style.get("stroke-opacity", 1.0))
+        opacity = as_float(style.get("opacity", 1.0))
         return toyplot.color.rgba(
             color["r"],
             color["g"],
@@ -144,10 +145,10 @@ def render(svg, canvas):
         styles.append(current_style)
 
         if "stroke-width" in current_style:
-            canvas.setLineWidth(float(current_style["stroke-width"]))
+            canvas.setLineWidth(as_float(current_style["stroke-width"]))
 
         if "stroke-dasharray" in current_style:
-            canvas.setDash([float(length) for length in current_style["stroke-dasharray"].split(",")])
+            canvas.setDash([as_float(length) for length in current_style["stroke-dasharray"].split(",")])
 
         if current_style.get("visibility") != "hidden":
 
@@ -158,14 +159,14 @@ def render(svg, canvas):
                         arguments = arguments.split(",")
                         if transform.strip() == "translate":
                             if len(arguments) == 2:
-                                canvas.translate(float(arguments[0]), float(arguments[1]))
+                                canvas.translate(as_float(arguments[0]), as_float(arguments[1]))
                         elif transform.strip() == "rotate":
                             if len(arguments) == 1:
-                                canvas.rotate(float(arguments[0]))
+                                canvas.rotate(as_float(arguments[0]))
                             if len(arguments) == 3:
-                                canvas.translate(float(arguments[1]), float(arguments[2]))
-                                canvas.rotate(float(arguments[0]))
-                                canvas.translate(-float(arguments[1]), -float(arguments[2]))
+                                canvas.translate(as_float(arguments[1]), as_float(arguments[2]))
+                                canvas.rotate(as_float(arguments[0]))
+                                canvas.translate(-as_float(arguments[1]), -as_float(arguments[2]))
 
             if element.tag == "svg":
                 if "background-color" in current_style:
@@ -173,20 +174,20 @@ def render(svg, canvas):
                     canvas.rect(
                         0,
                         0,
-                        float(element.get("width")[:-2]),
-                        float(element.get("height")[:-2]),
+                        as_float(element.get("width")[:-2]),
+                        as_float(element.get("height")[:-2]),
                         stroke=0,
                         fill=1,
                         )
 
                 if current_style["border-style"] != "none":
                     set_stroke_color(canvas, toyplot.color.css(current_style["border-color"]))
-                    canvas.setLineWidth(float(current_style["border-width"]))
+                    canvas.setLineWidth(as_float(current_style["border-width"]))
                     canvas.rect(
                         0,
                         0,
-                        float(element.get("width")[:-2]),
-                        float(element.get("height")[:-2]),
+                        as_float(element.get("width")[:-2]),
+                        as_float(element.get("height")[:-2]),
                         stroke=1,
                         fill=0,
                         )
@@ -205,10 +206,10 @@ def render(svg, canvas):
                     clip_path = root.find(".//*[@id='%s']" % clip_id)
                     for child in clip_path:
                         if child.tag == "rect":
-                            x = float(child.get("x"))
-                            y = float(child.get("y"))
-                            width = float(child.get("width"))
-                            height = float(child.get("height"))
+                            x = as_float(child.get("x"))
+                            y = as_float(child.get("y"))
+                            width = as_float(child.get("width"))
+                            height = as_float(child.get("height"))
                             path = canvas.beginPath()
                             path.moveTo(x, y)
                             path.lineTo(x + width, y)
@@ -231,10 +232,10 @@ def render(svg, canvas):
                     set_stroke_color(canvas, stroke)
                     canvas.setLineCap(get_line_cap(current_style))
                     canvas.line(
-                        float(element.get("x1", 0)),
-                        float(element.get("y1", 0)),
-                        float(element.get("x2", 0)),
-                        float(element.get("y2", 0)),
+                        as_float(element.get("x1", 0)),
+                        as_float(element.get("y1", 0)),
+                        as_float(element.get("x2", 0)),
+                        as_float(element.get("y2", 0)),
                         )
             elif element.tag == "path":
                 stroke = get_stroke(current_style)
@@ -247,10 +248,10 @@ def render(svg, canvas):
                         command = commands.pop(0)
                         if command == "L":
                             path.lineTo(
-                                float(commands.pop(0)), float(commands.pop(0)))
+                                as_float(commands.pop(0)), as_float(commands.pop(0)))
                         elif command == "M":
                             path.moveTo(
-                                float(commands.pop(0)), float(commands.pop(0)))
+                                as_float(commands.pop(0)), as_float(commands.pop(0)))
                     canvas.drawPath(path)
             elif element.tag == "polygon":
                 fill, fill_gradient = get_fill(root, current_style)
@@ -265,9 +266,9 @@ def render(svg, canvas):
                 points = [point.split(",") for point in element.get("points").split()]
                 path = canvas.beginPath()
                 for point in points[:1]:
-                    path.moveTo(float(point[0]), float(point[1]))
+                    path.moveTo(as_float(point[0]), as_float(point[1]))
                 for point in points[1:]:
-                    path.lineTo(float(point[0]), float(point[1]))
+                    path.lineTo(as_float(point[0]), as_float(point[1]))
                 path.close()
                 canvas.drawPath(path, stroke=stroke is not None, fill=fill is not None)
             elif element.tag == "rect":
@@ -278,10 +279,10 @@ def render(svg, canvas):
                 if stroke is not None:
                     set_stroke_color(canvas, stroke)
 
-                x = float(element.get("x", 0))
-                y = float(element.get("y", 0))
-                width = float(element.get("width"))
-                height = float(element.get("height"))
+                x = as_float(element.get("x", 0))
+                y = as_float(element.get("y", 0))
+                width = as_float(element.get("width"))
+                height = as_float(element.get("height"))
 
                 path = canvas.beginPath()
                 path.moveTo(x, y)
@@ -294,19 +295,19 @@ def render(svg, canvas):
                     pdf_colors = []
                     pdf_offsets = []
                     for stop in fill_gradient:
-                        offset = float(stop.get("offset"))
+                        offset = as_float(stop.get("offset"))
                         color = toyplot.color.css(stop.get("stop-color"))
-                        opacity = float(stop.get("stop-opacity"))
+                        opacity = as_float(stop.get("stop-opacity"))
                         pdf_colors.append(reportlab.lib.colors.Color(color["r"], color["g"], color["b"], color["a"] * opacity))
                         pdf_offsets.append(offset)
                     canvas.saveState()
                     canvas.clipPath(path, stroke=0, fill=1)
                     canvas.setFillAlpha(1)
                     canvas.linearGradient(
-                        float(fill_gradient.get("x1")),
-                        float(fill_gradient.get("y1")),
-                        float(fill_gradient.get("x2")),
-                        float(fill_gradient.get("y2")),
+                        as_float(fill_gradient.get("x1")),
+                        as_float(fill_gradient.get("y1")),
+                        as_float(fill_gradient.get("x2")),
+                        as_float(fill_gradient.get("y2")),
                         pdf_colors,
                         pdf_offsets,
                         )
@@ -323,13 +324,13 @@ def render(svg, canvas):
                 if stroke is not None:
                     set_stroke_color(canvas, stroke)
 
-                cx = float(element.get("cx", 0))
-                cy = float(element.get("cy", 0))
-                r = float(element.get("r"))
+                cx = as_float(element.get("cx", 0))
+                cy = as_float(element.get("cy", 0))
+                r = as_float(element.get("r"))
                 canvas.circle(cx, cy, r, stroke=stroke is not None, fill=fill is not None)
             elif element.tag == "text":
-                x = float(element.get("x", 0))
-                y = float(element.get("y", 0))
+                x = as_float(element.get("x", 0))
+                y = as_float(element.get("y", 0))
                 fill, fill_gradient = get_fill(element, current_style)
                 stroke = get_stroke(current_style)
                 font_family = get_font_family(current_style)
@@ -357,10 +358,10 @@ def render(svg, canvas):
                 image = PIL.Image.open(image)
                 image = reportlab.lib.utils.ImageReader(image)
 
-                x = float(element.get("x", 0))
-                y = float(element.get("y", 0))
-                width = float(element.get("width"))
-                height = float(element.get("height"))
+                x = as_float(element.get("x", 0))
+                y = as_float(element.get("y", 0))
+                width = as_float(element.get("width"))
+                height = as_float(element.get("height"))
 
                 canvas.saveState()
                 path = canvas.beginPath()

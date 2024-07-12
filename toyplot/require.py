@@ -110,3 +110,41 @@ def filename(value):
 def hyperlink(value):
     """Raise an exception if a value isn't a valid string hyperlink, or None."""
     return optional_string(value)
+
+def as_int(value,precision=None):
+    """Raise an exception if a value cannot be converted to an int, or value 
+    coerced to a python int. precision is optional but can be 8, 16, etc."""
+
+    # Try simple conversion; if this fails, move on
+    try:
+        return int(value,precision)
+    except ValueError:
+        pass
+
+    # If simple conversion failed, try to parse as a np.int64(value) string
+    try:
+        return int(value.split("(")[-1].split(")")[0],precision)
+    except Exception as e:
+        err = f"'{value}' could not be converted to a float."
+        raise ValueError(err) from e
+
+
+def as_float(value):
+    """Raise an exception if a value cannot be converted to a float, or value 
+    coerced to a python float."""
+
+    # Try simple conversion; if this fails, move on
+    try:
+        return float(value)
+    except ValueError:
+        pass
+
+    # If simple conversion failed, try to parse as a np.float64(value) string
+    try:
+        return float(value.split("(")[-1].split(")")[0])
+    except Exception as e:
+        err = f"'{value}' could not be converted to a float."
+        raise ValueError(err) from e
+                
+
+            

@@ -8,6 +8,7 @@
 
 import numbers
 import re
+from toyplot.require import as_float
 
 def convert(value, target, default=None, reference=None):
     """Convert quantities using real-world units.
@@ -49,7 +50,7 @@ def convert(value, target, default=None, reference=None):
         if value == "0":
             return 0
         value, units = re.match(r"([^a-zA-Z%]+)([a-zA-Z%]+)\Z", value).groups()
-        value = (float(value), units)
+        value = (as_float(value), units)
 
     if not isinstance(value, tuple):
         raise ValueError("Value must be a number, string or (number, string) tuple.")

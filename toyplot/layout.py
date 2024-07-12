@@ -12,6 +12,7 @@ import custom_inherit
 import numpy
 
 import toyplot.units
+from toyplot.require import as_float
 
 def region(
         xmin,
@@ -70,8 +71,8 @@ def region(
         value = toyplot.units.convert(
             value, "px", default="px", reference=vmax - vmin)
         if value < 0:
-            return float(vmax + value)
-        return float(vmin + value)
+            return as_float(vmax + value)
+        return as_float(vmin + value)
 
     # Specify explicit bounds for the region
     if bounds is not None:

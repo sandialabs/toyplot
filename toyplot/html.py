@@ -457,9 +457,9 @@ def _draw_text(
 
     transform = ""
     if x or y:
-        transform += "translate(%r,%r)" % (x, y)
+        transform += "translate(%s,%s)" % (x, y)
     if angle:
-        transform += "rotate(%r)" % (-angle) # pylint: disable=invalid-unary-operand-type
+        transform += "rotate(%s)" % (-angle) # pylint: disable=invalid-unary-operand-type
 
     group = xml.SubElement(
         root,
@@ -618,7 +618,7 @@ def _draw_bar(parent_xml, size, angle=0):
         y2=str(size / 2),
         )
     if angle:
-        markup.set("transform", "rotate(%r)" % (-angle,))
+        markup.set("transform", "rotate(%s)" % (-angle,))
 
 
 def _draw_rect(parent_xml, size, width=1, height=1, angle=0):
@@ -631,21 +631,21 @@ def _draw_rect(parent_xml, size, width=1, height=1, angle=0):
         height=str(size * height),
         )
     if angle:
-        markup.set("transform", "rotate(%r)" % (-angle,))
+        markup.set("transform", "rotate(%s)" % (-angle,))
 
 
 def _draw_triangle(parent_xml, size, angle=0):
     markup = xml.SubElement(
         parent_xml,
         "polygon",
-        points=" ".join(["%r,%r" % (xp, yp) for xp, yp in [
+        points=" ".join(["%s,%s" % (xp, yp) for xp, yp in [
            (-size / 2, size / 2),
            (0, -size / 2),
            (size / 2, size / 2),
            ]]),
         )
     if angle:
-        markup.set("transform", "rotate(%r)" % (-angle,))
+        markup.set("transform", "rotate(%s)" % (-angle,))
 
 
 def _draw_circle(parent_xml, size):
@@ -673,9 +673,9 @@ def _draw_marker(
         xml.SubElement(marker_xml, "title").text = str(title)
 
     if transform is None:
-        transform = "translate(%r, %r)" % (cx, cy)
+        transform = "translate(%s, %s)" % (cx, cy)
         if marker.angle:
-            transform += " rotate(%r)" % (-marker.angle,)
+            transform += " rotate(%s)" % (-marker.angle,)
     marker_xml.set("transform", transform)
 
     if marker.shape == "|":
@@ -750,7 +750,7 @@ def _draw_marker(
                 {
                     "-toyplot-vertical-align": "middle",
                     "fill": toyplot.color.black,
-                    "font-size": "%rpx" % (marker.size * 0.75),
+                    "font-size": "%spx" % (marker.size * 0.75),
                     "stroke": "none",
                     "text-anchor": "middle",
                 },
@@ -794,9 +794,9 @@ def _render(canvas, context):
             "xmlns:toyplot": "http://www.sandia.gov/toyplot",
             "xmlns:xlink": "http://www.w3.org/1999/xlink",
             },
-        width="%rpx" % canvas.width,
-        height="%rpx" % canvas.height,
-        viewBox="0 0 %r %r" % (canvas.width, canvas.height),
+        width="%spx" % canvas.width,
+        height="%spx" % canvas.height,
+        viewBox="0 0 %s %s" % (canvas.width, canvas.height),
         preserveAspectRatio="xMidYMid meet",
         style=_css_style(canvas._style),
         id=context.get_id(canvas))
@@ -2176,7 +2176,7 @@ def _render(axes, mark, context):
                     numpy.concatenate((boundary1[segment], boundary2[segment][::-1])),
                     numpy.concatenate((position[segment], position[segment][::-1])))
             series_xml = xml.SubElement(mark_xml, "polygon", points=" ".join(
-                ["%r,%r" % (xi, yi) for xi, yi in coordinates]), style=_css_style(series_style))
+                ["%s,%s" % (xi, yi) for xi, yi in coordinates]), style=_css_style(series_style))
             if title is not None:
                 xml.SubElement(series_xml, "title").text = str(title)
 
@@ -2222,7 +2222,7 @@ def _render(axes, mark, context):
                     numpy.concatenate((boundary1[segment], boundary2[segment][::-1])),
                     numpy.concatenate((position[segment], position[segment][::-1])))
             series_xml = xml.SubElement(mark_xml, "polygon", points=" ".join(
-                ["%r,%r" % (xi, yi) for xi, yi in coordinates]), style=_css_style(series_style))
+                ["%s,%s" % (xi, yi) for xi, yi in coordinates]), style=_css_style(series_style))
             if title is not None:
                 xml.SubElement(series_xml, "title").text = str(title)
 
@@ -2319,7 +2319,7 @@ def _render(axes, mark, context):
         x = axes.project("x", dx + p[:,0])
         y = axes.project("y", dy + p[:,1])
 
-        points = ["%r,%r" % point for point in zip(x, y)]
+        points = ["%s,%s" % point for point in zip(x, y)]
 
         datum_xml = xml.SubElement(
             series_xml,
@@ -2500,16 +2500,16 @@ def _render(axes, mark, context): # pragma: no cover
                 edge_coordinates[estart+1][0] - edge_coordinates[estart][0],
                 ))
 
-            transform = "translate(%r, %r)" % (edge_coordinates[estart][0], edge_coordinates[estart][1])
+            transform = "translate(%s, %s)" % (edge_coordinates[estart][0], edge_coordinates[estart][1])
             if edge_angle:
-                transform += " rotate(%r)" % (-edge_angle,)
-            transform += " translate(%r, 0)" % (marker.size / 2,)
+                transform += " rotate(%s)" % (-edge_angle,)
+            transform += " translate(%s, 0)" % (marker.size / 2,)
             if marker.angle is not None:
                 if isinstance(marker.angle, str) and marker.angle[0:1] == "r":
                     angle = as_float(marker.angle[1:])
                 else:
                     angle = -edge_angle + as_float(marker.angle)
-                transform += " rotate(%r)" % (-angle,)
+                transform += " rotate(%s)" % (-angle,)
 
 
             _draw_marker(
@@ -2572,16 +2572,16 @@ def _render(axes, mark, context): # pragma: no cover
                 edge_coordinates[end-1][0] - edge_coordinates[end-2][0],
                 ))
 
-            transform = "translate(%r, %r)" % (edge_coordinates[end-1][0], edge_coordinates[end-1][1])
+            transform = "translate(%s, %s)" % (edge_coordinates[end-1][0], edge_coordinates[end-1][1])
             if edge_angle:
-                transform += " rotate(%r)" % (-edge_angle,)
-            transform += " translate(%r, 0)" % (-marker.size / 2,)
+                transform += " rotate(%s)" % (-edge_angle,)
+            transform += " translate(%s, 0)" % (-marker.size / 2,)
             if marker.angle is not None:
                 if isinstance(marker.angle, str) and marker.angle[0:1] == "r":
                     angle = as_float(marker.angle[1:])
                 else:
                     angle = -edge_angle + as_float(marker.angle)
-                transform += " rotate(%r)" % (-angle,)
+                transform += " rotate(%s)" % (-angle,)
 
 
             _draw_marker(
@@ -2682,9 +2682,9 @@ def _render(axes, mark, context):
         for segment in segments:
             start, stop, step = segment.indices(len(not_null))
             for i in range(start, start + 1):
-                d.append("M %r %r" % (x[i], y[i]))
+                d.append("M %s %s" % (x[i], y[i]))
             for i in range(start + 1, stop):
-                d.append("L %r %r" % (x[i], y[i]))
+                d.append("L %s %s" % (x[i], y[i]))
         xml.SubElement(
             series_xml,
             "path",

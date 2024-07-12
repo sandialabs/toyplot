@@ -112,7 +112,7 @@ def hyperlink(value):
     return optional_string(value)
 
 def as_int(value,precision=None):
-    """Raise an exception of a value cannot be converted to an int, or value 
+    """Raise an exception if a value cannot be converted to an int, or value 
     coerced to a python int. precision is optional but can be 8, 16, etc."""
 
     # Try simple conversion; if this fails, move on
@@ -130,7 +130,7 @@ def as_int(value,precision=None):
 
 
 def as_float(value):
-    """Raise an exception of a value cannot be converted to a float, or value 
+    """Raise an exception if a value cannot be converted to a float, or value 
     coerced to a python float."""
 
     # Try simple conversion; if this fails, move on

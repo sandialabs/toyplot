@@ -7,6 +7,14 @@
 Release Notes
 =============
 
+Toyplot 2.0.0 - September 23rd, 2024
+------------------------------------
+
+* Added support for Numpy 2 - thanks to @harmssm!
+* Removed all animation-related functionality.
+* Switched to modern Python packaging tools.
+* Added Python 3.11 and 3.12 testing.
+
 Toyplot 1.0.3 - October 12th, 2022
 ----------------------------------
 

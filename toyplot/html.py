@@ -1041,10 +1041,7 @@ def _render_javascript(context):
                 search(requirement, visited, modules)
 
     # Generate the code.
-    script = """(function()
-{
-var modules={};
-"""
+    script = """(function()\n{\nvar modules={};\n"""
 
     # Initialize required modules.
     for name, (requirements, factory, value) in modules:
@@ -1072,6 +1069,22 @@ var modules={};
         script += """);\n"""
 
     script += """})();"""
+
+    # Security Hardening (Issue #218):
+    # Inline <script> blocks terminate when the HTML parser encounters the literal
+    # sequence </script>, even if it occurs inside a JavaScript string literal.
+    # User-controlled data funneled through json.dumps() could therefore inject
+    # arbitrary script by embedding </script><script>evil()</script>.
+    #
+    # Mitigation: escape every occurrence of </script> inside the script payload
+    # before inserting it into the DOM. The conventional safe form is <\/script>,
+    # which the JavaScript engine interprets the same, while the HTML parser does
+    # not treat it as an end tag.
+    #
+    # Note: We intentionally perform a plain string replacement across the entire
+    # script text. This is safe because it only increases escaping and does not
+    # alter runtime semantics. Future refactors may move to a data + loader model.
+    script = script.replace("</script>", "<\\/script>")
 
     # Create the DOM elements.
     xml.SubElement(context.parent, "script").text = script

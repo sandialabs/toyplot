@@ -188,6 +188,63 @@ def _create_projection(scale, domain_min, domain_max, range_min, range_max):
     return toyplot.projection.log(base, domain_min, domain_max, range_min, range_max)
 
 
+# Internal helper constants for Cartesian extent convergence.
+_CARTESIAN_FINALIZE_MAX_ITER = 6
+_CARTESIAN_FINALIZE_PX_TOL = 0.05
+
+
+def _cartesian_reset_expand_cache(axes):
+    axes._expand_domain_range_x = None
+    axes._expand_domain_range_y = None
+    axes._expand_domain_range_left = None
+    axes._expand_domain_range_right = None
+    axes._expand_domain_range_top = None
+    axes._expand_domain_range_bottom = None
+
+
+def _cartesian_projected_domain_tuple(axes):
+    xmin, xmax = axes._x_projection.inverse([axes._xmin_range, axes._xmax_range])
+    ymax, ymin = axes._y_projection.inverse([axes._ymax_range, axes._ymin_range])
+    return float(xmin), float(xmax), float(ymin), float(ymax)
+
+
+def _cartesian_max_extent_overflow_px(axes):
+    worst = 0.0
+
+    def _safe_max(values):
+        values = numpy.asarray(values)
+        if values.size == 0:
+            return 0.0
+        return float(numpy.max(values))
+
+    if axes._expand_domain_range_x is not None:
+        x_values = numpy.asarray(axes._expand_domain_range_x)
+        if x_values.size:
+            range_x = axes._x_projection(x_values)
+            over_right = _safe_max(
+                range_x + numpy.asarray(axes._expand_domain_range_right) - axes._xmax_range
+            )
+            over_left = _safe_max(
+                axes._xmin_range - (range_x + numpy.asarray(axes._expand_domain_range_left))
+            )
+            worst = max(worst, float(max(0.0, over_right)), float(max(0.0, over_left)))
+
+    if axes._expand_domain_range_y is not None:
+        y_values = numpy.asarray(axes._expand_domain_range_y)
+        if y_values.size:
+            range_y = axes._y_projection(y_values)
+            # Screen-space y increases downward: ymin_range is top, ymax_range is bottom.
+            over_top = _safe_max(
+                axes._ymin_range - (range_y + numpy.asarray(axes._expand_domain_range_top))
+            )
+            over_bottom = _safe_max(
+                (range_y + numpy.asarray(axes._expand_domain_range_bottom)) - axes._ymax_range
+            )
+            worst = max(worst, float(max(0.0, over_top)), float(max(0.0, over_bottom)))
+
+    return worst
+
+
 ##########################################################################
 # Axis
 
@@ -801,7 +858,7 @@ class Cartesian(object):
         self._ymax_range = value
     ymax_range = property(fset=_set_ymax_range)
 
-    def _finalize(self):
+    def _finalize_once(self):
         if self._finalized is None:
             # Begin with the implicit domain defined by our children.
             for child in self._scenegraph.targets(self.x, "map"):
@@ -1061,6 +1118,46 @@ class Cartesian(object):
         elif axis == "y":
             return self._y_projection(values)
         raise ValueError("Unexpected axis: %s" % axis)
+
+    def _finalize(self):
+        if self._finalized is not None:
+            return self._finalized
+
+        display_domain = (
+            self.x._display_min,
+            self.x._display_max,
+            self.y._display_min,
+            self.y._display_max,
+            )
+
+        _cartesian_reset_expand_cache(self)
+        self._finalized = None
+        self._finalize_once()
+
+        needs_x = self._expand_domain_range_x is not None
+        needs_y = self._expand_domain_range_y is not None
+        if needs_x or needs_y:
+            overflow = _cartesian_max_extent_overflow_px(self)
+            if overflow > _CARTESIAN_FINALIZE_PX_TOL:
+                previous_domain = _cartesian_projected_domain_tuple(self)
+                for idx in range(1, _CARTESIAN_FINALIZE_MAX_ITER):
+                    _cartesian_reset_expand_cache(self)
+                    self.x._display_min, self.x._display_max = previous_domain[0], previous_domain[1]
+                    self.y._display_min, self.y._display_max = previous_domain[2], previous_domain[3]
+
+                    self._finalized = None
+                    self._finalize_once()
+                    overflow = _cartesian_max_extent_overflow_px(self)
+                    if overflow <= _CARTESIAN_FINALIZE_PX_TOL:
+                        break
+
+                    previous_domain = _cartesian_projected_domain_tuple(self)
+                    if idx < (_CARTESIAN_FINALIZE_MAX_ITER - 1):
+                        self._finalized = None
+
+        self.x._display_min, self.x._display_max = display_domain[0], display_domain[1]
+        self.y._display_min, self.y._display_max = display_domain[2], display_domain[3]
+        return self._finalized
 
     def add_mark(self, mark):
         """Add a mark to the axes.

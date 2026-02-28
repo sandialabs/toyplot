@@ -190,7 +190,7 @@ def _create_projection(scale, domain_min, domain_max, range_min, range_max):
 
 # Internal helper constants for Cartesian extent convergence.
 _CARTESIAN_FINALIZE_MAX_ITER = 6
-_CARTESIAN_FINALIZE_PX_TOL = 0.05
+_CARTESIAN_FINALIZE_PX_TOL = 0.5
 
 
 def _cartesian_reset_expand_cache(axes):

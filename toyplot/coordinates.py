@@ -591,7 +591,7 @@ class Axis(object):
             self._label_offset = self.label.offset if self.label.offset is not None else 22
             self._interactive_coordinates_location = self.interactive.coordinates.location if self.interactive.coordinates.location is not None else _opposite_location(self._tick_labels_location)
 
-            endpoints = numpy.row_stack(((x1, y1), (x2, y2)))
+            endpoints = numpy.vstack(((x1, y1), (x2, y2)))
             length = numpy.linalg.norm(endpoints[1] - endpoints[0])
             self.projection = _create_projection(
                 scale=self.scale,

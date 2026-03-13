@@ -84,3 +84,10 @@ Feature: Cartesian coordinates
             | axes-palettes | axes-palettes |
             | axes-tick-titles | axes-tick-titles |
 
+
+
+    Scenario: Unreachable text extent uses bounded fallback iterations
+        Given a default canvas
+        And a set of cartesian axes
+        And an unreachable cartesian text extent case
+        Then cartesian finalize should stop at max iterations with remaining overflow

@@ -379,3 +379,53 @@ def step_impl(context):
     context.axes.y.ticks.locator = toyplot.locator.Explicit(locations=[-0.5, 0, 0.5], titles=["Red", "Green", "Blue"])
 
 
+
+
+@given(u'an unreachable cartesian text extent case')
+def step_impl(context):
+    import types
+    import toyplot.html
+
+    # Small drawable range and very long text can make the overflow
+    # tolerance mathematically unreachable. In this case finalize should
+    # terminate using max iterations and allow remaining overflow.
+    context.canvas = toyplot.Canvas(width=220, height=220)
+    context.axes = context.canvas.cartesian(margin=45)
+    rng = numpy.random.default_rng(123)
+    context.axes.scatterplot(rng.random(30), rng.random(30))
+
+    context._finalize_passes = 0
+    original_finalize_once = context.axes._finalize_once
+
+    def counted_finalize_once(this):
+        context._finalize_passes += 1
+        return original_finalize_once()
+
+    context.axes._finalize_once = types.MethodType(counted_finalize_once, context.axes)
+
+    context._text_mark = context.axes.text(
+        0.5,
+        0.5,
+        "W" * 350,
+        style={"font-size": "42px", "text-anchor": "middle"},
+        annotation=False,
+    )
+    toyplot.html.render(context.canvas)
+
+    (xdat, ydat), (left, right, top, bottom) = context._text_mark.extents(["x", "y"])
+    xpos = context.axes.project("x", xdat)
+    ypos = context.axes.project("y", ydat)
+    over_right = float((xpos + right)[0] - context.axes._xmax_range)
+    over_left = float(context.axes._xmin_range - (xpos + left)[0])
+    over_top = float(context.axes._ymin_range - (ypos + top)[0])
+    over_bottom = float((ypos + bottom)[0] - context.axes._ymax_range)
+    context._max_overflow = max(over_right, over_left, over_top, over_bottom, 0.0)
+
+
+@then(u'cartesian finalize should stop at max iterations with remaining overflow')
+def step_impl(context):
+    test.assert_true(context._finalize_passes <= toyplot.coordinates._CARTESIAN_FINALIZE_MAX_ITER)
+    test.assert_true(
+        context._max_overflow > toyplot.coordinates._CARTESIAN_FINALIZE_PX_TOL,
+        msg=f"Expected remaining overflow > tolerance, got {context._max_overflow}",
+    )

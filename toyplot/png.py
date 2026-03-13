@@ -46,39 +46,3 @@ def render(canvas, fobj=None, width=None, height=None, scale=None):
     return implementation.render(canvas, fobj, width, height, scale)
 
 
-def render_frames(canvas, width=None, height=None, scale=None):
-    """Render a canvas as a sequence of PNG images.
-
-    By default, canvas dimensions in CSS pixels are mapped directly to pixels in
-    the output PNG images.  Use one of `width`, `height`, or `scale` to override
-    this behavior.
-
-    Parameters
-    ----------
-    canvas: :class:`toyplot.canvas.Canvas`
-      Canvas to be rendered.
-    width: number, optional
-      Specify the width of the output image in pixels.
-    height: number, optional
-      Specify the height of the output image in pixels.
-    scale: number, optional
-      Ratio of output image pixels to `canvas` pixels.
-
-    Returns
-    -------
-    frames: Sequence of :class:`bytes` objects containing PNG image data.
-      The caller must iterate over the returned frames and is responsible for all
-      subsequent processing, including disk I/O, video compression, etc.
-
-    Notes
-    -----
-    The output PNG images are rendered using
-    :func:`toyplot.reportlab.png.render_frames()`.  This is subject to change.
-
-    Examples
-    --------
-    >>> for frame, png in enumerate(toyplot.png.render_frames(canvas)):
-    ...   open("frame-%s.png" % frame, "wb").write(png)
-    """
-    canvas = toyplot.require.instance(canvas, toyplot.canvas.Canvas)
-    return implementation.render_frames(canvas, width, height, scale)

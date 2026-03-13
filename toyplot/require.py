@@ -8,6 +8,7 @@
 
 import numbers
 import numpy
+from urllib.parse import urlparse
 
 def instance(value, types):
     """Raise an exception if a value isn't one of the given type(s)."""
@@ -107,9 +108,24 @@ def filename(value):
     return optional_string(value)
 
 
+_ALLOWED_URI_SCHEMES = {"", "http", "https", "mailto", "ftp"}
+
 def hyperlink(value):
-    """Raise an exception if a value isn't a valid string hyperlink, or None."""
-    return optional_string(value)
+    """
+    Raise an exception if a value isn't a valid string hyperlink, or None.
+    Only allows safe URI schemes: http, https, mailto, ftp, or relative URLs (no scheme).
+    """
+    value = optional_string(value)
+    if value is None:
+        return value
+    value = value.strip()
+    if not value:
+        return value
+    parsed = urlparse(value)
+    scheme = parsed.scheme.lower()
+    if scheme not in _ALLOWED_URI_SCHEMES:
+        raise ValueError(f"Disallowed URI scheme: {parsed.scheme}")
+    return value
 
 def as_int(value,precision=None):
     """Raise an exception if a value cannot be converted to an int, or value 

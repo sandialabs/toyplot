@@ -7,6 +7,8 @@
 
 
 import io
+import os
+import shutil
 import subprocess
 
 from packaging.version import Version
@@ -20,14 +22,17 @@ import toyplot.svg
 _gs_command = None
 _gs_version = None
 for command in ["gs", "gswin64c", "gswin32c"]:
-    try:
-        _gs_version = subprocess.check_output([command, "--version"]).decode(encoding="utf-8").strip()
-        _gs_command = command
-    except:
-        pass
+    path = shutil.which(command)
+    if path:
+        _gs_command = os.path.realpath(path)
+        try:
+            _gs_version = subprocess.check_output([_gs_command, "--version"]).decode(encoding="utf-8").strip()
+        except subprocess.CalledProcessError:
+            continue
+        break
 
 if _gs_command is None:
-    raise Exception("A ghostscript executable is required.")  # pragma: no cover
+    raise EnvironmentError("A ghostscript executable is required.")  # pragma: no cover
 
 if Version(_gs_version) >= Version("9.14"):
     _gs_resolution = ["-r%s" % (96 * 4), "-dDownScaleFactor=4"]
@@ -150,13 +155,14 @@ def render_frames(canvas, width=None, height=None, scale=None):
         surface.save()
 
         command = [
-            "gs",
+            _gs_command,
+            "-dSAFER",
             "-dNOPAUSE",
             "-dBATCH",
             "-dQUIET",
             "-dMaxBitmap=2147483647",
             "-sDEVICE=pngalpha",
-            "-r%s" % 96,
+            ] + _gs_resolution + [
             "-sOutputFile=-",
             "-",
             ]

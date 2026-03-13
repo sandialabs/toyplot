@@ -32,6 +32,9 @@ jobs:
       run: |
         coverage run --source toyplot -m behave --tags=~wip --logging-level INFO --no-logcapture
         coverage report
+    - name: Run unit tests
+      run: |
+        ./tests/run_tests.sh
     - name: Upload coverage to Coveralls
       run: coveralls --service=github
       env:

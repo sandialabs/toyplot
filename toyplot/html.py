@@ -760,7 +760,7 @@ def _draw_marker(
 
 
 def _axis_transform(x1, y1, x2, y2, offset, return_length=False):
-    p = numpy.row_stack(((x1, y1), (x2, y2)))
+    p = numpy.vstack(((x1, y1), (x2, y2)))
     basis = p[1] - p[0]
     length = numpy.linalg.norm(basis)
     theta = numpy.rad2deg(numpy.arctan2(basis[1], basis[0]))

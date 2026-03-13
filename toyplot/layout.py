@@ -286,8 +286,8 @@ def graph(a, b=None, c=None, olayout=None, layout=None, vcoordinates=None):
     # If the caller supplied the layout for an external graph, merge those coordinates in.
     if olayout is not None:
         olayout = toyplot.require.instance(olayout, (toyplot.mark.Graph, toyplot.layout.Graph))
-        oindices = numpy.in1d(olayout.vids, vids, assume_unique=True)
-        iindices = numpy.in1d(vids, olayout.vids, assume_unique=True)
+        oindices = numpy.isin(olayout.vids, vids, assume_unique=True)
+        iindices = numpy.isin(vids, olayout.vids, assume_unique=True)
         ivcoordinates[iindices] = olayout.vcoordinates[oindices]
 
     # If the caller supplied extra vertex coordinates, merge them in.

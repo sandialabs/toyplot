@@ -131,6 +131,23 @@ def render(svg, canvas):
         canvas.setStrokeColorRGB(color["r"], color["g"], color["b"])
         canvas.setStrokeAlpha(color["a"].item())
 
+    def draw_svg_path(path, commands):
+        while commands:
+            command = commands.pop(0)
+            if command == "L":
+                path.lineTo(
+                    as_float(commands.pop(0)), as_float(commands.pop(0)))
+            elif command == "M":
+                path.moveTo(
+                    as_float(commands.pop(0)), as_float(commands.pop(0)))
+            elif command == "C":
+                path.curveTo(
+                    as_float(commands.pop(0)), as_float(commands.pop(0)),
+                    as_float(commands.pop(0)), as_float(commands.pop(0)),
+                    as_float(commands.pop(0)), as_float(commands.pop(0)))
+            elif command in ["Z", "z"]:
+                path.close()
+
     def render_element(root, element, canvas, styles):
         canvas.saveState()
 
@@ -243,15 +260,7 @@ def render(svg, canvas):
                     set_stroke_color(canvas, stroke)
                     canvas.setLineCap(get_line_cap(current_style))
                     path = canvas.beginPath()
-                    commands = element.get("d").split()
-                    while commands:
-                        command = commands.pop(0)
-                        if command == "L":
-                            path.lineTo(
-                                as_float(commands.pop(0)), as_float(commands.pop(0)))
-                        elif command == "M":
-                            path.moveTo(
-                                as_float(commands.pop(0)), as_float(commands.pop(0)))
+                    draw_svg_path(path, element.get("d").split())
                     canvas.drawPath(path)
             elif element.tag == "polygon":
                 fill, fill_gradient = get_fill(root, current_style)

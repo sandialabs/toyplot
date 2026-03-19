@@ -91,3 +91,9 @@ Feature: Cartesian coordinates
         And a set of cartesian axes
         And an unreachable cartesian text extent case
         Then cartesian finalize should stop at max iterations with remaining overflow
+
+    Scenario: Scatterplot markers with empty and label-only values do not break cartesian finalize
+        Given a default canvas
+        And a set of cartesian axes
+        And a scatterplot marker extent edge case
+        Then cartesian finalize should render without point extent errors

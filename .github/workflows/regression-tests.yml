@@ -21,13 +21,16 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        cache: pip
     - name: Install Dependencies
       run: |
-        sudo apt-get install ffmpeg ghostscript
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends ffmpeg ghostscript
         python -m pip install --upgrade pip
-        pip install coveralls
-        pip install "${{ matrix.numpy-version }}"
-        pip install .[all]
+        python -m pip install coveralls
+        python -m pip install nbformat
+        python -m pip install "${{ matrix.numpy-version }}"
+        python -m pip install "./[all]"
     - name: Run tests
       run: |
         coverage run --source toyplot -m behave --tags=~wip --logging-level INFO --no-logcapture
@@ -37,10 +40,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Archive failed tests
-      if: ${{ always() }}
+      if: ${{ failure() }}
       uses: actions/upload-artifact@v4
       with:
-        name: failed
+        name: failed-tests-${{ matrix.python-version }}
         path: features/failed
         if-no-files-found: ignore
-

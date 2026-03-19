@@ -7,6 +7,16 @@
 Release Notes
 =============
 
+Toyplot 2.1.0 - March 19th, 2026
+--------------------------------
+
+* Toyplot requires Numpy >= 2.0.0, consequently Python 3.8 is no longer supported.
+* Added support for Python 3.13 and 3.14.
+* Added `toyplot.hou` module providing integration with SideFX Houdini, https://sidefx.com.
+* Removed deprecated `numpy.row_stack` calls - thanks to @harmsm!
+* Added support for cubic paths in rendered outputs - thanks to @eaton-lab!
+* Numerous fixes for problems with markers, styles and extents, ensuring data never gets clipped - thanks to @eaton-lab!
+
 Toyplot 2.0.0 - September 23rd, 2024
 ------------------------------------
 

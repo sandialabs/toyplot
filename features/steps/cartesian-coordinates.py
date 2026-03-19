@@ -4,8 +4,14 @@
 
 from behave import *
 
+import xml.etree.ElementTree as xml
+
 import numpy
+import toyplot
+import toyplot.coordinates
 import toyplot.data
+import toyplot.html
+import toyplot.marker
 
 import test
 import testing
@@ -429,3 +435,30 @@ def step_impl(context):
         context._max_overflow > toyplot.coordinates._CARTESIAN_FINALIZE_PX_TOL,
         msg=f"Expected remaining overflow > tolerance, got {context._max_overflow}",
     )
+
+
+@given(u'a scatterplot marker extent edge case')
+def step_impl(context):
+    marker_style = {"stroke": toyplot.color.black, "fill": "cornsilk"}
+    label_style = {"stroke": "none", "fill": toyplot.color.black}
+    markers = [
+        None,
+        "",
+        toyplot.marker.create(shape="", label="A"),
+        toyplot.marker.create(shape="o", label="1"),
+        toyplot.marker.create(shape="s", label="B"),
+    ]
+    context.axes.scatterplot(
+        numpy.arange(len(markers)),
+        color="steelblue",
+        marker=markers,
+        size=10,
+        mstyle=marker_style,
+        mlstyle=label_style,
+    )
+
+
+@then(u'cartesian finalize should render without point extent errors')
+def step_impl(context):
+    html = toyplot.html.render(context.canvas)
+    test.assert_is_instance(html, xml.Element)

@@ -14,6 +14,8 @@ import numpy
 import toyplot.color
 import toyplot.marker
 import toyplot.require
+import toyplot.style
+import toyplot.text
 
 
 log = logging.getLogger(__name__)
@@ -844,38 +846,133 @@ class Point(Mark):
         # iterate over entered axes (e.g., ['x', 'y']) if exists for Mark
         assert all(i in self._coordinate_axes for i in axes)
 
-        # get coordinates of 'x' 'y' from potentially ['x', 'y0', 'x', 'y1', ... etc]
         axis_map = {key: index for index, key in enumerate(self._coordinate_axes)}
-        coords = tuple([self._table[self._coordinates[axis_map[axis]]] for axis in axes])
+        dimensions = len(self._coordinate_axes)
+        series_count = len(self._coordinates) // dimensions
 
-        # get empty extents arrays to be filled below.
-        xext = numpy.zeros(coords[0].size)
-        yext = numpy.zeros(coords[0].size)
+        def datum_marker_extents(marker):
+            size = 0.0 if marker.size is None else toyplot.require.as_float(marker.size)
+            left = right = top = bottom = 0.0
 
-        # extents requires marker shape (rect or not), size, and stroke-width
-        _mstyle = {} if self._mstyle is None else self._mstyle
-        stroke_width = _mstyle.get("stroke-width", 0)
-        iterdata = zip(
-            range(coords[0].size),
-            self._table[self._marker[0]],
-            self._table[self._msize[0]],
+            if marker.shape:
+                width, height = 1.0, 1.0
+                if marker.shape[0] == "r":
+                    width, height = (
+                        toyplot.require.as_float(value)
+                        for value in marker.shape[1:].split("x")
+                    )
+                stroke_width = 0.0
+                if marker.mstyle is not None:
+                    stroke_width = toyplot.require.as_float(
+                        marker.mstyle.get("stroke-width", 0)
+                    )
+                xextent = (width * size) / 2 + stroke_width
+                yextent = (height * size) / 2 + stroke_width
+                left = -xextent
+                right = xextent
+                top = -yextent
+                bottom = yextent
+
+            if marker.label:
+                label_style = toyplot.style.combine(
+                    {
+                        "-toyplot-vertical-align": "middle",
+                        "fill": toyplot.color.black,
+                        "font-size": "%spx" % (size * 0.75),
+                        "stroke": "none",
+                        "text-anchor": "middle",
+                    },
+                    marker.lstyle,
+                )
+                label_left, label_right, label_top, label_bottom = toyplot.text.extents(
+                    [str(marker.label)],
+                    [0 if marker.angle is None else marker.angle],
+                    label_style,
+                )
+                label_left = float(label_left[0])
+                label_right = float(label_right[0])
+                label_top = float(label_top[0])
+                label_bottom = float(label_bottom[0])
+
+                if marker.shape:
+                    left = min(left, label_left)
+                    right = max(right, label_right)
+                    top = min(top, label_top)
+                    bottom = max(bottom, label_bottom)
+                else:
+                    left = label_left
+                    right = label_right
+                    top = label_top
+                    bottom = label_bottom
+
+            return left, right, top, bottom
+
+        coord_parts = [[] for axis in axes]
+        left_parts = []
+        right_parts = []
+        top_parts = []
+        bottom_parts = []
+
+        for series_index in range(series_count):
+            series_coordinates = self._coordinates[
+                series_index * dimensions:(series_index + 1) * dimensions
+            ]
+            series_coords = [
+                self._table[series_coordinates[axis_map[axis]]] for axis in axes
+            ]
+            count = series_coords[0].size
+
+            for index, values in enumerate(series_coords):
+                coord_parts[index].append(values)
+
+            left = numpy.zeros(count)
+            right = numpy.zeros(count)
+            top = numpy.zeros(count)
+            bottom = numpy.zeros(count)
+
+            iterdata = zip(
+                range(count),
+                self._table[self._marker[series_index]],
+                self._table[self._msize[series_index]],
+                self._table[self._mfill[series_index]],
+                self._table[self._mstroke[series_index]],
+                self._table[self._mopacity[series_index]],
+            )
+
+            # Mirror _draw_marker(): falsey markers render nothing, while
+            # label-only Marker objects contribute text extents only.
+            for idx, dmarker, dsize, dfill, dstroke, dopacity in iterdata:
+                if not dmarker:
+                    continue
+
+                dstyle = toyplot.style.combine(
+                    {
+                        "fill": toyplot.color.to_css(dfill),
+                        "stroke": toyplot.color.to_css(dstroke),
+                        "opacity": dopacity,
+                    },
+                    self._mstyle,
+                )
+                marker = (
+                    toyplot.marker.create(size=dsize, mstyle=dstyle, lstyle=self._mlstyle)
+                    + toyplot.marker.convert(dmarker)
+                )
+                left[idx], right[idx], top[idx], bottom[idx] = datum_marker_extents(marker)
+
+            left_parts.append(left)
+            right_parts.append(right)
+            top_parts.append(top)
+            bottom_parts.append(bottom)
+
+        coords = tuple(
+            numpy.concatenate(parts) if parts else numpy.array([])
+            for parts in coord_parts
         )
-
-        # fill extents (left, right, top, bottom) for each marker
-        for idx, shape, size in iterdata:
-
-            # if 'r2x1' then width is 2X height
-            if shape[0] == "r":
-                width, height = (int(i) for i in shape[1:].split("x"))
-            else:
-                width, height = 1, 1
-
-            # extent is half of size diameter, stroke is already half
-            xext[idx] = (width * size) / 2 + stroke_width
-            yext[idx] = (height * size) / 2 + stroke_width
-
-        # return is usually parsed: (x, y), (left, right, bottom, top) = ...
-        return coords, (-xext, xext, -yext, yext)
+        extents = tuple(
+            numpy.concatenate(parts) if parts else numpy.array([])
+            for parts in [left_parts, right_parts, top_parts, bottom_parts]
+        )
+        return coords, extents
 
     @property
     def markers(self):

@@ -10,5 +10,5 @@ Welcome to Toyplot, the kid-sized plotting toolkit for Python with grownup-sized
 
 You can see the full Toyplot documentation with tutorials at
 https://toyplot.readthedocs.io ... for questions, comments, or suggestions, get
-in touch with our team at https://gitter.im/sandialabs/toyplot.
+in touch with our team at https://github.com/sandialabs/toyplot/discussions.
 
